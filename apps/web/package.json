@@ -6,24 +6,32 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "dev:ws": "tsx watch webSockets/wsServer.ts",
+    "dev:all": "concurrently -n next,ws -c auto \"pnpm dev\" \"pnpm dev:ws\"",
     "lint": "eslint"
   },
   "dependencies": {
     "@prisma/client": "^7.2.0",
     "antd": "^6.1.4",
+    "axios": "^1.13.2",
     "next": "16.1.1",
     "next-auth": "^4.24.13",
+    "openai": "^6.16.0",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "ws": "^8.19.0"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/ws": "^8.18.1",
     "babel-plugin-react-compiler": "1.0.0",
+    "concurrently": "^9.2.1",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "prisma": "^7.2.0",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }
