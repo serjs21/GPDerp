@@ -12,6 +12,7 @@ export interface Context {
 
 export interface AgentRunOptions {
     context?: Context;
+    uid?: string;
 }
 
 
@@ -33,12 +34,22 @@ export const beerMeAnHaikuAgent = () => {
 
 return agent;
 }
+export const runHaikuAgentStream = async (
+  command: string,
+  options?: AgentRunOptions
+) => {
+  const context = options?.context ?? {
+    uid: options?.uid ?? "anonymous",
+    isProUser: true,
+  };
 
-export const runHaikuAgentStream = async (command: string, options?: AgentRunOptions ) => {
-    const context = options?.context ?? { uid: 'anonymous', isProUser: true };
-    const agent = beerMeAnHaikuAgent();
-    const result =  await run(agent, command, { context, stream: true });
-    return result.toTextStream({
-    compatibleWithNodeStreams: true,
+  const agent = beerMeAnHaikuAgent();
+
+  const streamed = await run(agent, command, {
+    ...options,
+    context,
+    stream: true,
   });
-}
+
+  return streamed.toTextStream({ compatibleWithNodeStreams: true });
+};

@@ -20,26 +20,35 @@ const resetChat = () => {
 
 const logMessage = useCallback((event: MessageEvent) => {
         try {
-            const response: {data: ResponseStreamEvent, id: string} = JSON.parse(event?.data || "{}") || {};
+            const response: {data: {delta?: string}, id: string} = JSON.parse(event?.data || "{}") || {};
 
             const { data, id } = response; 
-            const eventType = data?.type;
+            // const eventType = data?.type;
 
             setChatLogs((logs) => {
                 const updatedLogs = { ...logs };
-                if (eventType === 'response.created') {
-                    const response: Response = data?.response;
-                    const createdEpoch = response.created_at ? response.created_at * 1000 : Date.now();
+                if (!updatedLogs[id]) {
                     updatedLogs[id] = {
-                        createdAt: formatChatTime(new Date(createdEpoch)),
+                        createdAt: formatChatTime(new Date()),
                         content: '',
                     };
                 }
 
-                if (eventType === 'response.output_text.delta') {
-                    const delta = data?.delta || '';
-                    updatedLogs[id] =  {...logs[id], content: logs[id].content + delta};
-                }
+                const delta = data?.delta || '';
+                updatedLogs[id] =  {...updatedLogs[id], content: updatedLogs[id].content + delta};
+                // if (eventType === 'response.created') {
+                //     const response: Response = data?.response;
+                //     const createdEpoch = response.created_at ? response.created_at * 1000 : Date.now();
+                //     updatedLogs[id] = {
+                //         createdAt: formatChatTime(new Date(createdEpoch)),
+                //         content: '',
+                //     };
+                // }
+
+                // if (eventType === 'response.output_text.delta') {
+                //     const delta = data?.delta || '';
+                //     updatedLogs[id] =  {...logs[id], content: logs[id].content + delta};
+                // }
 
                 return updatedLogs;
             });

@@ -4,7 +4,7 @@ import { getTabId } from "./utils/tabId";
 export const TAB_HEADER_KEY = "x-tab-id";
 
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
-axios.defaults.timeout = 15_000;
+axios.defaults.timeout = 120_000;
 
 axios.defaults.headers.common["Content-Type"] = "application/json";
 axios.defaults.headers[TAB_HEADER_KEY] = getTabId();

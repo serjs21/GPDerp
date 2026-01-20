@@ -2,13 +2,13 @@ import Fastify, { FastifyRequest, FastifyReply } from "fastify";
 import multipart from '@fastify/multipart'
 import websocket from "@fastify/websocket";
 import cors from "@fastify/cors";
-import { runHaikuAgentStreamMock } from "./mocks/textStream";
-import { runHaikuAgentStream } from "./agent";
 import { env } from "./env";
 import type WebSocket from "ws";
-
-import * as sockets from "./sockets";
 import { TAB_HEADER_KEY } from "./consts/ids";
+
+import { runHaikuAgentStreamMock } from "./mocks/textStream";
+import { runHaikuAgentStream } from "./agent";
+
 
 const app = Fastify();
 
@@ -72,8 +72,14 @@ app.post<{ Body: { subject: string } }>("/beer_me_haiku", async (req, res: Fasti
   let stream: AsyncIterable<any> | null = null
 
   try {
-    // stream = await runHaikuAgentStreamMock();
-    stream = await runHaikuAgentStream(req.body.subject ||);
+    const subject = req.body?.subject || 'random morbit subject';
+    console.log(`\n\nCreating Haiku for subject - ${subject}:\n\n`);
+    // stream = await runHaikuAgentStream(req.body.subject || 'random morbit subject', {context: {
+    //   uid: req.headers?.[TAB_HEADER_KEY]?.toString() || 'anonymous',
+    //   isProUser: true,
+    // } });
+    stream = await runHaikuAgentStreamMock();
+    console.log('stream created', stream);
   } catch (e: Error | any) {
     res.code(500).send({ ok: false, error: e?.message ?? "agent start failed" });
     return
@@ -82,18 +88,29 @@ app.post<{ Body: { subject: string } }>("/beer_me_haiku", async (req, res: Fasti
 
   try {
       let text = "";
-    for await (const event of stream) {
+    // for await (const event of stream) {
       const uid = req.headers?.[TAB_HEADER_KEY]?.toString();
-
       if (!uid) console.error('No uid found in headers');
 
-        sendToUid(uid!, {data: event, id: req.id}); 
+    //     sendToUid(uid!, {data: event, id: req.id}); 
         
-      if (event.type === "response.output_text.delta") {
-        text += event.delta;
-        process.stdout.write(event.delta); // live output
-      }
+    //   if (event.type === "response.output_text.delta") {
+    //     text += event.delta;
+    //     process.stdout.write(event.delta); // live output
+    //   }
+    // }
+    if (!stream) throw new Error("No stream available");
+    
+        for await (const chunk of stream) {
+      const s = typeof chunk === "string" ? chunk : chunk.toString("utf8");
+      text += s;
+      console.log('chunk', s)
+
+      sendToUid(uid!, { data: {delta: s}, id: req.id }); // send text chunk to that tab
+      process.stdout.write(s);
     }
+
+    // sendToUid(uid, { data: "[DONE]", id: req.id });
     res.status(200).send({ ok: true });
   } catch (e: any) {
     res.code(500).send({ ok: false, error: e?.message ?? "stream failed" });

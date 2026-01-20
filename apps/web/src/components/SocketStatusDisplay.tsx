@@ -7,14 +7,10 @@ export const SocketStatusDisplay = () => {
     const { connected, chatLogs } = useHaikuSocket();
 
   return (
-    <div style={{ padding: 16 }}>
-      <div>WS: {connected ? "connected" : "disconnected"}</div>
-          <div style={{ padding: 16 }}>
-
+    <div style={{ padding: 16, width: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
        <SendHaikuAgentRequest />
-       </div>
 
-      <div style={{ marginTop: 16, padding: 8, border: "1px solid #ccc", height: 200, overflow: "auto" }}>
+      <div style={{ marginTop: 16, padding: 8, border: "1px solid #ccc", height: 200, overflow: "auto", width: "600px"}}>
     {Object.entries(chatLogs).map(([id, log]) => (
           <div key={id} style={{ marginBottom: 8 }}>
             <strong>{log.createdAt}</strong>: {log.content}
