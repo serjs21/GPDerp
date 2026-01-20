@@ -8,21 +8,14 @@ import { env } from "./env";
 import type WebSocket from "ws";
 
 import * as sockets from "./sockets";
+import { TAB_HEADER_KEY } from "./consts/ids";
 
 const app = Fastify();
 
 await app.register(cors, {
   origin: env.CORS_ORIGIN,
   methods: env.CORS_METHODS,
-  allowedHeaders: env.CORS_HEADERS,
-  credentials: env.CORS_CREDENTIALS,
-});
-
-
-console.log("CORS config:", {
-  origin: env.CORS_ORIGIN,
-  methods: env.CORS_METHODS,
-  allowedHeaders: true,
+  allowedHeaders: ["*"],
   credentials: env.CORS_CREDENTIALS,
 });
 
@@ -35,26 +28,6 @@ await app.register(multipart, {
 await app.register(websocket);
 
 app.get("/health", async () => ({ ok: true }));
-
-
-
-
-
-// app.get("/ws", { websocket: true }, (socket, req) => {
-
-//     console.log("🔥 WS connected");
-//   socket.on("message", (raw) => {
-//     const text = raw.toString();
-//     console.log("📩 MESSAGE", text);
-//   });
-
-//   socket.on("close", (code, reason) => {
-//     console.log("👋 CLOSE", code, reason.toString());
-//     app.log.info("WS disconnected");
-//   });
-// });
-
-
 
 const clients = new Map<string, Set<WebSocket>>();
 
@@ -82,25 +55,20 @@ const sendToUid = (uid: string, msg: unknown) => {
 app.get("/ws", { websocket: true }, (connection, req) => {
   const ws: WebSocket = (connection as any).socket ?? (connection as any);
 
-  const uid = req.id
+  const raw = req.headers["sec-websocket-protocol"];
+  const tabId = raw?.split('.')[1];
 
-  if (!uid) {
-    ws.close(1008, "uid required");
+  if (!tabId) {
+    ws.close(1008, "tabId required");
     return;
   }
 
-  addClient(uid, ws);
-  console.log(`🔥 WS connected: ${uid} (total clients: ${clients.size})`);
+  addClient(tabId, ws);
+  console.log(`🔥 WS connected: ${tabId} (total clients: ${clients.size})`);
 });
 
 
 app.post<{ Body: { subject: string } }>("/beer_me_haiku", async (req, res: FastifyReply) => {
-  // res.status(200)
-  // res.header("Content-Type", "text/event-stream; charset=utf-8")
-  // res.header("Cache-Control", "no-cache, no-transform")
-  // res.header("Connection", "keep-alive")
-  // ;(res as any).flushHeaders?.()
-
   let stream: AsyncIterable<any> | null = null
 
   try {
@@ -114,8 +82,14 @@ app.post<{ Body: { subject: string } }>("/beer_me_haiku", async (req, res: Fasti
   try {
       let text = "";
     for await (const event of stream) {
+      console.log('headers', req.headers)
+      const uid = req.headers?.[TAB_HEADER_KEY]?.toString();
 
-        sendToUid(req.headers?.['x-tab-id'], {data: event, id: req.id}); 
+      console.log('headers', req.headers?.[TAB_HEADER_KEY]);
+
+      if (!uid) console.error('No uid found in headers');
+
+        sendToUid(uid!, {data: event, id: req.id}); 
         
       if (event.type === "response.output_text.delta") {
         text += event.delta;
