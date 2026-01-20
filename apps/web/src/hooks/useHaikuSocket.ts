@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { formatChatTime } from "../utils/date";
-import type { Response, ResponseStreamEvent, ResponseTextDeltaEvent, ResponseCreatedEvent } from "openai/resources/responses/responses";
+import type { Response, ResponseStreamEvent } from "openai/resources/responses/responses";
 import { useWebSocket } from "./useWebSocket";
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:4000/ws";
@@ -18,12 +18,12 @@ const resetChat = () => {
     setChatLogs({});
 };
 
-const logMessage = (event: MessageEvent) => {
+const logMessage = useCallback((event: MessageEvent) => {
         try {
             const response: {data: ResponseStreamEvent, id: string} = JSON.parse(event?.data || "{}") || {};
 
             const { data, id } = response; 
-            const eventType = data.type;
+            const eventType = data?.type;
 
             setChatLogs((logs) => {
                 const updatedLogs = { ...logs };
@@ -38,7 +38,7 @@ const logMessage = (event: MessageEvent) => {
 
                 if (eventType === 'response.output_text.delta') {
                     const delta = data?.delta || '';
-                    logs[id].content = `${logs[id].content}${delta}`;
+                    updatedLogs[id] =  {...logs[id], content: logs[id].content + delta};
                 }
 
                 return updatedLogs;
@@ -47,7 +47,7 @@ const logMessage = (event: MessageEvent) => {
         } catch (error) {
             console.error("Failed to set WS message:", event.data, error);
         }
-    };
+    }, []);
 
     const { connected, send } = useWebSocket({
     url: SOCKET_URL,

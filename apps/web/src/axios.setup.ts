@@ -12,8 +12,8 @@ axios.defaults.headers[TAB_HEADER_KEY] = getTabId();
 
 axios.interceptors.request.use((config) => {
 config.headers[TAB_HEADER_KEY] = getTabId();
-console.log('Setting header', TAB_HEADER_KEY, config.headers[TAB_HEADER_KEY]);
-  const token = process.env.NEXT_PUBLIC_API_KEY;
+
+const token = process.env.NEXT_PUBLIC_API_KEY;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

@@ -72,7 +72,8 @@ app.post<{ Body: { subject: string } }>("/beer_me_haiku", async (req, res: Fasti
   let stream: AsyncIterable<any> | null = null
 
   try {
-    stream = await runHaikuAgentStreamMock() // req.body.subject)
+    // stream = await runHaikuAgentStreamMock();
+    stream = await runHaikuAgentStream(req.body.subject ||);
   } catch (e: Error | any) {
     res.code(500).send({ ok: false, error: e?.message ?? "agent start failed" });
     return
@@ -82,10 +83,7 @@ app.post<{ Body: { subject: string } }>("/beer_me_haiku", async (req, res: Fasti
   try {
       let text = "";
     for await (const event of stream) {
-      console.log('headers', req.headers)
       const uid = req.headers?.[TAB_HEADER_KEY]?.toString();
-
-      console.log('headers', req.headers?.[TAB_HEADER_KEY]);
 
       if (!uid) console.error('No uid found in headers');
 

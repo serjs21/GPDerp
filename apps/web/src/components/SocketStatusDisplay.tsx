@@ -4,7 +4,7 @@ import { SendHaikuAgentRequest } from './SendHaikuAgentRequest';
 import { useHaikuSocket } from '@/hooks/useHaikuSocket';
 
 export const SocketStatusDisplay = () => {
-    const { connected, chatLogs, send } = useHaikuSocket();
+    const { connected, chatLogs } = useHaikuSocket();
 
   return (
     <div style={{ padding: 16 }}>

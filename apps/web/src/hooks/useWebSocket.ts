@@ -96,6 +96,7 @@ export function useWebSocket({
 
     const ws = new WebSocket(url, [`tabId.${getTabId()}`,]);
     wsRef.current = ws;
+    (ws as any)['uid'] = crypto.randomUUID();
 
     ws.onopen = () => {
       retryCountRef.current = 0;
