@@ -10,6 +10,7 @@ const SOCKET_URL = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:4000/ws";
 export interface ChatLog {
   content: string;
   createdAt: string;
+  subject: string;
 }
 
 export const useHaikuSocket = () => {
@@ -20,7 +21,7 @@ const resetChat = () => {
 
 const logMessage = useCallback((event: MessageEvent) => {
         try {
-            const response: {data: {delta?: string}, id: string} = JSON.parse(event?.data || "{}") || {};
+            const response: {data: {delta?: string, subject: string}, id: string} = JSON.parse(event?.data || "{}") || {};
 
             const { data, id } = response; 
             // const eventType = data?.type;
@@ -31,6 +32,7 @@ const logMessage = useCallback((event: MessageEvent) => {
                     updatedLogs[id] = {
                         createdAt: formatChatTime(new Date()),
                         content: '',
+                        subject: data.subject,
                     };
                 }
 

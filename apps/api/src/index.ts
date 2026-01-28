@@ -74,12 +74,10 @@ app.post<{ Body: { subject: string } }>("/beer_me_haiku", async (req, res: Fasti
   try {
     const subject = req.body?.subject || 'random morbit subject';
     console.log(`\n\nCreating Haiku for subject - ${subject}:\n\n`);
-    // stream = await runHaikuAgentStream(req.body.subject || 'random morbit subject', {context: {
-    //   uid: req.headers?.[TAB_HEADER_KEY]?.toString() || 'anonymous',
-    //   isProUser: true,
-    // } });
-    stream = await runHaikuAgentStreamMock();
-    console.log('stream created', stream);
+    stream = await runHaikuAgentStream(req.body.subject || 'random morbit subject', {context: {
+      uid: req.headers?.[TAB_HEADER_KEY]?.toString() || 'anonymous',
+      isProUser: true,
+    } });
   } catch (e: Error | any) {
     res.code(500).send({ ok: false, error: e?.message ?? "agent start failed" });
     return
@@ -88,29 +86,19 @@ app.post<{ Body: { subject: string } }>("/beer_me_haiku", async (req, res: Fasti
 
   try {
       let text = "";
-    // for await (const event of stream) {
+      const subject = req.body?.subject || 'Random subject';
       const uid = req.headers?.[TAB_HEADER_KEY]?.toString();
       if (!uid) console.error('No uid found in headers');
-
-    //     sendToUid(uid!, {data: event, id: req.id}); 
-        
-    //   if (event.type === "response.output_text.delta") {
-    //     text += event.delta;
-    //     process.stdout.write(event.delta); // live output
-    //   }
-    // }
-    if (!stream) throw new Error("No stream available");
+      if (!stream) throw new Error("No stream available");
     
         for await (const chunk of stream) {
       const s = typeof chunk === "string" ? chunk : chunk.toString("utf8");
       text += s;
-      console.log('chunk', s)
 
-      sendToUid(uid!, { data: {delta: s}, id: req.id }); // send text chunk to that tab
+      sendToUid(uid!, { data: {delta: s, subject }, id: req.id });
       process.stdout.write(s);
     }
 
-    // sendToUid(uid, { data: "[DONE]", id: req.id });
     res.status(200).send({ ok: true });
   } catch (e: any) {
     res.code(500).send({ ok: false, error: e?.message ?? "stream failed" });
