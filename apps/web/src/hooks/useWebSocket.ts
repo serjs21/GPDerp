@@ -93,8 +93,11 @@ export function useWebSocket({
 
     // Ensure single active socket
     safeCloseCurrent(1000, "reinit");
+    const api = process.env.NEXT_PUBLIC_API_URL!;
+  const wsBase = api.replace(/^http/, "ws");   // https → wss
+const wsUrl = `${wsBase}/ws`;
 
-    const ws = new WebSocket(url, [`tabId.${getTabId()}`,]);
+    const ws = new WebSocket(wsUrl, [`tabId.${getTabId()}`,]);
     wsRef.current = ws;
     (ws as any)['uid'] = crypto.randomUUID();
 
