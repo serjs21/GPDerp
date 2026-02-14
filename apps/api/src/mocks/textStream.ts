@@ -66,29 +66,29 @@ type OpenAIResponsesStreamEvent =
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export const runHaikuAgentStreamMock = () => {
-  const chunks = [
-    "Cold streetlight hums\n",
-    "Footsteps fade into the fog —\n",
-    "A door left breathing.\n\n",
-    "Rust on the lock sings\n",
-    "Names peeled from forgotten bells,\n",
-    "Moon counts the leftovers.\n\n",
-    "Done.\n",
-  ];
+const chunks = [
+  "Cold ", "streetlight ", "hums", "\n",
+  "Footsteps ", "fade ", "into ", "the ", "fog ", "—", "\n",
+  "A ", "door ", "left ", "breathing.", "\n", "\n",
+  "Rust ", "on ", "the ", "lock ", "sings", "\n",
+  "Names ", "peeled ", "from ", "forgotten ", "bells,", "\n",
+  "Moon ", "counts ", "the ", "leftovers.", "\n", "\n",
+  "Done.", "\n",
+];
 
   let i = 0;
 
   return new Readable({
     read() {
       if (i >= chunks.length) {
-        this.push(null); // end stream
+        this.push(null);
         return;
       }
 
       const chunk = chunks[i++];
       setTimeout(() => {
         this.push(chunk);
-      }, 150 + Math.random() * 300); // jitter like real streaming
+      }, 150 + Math.random() * 300);
     },
   });
 }

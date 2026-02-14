@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Form, Input, notification } from 'antd';
-import { runHaikuAgent } from '@/api/taightwads';
+import { runHaikuAgent } from '@/api/agents';
 import { useEffect, useRef, useState } from 'react';
 
 type FieldType = {
@@ -46,10 +46,10 @@ export const SendHaikuAgentRequest = () => {
   return (
     <Form
       form={form}
-      layout="vertical"        // ✅ kill grid layout
+      layout="vertical"
       style={{
         width: '100%',
-        maxWidth: 420,          // ✅ stable readable width
+        maxWidth: 420,
       }}
       onFinish={onSubmit}
       autoComplete="off"
@@ -79,7 +79,7 @@ export const SendHaikuAgentRequest = () => {
             type="primary"
             htmlType="submit"
             loading={isLoading}
-            block               // ✅ always full width
+            block
           >
             Get a Haiku
           </Button>

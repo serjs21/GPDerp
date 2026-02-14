@@ -7,6 +7,7 @@ import type WebSocket from "ws";
 import { env } from "./env";
 import { TAB_HEADER_KEY } from "./consts/ids";
 import { runHaikuAgentStream } from "./agent";
+import { runHaikuAgentStreamMock } from "./mocks/textStream";
 // import { runHaikuAgentStreamMock } from "./mocks/textStream";
 
 const app = Fastify({
@@ -68,6 +69,8 @@ async function run() {
   /* --------------------------- WebSocket --------------------------- */
 
   app.get("/ws", { websocket: true }, (connection, req) => {
+        console.log(`🔥 connecting`);
+
     const ws: WebSocket = (connection as any).socket ?? (connection as any);
 
     const raw = req.headers["sec-websocket-protocol"];
@@ -93,12 +96,13 @@ async function run() {
         const subject = req.body?.subject || "random morbit subject";
         console.log(`\n✍️  Creating haiku for: ${subject}\n`);
 
-        stream = await runHaikuAgentStream(subject, {
-          context: {
-            uid: req.headers?.[TAB_HEADER_KEY]?.toString() || "anonymous",
-            isProUser: true,
-          },
-        });
+        stream = await runHaikuAgentStreamMock();
+        // await runHaikuAgentStream(subject, {
+        //   context: {
+        //     uid: req.headers?.[TAB_HEADER_KEY]?.toString() || "anonymous",
+        //     isProUser: true,
+        //   },
+        // });
       } catch (e: any) {
         res.code(500).send({
           ok: false,

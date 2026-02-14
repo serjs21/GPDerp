@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev:next": "next dev",
     "build": "next build",
     "start": "next start",
     "dev:ws": "tsx watch webSockets/wsServer.ts",
-    "dev:all": "concurrently -n next,ws -c auto \"pnpm dev\" \"pnpm dev:ws\"",
+    "dev": "concurrently -n next,ws -c auto \"pnpm dev:next\" \"pnpm dev:ws\"",
     "lint": "eslint"
   },
   "dependencies": {

@@ -95,7 +95,7 @@ export function useWebSocket({
     safeCloseCurrent(1000, "reinit");
     const api = process.env.NEXT_PUBLIC_API_URL!;
   const wsBase = api.replace(/^http/, "ws");   // https → wss
-const wsUrl = `${wsBase}/ws`;
+  const wsUrl = `${api}/ws`;
 
     const ws = new WebSocket(wsUrl, [`tabId.${getTabId()}`,]);
     wsRef.current = ws;
