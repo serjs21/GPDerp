@@ -1,17 +1,14 @@
 'use client';
 
-import { Button, Form, Input, notification } from 'antd';
+import { notification } from 'antd';
 import { runHaikuAgent } from '@/api/agents';
 import { useEffect, useRef, useState } from 'react';
-
-type FieldType = {
-  subject: string;
-};
+import styles from './HaikuGenerationChat/style.module.css';
 
 export const SendHaikuAgentRequest = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [form] = Form.useForm<FieldType>();
-  const inputRef = useRef<any | null>(null);
+  const [subject, setSubject] = useState('');
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -21,19 +18,21 @@ export const SendHaikuAgentRequest = () => {
 
   const onError = () => {
     api.error({
-      title: "Don't panic, but something went wrong",
+      message: "Don't panic, but something went wrong",
       description:
-        "Our slaves are working hard to fix the issue. We will dispatch someone to hit them harder soon.\nPlease try again later.",
+        "Our slaves are working hard on fixing this issue. We will dispatch someone to hit them harder soon.\nPlease try again later.",
       placement: 'top',
       duration: 3,
     });
   };
 
-  const onSubmit = async (values: FieldType) => {
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!subject.trim()) return;
     try {
       setIsLoading(true);
-      await runHaikuAgent(values?.subject || '');
-      form.resetFields();
+      await runHaikuAgent(subject);
+      setSubject('');
       inputRef.current?.focus();
     } catch (error) {
       console.error("Failed to send haiku agent request:", error);
@@ -44,49 +43,40 @@ export const SendHaikuAgentRequest = () => {
   };
 
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      style={{
-        width: '100%',
-        maxWidth: 420,
-      }}
-      onFinish={onSubmit}
-      autoComplete="off"
-    >
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 12,
-          width: '100%',
-        }}
-      >
-        <Form.Item<FieldType>
-          label="Haiku subject"
-          name="subject"
-          style={{ marginBottom: 0 }}
-        >
-          <Input
+    <form onSubmit={onSubmit} autoComplete="off" className={styles.shrine}>
+      {/* Torii top kasagi beam */}
+      <div className={styles.kasagi} />
+      {/* Second beam (nuki) */}
+      <div className={styles.nuki} />
+
+      {/* Pillars + inner content */}
+      <div className={styles.pillars}>
+        <div className={styles.pillar} />
+
+        <div className={styles.shrineInner}>
+          <label className={styles.shrineLabel}>題 subject</label>
+          <input
             ref={inputRef}
+            className={styles.shrineInput}
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
             disabled={isLoading}
             autoComplete="off"
+            placeholder="cherry blossoms..."
           />
-        </Form.Item>
-
-        <Form.Item style={{ marginBottom: 0 }}>
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={isLoading}
-            block
+          <button
+            type="submit"
+            className={styles.shrineButton}
+            disabled={isLoading}
           >
-            Get a Haiku
-          </Button>
-        </Form.Item>
+            {isLoading ? '...' : '詠む — compose'}
+          </button>
+        </div>
 
-        {contextHolder}
+        <div className={styles.pillar} />
       </div>
-    </Form>
+
+      {contextHolder}
+    </form>
   );
 };

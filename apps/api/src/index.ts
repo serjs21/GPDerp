@@ -18,7 +18,7 @@ const app = Fastify({
 
 async function run() {
   const port = Number(process.env.PORT ?? 4000);
-  console.log(`🚀 Starting server on port ${port}...`);
+  console.log(`Starting server on port ${port}...`);
 
   /* ---------- Plugins (MUST come before routes) ---------- */
 
@@ -69,7 +69,6 @@ async function run() {
   /* --------------------------- WebSocket --------------------------- */
 
   app.get("/ws", { websocket: true }, (connection, req) => {
-        console.log(`🔥 connecting`);
 
     const ws: WebSocket = (connection as any).socket ?? (connection as any);
 
@@ -82,7 +81,7 @@ async function run() {
     }
 
     addClient(tabId, ws);
-    console.log(`🔥 WS connected: ${tabId} (clients: ${clients.size})`);
+    console.log(`WS connected: ${tabId} (clients: ${clients.size})`);
   });
 
   /* ------------------------------ API ------------------------------ */
@@ -94,10 +93,10 @@ async function run() {
 
       try {
         const subject = req.body?.subject || "random morbit subject";
-        console.log(`\n✍️  Creating haiku for: ${subject}\n`);
+        console.log(`\n Creating haiku for: ${subject}\n`);
 
         stream = await runHaikuAgentStreamMock();
-        // await runHaikuAgentStream(subject, {
+        //  stream = await runHaikuAgentStream(subject, {
         //   context: {
         //     uid: req.headers?.[TAB_HEADER_KEY]?.toString() || "anonymous",
         //     isProUser: true,
@@ -157,7 +156,7 @@ async function run() {
     host: "0.0.0.0",
   });
 
-  console.log(`✅ Server ready on http://localhost:${port}`);
+  console.log(`Server ready on http://localhost:${port}`);
 }
 
 /* --------------------------- Entrypoint --------------------------- */

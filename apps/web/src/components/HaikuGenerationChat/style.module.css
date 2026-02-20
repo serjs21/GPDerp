@@ -1,0 +1,222 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;400;700&family=Note+This&display=swap");
+
+/* ───────────────────────────────
+   Chat wrapper
+   ─────────────────────────────── */
+
+.chatWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1rem;
+  max-width: 37.5rem;
+  margin: 0 auto;
+  min-width: min(28rem, 100%);
+}
+
+/* ───────────────────────────────
+   Chat log (scroll area)
+   ─────────────────────────────── */
+
+.chatLogContainer {
+  font-family: "Note This", cursive;
+  border: 1px solid rgba(60, 40, 30, 0.15);
+  min-width: min(20rem, 100%);
+  background: rgba(255, 253, 248, 0.6);
+  height: auto;
+  min-height: 12.5rem;
+  max-height: calc(80vh - 420px);
+  overflow: auto;
+  width: 100%;
+  padding: 1.5rem 3rem;
+  align-items: center;
+  white-space: pre-wrap;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.chatLogEntry {
+  min-width: min(20rem, 100%);
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ───────────────────────────────
+   Torii shrine form
+   ─────────────────────────────── */
+
+.shrine {
+  --ink: #2c1e1e;
+  --ink-light: rgba(60, 40, 30, 0.35);
+  --ink-faint: rgba(60, 40, 30, 0.08);
+  --vermillion: #c23a22;
+  --vermillion-soft: rgba(194, 58, 34, 0.75);
+  --paper: rgba(255, 253, 248, 0.85);
+  --brush-thin: 2px;
+  --brush-med: 3px;
+  --brush-thick: 4px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  font-family: "Noto Serif JP", "Note This", serif;
+}
+
+/* Top beam — kasagi (笠木)
+   Slightly wider than pillars, with upward curve via border-radius */
+.kasagi {
+  width: 108%;
+  height: 6px;
+  background: var(--vermillion-soft);
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  position: relative;
+  z-index: 2;
+  /* Ink-brush rough edge */
+  box-shadow:
+    0 2px 0 -1px var(--vermillion-soft),
+    0 -1px 0 0 var(--vermillion-soft);
+}
+
+/* Subtle upward wing tips */
+.kasagi::before,
+.kasagi::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  width: 18px;
+  height: 10px;
+  background: var(--vermillion-soft);
+  border-radius: 50% 50% 0 0;
+}
+.kasagi::before { left: -6px; transform: rotate(-12deg); }
+.kasagi::after  { right: -6px; transform: rotate(12deg); }
+
+/* Second beam — nuki (貫) */
+.nuki {
+  width: 100%;
+  height: var(--brush-thick);
+  background: var(--vermillion-soft);
+  margin-top: 6px;
+  border-radius: 1px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Pillar row */
+.pillars {
+  display: flex;
+  width: 100%;
+  margin-top: 4px;
+  gap: 0;
+}
+
+/* Single pillar (hashira 柱) */
+.pillar {
+  width: var(--brush-thick);
+  background: var(--vermillion-soft);
+  min-height: 100%;
+  border-radius: 0 0 1px 1px;
+  flex-shrink: 0;
+}
+
+/* Inner content between pillars */
+.shrineInner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 18px 22px;
+  position: relative;
+}
+
+/* Faint ground line under shrine */
+.shrine::after {
+  content: "";
+  width: 115%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--ink-light) 20%,
+    var(--ink-light) 80%,
+    transparent 100%
+  );
+  margin-top: 0;
+}
+
+/* ── Form elements ── */
+
+.shrineLabel {
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  color: var(--ink-light);
+  text-transform: uppercase;
+  font-weight: 200;
+  align-self: flex-start;
+  margin-left: 2px;
+}
+
+.shrineInput {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: var(--brush-thin) solid var(--ink-light);
+  padding: 8px 4px;
+  font-family: "Noto Serif JP", serif;
+  font-size: 1rem;
+  font-weight: 200;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.3s ease;
+  letter-spacing: 0.04em;
+}
+
+.shrineInput::placeholder {
+  color: rgba(60, 40, 30, 0.2);
+  font-style: italic;
+  font-weight: 200;
+}
+
+.shrineInput:focus {
+  border-bottom-color: var(--vermillion-soft);
+}
+
+.shrineInput:disabled {
+  opacity: 0.5;
+}
+
+.shrineButton {
+  margin-top: 4px;
+  background: transparent;
+  border: var(--brush-thin) solid var(--ink-light);
+  color: var(--ink);
+  font-family: "Noto Serif JP", serif;
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  padding: 8px 28px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.shrineButton:hover:not(:disabled) {
+  border-color: var(--vermillion-soft);
+  color: var(--vermillion);
+}
+
+.shrineButton:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.shrineButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

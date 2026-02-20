@@ -1,16 +1,13 @@
 import styles from "./page.module.css";
-import genStyles from "./generated.module.css";
-import { SocketStatusDisplay } from "@/components/SocketStatusDisplay";
+import { HaikuGenerationChat } from "@/components/HaikuGenerationChat/HaikuGenerationChat";
 
 export default function Home() {
   return (
-    <div className={`${styles.page} ${genStyles.page}`}>
-      {/* 👇 background layer */}
+    <div className={`${styles.page}}`}>
       <div className={styles.vgBg} aria-hidden />
-
       <main className={styles.main}>
-        <SocketStatusDisplay />
-
+        <HaikuGenerationChat />
+        
         <pre
           style={{
             whiteSpace: "pre-wrap",

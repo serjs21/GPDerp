@@ -29,7 +29,9 @@ export const websiteAgent = new Agent({
 export const beerMeAnHaikuAgent = () => {
     const agent = new Agent({
     name: 'Haiku Agent',
-    instructions: 'Always respond in haiku form.',
+    instructions: 'Always respond in haiku form.' + 
+    'As the last line, add a fake pun name to credit the haiku to. The pun name should be related to the haiku content.' + 
+    'Randomize the pun name each time. You can add fake titles to the name, but it is not required. Add an empty line between name and haiku.',
     });
 
 return agent;

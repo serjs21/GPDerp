@@ -1,8 +1,7 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { formatChatTime } from "../utils/date";
-import type { Response, ResponseStreamEvent } from "openai/resources/responses/responses";
 import { useWebSocket } from "./useWebSocket";
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:4000/ws";
@@ -22,9 +21,7 @@ const resetChat = () => {
 const logMessage = useCallback((event: MessageEvent) => {
         try {
             const response: {data: {delta?: string, subject: string}, id: string} = JSON.parse(event?.data || "{}") || {};
-
             const { data, id } = response; 
-            // const eventType = data?.type;
 
             setChatLogs((logs) => {
                 const updatedLogs = { ...logs };
@@ -38,20 +35,6 @@ const logMessage = useCallback((event: MessageEvent) => {
 
                 const delta = data?.delta || '';
                 updatedLogs[id] =  {...updatedLogs[id], content: updatedLogs[id].content + delta};
-                // if (eventType === 'response.created') {
-                //     const response: Response = data?.response;
-                //     const createdEpoch = response.created_at ? response.created_at * 1000 : Date.now();
-                //     updatedLogs[id] = {
-                //         createdAt: formatChatTime(new Date(createdEpoch)),
-                //         content: '',
-                //     };
-                // }
-
-                // if (eventType === 'response.output_text.delta') {
-                //     const delta = data?.delta || '';
-                //     updatedLogs[id] =  {...logs[id], content: logs[id].content + delta};
-                // }
-
                 return updatedLogs;
             });
 

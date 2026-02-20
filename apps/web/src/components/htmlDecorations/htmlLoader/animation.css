@@ -1,0 +1,204 @@
+html[data-hydrated="true"] .scene-container {
+  opacity: 0;
+  display: none;
+  pointer-events: none;
+}
+
+:root {
+  --bg: #fdf6e3;
+  --mt-dark: #2c3e50;
+  --mt-light: #34495e;
+  --sun-red: #e74c3c;
+  --snow: #ffffff;
+  --cloud: rgba(255, 255, 255, 0.9);
+  --speed: 6s; /* 2x slower */
+}
+
+.scene-container {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: var(--bg);
+}
+
+.fuji-scene {
+  position: relative;
+  width: 200px;
+  height: 120px;
+  overflow: hidden;
+  animation: scene-fade var(--speed) ease-in-out infinite;
+}
+
+/* Mountain with 3D-effect shadow */
+.mountain {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 80%;
+  background: linear-gradient(
+    90deg,
+    var(--mt-dark) 50%,
+    var(--mt-light) 50%
+  );
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  z-index: 3;
+  animation: draw-up var(--speed) ease-out infinite;
+}
+
+.snow-cap {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 30%;
+  background: var(--snow);
+  clip-path: polygon(
+    50% 0%,
+    35% 100%,
+    45% 85%,
+    55% 110%,
+    65% 100%
+  );
+}
+
+/* Larger, offset Sun */
+.sun {
+  position: absolute;
+  top: 5px;
+  right: 15px;
+  width: 45px;
+  height: 45px;
+  background: var(--sun-red);
+  border-radius: 50%;
+  z-index: 1;
+  box-shadow: 0 0 20px rgba(231, 76, 60, 0.3);
+  animation: sun-rise var(--speed) ease-out infinite;
+}
+
+/* Clouds as the final detail */
+.cloud {
+  position: absolute;
+  background: var(--cloud);
+  height: 12px;
+  border-radius: 10px;
+  z-index: 4;
+  opacity: 0;
+  animation: cloud-drift var(--speed) ease-in-out infinite;
+}
+
+.cloud::before,
+.cloud::after {
+  content: "";
+  position: absolute;
+  background: var(--cloud);
+  border-radius: 50%;
+}
+
+/* Cloud 1 */
+.c1 {
+  width: 40px;
+  top: 40px;
+  left: 20px;
+  animation-delay: calc(var(--speed) * 0.1);
+}
+
+.c1::before {
+  width: 20px;
+  height: 20px;
+  top: -10px;
+  left: 5px;
+}
+
+/* Cloud 2 */
+.c2 {
+  width: 50px;
+  top: 60px;
+  right: 10px;
+  animation-delay: calc(var(--speed) * 0.15);
+}
+
+.c2::before {
+  width: 25px;
+  height: 25px;
+  top: -12px;
+  left: 10px;
+}
+
+/* Animations */
+
+@keyframes draw-up {
+  0%,
+  10% {
+    transform: translateY(100%);
+  }
+
+  30%,
+  80% {
+    transform: translateY(0);
+  }
+
+  95%,
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes sun-rise {
+  0%,
+  20% {
+    transform: translateY(80px) scale(0.8);
+    opacity: 0;
+  }
+
+  40%,
+  80% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  95%,
+  100% {
+    transform: translateY(80px);
+    opacity: 0;
+  }
+}
+
+@keyframes cloud-drift {
+  0%,
+  35% {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+
+  35%,
+  85% {
+    transform: translateX(10px);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(30px);
+    opacity: 0;
+  }
+}
+
+@keyframes scene-fade {
+  0%,
+  5% {
+    opacity: 0;
+  }
+
+  15%,
+  85% {
+    opacity: 1;
+  }
+
+  95%,
+  100% {
+    opacity: 0;
+  }
+}

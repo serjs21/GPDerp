@@ -1,0 +1,36 @@
+.header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem;
+    height: 5rem;
+    background-color: #bc002d;
+}
+
+:root {
+  --gradientStart: #ff6b6b;
+  --gradientMid: #ffadad;
+  --gradientEnd: #fcfaf2;
+  --borderColor: #8200002b;
+}
+
+.pencilBorder {
+  padding-bottom: 6px;
+
+  background-color: var(--gradientStart);
+
+  background-image:
+    url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'>\
+<path d='M2 6 Q20 4 40 6 T80 6 T120 6 T160 6 T198 6' stroke='%23fff' stroke-width='2' fill='none' stroke-linecap='round'/>\
+</svg>"),
+    linear-gradient(
+      180deg,
+      var(--gradientStart) 0%,
+      var(--gradientMid) 50%,
+      var(--gradientEnd) 95%
+    );
+
+  background-repeat: no-repeat, no-repeat;
+  background-position: left bottom, left top;
+  background-size: 100% 8px, 100% 100%;
+}
