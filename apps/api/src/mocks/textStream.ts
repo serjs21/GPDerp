@@ -1,4 +1,5 @@
 import { Readable } from "node:stream";
+import _ from "lodash-es";
 
 type ResponseCreatedEvent = {
   type: "response.created";
@@ -65,16 +66,38 @@ type OpenAIResponsesStreamEvent =
 // small helper for timing
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-export const runHaikuAgentStreamMock = () => {
-const chunks = [
-  "Cold ", "streetlight ", "hums", "\n",
-  "Footsteps ", "fade ", "into ", "the ", "fog ", "—", "\n",
-  "A ", "door ", "left ", "breathing.", "\n", "\n",
-  "Rust ", "on ", "the ", "lock ", "sings", "\n",
-  "Names ", "peeled ", "from ", "forgotten ", "bells,", "\n",
-  "Moon ", "counts ", "the ", "leftovers.", "\n", "\n",
-  "Done.", "\n",
+// text only
+const HAIKUS = [
+  `Shadow questions rise,
+a void whispers, "Who are you?"
+Self slips through the cracks.
+
+-Jean-Paul Sartickle`,
+
+  `Nietzsche’s whisper fades,
+Empty sky and silent bells—
+Doubt’s garden grows wild.
+
+—Holy Ghostwriter`,
+
+  `Infernal flames burn,
+Whispers echo endless pain—
+Hope lost to the void.
+
+— Dante Fuego`,
 ];
+
+/** random haiku */
+export const randomHaiku = () => _.sample(HAIKUS)!;
+
+/** stream chunks (char or word) */
+export const streamChunks = (mode: "char" | "word" = "char") =>
+  mode === "word"
+    ? _.words(randomHaiku(), /[^\s]+|\s+/g)
+    : Array.from(randomHaiku());
+
+export const runHaikuAgentStreamMock = () => {
+const chunks = randomHaiku();
 
   let i = 0;
 
@@ -88,7 +111,7 @@ const chunks = [
       const chunk = chunks[i++];
       setTimeout(() => {
         this.push(chunk);
-      }, 150 + Math.random() * 300);
+      }, 10 + Math.random() * 30);
     },
   });
 }

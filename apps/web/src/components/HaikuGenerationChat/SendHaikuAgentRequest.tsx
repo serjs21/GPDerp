@@ -3,7 +3,8 @@
 import { notification } from 'antd';
 import { runHaikuAgent } from '@/api/agents';
 import { useEffect, useRef, useState } from 'react';
-import styles from './HaikuGenerationChat/style.module.css';
+import { Kasagi, Shimaki, Nuki, Pillars } from '../Dividers';
+import styles from './style.module.css';
 
 export const SendHaikuAgentRequest = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -11,8 +12,9 @@ export const SendHaikuAgentRequest = () => {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+    if (!isLoading)
+      inputRef.current?.focus();
+  }, [isLoading]);
 
   const [api, contextHolder] = notification.useNotification({ maxCount: 1 });
 
@@ -44,17 +46,11 @@ export const SendHaikuAgentRequest = () => {
 
   return (
     <form onSubmit={onSubmit} autoComplete="off" className={styles.shrine}>
-      {/* Torii top kasagi beam */}
-      <div className={styles.kasagi} />
-      {/* Second beam (nuki) */}
-      <div className={styles.nuki} />
+      <Kasagi />
+      <Shimaki />
+      <Nuki />
 
-      {/* Pillars + inner content */}
-      <div className={styles.pillars}>
-        <div className={styles.pillar} />
-
-        <div className={styles.shrineInner}>
-          <label className={styles.shrineLabel}>題 subject</label>
+      <Pillars>
           <input
             ref={inputRef}
             className={styles.shrineInput}
@@ -62,19 +58,17 @@ export const SendHaikuAgentRequest = () => {
             onChange={(e) => setSubject(e.target.value)}
             disabled={isLoading}
             autoComplete="off"
-            placeholder="cherry blossoms..."
+            placeholder="題 Subejct"
           />
           <button
             type="submit"
             className={styles.shrineButton}
             disabled={isLoading}
           >
-            {isLoading ? '...' : '詠む — compose'}
+            {isLoading ? '...' : '詠む Compose'}
           </button>
-        </div>
-
-        <div className={styles.pillar} />
-      </div>
+      </Pillars>
+      <Nuki />
 
       {contextHolder}
     </form>

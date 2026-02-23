@@ -1,9 +1,14 @@
+:root {
+  font-family: var(--font-noto-serif), serif;
+  --background-color: #fcfaf2;
+  color: var(--text-color);
+
 .page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;  align-items: center;
   justify-content: center;
-  background-color: #fcfaf2; /* Washi Paper */
+  background-color: var(--background-color);
   position: relative;
   overflow: hidden;
 }
@@ -44,8 +49,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2.5rem;
-  padding: 2rem;
+  gap: 0;
+  padding: 0 2rem 2rem;
 }
 
 /* Poetic Haiku Display Styling */
@@ -69,4 +74,22 @@
   background: #bc002d;
   margin: 0 auto 25px;
   opacity: 0.6;
+}
+
+
+.footerText {
+  background: color-mix(in srgb, var(--background-color) 40%, transparent);
+  border-radius: 2rem;
+
+  -webkit-mask:
+    linear-gradient(to right, transparent, black 1rem, black calc(100% - 1rem), transparent),
+    linear-gradient(to bottom, transparent, black 0.5rem, black calc(100% - 0.5rem), transparent);
+
+  -webkit-mask-composite: intersect;
+  mask-composite: intersect;
+  white-space: pre-wrap;
+  padding: 0.5rem 3rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
 }

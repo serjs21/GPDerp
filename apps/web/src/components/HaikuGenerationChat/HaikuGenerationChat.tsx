@@ -2,9 +2,11 @@
 
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { StreamText } from "../StreamText";
-import { SendHaikuAgentRequest } from "../SendHaikuAgentRequest";
+import { SendHaikuAgentRequest } from "./SendHaikuAgentRequest";
 import { useHaikuSocket } from "@/hooks/useHaikuSocket";
 import styles from "./style.module.css";
+import { HaikuDisplay } from "../HaikuDisplay/HaikuDisplay";
+import { Pillars, Shimaki, Nuki, Kasagi } from "../Dividers";
 
 const THRESHOLD = 80; 
 
@@ -32,16 +34,7 @@ export const HaikuGenerationChat = () => {
   return (
     <div className={`${styles.chatWrapper}`}>
       <SendHaikuAgentRequest />
-
-      <div ref={containerRef} className={styles.chatLogContainer}>
-        {Object.entries(chatLogs).map(([id, log]) => (
-          <div key={id} className={styles.chatLogEntry}>
-            <StreamText text={`${log.createdAt}: ${log.subject} \n\n`} />
-            {log.content}
-            <br />
-          </div>
-        ))}
-      </div>
-    </div>
+      <HaikuDisplay chatLogs={chatLogs} />  
+     </div>
   );
 };

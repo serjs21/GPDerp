@@ -1,0 +1,92 @@
+/* ───────────────────────────────
+   Torii divider tokens
+   ─────────────────────────────── */
+
+.dividers {
+  --vermillion-soft: rgba(194, 58, 34, 0.72);
+  --pillar-width: 0.3rem;
+  --pillar-inset: 1rem;
+  --beam-overshoot: 22px;
+}
+
+/* ── Kasagi (笠木) — top beam with upswept curve ── */
+.kasagi {
+  width: calc(100% + var(--beam-overshoot) * 2 + 16px);
+  height: 7px;
+  position: relative;
+  z-index: 2;
+  background: var(--vermillion-soft);
+  border-radius: 0;
+  clip-path: ellipse(52% 100% at 50% 100%);
+}
+
+/* ── Shimaki (島木) — second thinner beam directly under kasagi ── */
+.shimaki {
+  width: calc(100% + var(--beam-overshoot) * 2 + 8px);
+  height: 4px;
+  background: var(--vermillion-soft);
+  margin-top: 4px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Nuki (貫) — crossbeam with round end caps ── */
+.nuki {
+  width: calc(100%);
+  height: 3px;
+  background: var(--vermillion-soft);
+  margin-top: 0.2rem;
+  position: relative;
+  z-index: 2;
+  border-radius: 2px;
+}
+
+/* ── Pillar row ── */
+.pillars {
+  display: flex;
+  height: fit-content;
+  overflow: auto;
+  width: 100%;
+  margin-top: 0;
+  position: relative;
+}
+
+/* ── Hashira (柱) — vertical pillars ── */
+.pillar {
+  width: var(--pillar-width);
+  background: var(--vermillion-soft);
+  min-height: 100%;
+  flex-shrink: 0;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+.pillar:first-child {
+  left: var(--pillar-inset);
+}
+.pillar:last-child {
+  right: var(--pillar-inset);
+}
+
+.pillarsInner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 18px calc(var(--pillar-inset) + 16px) 24px;
+  position: relative;
+  width: 100%;
+}
+
+/* ── Inner content between pillars ── */
+.pillarsInner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 18px calc(var(--pillar-inset) + 16px) 24px;
+  position: relative;
+  width: 100%;
+}
