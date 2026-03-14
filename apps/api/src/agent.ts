@@ -1,20 +1,17 @@
 import { Agent, run } from "@openai/agents";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
-
-dotenv.config({ path: '.env' });
-
+dotenv.config({ path: ".env" });
 
 export interface Context {
-  uid: string;  
+  uid: string;
   isProUser: boolean;
 }
 
 export interface AgentRunOptions {
-    context?: Context;
-    uid?: string;
+  context?: Context;
+  uid?: string;
 }
-
 
 export const websiteAgent = new Agent({
   name: "Website Concierge",
@@ -25,20 +22,20 @@ export const websiteAgent = new Agent({
   ].join("\n"),
 });
 
-
 export const beerMeAnHaikuAgent = () => {
-    const agent = new Agent({
-    name: 'Haiku Agent',
-    instructions: 'Always respond in haiku form.' + 
-    'As the last line, add a fake pun name to credit the haiku to. The pun name should be related to the haiku content.' + 
-    'Randomize the pun name each time. You can add fake titles to the name, but it is not required. Add an empty line between name and haiku.',
-    });
+  const agent = new Agent({
+    name: "Haiku Agent",
+    instructions:
+      "Always respond in haiku form." +
+      "As the last line, add a fake pun name to credit the haiku to. The pun name should be related to the haiku content." +
+      "Randomize the pun name each time. You can add fake titles to the name, but it is not required. Add an empty line between name and haiku.",
+  });
 
-return agent;
-}
+  return agent;
+};
 export const runHaikuAgentStream = async (
   command: string,
-  options?: AgentRunOptions
+  options?: AgentRunOptions,
 ) => {
   const context = options?.context ?? {
     uid: options?.uid ?? "anonymous",

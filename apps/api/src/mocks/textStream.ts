@@ -50,8 +50,6 @@ type ResponseCompletedEvent = {
     status: "completed";
     completed_at: number;
     model: string;
-    output: any[];
-    usage: any; // keep loose; SDK fills this
     metadata: Record<string, unknown>;
   };
 };
@@ -97,7 +95,7 @@ export const streamChunks = (mode: "char" | "word" = "char") =>
     : Array.from(randomHaiku());
 
 export const runHaikuAgentStreamMock = () => {
-const chunks = randomHaiku();
+  const chunks = randomHaiku();
 
   let i = 0;
 
@@ -109,9 +107,12 @@ const chunks = randomHaiku();
       }
 
       const chunk = chunks[i++];
-      setTimeout(() => {
-        this.push(chunk);
-      }, 10 + Math.random() * 30);
+      setTimeout(
+        () => {
+          this.push(chunk);
+        },
+        10 + Math.random() * 30,
+      );
     },
   });
-}
+};

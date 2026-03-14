@@ -5,6 +5,7 @@ import { runHaikuAgent } from '@/api/agents';
 import { useEffect, useRef, useState } from 'react';
 import { Kasagi, Shimaki, Nuki, Pillars } from '../Dividers';
 import styles from './style.module.css';
+import { WritingLoader } from '../Loaders';
 
 export const SendHaikuAgentRequest = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -65,7 +66,7 @@ export const SendHaikuAgentRequest = () => {
             className={styles.shrineButton}
             disabled={isLoading}
           >
-            {isLoading ? '...' : '詠む Compose'}
+            {isLoading ? <WritingLoader variant="pen" /> : '詠む Compose'}
           </button>
       </Pillars>
       <Nuki />

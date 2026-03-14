@@ -1,0 +1,85 @@
+.loginWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.loginButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #3c4043;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, background 0.15s ease;
+  white-space: nowrap;
+}
+
+.loginButton:hover {
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.3);
+  background: #f8f9fa;
+}
+
+.loginButton:active {
+  background: #f1f3f4;
+}
+
+.error {
+  font-size: 0.8rem;
+  color: #d93025;
+  margin: 0;
+}
+
+/* ── Signed-in pill ── */
+
+.signedIn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem 0.25rem 0.25rem;
+  background: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 999px;
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
+  font-size: 0.875rem;
+  color: #3c4043;
+}
+
+.avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.name {
+  font-weight: 500;
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logoutButton {
+  margin-left: 0.25rem;
+  padding: 0.2rem 0.6rem;
+  background: transparent;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: #5f6368;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.logoutButton:hover {
+  background: #f1f3f4;
+}

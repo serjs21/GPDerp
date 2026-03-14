@@ -1,10 +1,11 @@
 "use client";
 
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { Layout } from "antd";
 import AxiosInit from "@/client.axios.setup";
 import { useMarkHydrated } from "@/hooks/useMarkHydrated";
+import { NavigationMenu } from "@/components/NavigationMenu/NavigationMenu";
 import styles from "./headerStyles.module.css";
+import { GoogleAuthentication } from "@/components/GoogleAuthentication/GoogleAuthentication";
 
 const { Header, Content } = Layout;
 
@@ -14,9 +15,8 @@ export interface LayoutProviderProps {
 }
 
 export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps) => {
-const clientId = googleClientId || process.env.GOOGLE_CLIENT_ID;
-useMarkHydrated();
-
+  const clientId = googleClientId || process.env.GOOGLE_CLIENT_ID;
+  useMarkHydrated();
 
   if (!clientId) {
     console.error("Missing GOOGLE_CLIENT_ID");
@@ -24,24 +24,19 @@ useMarkHydrated();
   }
 
   return (
-    <GoogleOAuthProvider clientId={clientId}>
-                <AxiosInit />
-
+    <>
+      <AxiosInit />
       <Layout>
         <Header className={`${styles.header} ${styles.pencilBorder}`}>
-        
-        <GoogleLogin
-            onSuccess={(credentialResponse) => console.log(credentialResponse)}
-            onError={() => console.log("Login Failed")}
-          />
-
+          {/* <NavigationMenu> */}
+            <GoogleAuthentication clientId={clientId} />
+          {/* </NavigationMenu> */}
         </Header>
         <div />
-
         <Content>
-        {children}
-        </Content>  
+          {children}
+        </Content>
       </Layout>
-    </GoogleOAuthProvider>
+    </>
   );
 }

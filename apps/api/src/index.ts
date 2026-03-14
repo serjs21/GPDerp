@@ -6,7 +6,6 @@ import type WebSocket from "ws";
 
 import { env } from "./env";
 import { TAB_HEADER_KEY } from "./consts/ids";
-import { runHaikuAgentStream } from "./agent";
 import { runHaikuAgentStreamMock } from "./mocks/textStream";
 // import { runHaikuAgentStreamMock } from "./mocks/textStream";
 
@@ -69,7 +68,6 @@ async function run() {
   /* --------------------------- WebSocket --------------------------- */
 
   app.get("/ws", { websocket: true }, (connection, req) => {
-
     const ws: WebSocket = (connection as any).socket ?? (connection as any);
 
     const raw = req.headers["sec-websocket-protocol"];
@@ -89,7 +87,7 @@ async function run() {
   app.post<{ Body: { subject: string } }>(
     "/beer_me_haiku",
     async (req, res: FastifyReply) => {
-      let stream: AsyncIterable<any> | null = null;
+      let stream: AsyncIterable<string | null> | null = null;
 
       try {
         const subject = req.body?.subject || "random morbit subject";
@@ -119,10 +117,7 @@ async function run() {
         if (!uid) console.warn("⚠️  No uid found in headers");
 
         for await (const chunk of stream) {
-          const s =
-            typeof chunk === "string"
-              ? chunk
-              : chunk.toString("utf8");
+          const s = typeof chunk === "string" ? chunk : chunk.toString("utf8");
 
           sendToUid(uid!, {
             data: { delta: s, subject },
@@ -133,13 +128,13 @@ async function run() {
         }
 
         res.status(200).send({ ok: true });
-      } catch (e: any) {
+      } catch (e: unknown) {
         res.code(500).send({
           ok: false,
           error: e?.message ?? "stream failed",
         });
       }
-    }
+    },
   );
 
   app.get("/ws-check", async () => ({

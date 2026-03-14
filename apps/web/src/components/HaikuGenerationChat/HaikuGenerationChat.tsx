@@ -6,7 +6,7 @@ import { SendHaikuAgentRequest } from "./SendHaikuAgentRequest";
 import { useHaikuSocket } from "@/hooks/useHaikuSocket";
 import styles from "./style.module.css";
 import { HaikuDisplay } from "../HaikuDisplay/HaikuDisplay";
-import { Pillars, Shimaki, Nuki, Kasagi } from "../Dividers";
+import { Pillars } from "../Dividers";
 
 const THRESHOLD = 80; 
 
@@ -32,9 +32,9 @@ export const HaikuGenerationChat = () => {
   }, [chatLogs]);
 
   return (
-    <div className={`${styles.chatWrapper}`}>
+    <div className={`${styles.chatWrapper}`} ref={containerRef}>
       <SendHaikuAgentRequest />
-      <HaikuDisplay chatLogs={chatLogs} />  
-     </div>
+        <HaikuDisplay chatLogs={chatLogs} />
+    </div>
   );
 };

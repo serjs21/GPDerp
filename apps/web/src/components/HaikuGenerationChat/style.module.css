@@ -137,3 +137,13 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+/* ───────────────────────────────
+   Chat log pillar wrapper
+   ─────────────────────────────── */
+
+.chatPillars {
+  flex: 1;
+  height: auto;
+  overflow: hidden;
+}

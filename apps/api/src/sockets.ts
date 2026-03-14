@@ -1,7 +1,3 @@
-import Fastify from "fastify";
-import websocket from "@fastify/websocket";
-import { WebSocket } from "ws"
-
 // const sockets = new Set<WebSocket>();
 
 // export const saveSocketConnection = (socket: WebSocket) => {
@@ -11,7 +7,6 @@ import { WebSocket } from "ws"
 // export const removeSocketConnection = (socket: WebSocket) => {
 //     sockets.delete(socket);
 // }
-
 
 // const app = Fastify({ logger: true });
 

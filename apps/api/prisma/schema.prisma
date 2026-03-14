@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id    String @id @default(uuid()) @db.Uuid
+  email String @unique
+}
+
+model Account {
+  id     String  @id @default(uuid()) @db.Uuid
+  haikus Haiku[]
+}
+
+model Haiku {
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String
+  titleSuffix Int      @default(0)
+  accountId   String
+  account     Account  @relation(fields: [accountId], references: [id])
+  body        String
+  createdAt   DateTime @default(now())
+
+  @@unique([accountId, title, titleSuffix])
+  @@index([accountId, title, titleSuffix(sort: Desc)])
+}
+
+model Label {
+  id   String @id @default(uuid()) @db.Uuid
+  name String @unique
+}
+
+model EntryLabel {
+  entryId Int
+  labelId Int
+
+  @@id([entryId, labelId])
+  @@index([labelId, entryId])
+}

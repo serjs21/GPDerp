@@ -1,9 +1,8 @@
 import type { Metadata } from "next";import { Geist, Geist_Mono, Noto_Serif_JP } from "next/font/google"; // Added Noto Serif
 import "./globals.css";
 import "@/axios.setup";
-import { LayoutProvider } from "./providers/layoutProviders";
+import { LayoutProvider } from "./providers/LayoutProviders";
 import { Layout } from "antd";
-import { GoogleLogin } from "@react-oauth/google";
 import { HtmlLoader } from "@/components/htmlDecorations/htmlLoader";const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
