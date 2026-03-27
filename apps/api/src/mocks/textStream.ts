@@ -61,10 +61,8 @@ type OpenAIResponsesStreamEvent =
   | OutputTextDoneEvent
   | ResponseCompletedEvent;
 
-// small helper for timing
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-// text only
 const HAIKUS = [
   `Shadow questions rise,
 a void whispers, "Who are you?"
@@ -85,10 +83,8 @@ Hope lost to the void.
 — Dante Fuego`,
 ];
 
-/** random haiku */
 export const randomHaiku = () => _.sample(HAIKUS)!;
 
-/** stream chunks (char or word) */
 export const streamChunks = (mode: "char" | "word" = "char") =>
   mode === "word"
     ? _.words(randomHaiku(), /[^\s]+|\s+/g)

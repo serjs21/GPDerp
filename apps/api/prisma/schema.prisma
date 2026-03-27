@@ -7,38 +7,82 @@ datasource db {
   provider = "postgresql"
 }
 
+enum AccountRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
 model User {
-  id    String @id @default(uuid()) @db.Uuid
-  email String @unique
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @unique
+  firstName String   @default("")
+  lastName  String   @default("")
+  createdAt DateTime @default(now())
+
+  memberships Membership[]
+  createdHaikus Haiku[] @relation("HaikuCreatedBy")
 }
 
 model Account {
-  id     String  @id @default(uuid()) @db.Uuid
-  haikus Haiku[]
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  createdAt DateTime @default(now())
+
+  memberships Membership[]
+  haikus      Haiku[]
+  labels      Label[]
+}
+
+model Membership {
+  id        String      @id @default(uuid()) @db.Uuid
+  userId    String      @db.Uuid
+  accountId String      @db.Uuid
+  role      AccountRole @default(MEMBER)
+  createdAt DateTime    @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, accountId])
+  @@index([userId])
+  @@index([accountId])
+  @@index([accountId, role])
 }
 
 model Haiku {
   id          String   @id @default(uuid()) @db.Uuid
   title       String
   titleSuffix Int      @default(0)
-  accountId   String
-  account     Account  @relation(fields: [accountId], references: [id])
   body        String
   createdAt   DateTime @default(now())
 
+  accountId   String   @db.Uuid
+  createdById String   @db.Uuid
+
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  createdBy User    @relation("HaikuCreatedBy", fields: [createdById], references: [id])
+
+  labels Label[]
+
   @@unique([accountId, title, titleSuffix])
+  @@index([accountId])
+  @@index([createdById])
+  @@index([accountId, createdAt])
   @@index([accountId, title, titleSuffix(sort: Desc)])
 }
 
 model Label {
-  id   String @id @default(uuid()) @db.Uuid
-  name String @unique
-}
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  createdAt DateTime @default(now())
 
-model EntryLabel {
-  entryId Int
-  labelId Int
+  accountId String   @db.Uuid
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
-  @@id([entryId, labelId])
-  @@index([labelId, entryId])
+  haikus Haiku[]
+
+  @@unique([accountId, name])
+  @@index([accountId])
 }
