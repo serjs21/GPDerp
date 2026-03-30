@@ -3,9 +3,9 @@
 import { Layout } from "antd";
 import AxiosInit from "@/client.axios.setup";
 import { useMarkHydrated } from "@/hooks/useMarkHydrated";
-import { NavigationMenu } from "@/components/NavigationMenu/NavigationMenu";
 import styles from "./headerStyles.module.css";
-import { GoogleAuthentication } from "@/components/GoogleAuthentication/GoogleAuthentication";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import Link from "next/link";
 
 const { Header, Content } = Layout;
 
@@ -15,28 +15,29 @@ export interface LayoutProviderProps {
 }
 
 export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps) => {
-  const clientId = googleClientId || process.env.GOOGLE_CLIENT_ID;
+  const clientId = googleClientId || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   useMarkHydrated();
 
-  if (!clientId) {
-    console.error("Missing GOOGLE_CLIENT_ID");
-    return <>{children}</>;
-  }
-
-  return (
+  const inner = (
     <>
       <AxiosInit />
       <Layout>
         <Header className={`${styles.header} ${styles.pencilBorder}`}>
-          {/* <NavigationMenu> */}
-            <GoogleAuthentication clientId={clientId} />
-          {/* </NavigationMenu> */}
+          <nav style={{ display: "flex", gap: 16 }}>
+            <Link href="/login">Login</Link>
+            <Link href="/register">Register</Link>
+          </nav>
         </Header>
         <div />
-        <Content>
-          {children}
-        </Content>
+        <Content>{children}</Content>
       </Layout>
     </>
   );
-}
+
+  if (!clientId) {
+    console.error("Missing NEXT_PUBLIC_GOOGLE_CLIENT_ID");
+    return inner;
+  }
+
+  return <GoogleOAuthProvider clientId={clientId}>{inner}</GoogleOAuthProvider>;
+};

@@ -1,0 +1,39 @@
+import nodemailer from "nodemailer";
+import { env } from "../../env";
+
+const transporter = nodemailer.createTransport({
+  host: env.SMTP_HOST,
+  port: env.SMTP_PORT,
+  secure: env.SMTP_SECURE,
+  auth:
+    env.SMTP_USER && env.SMTP_PASS
+      ? {
+          user: env.SMTP_USER,
+          pass: env.SMTP_PASS,
+        }
+      : undefined,
+});
+
+const assertMailConfig = () => {
+  if (!env.SMTP_HOST || !env.MAIL_FROM) {
+    throw new Error("Mail transport is not configured. Set SMTP_HOST and MAIL_FROM.");
+  }
+};
+
+export const mailService = {
+  async sendEmail(params: {
+    to: string;
+    subject: string;
+    text: string;
+    html: string;
+  }) {
+    assertMailConfig();
+    await transporter.sendMail({
+      from: env.MAIL_FROM,
+      to: params.to,
+      subject: params.subject,
+      text: params.text,
+      html: params.html,
+    });
+  },
+};

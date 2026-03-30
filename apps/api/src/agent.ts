@@ -1,7 +1,10 @@
 import { Agent, run } from "@openai/agents";
 import dotenv from "dotenv";
+import dotenvExpand from 'dotenv-expand';
 
-dotenv.config({ path: ".env" });
+
+const env = dotenv.config({ path: ".env" });
+dotenvExpand.expand(env);
 
 export interface Context {
   uid: string;

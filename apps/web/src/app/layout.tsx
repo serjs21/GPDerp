@@ -1,9 +1,12 @@
-import type { Metadata } from "next";import { Geist, Geist_Mono, Noto_Serif_JP } from "next/font/google"; // Added Noto Serif
+import type { Metadata } from "next";
+import { Geist, Geist_Mono, Noto_Serif_JP } from "next/font/google"; 
 import "./globals.css";
 import "@/axios.setup";
 import { LayoutProvider } from "./providers/LayoutProviders";
-import { Layout } from "antd";
-import { HtmlLoader } from "@/components/htmlDecorations/htmlLoader";const geistSans = Geist({
+import { AuthenticationProvider } from "./providers/AuthenticationProvider";
+import { HtmlLoader } from "@/components/htmlDecorations/htmlLoader";
+
+const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
@@ -19,8 +22,6 @@ const notoSerifJP = Noto_Serif_JP({
   weight: ["300", "500", "700"],
 });
 
-const { Header } = Layout;
-
 export const metadata: Metadata = {
   title: "GPDerp",
   description: "AI, but useless",
@@ -31,15 +32,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const googleClientId = process.env.GOOGLE_CLIENT_ID;
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? process.env.GOOGLE_CLIENT_ID;
   
   return (
     <html lang="en">
       <body className={`${notoSerifJP.variable} ${geistSans.variable} ${geistMono.variable} sumie-layout`}>
         <HtmlLoader />
-        <LayoutProvider googleClientId={googleClientId}>
-          {children}
-        </LayoutProvider>
+        <AuthenticationProvider>
+          <LayoutProvider googleClientId={googleClientId}>{children}</LayoutProvider>
+        </AuthenticationProvider>
       </body>
     </html>
   );

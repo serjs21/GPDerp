@@ -1,0 +1,29 @@
+.authPage {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 48px 16px;
+  min-height: 60vh;
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+}
+
+.divider {
+  text-align: center;
+  margin: 16px 0;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.googleRow {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.footerLinks {
+  margin-top: 8px;
+  text-align: center;
+}
