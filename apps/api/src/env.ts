@@ -5,27 +5,48 @@ const toBool = (value: string | undefined, fallback = false) => {
   if (value === undefined) return fallback;
   return value === "true";
 };
+const requireEnv = (key: string) => {
+  const value = process.env[key];
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${key}`);
+  }
+  return value;
+};
+const requirePositiveIntEnv = (key: string) => {
+  const raw = requireEnv(key);
+  const parsed = Number(raw);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new Error(`Invalid environment variable ${key}: expected a positive integer`);
+  }
+  return parsed;
+};
+const requireMinLengthEnv = (key: string, minLength: number) => {
+  const value = requireEnv(key);
+  if (value.length < minLength) {
+    throw new Error(`Invalid environment variable ${key}: expected at least ${minLength} characters`);
+  }
+  return value;
+};
 
 export const env = {
   PORT: Number(process.env.PORT ?? 3001),
   HOST: process.env.HOST ?? "0.0.0.0",
+  CLIENT_URL: process.env.CLIENT_URL ?? "http://localhost:3000",
 
-  CORS_ORIGIN: toList(process.env.CORS_ORIGIN ?? ""),
+  CORS_ORIGIN: toList(process.env.CLIENT_URL ?? "http://localhost:3000"),
   CORS_METHODS: toList(process.env.CORS_METHODS ?? "GET,POST,OPTIONS"),
   CORS_HEADERS: toList(process.env.CORS_HEADERS ?? "Content-Type"),
   CORS_CREDENTIALS: toBool(process.env.CORS_CREDENTIALS, true),
 
-  JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET ?? "dev_access_secret_change_me",
-  ACCESS_TOKEN_TTL_SECONDS: Number(process.env.ACCESS_TOKEN_TTL_SECONDS ?? 900),
-  REFRESH_TOKEN_TTL_SECONDS: Number(
-    process.env.REFRESH_TOKEN_TTL_SECONDS ?? 60 * 60 * 24 * 30,
-  ),
-  SESSION_TTL_SECONDS: Number(process.env.SESSION_TTL_SECONDS ?? 60 * 60 * 24 * 30),
-  TOKEN_HASH_PEPPER: process.env.TOKEN_HASH_PEPPER ?? "dev_token_pepper_change_me",
+  JWT_ACCESS_SECRET: requireMinLengthEnv("JWT_ACCESS_SECRET", 32),
+  ACCESS_TOKEN_TTL_SECONDS: requirePositiveIntEnv("ACCESS_TOKEN_TTL_SECONDS"),
+  REFRESH_TOKEN_TTL_SECONDS: requirePositiveIntEnv("REFRESH_TOKEN_TTL_SECONDS"),
+  SESSION_TTL_SECONDS: requirePositiveIntEnv("SESSION_TTL_SECONDS"),
+  TOKEN_HASH_PEPPER: requireMinLengthEnv("TOKEN_HASH_PEPPER", 16),
 
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID ?? "",
 
-  WEB_APP_URL: process.env.WEB_APP_URL ?? "http://localhost:3000",
+  WEB_APP_URL: process.env.WEB_APP_URL ?? process.env.CLIENT_URL ?? "http://localhost:3000",
   API_BASE_URL: process.env.API_BASE_URL ?? "http://localhost:4000",
 
   SMTP_HOST: process.env.SMTP_HOST ?? "",

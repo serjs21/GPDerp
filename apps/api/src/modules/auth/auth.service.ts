@@ -4,7 +4,11 @@ import { AuthProvider, EmailActionType } from "../../generated/prisma";
 import { AUTH_CODES, AUTH_MESSAGES, AUTH_TTL } from "./constants";
 import { authRepository } from "./repository";
 import { googleService, type GoogleIdentity } from "./googleService";
-import { buildPasswordResetEmail, buildVerificationEmail } from "../email/templates/authTemplates";
+import {
+  buildPasswordResetEmail,
+  buildVerificationEmail,
+  buildWelcomeEmail,
+} from "../email/templates/authTemplates";
 import { mailService } from "../email/mailService";
 import { tokenService } from "./tokenService";
 import {
@@ -29,6 +33,13 @@ type AuthTokens = {
   accessToken: string;
   refreshToken: string;
   csrfToken: string;
+};
+
+type GoogleSignupProfile = {
+  email: string;
+  firstName: string;
+  lastName: string;
+  avatar: string;
 };
 
 const unauthorizedError = () =>
@@ -160,7 +171,14 @@ export const authService = {
   async registerManual(
     app: FastifyInstance,
     request: FastifyRequest,
-    input: { email: string; password: string; userName: string; firstName?: string; lastName?: string },
+    input: {
+      email: string;
+      password: string;
+      userName: string;
+      firstName?: string;
+      lastName?: string;
+      avatar?: string;
+    },
   ) {
     const normalizedEmail = normalizeEmail(input.email);
     if (!normalizedEmail || !input.password || !input.userName) {
@@ -206,6 +224,7 @@ export const authService = {
         userName: userNameValidation.normalized,
         firstName: input.firstName ?? "",
         lastName: input.lastName ?? "",
+        avatar: input.avatar ?? "",
         passwordHash,
         provider: AuthProvider.LOCAL,
       });
@@ -334,23 +353,7 @@ export const authService = {
       });
       throw new AuthError(AUTH_MESSAGES.invalidAuthRequest, { statusCode: 400 });
     }
-    let googleIdentity: GoogleIdentity;
-    try {
-      googleIdentity = await googleService.verifyIdToken(input.token);
-    } catch (err) {
-      logAuthFailure(app.log, "auth: Google login failed — id token verification error", {
-        reason: "google_token_verify_failed",
-        err,
-      });
-      throw err;
-    }
-    if (!googleIdentity.emailVerified) {
-      logAuthFailure(app.log, "auth: Google login rejected — email not verified at Google", {
-        reason: "google_email_unverified",
-        sub: googleIdentity.sub,
-      });
-      throw unauthorizedError();
-    }
+    const googleIdentity = await verifyAndNormalizeGoogleIdentity(app, input.token);
 
     const existingGoogleIdentity =
       await authRepository.findGoogleIdentityByProviderAccountId(googleIdentity.sub);
@@ -372,6 +375,7 @@ export const authService = {
         userName,
         firstName: googleIdentity.firstName,
         lastName: googleIdentity.lastName,
+        avatar: googleIdentity.avatar,
         provider: AuthProvider.GOOGLE,
         providerAccountId: googleIdentity.sub,
         emailVerifiedAt: new Date(),
@@ -410,6 +414,160 @@ export const authService = {
         await authRepository.markUserEmailVerified(existingUser.id);
       }
       userId = existingUser.id;
+    }
+
+    return issueSessionTokens(userId, readSessionMeta(request));
+  },
+
+  async loginGoogleForLoginFlow(
+    app: FastifyInstance,
+    request: FastifyRequest,
+    input: { token: string },
+  ): Promise<
+    | { status: "authenticated"; tokens: AuthTokens }
+    | { status: "signup_required"; profile: GoogleSignupProfile }
+  > {
+    if (!input.token) {
+      logAuthFailure(app.log, "auth: Google login flow rejected — missing id token", {
+        reason: "missing_google_token",
+      });
+      throw new AuthError(AUTH_MESSAGES.invalidAuthRequest, { statusCode: 400 });
+    }
+
+    const googleIdentity = await verifyAndNormalizeGoogleIdentity(app, input.token);
+    const existingGoogleIdentity =
+      await authRepository.findGoogleIdentityByProviderAccountId(googleIdentity.sub);
+    const normalizedEmail = normalizeEmail(googleIdentity.email);
+    const existingUser = await authRepository.findUserByEmail(normalizedEmail);
+
+    if (!existingUser) {
+      if (existingGoogleIdentity) {
+        logAuthFailure(app.log, "auth: Google login flow rejected — orphan Google identity", {
+          reason: "google_identity_without_user",
+          sub: googleIdentity.sub,
+        });
+        throw unauthorizedError();
+      }
+      return {
+        status: "signup_required",
+        profile: {
+          email: normalizedEmail,
+          firstName: googleIdentity.firstName,
+          lastName: googleIdentity.lastName,
+          avatar: googleIdentity.avatar,
+        },
+      };
+    }
+
+    const currentGoogleIdentity = existingUser.authIdentities.find(
+      (identity) => identity.provider === AuthProvider.GOOGLE,
+    );
+    if (
+      currentGoogleIdentity?.providerAccountId &&
+      currentGoogleIdentity.providerAccountId !== googleIdentity.sub
+    ) {
+      logAuthFailure(app.log, "auth: Google login flow rejected — sub mismatch for linked account", {
+        reason: "google_sub_mismatch",
+        userId: existingUser.id,
+        storedSub: currentGoogleIdentity.providerAccountId,
+        tokenSub: googleIdentity.sub,
+      });
+      throw unauthorizedError();
+    }
+    if (existingGoogleIdentity && existingGoogleIdentity.userId !== existingUser.id) {
+      logAuthFailure(app.log, "auth: Google login flow rejected — Google account linked to another user", {
+        reason: "google_identity_wrong_user",
+        email: normalizedEmail,
+        tokenUserId: existingGoogleIdentity.userId,
+        emailUserId: existingUser.id,
+      });
+      throw unauthorizedError();
+    }
+
+    await authRepository.attachGoogleIdentity({
+      userId: existingUser.id,
+      providerAccountId: googleIdentity.sub,
+    });
+    if (!existingUser.emailVerifiedAt) {
+      await authRepository.markUserEmailVerified(existingUser.id);
+    }
+
+    return {
+      status: "authenticated",
+      tokens: await issueSessionTokens(existingUser.id, readSessionMeta(request)),
+    };
+  },
+
+  async registerGoogleWithUsername(
+    app: FastifyInstance,
+    request: FastifyRequest,
+    input: {
+      token: string;
+      userName: string;
+      firstName?: string;
+      lastName?: string;
+      avatar?: string;
+    },
+  ) {
+    if (!input.token || !input.userName) {
+      throw new AuthError(AUTH_MESSAGES.invalidAuthRequest, { statusCode: 400 });
+    }
+    const userNameValidation = validateUsername(input.userName);
+    if (!userNameValidation.valid) {
+      throw new AuthError(userNameValidation.message, { statusCode: 400, expose: true });
+    }
+
+    const googleIdentity = await verifyAndNormalizeGoogleIdentity(app, input.token);
+    const normalizedEmail = normalizeEmail(googleIdentity.email);
+    const existingUser = await authRepository.findUserByEmail(normalizedEmail);
+    if (existingUser) {
+      throw new AuthError(AUTH_MESSAGES.emailAlreadyRegistered, {
+        statusCode: 409,
+        expose: true,
+        code: AUTH_CODES.EMAIL_IN_USE,
+      });
+    }
+    const existingGoogleIdentity =
+      await authRepository.findGoogleIdentityByProviderAccountId(googleIdentity.sub);
+    if (existingGoogleIdentity) {
+      throw unauthorizedError();
+    }
+
+    let userId: string;
+    
+    try {
+      const user = await authRepository.createUserWithWorkspace({
+        email: normalizedEmail,
+        userName: userNameValidation.normalized,
+        firstName: input.firstName ?? googleIdentity.firstName,
+        lastName: input.lastName ?? googleIdentity.lastName,
+        avatar: input.avatar ?? googleIdentity.avatar,
+        provider: AuthProvider.GOOGLE,
+        providerAccountId: googleIdentity.sub,
+        emailVerifiedAt: new Date(),
+      });
+      userId = user.id;
+      
+      await mailService.sendEmail({
+        to: normalizedEmail,
+        ...buildWelcomeEmail(),
+      });
+    
+    } catch (error) {
+      if (!isUniqueConstraintError(error)) throw error;
+      const emailRace = await authRepository.findUserByEmail(normalizedEmail);
+      if (emailRace) {
+        throw new AuthError(AUTH_MESSAGES.emailAlreadyRegistered, {
+          statusCode: 409,
+          expose: true,
+          code: AUTH_CODES.EMAIL_IN_USE,
+        });
+      }
+      throw new AuthError(AUTH_MESSAGES.usernameTaken, {
+        statusCode: 409,
+        expose: true,
+        code: AUTH_CODES.USERNAME_TAKEN,
+      });
     }
 
     return issueSessionTokens(userId, readSessionMeta(request));
@@ -486,6 +644,7 @@ export const authService = {
         userName: user.userName,
         firstName: user.firstName,
         lastName: user.lastName,
+        avatar: user.avatar,
         emailVerifiedAt: user.emailVerifiedAt,
         providers: user.authIdentities.map((identity) => identity.provider),
       },
@@ -514,22 +673,61 @@ export const authService = {
     await createAndSendVerificationEmail(app.log, normalizedEmail, user.id);
   },
 
-  async verifyEmail(app: FastifyInstance, rawToken: string) {
-    const token = await authRepository.consumeEmailActionToken({
-      type: EmailActionType.EMAIL_VERIFICATION,
-      tokenHash: hashToken(rawToken),
-    });
-    if (!token) {
-      logAuthFailure(app.log, "auth: verify email rejected — invalid or consumed token", {
+  async verifyEmail(
+    app: FastifyInstance,
+    rawToken: string,
+  ): Promise<
+    | { status: "verified" }
+    | { status: "already_verified" }
+    | { status: "expired"; email: string | null }
+    | { status: "invalid" }
+  > {
+    const tokenHash = hashToken(rawToken);
+    const existingToken = await authRepository.findEmailActionTokenByHash(tokenHash);
+    if (!existingToken || existingToken.type !== EmailActionType.EMAIL_VERIFICATION) {
+      logAuthFailure(app.log, "auth: verify email rejected — token not found", {
         reason: "invalid_verification_token",
       });
-      throw new AuthError(AUTH_MESSAGES.invalidToken, { statusCode: 400, expose: true });
+      return { status: "invalid" };
     }
-    await authRepository.markUserEmailVerified(token.userId);
+    if (existingToken.expiresAt <= new Date()) {
+      return { status: "expired", email: existingToken.user.email ?? null };
+    }
+    if (existingToken.usedAt || existingToken.invalidatedAt) {
+      if (existingToken.user.emailVerifiedAt) {
+        return { status: "already_verified" };
+      }
+      logAuthFailure(app.log, "auth: verify email rejected — token already used/invalidated", {
+        reason: "invalid_verification_token",
+      });
+      return { status: "invalid" };
+    }
+
+    const consumedToken = await authRepository.consumeEmailActionToken({
+      type: EmailActionType.EMAIL_VERIFICATION,
+      tokenHash,
+    });
+    if (!consumedToken) {
+      const user = await authRepository.findUserById(existingToken.userId);
+      if (user?.emailVerifiedAt) return { status: "already_verified" };
+      logAuthFailure(app.log, "auth: verify email rejected — consume failed", {
+        reason: "invalid_verification_token",
+      });
+      return { status: "invalid" };
+    }
+
+    await authRepository.markUserEmailVerified(consumedToken.userId);
     await authRepository.invalidateEmailActionTokens({
-      userId: token.userId,
+      userId: consumedToken.userId,
       type: EmailActionType.EMAIL_VERIFICATION,
     });
+    if (existingToken.user.email) {
+      await mailService.sendEmail({
+        to: existingToken.user.email,
+        ...buildWelcomeEmail(),
+      });
+    }
+    return { status: "verified" };
   },
 
   async requestPasswordReset(email: string) {
@@ -592,4 +790,29 @@ export const authService = {
     // Security-first default: force re-authentication across devices after password change.
     await authRepository.revokeAllSessionsForUser(token.userId, "password_reset");
   },
+};
+
+const verifyAndNormalizeGoogleIdentity = async (
+  app: FastifyInstance,
+  token: string,
+): Promise<GoogleIdentity> => {
+  let googleIdentity: GoogleIdentity;
+  try {
+    googleIdentity = await googleService.verifyIdToken(token);
+  } catch (err) {
+    logAuthFailure(app.log, "auth: Google login failed — id token verification error", {
+      reason: "google_token_verify_failed",
+      err,
+    });
+    throw err;
+  }
+
+  if (!googleIdentity.emailVerified) {
+    logAuthFailure(app.log, "auth: Google login rejected — email not verified at Google", {
+      reason: "google_email_unverified",
+      sub: googleIdentity.sub,
+    });
+    throw unauthorizedError();
+  }
+  return googleIdentity;
 };

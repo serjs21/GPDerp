@@ -53,6 +53,7 @@ export const authRepository = {
     userName: string;
     firstName: string;
     lastName: string;
+    avatar?: string;
     passwordHash?: string;
     provider: AuthProvider;
     providerAccountId?: string | null;
@@ -65,6 +66,7 @@ export const authRepository = {
           userName: params.userName,
           firstName: params.firstName,
           lastName: params.lastName,
+          avatar: params.avatar ?? "",
           emailVerifiedAt: params.emailVerifiedAt ?? null,
         },
       });
@@ -367,6 +369,21 @@ export const authRepository = {
         data: { usedAt: new Date() },
       });
       return updated;
+    });
+  },
+
+  findEmailActionTokenByHash(tokenHash: string) {
+    return prismaClient.emailActionToken.findUnique({
+      where: { tokenHash },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            emailVerifiedAt: true,
+          },
+        },
+      },
     });
   },
 

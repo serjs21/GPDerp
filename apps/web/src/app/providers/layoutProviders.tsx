@@ -5,7 +5,7 @@ import AxiosInit from "@/client.axios.setup";
 import { useMarkHydrated } from "@/hooks/useMarkHydrated";
 import styles from "./headerStyles.module.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import Link from "next/link";
+import { AuthNavigation } from "@/components/AuthenticationNav/AuthNavigation";
 
 const { Header, Content } = Layout;
 
@@ -23,10 +23,7 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
       <AxiosInit />
       <Layout>
         <Header className={`${styles.header} ${styles.pencilBorder}`}>
-          <nav style={{ display: "flex", gap: 16 }}>
-            <Link href="/login">Login</Link>
-            <Link href="/register">Register</Link>
-          </nav>
+          <AuthNavigation />
         </Header>
         <div />
         <Content>{children}</Content>

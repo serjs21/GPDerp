@@ -9,6 +9,7 @@ export type GoogleIdentity = {
   emailVerified: boolean;
   firstName: string;
   lastName: string;
+  avatar: string;
 };
 
 export const googleService = {
@@ -32,6 +33,7 @@ export const googleService = {
       emailVerified: payload.email_verified === true,
       firstName: payload.given_name ?? "",
       lastName: payload.family_name ?? "",
+      avatar: payload.picture ?? "",
     };
   },
 };

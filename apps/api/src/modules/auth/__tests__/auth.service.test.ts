@@ -19,6 +19,7 @@ jest.mock("../repository", () => ({
     rotateRefreshTokenAtomic: jest.fn(),
     revokeSession: jest.fn(),
     consumeEmailActionToken: jest.fn(),
+    findEmailActionTokenByHash: jest.fn(),
     updatePassword: jest.fn(),
     revokeAllSessionsForUser: jest.fn(),
     findUserById: jest.fn(),
@@ -34,7 +35,7 @@ jest.mock("../googleService", () => ({
   },
 }));
 
-jest.mock("../mailService", () => ({
+jest.mock("../../email/mailService", () => ({
   mailService: {
     sendEmail: jest.fn(),
   },
@@ -46,12 +47,13 @@ jest.mock("../tokenService", () => ({
     refreshExpiresAt: jest.fn(() => new Date("2030-01-01T00:10:00.000Z")),
     createRefreshToken: jest.fn(() => "raw-refresh-token"),
     createAccessToken: jest.fn(() => "access-token"),
+    createCsrfToken: jest.fn(() => "csrf-token"),
   },
 }));
 
 const { authRepository } = jest.requireMock("../repository") as any;
 const { googleService } = jest.requireMock("../googleService") as any;
-const { mailService } = jest.requireMock("../mailService") as any;
+const { mailService } = jest.requireMock("../../email/mailService") as any;
 
 const mockLog = {
   warn: jest.fn(),
@@ -108,6 +110,7 @@ describe("authService", () => {
     expect(result).toEqual({
       accessToken: "access-token",
       refreshToken: "raw-refresh-token",
+      csrfToken: "csrf-token",
     });
   });
 
@@ -211,6 +214,7 @@ describe("authService", () => {
       emailVerified: true,
       firstName: "New",
       lastName: "Google",
+      avatar: "https://avatar.example/newgoogle.png",
     });
     authRepository.findGoogleIdentityByProviderAccountId.mockResolvedValue(null);
     authRepository.findUserByEmail.mockResolvedValue(null);
@@ -235,6 +239,7 @@ describe("authService", () => {
       emailVerified: true,
       firstName: "User",
       lastName: "Example",
+      avatar: "https://avatar.example/user.png",
     });
     authRepository.findUserByEmail.mockResolvedValue({
       id: "user-1",
@@ -259,6 +264,7 @@ describe("authService", () => {
       emailVerified: false,
       firstName: "User",
       lastName: "Example",
+      avatar: "https://avatar.example/user.png",
     });
 
     await expect(authService.loginGoogle(mockApp, mockRequest, { token: "bad-token" })).rejects.toThrow(
@@ -340,7 +346,7 @@ describe("authService", () => {
       },
     });
     authRepository.rotateRefreshTokenAtomic.mockResolvedValue({
-      reused: false,
+      status: "ok",
       nextToken: { id: "rt-2" },
     });
 
@@ -349,6 +355,7 @@ describe("authService", () => {
     expect(result).toEqual({
       accessToken: "access-token",
       refreshToken: "raw-refresh-token",
+      csrfToken: "csrf-token",
     });
   });
 
@@ -364,7 +371,7 @@ describe("authService", () => {
       },
     });
     authRepository.rotateRefreshTokenAtomic.mockResolvedValue({
-      reused: true,
+      status: "reused",
     });
 
     await expect(authService.refresh(mockApp, "replayed-token")).rejects.toThrow("Unauthorized");
@@ -385,5 +392,102 @@ describe("authService", () => {
 
     await authService.logout("logout-token");
     expect(authRepository.revokeSession).toHaveBeenCalledWith("session-1", "logout");
+  });
+
+  it("returns signup_required profile for unknown google user in login flow", async () => {
+    googleService.verifyIdToken.mockResolvedValue({
+      sub: "google-sub-signup",
+      email: "new.signup@example.com",
+      emailVerified: true,
+      firstName: "New",
+      lastName: "Signup",
+      avatar: "https://avatar.example/new-signup.png",
+    });
+    authRepository.findGoogleIdentityByProviderAccountId.mockResolvedValue(null);
+    authRepository.findUserByEmail.mockResolvedValue(null);
+
+    const result = await authService.loginGoogleForLoginFlow(mockApp, mockRequest, {
+      token: "google-token-signup",
+    });
+
+    expect(result).toEqual({
+      status: "signup_required",
+      profile: {
+        email: "new.signup@example.com",
+        firstName: "New",
+        lastName: "Signup",
+        avatar: "https://avatar.example/new-signup.png",
+      },
+    });
+  });
+
+  it("registers google user with username and profile details", async () => {
+    googleService.verifyIdToken.mockResolvedValue({
+      sub: "google-sub-register",
+      email: "register@example.com",
+      emailVerified: true,
+      firstName: "Google",
+      lastName: "Person",
+      avatar: "https://avatar.example/google-person.png",
+    });
+    authRepository.findUserByEmail.mockResolvedValue(null);
+    authRepository.findGoogleIdentityByProviderAccountId.mockResolvedValue(null);
+    authRepository.createUserWithWorkspace.mockResolvedValue({ id: "google-user-1" });
+
+    const result = await authService.registerGoogleWithUsername(mockApp, mockRequest, {
+      token: "google-register-token",
+      userName: "google_person",
+      firstName: "Given",
+      lastName: "Name",
+      avatar: "https://avatar.example/custom.png",
+    });
+
+    expect(authRepository.createUserWithWorkspace).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: "register@example.com",
+        userName: "google_person",
+        firstName: "Given",
+        lastName: "Name",
+        avatar: "https://avatar.example/custom.png",
+        provider: "GOOGLE",
+        providerAccountId: "google-sub-register",
+      }),
+    );
+    expect(result).toEqual({
+      accessToken: "access-token",
+      refreshToken: "raw-refresh-token",
+      csrfToken: "csrf-token",
+    });
+  });
+
+  it("sends a welcome email after successful email verification", async () => {
+    authRepository.findEmailActionTokenByHash.mockResolvedValue({
+      id: "email-token-1",
+      userId: "user-verified",
+      type: EmailActionType.EMAIL_VERIFICATION,
+      expiresAt: new Date(Date.now() + 10_000),
+      usedAt: null,
+      invalidatedAt: null,
+      user: {
+        id: "user-verified",
+        email: "verified@example.com",
+        emailVerifiedAt: null,
+      },
+    });
+    authRepository.consumeEmailActionToken.mockResolvedValue({
+      userId: "user-verified",
+      type: EmailActionType.EMAIL_VERIFICATION,
+    });
+
+    const result = await authService.verifyEmail(mockApp, "verify-token");
+
+    expect(authRepository.markUserEmailVerified).toHaveBeenCalledWith("user-verified");
+    expect(mailService.sendEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: "verified@example.com",
+        subject: "Welcome to GPDerp",
+      }),
+    );
+    expect(result).toEqual({ status: "verified" });
   });
 });

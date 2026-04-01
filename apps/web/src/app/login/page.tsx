@@ -6,17 +6,65 @@ import axios from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import authStyles from '../auth.shared.module.css';
+import { useAuthentication } from '@/hooks/useAuthentication';
+
+type GoogleSignupRequiredResponse = {
+  error?: string;
+  code?: string;
+  data?: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    avatar: string;
+  };
+};
+
+const logAuthDebug = (event: string, data: Record<string, unknown>) => {
+  if (process.env.NODE_ENV === 'production') return;
+  console.info(`[auth-debug] ${event}`, data);
+};
 
 const LoginPage = () => {
   const router = useRouter();
+  const {} = useAuthentication()
   const [form] = Form.useForm();
 
   const onGoogleCredential = async (credential: string | undefined) => {
-    if (!credential) return;
+    if (!credential) {
+      logAuthDebug('google_login_callback_missing_credential', {});
+      return;
+    }
     try {
-      await axios.post('/auth/google', { token: credential });
+      await axios.post('/auth/google/login', { token: credential });
       router.push('/');
-    } catch {
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        logAuthDebug('google_login_request_error', {
+          endpoint: String(e.config?.url ?? '/auth/google/login'),
+          status: e.response?.status ?? null,
+          code: (e.response?.data as { code?: string } | undefined)?.code ?? null,
+          error: (e.response?.data as { error?: string } | undefined)?.error ?? null,
+        });
+      } else {
+        logAuthDebug('google_login_request_error', {
+          endpoint: '/auth/google/login',
+          nonAxiosError: true,
+        });
+      }
+      if (axios.isAxiosError(e) && e.response?.status === 409) {
+        const data = e.response.data as GoogleSignupRequiredResponse;
+        if (data.code === 'GOOGLE_SIGNUP_REQUIRED' && data.data) {
+          sessionStorage.setItem(
+            'googleSignupDraft',
+            JSON.stringify({
+              token: credential,
+              ...data.data,
+            }),
+          );
+          router.push('/register?flow=google');
+          return;
+        }
+      }
       message.error('Google sign-in failed');
     }
   };
@@ -26,6 +74,19 @@ const LoginPage = () => {
       await axios.post('/auth/login', values);
       router.push('/');
     } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        logAuthDebug('password_login_request_error', {
+          endpoint: String(e.config?.url ?? '/auth/login'),
+          status: e.response?.status ?? null,
+          code: (e.response?.data as { code?: string } | undefined)?.code ?? null,
+          error: (e.response?.data as { error?: string } | undefined)?.error ?? null,
+        });
+      } else {
+        logAuthDebug('password_login_request_error', {
+          endpoint: '/auth/login',
+          nonAxiosError: true,
+        });
+      }
       if (axios.isAxiosError(e) && e.response?.data) {
         const data = e.response.data as { error?: string; code?: string };
         if (data.code === 'USE_GOOGLE') {
@@ -50,7 +111,7 @@ const LoginPage = () => {
             label="Email"
             rules={[{ required: true, type: 'email', message: 'Enter a valid email' }]}
           >
-            <Input autoComplete="email" />
+            <Input autoComplete="email" type="email" />
           </Form.Item>
           <Form.Item name="password" label="Password" rules={[{ required: true, message: 'Required' }]}>
             <Input.Password autoComplete="current-password" />

@@ -17,3 +17,12 @@ export const buildPasswordResetEmail = (token: string) => {
     html: `<p>Reset your password by clicking <a href="${resetUrl}">this link</a>.</p><p>This link expires in 24 hours.</p>`,
   };
 };
+
+export const buildWelcomeEmail = () => {
+  const homeUrl = env.CLIENT_URL;
+  return {
+    subject: "Welcome to GPDerp",
+    text: `Thanks for verifying your email. Your account is now active.\n\nGet started here: ${homeUrl}`,
+    html: `<p>Thanks for verifying your email. Your account is now active.</p><p>Get started at <a href="${homeUrl}">${homeUrl}</a>.</p>`,
+  };
+};

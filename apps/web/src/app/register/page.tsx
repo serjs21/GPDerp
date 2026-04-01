@@ -4,8 +4,8 @@ import { Button, Card, Form, Input, Steps, Typography, message } from 'antd';
 import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import authStyles from '../auth.shared.module.css';
 
 type CheckEmailResponse = { ok: boolean; data: { canRegisterWithPassword: boolean } };
@@ -13,21 +13,61 @@ type CheckUsernameResponse = {
   ok: boolean;
   data: { available: boolean; normalized: string | null; reason: string | null };
 };
+type GoogleSignupDraft = {
+  token: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  avatar: string;
+};
+type GoogleSignupRequiredResponse = {
+  error?: string;
+  code?: string;
+  data?: Omit<GoogleSignupDraft, 'token'>;
+};
 
 const RegisterPage = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [step, setStep] = useState(0);
   const [form1] = Form.useForm();
   const [form2] = Form.useForm();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [googleSignup, setGoogleSignup] = useState<GoogleSignupDraft | null>(null);
+
+  useEffect(() => {
+    if (searchParams.get('flow') !== 'google') return;
+    const draftRaw = sessionStorage.getItem('googleSignupDraft');
+    if (!draftRaw) return;
+    try {
+      const draft = JSON.parse(draftRaw) as GoogleSignupDraft;
+      if (!draft.token || !draft.email) return;
+      setGoogleSignup(draft);
+      setEmail(draft.email);
+      setStep(1);
+    } catch {
+      sessionStorage.removeItem('googleSignupDraft');
+    }
+  }, [searchParams]);
 
   const onGoogleCredential = async (credential: string | undefined) => {
     if (!credential) return;
     try {
-      await axios.post('/auth/google', { token: credential });
+      await axios.post('/auth/google/login', { token: credential });
       router.push('/');
-    } catch {
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e) && e.response?.status === 409) {
+        const data = e.response.data as GoogleSignupRequiredResponse;
+        if (data.code === 'GOOGLE_SIGNUP_REQUIRED' && data.data) {
+          const draft: GoogleSignupDraft = { token: credential, ...data.data };
+          sessionStorage.setItem('googleSignupDraft', JSON.stringify(draft));
+          setGoogleSignup(draft);
+          setEmail(draft.email);
+          setStep(1);
+          return;
+        }
+      }
       message.error('Google sign-in failed');
     }
   };
@@ -43,6 +83,8 @@ const RegisterPage = () => {
       }
       setEmail(values.email.trim().toLowerCase());
       setPassword(values.password);
+      setGoogleSignup(null);
+      sessionStorage.removeItem('googleSignupDraft');
       setStep(1);
     } catch {
       message.error('Could not verify email. Try again.');
@@ -51,11 +93,22 @@ const RegisterPage = () => {
 
   const onRegister = async (values: { userName: string }) => {
     try {
-      await axios.post('/auth/register', {
-        email,
-        password,
-        userName: values.userName.trim(),
-      });
+      if (googleSignup) {
+        await axios.post('/auth/google/register', {
+          token: googleSignup.token,
+          userName: values.userName.trim(),
+          firstName: googleSignup.firstName,
+          lastName: googleSignup.lastName,
+          avatar: googleSignup.avatar,
+        });
+      } else {
+        await axios.post('/auth/register', {
+          email,
+          password,
+          userName: values.userName.trim(),
+        });
+      }
+      sessionStorage.removeItem('googleSignupDraft');
       message.success('Account created');
       router.push('/');
     } catch (e: unknown) {
@@ -103,7 +156,7 @@ const RegisterPage = () => {
                 label="Email"
                 rules={[{ required: true, type: 'email', message: 'Enter a valid email' }]}
               >
-                <Input autoComplete="email" />
+                <Input autoComplete="email" type="email" />
               </Form.Item>
               <Form.Item
                 name="password"
@@ -144,6 +197,11 @@ const RegisterPage = () => {
 
         {step === 1 && (
           <Form form={form2} onFinish={onRegister} layout="vertical" requiredMark={false}>
+            {googleSignup && (
+              <Typography.Paragraph type="secondary">
+                Continue Google sign-up for <strong>{googleSignup.email}</strong>.
+              </Typography.Paragraph>
+            )}
             <Form.Item
               name="userName"
               label="Username"
@@ -173,7 +231,13 @@ const RegisterPage = () => {
               <Input autoComplete="username" placeholder="your_handle" />
             </Form.Item>
             <Form.Item>
-              <SpaceButtons onBack={() => setStep(0)} />
+              <SpaceButtons
+                onBack={() => {
+                  setStep(0);
+                  setGoogleSignup(null);
+                  sessionStorage.removeItem('googleSignupDraft');
+                }}
+              />
             </Form.Item>
           </Form>
         )}

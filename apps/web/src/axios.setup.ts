@@ -6,6 +6,10 @@ import Cookies from "js-cookie";
 export const TAB_HEADER_KEY = "x-tab-id";
 
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
+if (!axios.defaults.baseURL && typeof window !== "undefined" && window.location.hostname === "localhost") {
+  // Dev fallback: avoid hitting Next.js (3000) when API base URL is not configured.
+  axios.defaults.baseURL = "http://localhost:4000";
+}
 axios.defaults.timeout = 120_000;
 axios.defaults.withCredentials = true;
 

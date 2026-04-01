@@ -2,7 +2,7 @@ import fp from "fastify-plugin";
 import cookie from "@fastify/cookie";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { env } from "../../env";
-import { AUTH_COOKIE_NAMES, AUTH_HEADER_NAMES, AUTH_MESSAGES } from "./constants";
+import { AUTH_CODES, AUTH_COOKIE_NAMES, AUTH_HEADER_NAMES, AUTH_MESSAGES } from "./constants";
 import { authService } from "./auth.service";
 import { authRepository } from "./repository";
 import { tokenService } from "./tokenService";
@@ -15,8 +15,34 @@ const authPluginImpl = async (app: FastifyInstance) => {
   await app.register(cookie);
   const accessJwtSecret = new TextEncoder().encode(env.JWT_ACCESS_SECRET);
 
-  const respondAuthError = (reply: FastifyReply, error: unknown) => {
+  const requestAuthMeta = (request: FastifyRequest) => ({
+    route: request.routeOptions.url,
+    method: request.method,
+    ip: request.ip,
+    origin: request.headers.origin,
+    hasCookieHeader: Boolean(request.headers.cookie),
+    contentType: request.headers["content-type"],
+  });
+
+  const respondAuthError = (
+    request: FastifyRequest,
+    reply: FastifyReply,
+    error: unknown,
+    context: string,
+  ) => {
     if (isAuthError(error)) {
+      app.log.warn(
+        {
+          ...requestAuthMeta(request),
+          authFailure: true,
+          context,
+          statusCode: error.statusCode,
+          code: error.code,
+          expose: error.expose,
+          message: error.message,
+        },
+        "auth: request failed with known auth error",
+      );
       return reply.code(error.statusCode).send({
         ok: false,
         error: error.expose ? error.message : AUTH_MESSAGES.unauthorized,
@@ -24,6 +50,15 @@ const authPluginImpl = async (app: FastifyInstance) => {
       });
     }
 
+    app.log.error(
+      {
+        ...requestAuthMeta(request),
+        authFailure: true,
+        context,
+        err: error,
+      },
+      "auth: request failed with unexpected error",
+    );
     return reply.code(400).send({ ok: false, error: AUTH_MESSAGES.invalidAuthRequest });
   };
 
@@ -62,7 +97,7 @@ const authPluginImpl = async (app: FastifyInstance) => {
 
   const expectedWebOrigin = (() => {
     try {
-      return new URL(env.WEB_APP_URL).origin;
+      return new URL(env.CLIENT_URL).origin;
     } catch {
       return null;
     }
@@ -98,6 +133,7 @@ const authPluginImpl = async (app: FastifyInstance) => {
       userName: string;
       firstName?: string;
       lastName?: string;
+      avatar?: string;
     };
     try {
       const tokens = await authService.registerManual(app, request, body);
@@ -108,7 +144,7 @@ const authPluginImpl = async (app: FastifyInstance) => {
       });
       return reply.code(201).send({ ok: true });
     } catch (error) {
-      return respondAuthError(reply, error);
+      return respondAuthError(request, reply, error, "register_manual");
     }
   });
 
@@ -161,6 +197,50 @@ const authPluginImpl = async (app: FastifyInstance) => {
     }
   });
 
+  app.post("/auth/google/login", async (request: FastifyRequest, reply: FastifyReply) => {
+    const body = request.body as { token: string };
+    try {
+      const result = await authService.loginGoogleForLoginFlow(app, request, body);
+      if (result.status === "signup_required") {
+        return reply.code(409).send({
+          ok: false,
+          error: AUTH_MESSAGES.googleSignupRequired,
+          code: AUTH_CODES.GOOGLE_SIGNUP_REQUIRED,
+          data: result.profile,
+        });
+      }
+      tokenService.setAuthCookies(reply, {
+        accessToken: result.tokens.accessToken,
+        refreshToken: result.tokens.refreshToken,
+        csrfToken: result.tokens.csrfToken,
+      });
+      return reply.send({ ok: true });
+    } catch (error) {
+      return respondAuthError(request, reply, error, "login_google_flow");
+    }
+  });
+
+  app.post("/auth/google/register", async (request: FastifyRequest, reply: FastifyReply) => {
+    const body = request.body as {
+      token: string;
+      userName: string;
+      firstName?: string;
+      lastName?: string;
+      avatar?: string;
+    };
+    try {
+      const tokens = await authService.registerGoogleWithUsername(app, request, body);
+      tokenService.setAuthCookies(reply, {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+        csrfToken: tokens.csrfToken,
+      });
+      return reply.code(201).send({ ok: true });
+    } catch (error) {
+      return respondAuthError(request, reply, error, "register_google_with_username");
+    }
+  });
+
   app.post("/auth/refresh", { preHandler: [requireCsrf] }, async (request: FastifyRequest, reply: FastifyReply) => {
     const refreshToken = request.cookies[AUTH_COOKIE_NAMES.refreshToken];
     if (!refreshToken) {
@@ -204,12 +284,18 @@ const authPluginImpl = async (app: FastifyInstance) => {
   });
 
   app.get("/auth/verify-email", async (request: FastifyRequest, reply: FastifyReply) => {
-    const q = request.query as { token: string };
+    const q = request.query as { token?: string };
+    if (!q.token) {
+      return reply.code(400).send({
+        ok: false,
+        error: AUTH_MESSAGES.invalidToken,
+      });
+    }
     try {
-      await authService.verifyEmail(app, q.token);
-      return reply.send({ ok: true });
+      const result = await authService.verifyEmail(app, q.token);
+      return reply.send({ ok: true, data: result });
     } catch (error) {
-      return respondAuthError(reply, error);
+      return respondAuthError(request, reply, error, "verify_email");
     }
   });
 
@@ -225,7 +311,7 @@ const authPluginImpl = async (app: FastifyInstance) => {
       await authService.confirmPasswordReset(app, body);
       return reply.send({ ok: true });
     } catch (error) {
-      return respondAuthError(reply, error);
+      return respondAuthError(request, reply, error, "confirm_password_reset");
     }
   });
 };

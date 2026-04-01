@@ -29,6 +29,7 @@ model User {
   email           String    @unique
   firstName       String    @default("")
   lastName        String    @default("")
+  avatar          String    @default("")
   userName        String    @unique
   emailVerifiedAt DateTime?
   blockedAt       DateTime?
