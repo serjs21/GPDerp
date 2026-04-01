@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import authStyles from '../auth.shared.module.css';
 import { useAuthentication } from '@/hooks/useAuthentication';
+import { useAuthenticationState } from '../providers/AuthenticationProvider';
 
 type GoogleSignupRequiredResponse = {
   error?: string;
@@ -26,8 +27,14 @@ const logAuthDebug = (event: string, data: Record<string, unknown>) => {
 
 const LoginPage = () => {
   const router = useRouter();
-  const {} = useAuthentication()
+  const {checkAuthentication} = useAuthenticationState()
   const [form] = Form.useForm();
+
+  const onLoginSuccess = () => {
+    router.replace('/');
+    checkAuthentication();
+    router.refresh();
+  }
 
   const onGoogleCredential = async (credential: string | undefined) => {
     if (!credential) {
@@ -36,8 +43,8 @@ const LoginPage = () => {
     }
     try {
       await axios.post('/auth/google/login', { token: credential });
-      router.push('/');
-    } catch (e: unknown) {
+      onLoginSuccess()
+        } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
         logAuthDebug('google_login_request_error', {
           endpoint: String(e.config?.url ?? '/auth/google/login'),
@@ -72,7 +79,7 @@ const LoginPage = () => {
   const onFinish = async (values: { email: string; password: string }) => {
     try {
       await axios.post('/auth/login', values);
-      router.push('/');
+      onLoginSuccess();
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
         logAuthDebug('password_login_request_error', {

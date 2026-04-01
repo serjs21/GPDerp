@@ -10,6 +10,18 @@ type LoggedInUserDropdownProps = {
   onLogout: () => void | Promise<void>;
 };
 
+
+const UserIdDisplay = ({ user }: { user: UserObject }) => {
+  return (
+    <Space>
+      <Avatar shape="square" size={36} src={user.avatar || undefined}>
+        {user.userName.slice(0, 1).toUpperCase()}
+      </Avatar>
+      <span>{user.userName}</span>
+    </Space>
+  )
+}
+
 export const LoggedInUserDropdown = ({ user, onLogout }: LoggedInUserDropdownProps) => {
   const displayName = user.userName || user.email || "User";
 
@@ -51,11 +63,8 @@ export const LoggedInUserDropdown = ({ user, onLogout }: LoggedInUserDropdownPro
       trigger={["click"]}
       menu={{ items, onClick: onMenuClick }}
     >
-      <Button type="text">
-        <Space>
-          <span>{displayName}</span>
-          <DownOutlined />
-        </Space>
+      <Button type="text" style={{ width: 'fit-content' }}>
+        <UserIdDisplay user={user} />
       </Button>
     </Dropdown>
   );

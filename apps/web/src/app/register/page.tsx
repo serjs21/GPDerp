@@ -55,7 +55,8 @@ const RegisterPage = () => {
     if (!credential) return;
     try {
       await axios.post('/auth/google/login', { token: credential });
-      router.push('/');
+      router.replace('/');
+      router.refresh();
     } catch (e: unknown) {
       if (axios.isAxiosError(e) && e.response?.status === 409) {
         const data = e.response.data as GoogleSignupRequiredResponse;
@@ -110,7 +111,8 @@ const RegisterPage = () => {
       }
       sessionStorage.removeItem('googleSignupDraft');
       message.success('Account created');
-      router.push('/');
+      router.replace('/');
+      router.refresh();
     } catch (e: unknown) {
       if (axios.isAxiosError(e) && e.response?.data) {
         const data = e.response.data as { error?: string; code?: string };

@@ -59,42 +59,69 @@ export const useAuthentication = (): AuthenticationResult => {
     setAuthenticationState(getUnauthenticatedState());
   };
 
-  const checkJWTAuthentication = (): boolean => {
+  const checkJWTAuthentication = (): {
+    valid: boolean;
+    shouldRefreshForMissingClaims: boolean;
+  } => {
     // `access_token` cookie is non-HttpOnly specifically to enable a fast init check.
     if (typeof document === "undefined") {
       setLoggedOut();
-      return false;
+      return { valid: false, shouldRefreshForMissingClaims: false };
     }
 
     const token = Cookies.get("access_token");
     if (!token) {
       setLoggedOut();
-      return false;
+      return { valid: false, shouldRefreshForMissingClaims: false };
       }
 
     try {
-      const payload = decodeJwt(token) as { sub?: string; sid?: string; exp?: number };
+      const payload = decodeJwt(token) as {
+        sub?: string;
+        sid?: string;
+        exp?: number;
+        userName?: string;
+        avatar?: string;
+        emailVerifiedAt?: string | null;
+      };
+
       if (!payload?.sub || !payload?.sid || !payload?.exp) {
         setLoggedOut();
-        return false;
+        return { valid: false, shouldRefreshForMissingClaims: false };
       }
 
       const expMs = payload.exp * 1000;
       if (expMs <= Date.now()) {
         setLoggedOut();
-        return false;
+        return { valid: false, shouldRefreshForMissingClaims: false };
       }
+
+      const hasUserNameClaim = typeof payload.userName === "string";
+      const hasAvatarClaim = typeof payload.avatar === "string";
+      const hasEmailVerifiedAtClaim =
+        typeof payload.emailVerifiedAt === "string" || payload.emailVerifiedAt === null;
 
       // Optimistic: we have a non-expired access JWT. We'll still verify server-side in background.
       setAuthenticationState({
-        user: { ...EMPTY_USER, id: payload.sub },
+        user: {
+          ...EMPTY_USER,
+          id: payload.sub,
+          userName: typeof payload.userName === "string" ? payload.userName : "",
+          avatar: typeof payload.avatar === "string" ? payload.avatar : "",
+          emailVerifiedAt:
+            typeof payload.emailVerifiedAt === "string" ? payload.emailVerifiedAt : null,
+        },
         account: [],
         initialized: true,
       })
-      return true;
+      return {
+        valid: true,
+        shouldRefreshForMissingClaims:
+          !hasUserNameClaim || !hasAvatarClaim || !hasEmailVerifiedAtClaim,
+      };
     } catch {
       setLoggedOut();
-      return false;
+      return { valid: false, shouldRefreshForMissingClaims: false };
     }
   };
 
@@ -126,8 +153,12 @@ export const useAuthentication = (): AuthenticationResult => {
   }
 
   const checkAuthentication = () => {
-    const hasValidJWTToken = checkJWTAuthentication();
-    if (!hasValidJWTToken) return;
+    const jwtState = checkJWTAuthentication();
+    if (!jwtState.valid) return;
+    if (jwtState.shouldRefreshForMissingClaims) {
+      axios.post("/auth/refresh").catch(() => undefined).finally(fetchAuthUser);
+      return;
+    }
     fetchAuthUser();
   }
 

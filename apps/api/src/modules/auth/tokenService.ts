@@ -8,6 +8,9 @@ import { TextEncoder } from "node:util";
 type AccessTokenPayload = {
   sub: string;
   sid: string;
+  userName: string;
+  avatar: string;
+  emailVerifiedAt: string | null;
 };
 
 const cookieSameSite = (() => {

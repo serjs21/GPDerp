@@ -63,6 +63,9 @@ const issueSessionTokens = async (
   userId: string,
   sessionMeta: SessionMeta,
 ): Promise<AuthTokens> => {
+  const user = await authRepository.findUserById(userId);
+  if (!user) throw unauthorizedError();
+
   const session = await authRepository.createSession({
     userId,
     ...sessionMeta,
@@ -78,6 +81,9 @@ const issueSessionTokens = async (
   const accessToken = await tokenService.createAccessToken({
     sub: userId,
     sid: session.id,
+    userName: user.userName,
+    avatar: user.avatar ?? "",
+    emailVerifiedAt: user.emailVerifiedAt?.toISOString() ?? null,
   });
   return { accessToken, refreshToken, csrfToken };
 };
@@ -609,9 +615,15 @@ export const authService = {
       throw unauthorizedError();
     }
 
+    const user = await authRepository.findUserById(currentToken.session.userId);
+    if (!user) throw unauthorizedError();
+
     const accessToken = await tokenService.createAccessToken({
       sub: currentToken.session.userId,
       sid: currentToken.session.id,
+      userName: user.userName,
+      avatar: user.avatar ?? "",
+      emailVerifiedAt: user.emailVerifiedAt?.toISOString() ?? null,
     });
 
     return {
