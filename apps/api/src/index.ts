@@ -38,8 +38,8 @@ async function run() {
   });
 
   await app.register(webSocketPlugin);
-  await app.register(haikuPlugin);
   await app.register(authPlugin);
+  await app.register(haikuPlugin);
 
   /* ------------------------------ Routes ------------------------------ */
 

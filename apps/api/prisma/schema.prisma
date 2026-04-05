@@ -37,6 +37,7 @@ model User {
   updatedAt       DateTime  @updatedAt
 
   memberships Membership[]
+  createdAccounts Account[] @relation("AccountCreatedBy")
   createdHaikus Haiku[] @relation("HaikuCreatedBy")
   authIdentities AuthIdentity[]
   passwordCredential PasswordCredential?
@@ -54,13 +55,18 @@ model FailedLoginAttempt {
 }
 
 model Account {
-  id        String   @id @default(uuid()) @db.Uuid
-  name      String
-  createdAt DateTime @default(now())
+  id              String   @id @default(uuid()) @db.Uuid
+  name            String
+  createdAt       DateTime @default(now())
+  createdByUserId String?  @db.Uuid
+
+  createdBy User? @relation("AccountCreatedBy", fields: [createdByUserId], references: [id], onDelete: SetNull)
 
   memberships Membership[]
   haikus      Haiku[]
   labels      Label[]
+
+  @@index([createdByUserId])
 }
 
 model Membership {
@@ -98,6 +104,7 @@ model Haiku {
   @@index([accountId])
   @@index([createdById])
   @@index([accountId, createdAt])
+  @@index([createdAt(sort: Desc)])
   @@index([accountId, title, titleSuffix(sort: Desc)])
 }
 

@@ -67,11 +67,11 @@ const authPluginImpl = async (app: FastifyInstance) => {
     reply.code(statusCode).send({ ok: false, error: AUTH_MESSAGES.unauthorized });
   };
 
-  // Route guard: verifies access JWT from the `access_token` cookie and checks that the
+  // Shared: verifies access JWT from the `access_token` cookie and checks that the
   // associated server-side session is still active (not revoked/expired).
-  const authenticate = async (request: FastifyRequest, reply: FastifyReply) => {
+  const verifyAccessTokenForRequest = async (request: FastifyRequest): Promise<boolean> => {
     const token = request.cookies[AUTH_COOKIE_NAMES.accessToken];
-    if (!token) return denyWithAuthCookiesCleared(reply, 401);
+    if (!token) return false;
 
     try {
       const { payload } = await jwtVerify(token, accessJwtSecret, {
@@ -82,18 +82,35 @@ const authPluginImpl = async (app: FastifyInstance) => {
       const sid = (payload as Record<string, unknown>).sid;
 
       if (typeof sub !== "string" || typeof sid !== "string") {
-        return denyWithAuthCookiesCleared(reply, 401);
+        return false;
       }
 
       const session = await authRepository.findActiveAuthSessionById(sid);
-      if (!session || session.userId !== sub) return denyWithAuthCookiesCleared(reply, 401);
+      if (!session || session.userId !== sub) return false;
       request.user = { sub, sid };
+      return true;
     } catch {
-      return denyWithAuthCookiesCleared(reply, 401);
+      return false;
     }
   };
 
+  // Route guard for session-style endpoints (401 when not logged in).
+  const authenticate = async (request: FastifyRequest, reply: FastifyReply) => {
+    const ok = await verifyAccessTokenForRequest(request);
+    if (ok) return;
+    return denyWithAuthCookiesCleared(reply, 401);
+  };
+
+  // Stricter guard for resources that must not run without a valid user (403).
+  const requireAuthenticated = async (request: FastifyRequest, reply: FastifyReply) => {
+    const ok = await verifyAccessTokenForRequest(request);
+    if (ok) return;
+    tokenService.clearAuthCookies(reply);
+    return reply.code(403).send({ ok: false, error: AUTH_MESSAGES.unauthorized });
+  };
+
   app.decorate("authenticate", authenticate);
+  app.decorate("requireAuthenticated", requireAuthenticated);
 
   const expectedWebOrigin = (() => {
     try {

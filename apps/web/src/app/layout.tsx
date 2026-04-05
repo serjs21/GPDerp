@@ -4,7 +4,7 @@ import "./globals.css";
 import "@/axios.setup";
 import { LayoutProvider } from "./providers/LayoutProviders";
 import { AuthenticationProvider } from "./providers/AuthenticationProvider";
-import { HtmlLoader } from "@/components/htmlDecorations/htmlLoader";
+import { HtmlLoader } from "@/components/Loaders";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

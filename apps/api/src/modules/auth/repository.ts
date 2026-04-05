@@ -91,6 +91,7 @@ export const authRepository = {
       const account = await tx.account.create({
         data: {
           name: `${params.firstName || params.email}'s Account`,
+          createdByUserId: user.id,
         },
       });
 
@@ -475,5 +476,49 @@ export const authRepository = {
     return prismaClient.failedLoginAttempt.deleteMany({
       where: { emailKey },
     });
+  },
+
+  async listAccountIdsForUser(userId: string) {
+    const rows = await prismaClient.membership.findMany({
+      where: { userId },
+      select: { accountId: true },
+    });
+    return rows.map((r) => r.accountId);
+  },
+
+  /** Account this user created at signup, else first membership account (legacy rows). */
+  async findDefaultWorkspaceAccountIdForUser(userId: string) {
+    const owned = await prismaClient.account.findFirst({
+      where: { createdByUserId: userId },
+      orderBy: { createdAt: "asc" },
+      select: { id: true },
+    });
+    if (owned) return owned.id;
+
+    const membership = await prismaClient.membership.findFirst({
+      where: { userId },
+      orderBy: { createdAt: "asc" },
+      select: { accountId: true },
+    });
+    return membership?.accountId ?? null;
+  },
+
+  async findAccountIdForUser(userId: string, preferredAccountId?: string | null) {
+    if (preferredAccountId) {
+      const membership = await prismaClient.membership.findUnique({
+        where: {
+          userId_accountId: { userId, accountId: preferredAccountId },
+        },
+        select: { accountId: true },
+      });
+      return membership?.accountId ?? null;
+    }
+
+    const membership = await prismaClient.membership.findFirst({
+      where: { userId },
+      orderBy: { createdAt: "asc" },
+      select: { accountId: true },
+    });
+    return membership?.accountId ?? null;
   },
 };

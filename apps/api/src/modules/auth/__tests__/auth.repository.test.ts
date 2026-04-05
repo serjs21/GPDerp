@@ -48,7 +48,12 @@ describe("authRepository", () => {
         userName: "user_example",
       }),
     });
-    expect(tx.account.create).toHaveBeenCalledTimes(1);
+    expect(tx.account.create).toHaveBeenCalledWith({
+      data: {
+        name: "User's Account",
+        createdByUserId: "user-1",
+      },
+    });
     expect(tx.membership.create).toHaveBeenCalledWith({
       data: {
         userId: "user-1",
