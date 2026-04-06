@@ -96,5 +96,29 @@ export const haikuService = {
 
     return { ok: true, items, total, pageSize, offset };
   },
+
+  async deleteHaikuForUser(params: {
+    userId: string;
+    haikuId: string;
+  }): Promise<{ ok: true } | { ok: false; reason: "not_found" | "forbidden" }> {
+    const { userId, haikuId } = params;
+
+    const haiku = await haikuRepository.findById(haikuId);
+    if (!haiku) return { ok: false, reason: "not_found" };
+
+    if (haiku.createdById === userId) {
+      await haikuRepository.deleteById(haikuId);
+      return { ok: true };
+    }
+
+    const membership = await authRepository.findMembershipRoleForAccount(userId, haiku.accountId);
+    const role = membership?.role;
+    if (role === "ADMIN" || role === "OWNER") {
+      await haikuRepository.deleteById(haikuId);
+      return { ok: true };
+    }
+
+    return { ok: false, reason: "forbidden" };
+  },
 };
 

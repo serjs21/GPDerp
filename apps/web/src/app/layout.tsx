@@ -4,6 +4,7 @@ import "./globals.css";
 import "@/axios.setup";
 import { LayoutProvider } from "./providers/LayoutProviders";
 import { AuthenticationProvider } from "./providers/AuthenticationProvider";
+import { QueryProvider } from "./providers/QueryProvider";
 import { HtmlLoader } from "@/components/Loaders";
 
 const geistSans = Geist({
@@ -39,7 +40,9 @@ export default function RootLayout({
       <body className={`${notoSerifJP.variable} ${geistSans.variable} ${geistMono.variable} sumie-layout`}>
         <HtmlLoader />
         <AuthenticationProvider>
-          <LayoutProvider googleClientId={googleClientId}>{children}</LayoutProvider>
+          <QueryProvider>
+            <LayoutProvider googleClientId={googleClientId}>{children}</LayoutProvider>
+          </QueryProvider>
         </AuthenticationProvider>
       </body>
     </html>

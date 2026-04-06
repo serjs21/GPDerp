@@ -74,6 +74,37 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
     },
   );
 
+  app.delete(
+    "/haiku/:haikuId",
+    { preHandler: [app.requireAuthenticated] },
+    async (req: FastifyRequest, res: FastifyReply) => {
+      const userId = req.user?.sub;
+      if (!userId) {
+        res.code(403).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+
+      const { haikuId } = req.params as { haikuId: string };
+      if (!isUuid(haikuId)) {
+        res.code(400).send({ ok: false, error: "Invalid haiku id" });
+        return;
+      }
+
+      const result = await haikuService.deleteHaikuForUser({ userId, haikuId });
+
+      if (!result.ok) {
+        if (result.reason === "not_found") {
+          res.code(404).send({ ok: false, error: "Not found" });
+          return;
+        }
+        res.code(403).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+
+      res.send({ ok: true });
+    },
+  );
+
   app.post(
     "/beer_me_haiku",
     { preHandler: [app.requireAuthenticated] },

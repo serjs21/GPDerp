@@ -58,4 +58,17 @@ export const haikuRepository = {
       where: { accountId: { in: accountIds } },
     });
   },
+
+  findById(id: string) {
+    return prismaClient.haiku.findUnique({
+      where: { id },
+      select: { id: true, accountId: true, createdById: true },
+    });
+  },
+
+  deleteById(id: string) {
+    return prismaClient.haiku.delete({
+      where: { id },
+    });
+  },
 };

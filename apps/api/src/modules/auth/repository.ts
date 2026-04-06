@@ -521,4 +521,11 @@ export const authRepository = {
     });
     return membership?.accountId ?? null;
   },
+
+  findMembershipRoleForAccount(userId: string, accountId: string) {
+    return prismaClient.membership.findUnique({
+      where: { userId_accountId: { userId, accountId } },
+      select: { role: true },
+    });
+  },
 };

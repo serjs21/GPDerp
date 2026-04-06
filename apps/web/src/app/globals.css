@@ -55,8 +55,12 @@ textarea {
   background: rgba(255, 255, 255, 0.7);
 }
 
-/* Button - Standard Blue or Hanko Red */
-button {
+/*
+ * Form-style buttons only. Exclude Ant Design: <button class="ant-btn"> would otherwise
+ * inherit width:100% / max-width and other rules (Modal.confirm, dropdowns, etc.) and
+ * diverge from Storybook, which does not load this stylesheet by default.
+ */
+button:not(.ant-btn) {
   width: 100%;
   max-width: 450px;
   padding: 12px;
@@ -69,7 +73,7 @@ button {
   cursor: pointer;  transition: opacity 0.2s;
 }
 
-button:hover {
+button:not(.ant-btn):hover {
   opacity: 0.9;
 }
 

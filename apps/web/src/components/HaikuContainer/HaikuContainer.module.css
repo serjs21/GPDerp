@@ -1,0 +1,47 @@
+.root {
+  position: relative;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--text-color, #2c2c2c) 8%, transparent);
+}
+
+.root:last-child {
+  border-bottom: none;
+}
+
+.actions {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  display: flex;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 1;
+}
+
+.root:hover .actions,
+.root:focus-within .actions {
+  opacity: 1;
+}
+
+.titleRow {
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.35rem;
+  color: var(--text-color, #2c2c2c);
+  padding-right: 5rem;
+}
+
+.meta {
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--text-color, #2c2c2c) 45%, transparent);
+  margin-bottom: 0.5rem;
+}
+
+.body {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  font-style: italic;
+  font-weight: 300;
+}
