@@ -34,7 +34,7 @@ export const env = {
   CLIENT_URL: process.env.CLIENT_URL ?? "http://localhost:3000",
 
   CORS_ORIGIN: toList(process.env.CLIENT_URL ?? "http://localhost:3000"),
-  CORS_METHODS: toList(process.env.CORS_METHODS ?? "GET,POST,OPTIONS"),
+  CORS_METHODS: toList(process.env.CORS_METHODS ?? "GET,POST,OPTIONS,PATCH,PUT,DELETE"),
   CORS_HEADERS: toList(process.env.CORS_HEADERS ?? "Content-Type"),
   CORS_CREDENTIALS: toBool(process.env.CORS_CREDENTIALS, true),
 

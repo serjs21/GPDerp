@@ -496,7 +496,10 @@ export const authRepository = {
     if (owned) return owned.id;
 
     const membership = await prismaClient.membership.findFirst({
-      where: { userId },
+      where: {
+        userId,
+        role: { in: ["ADMIN", "OWNER"] },
+      },
       orderBy: { createdAt: "asc" },
       select: { accountId: true },
     });

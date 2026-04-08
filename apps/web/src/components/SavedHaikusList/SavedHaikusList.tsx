@@ -2,7 +2,7 @@
 
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "antd";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, type RefObject } from "react";
 import {
   fetchHaikusPage,
   haikuQueryKeys,
@@ -13,6 +13,7 @@ import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { HaikuContainer } from "@/components/HaikuContainer/HaikuContainer";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { useEndOfContentScroll } from "@/hooks/useEndOfContentScroll";
+import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import styles from "./SavedHaikusList.module.css";
 
 export type SavedHaikusListViewProps = {
@@ -24,6 +25,11 @@ export type SavedHaikusListViewProps = {
   onLoadMore: () => void;
   onRetry: () => void;
   onHaikuDeleted?: () => void;
+  /** In-flight generation row (same shell as saved items); cleared when WS sends `saved` or `complete`. */
+  generatingDraft?: GeneratingDraft | null;
+  /** When true, omits heading and inner scroll box; parent must supply `scrollRootRef` as the scrolling element. */
+  embedded?: boolean;
+  scrollRootRef?: RefObject<HTMLDivElement | null>;
 };
 
 export function SavedHaikusListView({
@@ -35,8 +41,12 @@ export function SavedHaikusListView({
   onLoadMore,
   onRetry,
   onHaikuDeleted,
+  generatingDraft = null,
+  embedded = false,
+  scrollRootRef: externalScrollRootRef,
 }: SavedHaikusListViewProps) {
-  const scrollRootRef = useRef<HTMLDivElement>(null);
+  const internalScrollRef = useRef<HTMLDivElement>(null);
+  const scrollRootRef = externalScrollRootRef ?? internalScrollRef;
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   const handleEnd = useCallback(() => {
@@ -47,6 +57,49 @@ export function SavedHaikusListView({
     enabled: !isInitialLoading && !isError && haikus.length > 0 && hasNextPage,
   });
 
+  const listInner = (
+    <>
+      {generatingDraft ? (
+        <HaikuContainer generatingDraft={generatingDraft} />
+      ) : null}
+      {haikus.length === 0 && !isError && !generatingDraft ? (
+        <p className={styles.empty}>No saved haikus yet.</p>
+      ) : null}
+      {haikus.map((h) => (
+        <HaikuContainer key={h.id} haiku={h} onDeleted={onHaikuDeleted} onChanged={onHaikuDeleted} />
+      ))}
+      <div ref={sentinelRef} className={styles.sentinel} aria-hidden />
+      {isFetchingNextPage ? (
+        <div className={styles.loaderRow}>
+          <SakuraPetalLoader />
+        </div>
+      ) : null}
+    </>
+  );
+
+  const errorFooter = isError ? (
+    <div className={styles.footerActions}>
+      <Button type="primary" onClick={onRetry}>
+        Try again
+      </Button>
+    </div>
+  ) : null;
+
+  if (embedded) {
+    return (
+      <div className={styles.embedded}>
+        {isInitialLoading ? (
+          <div className={styles.loaderRow}>
+            <SakuraPetalLoader />
+          </div>
+        ) : (
+          listInner
+        )}
+        {errorFooter}
+      </div>
+    );
+  }
+
   return (
     <section className={styles.root} aria-label="Saved haikus">
       <h2 className={styles.heading}>Saved haikus</h2>
@@ -56,35 +109,27 @@ export function SavedHaikusListView({
           <SakuraPetalLoader />
         </div>
       ) : (
-        <div ref={scrollRootRef} className={styles.scrollArea}>
-          {haikus.length === 0 && !isError ? (
-            <p className={styles.empty}>No saved haikus yet.</p>
-          ) : (
-            haikus.map((h) => (
-              <HaikuContainer key={h.id} haiku={h} onDeleted={onHaikuDeleted} />
-            ))
-          )}
-          <div ref={sentinelRef} className={styles.sentinel} aria-hidden />
-          {isFetchingNextPage ? (
-            <div className={styles.loaderRow}>
-              <SakuraPetalLoader />
-            </div>
-          ) : null}
+        <div ref={internalScrollRef} className={styles.scrollArea}>
+          {listInner}
         </div>
       )}
 
-      {isError ? (
-        <div className={styles.footerActions}>
-          <Button type="primary" onClick={onRetry}>
-            Try again
-          </Button>
-        </div>
-      ) : null}
+      {errorFooter}
     </section>
   );
 }
 
-export function SavedHaikusList() {
+export type SavedHaikusListProps = {
+  embedded?: boolean;
+  scrollRootRef?: RefObject<HTMLDivElement | null>;
+  generatingDraft?: GeneratingDraft | null;
+};
+
+export function SavedHaikusList({
+  embedded,
+  scrollRootRef,
+  generatingDraft,
+}: SavedHaikusListProps = {}) {
   const { isLoggedIn, initialized } = useAuthenticationState();
   const queryClient = useQueryClient();
 
@@ -120,6 +165,9 @@ export function SavedHaikusList() {
       onLoadMore={() => void query.fetchNextPage()}
       onRetry={() => void query.refetch()}
       onHaikuDeleted={() => void queryClient.invalidateQueries({ queryKey: haikuQueryKeys.all })}
+      generatingDraft={generatingDraft}
+      embedded={embedded}
+      scrollRootRef={scrollRootRef}
     />
   );
 }

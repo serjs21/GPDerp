@@ -1,0 +1,36 @@
+.loaderRow {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0;
+}
+
+.sectionLabel {
+  margin-bottom: 6px;
+}
+
+.select {
+  width: 100%;
+}
+
+.createBtn {
+  padding-inline: 0;
+}
+
+.tagWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-inline-end: 4px;
+}
+
+.tagClose {
+  color: #666;
+  padding: 0 2px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+  font-size: 10px;
+  line-height: 1;
+}

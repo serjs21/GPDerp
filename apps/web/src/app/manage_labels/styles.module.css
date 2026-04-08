@@ -1,0 +1,44 @@
+.page {
+  height: calc(100vh - 64px);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.container {
+  width: min(42rem, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 0;
+}
+
+.topAction {
+  padding-inline: 0;
+}
+
+.listShell {
+  border: 1px solid color-mix(in srgb, var(--text-color, #2c2c2c) 12%, transparent);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--background-color, #fcfaf2) 85%, transparent);
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: auto;
+}
+
+.loaderRow {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.empty {
+  padding: 1rem;
+  color: color-mix(in srgb, var(--text-color, #2c2c2c) 50%, transparent);
+}
+
+.sentinel {
+  width: 100%;
+  height: 1px;
+}

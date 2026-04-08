@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { HaikuDisplay } from "./HaikuDisplay";
-import type { ChatLog } from "@/hooks/useHaikuSocket";
+import type { ChatLog } from "./HaikuDisplay";
 
 jest.mock("motion/react", () => ({
   motion: {

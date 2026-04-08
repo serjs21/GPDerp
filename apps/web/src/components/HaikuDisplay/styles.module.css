@@ -1,3 +1,12 @@
+/* Outer stream column when the parent provides the scroll container (no nested scroll). */
+.haikuDisplayStream {
+  scrollbar-width: inherit;
+  overflow: visible;
+  min-height: 0;
+  height: auto;
+  flex: 0 0 auto;
+}
+
 .haikuDisplay {
   scrollbar-width: none;
   background: #f5f5f57b;

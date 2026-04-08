@@ -26,6 +26,22 @@ export const haikuRepository = {
         titleSuffix,
         body: params.body.trim(),
       },
+      select: {
+        id: true,
+        title: true,
+        titleSuffix: true,
+        body: true,
+        createdAt: true,
+        accountId: true,
+        createdById: true,
+        labels: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
+        },
+      },
     });
   },
 
@@ -46,6 +62,13 @@ export const haikuRepository = {
         createdAt: true,
         accountId: true,
         createdById: true,
+        labels: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
+        },
       },
     });
   },
@@ -62,7 +85,39 @@ export const haikuRepository = {
   findById(id: string) {
     return prismaClient.haiku.findUnique({
       where: { id },
-      select: { id: true, accountId: true, createdById: true },
+      select: {
+        id: true,
+        accountId: true,
+        createdById: true,
+        labels: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
+        },
+      },
+    });
+  },
+
+  setLabels(id: string, labelIds: string[]) {
+    return prismaClient.haiku.update({
+      where: { id },
+      data: {
+        labels: {
+          set: labelIds.map((labelId) => ({ id: labelId })),
+        },
+      },
+      select: {
+        id: true,
+        labels: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
+        },
+      },
     });
   },
 

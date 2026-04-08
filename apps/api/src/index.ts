@@ -6,6 +6,7 @@ import { env } from "./env";
 import { authPlugin } from "./modules/auth/auth.controller";
 import { webSocketPlugin } from "./modules/webSocket/webSocket.controller";
 import { haikuPlugin } from "./modules/haiku/haiku.controller";
+import { labelPlugin } from "./modules/label/label.controller";
 
 const app = Fastify({
   logger: true,
@@ -40,6 +41,7 @@ async function run() {
   await app.register(webSocketPlugin);
   await app.register(authPlugin);
   await app.register(haikuPlugin);
+  await app.register(labelPlugin);
 
   /* ------------------------------ Routes ------------------------------ */
 

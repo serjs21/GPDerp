@@ -60,6 +60,7 @@ export type HaikuObject = {
 export type LabelObject = {
   id: string;
   name: string;
+  color: string;
   createdAt: string;
   accountId: string;
 };

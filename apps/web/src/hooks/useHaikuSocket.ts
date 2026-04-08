@@ -1,59 +1,134 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import type { HaikuDto } from "@/api/haikus";
 import { formatChatTime } from "../utils/date";
 import { useWebSocket } from "./useWebSocket";
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:4000/ws";
 
-export interface ChatLog {
-  content: string;
-  createdAt: string;
+export type GeneratingDraft = {
+  requestId: string;
   subject: string;
-}
-
-export const useHaikuSocket = () => {
-const [chatLogs , setChatLogs] = useState<Record<string, ChatLog>>({});
-const resetChat = () => {
-    setChatLogs({});
+  content: string;
+  createdAtLabel: string;
 };
 
-const logMessage = useCallback((event: MessageEvent) => {
-        try {
-            const response: {data: {delta?: string, subject: string}, id: string} = JSON.parse(event?.data || "{}") || {};
-            const { data, id } = response; 
+type DeltaPayload = {
+  id: string;
+  data: { delta?: string; subject: string };
+  kind?: "delta";
+};
 
-            setChatLogs((logs) => {
-                const updatedLogs = { ...logs };
-                if (!updatedLogs[id]) {
-                    updatedLogs[id] = {
-                        createdAt: formatChatTime(new Date()),
-                        content: '',
-                        subject: data.subject,
-                    };
-                }
+type SavedPayload = {
+  id: string;
+  kind: "saved";
+  data: { haiku: HaikuDto; subject: string };
+};
 
-                const delta = data?.delta || '';
-                updatedLogs[id] =  {...updatedLogs[id], content: updatedLogs[id].content + delta};
-                return updatedLogs;
-            });
+type CompletePayload = {
+  id: string;
+  kind: "complete";
+  data: { subject: string };
+};
 
-        } catch (error) {
-            console.error("Failed to set WS message:", event.data, error);
+type WsHaikuMessage = DeltaPayload | SavedPayload | CompletePayload;
+
+function parseMessage(raw: string): WsHaikuMessage | null {
+  try {
+    const parsed = JSON.parse(raw || "{}") as Record<string, unknown>;
+    const id = parsed.id;
+    if (typeof id !== "string") return null;
+
+    const kind = (parsed.kind as string | undefined) ?? "delta";
+    const data = parsed.data as Record<string, unknown> | undefined;
+    if (!data || typeof data !== "object") return null;
+
+    if (kind === "saved") {
+      const haiku = data.haiku as HaikuDto | undefined;
+      if (!haiku || typeof haiku.id !== "string") return null;
+      const subject = typeof data.subject === "string" ? data.subject : "";
+      return { id, kind: "saved", data: { haiku, subject } };
+    }
+
+    if (kind === "complete") {
+      const subject = typeof data.subject === "string" ? data.subject : "";
+      return { id, kind: "complete", data: { subject } };
+    }
+
+    const subject = typeof data.subject === "string" ? data.subject : "";
+    const delta = typeof data.delta === "string" ? data.delta : "";
+    return {
+      id,
+      kind: "delta",
+      data: { delta, subject },
+    };
+  } catch {
+    return null;
+  }
+}
+
+export type UseHaikuSocketOptions = {
+  onHaikuSaved?: (haiku: HaikuDto) => void;
+};
+
+export const useHaikuSocket = (options?: UseHaikuSocketOptions) => {
+  const { onHaikuSaved } = options ?? {};
+  const [generatingDraft, setGeneratingDraft] = useState<GeneratingDraft | null>(null);
+
+  const logMessage = useCallback(
+    (event: MessageEvent) => {
+      const msg = parseMessage(String(event.data ?? ""));
+      if (!msg) return;
+
+      if (msg.kind === "saved") {
+        onHaikuSaved?.(msg.data.haiku);
+        setGeneratingDraft((d) => (d?.requestId === msg.id ? null : d));
+        return;
+      }
+
+      if (msg.kind === "complete") {
+        setGeneratingDraft((d) => (d?.requestId === msg.id ? null : d));
+        return;
+      }
+
+      const { id, data } = msg;
+      const delta = data.delta ?? "";
+
+      setGeneratingDraft((prev) => {
+        if (!prev || prev.requestId !== id) {
+          return {
+            requestId: id,
+            subject: data.subject,
+            content: delta,
+            createdAtLabel: formatChatTime(new Date()),
+          };
         }
-    }, []);
+        return {
+          ...prev,
+          content: prev.content + delta,
+          subject: data.subject || prev.subject,
+        };
+      });
+    },
+    [onHaikuSaved],
+  );
 
-    const { connected, send } = useWebSocket({
+  const { connected, send } = useWebSocket({
     url: SOCKET_URL,
     enabled: true,
     reconnect: true,
     onMessage: logMessage,
-    });
+  });
+
+  const resetGenerating = useCallback(() => {
+    setGeneratingDraft(null);
+  }, []);
 
   return {
     connected,
-    chatLogs,
-    resetChat,
     send,
+    generatingDraft,
+    resetGenerating,
   };
 };

@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { HaikuDto } from "@/api/haikus";
+import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { SavedHaikusListView } from "./SavedHaikusList";
 
 /**
@@ -32,6 +34,7 @@ function makeMockHaiku(partial: Partial<HaikuDto> & Pick<HaikuDto, "id" | "body"
     createdAt: new Date("2026-01-15T12:00:00.000Z").toISOString(),
     accountId: "00000000-0000-4000-8000-000000000001",
     createdById: "00000000-0000-4000-8000-000000000002",
+    labels: [],
     ...partial,
   };
 }
@@ -39,6 +42,16 @@ function makeMockHaiku(partial: Partial<HaikuDto> & Pick<HaikuDto, "id" | "body"
 const meta: Meta<typeof SavedHaikusListView> = {
   title: "Haiku/SavedHaikusList",
   component: SavedHaikusListView,
+  decorators: [
+    (Story) => {
+      const qc = new QueryClient();
+      return (
+        <QueryClientProvider client={qc}>
+          <Story />
+        </QueryClientProvider>
+      );
+    },
+  ],
   args: {
     onLoadMore: () => undefined,
     onRetry: () => undefined,
@@ -57,9 +70,27 @@ const exampleHaikus: HaikuDto[] = TEXT_STREAM_STYLE_HAIKUS.map((body, i) =>
   }),
 );
 
+const midGenerationDraft: GeneratingDraft = {
+  requestId: "story-req-1",
+  subject: "Autumn wind",
+  content: "Leaves fall —\n",
+  createdAtLabel: "2:30 PM",
+};
+
 export const WithExamples: Story = {
   args: {
     haikus: exampleHaikus,
+    isInitialLoading: false,
+    isFetchingNextPage: false,
+    isError: false,
+    hasNextPage: true,
+  },
+};
+
+export const WithGeneratingDraft: Story = {
+  args: {
+    haikus: exampleHaikus,
+    generatingDraft: midGenerationDraft,
     isInitialLoading: false,
     isFetchingNextPage: false,
     isError: false,

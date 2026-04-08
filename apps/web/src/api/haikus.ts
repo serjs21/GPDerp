@@ -1,3 +1,4 @@
+import type { InfiniteData, QueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
 /** Page size for saved haiku list requests (must match product default). */
@@ -11,6 +12,7 @@ export type HaikuDto = {
   createdAt: string;
   accountId: string;
   createdById: string;
+  labels: Array<{ id: string; name: string; color: string }>;
 };
 
 export type HaikuListSuccess = {
@@ -66,3 +68,49 @@ export const haikuQueryKeys = {
   all: ["haikus"] as const,
   infiniteList: (pageSize: number) => [...haikuQueryKeys.all, "infinite", pageSize] as const,
 };
+
+/** Upsert newest item into the first infinite page (for WS `saved` without refetch). */
+export function prependHaikuToInfiniteCache(
+  queryClient: QueryClient,
+  pageSize: number,
+  haiku: HaikuDto,
+): void {
+  queryClient.setQueryData<InfiniteData<HaikuListSuccess, number>>(
+    haikuQueryKeys.infiniteList(pageSize),
+    (old) => {
+      if (!old?.pages?.length) {
+        return {
+          pageParams: [0],
+          pages: [
+            {
+              ok: true,
+              data: {
+                haikus: [haiku],
+                total: 1,
+                pageSize,
+                offset: 0,
+              },
+            },
+          ],
+        };
+      }
+      const [first, ...rest] = old.pages;
+      const exists = first.data.haikus.some((h) => h.id === haiku.id);
+      if (exists) return old;
+      return {
+        ...old,
+        pages: [
+          {
+            ...first,
+            data: {
+              ...first.data,
+              haikus: [haiku, ...first.data.haikus],
+              total: first.data.total + 1,
+            },
+          },
+          ...rest,
+        ],
+      };
+    },
+  );
+}

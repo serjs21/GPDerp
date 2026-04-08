@@ -8,9 +8,171 @@ import {
 import { ACCOUNT_HEADER_KEY, TAB_HEADER_KEY } from "../../consts/ids";
 import { isUuid } from "../../utils/uuid";
 import { authRepository } from "../auth/repository";
-import { haikuService } from "./haiku.service";
+import { haikuService, type HaikuStreamYield } from "./haiku.service";
 
 const haikuPluginImpl = async (app: FastifyInstance) => {
+  app.get(
+    "/haiku/manage_labels/account",
+    { preHandler: [app.requireAuthenticated] },
+    async (req: FastifyRequest, res: FastifyReply) => {
+      const userId = req.user?.sub;
+      if (!userId) {
+        res.code(403).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+      const accountId = await haikuService.getManageLabelsAccountIdForUser(userId);
+      if (!accountId) {
+        res.code(404).send({ ok: false, error: "No account found" });
+        return;
+      }
+      res.send({ ok: true, data: { accountId } });
+    },
+  );
+
+  app.get(
+    "/haiku/labels/:accountId",
+    { preHandler: [app.requireAuthenticated] },
+    async (req: FastifyRequest, res: FastifyReply) => {
+      const userId = req.user?.sub;
+      if (!userId) {
+        res.code(403).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+      const { accountId } = req.params as { accountId: string };
+      if (!isUuid(accountId)) {
+        res.code(400).send({ ok: false, error: "Invalid accountId" });
+        return;
+      }
+      const q = req.query as Record<string, string | undefined>;
+      const pageSize = Math.max(1, Math.min(Number(q.pageSize ?? "50") || 50, 100));
+      const offset = Math.max(0, Number(q.offset ?? "0") || 0);
+      const result = await haikuService.listLabelsForUser({
+        userId,
+        accountId,
+        pageSize,
+        offset,
+      });
+      if (!result.ok) {
+        res.code(403).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+      res.send({
+        ok: true,
+        data: {
+          labels: result.labels,
+          total: result.total,
+          pageSize: result.pageSize,
+          offset: result.offset,
+        },
+      });
+    },
+  );
+
+  app.post(
+    "/haiku/label/:accountId",
+    { preHandler: [app.requireAuthenticated] },
+    async (req: FastifyRequest, res: FastifyReply) => {
+      const userId = req.user?.sub;
+      if (!userId) {
+        res.code(403).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+      const { accountId } = req.params as { accountId: string };
+      if (!isUuid(accountId)) {
+        res.code(400).send({ ok: false, error: "Invalid accountId" });
+        return;
+      }
+      const body = (req.body as { name?: string; color?: string } | undefined) ?? {};
+      const result = await haikuService.createLabelForUser({
+        userId,
+        accountId,
+        name: (body.name ?? "").trim(),
+        color: (body.color ?? "default").trim(),
+      });
+      if (!result.ok) {
+        if (result.reason === "invalid_name") {
+          res.code(400).send({ ok: false, error: "Label name must be at least 3 characters" });
+          return;
+        }
+        if (result.reason === "duplicate") {
+          res.code(409).send({ ok: false, error: "Label already exists" });
+          return;
+        }
+        res.code(403).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+      res.code(201).send({ ok: true, data: { label: result.label } });
+    },
+  );
+
+  app.patch(
+    "/haiku/label/:labelId",
+    { preHandler: [app.requireAuthenticated] },
+    async (req: FastifyRequest, res: FastifyReply) => {
+      const userId = req.user?.sub;
+      if (!userId) {
+        res.code(403).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+      const { labelId } = req.params as { labelId: string };
+      if (!isUuid(labelId)) {
+        res.code(400).send({ ok: false, error: "Invalid labelId" });
+        return;
+      }
+      const body = (req.body as { name?: string; color?: string } | undefined) ?? {};
+      const result = await haikuService.updateLabelForUser({
+        userId,
+        labelId,
+        name: (body.name ?? "").trim(),
+        color: (body.color ?? "default").trim(),
+      });
+      if (!result.ok) {
+        if (result.reason === "not_found") {
+          res.code(404).send({ ok: false, error: "Not found" });
+          return;
+        }
+        if (result.reason === "invalid_name") {
+          res.code(400).send({ ok: false, error: "Label name must be at least 3 characters" });
+          return;
+        }
+        if (result.reason === "duplicate") {
+          res.code(409).send({ ok: false, error: "Label already exists" });
+          return;
+        }
+        res.code(403).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+      res.send({ ok: true, data: { label: result.label } });
+    },
+  );
+
+  app.delete(
+    "/haiku/label/:labelId",
+    { preHandler: [app.requireAuthenticated] },
+    async (req: FastifyRequest, res: FastifyReply) => {
+      const userId = req.user?.sub;
+      if (!userId) {
+        res.code(403).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+      const { labelId } = req.params as { labelId: string };
+      if (!isUuid(labelId)) {
+        res.code(400).send({ ok: false, error: "Invalid labelId" });
+        return;
+      }
+      const result = await haikuService.deleteLabelForUser({ userId, labelId });
+      if (!result.ok) {
+        if (result.reason === "not_found") {
+          res.code(404).send({ ok: false, error: "Not found" });
+          return;
+        }
+        res.code(403).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+      res.send({ ok: true });
+    },
+  );
+
   app.get(
     "/haiku",
     { preHandler: [app.requireAuthenticated] },
@@ -110,7 +272,7 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
     { preHandler: [app.requireAuthenticated] },
     async (req: FastifyRequest, res: FastifyReply) => {
       const body = req.body as { subject?: string } | undefined;
-      let stream: AsyncIterable<string> | null = null;
+      let stream: AsyncIterable<HaikuStreamYield> | null = null;
 
       const userId = req.user?.sub;
       if (!userId) {
@@ -151,15 +313,35 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
 
         const sendToUid = (app as any).sendToUid as undefined | ((uid: string, msg: unknown) => void);
 
-        for await (const chunk of stream) {
-          if (uid && sendToUid) {
-            sendToUid(uid, {
-              data: { delta: chunk, subject },
-              id: req.id,
-            });
+        let savedNotified = false;
+        for await (const chunk of stream as AsyncIterable<HaikuStreamYield>) {
+          if (typeof chunk === "string") {
+            if (uid && sendToUid) {
+              sendToUid(uid, {
+                id: req.id,
+                kind: "delta",
+                data: { delta: chunk, subject },
+              });
+            }
+            process.stdout.write(chunk);
+          } else if (chunk.type === "saved") {
+            savedNotified = true;
+            if (uid && sendToUid) {
+              sendToUid(uid, {
+                id: req.id,
+                kind: "saved",
+                data: { haiku: chunk.haiku, subject },
+              });
+            }
           }
+        }
 
-          process.stdout.write(chunk);
+        if (uid && sendToUid && !savedNotified) {
+          sendToUid(uid, {
+            id: req.id,
+            kind: "complete",
+            data: { subject },
+          });
         }
 
         res.status(200).send({ ok: true });

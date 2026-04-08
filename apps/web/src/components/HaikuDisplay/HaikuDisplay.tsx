@@ -2,12 +2,19 @@
 
 import { useRef, useMemo } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
-import type { ChatLog } from "@/hooks/useHaikuSocket";
 import { StreamText } from "../StreamText";
 import styles from "./styles.module.css";
 
-interface HaikuDisplayProps {
+export type ChatLog = {
+  content: string;
+  createdAt: string;
+  subject: string;
+};
+
+export interface HaikuDisplayProps {
   chatLogs: Record<string, ChatLog>;
+  /** When set, this element is the scroll parent for motion/useScroll; inner list does not scroll. */
+  scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 const EntryCard = ({
@@ -48,22 +55,23 @@ const EntryCard = ({
   );
 };
 
-export const HaikuDisplay = ({ chatLogs }: HaikuDisplayProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+export const HaikuDisplay = ({ chatLogs, scrollContainerRef }: HaikuDisplayProps) => {
+  const fallbackRef = useRef<HTMLDivElement>(null);
+  const motionScrollRef = scrollContainerRef ?? fallbackRef;
 
   const sortedEntries = useMemo(
     () => Object.entries(chatLogs).reverse(),
     [chatLogs]
   );
 
+  const rootClassName = scrollContainerRef
+    ? `${styles.haikuDisplay} ${styles.haikuDisplayStream}`
+    : styles.haikuDisplay;
+
   return (
-    <div ref={containerRef} className={styles.haikuDisplay}>
+    <div ref={scrollContainerRef ? undefined : fallbackRef} className={rootClassName}>
       {sortedEntries.map(([id, log]) => (
-        <EntryCard
-          key={id}
-          log={log}
-          containerRef={containerRef}
-        />
+        <EntryCard key={id} log={log} containerRef={motionScrollRef} />
       ))}
     </div>
   );
