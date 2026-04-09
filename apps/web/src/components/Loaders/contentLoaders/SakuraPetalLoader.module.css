@@ -31,6 +31,22 @@
   pointer-events: none;
 }
 
+/*
+ * Same ring geometry as sakura-orbit-breathe at 0% / 1rem (initial gap),
+ * scaled down to ~Ant Design small icon control height (1.5rem).
+ */
+.root.compact {
+  width: 1.5rem;
+  height: 1.5rem;
+  min-height: unset;
+  margin: 0;
+}
+
+.root.compact .orbitRack {
+  animation: none;
+  --sakura-orbit-r: 1rem;
+}
+
 .fadeShell {
   position: absolute;
   inset: 0;

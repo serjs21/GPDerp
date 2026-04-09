@@ -25,7 +25,7 @@ export function useConfirm() {
       okType: options.okType ?? "primary",
       okButtonProps: options.danger ? { danger: true } : undefined,
       icon: options.icon,
-      closable: options.closable ?? true,
+      closable: true,
       onOk: options.onOk,
     });
   };

@@ -1,0 +1,51 @@
+.root {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  padding: 0.25rem 0.65rem;
+  border: 1px dashed color-mix(in srgb, var(--text-color, #2c2c2c) 28%, transparent);
+  border-radius: 6px;
+  min-width: 0;
+  background: #f0f0f0; 
+}
+
+.textBase {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: inherit;
+  text-align: left;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+}
+
+.link {
+  color: var(--ant-color-primary, #1677ff);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.link:hover {
+  color: color-mix(in srgb, var(--ant-color-primary, #1677ff) 85%, #000);
+}
+
+.plain {
+  color: inherit;
+  cursor: default;
+}
+
+.copyButton {
+  flex-shrink: 0;
+}
+
+/* Storybook */
+.storyShell {
+  width: min(420px, 92vw);
+}

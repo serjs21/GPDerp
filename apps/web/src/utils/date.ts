@@ -1,3 +1,14 @@
+export const formatCreatedAt = (iso: string): string => {
+  try {
+    return new Date(iso).toLocaleString(undefined, {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+  } catch {
+    return iso;
+  }
+};
+
 export const formatChatTime = (input: Date | number | string) => {
   const d = new Date(input);
   const now = new Date();

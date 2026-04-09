@@ -5,6 +5,7 @@ import { Button } from "antd";
 import { useCallback, useMemo, useRef, type RefObject } from "react";
 import {
   fetchHaikusPage,
+  flattenInfiniteHaikuPages,
   haikuQueryKeys,
   HAIKU_LIST_PAGE_SIZE,
   type HaikuDto,
@@ -147,7 +148,7 @@ export function SavedHaikusList({
   });
 
   const haikus = useMemo(
-    () => query.data?.pages.flatMap((p) => p.data.haikus) ?? [],
+    () => flattenInfiniteHaikuPages(query.data?.pages ?? []),
     [query.data?.pages],
   );
 

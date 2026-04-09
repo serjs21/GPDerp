@@ -100,6 +100,29 @@ export const haikuRepository = {
     });
   },
 
+  /** Full row for API payloads (e.g. public share view). */
+  findFullById(id: string) {
+    return prismaClient.haiku.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        title: true,
+        titleSuffix: true,
+        body: true,
+        createdAt: true,
+        accountId: true,
+        createdById: true,
+        labels: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
+        },
+      },
+    });
+  },
+
   setLabels(id: string, labelIds: string[]) {
     return prismaClient.haiku.update({
       where: { id },

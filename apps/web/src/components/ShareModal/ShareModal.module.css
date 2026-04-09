@@ -1,0 +1,12 @@
+.modalBody {
+  padding-block: 0.25rem;
+}
+
+.modalFooter {
+  margin-top: 0;
+}
+
+.footerBtns {
+  display: inline-flex;
+  gap: 0.5rem;
+}

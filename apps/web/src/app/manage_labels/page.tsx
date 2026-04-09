@@ -40,11 +40,8 @@ export default function ManageLabelsPage() {
         {accountId ? (
           <LabelCreateAction
             accountId={accountId}
-            buttonText="+ Create a new label"
             className={styles.topAction}
-            onCreated={async () => {
-              await fetch(true);
-            }}
+            onCreated={() => fetch(true)}
           />
         ) : null}
 

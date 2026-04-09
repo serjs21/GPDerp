@@ -39,6 +39,7 @@ model User {
   memberships Membership[]
   createdAccounts Account[] @relation("AccountCreatedBy")
   createdHaikus Haiku[] @relation("HaikuCreatedBy")
+  shareLinks   ShareLink[]
   authIdentities AuthIdentity[]
   passwordCredential PasswordCredential?
   authSessions AuthSession[]
@@ -99,7 +100,8 @@ model Haiku {
   account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
   createdBy User    @relation("HaikuCreatedBy", fields: [createdById], references: [id])
 
-  labels Label[]
+  labels     Label[]
+  shareLinks ShareLink[]
 
   @@unique([accountId, title, titleSuffix])
   @@index([accountId])
@@ -107,6 +109,23 @@ model Haiku {
   @@index([accountId, createdAt])
   @@index([createdAt(sort: Desc)])
   @@index([accountId, title, titleSuffix(sort: Desc)])
+}
+
+model ShareLink {
+  id              String    @id @default(uuid()) @db.Uuid
+  shareHash       String    @unique
+  createdByUserId String    @db.Uuid
+  sharedHaikuId   String    @db.Uuid
+  expirationDate  DateTime?
+  maxViews        Int?
+  viewCount       Int       @default(0)
+  createdAt       DateTime  @default(now())
+
+  createdBy User  @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
+  haiku     Haiku @relation(fields: [sharedHaikuId], references: [id], onDelete: Cascade)
+
+  @@index([createdByUserId])
+  @@index([createdAt])
 }
 
 model Label {

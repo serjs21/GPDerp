@@ -1,5 +1,6 @@
 import type { InfiniteData, QueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import uniqBy from "lodash-es/uniqBy";
 
 /** Page size for saved haiku list requests (must match product default). */
 export const HAIKU_LIST_PAGE_SIZE = 3;
@@ -69,6 +70,17 @@ export const haikuQueryKeys = {
   infiniteList: (pageSize: number) => [...haikuQueryKeys.all, "infinite", pageSize] as const,
 };
 
+/**
+ * Flatten infinite-query pages in order, keeping the first occurrence of each id.
+ * Prepended items lengthen page 1 without updating later fetch offsets, so the next
+ * page from the API can repeat tail items from page 1 — dedupe fixes keys and display.
+ */
+export const flattenInfiniteHaikuPages = (pages: HaikuListSuccess[]): HaikuDto[] =>
+  uniqBy(
+    pages.flatMap((p) => p.data.haikus),
+    (h) => h.id,
+  );
+
 /** Upsert newest item into the first infinite page (for WS `saved` without refetch). */
 export function prependHaikuToInfiniteCache(
   queryClient: QueryClient,
@@ -95,7 +107,7 @@ export function prependHaikuToInfiniteCache(
         };
       }
       const [first, ...rest] = old.pages;
-      const exists = first.data.haikus.some((h) => h.id === haiku.id);
+      const exists = old.pages.some((p) => p.data.haikus.some((h) => h.id === haiku.id));
       if (exists) return old;
       return {
         ...old,

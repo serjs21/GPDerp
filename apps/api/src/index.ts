@@ -7,6 +7,7 @@ import { authPlugin } from "./modules/auth/auth.controller";
 import { webSocketPlugin } from "./modules/webSocket/webSocket.controller";
 import { haikuPlugin } from "./modules/haiku/haiku.controller";
 import { labelPlugin } from "./modules/label/label.controller";
+import { shareLinkPlugin } from "./modules/shareLinks/shareLink.controller";
 
 const app = Fastify({
   logger: true,
@@ -42,6 +43,7 @@ async function run() {
   await app.register(authPlugin);
   await app.register(haikuPlugin);
   await app.register(labelPlugin);
+  await app.register(shareLinkPlugin);
 
   /* ------------------------------ Routes ------------------------------ */
 
