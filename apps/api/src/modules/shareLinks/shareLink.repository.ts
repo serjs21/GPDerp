@@ -37,6 +37,24 @@ export const shareLinkRepository = {
   findByShareHash(shareHash: string) {
     return prismaClient.shareLink.findUnique({
       where: { shareHash },
+      select: {
+        id: true,
+        shareHash: true,
+        createdByUserId: true,
+        sharedHaikuId: true,
+        expirationDate: true,
+        maxViews: true,
+        viewCount: true,
+        createdAt: true,
+        createdBy: {
+          select: {
+            userName: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+      },
     });
   },
 

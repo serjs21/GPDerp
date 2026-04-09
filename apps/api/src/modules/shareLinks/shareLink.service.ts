@@ -20,6 +20,24 @@ const haikuPayload = (
 
 const newShareHash = (): string => randomBytes(18).toString("base64url");
 
+const resolveDisplayName = (createdBy: {
+  userName: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+}): string => {
+  const userName = createdBy.userName?.trim();
+  if (userName) return userName;
+
+  const first = createdBy.firstName?.trim() ?? "";
+  const last = createdBy.lastName?.trim() ?? "";
+  const full = `${first} ${last}`.trim();
+  if (full) return full;
+
+  const emailPrefix = createdBy.email?.split("@")[0]?.trim();
+  return emailPrefix || "Unknown author";
+};
+
 export const shareLinkService = {
   async userCanAccessHaiku(userId: string, haikuId: string): Promise<boolean> {
     const haiku = await haikuRepository.findById(haikuId);
@@ -115,6 +133,7 @@ export const shareLinkService = {
         haiku: ReturnType<typeof haikuPayload>;
         remainingViews: number | null;
         permanent: boolean;
+        sharedByUserName: string;
       }
     | { ok: false; reason: string }
   > {
@@ -161,6 +180,7 @@ export const shareLinkService = {
       haiku: haikuPayload(haikuRow),
       remainingViews,
       permanent,
+      sharedByUserName: resolveDisplayName(row.createdBy),
     };
   },
 };

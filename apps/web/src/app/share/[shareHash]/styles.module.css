@@ -2,10 +2,15 @@
   min-height: 100vh;
   padding: 1.5rem;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+
 
 .card {
   max-width: 36rem;
+  background: #ffffff66;
   margin: 0 auto;
   padding: 1.25rem;
   border-radius: 8px;
@@ -49,4 +54,21 @@
   margin: 0.65rem 0 0;
   font-size: 0.85rem;
   opacity: 0.75;
+}
+
+.providedBy {
+  margin: 0 0 0.65rem;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: rgb(0 0 0 / 45%);
+}
+
+.contentContainer {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.5rem;
 }

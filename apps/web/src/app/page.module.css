@@ -2,42 +2,16 @@
   font-family: var(--font-noto-serif), serif;
   --background-color: #fcfaf2;
   color: var(--text-color);
+}
 
 .page {
   min-height: 100vh;
   display: flex;
-  flex-direction: column;  align-items: center;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  background-color: var(--background-color);
   position: relative;
   overflow: hidden;
-}
-
-/* Background Art (Sun, Mountains, Sakura hints) */
-.vgBg {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  background-image: 
-    url("/background.webp"),
-    linear-gradient(160deg, transparent 60%, rgba(0,0,0,0.03) 60%, rgba(0,0,0,0.06) 100%),
-    linear-gradient(200deg, transparent 75%, rgba(0,0,0,0.04) 75%, rgba(0,0,0,0.02) 100%);
-    background-size: 
-    cover,
-    100% 100%,
-    100% 100%;
-
-  background-repeat:
-    no-repeat,
-    no-repeat,
-    no-repeat;
-
-  background-position:
-    center,
-    center,
-    center;
-  opacity: 0.8;
 }
 
 .main {
@@ -91,5 +65,4 @@
   padding: 0.5rem 3rem;
   font-size: 1rem;
   line-height: 1.5;
-}
 }

@@ -4,6 +4,7 @@ export type SharedHaikuPayload = {
   haiku: HaikuDto;
   remainingViews: number | null;
   permanent: boolean;
+  sharedByUserName: string;
 };
 
 export type FetchSharedHaikuResult =

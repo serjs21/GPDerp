@@ -21,13 +21,19 @@ export default async function SharedHaikuPage({ params }: { params: Promise<{ sh
     );
   }
 
-  const { haiku } = result.data;
+  const { haiku, sharedByUserName } = result.data;
+  const providerName = sharedByUserName?.trim() || "Unknown author";
 
   return (
     <div className={styles.page}>
+      <div className={styles.contentContainer}>
+      <span className={styles.providedBy}>
+        A poem from <strong>{providerName}</strong>:
+      </span>
       <article className={styles.card}>
         <SharedHaikuTyping title={formatHaikuTitle(haiku, false)} body={haiku.body} />
       </article>
+      </div>
     </div>
   );
 }

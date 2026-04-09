@@ -120,6 +120,7 @@ const shareLinkPluginImpl = async (app: FastifyInstance) => {
         haiku: result.haiku,
         remainingViews: result.remainingViews,
         permanent: result.permanent,
+        sharedByUserName: result.sharedByUserName,
       },
     });
   });
