@@ -1,0 +1,16 @@
+.chunk {
+  opacity: 0;
+  animation-name: revealChunk;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+  animation-delay: calc(var(--chunk-index, 0) * 0.05s);
+}
+
+@keyframes revealChunk {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

@@ -1,9 +1,25 @@
 .header {
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
     padding: 1rem;
     height: 5rem;
     background-color: #bc002d;
+}
+
+.headerBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+}
+
+.headerAuth {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 1;
+    min-width: 0;
 }
 
 :root {

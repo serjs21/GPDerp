@@ -6,6 +6,7 @@ import { useMarkHydrated } from "@/hooks/useMarkHydrated";
 import styles from "./headerStyles.module.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthNavigation } from "@/components/AuthenticationNav/AuthNavigation";
+import { BeamMeUpScotty } from "@/components/BeamMeUpScotty/BeamMeUpScotty";
 
 const { Header, Content } = Layout;
 
@@ -23,7 +24,12 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
       <AxiosInit />
       <Layout>
         <Header className={`${styles.header} ${styles.pencilBorder}`}>
-          <AuthNavigation />
+          <div className={styles.headerBar}>
+            <BeamMeUpScotty />
+            <div className={styles.headerAuth}>
+              <AuthNavigation />
+            </div>
+          </div>
         </Header>
         <div />
         <Content>{children}</Content>

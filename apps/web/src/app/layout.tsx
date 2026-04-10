@@ -26,6 +26,19 @@ const notoSerifJP = Noto_Serif_JP({
 export const metadata: Metadata = {
   title: "GPDerp",
   description: "AI, but useless",
+  manifest: "/site.webmanifest",
+  icons: {
+    icon: [
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/icons/apple-touch-icon.png",
+  },
+  themeColor: "#bc002d",
+  appleWebApp: {
+    capable: true,
+    title: "GPDerp",
+  },
 };
 
 export default function RootLayout({

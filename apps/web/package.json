@@ -12,7 +12,8 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "generate-icons": "node scripts/generate-icons.mjs"
   },
   "dependencies": {
     "@ant-design/cssinjs": "^2.1.2",
@@ -64,7 +65,9 @@
     "jest-environment-jsdom": "^30.2.0",
     "playwright": "^1.58.2",
     "prisma": "^7.2.0",
+    "sharp": "^0.34.5",
     "storybook": "^10.3.1",
+    "to-ico": "^1.1.5",
     "tsx": "^4.21.0",
     "typescript": "^5",
     "vite": "^8.0.1",
