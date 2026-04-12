@@ -9,6 +9,7 @@
     "start": "node dist/index.js",
     "check-db": "tsx scripts/check-connection.ts",
     "verify-email": "tsx scripts/verify-email.ts",
+    "send-share-template-email": "tsx scripts/send-share-template-email.ts",
     "test": "jest",
     "lint:check": "eslint . && prisma format --check && prisma validate",
     "lint:ts": "eslint .",

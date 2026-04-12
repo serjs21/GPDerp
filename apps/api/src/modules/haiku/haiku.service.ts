@@ -6,9 +6,22 @@ import { runHaikuAgentStreamMock } from "../../mocks/textStream";
 import { authRepository } from "../auth/repository";
 import { haikuRepository } from "./haiku.repository";
 import { labelRepository } from "../label/label.repository";
+import { mailService } from "../email/mailService";
+import { buildShareHaikuEmail } from "../email/templates/shareHaikuTemplate";
 
 const chunkToString = (chunk: string | Buffer): string =>
   typeof chunk === "string" ? chunk : Buffer.from(chunk).toString("utf-8");
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
+
+const resolveSenderName = (user: { userName?: string; firstName?: string; lastName?: string; email?: string }) => {
+  const userName = user.userName?.trim();
+  if (userName) return userName;
+  const fullName = `${user.firstName?.trim() ?? ""} ${user.lastName?.trim() ?? ""}`.trim();
+  if (fullName) return fullName;
+  const emailPrefix = user.email?.split("@")[0]?.trim();
+  return emailPrefix || "Someone";
+};
 
 export type HaikuStreamContext = {
   accountId: string;
@@ -272,6 +285,51 @@ export const haikuService = {
 
     const updated = await haikuRepository.setLabels(haikuId, uniqueIds);
     return { ok: true, labels: updated.labels };
+  },
+
+  async shareHaikuByEmailForUser(params: {
+    userId: string;
+    haikuId: string;
+    recipients: string[];
+    personalMessage: string;
+  }): Promise<
+    | { ok: true; sentCount: number }
+    | { ok: false; reason: "not_found" | "forbidden" | "invalid_recipients" }
+  > {
+    const normalizedRecipients = [...new Set(params.recipients.map((v) => v.trim().toLowerCase()))].filter(Boolean);
+    if (normalizedRecipients.length === 0 || !normalizedRecipients.every((email) => EMAIL_REGEX.test(email))) {
+      return { ok: false, reason: "invalid_recipients" };
+    }
+
+    const haiku = await haikuRepository.findFullById(params.haikuId);
+    if (!haiku) return { ok: false, reason: "not_found" };
+
+    const allowed = await authRepository.findAccountIdForUser(params.userId, haiku.accountId);
+    if (!allowed) return { ok: false, reason: "forbidden" };
+    const sender = await authRepository.findUserById(params.userId);
+    if (!sender) return { ok: false, reason: "forbidden" };
+
+    const senderName = resolveSenderName(sender);
+    const emailPayload = buildShareHaikuEmail({
+      senderName,
+      personalMessage: params.personalMessage,
+      title: haiku.title,
+      body: haiku.body,
+    });
+
+    await Promise.all(
+      normalizedRecipients.map((to) =>
+        mailService.sendEmail({
+          to,
+          subject: emailPayload.subject,
+          text: emailPayload.text,
+          html: emailPayload.html,
+          replyTo: sender.email,
+        }),
+      ),
+    );
+
+    return { ok: true, sentCount: normalizedRecipients.length };
   },
 };
 

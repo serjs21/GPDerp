@@ -10,3 +10,7 @@
   display: inline-flex;
   gap: 0.5rem;
 }
+
+.success {
+  margin: 0.5rem 0;
+}

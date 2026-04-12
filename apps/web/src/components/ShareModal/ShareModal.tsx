@@ -1,12 +1,12 @@
 "use client";
 
-import { Button, message, Modal, Radio } from "antd";
+import { Button, message, Modal, Radio, Tooltip, Typography } from "antd";
 import type { RadioChangeEvent } from "antd/es/radio";
 import type { Dayjs } from "dayjs";
 import axios from "axios";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
-import { createShareLink } from "@/api/shareLinks";
+import { createShareLink, shareHaikuByEmail } from "@/api/shareLinks";
 import { CopyText } from "../CopyText/CopyText";
 import { SendShareEmailContent } from "./SendShareEmailContent";
 import { ShareLinkContent } from "./ShareLinkContent";
@@ -35,12 +35,17 @@ export function ShareModal({
   initialMethod = "link",
   initialLinkPolicy = "permanent",
 }: ShareModalProps) {
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
   const [method, setMethod] = useState<ShareMethod>("link");
   const [linkPolicy, setLinkPolicy] = useState<LinkPolicy>("permanent");
   const [expiresAt, setExpiresAt] = useState<Dayjs | null>(null);
   const [maxViews, setMaxViews] = useState<number | null>(3);
   const [createdUrl, setCreatedUrl] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+  const [emailMessage, setEmailMessage] = useState("");
+  const [emailRecipients, setEmailRecipients] = useState<string[]>([]);
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -49,6 +54,10 @@ export function ShareModal({
     setExpiresAt(null);
     setMaxViews(3);
     setCreatedUrl(initialCreatedUrl ?? null);
+    setEmailMessage("");
+    setEmailRecipients([]);
+    setSendingEmail(false);
+    setEmailSent(false);
   }, [open, initialCreatedUrl, initialMethod, initialLinkPolicy]);
 
   useEffect(() => {
@@ -61,6 +70,23 @@ export function ShareModal({
     linkPolicy === "permanent" ||
     (linkPolicy === "expires" && expiresAt != null && expiresAt.isAfter(dayjs())) ||
     (linkPolicy === "limited" && maxViews != null && maxViews >= 1);
+  const normalizedEmails = [...new Set(emailRecipients.map((v) => v.trim().toLowerCase()))].filter(Boolean);
+  const invalidEmails = normalizedEmails.filter((email) => !EMAIL_REGEX.test(email));
+  const canSendEmail = normalizedEmails.length > 0 && invalidEmails.length === 0;
+  const linkCtaHint =
+    canCreateLink || creating
+      ? ""
+      : linkPolicy === "expires"
+        ? "Pick a future expiration date"
+        : linkPolicy === "limited"
+          ? "Max views should be at least 1"
+          : "Invalid share link settings";
+  const emailCtaHint =
+    canSendEmail || sendingEmail
+      ? ""
+      : normalizedEmails.length === 0
+        ? "Add at least one recipient email"
+        : "Fix invalid recipient emails";
 
   const onCreateLink = async () => {
     if (!canCreateLink) return;
@@ -95,8 +121,29 @@ export function ShareModal({
     }
   };
 
-  const onSendEmailPlaceholder = () => {
-    message.info("Email sharing is not available yet.");
+  const onSendEmail = async () => {
+    if (!canSendEmail) return;
+    setSendingEmail(true);
+    try {
+      const sentCount = await shareHaikuByEmail({
+        haikuId,
+        emails: normalizedEmails,
+        message: emailMessage.trim(),
+      });
+      setEmailSent(true);
+      message.success(
+        sentCount === 1 ? "Your haiku has been sent" : `Your haikus have been sent (${sentCount})`,
+      );
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        const msg = (e.response?.data as { error?: string } | undefined)?.error;
+        message.error(typeof msg === "string" ? msg : "Could not send email");
+      } else {
+        message.error("Could not send email");
+      }
+    } finally {
+      setSendingEmail(false);
+    }
   };
 
   const onMethodChange = (e: RadioChangeEvent) => {
@@ -110,21 +157,25 @@ export function ShareModal({
   };
 
   const footer =
-    createdUrl != null ? (
+    createdUrl != null || emailSent ? (
       <Button type="primary" onClick={onClose}>
         Done
       </Button>
     ) : (
       <div className={styles.footerBtns}>
         <Button onClick={onClose}>Close</Button>
-        <Button
-          type="primary"
-          loading={creating}
-          disabled={method === "link" ? !canCreateLink : false}
-          onClick={method === "link" ? onCreateLink : onSendEmailPlaceholder}
-        >
-          {method === "email" ? "Send" : "Create link"}
-        </Button>
+        <Tooltip title={method === "link" ? linkCtaHint : emailCtaHint}>
+          <span>
+            <Button
+              type="primary"
+              loading={method === "link" ? creating : sendingEmail}
+              disabled={method === "link" ? !canCreateLink : !canSendEmail}
+              onClick={method === "link" ? onCreateLink : onSendEmail}
+            >
+              {method === "email" ? "Send" : "Create link"}
+            </Button>
+          </span>
+        </Tooltip>
       </div>
     );
 
@@ -142,6 +193,10 @@ export function ShareModal({
     >
       {createdUrl != null ? (
         <CopyText text={createdUrl} mode="link" />
+      ) : emailSent ? (
+        <Typography.Paragraph className={styles.success}>
+          Your haikus have been sent.
+        </Typography.Paragraph>
       ) : (
         <>
           <Radio.Group
@@ -163,7 +218,14 @@ export function ShareModal({
               onMaxViewsChange={(v) => setMaxViews(typeof v === "number" ? v : null)}
             />
           ) : (
-            <SendShareEmailContent />
+            <SendShareEmailContent
+              message={emailMessage}
+              emails={emailRecipients}
+              invalidEmails={invalidEmails}
+              onMessageChange={setEmailMessage}
+              onEmailsChange={setEmailRecipients}
+              disabled={sendingEmail}
+            />
           )}
         </>
       )}

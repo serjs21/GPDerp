@@ -268,6 +268,61 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
   );
 
   app.post(
+    "/share_haiku_email",
+    { preHandler: [app.requireAuthenticated] },
+    async (req: FastifyRequest, res: FastifyReply) => {
+      const userId = req.user?.sub;
+      if (!userId) {
+        res.code(403).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+
+      const body =
+        (req.body as
+          | {
+              haikuId?: string;
+              emails?: string[];
+              message?: string;
+            }
+          | undefined) ?? {};
+
+      const haikuId = (body.haikuId ?? "").trim();
+      if (!isUuid(haikuId)) {
+        res.code(400).send({ ok: false, error: "Invalid haikuId" });
+        return;
+      }
+
+      const emails = Array.isArray(body.emails) ? body.emails : [];
+      if (emails.length === 0) {
+        res.code(400).send({ ok: false, error: "At least one recipient email is required" });
+        return;
+      }
+
+      const result = await haikuService.shareHaikuByEmailForUser({
+        userId,
+        haikuId,
+        recipients: emails,
+        personalMessage: (body.message ?? "").trim(),
+      });
+
+      if (!result.ok) {
+        if (result.reason === "not_found") {
+          res.code(404).send({ ok: false, error: "Haiku not found" });
+          return;
+        }
+        if (result.reason === "invalid_recipients") {
+          res.code(400).send({ ok: false, error: "One or more recipient emails are invalid" });
+          return;
+        }
+        res.code(403).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+
+      res.send({ ok: true, data: { sentCount: result.sentCount } });
+    },
+  );
+
+  app.post(
     "/beer_me_haiku",
     { preHandler: [app.requireAuthenticated] },
     async (req: FastifyRequest, res: FastifyReply) => {

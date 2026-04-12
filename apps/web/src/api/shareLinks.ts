@@ -33,3 +33,19 @@ export const deleteShareLink = async (shareLinkId: string): Promise<void> => {
     throw new Error(typeof data.error === "string" ? data.error : "Delete failed");
   }
 };
+
+export type ShareHaikuEmailBody = {
+  haikuId: string;
+  emails: string[];
+  message?: string;
+};
+
+type ShareHaikuEmailResponse = { ok: true; data: { sentCount: number } } | { ok: false; error: string };
+
+export const shareHaikuByEmail = async (body: ShareHaikuEmailBody): Promise<number> => {
+  const { data } = await axios.post<ShareHaikuEmailResponse>("/share_haiku_email", body);
+  if (!data.ok) {
+    throw new Error(data.error || "Could not send email");
+  }
+  return data.data.sentCount;
+};

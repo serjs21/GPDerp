@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import type { SendMailOptions } from "nodemailer";
 import { env } from "../../env";
 
 const transporter = nodemailer.createTransport({
@@ -22,10 +23,12 @@ const assertMailConfig = () => {
 
 export const mailService = {
   async sendEmail(params: {
-    to: string;
+    to: string | string[];
     subject: string;
     text: string;
     html: string;
+    replyTo?: string;
+    attachments?: SendMailOptions["attachments"];
   }) {
     assertMailConfig();
     await transporter.sendMail({
@@ -34,6 +37,8 @@ export const mailService = {
       subject: params.subject,
       text: params.text,
       html: params.html,
+      replyTo: params.replyTo,
+      attachments: params.attachments,
     });
   },
 };
