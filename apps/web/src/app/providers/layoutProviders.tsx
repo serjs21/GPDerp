@@ -7,8 +7,9 @@ import styles from "./headerStyles.module.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthNavigation } from "@/components/AuthenticationNav/AuthNavigation";
 import { BeamMeUpScotty } from "@/components/BeamMeUpScotty/BeamMeUpScotty";
+import { SiteFooter } from "@/components/SiteFooter/SiteFooter";
 
-const { Header, Content } = Layout;
+const { Header, Content, Footer } = Layout;
 
 export interface LayoutProviderProps {
   children: React.ReactNode;
@@ -22,7 +23,14 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
   const inner = (
     <>
       <AxiosInit />
-      <Layout>
+      <Layout
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          background: "transparent",
+        }}
+      >
         <Header className={`${styles.header} ${styles.pencilBorder}`}>
           <div className={styles.headerBar}>
             <BeamMeUpScotty />
@@ -32,7 +40,10 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
           </div>
         </Header>
         <div />
-        <Content>{children}</Content>
+        <Content style={{ flex: 1 }}>{children}</Content>
+        <Footer style={{ padding: 0, margin: 0, background: "transparent" }}>
+          <SiteFooter />
+        </Footer>
       </Layout>
     </>
   );

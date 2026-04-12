@@ -1,0 +1,53 @@
+.footer {
+  padding: 1rem 1.25rem 1.25rem;
+  margin-top: auto;
+  text-align: center;
+  background: color-mix(in srgb, var(--background, #fcfaf2) 88%, transparent);
+  border-top: 1px solid rgba(45, 45, 45, 0.1);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem 0.65rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  margin-bottom: 0.65rem;
+}
+
+.links a {
+  color: var(--sumi-ink, #2d2d2d);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.links a:hover {
+  color: var(--accent-red, #bc002d);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.sep {
+  color: rgba(45, 45, 45, 0.35);
+  user-select: none;
+}
+
+.paddle {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: rgba(45, 45, 45, 0.72);
+  max-width: 36rem;
+  margin: 0 auto;
+}
+
+.paddle a {
+  color: var(--accent-red, #bc002d);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.paddle a:hover {
+  opacity: 0.9;
+}
