@@ -42,12 +42,10 @@ export default function ProfilePage() {
           </Space>
 
           <Descriptions bordered column={1} size="small">
-            <Descriptions.Item label="ID">{user.id}</Descriptions.Item>
             <Descriptions.Item label="Username">{user.userName || "-"}</Descriptions.Item>
             <Descriptions.Item label="Email">{user.email || "-"}</Descriptions.Item>
             <Descriptions.Item label="First name">{user.firstName || "-"}</Descriptions.Item>
             <Descriptions.Item label="Last name">{user.lastName || "-"}</Descriptions.Item>
-            <Descriptions.Item label="Email verified">{user.emailVerifiedAt ? "Yes" : "No"}</Descriptions.Item>
           </Descriptions>
         </Space>
       </Card>

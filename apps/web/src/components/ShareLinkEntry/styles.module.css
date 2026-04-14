@@ -1,0 +1,43 @@
+.card {
+  border: 1px solid color-mix(in srgb, var(--text-color, #2c2c2c) 12%, transparent);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--background-color, #fcfaf2) 94%, transparent);
+  padding: 0.85rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.subject {
+  margin: 0 !important;
+}
+
+.url {
+  font-size: 0.85rem;
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.statusIcon {
+  display: inline-flex;
+}
+
+.metaRow {
+  margin-top: 0.4rem;
+}
+
+.actions {
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}

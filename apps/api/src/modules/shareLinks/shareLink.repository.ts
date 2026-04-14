@@ -1,10 +1,12 @@
 import { prismaClient } from "../../lib/prisma";
+import type { Prisma } from "../../generated/prisma";
 
 export const shareLinkRepository = {
   create(data: {
     shareHash: string;
     createdByUserId: string;
     sharedHaikuId: string;
+    haikuSubject: string;
     expirationDate: Date | null;
     maxViews: number | null;
   }) {
@@ -13,6 +15,7 @@ export const shareLinkRepository = {
         shareHash: data.shareHash,
         createdByUserId: data.createdByUserId,
         sharedHaikuId: data.sharedHaikuId,
+        haikuSubject: data.haikuSubject,
         expirationDate: data.expirationDate,
         maxViews: data.maxViews,
       },
@@ -24,6 +27,7 @@ export const shareLinkRepository = {
         maxViews: true,
         viewCount: true,
         sharedHaikuId: true,
+        haikuSubject: true,
       },
     });
   },
@@ -61,6 +65,68 @@ export const shareLinkRepository = {
   deleteById(id: string) {
     return prismaClient.shareLink.delete({
       where: { id },
+    });
+  },
+
+  listForCreator(params: {
+    createdByUserId: string;
+    where?: Prisma.ShareLinkWhereInput;
+    offset: number;
+    pageSize: number;
+  }) {
+    return prismaClient.shareLink.findMany({
+      where: {
+        createdByUserId: params.createdByUserId,
+        ...(params.where ?? {}),
+      },
+      orderBy: { createdAt: "desc" },
+      skip: params.offset,
+      take: params.pageSize,
+      select: {
+        id: true,
+        shareHash: true,
+        createdAt: true,
+        expirationDate: true,
+        maxViews: true,
+        viewCount: true,
+        haikuSubject: true,
+      },
+    });
+  },
+
+  countForCreator(params: {
+    createdByUserId: string;
+    where?: Prisma.ShareLinkWhereInput;
+  }) {
+    return prismaClient.shareLink.count({
+      where: {
+        createdByUserId: params.createdByUserId,
+        ...(params.where ?? {}),
+      },
+    });
+  },
+
+  refreshById(params: {
+    id: string;
+    expirationDate: Date | null;
+    maxViews: number | null;
+  }) {
+    return prismaClient.shareLink.update({
+      where: { id: params.id },
+      data: {
+        expirationDate: params.expirationDate,
+        maxViews: params.maxViews,
+        viewCount: 0,
+      },
+      select: {
+        id: true,
+        shareHash: true,
+        createdAt: true,
+        expirationDate: true,
+        maxViews: true,
+        viewCount: true,
+        haikuSubject: true,
+      },
     });
   },
 };

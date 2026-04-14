@@ -1,0 +1,13 @@
+.modal :global(.ant-modal-body) {
+  padding-top: 8px;
+}
+
+.subtitle {
+  margin-bottom: 12px;
+}
+
+.linkRow {
+  margin-top: 10px;
+  margin-bottom: 0;
+  text-align: center;
+}

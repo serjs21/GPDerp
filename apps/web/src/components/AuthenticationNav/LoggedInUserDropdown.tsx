@@ -38,6 +38,10 @@ export const LoggedInUserDropdown = ({ user, onLogout }: LoggedInUserDropdownPro
       label: <Link href="/manage_labels"><div className={styles.userDropdownItem}>Manage labels</div></Link>,
     },
     {
+      key: "manageShareLinks",
+      label: <Link href="/manage_share_links"><div className={styles.userDropdownItem}>Manage share links</div></Link>,
+    },
+    {
       type: "divider",
     },
     {

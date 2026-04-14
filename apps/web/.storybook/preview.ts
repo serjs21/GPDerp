@@ -1,6 +1,16 @@
 import type { Preview } from '@storybook/nextjs-vite'
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { createElement } from 'react';
 
 const preview: Preview = {
+  decorators: [
+    (Story) =>
+      createElement(
+        GoogleOAuthProvider,
+        { clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || 'storybook-google-client-id' },
+        createElement(Story),
+      ),
+  ],
   parameters: {
     controls: {
       matchers: {
