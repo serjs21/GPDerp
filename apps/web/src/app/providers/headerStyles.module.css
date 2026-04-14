@@ -3,6 +3,10 @@
     align-items: center;
     padding: 1rem;
     height: 5rem;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 500;
     background-color: #bc002d;
 }
 

@@ -7,7 +7,7 @@ export default function Home() {
       <main className={styles.main}>
         <HaikuGenerationChat />
 
-        <footer className={styles.footerText}>
+        <footer className={`${styles.footerText} poetic-footer`}>
           {"Stars blink, I wonder—\nAm I just dust in the void,\nOr meaning’s whisper?"}
         </footer>
       </main>

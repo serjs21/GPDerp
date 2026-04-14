@@ -4,6 +4,7 @@ import { Layout } from "antd";
 import AxiosInit from "@/client.axios.setup";
 import { useMarkHydrated } from "@/hooks/useMarkHydrated";
 import styles from "./headerStyles.module.css";
+import layoutStyles from "./layoutProviders.module.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthNavigation } from "@/components/AuthenticationNav/AuthNavigation";
 import { BeamMeUpScotty } from "@/components/BeamMeUpScotty/BeamMeUpScotty";
@@ -23,14 +24,7 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
   const inner = (
     <>
       <AxiosInit />
-      <Layout
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          background: "transparent",
-        }}
-      >
+      <Layout className={layoutStyles.shell}>
         <Header className={`${styles.header} ${styles.pencilBorder}`}>
           <div className={styles.headerBar}>
             <BeamMeUpScotty />
@@ -39,9 +33,10 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
             </div>
           </div>
         </Header>
-        <div />
-        <Content style={{ flex: 1 }}>{children}</Content>
-        <Footer style={{ padding: 0, margin: 0, background: "transparent" }}>
+        <Content className={layoutStyles.contentMain}>
+          <div className={layoutStyles.contentStretch}>{children}</div>
+        </Content>
+        <Footer className={layoutStyles.footerSlot}>
           <SiteFooter />
         </Footer>
       </Layout>

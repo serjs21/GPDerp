@@ -1,9 +1,12 @@
 .authPage {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: flex-start;
   padding: 48px 16px;
-  min-height: 60vh;
+  box-sizing: border-box;
 }
 
 .card {

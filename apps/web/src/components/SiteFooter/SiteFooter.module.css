@@ -1,9 +1,9 @@
 .footer {
-  padding: 1rem 1.25rem 1.25rem;
-  margin-top: auto;
+  flex-shrink: 0;
+  padding: 1.25rem 1.25rem 1.5rem;
   text-align: center;
-  background: color-mix(in srgb, var(--background, #fcfaf2) 88%, transparent);
-  border-top: 1px solid rgba(45, 45, 45, 0.1);
+  background: color-mix(in srgb, var(--background, #fcfaf2) 92%, transparent);
+  border-top: 1px solid rgba(45, 45, 45, 0.12);
 }
 
 .links {
@@ -13,8 +13,8 @@
   justify-content: center;
   gap: 0.35rem 0.65rem;
   font-size: 0.8125rem;
-  line-height: 1.5;
-  margin-bottom: 0.65rem;
+  line-height: 1.6;
+  margin-bottom: 0.85rem;
 }
 
 .links a {

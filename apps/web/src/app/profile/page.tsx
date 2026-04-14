@@ -19,7 +19,17 @@ export default function ProfilePage() {
   const displayName = user.userName || user.email || "User";
 
   return (
-    <main style={{ maxWidth: 720, margin: "24px auto", padding: "0 16px" }}>
+    <main
+      style={{
+        flex: 1,
+        minHeight: 0,
+        width: "100%",
+        maxWidth: 720,
+        margin: "24px auto",
+        padding: "0 16px",
+        boxSizing: "border-box",
+      }}
+    >
       <Card title="Profile">
         <Space orientation="vertical" size={16} style={{ width: "100%" }}>
           <Space size={12}>

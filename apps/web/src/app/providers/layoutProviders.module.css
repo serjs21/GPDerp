@@ -1,0 +1,39 @@
+/* Chrome estimates: header (5rem + pencil border) + legal footer block */
+.shell {
+  --layout-chrome-top: 5.75rem;
+  --layout-chrome-bottom: 10.5rem;
+}
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh !important;
+  height: auto !important;
+  background: transparent !important;
+}
+
+/* Ant Layout defaults use min-height:0 on content so the middle scrolls inside the viewport; we want document scroll + footer after long pages */
+.contentMain {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 0 auto !important;
+  min-height: unset !important;
+  overflow: visible !important;
+}
+
+.footerSlot {
+  flex: 0 0 auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+}
+
+/* At least one viewport of main area on short pages (footer pins to bottom); grows with taller content */
+.contentStretch {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: calc(100dvh - var(--layout-chrome-top) - var(--layout-chrome-bottom));
+}
