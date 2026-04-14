@@ -8,6 +8,8 @@ import { webSocketPlugin } from "./modules/webSocket/webSocket.controller";
 import { haikuPlugin } from "./modules/haiku/haiku.controller";
 import { labelPlugin } from "./modules/label/label.controller";
 import { shareLinkPlugin } from "./modules/shareLinks/shareLink.controller";
+import { userPlugin } from "./modules/user/user.controller";
+import { iconUploadPlugin } from "./modules/iconUpload/iconUpload.controller";
 
 const app = Fastify({
   logger: true,
@@ -44,6 +46,8 @@ async function run() {
   await app.register(haikuPlugin);
   await app.register(labelPlugin);
   await app.register(shareLinkPlugin);
+  await app.register(userPlugin);
+  await app.register(iconUploadPlugin);
 
   /* ------------------------------ Routes ------------------------------ */
 

@@ -20,6 +20,7 @@ export type UserObject = {
   firstName: string;
   lastName: string;
   avatar: string;
+  avatarManuallySet: boolean;
   emailVerifiedAt: string | null;
   // Present on `/auth/me` (derived from AuthIdentity rows).
   providers: AuthProvider[];

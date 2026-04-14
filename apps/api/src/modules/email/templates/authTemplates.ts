@@ -26,3 +26,18 @@ export const buildWelcomeEmail = () => {
     html: `<p>Thanks for verifying your email. Your account is now active.</p><p>Get started at <a href="${homeUrl}">${homeUrl}</a>.</p>`,
   };
 };
+
+export const buildEmailChangeVerificationEmail = (token: string, nextEmail: string) => {
+  const verifyUrl = `${env.API_BASE_URL}/user/change-email/verify?token=${encodeURIComponent(token)}`;
+  return {
+    subject: "Confirm your new email",
+    text: `We received a request to change your account email to ${nextEmail}.\nConfirm it here:\n${verifyUrl}\n\nThis link expires in 24 hours.`,
+    html: `<p>We received a request to change your account email to <strong>${nextEmail}</strong>.</p><p>Confirm it by clicking <a href="${verifyUrl}">this link</a>.</p><p>This link expires in 24 hours.</p>`,
+  };
+};
+
+export const buildEmailChangePreviousAddressAlert = (nextEmail: string) => ({
+  subject: "Your account email change was requested",
+  text: `A request was made to change your account email to ${nextEmail}.\nIf this wasn't you, please ignore this message.`,
+  html: `<p>A request was made to change your account email to <strong>${nextEmail}</strong>.</p><p>If this wasn't you, please ignore this message.</p>`,
+});

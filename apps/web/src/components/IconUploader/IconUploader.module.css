@@ -1,0 +1,139 @@
+.container {
+  display: inline-grid;
+  gap: 8px;
+  vertical-align: middle;
+  position: relative;
+}
+
+.container:focus-within .iconHitArea {
+  outline: 2px solid #1677ff;
+  outline-offset: 2px;
+}
+
+.container:focus-within .iconHitArea .overlay {
+  opacity: 1;
+}
+
+.container:focus-within .iconHitAreaDisabled:not(.iconHitAreaUploading) .overlay {
+  opacity: 0;
+}
+
+/* Visually hidden but focusable for keyboard / SR — avoids native “Choose File” UI */
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  border: 0;
+  white-space: nowrap;
+}
+
+.iconHitArea {
+  display: block;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  border: 0;
+  border-radius: 8px;
+  padding: 0;
+  background: transparent;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.iconHitAreaDisabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.iconHitAreaUploading {
+  cursor: wait;
+}
+
+.iconHitAreaUploading .overlay {
+  opacity: 1;
+}
+
+.dropZoneActive {
+  outline: 2px solid #1677ff;
+  outline-offset: 2px;
+}
+
+.iconImage {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  display: block;
+  border-radius: 8px;
+  vertical-align: middle;
+}
+
+.placeholder {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: #f3f4f6;
+  color: #6b7280;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(107, 114, 128, 0.6);
+  color: #fff;
+  opacity: 0;
+  transition: opacity 140ms ease;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.iconHitArea:hover .overlay,
+.iconHitArea:focus-visible .overlay {
+  opacity: 1;
+}
+
+.iconHitAreaDisabled:not(.iconHitAreaUploading) .overlay {
+  opacity: 0;
+}
+
+.meta {
+  color: #57606a;
+  font-size: 12px;
+}
+
+.error {
+  color: #c0362c;
+  font-size: 13px;
+}
+
+.success {
+  color: #1f883d;
+  font-size: 13px;
+}
+
+.progressTrack {
+  width: 44px;
+  height: 8px;
+  border-radius: 999px;
+  background: #e5e7eb;
+}
+
+.progressBar {
+  height: 100%;
+  border-radius: 999px;
+  background: #1677ff;
+  transition: width 80ms linear;
+}

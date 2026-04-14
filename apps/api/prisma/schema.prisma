@@ -22,6 +22,7 @@ enum AuthProvider {
 enum EmailActionType {
   EMAIL_VERIFICATION
   PASSWORD_RESET
+  EMAIL_CHANGE
 }
 
 model User {
@@ -30,6 +31,7 @@ model User {
   firstName       String    @default("")
   lastName        String    @default("")
   avatar          String    @default("")
+  avatarManuallySet Boolean @default(false)
   userName        String    @unique
   emailVerifiedAt DateTime?
   blockedAt       DateTime?
@@ -44,6 +46,25 @@ model User {
   passwordCredential PasswordCredential?
   authSessions AuthSession[]
   emailActionTokens EmailActionToken[]
+  emailChangeRequests UserEmailChangeRequest[]
+}
+
+model UserEmailChangeRequest {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @db.Uuid
+  oldEmail      String
+  newEmail      String
+  tokenHash     String   @unique
+  createdAt     DateTime @default(now())
+  expiresAt     DateTime
+  sentAt        DateTime?
+  consumedAt    DateTime?
+  invalidatedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId])
+  @@index([expiresAt])
 }
 
 /// Tracks failed password login attempts for rate limiting (per normalized email, rolling window).

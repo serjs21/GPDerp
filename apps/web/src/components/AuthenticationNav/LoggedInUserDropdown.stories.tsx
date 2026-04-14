@@ -27,6 +27,7 @@ function makeUser({
     firstName: userName.split(" ")[0] ?? userName,
     lastName: userName.split(" ").slice(1).join(" "),
     avatar,
+    avatarManuallySet: true,
     emailVerifiedAt: null,
     providers: [AuthProvider.LOCAL],
   };

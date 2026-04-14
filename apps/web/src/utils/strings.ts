@@ -10,3 +10,6 @@ export const formatHaikuTitle = (haiku: HaikuDto, includeSuffix: boolean = true)
 export const formatHaikuPlainToText = (haiku: HaikuDto): string => {
   return `${formatHaikuTitle(haiku, false)}:\n\n${haiku.body.trim()}`;
 };
+
+export const isValidEmail = (value: string): boolean =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());

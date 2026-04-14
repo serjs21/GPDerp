@@ -416,6 +416,9 @@ export const authService = {
         userId: existingUser.id,
         providerAccountId: googleIdentity.sub,
       });
+      if (googleIdentity.avatar) {
+        await authRepository.updateGoogleAvatarIfNotManual(existingUser.id, googleIdentity.avatar);
+      }
       if (!existingUser.emailVerifiedAt) {
         await authRepository.markUserEmailVerified(existingUser.id);
       }
@@ -494,6 +497,9 @@ export const authService = {
       userId: existingUser.id,
       providerAccountId: googleIdentity.sub,
     });
+    if (googleIdentity.avatar) {
+      await authRepository.updateGoogleAvatarIfNotManual(existingUser.id, googleIdentity.avatar);
+    }
     if (!existingUser.emailVerifiedAt) {
       await authRepository.markUserEmailVerified(existingUser.id);
     }
@@ -657,6 +663,7 @@ export const authService = {
         firstName: user.firstName,
         lastName: user.lastName,
         avatar: user.avatar,
+        avatarManuallySet: user.avatarManuallySet,
         emailVerifiedAt: user.emailVerifiedAt,
         providers: user.authIdentities.map((identity) => identity.provider),
       },

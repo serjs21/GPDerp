@@ -21,6 +21,7 @@ const EMPTY_USER: UserObject = {
   firstName: "",
   lastName: "",
   avatar: "",
+  avatarManuallySet: false,
   emailVerifiedAt: null,
   providers: [],
 };
@@ -108,6 +109,7 @@ export const useAuthentication = (): AuthenticationResult => {
           id: payload.sub,
           userName: typeof payload.userName === "string" ? payload.userName : "",
           avatar: typeof payload.avatar === "string" ? payload.avatar : "",
+          avatarManuallySet: false,
           emailVerifiedAt:
             typeof payload.emailVerifiedAt === "string" ? payload.emailVerifiedAt : null,
         },

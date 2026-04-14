@@ -395,6 +395,18 @@ export const authRepository = {
     });
   },
 
+  updateGoogleAvatarIfNotManual(userId: string, avatar: string) {
+    return prismaClient.user.updateMany({
+      where: {
+        id: userId,
+        avatarManuallySet: false,
+      },
+      data: {
+        avatar,
+      },
+    });
+  },
+
   updatePassword(userId: string, passwordHash: string) {
     return prismaClient.$transaction(async (tx) => {
       await tx.passwordCredential.upsert({

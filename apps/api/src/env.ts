@@ -68,4 +68,14 @@ POSTGRES_PORT: process.env.POSTGRES_PORT ?? "5433",
     | "lax"
     | "strict"
     | "none",
+
+  R2_ACCOUNT_ID: requireEnv("R2_ACCOUNT_ID"),
+  R2_ACCESS_KEY_ID: requireEnv("R2_ACCESS_KEY_ID"),
+  R2_SECRET_ACCESS_KEY: requireEnv("R2_SECRET_ACCESS_KEY"),
+  R2_BUCKET_NAME: requireEnv("R2_BUCKET_NAME"),
+  R2_PUBLIC_BASE_URL: requireEnv("R2_PUBLIC_BASE_URL"),
+  R2_REGION: process.env.R2_REGION ?? "auto",
+  R2_S3_ENDPOINT:
+    process.env.R2_S3_ENDPOINT ??
+    `https://${requireEnv("R2_ACCOUNT_ID")}.r2.cloudflarestorage.com`,
 };
