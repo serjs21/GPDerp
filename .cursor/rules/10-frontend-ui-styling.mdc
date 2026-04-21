@@ -1,0 +1,16 @@
+---
+description: Frontend UI and styling conventions for Next.js app code
+globs: apps/web/src/**/*.{ts,tsx,css}
+alwaysApply: false
+---
+
+# Frontend UI And Styling
+
+- Prefer reuse: check `apps/web/src/components` and existing hooks in `apps/web/src/hooks` and utils in `apps/api/src/utils` for utils before creating one-off UI or logic.
+- Use existing styling language: prefer CSS modules and existing theme variables from `apps/web/src/app/globals.css` over new hardcoded color systems.
+- Keep semantics and accessibility intact: use semantic HTML, meaningful labels, keyboard-safe interactions, and clear `alt` text.
+- Preserve responsive behavior: avoid fixed layouts that break mobile; follow existing layout/container patterns in `apps/web/src/app` and providers.
+- Minimize client-only logic: only use `"use client"` when browser APIs, stateful interactivity, or client hooks require it.
+- Respect existing API client patterns: use `axios` setup and established API modules under `apps/web/src/api` instead of ad hoc fetch flows.
+- Avoid introducing standalone visual paradigms when a shared component can be extended safely.
+- Avoid keeping utils logic inside the components, and prefet puting them inside utils folder based on their functionality

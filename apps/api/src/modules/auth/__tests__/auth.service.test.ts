@@ -1,10 +1,13 @@
 import { EmailActionType } from "../../../generated/prisma";
 import { authService } from "../auth.service";
 import { hashPassword } from "../utils";
+import { userService } from "../../user/user.service";
+import { sendVerificationEmail } from "../verificationEmail";
 
 jest.mock("../repository", () => ({
   authRepository: {
     findUserByEmail: jest.fn(),
+    findUserById: jest.fn(),
     findUserByUserName: jest.fn(),
     findGoogleIdentityByProviderAccountId: jest.fn(),
     createUserWithWorkspace: jest.fn(),
@@ -14,6 +17,7 @@ jest.mock("../repository", () => ({
     invalidateEmailActionTokens: jest.fn(),
     createEmailActionToken: jest.fn(),
     attachGoogleIdentity: jest.fn(),
+    updateGoogleAvatarIfNotManual: jest.fn(),
     markUserEmailVerified: jest.fn(),
     findRefreshTokenByHash: jest.fn(),
     rotateRefreshTokenAtomic: jest.fn(),
@@ -22,7 +26,6 @@ jest.mock("../repository", () => ({
     findEmailActionTokenByHash: jest.fn(),
     updatePassword: jest.fn(),
     revokeAllSessionsForUser: jest.fn(),
-    findUserById: jest.fn(),
     countFailedLoginAttemptsSince: jest.fn(),
     recordFailedLoginAttempt: jest.fn(),
     clearFailedLoginAttemptsForEmail: jest.fn(),
@@ -39,6 +42,10 @@ jest.mock("../../email/mailService", () => ({
   mailService: {
     sendEmail: jest.fn(),
   },
+}));
+
+jest.mock("../verificationEmail", () => ({
+  sendVerificationEmail: jest.fn(),
 }));
 
 jest.mock("../tokenService", () => ({
@@ -65,7 +72,7 @@ const mockLog = {
 const mockApp = { log: mockLog } as any;
 const mockRequest = {
   ip: "127.0.0.1",
-  headers: { "user-agent": "jest-test-agent" },
+  headers: { "user-agent": "jest-test-agent", "cf-ipcountry": "US" },
 } as any;
 
 const setupSessionMocks = () => {
@@ -73,44 +80,49 @@ const setupSessionMocks = () => {
   authRepository.createRefreshToken.mockResolvedValue({ id: "rt-1" });
   authRepository.countFailedLoginAttemptsSince.mockResolvedValue(0);
   authRepository.clearFailedLoginAttemptsForEmail.mockResolvedValue({ count: 0 });
+  authRepository.findUserById.mockImplementation((id: string) =>
+    Promise.resolve({
+      id,
+      userName: id === "google-user-1" ? "google_person" : "new_user",
+      avatar: "",
+      emailVerifiedAt: null,
+    }),
+  );
 };
 
 describe("authService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     setupSessionMocks();
+    jest.spyOn(userService, "registerNewLocalUser").mockResolvedValue({
+      outcome: "created",
+      userId: "user-1",
+      normalizedEmail: "new@example.com",
+    });
   });
 
   it("registers a manual user successfully", async () => {
-    authRepository.findUserByEmail.mockResolvedValue(null);
-    authRepository.createUserWithWorkspace.mockResolvedValue({ id: "user-1" });
-
     const result = await authService.registerManual(mockApp, mockRequest, {
       email: "NEW@EXAMPLE.COM",
       password: "password123",
-      userName: "new_user",
       firstName: "New",
       lastName: "User",
     });
 
-    expect(authRepository.createUserWithWorkspace).toHaveBeenCalledWith(
+    expect(userService.registerNewLocalUser).toHaveBeenCalledWith(
       expect.objectContaining({
-        email: "new@example.com",
-        userName: "new_user",
-        provider: "LOCAL",
+        emailRaw: "NEW@EXAMPLE.COM",
+        countryCode: "US",
       }),
     );
-    expect(authRepository.createEmailActionToken).toHaveBeenCalledWith(
-      expect.objectContaining({
-        userId: "user-1",
-        type: EmailActionType.EMAIL_VERIFICATION,
-      }),
-    );
-    expect(mailService.sendEmail).toHaveBeenCalledTimes(1);
+    expect(sendVerificationEmail).toHaveBeenCalledWith(mockLog, "new@example.com", "user-1");
     expect(result).toEqual({
-      accessToken: "access-token",
-      refreshToken: "raw-refresh-token",
-      csrfToken: "csrf-token",
+      status: "session",
+      tokens: {
+        accessToken: "access-token",
+        refreshToken: "raw-refresh-token",
+        csrfToken: "csrf-token",
+      },
     });
   });
 
@@ -149,36 +161,34 @@ describe("authService", () => {
     expect(authRepository.recordFailedLoginAttempt).toHaveBeenCalledWith("user@example.com");
   });
 
-  it("prevents password registration when email already exists", async () => {
-    authRepository.findUserByEmail.mockResolvedValue({
-      id: "user-1",
-      passwordCredential: { passwordHash: "existing" },
-      authIdentities: [],
+  it("returns neutral when email already exists (duplicate handled in user service)", async () => {
+    (userService.registerNewLocalUser as jest.Mock).mockResolvedValueOnce({
+      outcome: "duplicate_handled",
+      normalizedEmail: "user@example.com",
     });
 
-    await expect(
-      authService.registerManual(mockApp, mockRequest, {
-        email: "user@example.com",
-        password: "password123",
-        userName: "someone",
-      }),
-    ).rejects.toThrow("An account with this email already exists");
+    const result = await authService.registerManual(mockApp, mockRequest, {
+      email: "user@example.com",
+      password: "password123",
+    });
+
+    expect(result).toEqual({ status: "neutral" });
+    expect(sendVerificationEmail).not.toHaveBeenCalled();
   });
 
-  it("rejects password registration for google-only email", async () => {
-    authRepository.findUserByEmail.mockResolvedValue({
-      id: "user-google-only",
-      passwordCredential: null,
-      authIdentities: [{ provider: "GOOGLE" }],
+  it("returns neutral for duplicate google-only email without throwing", async () => {
+    (userService.registerNewLocalUser as jest.Mock).mockResolvedValueOnce({
+      outcome: "duplicate_handled",
+      normalizedEmail: "google.only@example.com",
     });
 
-    await expect(
-      authService.registerManual(mockApp, mockRequest, {
-        email: "google.only@example.com",
-        password: "password123",
-        userName: "someone",
-      }),
-    ).rejects.toThrow("An account with this email already exists");
+    const result = await authService.registerManual(mockApp, mockRequest, {
+      email: "google.only@example.com",
+      password: "password123",
+    });
+
+    expect(result).toEqual({ status: "neutral" });
+    expect(sendVerificationEmail).not.toHaveBeenCalled();
   });
 
   it("rejects password login for google-only accounts", async () => {
@@ -280,17 +290,7 @@ describe("authService", () => {
 
     await authService.resendVerification(mockApp, "USER@example.com");
 
-    expect(authRepository.invalidateEmailActionTokens).toHaveBeenCalledWith({
-      userId: "user-1",
-      type: EmailActionType.EMAIL_VERIFICATION,
-    });
-    expect(authRepository.createEmailActionToken).toHaveBeenCalledWith(
-      expect.objectContaining({
-        userId: "user-1",
-        type: EmailActionType.EMAIL_VERIFICATION,
-      }),
-    );
-    expect(mailService.sendEmail).toHaveBeenCalledTimes(1);
+    expect(sendVerificationEmail).toHaveBeenCalledWith(mockLog, "user@example.com", "user-1");
   });
 
   it("creates reset token during password reset request", async () => {

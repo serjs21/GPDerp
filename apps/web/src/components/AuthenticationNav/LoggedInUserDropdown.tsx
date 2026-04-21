@@ -13,14 +13,15 @@ type LoggedInUserDropdownProps = {
 
 
 const UserIdDisplay = ({ user }: { user: UserObject }) => {
+  const initial = (user.userName?.slice(0, 1) ?? user.email?.slice(0, 1) ?? "?").toUpperCase();
   return (
     <Space>
       <Avatar shape="square" size={36} src={user.avatar || undefined}>
-        {user.userName.slice(0, 1).toUpperCase()}
+        {initial}
       </Avatar>
     </Space>
-  )
-}
+  );
+};
 
 export const LoggedInUserDropdown = ({ user, onLogout }: LoggedInUserDropdownProps) => {
   const displayName = user.userName || user.email || "User";

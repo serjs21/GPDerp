@@ -50,7 +50,7 @@ export const authRepository = {
 
   async createUserWithWorkspace(params: {
     email: string;
-    userName: string;
+    userName: string | null;
     firstName: string;
     lastName: string;
     avatar?: string;

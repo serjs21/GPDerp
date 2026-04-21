@@ -4,11 +4,7 @@ import { AuthProvider, EmailActionType } from "../../generated/prisma";
 import { AUTH_CODES, AUTH_MESSAGES, AUTH_TTL } from "./constants";
 import { authRepository } from "./repository";
 import { googleService, type GoogleIdentity } from "./googleService";
-import {
-  buildPasswordResetEmail,
-  buildVerificationEmail,
-  buildWelcomeEmail,
-} from "../email/templates/authTemplates";
+import { buildPasswordResetEmail, buildWelcomeEmail } from "../email/templates/authTemplates";
 import { mailService } from "../email/mailService";
 import { tokenService } from "./tokenService";
 import {
@@ -16,13 +12,16 @@ import {
   hashPassword,
   hashToken,
   normalizeEmail,
-  normalizeUsername,
   validatePassword,
-  validateUsername,
   verifyPassword,
   verifyPasswordAgainstDummyHash,
 } from "./utils";
 import { AuthError } from "./errors";
+import { userService } from "../user/user.service";
+import { sendVerificationEmail } from "./verificationEmail";
+import { resolveRequestCountryCode } from "../../utils/requestCountry";
+import { validateUsername } from "../../utils/usernameValidation";
+import { stripDangerousControlChars } from "../../utils/sqlSafeInput";
 
 type SessionMeta = {
   ip?: string;
@@ -34,6 +33,10 @@ type AuthTokens = {
   refreshToken: string;
   csrfToken: string;
 };
+
+export type RegisterManualResult =
+  | { status: "session"; tokens: AuthTokens }
+  | { status: "neutral" };
 
 type GoogleSignupProfile = {
   email: string;
@@ -81,50 +84,12 @@ const issueSessionTokens = async (
   const accessToken = await tokenService.createAccessToken({
     sub: userId,
     sid: session.id,
-    userName: user.userName,
+    userName: user.userName ?? "",
     avatar: user.avatar ?? "",
     emailVerifiedAt: user.emailVerifiedAt?.toISOString() ?? null,
   });
   return { accessToken, refreshToken, csrfToken };
 };
-
-const createAndSendVerificationEmail = async (
-  log: FastifyBaseLogger,
-  email: string,
-  userId: string,
-) => {
-  await authRepository.invalidateEmailActionTokens({
-    userId,
-    type: EmailActionType.EMAIL_VERIFICATION,
-  });
-
-  const rawToken = tokenService.createRefreshToken();
-  await authRepository.createEmailActionToken({
-    userId,
-    type: EmailActionType.EMAIL_VERIFICATION,
-    tokenHash: hashToken(rawToken),
-    expiresAt: addSeconds(AUTH_TTL.verificationTokenSeconds),
-  });
-  const message = buildVerificationEmail(rawToken);
-  try {
-    await mailService.sendEmail({
-      to: email,
-      ...message,
-    });
-  } catch (err) {
-    log.error(
-      { err, authFailure: true, step: "verification_email_send", userId },
-      "auth: failed to send verification email",
-    );
-    throw err;
-  }
-};
-
-const isUniqueConstraintError = (error: unknown) =>
-  typeof error === "object" &&
-  error !== null &&
-  "code" in error &&
-  (error as { code?: string }).code === "P2002";
 
 const LOGIN_FAILURE_WINDOW_MS = 60 * 60 * 1000;
 const MAX_FAILED_LOGINS_PER_WINDOW = 5;
@@ -132,63 +97,20 @@ const MAX_FAILED_LOGINS_PER_WINDOW = 5;
 const hasGoogleIdentity = (user: { authIdentities: { provider: AuthProvider }[] }) =>
   user.authIdentities.some((i) => i.provider === AuthProvider.GOOGLE);
 
-const allocateUsernameFromEmail = async (
-  log: FastifyBaseLogger,
-  email: string,
-): Promise<string> => {
-  const localPart = email.split("@")[0] ?? "user";
-  const base = normalizeUsername(localPart.replace(/\./g, "_")) || "user";
-  for (let i = 0; i < 100; i++) {
-    const suffix = i === 0 ? "" : `_${i}`;
-    const maxBase = 32 - suffix.length;
-    const candidate = (base.slice(0, Math.max(1, maxBase)) + suffix).toLowerCase();
-    const taken = await authRepository.findUserByUserName(candidate);
-    if (!taken) return candidate;
-  }
-  logAuthFailure(log, "auth: could not allocate unique username from email", {
-    reason: "username_candidates_exhausted",
-  });
-  throw new AuthError(AUTH_MESSAGES.invalidAuthRequest, { statusCode: 400 });
-};
-
 export const authService = {
-  async checkEmailForPasswordRegistration(email: string) {
-    const normalizedEmail = normalizeEmail(email);
-    if (!normalizedEmail) {
-      return { canRegisterWithPassword: false as const };
-    }
-    const user = await authRepository.findUserByEmail(normalizedEmail);
-    return { canRegisterWithPassword: !user };
-  },
-
-  async checkUsernameAvailable(raw: string) {
-    const validation = validateUsername(raw);
-    if (!validation.valid) {
-      return { available: false as const, normalized: null as string | null, reason: validation.message };
-    }
-    const existing = await authRepository.findUserByUserName(validation.normalized);
-    return {
-      available: !existing,
-      normalized: validation.normalized,
-      reason: null as string | null,
-    };
-  },
-
   async registerManual(
     app: FastifyInstance,
     request: FastifyRequest,
     input: {
       email: string;
       password: string;
-      userName: string;
       firstName?: string;
       lastName?: string;
       avatar?: string;
     },
-  ) {
-    const normalizedEmail = normalizeEmail(input.email);
-    if (!normalizedEmail || !input.password || !input.userName) {
-      logAuthFailure(app.log, "auth: register rejected — missing email, password, or username", {
+  ): Promise<RegisterManualResult> {
+    if (!input.password) {
+      logAuthFailure(app.log, "auth: register rejected — missing email or password", {
         reason: "invalid_auth_request",
       });
       throw new AuthError(AUTH_MESSAGES.invalidAuthRequest, { statusCode: 400 });
@@ -200,75 +122,80 @@ export const authService = {
       });
       throw new AuthError(passwordValidation.message, { statusCode: 400, expose: true });
     }
-    const userNameValidation = validateUsername(input.userName);
-    if (!userNameValidation.valid) {
-      logAuthFailure(app.log, "auth: register rejected — username validation", {
-        reason: "username_validation_failed",
+
+    const passwordHash = await hashPassword(input.password);
+    const countryCode = resolveRequestCountryCode(request);
+    const userAgent =
+      typeof request.headers["user-agent"] === "string" ? request.headers["user-agent"] : null;
+
+    let registerResult: Awaited<ReturnType<typeof userService.registerNewLocalUser>>;
+    try {
+      registerResult = await userService.registerNewLocalUser({
+        emailRaw: input.email,
+        passwordHash,
+        firstName: input.firstName,
+        lastName: input.lastName,
+        avatar: input.avatar,
+        log: app.log,
+        countryCode,
+        ip: request.ip,
+        userAgent,
       });
+    } catch (error) {
+      if (error instanceof AuthError) throw error;
+      logAuthFailure(app.log, "auth: register failed during user creation", {
+        reason: "create_user_error",
+        err: error,
+      });
+      throw error;
+    }
+
+    if (registerResult.outcome === "duplicate_handled") {
+      return { status: "neutral" };
+    }
+
+    await sendVerificationEmail(app.log, registerResult.normalizedEmail, registerResult.userId);
+    const tokens = await issueSessionTokens(registerResult.userId, readSessionMeta(request));
+    return { status: "session", tokens };
+  },
+
+  async completeRegistrationUsername(
+    app: FastifyInstance,
+    request: FastifyRequest,
+    userNameRaw: string,
+  ): Promise<AuthTokens> {
+    const userId = request.user?.sub;
+    if (!userId) throw unauthorizedError();
+
+    const trimmed = userNameRaw?.trim() ?? "";
+    if (!trimmed) {
+      throw new AuthError(AUTH_MESSAGES.invalidAuthRequest, { statusCode: 400 });
+    }
+    const userNameValidation = validateUsername(stripDangerousControlChars(trimmed));
+    if (!userNameValidation.valid) {
       throw new AuthError(userNameValidation.message, { statusCode: 400, expose: true });
     }
 
-    const existingUser = await authRepository.findUserByEmail(normalizedEmail);
-    if (existingUser) {
-      logAuthFailure(app.log, "auth: register rejected — email already registered", {
-        reason: "email_in_use",
-        email: normalizedEmail,
-      });
-      throw new AuthError(AUTH_MESSAGES.emailAlreadyRegistered, {
-        statusCode: 409,
-        expose: true,
-        code: AUTH_CODES.EMAIL_IN_USE,
-      });
+    const result = await userService.setUsernameForVerifiedUser({ userId, userNameRaw: trimmed });
+    if (result.ok) {
+      return issueSessionTokens(userId, readSessionMeta(request));
     }
-
-    const passwordHash = await hashPassword(input.password);
-
-    let userId: string;
-    try {
-      const user = await authRepository.createUserWithWorkspace({
-        email: normalizedEmail,
-        userName: userNameValidation.normalized,
-        firstName: input.firstName ?? "",
-        lastName: input.lastName ?? "",
-        avatar: input.avatar ?? "",
-        passwordHash,
-        provider: AuthProvider.LOCAL,
-      });
-      userId = user.id;
-      await createAndSendVerificationEmail(app.log, normalizedEmail, user.id);
-    } catch (error) {
-      if (!isUniqueConstraintError(error)) {
-        logAuthFailure(app.log, "auth: register failed during user creation", {
-          reason: "create_user_error",
-          err: error,
-        });
-        throw error;
-      }
-      const emailRace = await authRepository.findUserByEmail(normalizedEmail);
-      if (emailRace) {
-        logAuthFailure(app.log, "auth: register rejected — unique constraint, email taken (race)", {
-          reason: "email_in_use_race",
-          email: normalizedEmail,
-        });
-        throw new AuthError(AUTH_MESSAGES.emailAlreadyRegistered, {
+    switch (result.reason) {
+      case "email_not_verified":
+        throw new AuthError(AUTH_MESSAGES.unauthorized, { statusCode: 403 });
+      case "already_set":
+        throw new AuthError(AUTH_MESSAGES.invalidAuthRequest, { statusCode: 400 });
+      case "username_invalid":
+        throw new AuthError(AUTH_MESSAGES.invalidAuthRequest, { statusCode: 400 });
+      case "username_taken":
+        throw new AuthError(AUTH_MESSAGES.usernameTaken, {
           statusCode: 409,
           expose: true,
-          code: AUTH_CODES.EMAIL_IN_USE,
+          code: AUTH_CODES.USERNAME_TAKEN,
         });
-      }
-      logAuthFailure(app.log, "auth: register rejected — unique constraint, username taken", {
-        reason: "username_taken_race",
-        userName: userNameValidation.normalized,
-      });
-      throw new AuthError(AUTH_MESSAGES.usernameTaken, {
-        statusCode: 409,
-        expose: true,
-        code: AUTH_CODES.USERNAME_TAKEN,
-      });
+      default:
+        throw unauthorizedError();
     }
-
-    const tokens = await issueSessionTokens(userId, readSessionMeta(request));
-    return tokens;
   },
 
   async loginManual(
@@ -375,18 +302,16 @@ export const authService = {
         });
         throw unauthorizedError();
       }
-      const userName = await allocateUsernameFromEmail(app.log, normalizedEmail);
-      const user = await authRepository.createUserWithWorkspace({
-        email: normalizedEmail,
+      const userName = await userService.allocateUniqueUsernameFromEmail(app.log, normalizedEmail);
+      const { userId: newId } = await userService.createGoogleUserOnFirstLogin({
+        normalizedEmail,
         userName,
         firstName: googleIdentity.firstName,
         lastName: googleIdentity.lastName,
         avatar: googleIdentity.avatar,
-        provider: AuthProvider.GOOGLE,
         providerAccountId: googleIdentity.sub,
-        emailVerifiedAt: new Date(),
       });
-      userId = user.id;
+      userId = newId;
     } else {
       const currentGoogleIdentity = existingUser.authIdentities.find(
         (identity) => identity.provider === AuthProvider.GOOGLE,
@@ -524,63 +449,23 @@ export const authService = {
     if (!input.token || !input.userName) {
       throw new AuthError(AUTH_MESSAGES.invalidAuthRequest, { statusCode: 400 });
     }
-    const userNameValidation = validateUsername(input.userName);
-    if (!userNameValidation.valid) {
-      throw new AuthError(userNameValidation.message, { statusCode: 400, expose: true });
-    }
 
     const googleIdentity = await verifyAndNormalizeGoogleIdentity(app, input.token);
     const normalizedEmail = normalizeEmail(googleIdentity.email);
-    const existingUser = await authRepository.findUserByEmail(normalizedEmail);
-    if (existingUser) {
-      throw new AuthError(AUTH_MESSAGES.emailAlreadyRegistered, {
-        statusCode: 409,
-        expose: true,
-        code: AUTH_CODES.EMAIL_IN_USE,
-      });
-    }
-    const existingGoogleIdentity =
-      await authRepository.findGoogleIdentityByProviderAccountId(googleIdentity.sub);
-    if (existingGoogleIdentity) {
-      throw unauthorizedError();
-    }
 
-    let userId: string;
-    
-    try {
-      const user = await authRepository.createUserWithWorkspace({
-        email: normalizedEmail,
-        userName: userNameValidation.normalized,
-        firstName: input.firstName ?? googleIdentity.firstName,
-        lastName: input.lastName ?? googleIdentity.lastName,
-        avatar: input.avatar ?? googleIdentity.avatar,
-        provider: AuthProvider.GOOGLE,
-        providerAccountId: googleIdentity.sub,
-        emailVerifiedAt: new Date(),
-      });
-      userId = user.id;
-      
-      await mailService.sendEmail({
-        to: normalizedEmail,
-        ...buildWelcomeEmail(),
-      });
-    
-    } catch (error) {
-      if (!isUniqueConstraintError(error)) throw error;
-      const emailRace = await authRepository.findUserByEmail(normalizedEmail);
-      if (emailRace) {
-        throw new AuthError(AUTH_MESSAGES.emailAlreadyRegistered, {
-          statusCode: 409,
-          expose: true,
-          code: AUTH_CODES.EMAIL_IN_USE,
-        });
-      }
-      throw new AuthError(AUTH_MESSAGES.usernameTaken, {
-        statusCode: 409,
-        expose: true,
-        code: AUTH_CODES.USERNAME_TAKEN,
-      });
-    }
+    const { userId } = await userService.registerNewGoogleUserWithUsername({
+      normalizedEmail,
+      userNameRaw: input.userName,
+      firstName: input.firstName ?? googleIdentity.firstName,
+      lastName: input.lastName ?? googleIdentity.lastName,
+      avatar: input.avatar ?? googleIdentity.avatar,
+      providerAccountId: googleIdentity.sub,
+    });
+
+    await mailService.sendEmail({
+      to: normalizedEmail,
+      ...buildWelcomeEmail(),
+    });
 
     return issueSessionTokens(userId, readSessionMeta(request));
   },
@@ -627,7 +512,7 @@ export const authService = {
     const accessToken = await tokenService.createAccessToken({
       sub: currentToken.session.userId,
       sid: currentToken.session.id,
-      userName: user.userName,
+      userName: user.userName ?? "",
       avatar: user.avatar ?? "",
       emailVerifiedAt: user.emailVerifiedAt?.toISOString() ?? null,
     });
@@ -689,7 +574,7 @@ export const authService = {
     if (!normalizedEmail) return;
     const user = await authRepository.findUserByEmail(normalizedEmail);
     if (!user || user.emailVerifiedAt) return;
-    await createAndSendVerificationEmail(app.log, normalizedEmail, user.id);
+    await sendVerificationEmail(app.log, normalizedEmail, user.id);
   },
 
   async verifyEmail(

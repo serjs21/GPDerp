@@ -36,7 +36,9 @@ axios.interceptors.request.use((config) => {
   const url = config.url ?? "";
   const isCsrfProtectedAuthEndpoint =
     config.method?.toLowerCase() === "post" &&
-    (url.startsWith("/auth/refresh") || url.startsWith("/auth/logout"));
+    (url.startsWith("/auth/refresh") ||
+      url.startsWith("/auth/logout") ||
+      url.startsWith("/auth/complete-registration"));
 
   if (isCsrfProtectedAuthEndpoint && csrfToken) {
     config.headers["x-csrf-token"] = csrfToken;

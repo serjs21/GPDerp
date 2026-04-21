@@ -24,7 +24,7 @@ const DEFAULT_PAGE_SIZE = 50;
 const MAX_PAGE_SIZE = 50;
 
 const resolveDisplayName = (createdBy: {
-  userName: string;
+  userName: string | null;
   firstName: string;
   lastName: string;
   email: string;

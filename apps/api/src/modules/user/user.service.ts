@@ -1,28 +1,63 @@
+import type { FastifyBaseLogger } from "fastify/types/logger";
 import { AuthProvider } from "../../generated/prisma";
 import { prismaClient } from "../../lib/prisma";
 import { authRepository } from "../auth/repository";
-import { hashToken, normalizeEmail } from "../auth/utils";
+import { sendVerificationEmail } from "../auth/verificationEmail";
+import { AUTH_CODES, AUTH_MESSAGES } from "../auth/constants";
+import { AuthError } from "../auth/errors";
+import { hashToken } from "../auth/utils";
 import { tokenService } from "../auth/tokenService";
 import {
   buildEmailChangePreviousAddressAlert,
   buildEmailChangeVerificationEmail,
+  buildSuspiciousRegistrationAttemptEmail,
 } from "../email/templates/authTemplates";
 import { mailService } from "../email/mailService";
+import { formatCountryLabel } from "../../utils/requestCountry";
+import { cleanText } from "../../utils/text";
+import { normalizeEmail, isValidEmailFormat } from "../../utils/emailValidation";
+import { normalizeUsername, validateUsername } from "../../utils/usernameValidation";
+import { stripDangerousControlChars } from "../../utils/sqlSafeInput";
+import { isUniqueConstraintError } from "../../utils/prismaErrors";
 
 const EMAIL_CHANGE_TTL_MS = 24 * 60 * 60 * 1000;
 
-const cleanText = (value: unknown, max = 200): string | undefined => {
-  if (typeof value !== "string") return undefined;
-  const trimmed = value.trim();
-  return trimmed.slice(0, max);
-};
+type AuthFailureLog = { warn: (detail: Record<string, unknown>, message: string) => void };
 
-const isValidEmail = (value: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+async function recordDuplicatePasswordRegistrationAttempt(params: {
+  log: FastifyBaseLogger;
+  normalizedEmail: string;
+  countryCode: string;
+  ip?: string;
+  userAgent?: string | null;
+  matchedUser: { id: string; email: string; emailVerifiedAt: Date | null };
+}) {
+  await prismaClient.suspiciousRegistrationAttempt.create({
+    data: {
+      normalizedEmail: params.normalizedEmail,
+      countryCode: params.countryCode,
+      ip: params.ip ?? null,
+      userAgent: params.userAgent ?? null,
+      matchedUserId: params.matchedUser.id,
+    },
+  });
+
+  if (params.matchedUser.emailVerifiedAt) {
+    await mailService.sendEmail({
+      to: params.matchedUser.email,
+      ...buildSuspiciousRegistrationAttemptEmail({
+        countryLabel: formatCountryLabel(params.countryCode),
+      }),
+    });
+  } else {
+    await sendVerificationEmail(params.log, params.normalizedEmail, params.matchedUser.id);
+  }
+}
 
 export type UserProfileView = {
   id: string;
   email: string;
-  userName: string;
+  userName: string | null;
   firstName: string;
   lastName: string;
   avatar: string;
@@ -37,6 +72,243 @@ export type UserProfileView = {
 };
 
 export const userService = {
+  async checkEmailForPasswordRegistration(emailRaw: string) {
+    const normalized = normalizeEmail(emailRaw);
+    if (!normalized || !isValidEmailFormat(normalized)) {
+      return { canRegisterWithPassword: false as const };
+    }
+    const user = await authRepository.findUserByEmail(normalized);
+    return { canRegisterWithPassword: !user };
+  },
+
+  async checkUsernameAvailable(raw: string) {
+    const validation = validateUsername(stripDangerousControlChars(raw));
+    if (!validation.valid) {
+      return { available: false as const, normalized: null as string | null, reason: validation.message };
+    }
+    const existing = await authRepository.findUserByUserName(validation.normalized);
+    return {
+      available: !existing,
+      normalized: validation.normalized,
+      reason: null as string | null,
+    };
+  },
+
+  async allocateUniqueUsernameFromEmail(log: AuthFailureLog, email: string): Promise<string> {
+    const localPart = email.split("@")[0] ?? "user";
+    const base = normalizeUsername(localPart.replace(/\./g, "_")) || "user";
+    for (let i = 0; i < 100; i++) {
+      const suffix = i === 0 ? "" : `_${i}`;
+      const maxBase = 32 - suffix.length;
+      const candidate = (base.slice(0, Math.max(1, maxBase)) + suffix).toLowerCase();
+      const taken = await authRepository.findUserByUserName(candidate);
+      if (!taken) return candidate;
+    }
+    log.warn(
+      { reason: "username_candidates_exhausted", authFailure: true },
+      "user: could not allocate unique username from email",
+    );
+    throw new AuthError(AUTH_MESSAGES.invalidAuthRequest, { statusCode: 400 });
+  },
+
+  async registerNewLocalUser(params: {
+    emailRaw: string;
+    passwordHash: string;
+    firstName?: string;
+    lastName?: string;
+    avatar?: string;
+    log: FastifyBaseLogger;
+    countryCode: string;
+    ip?: string;
+    userAgent?: string | null;
+  }): Promise<
+    | { outcome: "created"; userId: string; normalizedEmail: string }
+    | { outcome: "duplicate_handled"; normalizedEmail: string }
+  > {
+    const normalizedEmail = normalizeEmail(stripDangerousControlChars(params.emailRaw));
+    if (!normalizedEmail || !isValidEmailFormat(normalizedEmail)) {
+      throw new AuthError(AUTH_MESSAGES.invalidAuthRequest, { statusCode: 400 });
+    }
+    const existingUser = await authRepository.findUserByEmail(normalizedEmail);
+    if (existingUser) {
+      await recordDuplicatePasswordRegistrationAttempt({
+        log: params.log,
+        normalizedEmail,
+        countryCode: params.countryCode,
+        ip: params.ip,
+        userAgent: params.userAgent,
+        matchedUser: {
+          id: existingUser.id,
+          email: existingUser.email,
+          emailVerifiedAt: existingUser.emailVerifiedAt,
+        },
+      });
+      return { outcome: "duplicate_handled", normalizedEmail };
+    }
+    const firstName = cleanText(params.firstName, 120) ?? "";
+    const lastName = cleanText(params.lastName, 120) ?? "";
+    const avatar = cleanText(params.avatar, 2048) ?? "";
+    try {
+      const user = await authRepository.createUserWithWorkspace({
+        email: normalizedEmail,
+        userName: null,
+        firstName,
+        lastName,
+        avatar,
+        passwordHash: params.passwordHash,
+        provider: AuthProvider.LOCAL,
+      });
+      return { outcome: "created", userId: user.id, normalizedEmail };
+    } catch (error) {
+      if (!isUniqueConstraintError(error)) throw error;
+      const emailRace = await authRepository.findUserByEmail(normalizedEmail);
+      if (emailRace) {
+        await recordDuplicatePasswordRegistrationAttempt({
+          log: params.log,
+          normalizedEmail,
+          countryCode: params.countryCode,
+          ip: params.ip,
+          userAgent: params.userAgent,
+          matchedUser: {
+            id: emailRace.id,
+            email: emailRace.email,
+            emailVerifiedAt: emailRace.emailVerifiedAt,
+          },
+        });
+        return { outcome: "duplicate_handled", normalizedEmail };
+      }
+      throw new AuthError(AUTH_MESSAGES.usernameTaken, {
+        statusCode: 409,
+        expose: true,
+        code: AUTH_CODES.USERNAME_TAKEN,
+      });
+    }
+  },
+
+  async setUsernameForVerifiedUser(params: {
+    userId: string;
+    userNameRaw: string;
+  }): Promise<
+    | { ok: true }
+    | {
+        ok: false;
+        reason:
+          | "not_found"
+          | "email_not_verified"
+          | "username_invalid"
+          | "username_taken"
+          | "already_set";
+      }
+  > {
+    const user = await prismaClient.user.findUnique({ where: { id: params.userId } });
+    if (!user) return { ok: false, reason: "not_found" };
+    if (!user.emailVerifiedAt) return { ok: false, reason: "email_not_verified" };
+    if (user.userName) return { ok: false, reason: "already_set" };
+    const validation = validateUsername(stripDangerousControlChars(params.userNameRaw));
+    if (!validation.valid) return { ok: false, reason: "username_invalid" };
+    try {
+      await prismaClient.user.update({
+        where: { id: params.userId },
+        data: { userName: validation.normalized },
+      });
+      return { ok: true };
+    } catch (error) {
+      if (isUniqueConstraintError(error)) return { ok: false, reason: "username_taken" };
+      throw error;
+    }
+  },
+
+  async registerNewGoogleUserWithUsername(params: {
+    normalizedEmail: string;
+    userNameRaw: string;
+    firstName: string;
+    lastName: string;
+    avatar: string;
+    providerAccountId: string;
+  }): Promise<{ userId: string }> {
+    const email = normalizeEmail(stripDangerousControlChars(params.normalizedEmail));
+    if (!email || !isValidEmailFormat(email)) {
+      throw new AuthError(AUTH_MESSAGES.invalidAuthRequest, { statusCode: 400 });
+    }
+    const userNameValidation = validateUsername(stripDangerousControlChars(params.userNameRaw));
+    if (!userNameValidation.valid) {
+      throw new AuthError(userNameValidation.message, { statusCode: 400, expose: true });
+    }
+    const existingUser = await authRepository.findUserByEmail(email);
+    if (existingUser) {
+      throw new AuthError(AUTH_MESSAGES.emailAlreadyRegistered, {
+        statusCode: 409,
+        expose: true,
+        code: AUTH_CODES.EMAIL_IN_USE,
+      });
+    }
+    const existingGoogleIdentity = await authRepository.findGoogleIdentityByProviderAccountId(
+      params.providerAccountId,
+    );
+    if (existingGoogleIdentity) {
+      throw new AuthError(AUTH_MESSAGES.unauthorized, { statusCode: 401 });
+    }
+    const firstName = cleanText(stripDangerousControlChars(params.firstName), 120) ?? "";
+    const lastName = cleanText(stripDangerousControlChars(params.lastName), 120) ?? "";
+    const avatar = cleanText(stripDangerousControlChars(params.avatar), 2048) ?? "";
+    try {
+      const user = await authRepository.createUserWithWorkspace({
+        email,
+        userName: userNameValidation.normalized,
+        firstName,
+        lastName,
+        avatar,
+        provider: AuthProvider.GOOGLE,
+        providerAccountId: params.providerAccountId,
+        emailVerifiedAt: new Date(),
+      });
+      return { userId: user.id };
+    } catch (error) {
+      if (!isUniqueConstraintError(error)) throw error;
+      const emailRace = await authRepository.findUserByEmail(email);
+      if (emailRace) {
+        throw new AuthError(AUTH_MESSAGES.emailAlreadyRegistered, {
+          statusCode: 409,
+          expose: true,
+          code: AUTH_CODES.EMAIL_IN_USE,
+        });
+      }
+      throw new AuthError(AUTH_MESSAGES.usernameTaken, {
+        statusCode: 409,
+        expose: true,
+        code: AUTH_CODES.USERNAME_TAKEN,
+      });
+    }
+  },
+
+  async createGoogleUserOnFirstLogin(params: {
+    normalizedEmail: string;
+    userName: string;
+    firstName: string;
+    lastName: string;
+    avatar: string;
+    providerAccountId: string;
+  }) {
+    const email = normalizeEmail(stripDangerousControlChars(params.normalizedEmail));
+    if (!email || !isValidEmailFormat(email)) {
+      throw new AuthError(AUTH_MESSAGES.invalidAuthRequest, { statusCode: 400 });
+    }
+    const firstName = cleanText(stripDangerousControlChars(params.firstName), 120) ?? "";
+    const lastName = cleanText(stripDangerousControlChars(params.lastName), 120) ?? "";
+    const avatar = cleanText(stripDangerousControlChars(params.avatar), 2048) ?? "";
+    const user = await authRepository.createUserWithWorkspace({
+      email,
+      userName: params.userName,
+      firstName,
+      lastName,
+      avatar,
+      provider: AuthProvider.GOOGLE,
+      providerAccountId: params.providerAccountId,
+      emailVerifiedAt: new Date(),
+    });
+    return { userId: user.id };
+  },
+
   async getOwnProfile(userId: string): Promise<UserProfileView | null> {
     const user = await prismaClient.user.findUnique({
       where: { id: userId },
@@ -84,20 +356,13 @@ export const userService = {
 
     const firstName = cleanText(params.payload.firstName, 120);
     const lastName = cleanText(params.payload.lastName, 120);
-    const avatar = cleanText(params.payload.avatar, 2048);
 
     const data: {
       firstName?: string;
       lastName?: string;
-      avatar?: string;
-      avatarManuallySet?: boolean;
     } = {};
     if (firstName !== undefined) data.firstName = firstName;
     if (lastName !== undefined) data.lastName = lastName;
-    if (avatar !== undefined) {
-      data.avatar = avatar;
-      data.avatarManuallySet = true;
-    }
 
     if (Object.keys(data).length > 0) {
       await prismaClient.user.update({
@@ -108,6 +373,33 @@ export const userService = {
 
     const profile = await userService.getOwnProfile(params.userId);
     if (!profile) return { ok: false };
+    return { ok: true, profile };
+  },
+
+  async updateOwnAvatar(params: {
+    userId: string;
+    avatarRaw: unknown;
+  }): Promise<
+    { ok: true; profile: UserProfileView } | { ok: false; reason: "not_found" | "invalid_avatar" }
+  > {
+    if (typeof params.avatarRaw !== "string") {
+      return { ok: false, reason: "invalid_avatar" };
+    }
+    const avatar = params.avatarRaw.trim().slice(0, 2048);
+    if (!avatar) {
+      return { ok: false, reason: "invalid_avatar" };
+    }
+
+    const existing = await prismaClient.user.findUnique({ where: { id: params.userId } });
+    if (!existing) return { ok: false, reason: "not_found" };
+
+    await prismaClient.user.update({
+      where: { id: params.userId },
+      data: { avatar, avatarManuallySet: true },
+    });
+
+    const profile = await userService.getOwnProfile(params.userId);
+    if (!profile) return { ok: false, reason: "not_found" };
     return { ok: true, profile };
   },
 
@@ -126,7 +418,7 @@ export const userService = {
     }
 
     const nextEmail = normalizeEmail(params.nextEmailRaw || "");
-    if (!nextEmail || !isValidEmail(nextEmail)) {
+    if (!nextEmail || !isValidEmailFormat(nextEmail)) {
       return { ok: false, reason: "invalid_email" };
     }
 

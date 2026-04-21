@@ -4,7 +4,7 @@ import type { AuthProvider } from "@/types";
 export type UserProfileResponse = {
   id: string;
   email: string;
-  userName: string;
+  userName: string | null;
   firstName: string;
   lastName: string;
   avatar: string;
@@ -26,13 +26,15 @@ export async function fetchOwnProfile(): Promise<UserProfileResponse> {
   return data.data;
 }
 
-export async function updateOwnProfile(body: {
-  firstName?: string;
-  lastName?: string;
-  avatar?: string;
-}): Promise<UserProfileResponse> {
+export async function updateOwnProfile(body: { firstName?: string; lastName?: string }): Promise<UserProfileResponse> {
   const { data } = await axios.patch<ProfileApiResponse>("/user/profile", body);
   if (!data.ok) throw new Error(data.error ?? "Failed to update profile");
+  return data.data;
+}
+
+export async function updateOwnAvatar(avatar: string): Promise<UserProfileResponse> {
+  const { data } = await axios.patch<ProfileApiResponse>("/user/profile/avatar", { avatar });
+  if (!data.ok) throw new Error(data.error ?? "Failed to update avatar");
   return data.data;
 }
 

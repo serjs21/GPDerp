@@ -14,7 +14,12 @@ const chunkToString = (chunk: string | Buffer): string =>
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 
-const resolveSenderName = (user: { userName?: string; firstName?: string; lastName?: string; email?: string }) => {
+const resolveSenderName = (user: {
+  userName?: string | null;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+}) => {
   const userName = user.userName?.trim();
   if (userName) return userName;
   const fullName = `${user.firstName?.trim() ?? ""} ${user.lastName?.trim() ?? ""}`.trim();

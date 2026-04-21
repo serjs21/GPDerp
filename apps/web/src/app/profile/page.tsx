@@ -11,6 +11,7 @@ import {
   fetchOwnProfile,
   requestEmailChange,
   resendEmailChange,
+  updateOwnAvatar,
   updateOwnProfile,
   type UserProfileResponse,
 } from "@/api/user";
@@ -30,7 +31,6 @@ export default function ProfilePage() {
   const [requestingEmailChange, setRequestingEmailChange] = useState(false);
   const [resendingEmailChange, setResendingEmailChange] = useState(false);
   const [savingAvatar, setSavingAvatar] = useState(false);
-  const avatarDraft = Form.useWatch("avatar", form) as string | undefined;
 
   useEffect(() => {
     if (!initialized) return;
@@ -49,7 +49,6 @@ export default function ProfilePage() {
         form.setFieldsValue({
           firstName: data.firstName,
           lastName: data.lastName,
-          avatar: data.avatar,
           email: data.email,
         });
       })
@@ -66,17 +65,12 @@ export default function ProfilePage() {
   const isGoogleUser = profile.providers.includes(AuthProvider.GOOGLE);
   const pendingNewEmail = profile.pendingEmailChange?.newEmail ?? null;
 
-  const onSaveProfile = async (values: {
-    firstName?: string;
-    lastName?: string;
-    avatar?: string;
-  }) => {
+  const onSaveProfile = async (values: { firstName?: string; lastName?: string }) => {
     try {
       setSaving(true);
       const updated = await updateOwnProfile({
         firstName: values.firstName,
         lastName: values.lastName,
-        avatar: values.avatar,
       });
       setProfile(updated);
       message.success("Profile updated");
@@ -155,17 +149,15 @@ export default function ProfilePage() {
         <Space orientation="vertical" size={16} style={{ width: "100%" }}>
           <Space size={12} align="center">
             <IconUploader
-              iconUrl={avatarDraft || profile.avatar}
+              iconUrl={profile.avatar}
               alt={`${displayName} profile icon`}
               fallbackChar={displayName.slice(0, 1)}
               disabled={savingAvatar}
               onUploaded={({ publicUrl }) => {
-                form.setFieldValue("avatar", publicUrl);
-                setProfile((prev) => (prev ? { ...prev, avatar: publicUrl, avatarManuallySet: true } : prev));
                 void (async () => {
                   try {
                     setSavingAvatar(true);
-                    const updated = await updateOwnProfile({ avatar: publicUrl });
+                    const updated = await updateOwnAvatar(publicUrl);
                     setProfile(updated);
                     message.success("Profile picture saved");
                     checkAuthentication();
@@ -188,9 +180,6 @@ export default function ProfilePage() {
             onFinish={(values) => void onSaveProfile(values)}
             requiredMark={false}
           >
-            <Form.Item name="avatar" hidden>
-              <Input />
-            </Form.Item>
             <Form.Item name="firstName" label="First name">
               <Input />
             </Form.Item>

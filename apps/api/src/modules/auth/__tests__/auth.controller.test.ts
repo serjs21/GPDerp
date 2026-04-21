@@ -9,8 +9,6 @@ jest.mock("jose", () => ({
 jest.mock("../auth.service", () => ({
   authService: {
     registerManual: jest.fn(),
-    checkEmailForPasswordRegistration: jest.fn(),
-    checkUsernameAvailable: jest.fn(),
     loginManual: jest.fn(),
     loginGoogle: jest.fn(),
     loginGoogleForLoginFlow: jest.fn(),

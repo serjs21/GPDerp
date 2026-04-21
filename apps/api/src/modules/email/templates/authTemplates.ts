@@ -20,12 +20,19 @@ export const buildPasswordResetEmail = (token: string) => {
 
 export const buildWelcomeEmail = () => {
   const homeUrl = env.CLIENT_URL;
+  const completeUrl = `${env.WEB_APP_URL}/complete-registration`;
   return {
     subject: "Welcome to GPDerp",
-    text: `Thanks for verifying your email. Your account is now active.\n\nGet started here: ${homeUrl}`,
-    html: `<p>Thanks for verifying your email. Your account is now active.</p><p>Get started at <a href="${homeUrl}">${homeUrl}</a>.</p>`,
+    text: `Thanks for verifying your email. Your account is now active.\n\nIf you have not chosen a username yet, complete your profile here:\n${completeUrl}\n\nOr go to the app: ${homeUrl}`,
+    html: `<p>Thanks for verifying your email. Your account is now active.</p><p>If you have not chosen a username yet, <a href="${completeUrl}">complete your registration</a>.</p><p>Or get started at <a href="${homeUrl}">${homeUrl}</a>.</p>`,
   };
 };
+
+export const buildSuspiciousRegistrationAttemptEmail = (params: { countryLabel: string }) => ({
+  subject: "Security alert: sign-up attempt using your email",
+  text: `Someone attempted to create a new account using this email address. The request appeared to originate from: ${params.countryLabel}.\n\nIf this was not you, you can ignore this message — your existing account is unchanged. If you are concerned, change your password from your account settings.`,
+  html: `<p>Someone attempted to create a new account using <strong>this email address</strong>.</p><p>The request appeared to originate from: <strong>${params.countryLabel}</strong>.</p><p>If this was not you, you can ignore this message — your existing account is unchanged. If you are concerned, change your password from your account settings.</p>`,
+});
 
 export const buildEmailChangeVerificationEmail = (token: string, nextEmail: string) => {
   const verifyUrl = `${env.API_BASE_URL}/user/change-email/verify?token=${encodeURIComponent(token)}`;

@@ -17,7 +17,7 @@ type AuthMeResponse = {
 const EMPTY_USER: UserObject = {
   id: "",
   email: "",
-  userName: "",
+  userName: null,
   firstName: "",
   lastName: "",
   avatar: "",
@@ -107,7 +107,8 @@ export const useAuthentication = (): AuthenticationResult => {
         user: {
           ...EMPTY_USER,
           id: payload.sub,
-          userName: typeof payload.userName === "string" ? payload.userName : "",
+          userName:
+            typeof payload.userName === "string" && payload.userName.length > 0 ? payload.userName : null,
           avatar: typeof payload.avatar === "string" ? payload.avatar : "",
           avatarManuallySet: false,
           emailVerifiedAt:

@@ -5,6 +5,7 @@ import { env } from "../../env";
 import { AUTH_CODES, AUTH_COOKIE_NAMES, AUTH_HEADER_NAMES, AUTH_MESSAGES } from "./constants";
 import { authService } from "./auth.service";
 import { authRepository } from "./repository";
+import { userService } from "../user/user.service";
 import { tokenService } from "./tokenService";
 import { isAuthError } from "./errors";
 import { safeEqual } from "./utils";
@@ -147,33 +148,53 @@ const authPluginImpl = async (app: FastifyInstance) => {
     const body = request.body as {
       email: string;
       password: string;
-      userName: string;
       firstName?: string;
       lastName?: string;
       avatar?: string;
     };
     try {
-      const tokens = await authService.registerManual(app, request, body);
-      tokenService.setAuthCookies(reply, {
-        accessToken: tokens.accessToken,
-        refreshToken: tokens.refreshToken,
-        csrfToken: tokens.csrfToken,
-      });
+      const result = await authService.registerManual(app, request, body);
+      if (result.status === "session") {
+        tokenService.setAuthCookies(reply, {
+          accessToken: result.tokens.accessToken,
+          refreshToken: result.tokens.refreshToken,
+          csrfToken: result.tokens.csrfToken,
+        });
+      }
       return reply.code(201).send({ ok: true });
     } catch (error) {
       return respondAuthError(request, reply, error, "register_manual");
     }
   });
 
+  app.post(
+    "/auth/complete-registration",
+    { preHandler: [requireCsrf, app.requireAuthenticated] },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const body = (request.body as { userName?: string } | undefined) ?? {};
+      try {
+        const tokens = await authService.completeRegistrationUsername(app, request, body.userName ?? "");
+        tokenService.setAuthCookies(reply, {
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+          csrfToken: tokens.csrfToken,
+        });
+        return reply.send({ ok: true });
+      } catch (error) {
+        return respondAuthError(request, reply, error, "complete_registration");
+      }
+    },
+  );
+
   app.get("/auth/check-email", async (request: FastifyRequest, reply: FastifyReply) => {
     const query = request.query as { email?: string };
-    const result = await authService.checkEmailForPasswordRegistration(query.email ?? "");
+    const result = await userService.checkEmailForPasswordRegistration(query.email ?? "");
     return reply.send({ ok: true, data: result });
   });
 
   app.get("/auth/check-username", async (request: FastifyRequest, reply: FastifyReply) => {
     const q = request.query as { username?: string };
-    const result = await authService.checkUsernameAvailable(q.username ?? "");
+    const result = await userService.checkUsernameAvailable(q.username ?? "");
     return reply.send({ ok: true, data: result });
   });
 

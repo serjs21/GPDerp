@@ -9,6 +9,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthNavigation } from "@/components/AuthenticationNav/AuthNavigation";
 import { BeamMeUpScotty } from "@/components/BeamMeUpScotty/BeamMeUpScotty";
 import { SiteFooter } from "@/components/SiteFooter/SiteFooter";
+import { CompleteRegistrationRedirect } from "@/components/AuthFlows/CompleteRegistrationRedirect";
 
 const { Header, Content, Footer } = Layout;
 
@@ -34,6 +35,7 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
           </div>
         </Header>
         <Content className={layoutStyles.contentMain}>
+          <CompleteRegistrationRedirect />
           <div className={layoutStyles.contentStretch}>{children}</div>
         </Content>
         <Footer className={layoutStyles.footerSlot}>

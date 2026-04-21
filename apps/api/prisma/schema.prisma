@@ -32,7 +32,8 @@ model User {
   lastName        String    @default("")
   avatar          String    @default("")
   avatarManuallySet Boolean @default(false)
-  userName        String    @unique
+  /// Set after email verification via complete-registration (password sign-up) or at Google sign-up.
+  userName        String?   @unique
   emailVerifiedAt DateTime?
   blockedAt       DateTime?
   createdAt       DateTime  @default(now())
@@ -47,6 +48,22 @@ model User {
   authSessions AuthSession[]
   emailActionTokens EmailActionToken[]
   emailChangeRequests UserEmailChangeRequest[]
+  suspiciousRegistrationAttempts SuspiciousRegistrationAttempt[]
+}
+
+/// Audit + notification trigger when someone attempts password registration for an existing email.
+model SuspiciousRegistrationAttempt {
+  id              String   @id @default(uuid()) @db.Uuid
+  normalizedEmail String
+  countryCode     String?
+  ip              String?
+  userAgent       String?
+  matchedUserId   String?  @db.Uuid
+  createdAt       DateTime @default(now())
+
+  matchedUser User? @relation(fields: [matchedUserId], references: [id], onDelete: SetNull)
+
+  @@index([normalizedEmail, createdAt])
 }
 
 model UserEmailChangeRequest {

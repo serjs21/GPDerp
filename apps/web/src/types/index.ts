@@ -16,7 +16,7 @@ export enum AuthProvider {
 export type UserObject = {
   id: string;
   email: string;
-  userName: string;
+  userName: string | null;
   firstName: string;
   lastName: string;
   avatar: string;

@@ -28,6 +28,24 @@ const userPluginImpl = async (app: FastifyInstance) => {
     },
   );
 
+  app.patch(
+    "/user/profile/avatar",
+    { preHandler: [app.requireAuthenticated] },
+    async (req: FastifyRequest, res: FastifyReply) => {
+      const userId = req.user?.sub;
+      if (!userId) return res.code(403).send({ ok: false, error: "Unauthorized" });
+      const body = (req.body as { avatar?: unknown } | undefined) ?? {};
+      const result = await userService.updateOwnAvatar({ userId, avatarRaw: body.avatar });
+      if (!result.ok) {
+        if (result.reason === "invalid_avatar") {
+          return res.code(400).send({ ok: false, error: "Invalid avatar URL" });
+        }
+        return res.code(404).send({ ok: false, error: "User not found" });
+      }
+      return res.send({ ok: true, data: result.profile });
+    },
+  );
+
   app.post(
     "/user/change-email/request",
     { preHandler: [app.requireAuthenticated] },
