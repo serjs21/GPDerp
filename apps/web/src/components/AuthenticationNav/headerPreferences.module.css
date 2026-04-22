@@ -1,0 +1,26 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.select {
+  min-width: 6.75rem;
+  max-width: 10.5rem;
+  font-size: 0.8125rem;
+  min-height: 2.5rem;
+  padding-block: 0.35rem;
+}
+
+@media (max-width: 480px) {
+  .wrap {
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  .select {
+    flex: 1 1 auto;
+    max-width: none;
+  }
+}

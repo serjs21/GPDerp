@@ -1,6 +1,15 @@
 .userDropdownTrigger {
-  width: fit-content;
-  padding: 0;
+  width: 2.75rem;
+  min-width: 2.75rem;
+  height: 2.75rem;
+  padding: 0 !important;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--profile-surface-bg, #fff) 84%, transparent) !important;
+  border: 1px solid var(--profile-surface-border, rgb(45 45 45 / 0.16)) !important;
+  color: var(--text-color);
 }
 
 .userDropdownItem {
@@ -19,5 +28,26 @@
   white-space: nowrap;
   overflow: hidden;
   font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.authCluster {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.headerAuthNav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.authButton {
+  width: 6.75rem;
+  height: 2.75rem;
+  border-radius: 12px;
   font-weight: 600;
 }

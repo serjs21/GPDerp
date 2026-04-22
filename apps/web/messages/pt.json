@@ -1,0 +1,45 @@
+{
+  "Profile": {
+    "title": "Perfil",
+    "saveProfile": "Salvar perfil",
+    "theme": "Tema",
+    "language": "Idioma",
+    "preferencesGroupLabel": "Exibicao e idioma",
+    "preferencesSaveError": "Nao foi possivel salvar as preferencias"
+  },
+  "ProfileInfo": {
+    "firstName": "Nome",
+    "lastName": "Sobrenome",
+    "emailTitle": "Email",
+    "currentEmail": "Email atual",
+    "confirmationRequired": "Confirmacao necessaria",
+    "pendingNewEmail": "Novo email pendente",
+    "resendEmail": "Reenviar email",
+    "changeEmail": "Alterar email",
+    "newEmailPlaceholder": "novo@email.com",
+    "confirmEmailChangeTitle": "Confirmar alteracao de email",
+    "confirmEmailChangeBody": "A verificacao sera necessaria para {email}.",
+    "resendVerificationEmailTitle": "Reenviar email de verificacao",
+    "resendDescription": "Voce pode alterar o destino antes de reenviar.",
+    "confirm": "Confirmar",
+    "cancel": "Cancelar"
+  },
+  "Themes": {
+    "tokyoDusk": "Tokyo Dusk",
+    "sumie": "Sumie",
+    "nightSky": "Ceu Noturno"
+  },
+  "Languages": {
+    "codes": {
+      "en": "Ingles",
+      "ja": "Japones",
+      "es": "Espanhol",
+      "fr": "Frances",
+      "th": "Tailandes",
+      "de": "Alemao",
+      "it": "Italiano",
+      "pt": "Portugues",
+      "lol": "Idioma de brincadeira"
+    }
+  }
+}

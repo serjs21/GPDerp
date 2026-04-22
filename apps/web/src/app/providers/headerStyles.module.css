@@ -1,13 +1,25 @@
 .header {
     display: flex;
     align-items: center;
-    padding: 1rem;
+    padding: calc(0.8rem + env(safe-area-inset-top)) 1rem 0.8rem;
     height: 5rem;
     flex-shrink: 0;
     position: sticky;
     top: 0;
     z-index: 500;
-    background-color: #bc002d;
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--gradientStart) 88%, transparent) 0%,
+        color-mix(in srgb, var(--gradientMid) 74%, transparent) 55%,
+        transparent 100%
+      );
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid color-mix(in srgb, var(--border-color) 55%, transparent);
+    transition:
+      background var(--motion-duration-base) var(--motion-easing-standard),
+      border-color var(--motion-duration-fast) var(--motion-easing-standard),
+      backdrop-filter var(--motion-duration-fast) var(--motion-easing-standard);
 }
 
 .headerBar {
@@ -15,7 +27,8 @@
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    width: 100%;
+    width: min(100%, 76rem);
+    margin: 0 auto;
 }
 
 .headerAuth {
@@ -26,31 +39,9 @@
     min-width: 0;
 }
 
-:root {
-  --gradientStart: #ff6b6b;
-  --gradientMid: #ffadad;
-  --gradientEnd: #fcfaf2;
-  --borderColor: #8200002b;
-}
-
-.pencilBorder {
-  padding-bottom: 6px;
-
-  background-color: var(--gradientStart);
-
-  background-image:
-    url("data:image/svg+xml;utf8,\
-<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'>\
-<path d='M2 6 Q20 4 40 6 T80 6 T120 6 T160 6 T198 6' stroke='%23fff' stroke-width='2' fill='none' stroke-linecap='round'/>\
-</svg>"),
-    linear-gradient(
-      180deg,
-      var(--gradientStart) 0%,
-      var(--gradientMid) 50%,
-      var(--gradientEnd) 95%
-    );
-
-  background-repeat: no-repeat, no-repeat;
-  background-position: left bottom, left top;
-  background-size: 100% 8px, 100% 100%;
+@media (max-width: 768px) {
+  .header {
+    height: auto;
+    min-height: 4.5rem;
+  }
 }

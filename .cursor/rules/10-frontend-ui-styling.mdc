@@ -7,7 +7,11 @@ alwaysApply: false
 # Frontend UI And Styling
 
 - Prefer reuse: check `apps/web/src/components` and existing hooks in `apps/web/src/hooks` and utils in `apps/api/src/utils` for utils before creating one-off UI or logic.
+- Split large components into smaller ones. Reusable components should be added under `apps/web/src/components` in the folder with a same name as component. Page specific components and sub components of a bigger components can be stored in the same folder.
+- Avoid storing logic in components as much as you can. Extract aggregeted logic to utils under specific files named after functionality to `apps/api/src/utils` and aggregated logic with states to hooks in  `apps/web/src/hooks`.
+- Prefer usage of context and react query to share fetched information over cascading it via props.
 - Use existing styling language: prefer CSS modules and existing theme variables from `apps/web/src/app/globals.css` over new hardcoded color systems.
+- Use css modules for styling. Avoid usage of inline styles unless docs of component specifically require them. Review `apps/web/src/app/themes`, `apps/web/src/hooks/useTheme.ts` and `next-themes` before adding styles.
 - Keep semantics and accessibility intact: use semantic HTML, meaningful labels, keyboard-safe interactions, and clear `alt` text.
 - Preserve responsive behavior: avoid fixed layouts that break mobile; follow existing layout/container patterns in `apps/web/src/app` and providers.
 - Minimize client-only logic: only use `"use client"` when browser APIs, stateful interactivity, or client hooks require it.

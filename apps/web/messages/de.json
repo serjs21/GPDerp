@@ -1,0 +1,45 @@
+{
+  "Profile": {
+    "title": "Profil",
+    "saveProfile": "Profil speichern",
+    "theme": "Thema",
+    "language": "Sprache",
+    "preferencesGroupLabel": "Anzeige und Sprache",
+    "preferencesSaveError": "Einstellungen konnten nicht gespeichert werden"
+  },
+  "ProfileInfo": {
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "emailTitle": "E-Mail",
+    "currentEmail": "Aktuelle E-Mail",
+    "confirmationRequired": "Bestaetigung erforderlich",
+    "pendingNewEmail": "Neue E-Mail ausstehend",
+    "resendEmail": "E-Mail erneut senden",
+    "changeEmail": "E-Mail aendern",
+    "newEmailPlaceholder": "neu@email.com",
+    "confirmEmailChangeTitle": "E-Mail-Aenderung bestaetigen",
+    "confirmEmailChangeBody": "Eine Verifizierung wird fuer {email} benoetigt.",
+    "resendVerificationEmailTitle": "Verifizierungs-E-Mail erneut senden",
+    "resendDescription": "Sie koennen das Ziel vor dem erneuten Senden aendern.",
+    "confirm": "Bestaetigen",
+    "cancel": "Abbrechen"
+  },
+  "Themes": {
+    "tokyoDusk": "Tokyo Dusk",
+    "sumie": "Sumie",
+    "nightSky": "Nacht Himmel"
+  },
+  "Languages": {
+    "codes": {
+      "en": "Englisch",
+      "ja": "Japanisch",
+      "es": "Spanisch",
+      "fr": "Franzoesisch",
+      "th": "Thai",
+      "de": "Deutsch",
+      "it": "Italienisch",
+      "pt": "Portugiesisch",
+      "lol": "Witzsprache"
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { AuthProvider } from "@/types";
+import type { AppLocale, ThemeName } from "@/config/userConfiguration";
 
 export type UserProfileResponse = {
   id: string;
@@ -16,6 +17,10 @@ export type UserProfileResponse = {
     expiresAt: string;
     requestedAt: string;
   } | null;
+  configuration: {
+    theme: ThemeName;
+    language: AppLocale;
+  };
 };
 
 type ProfileApiResponse = { ok: true; data: UserProfileResponse } | { ok: false; error: string };
@@ -49,5 +54,18 @@ export async function requestEmailChange(newEmail: string): Promise<{ pendingEma
 export async function resendEmailChange(newEmail?: string): Promise<{ pendingEmail: string }> {
   const { data } = await axios.post<EmailChangeResponse>("/user/change-email/resend", { newEmail });
   if (!data.ok) throw new Error(data.error ?? "Failed to resend email change verification");
+  return data.data;
+}
+
+type UserConfigurationResponse =
+  | { ok: true; data: { theme: ThemeName; language: AppLocale } }
+  | { ok: false; error: string };
+
+export async function updateOwnConfiguration(body: {
+  theme?: ThemeName;
+  language?: AppLocale;
+}): Promise<{ theme: ThemeName; language: AppLocale }> {
+  const { data } = await axios.patch<UserConfigurationResponse>("/user/configuration", body);
+  if (!data.ok) throw new Error(data.error ?? "Failed to update settings");
   return data.data;
 }

@@ -1,0 +1,141 @@
+.button {
+  appearance: none;
+  border: 1px solid var(--profile-surface-border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--text-color);
+  cursor: pointer;
+  font: inherit;
+  line-height: 1.2;
+  padding: 0.55rem 0.9rem;
+  transition:
+    background-color var(--motion-duration-fast) var(--motion-easing-standard),
+    border-color var(--motion-duration-fast) var(--motion-easing-standard),
+    color var(--motion-duration-fast) var(--motion-easing-standard),
+    box-shadow var(--motion-duration-fast) var(--motion-easing-standard),
+    transform var(--motion-duration-fast) var(--motion-easing-standard);
+}
+
+.buttonPrimary {
+  background: var(--accent-red);
+  border-color: var(--accent-red);
+  color: #fff;
+}
+
+.buttonDanger {
+  border-color: #b91c1c;
+  color: #b91c1c;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button:hover:not(:disabled) {
+  box-shadow: 0 3px 14px color-mix(in srgb, var(--accent-red) 18%, transparent);
+  transform: translateY(-1px);
+}
+
+.card {
+  background: var(--profile-surface-bg);
+  border: 1px solid var(--profile-surface-border);
+  border-radius: 12px;
+  transition:
+    background-color var(--motion-duration-base) var(--motion-easing-standard),
+    border-color var(--motion-duration-base) var(--motion-easing-standard),
+    box-shadow var(--motion-duration-fast) var(--motion-easing-standard);
+}
+
+.cardHeader {
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid var(--profile-surface-border);
+  font-weight: 600;
+}
+
+.cardBody {
+  padding: 1rem;
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  border: 1px solid var(--profile-surface-border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--text-color);
+  font: inherit;
+  padding: 0.55rem 0.75rem;
+  min-height: 44px;
+  transition:
+    background-color var(--motion-duration-fast) var(--motion-easing-standard),
+    border-color var(--motion-duration-fast) var(--motion-easing-standard),
+    box-shadow var(--motion-duration-fast) var(--motion-easing-standard);
+}
+
+.input:focus-visible,
+.select:focus-visible,
+.textarea:focus-visible,
+.button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-red) 24%, transparent);
+  border-color: var(--accent-red);
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.label {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.stack {
+  display: flex;
+}
+
+.stackVertical {
+  flex-direction: column;
+}
+
+.tabs {
+  display: grid;
+  gap: 1rem;
+}
+
+.tabList {
+  display: flex;
+  gap: 0.4rem;
+  border-bottom: 1px solid var(--profile-surface-border);
+  padding-bottom: 0.5rem;
+}
+
+.tab {
+  background: transparent;
+  color: var(--text-color);
+}
+
+.tabActive {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.cardHeader,
+.cardBody {
+  color: var(--text-color);
+}
+
+.input::placeholder,
+.select option,
+.textarea::placeholder {
+  color: var(--input-placeholder);
+  opacity: 1;
+}

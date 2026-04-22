@@ -1,0 +1,45 @@
+{
+  "Profile": {
+    "title": "SUPREME PROFILE CONTROL STATION 9000",
+    "saveProfile": "Launch profile payload into orbit",
+    "theme": "Vibe Frequency Selector",
+    "language": "Tongue Firmware",
+    "preferencesGroupLabel": "Cosmetics n chatter matrix",
+    "preferencesSaveError": "The cloud said no; try again later"
+  },
+  "ProfileInfo": {
+    "firstName": "Citizen Identifier: Front Half",
+    "lastName": "Citizen Identifier: Back Half",
+    "emailTitle": "Bureau of Electronic Pigeons",
+    "currentEmail": "Official inbox assigned by the labyrinth",
+    "confirmationRequired": "A stamp from Department 7-B is still missing",
+    "pendingNewEmail": "Email currently trapped in procedural limbo",
+    "resendEmail": "Summon another bureaucratic raven",
+    "changeEmail": "File form 22-C to mutate inbox",
+    "newEmailPlaceholder": "new@email.com (must be approved by three shadows)",
+    "confirmEmailChangeTitle": "Ratify Inbox Transfiguration Decree",
+    "confirmEmailChangeBody": "By proceeding, {email} enters a 14-step corridor of signatures and suspicious fluorescent lighting.",
+    "resendVerificationEmailTitle": "Reissue Administrative Scroll",
+    "resendDescription": "Adjust the recipient before the Ministry of Verification launches another paper avalanche.",
+    "confirm": "Sign in triplicate",
+    "cancel": "Retreat into the corridor"
+  },
+  "Themes": {
+    "tokyoDusk": "Sunset Bureau Edition",
+    "sumie": "Ink Audit Mode",
+    "nightSky": "Midnight Compliance Matrix"
+  },
+  "Languages": {
+    "codes": {
+      "en": "ENGLISH.exe",
+      "ja": "NIPPON BEAM",
+      "es": "SPICY SPANISH",
+      "fr": "FANCY BAGUETTE MODE",
+      "th": "THAI THUNDER",
+      "de": "GERMAN ENGINE",
+      "it": "PASTA OPERATING SYSTEM",
+      "pt": "PORTUGUESE WAVE",
+      "lol": "MAXIMUM MEME DIALECT"
+    }
+  }
+}

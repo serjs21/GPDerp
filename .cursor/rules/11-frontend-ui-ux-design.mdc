@@ -1,0 +1,25 @@
+---
+description: Frontend UI/UX design guidance for modern, accessible, theme-aware interfaces
+globs: apps/web/src/**/*.{ts,tsx,css}
+alwaysApply: false
+---
+
+# Frontend UI/UX Design
+
+- Design for intent first: identify primary user action per screen and make that action visually dominant with hierarchy (size, contrast, placement, spacing).
+- Prioritize readability over density: preserve whitespace, clear grouping, and comfortable scan paths; avoid cramming controls or copy into tight layouts.
+- Content-first structure: let content and tasks define layout; avoid decorative UI that competes with meaning.
+- Use progressive disclosure: show essential information first, reveal advanced controls only when needed.
+- Consistency over cleverness: reuse established interaction patterns, copy tone, and component behavior across flows.
+- Build with design-system thinking: prefer existing components/tokens before adding one-off styles or bespoke interaction rules.
+- Respect theme architecture: when adding/editing styles, use CSS variables from `apps/web/src/app/globals.css` and existing files in `apps/web/src/app/themes`; avoid hardcoded colors, spacing, radii, shadows, or motion values.
+- Preserve theme switching behavior: align changes with `apps/web/src/hooks/useTheme.ts` and `apps/web/src/app/providers/ThemeProvider.tsx`; new theme-dependent styles must work across configured themes.
+- Treat responsive as fluid: start mobile-first, use intrinsic sizing, flexible spacing, and container-aware composition; do not rely only on breakpoint jumps.
+- Accessibility is required, not optional: semantic HTML, keyboard navigation, visible focus states, screen-reader labels, and WCAG-aware contrast in all themes.
+- Design meaningful feedback states: define hover, active, focus, disabled, loading, success, empty, and error states for interactive and async UI.
+- Optimize perceived performance: use optimistic feedback, skeletons, staged loading, and stable layouts to reduce visual jank.
+- Use motion with purpose: short, subtle transitions that support orientation and state change; respect reduced-motion preferences and avoid decorative animation.
+- Strengthen affordances: interactive elements must look interactive (tap targets, cursors, labels, icon pairing, drag handles where relevant).
+- Prevent errors before handling them: constrain invalid input with smart defaults, formatting, helper text, and clear validation timing.
+- Keep cognitive load low: limit simultaneous choices, chunk long forms, and sequence complex tasks into smaller steps.
+- Ensure clear system status: users should always understand current state, what is processing, and what will happen next.

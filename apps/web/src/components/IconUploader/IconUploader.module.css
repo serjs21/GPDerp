@@ -6,7 +6,7 @@
 }
 
 .container:focus-within .iconHitArea {
-  outline: 2px solid #1677ff;
+  outline: 2px solid var(--accent-red);
   outline-offset: 2px;
 }
 
@@ -63,7 +63,7 @@
 }
 
 .dropZoneActive {
-  outline: 2px solid #1677ff;
+  outline: 2px solid var(--accent-red);
   outline-offset: 2px;
 }
 
@@ -81,8 +81,8 @@
   height: 44px;
   display: grid;
   place-items: center;
-  background: #f3f4f6;
-  color: #6b7280;
+  background: var(--ink-wash);
+  color: var(--text-muted);
   font-weight: 600;
   border-radius: 8px;
 }
@@ -92,7 +92,7 @@
   inset: 0;
   display: grid;
   place-items: center;
-  background: rgba(107, 114, 128, 0.6);
+  background: rgb(0 0 0 / 0.45);
   color: #fff;
   opacity: 0;
   transition: opacity 140ms ease;
@@ -110,17 +110,17 @@
 }
 
 .meta {
-  color: #57606a;
+  color: var(--text-muted);
   font-size: 12px;
 }
 
 .error {
-  color: #c0362c;
+  color: var(--form-error-color);
   font-size: 13px;
 }
 
 .success {
-  color: #1f883d;
+  color: var(--color-bamboo-green);
   font-size: 13px;
 }
 
@@ -128,12 +128,12 @@
   width: 44px;
   height: 8px;
   border-radius: 999px;
-  background: #e5e7eb;
+  background: var(--profile-surface-border);
 }
 
 .progressBar {
   height: 100%;
   border-radius: 999px;
-  background: #1677ff;
+  background: var(--accent-red);
   transition: width 80ms linear;
 }

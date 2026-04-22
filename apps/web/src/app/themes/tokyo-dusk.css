@@ -1,0 +1,39 @@
+:root,
+html[data-theme="tokyo-dusk"] {
+  --color-highlight: rgb(248 79 76);
+  --color-highlight-secondary: rgb(254 104 80);
+  --color-primary: rgb(26 25 27);
+  --color-secondary: rgb(177 175 174);
+
+  /* Japanese-inspired supporting tones */
+  --color-washi: rgb(249 246 241);
+  --color-sakura-mist: rgb(250 227 222);
+  --color-ink-soft: rgb(62 58 56);
+  --color-bamboo-green: rgb(88 123 101);
+  --color-gold-foil: rgb(205 169 107);
+
+  --background: var(--color-washi);
+  --sumi-ink: var(--color-primary);
+  --accent-red: var(--color-highlight);
+  --hanko-red: var(--color-highlight-secondary);
+  --border-color: var(--color-secondary);
+  --text-color: var(--color-primary);
+  --input-bg: rgb(255 255 255 / 0.95);
+  --ink-wash: rgb(26 25 27 / 0.06);
+
+  --gradientStart: var(--color-highlight);
+  --gradientMid: var(--color-highlight-secondary);
+  --gradientEnd: var(--color-washi);
+  --bg-overlay: rgb(255 247 236 / 0.1);
+  --bg-mountain-1-start: rgb(126 88 73 / 0.16);
+  --bg-mountain-1-end: rgb(92 61 50 / 0.26);
+  --bg-mountain-2-start: rgb(103 78 61 / 0.18);
+  --bg-mountain-2-end: rgb(77 54 41 / 0.24);
+  --profile-surface-bg: rgb(255 251 246 / 0.92);
+  --profile-surface-border: rgb(92 61 50 / 0.28);
+  --text-muted: #4a4846;
+  --input-placeholder: #5c5a58;
+  --form-error-color: #b42318;
+  --tooltip-bg: #2a2826;
+  --tooltip-fg: #faf8f4;
+}

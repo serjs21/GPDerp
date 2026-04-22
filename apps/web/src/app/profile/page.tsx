@@ -1,9 +1,8 @@
 "use client";
 
-import { IssuesCloseOutlined, RedoOutlined } from "@ant-design/icons";
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button, Card, Form, Input, Modal, Space, Tooltip, Typography, message } from "antd";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { message } from "antd";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { AuthProvider } from "@/types";
 import { isValidEmail } from "@/utils/strings";
@@ -15,12 +14,27 @@ import {
   updateOwnProfile,
   type UserProfileResponse,
 } from "@/api/user";
-import { IconUploader } from "@/components/IconUploader";
+import {
+  isAppLocale,
+  isThemeName,
+  PREFERENCE_LOCALE_STORAGE_KEY,
+  PREFERENCE_THEME_STORAGE_KEY,
+} from "@/config/userConfiguration";
+import { useTheme } from "@/hooks/useTheme";
+import { useLocale } from "@/hooks/useLocale";
+import { useTranslations } from "next-intl";
+import { ProfileProvider, type ProfileContextValue } from "./ProfileContext";
+import { ProfileInfoTab } from "./components/ProfileInfoTab";
+import { UICard } from "@/components/ui";
+import { shouldApplyServerPreference } from "./tabState";
 
 export default function ProfilePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
   const { initialized, isLoggedIn, checkAuthentication } = useAuthenticationState();
-  const [form] = Form.useForm();
+  const hasStoredTheme = useRef(false);
+  const hasStoredLanguage = useRef(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState<UserProfileResponse | null>(null);
@@ -31,14 +45,35 @@ export default function ProfilePage() {
   const [requestingEmailChange, setRequestingEmailChange] = useState(false);
   const [resendingEmailChange, setResendingEmailChange] = useState(false);
   const [savingAvatar, setSavingAvatar] = useState(false);
+  const { setTheme } = useTheme();
+  const { setLocale } = useLocale();
+  const t = useTranslations("Profile");
+
+  useEffect(() => {
+    if (tabParam !== "settings") return;
+    router.replace("/profile", { scroll: false });
+  }, [tabParam, router]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const storedTheme = window.localStorage.getItem(PREFERENCE_THEME_STORAGE_KEY);
+    if (storedTheme && isThemeName(storedTheme)) {
+      hasStoredTheme.current = true;
+      setTheme(storedTheme);
+    }
+    const storedLanguage = window.localStorage.getItem(PREFERENCE_LOCALE_STORAGE_KEY);
+    if (storedLanguage && isAppLocale(storedLanguage)) {
+      hasStoredLanguage.current = true;
+      setLocale(storedLanguage);
+    }
+  }, [setLocale, setTheme]);
 
   useEffect(() => {
     if (!initialized) return;
     if (!isLoggedIn) router.replace("/");
   }, [initialized, isLoggedIn, router]);
- 
-  const validEmailDraft = useMemo(() => isValidEmail(emailDraft), [emailDraft]);
 
+  const validEmailDraft = useMemo(() => isValidEmail(emailDraft), [emailDraft]);
 
   useEffect(() => {
     if (!initialized || !isLoggedIn) return;
@@ -46,17 +81,34 @@ export default function ProfilePage() {
     void fetchOwnProfile()
       .then((data) => {
         setProfile(data);
-        form.setFieldsValue({
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-        });
+        if (
+          shouldApplyServerPreference({
+            hasClientPreference: hasStoredTheme.current,
+            isValidServerValue: isThemeName(data.configuration.theme),
+          })
+        ) {
+          setTheme(data.configuration.theme);
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem(PREFERENCE_THEME_STORAGE_KEY, data.configuration.theme);
+          }
+        }
+        if (
+          shouldApplyServerPreference({
+            hasClientPreference: hasStoredLanguage.current,
+            isValidServerValue: isAppLocale(data.configuration.language),
+          })
+        ) {
+          setLocale(data.configuration.language);
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem(PREFERENCE_LOCALE_STORAGE_KEY, data.configuration.language);
+          }
+        }
       })
       .catch(() => {
         message.error("Could not load profile");
       })
       .finally(() => setLoading(false));
-  }, [form, initialized, isLoggedIn]);
+  }, [initialized, isLoggedIn, setLocale, setTheme]);
 
   if (!initialized || !isLoggedIn) return null;
   if (loading || !profile) return null;
@@ -81,7 +133,6 @@ export default function ProfilePage() {
       setSaving(false);
     }
   };
-
 
   const createEmailChange = async () => {
     try {
@@ -133,6 +184,53 @@ export default function ProfilePage() {
     }
   };
 
+  const profileContextValue: ProfileContextValue = {
+    displayName,
+    avatarUrl: profile.avatar,
+    email: profile.email,
+    firstName: profile.firstName,
+    lastName: profile.lastName,
+    isGoogleUser,
+    pendingEmailChange: pendingNewEmail ? { newEmail: pendingNewEmail } : null,
+    emailDraft,
+    resendEmailDraft,
+    validEmailDraft,
+    saving,
+    savingAvatar,
+    requestingEmailChange,
+    resendingEmailChange,
+    emailConfirmOpen,
+    resendOpen,
+    saveProfileLabel: t("saveProfile"),
+    onSaveProfile,
+    onAvatarUploaded: ({ publicUrl }) => {
+      void (async () => {
+        try {
+          setSavingAvatar(true);
+          const updated = await updateOwnAvatar(publicUrl);
+          setProfile(updated);
+          message.success("Profile picture saved");
+          checkAuthentication();
+        } catch {
+          message.error("Could not save profile picture to your account");
+        } finally {
+          setSavingAvatar(false);
+        }
+      })();
+    },
+    onEmailDraftChange: setEmailDraft,
+    onResendEmailDraftChange: setResendEmailDraft,
+    onOpenEmailConfirm: () => setEmailConfirmOpen(true),
+    onCloseEmailConfirm: () => setEmailConfirmOpen(false),
+    onConfirmEmailChange: () => void createEmailChange(),
+    onOpenResend: () => {
+      setResendEmailDraft(pendingNewEmail ?? "");
+      setResendOpen(true);
+    },
+    onCloseResend: () => setResendOpen(false),
+    onConfirmResend: () => void resendChange(),
+  };
+
   return (
     <main
       style={{
@@ -145,132 +243,11 @@ export default function ProfilePage() {
         boxSizing: "border-box",
       }}
     >
-      <Card title="Profile">
-        <Space orientation="vertical" size={16} style={{ width: "100%" }}>
-          <Space size={12} align="center">
-            <IconUploader
-              iconUrl={profile.avatar}
-              alt={`${displayName} profile icon`}
-              fallbackChar={displayName.slice(0, 1)}
-              disabled={savingAvatar}
-              onUploaded={({ publicUrl }) => {
-                void (async () => {
-                  try {
-                    setSavingAvatar(true);
-                    const updated = await updateOwnAvatar(publicUrl);
-                    setProfile(updated);
-                    message.success("Profile picture saved");
-                    checkAuthentication();
-                  } catch {
-                    message.error("Could not save profile picture to your account");
-                  } finally {
-                    setSavingAvatar(false);
-                  }
-                })();
-              }}
-            />
-            <Typography.Title level={4} style={{ margin: 0 }}>
-              {displayName}
-            </Typography.Title>
-          </Space>
-
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={(values) => void onSaveProfile(values)}
-            requiredMark={false}
-          >
-            <Form.Item name="firstName" label="First name">
-              <Input />
-            </Form.Item>
-            <Form.Item name="lastName" label="Last name">
-              <Input />
-            </Form.Item>
-            <Button type="primary" htmlType="submit" loading={saving}>
-              Save profile
-            </Button>
-          </Form>
-
-          {!isGoogleUser ? (
-            <Card size="small" title="Email">
-              <Space direction="vertical" size={8} style={{ width: "100%" }}>
-                <Typography.Text>
-                  Current email: <strong>{profile.email}</strong>
-                </Typography.Text>
-                {pendingNewEmail ? (
-                  <Space size={8}>
-                    <Tooltip title="Confirmation required">
-                      <IssuesCloseOutlined />
-                    </Tooltip>
-                    <Typography.Text>Pending new email: {pendingNewEmail}</Typography.Text>
-                    <Button
-                      icon={<RedoOutlined />}
-                      onClick={() => {
-                        setResendEmailDraft(pendingNewEmail);
-                        setResendOpen(true);
-                      }}
-                    >
-                      Resend email
-                    </Button>
-                  </Space>
-                ) : null}
-
-                <Space.Compact style={{ width: "100%" }}>
-                  <Input
-                    placeholder="new@email.com"
-                    value={emailDraft}
-                    onChange={(e) => setEmailDraft(e.target.value)}
-                  />
-                  <Button
-                    type="primary"
-                    disabled={!validEmailDraft}
-                    onClick={() => setEmailConfirmOpen(true)}
-                  >
-                    Change email
-                  </Button>
-                </Space.Compact>
-              </Space>
-            </Card>
-          ) : null}
-        </Space>
-      </Card>
-
-      <Modal
-        title="Confirm email change"
-        open={emailConfirmOpen}
-        onCancel={() => setEmailConfirmOpen(false)}
-        onOk={() => void createEmailChange()}
-        okText="Confirm"
-        cancelText="Cancel"
-        confirmLoading={requestingEmailChange}
-        okButtonProps={{ disabled: !validEmailDraft }}
-      >
-        <Typography.Paragraph>
-          Email verification will be required for <strong>{emailDraft.trim()}</strong>.
-        </Typography.Paragraph>
-      </Modal>
-
-      <Modal
-        title="Resend verification email"
-        open={resendOpen}
-        onCancel={() => setResendOpen(false)}
-        onOk={() => void resendChange()}
-        okText="Confirm"
-        cancelText="Cancel"
-        confirmLoading={resendingEmailChange}
-        okButtonProps={{
-          disabled: !isValidEmail(resendEmailDraft),
-        }}
-      >
-        <Typography.Paragraph>
-          You can change the target email before resending.
-        </Typography.Paragraph>
-        <Input
-          value={resendEmailDraft}
-          onChange={(e) => setResendEmailDraft(e.target.value)}
-          placeholder="new@email.com"
-        />
-      </Modal>
+      <ProfileProvider value={profileContextValue}>
+        <UICard title={t("title")}>
+          <ProfileInfoTab />
+        </UICard>
+      </ProfileProvider>
     </main>
   );
 }

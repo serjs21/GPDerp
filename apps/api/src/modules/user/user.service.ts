@@ -69,7 +69,14 @@ export type UserProfileView = {
     expiresAt: string;
     requestedAt: string;
   } | null;
+  configuration: {
+    theme: string;
+    language: string;
+  };
 };
+
+const SUPPORTED_THEMES = new Set(["tokyo-dusk", "sumie", "night-sky"]);
+const SUPPORTED_LANGUAGES = new Set(["en", "ja", "es", "fr", "th", "de", "it", "pt", "lol"]);
 
 export const userService = {
   async checkEmailForPasswordRegistration(emailRaw: string) {
@@ -323,6 +330,7 @@ export const userService = {
           orderBy: { createdAt: "desc" },
           take: 1,
         },
+        configuration: true,
       },
     });
     if (!user) return null;
@@ -344,6 +352,10 @@ export const userService = {
             requestedAt: pending.createdAt.toISOString(),
           }
         : null,
+      configuration: {
+        theme: user.configuration?.theme ?? "tokyo-dusk",
+        language: user.configuration?.language ?? "en",
+      },
     };
   },
 
@@ -528,5 +540,58 @@ export const userService = {
     });
 
     return { status: "verified" };
+  },
+
+  async updateOwnConfiguration(params: {
+    userId: string;
+    payload: Record<string, unknown>;
+  }): Promise<
+    | { ok: true; configuration: { theme: string; language: string } }
+    | { ok: false; reason: "not_found" | "invalid_theme" | "invalid_language" }
+  > {
+    const existing = await prismaClient.user.findUnique({ where: { id: params.userId }, select: { id: true } });
+    if (!existing) return { ok: false, reason: "not_found" };
+
+    const rawTheme = cleanText(params.payload.theme, 32);
+    const rawLanguage = cleanText(params.payload.language, 16);
+
+    if (rawTheme !== undefined && !SUPPORTED_THEMES.has(rawTheme)) {
+      return { ok: false, reason: "invalid_theme" };
+    }
+    if (rawLanguage !== undefined && !SUPPORTED_LANGUAGES.has(rawLanguage)) {
+      return { ok: false, reason: "invalid_language" };
+    }
+
+    if (rawTheme === undefined && rawLanguage === undefined) {
+      const current = await prismaClient.userConfiguration.findUnique({ where: { userId: params.userId } });
+      return {
+        ok: true,
+        configuration: {
+          theme: current?.theme ?? "tokyo-dusk",
+          language: current?.language ?? "en",
+        },
+      };
+    }
+
+    const updated = await prismaClient.userConfiguration.upsert({
+      where: { userId: params.userId },
+      update: {
+        ...(rawTheme !== undefined ? { theme: rawTheme } : {}),
+        ...(rawLanguage !== undefined ? { language: rawLanguage } : {}),
+      },
+      create: {
+        userId: params.userId,
+        theme: rawTheme ?? "tokyo-dusk",
+        language: rawLanguage ?? "en",
+      },
+    });
+
+    return {
+      ok: true,
+      configuration: {
+        theme: updated.theme,
+        language: updated.language,
+      },
+    };
   },
 };

@@ -1,0 +1,45 @@
+{
+  "Profile": {
+    "title": "โปรไฟล์",
+    "saveProfile": "บันทึกโปรไฟล์",
+    "theme": "ธีม",
+    "language": "ภาษา",
+    "preferencesGroupLabel": "การแสดงผลและภาษา",
+    "preferencesSaveError": "บันทึกการตั้งค่าไม่สำเร็จ"
+  },
+  "ProfileInfo": {
+    "firstName": "ชื่อ",
+    "lastName": "นามสกุล",
+    "emailTitle": "อีเมล",
+    "currentEmail": "อีเมลปัจจุบัน",
+    "confirmationRequired": "ต้องยืนยัน",
+    "pendingNewEmail": "อีเมลใหม่ที่รอดำเนินการ",
+    "resendEmail": "ส่งอีเมลอีกครั้ง",
+    "changeEmail": "เปลี่ยนอีเมล",
+    "newEmailPlaceholder": "new@email.com",
+    "confirmEmailChangeTitle": "ยืนยันการเปลี่ยนอีเมล",
+    "confirmEmailChangeBody": "ต้องยืนยันอีเมลสำหรับ {email}",
+    "resendVerificationEmailTitle": "ส่งอีเมลยืนยันอีกครั้ง",
+    "resendDescription": "คุณสามารถเปลี่ยนอีเมลปลายทางก่อนส่งอีกครั้ง",
+    "confirm": "ยืนยัน",
+    "cancel": "ยกเลิก"
+  },
+  "Themes": {
+    "tokyoDusk": "Tokyo Dusk",
+    "sumie": "Sumie",
+    "nightSky": "ท้องฟ้ายามคืน"
+  },
+  "Languages": {
+    "codes": {
+      "en": "อังกฤษ",
+      "ja": "ญี่ปุ่น",
+      "es": "สเปน",
+      "fr": "ฝรั่งเศส",
+      "th": "ไทย",
+      "de": "เยอรมัน",
+      "it": "อิตาลี",
+      "pt": "โปรตุเกส",
+      "lol": "ภาษาขำขัน"
+    }
+  }
+}

@@ -2,6 +2,8 @@
 .shell {
   --layout-chrome-top: 5.75rem;
   --layout-chrome-bottom: 10.5rem;
+  --layout-content-max: 76rem;
+  --layout-inline-padding: clamp(0.9rem, 2vw, 1.4rem);
 }
 
 .shell {
@@ -19,6 +21,10 @@
   flex: 1 0 auto !important;
   min-height: unset !important;
   overflow: visible !important;
+  width: min(100%, var(--layout-content-max));
+  margin-inline: auto;
+  padding-inline: var(--layout-inline-padding);
+  padding-top: clamp(0.9rem, 1.2vw, 1.2rem);
 }
 
 .footerSlot {
@@ -36,4 +42,16 @@
   width: 100%;
   min-width: 0;
   min-height: calc(100dvh - var(--layout-chrome-top) - var(--layout-chrome-bottom));
+  gap: clamp(0.85rem, 1.2vw, 1.2rem);
+}
+
+@media (max-width: 768px) {
+  .shell {
+    --layout-chrome-bottom: 8.25rem;
+  }
+
+  .contentMain {
+    padding-inline: clamp(0.7rem, 3vw, 1rem);
+    padding-top: 0.75rem;
+  }
 }

@@ -100,6 +100,27 @@ const userPluginImpl = async (app: FastifyInstance) => {
     if (result.status === "expired") return res.code(400).send({ ok: false, error: "Token expired" });
     return res.send({ ok: true, data: { status: "verified" } });
   });
+
+  app.patch(
+    "/user/configuration",
+    { preHandler: [app.requireAuthenticated] },
+    async (req: FastifyRequest, res: FastifyReply) => {
+      const userId = req.user?.sub;
+      if (!userId) return res.code(403).send({ ok: false, error: "Unauthorized" });
+      const payload = (req.body as Record<string, unknown> | undefined) ?? {};
+      const result = await userService.updateOwnConfiguration({ userId, payload });
+      if (!result.ok) {
+        if (result.reason === "invalid_theme") {
+          return res.code(400).send({ ok: false, error: "Invalid theme" });
+        }
+        if (result.reason === "invalid_language") {
+          return res.code(400).send({ ok: false, error: "Invalid language" });
+        }
+        return res.code(404).send({ ok: false, error: "User not found" });
+      }
+      return res.send({ ok: true, data: result.configuration });
+    },
+  );
 };
 
 export const userPlugin = fp(userPluginImpl, { name: "user-routes" });

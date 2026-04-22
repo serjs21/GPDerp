@@ -1,0 +1,45 @@
+{
+  "Profile": {
+    "title": "Profile",
+    "saveProfile": "Save profile",
+    "theme": "Theme",
+    "language": "Language",
+    "preferencesGroupLabel": "Display and language",
+    "preferencesSaveError": "Could not save your preferences"
+  },
+  "ProfileInfo": {
+    "firstName": "First name",
+    "lastName": "Last name",
+    "emailTitle": "Email",
+    "currentEmail": "Current email",
+    "confirmationRequired": "Confirmation required",
+    "pendingNewEmail": "Pending new email",
+    "resendEmail": "Resend email",
+    "changeEmail": "Change email",
+    "newEmailPlaceholder": "new@email.com",
+    "confirmEmailChangeTitle": "Confirm email change",
+    "confirmEmailChangeBody": "Email verification will be required for {email}.",
+    "resendVerificationEmailTitle": "Resend verification email",
+    "resendDescription": "You can change the target email before resending.",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  },
+  "Themes": {
+    "tokyoDusk": "Tokyo Dusk",
+    "sumie": "Sumie",
+    "nightSky": "Night Sky"
+  },
+  "Languages": {
+    "codes": {
+      "en": "English",
+      "ja": "Japanese",
+      "es": "Spanish",
+      "fr": "French",
+      "th": "Thai",
+      "de": "German",
+      "it": "Italian",
+      "pt": "Portuguese",
+      "lol": "Joke Language"
+    }
+  }
+}

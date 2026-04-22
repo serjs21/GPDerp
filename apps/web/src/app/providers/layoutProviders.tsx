@@ -1,6 +1,5 @@
 "use client";
 
-import { Layout } from "antd";
 import AxiosInit from "@/client.axios.setup";
 import { useMarkHydrated } from "@/hooks/useMarkHydrated";
 import styles from "./headerStyles.module.css";
@@ -11,37 +10,35 @@ import { BeamMeUpScotty } from "@/components/BeamMeUpScotty/BeamMeUpScotty";
 import { SiteFooter } from "@/components/SiteFooter/SiteFooter";
 import { CompleteRegistrationRedirect } from "@/components/AuthFlows/CompleteRegistrationRedirect";
 
-const { Header, Content, Footer } = Layout;
-
 export interface LayoutProviderProps {
   children: React.ReactNode;
   googleClientId?: string;
 }
 
-export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps) => {
+export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps): React.JSX.Element => {
   const clientId = googleClientId || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-  useMarkHydrated();
+useMarkHydrated();
 
   const inner = (
     <>
       <AxiosInit />
-      <Layout className={layoutStyles.shell}>
-        <Header className={`${styles.header} ${styles.pencilBorder}`}>
+      <div className={layoutStyles.shell}>
+        <header className={styles.header}>
           <div className={styles.headerBar}>
             <BeamMeUpScotty />
             <div className={styles.headerAuth}>
               <AuthNavigation />
             </div>
           </div>
-        </Header>
-        <Content className={layoutStyles.contentMain}>
+        </header>
+        <main className={layoutStyles.contentMain}>
           <CompleteRegistrationRedirect />
           <div className={layoutStyles.contentStretch}>{children}</div>
-        </Content>
-        <Footer className={layoutStyles.footerSlot}>
+        </main>
+        <footer className={layoutStyles.footerSlot}>
           <SiteFooter />
-        </Footer>
-      </Layout>
+        </footer>
+      </div>
     </>
   );
 
