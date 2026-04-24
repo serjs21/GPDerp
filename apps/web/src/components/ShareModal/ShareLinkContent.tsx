@@ -1,6 +1,6 @@
 "use client";
 
-import { DatePicker, InputNumber, Radio, Typography } from "antd";
+import { DatePicker, InputNumber, Radio, Typography } from "@/components/StyledComponents";
 import type { RadioChangeEvent } from "antd/es/radio";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";

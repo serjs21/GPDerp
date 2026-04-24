@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "antd";
+import { Button } from "@/components/StyledComponents";
 import Link from "next/link";
 import styles from "./style.module.css";
 

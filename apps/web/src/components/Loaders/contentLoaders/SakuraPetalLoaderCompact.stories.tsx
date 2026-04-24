@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { Tooltip } from "antd";
+import { Tooltip } from "@/components/StyledComponents";
 
 import { SakuraPetalLoader } from "./SakuraPetalLoader";
 

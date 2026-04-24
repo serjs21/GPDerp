@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Form, Input, Typography, message } from 'antd';
+import { Button, Card, Form, Input, Typography, message } from "@/components/StyledComponents";
 import axios from 'axios';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';

@@ -1,9 +1,9 @@
 "use client";
 
-import { Button, Form, Input, message } from "antd";
+import { Button, Form, GoogleLoginButton, Input, message } from "@/components/StyledComponents";
 import axios from "axios";
-import { GoogleLogin } from "@react-oauth/google";
 import authStyles from "@/app/auth.shared.module.css";
+import { useState } from "react";
 
 type LoginFlowProps = {
   onSuccess: () => void;
@@ -32,6 +32,7 @@ export function LoginFlow({
   onGoogleSignupRequired,
 }: LoginFlowProps) {
   const [form] = Form.useForm<LoginValues>();
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const onFinish = async (values: LoginValues) => {
     try {
@@ -105,35 +106,70 @@ export function LoginFlow({
   };
 
   return (
-    <>
-      <Form form={form} onFinish={onFinish} layout="vertical" requiredMark={false}>
+    <div className={authStyles.flow}>
+      {showGoogle ? (
+        <div className={authStyles.socialBlock}>
+          <div className={authStyles.googleRow}>
+            <GoogleLoginButton
+              onSuccess={(c) => void onGoogleCredential(c.credential)}
+              onError={() => message.error("Google sign-in failed")}
+              text="signin_with"
+            />
+          </div>
+          <div className={authStyles.divider}>or sign in with email</div>
+        </div>
+      ) : null}
+
+      <Form
+        className={authStyles.flowForm}
+        form={form}
+        onFinish={(values) => {
+          setHasSubmitted(true);
+          void onFinish(values);
+        }}
+        onFinishFailed={() => {
+          setHasSubmitted(true);
+        }}
+        onValuesChange={(changedValues) => {
+          if (!hasSubmitted) return;
+          const changedFieldNames = Object.keys(changedValues) as Array<keyof LoginValues>;
+          form.setFields(
+            changedFieldNames.map((fieldName) => ({
+              name: fieldName,
+              errors: [],
+            })),
+          );
+          setHasSubmitted(false);
+        }}
+        layout="vertical"
+        requiredMark={false}
+        validateTrigger={false}
+        onKeyDown={(event) => {
+          if (event.key !== "Enter" || event.shiftKey) return;
+          event.preventDefault();
+          void form.submit();
+        }}
+      >
         <Form.Item
+          className={authStyles.formItem}
           name="email"
           label="Email"
           rules={[{ required: true, type: "email", message: "Enter a valid email" }]}
         >
           <Input autoComplete="email" type="email" />
         </Form.Item>
-        <Form.Item name="password" label="Password" rules={[{ required: true, message: "Required" }]}>
+        <Form.Item className={authStyles.formItem} name="password" label="Password" rules={[{ required: true, message: "Required" }]}>
           <Input.Password autoComplete="current-password" />
         </Form.Item>
-        <Form.Item>
-          <Button type="primary" htmlType="submit" block>
+        <Form.Item className={`${authStyles.formItem} ${authStyles.hiddenMirrorRow}`} label="Confirm password">
+          <Input.Password autoComplete="off" disabled />
+        </Form.Item>
+        <Form.Item className={authStyles.submitItem}>
+          <Button type="primary" htmlType="submit" block className={authStyles.primaryCta}>
             Sign in
           </Button>
         </Form.Item>
       </Form>
-      {showGoogle ? (
-        <>
-          <div className={authStyles.divider}>or</div>
-          <div className={authStyles.googleRow}>
-            <GoogleLogin
-              onSuccess={(c) => void onGoogleCredential(c.credential)}
-              onError={() => message.error("Google sign-in failed")}
-            />
-          </div>
-        </>
-      ) : null}
-    </>
+    </div>
   );
 }

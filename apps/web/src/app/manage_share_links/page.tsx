@@ -1,6 +1,6 @@
 "use client";
 
-import { Input, Select, Space, Typography } from "antd";
+import { Input, Select, Space, Typography } from "@/components/StyledComponents";
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { ShareLinkEntry } from "@/components/ShareLinkEntry/ShareLinkEntry";

@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Modal, Tabs, Typography } from "antd";
-import { useEffect, useState } from "react";
+import { Modal, Tabs, Typography } from "@/components/StyledComponents";
+import { useState } from "react";
 import { LoginFlow } from "@/components/AuthFlows/LoginFlow";
 import { RegisterFlow } from "@/components/AuthFlows/RegisterFlow";
 import styles from "./styles.module.css";
@@ -23,10 +23,6 @@ export function AuthGateModal({
   initialMode = "login",
 }: AuthGateModalProps) {
   const [mode, setMode] = useState<ViewMode>(initialMode);
-
-  useEffect(() => {
-    if (open) setMode(initialMode);
-  }, [initialMode, open]);
 
   return (
     <Modal
@@ -49,34 +45,43 @@ export function AuthGateModal({
             key: "login",
             label: "Sign in",
             children: (
-              <>
-                <LoginFlow
-                  onSuccess={() => {
-                    onAuthenticated();
-                    onClose();
-                  }}
-                  showGoogle
-                  onGoogleSignupRequired={() => {
-                    setMode("register");
-                  }}
-                />
+              <div className={styles.tabContent}>
+                <div className={styles.tabFlow}>
+                  <LoginFlow
+                    onSuccess={() => {
+                      onAuthenticated();
+                      onClose();
+                    }}
+                    showGoogle
+                    onGoogleSignupRequired={() => {
+                      setMode("register");
+                    }}
+                  />
+                </div>
                 <Typography.Paragraph className={styles.linkRow}>
                   <Link href="/reset_password">Forgot password?</Link>
                 </Typography.Paragraph>
-              </>
+              </div>
             ),
           },
           {
             key: "register",
             label: "Register",
             children: (
-              <RegisterFlow
-                onSuccess={() => {
-                  onAuthenticated();
-                  onClose();
-                }}
-                showGoogle
-              />
+              <div className={styles.tabContent}>
+                <div className={styles.tabFlow}>
+                  <RegisterFlow
+                    onSuccess={() => {
+                      onAuthenticated();
+                      onClose();
+                    }}
+                    showGoogle
+                  />
+                </div>
+                <Typography.Paragraph className={styles.linkRow}>
+                  <Link href="/reset_password">Forgot password?</Link>
+                </Typography.Paragraph>
+              </div>
             ),
           },
         ]}

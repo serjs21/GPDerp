@@ -1,4 +1,4 @@
-import { Button, Card, Typography } from "antd";
+import { Button, Card, Typography } from "@/components/StyledComponents";
 
 export type VerifyEmailUiState = "verifying" | "alreadyValidated" | "tokenExpired";
 

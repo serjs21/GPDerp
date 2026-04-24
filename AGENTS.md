@@ -20,7 +20,7 @@ Operational guide for AI/code agents working in this repository.
 - Frontend components: `apps/web/src/components/*`
 - Frontend API clients: `apps/web/src/api/*`
 - Frontend hooks: `apps/web/src/hooks/*`
-- Frontend global styles/tokens: `apps/web/src/app/globals.css`
+- Frontend global styles/tokens: `apps/web/src/theme/globals.css`
 
 ## Practical Conventions
 
@@ -54,6 +54,7 @@ Run commands from each app directory unless noted.
 - Do not change public contracts without explicit instruction.
 - Run targeted verification first; then escalate to broader checks when risk warrants it.
 - Report what was verified and what was intentionally not run.
+- Apply the `learner` skill for recurring issues: persist externally validated learnings to `/wisdom` and reuse prior conclusions.
 
 ## Assumptions To Re-check
 

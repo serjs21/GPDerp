@@ -3,7 +3,7 @@
   padding: 1.25rem 1.25rem 1.5rem;
   text-align: center;
   background: color-mix(in srgb, var(--background, #fcfaf2) 92%, transparent);
-  border-top: 1px solid rgba(45, 45, 45, 0.12);
+  border-top: 1px solid var(--footer-border);
 }
 
 .links {
@@ -30,14 +30,14 @@
 }
 
 .sep {
-  color: rgba(45, 45, 45, 0.35);
+  color: var(--footer-separator);
   user-select: none;
 }
 
 .paddle {
   font-size: 0.75rem;
   line-height: 1.5;
-  color: rgba(45, 45, 45, 0.72);
+  color: var(--footer-muted);
   max-width: 36rem;
   margin: 0 auto;
 }

@@ -9,7 +9,7 @@ Add UI in `apps/web` using existing design and data-fetching patterns.
 3. For new routes, place under `apps/web/src/app/.../page.tsx`; for reusable UI, add to `apps/web/src/components/...`.
 4. Keep server/client boundaries intentional; add `"use client"` only when required.
 5. Use existing API modules in `apps/web/src/api` and shared axios setup (`src/axios.setup.ts` / `src/client.axios.setup.ts`).
-6. Prefer CSS modules and existing variables from `apps/web/src/app/globals.css`.
+6. Prefer CSS modules and existing variables from `apps/web/src/theme/globals.css`.
 7. Preserve semantic HTML and accessibility labels/roles.
 
 ## Verification

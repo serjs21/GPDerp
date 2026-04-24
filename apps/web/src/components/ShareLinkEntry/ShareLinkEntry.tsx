@@ -1,7 +1,7 @@
 "use client";
 
 import { CheckCircleTwoTone, CloseCircleTwoTone } from "@ant-design/icons";
-import { Button, Modal, Typography, message } from "antd";
+import { Button, Modal, Typography, message } from "@/components/StyledComponents";
 import axios from "axios";
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";

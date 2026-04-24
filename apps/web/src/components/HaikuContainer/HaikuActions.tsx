@@ -1,7 +1,7 @@
 "use client";
 
 import { CopyOutlined, DeleteOutlined, ShareAltOutlined, TagOutlined, WarningOutlined } from "@ant-design/icons";
-import { Button, message, Tooltip } from "antd";
+import { Button, message, Tooltip } from "@/components/StyledComponents";
 import axios from "axios";
 import { useState } from "react";
 import type { HaikuDto } from "@/api/haikus";

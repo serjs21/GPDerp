@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, Button, Dropdown, type MenuProps, Space } from "antd";
+import { Avatar, Button, Dropdown, Space, type MenuProps } from "@/components/StyledComponents";
 import Link from "next/link";
 import type { UserObject } from "@/types";
 import styles from "./style.module.css";

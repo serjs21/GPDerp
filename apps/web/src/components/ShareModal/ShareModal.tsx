@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, message, Modal, Radio, Tooltip, Typography } from "antd";
+import { Button, Modal, Radio, Tooltip, Typography, message } from "@/components/StyledComponents";
 import type { RadioChangeEvent } from "antd/es/radio";
 import type { Dayjs } from "dayjs";
 import axios from "axios";

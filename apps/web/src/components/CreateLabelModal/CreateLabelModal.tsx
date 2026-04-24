@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Input, Modal, Tooltip, message } from "antd";
+import { Button, Input, Modal, Tooltip, message } from "@/components/StyledComponents";
 import { useState } from "react";
 import { HexColorPicker } from "react-colorful";
 import type { LabelDto } from "@/api/labels";

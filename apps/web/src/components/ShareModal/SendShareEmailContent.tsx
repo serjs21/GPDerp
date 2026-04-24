@@ -1,6 +1,6 @@
 "use client";
 
-import { Input, Select, Typography } from "antd";
+import { Input, Select, Typography } from "@/components/StyledComponents";
 import styles from "./SendShareEmailContent.module.css";
 
 type SendShareEmailContentProps = {

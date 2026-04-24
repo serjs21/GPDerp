@@ -1,7 +1,7 @@
 "use client";
 
 import { CopyOutlined } from "@ant-design/icons";
-import { Button } from "antd";
+import { Button } from "@/components/StyledComponents";
 import { useCopy } from "@/hooks/useCopy";
 import styles from "./CopyText.module.css";
 

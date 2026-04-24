@@ -22,10 +22,10 @@
 
 .chatLogContainer {
   font-family: "Note This", cursive;
-  border: 1px solid rgba(60, 40, 30, 0.15);
+  border: 1px solid var(--surface-border-soft);
   flex: 1;
   min-width: 0;
-  background: rgba(255, 253, 248, 0.6);
+  background: var(--surface-glass);
   height: auto;
   min-height: 12.5rem;
   /* Taller single stream: live generations + saved haikus share this pane */
@@ -54,12 +54,12 @@
    ─────────────────────────────── */
 
 .shrine {
-  --ink: #2c1e1e;
-  --ink-light: rgba(60, 40, 30, 0.35);
-  --ink-faint: rgba(60, 40, 30, 0.08);
-  --vermillion: #c23a22;
-  --vermillion-soft: rgba(194, 58, 34, 0.72);
-  --paper: rgba(255, 253, 248, 0.85);
+  --ink: var(--shrine-ink);
+  --ink-light: var(--shrine-ink-light);
+  --ink-faint: var(--surface-border-soft);
+  --vermillion: var(--shrine-accent);
+  --vermillion-soft: var(--shrine-accent-soft);
+  --paper: var(--surface-glass-strong);
 
   display: flex;
   flex-direction: column;
@@ -97,7 +97,7 @@
 }
 
 .shrineInput::placeholder {
-  color: rgba(60, 40, 30, 0.2);
+  color: var(--shrine-placeholder);
   font-style: italic;
   font-weight: 200;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "antd";
+import { Button } from "@/components/StyledComponents";
 import type { LabelDto } from "@/api/labels";
 import { CreateLabelModal } from "@/components/CreateLabelModal/CreateLabelModal";
 import { PlusOutlined } from "@ant-design/icons";

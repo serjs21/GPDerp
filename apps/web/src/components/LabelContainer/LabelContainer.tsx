@@ -1,7 +1,7 @@
 "use client";
 
 import { DeleteOutlined, EditOutlined, WarningOutlined } from "@ant-design/icons";
-import { Button, message, Tooltip } from "antd";
+import { Button, message, Tooltip } from "@/components/StyledComponents";
 import { useState } from "react";
 import type { LabelDto } from "@/api/labels";
 import { CreateLabelModal } from "@/components/CreateLabelModal/CreateLabelModal";

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { message } from "antd";
+import { message } from "@/components/StyledComponents";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { AuthProvider } from "@/types";
 import { isValidEmail } from "@/utils/strings";

@@ -16,17 +16,95 @@
 
 .divider {
   text-align: center;
-  margin: 16px 0;
-  color: rgba(0, 0, 0, 0.45);
+  margin: 6px 0 2px;
+  color: color-mix(in srgb, var(--text-color, #000) 55%, transparent);
+  font-size: 0.95rem;
 }
 
 .googleRow {
   display: flex;
   justify-content: center;
+  margin-bottom: 0;
+  width: 100%;
+  /* padding-inline: 5px; */
+  margin-inline: auto;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.socialBlock {
+  display: grid;
+  gap: 12px;
+  margin-top: 8px;
+  margin-bottom: 20px;
+  justify-items: stretch;
+  width: 100%;
+}
+
+.flow {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.flowForm {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.googleRow :global(div[role="button"]),
+.googleRow :global(iframe) {
+  min-height: 48px;
+}
+
+.formItem {
   margin-bottom: 16px;
 }
 
+.submitItem {
+  margin-top: auto;
+  padding-top: 10px;
+  margin-bottom: 0;
+}
+
+.hiddenMirrorRow {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.primaryCta {
+  min-height: 46px;
+  font-size: 1.02rem;
+  font-weight: 600;
+}
+
 .footerLinks {
-  margin-top: 8px;
+  margin-top: 16px;
   text-align: center;
+}
+
+@media (max-width: 640px) {
+  .socialBlock {
+    margin-top: 12px;
+    margin-bottom: 18px;
+  }
+
+  .divider {
+    font-size: 0.9rem;
+  }
+
+  .googleRow {
+    max-width: 100%;
+  }
+
+  .googleRow :global(div[role="button"]),
+  .googleRow :global(iframe) {
+    min-height: 46px;
+  }
+
+  .primaryCta {
+    min-height: 44px;
+    font-size: 1rem;
+  }
 }

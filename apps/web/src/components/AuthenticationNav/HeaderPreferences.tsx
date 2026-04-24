@@ -1,11 +1,12 @@
 "use client";
 
-import { message } from "antd";
+import { Dropdown, type MenuProps, message } from "@/components/StyledComponents";
+import { UIButton, UISelect } from "@/components/ui";
+import { Languages, ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, type ComponentType, useMemo } from "react";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { updateOwnConfiguration } from "@/api/user";
-import { UISelect } from "@/components/ui";
 import {
   PREFERENCE_LOCALE_STORAGE_KEY,
   PREFERENCE_THEME_STORAGE_KEY,
@@ -16,7 +17,24 @@ import { useProfileI18n } from "@/hooks/useProfileI18n";
 import { useLocale } from "@/hooks/useLocale";
 import { useTheme } from "@/hooks/useTheme";
 import { useTranslations } from "next-intl";
+import { DE, ES, FR, IT, JP, PT, TH, US } from "country-flag-icons/react/3x2";
 import styles from "./headerPreferences.module.css";
+
+type FlagComponent = ComponentType<{
+  className?: string;
+  "aria-hidden"?: boolean;
+}>;
+
+const LOCALE_FLAGS: Partial<Record<AppLocale, FlagComponent>> = {
+  en: US,
+  ja: JP,
+  es: ES,
+  fr: FR,
+  th: TH,
+  de: DE,
+  it: IT,
+  pt: PT,
+};
 
 export const HeaderPreferences = () => {
   const router = useRouter();
@@ -62,6 +80,43 @@ export const HeaderPreferences = () => {
     void persistIfLoggedIn({ language: next });
   };
 
+  const localeLabelByValue = useMemo(
+    () =>
+      languageOptions.reduce(
+        (acc, option) => {
+          acc[option.value] = option.label;
+          return acc;
+        },
+        {} as Record<AppLocale, string>,
+      ),
+    [languageOptions],
+  );
+
+  const selectedLocaleLabel = localeLabelByValue[locale] ?? locale;
+  const SelectedFlag = LOCALE_FLAGS[locale];
+
+  const localeMenuItems: MenuProps["items"] = languageOptions.map((option) => {
+    const OptionFlag = LOCALE_FLAGS[option.value];
+    const isSelected = option.value === locale;
+    return {
+      key: option.value,
+      label: (
+        <span className={styles.localeOption}>
+          {OptionFlag ? (
+            <OptionFlag className={styles.localeFlag} aria-hidden />
+          ) : (
+            <Languages className={styles.localeFallbackIcon} aria-hidden />
+          )}
+          <span className={styles.localeOptionLabel}>{option.label}</span>
+          <span className={styles.localeCode} aria-hidden>
+            {option.value.toUpperCase()}
+          </span>
+          {isSelected ? <span className={styles.localeCurrent}>Current</span> : null}
+        </span>
+      ),
+    };
+  });
+
   return (
     <div className={styles.wrap} role="group" aria-label={t("preferencesGroupLabel")}>
       <UISelect
@@ -71,13 +126,29 @@ export const HeaderPreferences = () => {
         options={themeOptions}
         aria-label={t("theme")}
       />
-      <UISelect
-        className={styles.select}
-        value={locale}
-        onChange={(e) => onLocaleChange(e.target.value as AppLocale)}
-        options={languageOptions}
-        aria-label={t("language")}
-      />
+      <Dropdown
+        trigger={["click"]}
+        placement="bottomRight"
+        menu={{
+          items: localeMenuItems,
+          selectedKeys: [locale],
+          onClick: ({ key }) => onLocaleChange(key as AppLocale),
+        }}
+      >
+        <UIButton
+          className={styles.localeTrigger}
+          aria-haspopup="menu"
+          aria-label={`${t("language")}: ${selectedLocaleLabel}`}
+          title={selectedLocaleLabel}
+        >
+          {SelectedFlag ? (
+            <SelectedFlag className={styles.localeFlag} aria-hidden />
+          ) : (
+            <Languages className={styles.localeFallbackIcon} aria-hidden />
+          )}
+          <ChevronDown className={styles.localeChevron} aria-hidden />
+        </UIButton>
+      </Dropdown>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Typography, message } from 'antd';
+import { Card, Typography, message } from "@/components/StyledComponents";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import authStyles from '../auth.shared.module.css';

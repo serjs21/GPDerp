@@ -1,7 +1,7 @@
 "use client";
 
 import { IssuesCloseOutlined, RedoOutlined } from "@ant-design/icons";
-import { Button, Card, Form, Input, Modal, Space, Tooltip, Typography } from "antd";
+import { Button, Card, Form, Input, Modal, Space, Tooltip, Typography } from "@/components/StyledComponents";
 import { IconUploader } from "@/components/IconUploader";
 import { useProfile } from "../ProfileContext";
 import { useProfileI18n } from "@/hooks/useProfileI18n";

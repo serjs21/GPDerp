@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Modal } from "antd";
+import { Modal } from "@/components/StyledComponents";
 
 export type ConfirmOptions = {
   title: string;

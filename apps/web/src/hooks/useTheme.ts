@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import Cookies from "js-cookie";
 import { useTheme as useNextTheme } from "next-themes";
 import {
   COOKIE_MAX_AGE,
@@ -12,18 +11,23 @@ import {
   type ThemeName,
 } from "@/config/userConfiguration";
 
+const setClientCookie = (name: string, value: string, maxAgeInSeconds: number) => {
+  if (typeof document === "undefined") return;
+  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAgeInSeconds}; samesite=lax`;
+};
+
 export const useTheme = () => {
   const { resolvedTheme, setTheme: setRawTheme } = useNextTheme();
   const theme: ThemeName = resolvedTheme && isThemeName(resolvedTheme) ? resolvedTheme : DEFAULT_THEME;
 
   useEffect(() => {
-    Cookies.set(THEME_COOKIE, theme, { expires: 365, sameSite: "lax" });
+    setClientCookie(THEME_COOKIE, theme, COOKIE_MAX_AGE);
   }, [theme]);
 
   const setTheme = (nextTheme: ThemeName) => {
     if (!isThemeName(nextTheme)) return;
     setRawTheme(nextTheme);
-    Cookies.set(THEME_COOKIE, nextTheme, { expires: 365, sameSite: "lax" });
+    setClientCookie(THEME_COOKIE, nextTheme, COOKIE_MAX_AGE);
   };
 
   return {

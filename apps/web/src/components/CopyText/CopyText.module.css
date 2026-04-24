@@ -7,7 +7,7 @@
   border: 1px dashed color-mix(in srgb, var(--text-color, #2c2c2c) 28%, transparent);
   border-radius: 6px;
   min-width: 0;
-  background: #f0f0f0; 
+  background: var(--chip-surface);
 }
 
 .textBase {

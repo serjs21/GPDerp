@@ -1,4 +1,4 @@
-import { Button, Dropdown, Menu, MenuProps, Space } from 'antd';
+import { Button, Dropdown, Menu, Space, type MenuProps } from "@/components/StyledComponents";
 import { DownOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons';
 
 

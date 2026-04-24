@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Serif_JP } from "next/font/google"; 
-import "./globals.css";
-import "./themes/tokyo-dusk.css";
-import "./themes/sumie.css";
-import "./themes/night-sky.css";
-import "./antd-overrides.css";
+import "@/theme/globals.css";
+import "@/theme/themes/tokyo-dusk.css";
+import "@/theme/themes/sumie.css";
+import "@/theme/themes/night-sky.css";
+import "@/theme/antd-overrides.css";
 import "@/axios.setup";
 import { LayoutProvider } from "./providers/LayoutProviders";
 import { AuthenticationProvider } from "./providers/AuthenticationProvider";
+import { AuthenticationVerificationProvider } from "./providers/AuthenticationVerificationProvider";
 import { QueryProvider } from "./providers/QueryProvider";
 import { HtmlLoader } from "@/components/Loaders";
-import { ThemeProvider } from "./providers/ThemeProvider";
+import { ThemeProvider } from "@/theme/ThemeProvider";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { getSsrThemeSettings } from "@/hooks/useTheme.server";
 import { NextIntlClientProvider } from "next-intl";
@@ -67,9 +68,11 @@ export default async function RootLayout({
           <NextIntlClientProvider locale={initialLocale} messages={messages}>
             <ThemeProvider initialTheme={initialTheme}>
               <AuthenticationProvider>
-                <QueryProvider>
-                  <LayoutProvider googleClientId={googleClientId}>{children}</LayoutProvider>
-                </QueryProvider>
+                <LayoutProvider googleClientId={googleClientId}>
+                  <AuthenticationVerificationProvider>
+                    <QueryProvider>{children}</QueryProvider>
+                  </AuthenticationVerificationProvider>
+                </LayoutProvider>
               </AuthenticationProvider>
             </ThemeProvider>
           </NextIntlClientProvider>

@@ -9,7 +9,7 @@
 
 .haikuDisplay {
   scrollbar-width: none;
-  background: #f5f5f57b;
+  background: var(--surface-glass);
   -webkit-mask:
     linear-gradient(to right, transparent, black 1rem, black calc(100% - 1rem), transparent),
     linear-gradient(to bottom, transparent, black 0.3rem, black calc(100% - 0.3rem), transparent);
@@ -35,7 +35,7 @@
   line-height: var(--line-height);
   padding: 1rem;
 
-  background: #f5f5f5db;
+  background: var(--surface-glass-strong);
   -webkit-mask:
     linear-gradient(to right, transparent, black 1rem, black calc(100% - 1rem), transparent),
     linear-gradient(to bottom, transparent, black 1rem, black calc(100% - 1rem), transparent);
@@ -54,14 +54,13 @@
   min-height: var(--entry-height);  
   display: inline-block;
   padding: 1.2rem 1.8rem;
-  background: #f5f5f5db;
+  background: var(--surface-glass-strong);
   border-radius: 1rem;
   width: 100%;
   position: relative;
   line-height: 1.5;
   box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.06),
-    0 2px 6px rgba(0, 0, 0, 0.04);
+    var(--surface-shadow-soft);
     
   -webkit-mask-image: radial-gradient(
       circle at center,
@@ -80,7 +79,7 @@
 .cloud::after {
   content: "";
   position: absolute;
-  background: #f5f5f5db;
+  background: var(--surface-glass-strong);
   border-radius: 50%;
   z-index: -1;
 }

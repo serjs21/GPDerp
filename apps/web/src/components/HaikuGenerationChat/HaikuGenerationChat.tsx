@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { notification } from "antd";
+import { notification } from "@/components/StyledComponents";
 import {
   HAIKU_LIST_PAGE_SIZE,
   prependHaikuToInfiniteCache,
@@ -11,8 +11,7 @@ import { runHaikuAgent } from "@/api/agents";
 import { SavedHaikusList } from "@/components/SavedHaikusList/SavedHaikusList";
 import { useHaikuSocket } from "@/hooks/useHaikuSocket";
 import { useEndOfContentScroll } from "@/hooks/useEndOfContentScroll";
-import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
-import { AuthGateModal } from "@/components/AuthGateModal/AuthGateModal";
+import { useAuthenticationVerification } from "@/app/providers/AuthenticationVerificationProvider";
 import { Kasagi, Nuki, Pillars, Shimaki } from "@/components/Dividers";
 import { WritingLoader } from "@/components/Loaders";
 import styles from "./style.module.css";
@@ -24,8 +23,7 @@ export const HaikuGenerationChat = () => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [subject, setSubject] = useState("");
-  const [authModalOpen, setAuthModalOpen] = useState(false);
-  const { isLoggedIn, checkAuthentication } = useAuthenticationState();
+  const { requestAuthentication } = useAuthenticationVerification();
   const [api, contextHolder] = notification.useNotification({ maxCount: 1 });
 
   const { generatingDraft } = useHaikuSocket({
@@ -66,8 +64,7 @@ export const HaikuGenerationChat = () => {
     e.preventDefault();
     if (!subject.trim()) return;
 
-    if (!isLoggedIn) {
-      setAuthModalOpen(true);
+    if (!requestAuthentication()) {
       return;
     }
 
@@ -119,13 +116,6 @@ export const HaikuGenerationChat = () => {
         <div ref={endOfContentRef} aria-hidden="true" />
       </div>
       {contextHolder}
-      <AuthGateModal
-        open={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-        onAuthenticated={() => {
-          checkAuthentication();
-        }}
-      />
     </div>
   );
 };

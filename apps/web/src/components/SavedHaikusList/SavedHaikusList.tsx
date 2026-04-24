@@ -1,7 +1,7 @@
 "use client";
 
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { Button } from "antd";
+import { Button } from "@/components/StyledComponents";
 import { useCallback, useMemo, useRef, type RefObject } from "react";
 import {
   fetchHaikusPage,

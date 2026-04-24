@@ -1,7 +1,6 @@
 "use client";
 
-import { Modal, Select, Typography, message } from "antd";
-import type { SelectProps } from "antd";
+import { Modal, Select, Typography, message } from "@/components/StyledComponents";
 import { useMemo, useState } from "react";
 import type { HaikuDto } from "@/api/haikus";
 import { Label } from "@/components/Label/Label";
@@ -49,29 +48,6 @@ export function ManageLabelsModal({
     }
     return labelById;
   }, [availableLabels, haiku.labels]);
-
-  const renderTag: SelectProps["tagRender"] = (props) => {
-    const { value, closable, onClose } = props;
-    const id = String(value);
-    const meta = labelById.get(id);
-    return (
-      <span className={styles.tagWrap} onMouseDown={(e) => e.stopPropagation()}>
-        <Label name={meta?.name ?? id} color={meta?.color ?? "default"} />
-        {closable ? (
-          <span
-            className={styles.tagClose}
-            onMouseDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-            onClick={onClose}
-          >
-            ×
-          </span>
-        ) : null}
-      </span>
-    );
-  };
 
   const submit = () => {
     if (showLoading) {
@@ -124,11 +100,9 @@ export function ManageLabelsModal({
                   mode="multiple"
                   className={styles.select}
                   placeholder="Select labels"
-                  showSearch={{ optionFilterProp: "label" }}
                   options={selectOptions}
                   value={selectedIds}
                   onChange={(next) => setSelectedIds(next)}
-                  tagRender={renderTag}
                 />
               </>
             ) : null}

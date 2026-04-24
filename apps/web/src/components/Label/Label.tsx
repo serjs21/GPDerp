@@ -1,6 +1,6 @@
 "use client";
 
-import { Tag } from "antd";
+import { Tag } from "@/components/StyledComponents";
 
 export type LabelProps = {
   name: string;

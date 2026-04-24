@@ -1,4 +1,4 @@
-import { message } from "antd";
+import { message } from "@/components/StyledComponents";
 import { useCallback } from "react";
 import { copyTextToClipboard } from "@/utils/clipboard";
 
