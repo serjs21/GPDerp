@@ -9,6 +9,7 @@ import { AuthNavigation } from "@/components/AuthenticationNav/AuthNavigation";
 import { BeamMeUpScotty } from "@/components/BeamMeUpScotty/BeamMeUpScotty";
 import { SiteFooter } from "@/components/SiteFooter/SiteFooter";
 import { CompleteRegistrationRedirect } from "@/components/AuthFlows/CompleteRegistrationRedirect";
+import { GoogleOAuthAvailabilityProvider } from "./GoogleOAuthAvailabilityProvider";
 
 export interface LayoutProviderProps {
   children: React.ReactNode;
@@ -42,10 +43,12 @@ useMarkHydrated();
     </>
   );
 
-  if (!clientId) {
-    console.error("Missing NEXT_PUBLIC_GOOGLE_CLIENT_ID");
-    return inner;
-  }
+  const withGoogleAvailability = (
+    <GoogleOAuthAvailabilityProvider enabled={Boolean(clientId)}>
+      {inner}
+    </GoogleOAuthAvailabilityProvider>
+  );
 
-  return <GoogleOAuthProvider clientId={clientId}>{inner}</GoogleOAuthProvider>;
+  if (!clientId) return withGoogleAvailability;
+  return <GoogleOAuthProvider clientId={clientId}>{withGoogleAvailability}</GoogleOAuthProvider>;
 };

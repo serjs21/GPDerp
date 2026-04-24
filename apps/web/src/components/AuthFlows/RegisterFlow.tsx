@@ -4,6 +4,7 @@ import { Button, Form, GoogleLoginButton, Input, message } from "@/components/St
 import authStyles from "@/app/auth.shared.module.css";
 import { useRegistration, type RegisterFormValues } from "@/hooks/useRegistration";
 import { useState } from "react";
+import { useGoogleOAuthAvailability } from "@/app/providers/GoogleOAuthAvailabilityProvider";
 
 type RegisterFlowProps = {
   onSuccess: () => void;
@@ -11,8 +12,10 @@ type RegisterFlowProps = {
 };
 
 export function RegisterFlow({ onSuccess, showGoogle = false }: RegisterFlowProps) {
+  const googleOAuthEnabled = useGoogleOAuthAvailability();
   const [form] = Form.useForm<RegisterFormValues>();
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const canShowGoogle = showGoogle && googleOAuthEnabled;
 
   const { submitting, registerWithPassword, signUpWithGoogle } = useRegistration({
     onSuccess,
@@ -23,7 +26,7 @@ export function RegisterFlow({ onSuccess, showGoogle = false }: RegisterFlowProp
 
   return (
     <div className={authStyles.flow}>
-      {showGoogle ? (
+      {canShowGoogle ? (
         <div className={authStyles.socialBlock}>
           <div className={authStyles.googleRow}>
             <GoogleLoginButton

@@ -1,0 +1,19 @@
+:root[data-theme="sumie"] {
+  --background: #f7f6f3;
+  --background-color: #f7f6f3;
+  --text-color: #252422;
+  --text-muted: #64615d;
+  --input-bg: rgba(255, 255, 255, 0.86);
+  --profile-surface-bg: rgba(255, 255, 255, 0.88);
+  --profile-surface-border: rgba(37, 36, 34, 0.16);
+  --gradientStart: #f0eeea;
+  --gradientMid: #faf9f6;
+  --surface-glass: rgba(255, 255, 255, 0.66);
+  --surface-glass-strong: rgba(255, 255, 255, 0.88);
+  --surface-border-soft: rgba(128, 116, 108, 0.3);
+  --accent-red: #aa1f3f;
+  --hanko-red: #aa1f3f;
+  --shrine-accent: #aa1f3f;
+  --shrine-accent-soft: #bf6e83;
+  --sumi-ink: #252422;
+}

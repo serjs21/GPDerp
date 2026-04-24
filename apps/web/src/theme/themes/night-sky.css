@@ -1,0 +1,29 @@
+:root[data-theme="night-sky"] {
+  --background: #0d1320;
+  --background-color: #0d1320;
+  --text-color: #e7eaf1;
+  --text-muted: #a7afc1;
+  --input-placeholder: #8f98ad;
+  --input-bg: rgba(18, 28, 44, 0.72);
+  --profile-surface-bg: rgba(22, 34, 53, 0.8);
+  --profile-surface-border: rgba(185, 196, 219, 0.22);
+  --gradientStart: #10192a;
+  --gradientMid: #15213a;
+  --surface-glass: rgba(18, 28, 44, 0.62);
+  --surface-glass-strong: rgba(20, 33, 53, 0.86);
+  --surface-border-soft: rgba(133, 154, 194, 0.34);
+  --accent-red: #df4f70;
+  --hanko-red: #df4f70;
+  --shrine-accent: #df4f70;
+  --shrine-accent-soft: #f07d95;
+  --shrine-ink: #dbe2ef;
+  --shrine-ink-light: #a6b3ca;
+  --shrine-placeholder: rgba(219, 226, 239, 0.44);
+  --sumi-ink: #e7eaf1;
+  --border-color: rgba(167, 175, 193, 0.28);
+  --footer-border: rgba(167, 175, 193, 0.24);
+  --footer-separator: rgba(167, 175, 193, 0.54);
+  --footer-muted: rgba(167, 175, 193, 0.78);
+  --chip-surface: rgba(23, 35, 56, 0.76);
+  --ink-wash: rgba(231, 234, 241, 0.08);
+}

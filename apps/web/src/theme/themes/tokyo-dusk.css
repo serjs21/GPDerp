@@ -1,0 +1,19 @@
+:root[data-theme="tokyo-dusk"] {
+  --background: #f2efe8;
+  --background-color: #f2efe8;
+  --text-color: #2f2a2a;
+  --text-muted: #716866;
+  --input-bg: rgba(255, 255, 255, 0.78);
+  --profile-surface-bg: rgba(255, 255, 255, 0.82);
+  --profile-surface-border: rgba(47, 42, 42, 0.18);
+  --gradientStart: #efeae0;
+  --gradientMid: #f9f6ef;
+  --surface-glass: rgba(255, 255, 255, 0.56);
+  --surface-glass-strong: rgba(255, 255, 255, 0.8);
+  --surface-border-soft: rgba(156, 87, 87, 0.3);
+  --accent-red: #bc002d;
+  --hanko-red: #bc002d;
+  --shrine-accent: #bc002d;
+  --shrine-accent-soft: #d16369;
+  --sumi-ink: #2f2a2a;
+}

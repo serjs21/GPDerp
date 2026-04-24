@@ -1,0 +1,7 @@
+.ant-message {
+  z-index: 2000;
+}
+
+.ant-modal-root {
+  z-index: 1500;
+}

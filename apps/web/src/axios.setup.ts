@@ -4,6 +4,12 @@ import { getTabId } from "./utils/tabId";
 import Cookies from "js-cookie";
 
 export const TAB_HEADER_KEY = "x-tab-id";
+export const AUTH_REQUIRED_EVENT = "gpderp:auth-required";
+
+const notifyAuthRequired = () => {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new Event(AUTH_REQUIRED_EVENT));
+};
 
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const isBrowserLocalDevHost = () => {
@@ -66,10 +72,14 @@ axios.interceptors.response.use(
 
     // Don't attempt refresh for the refresh/logout endpoint itself.
     if (url.startsWith("/auth/refresh") || url.startsWith("/auth/logout")) {
+      notifyAuthRequired();
       return Promise.reject(err);
     }
 
-    if (originalConfig._retry) return Promise.reject(err);
+    if (originalConfig._retry) {
+      notifyAuthRequired();
+      return Promise.reject(err);
+    }
     originalConfig._retry = true;
 
     try {
@@ -83,6 +93,7 @@ axios.interceptors.response.use(
       return axios(originalConfig);
     } catch (refreshErr) {
       refreshInFlight = null;
+      notifyAuthRequired();
       return Promise.reject(refreshErr);
     }
   },

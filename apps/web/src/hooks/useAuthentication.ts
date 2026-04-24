@@ -27,10 +27,15 @@ const EMPTY_USER: UserObject = {
 };
 
 interface UnauthenticatedStateOptions {
-  isInitialized: boolean
+  isInitialized: boolean;
 }
-const getUnauthenticatedState = ({ isInitialized }: UnauthenticatedStateOptions = ({isInitialized: true})): AuthenticationState =>
-    ({ user: {...EMPTY_USER}, account: [], initialized: isInitialized })
+const getUnauthenticatedState = ({
+  isInitialized,
+}: UnauthenticatedStateOptions = { isInitialized: true }): AuthenticationState => ({
+  user: { ...EMPTY_USER },
+  account: [],
+  initialized: isInitialized,
+});
 
 export type AuthenticationState = {
   // Kept non-null to match the required hook contract.
@@ -55,7 +60,6 @@ const clearClientAuthCookies = () => {
 };
 
 export const useAuthentication = (): AuthenticationResult => {
-
   const setLoggedOut = () => {
     setAuthenticationState(getUnauthenticatedState());
   };
@@ -63,18 +67,18 @@ export const useAuthentication = (): AuthenticationResult => {
   const checkJWTAuthentication = (): {
     valid: boolean;
     shouldRefreshForMissingClaims: boolean;
+    shouldAttemptRefresh: boolean;
   } => {
     // `access_token` cookie is non-HttpOnly specifically to enable a fast init check.
     if (typeof document === "undefined") {
       setLoggedOut();
-      return { valid: false, shouldRefreshForMissingClaims: false };
+      return { valid: false, shouldRefreshForMissingClaims: false, shouldAttemptRefresh: false };
     }
 
     const token = Cookies.get("access_token");
     if (!token) {
-      setLoggedOut();
-      return { valid: false, shouldRefreshForMissingClaims: false };
-      }
+      return { valid: false, shouldRefreshForMissingClaims: false, shouldAttemptRefresh: true };
+    }
 
     try {
       const payload = decodeJwt(token) as {
@@ -87,14 +91,12 @@ export const useAuthentication = (): AuthenticationResult => {
       };
 
       if (!payload?.sub || !payload?.sid || !payload?.exp) {
-        setLoggedOut();
-        return { valid: false, shouldRefreshForMissingClaims: false };
+        return { valid: false, shouldRefreshForMissingClaims: false, shouldAttemptRefresh: true };
       }
 
       const expMs = payload.exp * 1000;
       if (expMs <= Date.now()) {
-        setLoggedOut();
-        return { valid: false, shouldRefreshForMissingClaims: false };
+        return { valid: false, shouldRefreshForMissingClaims: false, shouldAttemptRefresh: true };
       }
 
       const hasUserNameClaim = typeof payload.userName === "string";
@@ -116,19 +118,21 @@ export const useAuthentication = (): AuthenticationResult => {
         },
         account: [],
         initialized: true,
-      })
+      });
       return {
         valid: true,
         shouldRefreshForMissingClaims:
           !hasUserNameClaim || !hasAvatarClaim || !hasEmailVerifiedAtClaim,
+        shouldAttemptRefresh: false,
       };
     } catch {
-      setLoggedOut();
-      return { valid: false, shouldRefreshForMissingClaims: false };
+      return { valid: false, shouldRefreshForMissingClaims: false, shouldAttemptRefresh: true };
     }
   };
 
-  const [authenticationState, setAuthenticationState] = useState<AuthenticationState>(getUnauthenticatedState({isInitialized: false}));
+  const [authenticationState, setAuthenticationState] = useState<AuthenticationState>(
+    getUnauthenticatedState({ isInitialized: false }),
+  );
 
   const logout = async () => {
     try {
@@ -137,36 +141,47 @@ export const useAuthentication = (): AuthenticationResult => {
       // Still clear client auth state/cookies even if API logout fails.
     } finally {
       clearClientAuthCookies();
-      setLoggedOut()
+      setLoggedOut();
     }
   };
 
   const fetchAuthUser = async () => {
     try {
-    const result = await axios.get<AuthMeResponse>("/auth/me");
-    if (!result.data.ok) return setLoggedOut();
+      const result = await axios.get<AuthMeResponse>("/auth/me");
+      if (!result.data.ok) return setLoggedOut();
       setAuthenticationState({
         initialized: true,
         user: result.data.data.user,
         account: result.data.data.account,
       });
     } catch {
-        setLoggedOut();
+      setLoggedOut();
     }
-  }
+  };
 
   const checkAuthentication = () => {
     const jwtState = checkJWTAuthentication();
-    if (!jwtState.valid) return;
+    if (!jwtState.valid) {
+      if (jwtState.shouldAttemptRefresh) {
+        axios
+          .post("/auth/refresh")
+          .then(fetchAuthUser)
+          .catch(() => setLoggedOut());
+      } else {
+        setLoggedOut();
+      }
+      return;
+    }
+
     if (jwtState.shouldRefreshForMissingClaims) {
-      axios.post("/auth/refresh").catch(() => undefined).finally(fetchAuthUser);
+      axios.post("/auth/refresh").then(fetchAuthUser).catch(() => fetchAuthUser());
       return;
     }
     fetchAuthUser();
-  }
+  };
 
   useEffect(checkAuthentication, []);
 
   return { ...authenticationState, isLoggedIn: !!authenticationState?.user?.id, logout, checkAuthentication };
-}
+};
 

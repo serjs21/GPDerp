@@ -10,7 +10,6 @@ const AuthenticationContext = createContext<AuthenticationResult | undefined>(un
 export const AuthenticationProvider = ({ children }: { children: ReactNode }) => {
   const [isMounted, setIsMounted] = useState(false);
   const authState = useAuthentication();
-  console.log('AuthenticationProvider', authState);
 
   useEffect(() => {
     setIsMounted(true);
@@ -21,7 +20,7 @@ export const AuthenticationProvider = ({ children }: { children: ReactNode }) =>
   }
 
   return (
-    <AuthenticationContext.Provider value={authState} key={authState.user?.id || 'unauthenticated'}>
+    <AuthenticationContext.Provider value={authState}>
       {children}
     </AuthenticationContext.Provider>
   );

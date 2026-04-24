@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Modal, Tabs, Typography } from "@/components/StyledComponents";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LoginFlow } from "@/components/AuthFlows/LoginFlow";
 import { RegisterFlow } from "@/components/AuthFlows/RegisterFlow";
 import styles from "./styles.module.css";
@@ -24,6 +24,12 @@ export function AuthGateModal({
 }: AuthGateModalProps) {
   const [mode, setMode] = useState<ViewMode>(initialMode);
 
+  useEffect(() => {
+    if (open) {
+      setMode(initialMode);
+    }
+  }, [initialMode, open]);
+
   return (
     <Modal
       open={open}
@@ -39,7 +45,7 @@ export function AuthGateModal({
 
       <Tabs
         activeKey={mode}
-        onChange={(key) => setMode(key as ViewMode)}
+        onChange={(key: string) => setMode(key as ViewMode)}
         items={[
           {
             key: "login",

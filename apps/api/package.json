@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "predev": "pnpm env:check",
     "dev": "tsx watch src/index.ts",
+    "env:check": "tsx src/checkEnv.ts",
+    "dev:sanity": "pnpm env:check && pnpm build",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "check-db": "tsx scripts/check-connection.ts",

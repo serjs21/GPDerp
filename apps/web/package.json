@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev:next": "next dev",
+    "dev:sanity": "pnpm build",
     "build": "next build",
     "start": "next start",
     "dev": "concurrently -n next,ws -c auto \"pnpm dev:next\"",

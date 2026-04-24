@@ -1,0 +1,82 @@
+:root {
+  color-scheme: light;
+  --background: #fcfaf2;
+  --background-color: var(--background);
+  --text-color: #2d2d2d;
+  --text-muted: #6b6863;
+  --input-placeholder: #8a867f;
+  --border-color: rgba(45, 45, 45, 0.18);
+  --accent-red: #bc002d;
+  --hanko-red: #bc002d;
+  --sumi-ink: #2d2d2d;
+  --ink-wash: rgba(45, 45, 45, 0.06);
+  --chip-surface: rgba(255, 255, 255, 0.66);
+  --form-error-color: #c62828;
+  --color-bamboo-green: #2e7d32;
+  --profile-surface-bg: rgba(255, 255, 255, 0.76);
+  --profile-surface-border: rgba(45, 45, 45, 0.16);
+  --input-bg: rgba(255, 255, 255, 0.75);
+  --gradientStart: #efeae0;
+  --gradientMid: #f8f5ef;
+  --footer-border: rgba(45, 45, 45, 0.14);
+  --footer-separator: rgba(45, 45, 45, 0.35);
+  --footer-muted: rgba(45, 45, 45, 0.62);
+  --layout-content-max: 1180px;
+  --layout-inline-padding: clamp(16px, 3vw, 32px);
+  --layout-chrome-top: 74px;
+  --layout-chrome-bottom: 68px;
+  --surface-border-soft: rgba(122, 57, 57, 0.34);
+  --surface-glass: rgba(255, 255, 255, 0.58);
+  --surface-glass-strong: rgba(255, 255, 255, 0.78);
+  --surface-shadow-soft: rgba(0, 0, 0, 0.08);
+  --shrine-ink: #4d3f39;
+  --shrine-ink-light: #8f7f76;
+  --shrine-accent: #bc002d;
+  --shrine-accent-soft: #d35d64;
+  --shrine-placeholder: rgba(77, 63, 57, 0.45);
+  --motion-duration-fast: 160ms;
+  --motion-duration-base: 240ms;
+  --motion-easing-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --vermillion-soft: #d67778;
+  --beam-overshoot: 12px;
+  --pillar-width: 3px;
+  --pillar-inset: 10px;
+  --sakura-spin-period: 4200ms;
+  --sakura-fade-period: 3000ms;
+  --sakura-orbit-r: 22px;
+  --sakura-petal-light: #ffd9de;
+  --sakura-petal: #f6a0ad;
+  --sakura-petal-deep: #d86778;
+  --bg: transparent;
+  --mt-dark: #7f7f7f;
+  --mt-light: #d3d3d3;
+  --snow: rgba(255, 255, 255, 0.96);
+  --sun-red: #c83a46;
+  --cloud: rgba(255, 255, 255, 0.85);
+  --speed: 4200ms;
+  --font-size: 1rem;
+  --line-height: 1.5;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  background: var(--background);
+  color: var(--text-color);
+}
+
+a {
+  color: inherit;
+}

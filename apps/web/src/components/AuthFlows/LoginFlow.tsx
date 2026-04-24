@@ -4,6 +4,7 @@ import { Button, Form, GoogleLoginButton, Input, message } from "@/components/St
 import axios from "axios";
 import authStyles from "@/app/auth.shared.module.css";
 import { useState } from "react";
+import { useGoogleOAuthAvailability } from "@/app/providers/GoogleOAuthAvailabilityProvider";
 
 type LoginFlowProps = {
   onSuccess: () => void;
@@ -31,8 +32,10 @@ export function LoginFlow({
   showGoogle = false,
   onGoogleSignupRequired,
 }: LoginFlowProps) {
+  const googleOAuthEnabled = useGoogleOAuthAvailability();
   const [form] = Form.useForm<LoginValues>();
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const canShowGoogle = showGoogle && googleOAuthEnabled;
 
   const onFinish = async (values: LoginValues) => {
     try {
@@ -107,7 +110,7 @@ export function LoginFlow({
 
   return (
     <div className={authStyles.flow}>
-      {showGoogle ? (
+      {canShowGoogle ? (
         <div className={authStyles.socialBlock}>
           <div className={authStyles.googleRow}>
             <GoogleLoginButton
