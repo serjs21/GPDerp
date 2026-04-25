@@ -19,6 +19,40 @@
   box-sizing: border-box;
 }
 
+.vgBg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image:
+    url("/background.webp"),
+    linear-gradient(
+      160deg,
+      transparent 60%,
+      color-mix(in srgb, var(--text-color) 6%, transparent) 60%,
+      color-mix(in srgb, var(--text-color) 10%, transparent) 100%
+    ),
+    linear-gradient(
+      200deg,
+      transparent 75%,
+      color-mix(in srgb, var(--text-color) 7%, transparent) 75%,
+      color-mix(in srgb, var(--text-color) 3%, transparent) 100%
+    );
+  background-size:
+    cover,
+    100% 100%,
+    100% 100%;
+  background-repeat:
+    no-repeat,
+    no-repeat,
+    no-repeat;
+  background-position:
+    center,
+    center,
+    center;
+  opacity: var(--bg-art-opacity, 0.8);
+}
+
 .main {
   position: relative;
   z-index: 2;

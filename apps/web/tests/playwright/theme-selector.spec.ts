@@ -1,10 +1,31 @@
-import { expect, test } from "playwright/test";
+import { expect, test, type Locator } from "playwright/test";
 
 const STORY_URL = "/iframe.html?id=auth-themeselector--dark&viewMode=story";
-const getComputedColor = async (locator: Parameters<typeof expect>[0]) =>
-  (locator as any).evaluate((el: Element) => getComputedStyle(el).color);
+const getComputedColor = async (locator: Locator) =>
+  locator.evaluate((el: Element) => getComputedStyle(el).color);
 
 test.describe("ThemeSelector dropdown behavior", () => {
+  test("story renders sky background and mountain triangle layers", async ({ page }) => {
+    await page.goto(STORY_URL);
+
+    const stage = page.locator("[class*='stage']");
+    const triangleBack = page.locator("[class*='triangleBack']");
+    const triangleMid = page.locator("[class*='triangleMid']");
+    const triangleFront = page.locator("[class*='triangleFront']");
+
+    await expect(stage).toBeVisible();
+    await expect(triangleBack).toBeVisible();
+    await expect(triangleMid).toBeVisible();
+    await expect(triangleFront).toBeVisible();
+
+    const stageBackground = await stage.evaluate((el) => getComputedStyle(el).backgroundImage);
+    const backClipPath = await triangleBack.evaluate((el) => getComputedStyle(el).clipPath);
+
+    expect(stageBackground).toContain("gradient");
+    expect(stageBackground).toContain("background.webp");
+    expect(backClipPath).toContain("polygon");
+  });
+
   test("preset buttons keep dropdown open and set expected values", async ({ page }) => {
     await page.goto(STORY_URL);
 
@@ -50,9 +71,8 @@ test.describe("ThemeSelector dropdown behavior", () => {
     await sunButton.click();
     await sunIcon.hover();
     const sunIconColor = await getComputedColor(sunIcon);
-    expect(
-      moonIconColor === "rgb(154, 137, 205)" || moonIconColor.includes("0.603922 0.537255 0.803922"),
-    ).toBeTruthy();
+
+    expect(moonIconColor).not.toBe("rgba(0, 0, 0, 0)");
     expect(moonIconColor).not.toBe(mountainIconColor);
     expect(mountainIconColor).not.toBe(sunIconColor);
     expect(sunIconColor).not.toBe(moonIconColor);

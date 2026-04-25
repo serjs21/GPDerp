@@ -4,7 +4,7 @@ import { Moon, Mountain, Sun } from "lucide-react";
 import type { ThemeName } from "@/config/userConfiguration";
 import { Dropdown, Slider } from "@/components/StyledComponents";
 import { UIButton } from "@/components/ui";
-import { useEffect, useState, type CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 import { getThemeScaleVars } from "@/theme/themeScale";
 import styles from "./ThemeSelector.module.css";
 
@@ -23,12 +23,12 @@ const MAX_ICON_OVERLAP_PX = 4;
 const ICON_BUTTON_PADDING_PX = 4;
 const ICON_SIZE_PX = 16;
 const ICON_CORNER_OFFSET_PX = (ICON_SIZE_PX - MAX_ICON_OVERLAP_PX) / Math.SQRT2;
-const MOON_ICON_COLOR = "#9a89cd";
-const SUN_ICON_COLOR = "#ecb173";
-const MOUNTAIN_ICON_COLOR = "#b6bcc8";
-const MOON_STROKE_COLOR = "#e7eaf1";
-const SUN_STROKE_COLOR = "#252422";
-const MOUNTAIN_STROKE_COLOR = "#2f2a2a";
+const MOON_ICON_COLOR = "#f4d46a";
+const SUN_ICON_COLOR = "#57a8f0";
+const MOUNTAIN_ICON_COLOR = "#ef8f5b";
+const MOON_STROKE_COLOR = "#fff6d0";
+const SUN_STROKE_COLOR = "#1f3550";
+const MOUNTAIN_STROKE_COLOR = "#5a2f30";
 const MOON_FADE_START = 20;
 const MOON_HIDE_AT = 45;
 const SUN_APPEAR_AT = 55;
@@ -63,10 +63,16 @@ const mixHex = (from: string, to: string, ratio: number) => {
 };
 
 const accentForProgress = (progress: number) => {
-  if (progress <= 75) {
-    return mixHex("#e08d3c", "#d74844", progress / 75);
+  if (progress <= 25) {
+    return mixHex("#4a9de5", "#9962ce", progress / 25);
   }
-  return mixHex("#d74844", "#7764b2", (progress - 75) / 25);
+  if (progress <= 50) {
+    return mixHex("#9962ce", "#db5c3e", (progress - 25) / 25);
+  }
+  if (progress <= 75) {
+    return mixHex("#db5c3e", "#8b79d0", (progress - 50) / 25);
+  }
+  return mixHex("#8b79d0", "#f4d46a", (progress - 75) / 25);
 };
 
 export const getNearestThemeByProgress = (progress: number): ThemeName => {
@@ -80,6 +86,7 @@ export const getNearestThemeByProgress = (progress: number): ThemeName => {
 
 type ThemeSelectorProps = {
   value: ThemeName;
+  scaleValue?: number;
   onChange: (next: ThemeName) => void; // committed theme
   onPreviewChange?: (progress: number) => void; // smooth slider preview 0..100
   onScaleCommit?: (progress: number) => void; // exact 0..100 commit
@@ -89,6 +96,7 @@ type ThemeSelectorProps = {
 
 export const ThemeSelector = ({
   value,
+  scaleValue,
   onChange,
   onPreviewChange,
   onScaleCommit,
@@ -100,13 +108,10 @@ export const ThemeSelector = ({
   const [hasManualPosition, setHasManualPosition] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const toThemeScaleProgress = (uiProgress: number) => 100 - uiProgress;
-  const themeScaleProgress = toThemeScaleProgress(progress);
+  const effectiveProgress =
+    hasManualPosition || scaleValue === undefined ? progress : Math.max(0, Math.min(100, 100 - scaleValue));
+  const themeScaleProgress = toThemeScaleProgress(effectiveProgress);
   const themeVars = getThemeScaleVars(themeScaleProgress);
-
-  useEffect(() => {
-    if (interacting || hasManualPosition) return;
-    setProgress(THEME_PROGRESS[value]);
-  }, [hasManualPosition, interacting, value]);
 
   const commitTheme = (nextProgress: number) => {
     const themeProgress = toThemeScaleProgress(nextProgress);
@@ -123,10 +128,10 @@ export const ThemeSelector = ({
     return (value - start) / (end - start);
   };
 
-  const moonFadeProgress = phaseBetween(progress, MOON_FADE_START, MOON_HIDE_AT);
+  const moonFadeProgress = phaseBetween(effectiveProgress, MOON_FADE_START, MOON_HIDE_AT);
   const moonPhase = 1 - moonFadeProgress;
-  const mountainVisible = progress >= MOUNTAIN_VISIBLE_FROM && progress <= MOUNTAIN_VISIBLE_TO;
-  const sunPhase = phaseBetween(progress, SUN_APPEAR_AT, SUN_MAX_SCALE_AT);
+  const mountainVisible = effectiveProgress >= MOUNTAIN_VISIBLE_FROM && effectiveProgress <= MOUNTAIN_VISIBLE_TO;
+  const sunPhase = phaseBetween(effectiveProgress, SUN_APPEAR_AT, SUN_MAX_SCALE_AT);
   const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
   const lerp = (from: number, to: number, t: number) => from + (to - from) * clamp01(t);
   const easeInOut = (t: number) => {
@@ -136,9 +141,9 @@ export const ThemeSelector = ({
   const iconTransform = (x: number, y: number, scale: number) =>
     `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(${scale})`;
 
-  const moonEdgeCenter = easeInOut(clamp01(1 - progress / EDGE_CENTER_WINDOW));
+  const moonEdgeCenter = easeInOut(clamp01(1 - effectiveProgress / EDGE_CENTER_WINDOW));
   const sunEdgeCenter = easeInOut(
-    clamp01((progress - (100 - EDGE_CENTER_WINDOW)) / EDGE_CENTER_WINDOW),
+    clamp01((effectiveProgress - (100 - EDGE_CENTER_WINDOW)) / EDGE_CENTER_WINDOW),
   );
 
   const moonX = lerp(-ICON_CORNER_OFFSET_PX, 0, moonEdgeCenter);
@@ -148,9 +153,9 @@ export const ThemeSelector = ({
 
   const sunScale = 0.7 + sunPhase * 0.3;
   const moonScale = 0.66 + moonPhase * 0.34;
-  const moonOpacity = 1 - phaseBetween(progress, MOON_OPACITY_FADE_START, MOON_OPACITY_HIDE_AT);
-  const sunOpacity = phaseBetween(progress, SUN_OPACITY_SHOW_AT, SUN_OPACITY_FULL_AT);
-  const colorInfluence = (anchor: number) => clamp01(1 - Math.abs(progress - anchor) / 50);
+  const moonOpacity = 1 - phaseBetween(effectiveProgress, MOON_OPACITY_FADE_START, MOON_OPACITY_HIDE_AT);
+  const sunOpacity = phaseBetween(effectiveProgress, SUN_OPACITY_SHOW_AT, SUN_OPACITY_FULL_AT);
+  const colorInfluence = (anchor: number) => clamp01(1 - Math.abs(effectiveProgress - anchor) / 50);
   const moonInfluence = colorInfluence(0);
   const mountainInfluence = colorInfluence(50);
   const sunInfluence = colorInfluence(100);
@@ -183,14 +188,14 @@ export const ThemeSelector = ({
         onOpenChange={setIsOpen}
         trigger={["click"]}
         placement="bottom"
-        overlayStyle={
-          {
+        styles={{
+          root: {
             "--slider-accent": accentForProgress(themeScaleProgress),
             "--moon-highlight": MOON_ICON_COLOR,
             "--sun-highlight": SUN_ICON_COLOR,
             "--mountain-highlight": MOUNTAIN_ICON_COLOR,
-          } as CSSProperties
-        }
+          } as CSSProperties,
+        }}
         popupRender={() => (
           <div className={styles.panel}>
             <div className={styles.panelIcons}>
@@ -248,7 +253,7 @@ export const ThemeSelector = ({
                 min={0}
                 max={100}
                 step={1}
-                value={progress}
+                value={effectiveProgress}
                 dots={false}
                 tooltip={{ open: false }}
                 onChange={(value) => {
@@ -273,7 +278,7 @@ export const ThemeSelector = ({
         <UIButton
           className={styles.trigger}
           aria-label={ariaLabel}
-          title={`${Math.round(progress)}%`}
+          title={`${Math.round(effectiveProgress)}%`}
           style={{
             "--icon-button-padding": `${ICON_BUTTON_PADDING_PX}px`,
             background: "color-mix(in srgb, var(--background) 88%, #fff 12%)",

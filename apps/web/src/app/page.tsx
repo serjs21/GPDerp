@@ -4,6 +4,7 @@ import { HaikuGenerationChat } from "@/components/HaikuGenerationChat/HaikuGener
 export default function Home() {
   return (
     <div className={styles.page}>
+      <div className={styles.vgBg} aria-hidden />
       <main className={styles.main}>
         <HaikuGenerationChat />
 

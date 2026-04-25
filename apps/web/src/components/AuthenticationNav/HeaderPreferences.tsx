@@ -11,6 +11,7 @@ import { updateOwnConfiguration } from "@/api/user";
 import {
   PREFERENCE_LOCALE_STORAGE_KEY,
   PREFERENCE_THEME_STORAGE_KEY,
+  PREFERENCE_THEME_SCALE_STORAGE_KEY,
   type AppLocale,
   type ThemeName,
 } from "@/config/userConfiguration";
@@ -38,6 +39,21 @@ const LOCALE_FLAGS: Partial<Record<AppLocale, FlagComponent>> = {
   pt: PT,
 };
 
+const THEME_SCALE_FROM_THEME: Record<ThemeName, number> = {
+  sumie: 0,
+  "tokyo-dusk": 50,
+  "night-sky": 100,
+};
+
+const readStoredThemeScale = (theme: ThemeName): number => {
+  if (typeof window === "undefined") return THEME_SCALE_FROM_THEME[theme];
+  const storedScale = window.localStorage.getItem(PREFERENCE_THEME_SCALE_STORAGE_KEY);
+  if (!storedScale) return THEME_SCALE_FROM_THEME[theme];
+  const parsedScale = Number.parseInt(storedScale, 10);
+  if (Number.isNaN(parsedScale)) return THEME_SCALE_FROM_THEME[theme];
+  return Math.max(0, Math.min(100, parsedScale));
+};
+
 export const HeaderPreferences = () => {
   const router = useRouter();
   const { isLoggedIn } = useAuthenticationState();
@@ -45,7 +61,7 @@ export const HeaderPreferences = () => {
   const { locale, setLocale } = useLocale();
   const { languageOptions } = useProfileI18n();
   const t = useTranslations("Profile");
-  const [themePreviewProgress, setThemePreviewProgress] = useState<number | null>(null);
+  const [themePreviewProgress, setThemePreviewProgress] = useState<number | null>(() => readStoredThemeScale(theme));
 
   const persistIfLoggedIn = useCallback(
     async (body: { theme?: ThemeName; language?: AppLocale }) => {
@@ -63,11 +79,13 @@ export const HeaderPreferences = () => {
     [isLoggedIn, locale, router, t, theme],
   );
 
-  const onThemeChange = (next: ThemeName) => {
-    setThemePreviewProgress(null);
+  const onThemeChange = (next: ThemeName, scaleOverride?: number) => {
+    const nextScale = scaleOverride ?? THEME_SCALE_FROM_THEME[next];
+    setThemePreviewProgress(nextScale);
     setTheme(next);
     if (typeof window !== "undefined") {
       window.localStorage.setItem(PREFERENCE_THEME_STORAGE_KEY, next);
+      window.localStorage.setItem(PREFERENCE_THEME_SCALE_STORAGE_KEY, String(nextScale));
     }
     void persistIfLoggedIn({ theme: next });
   };
@@ -98,7 +116,7 @@ export const HeaderPreferences = () => {
   }, [themePreviewProgress]);
 
   const onThemeScaleCommit = (progress: number) => {
-    onThemeChange(getPersistedThemeFromScale(progress));
+    onThemeChange(getPersistedThemeFromScale(progress), progress);
   };
 
   const onLocaleChange = (next: AppLocale) => {
@@ -154,6 +172,7 @@ export const HeaderPreferences = () => {
     <div className={styles.wrap} role="group" aria-label={t("preferencesGroupLabel")}>
       <ThemeSelector
         value={theme}
+        scaleValue={themePreviewProgress ?? THEME_SCALE_FROM_THEME[theme]}
         onChange={onThemeChange}
         onScaleCommit={onThemeScaleCommit}
         onPreviewChange={setThemePreviewProgress}

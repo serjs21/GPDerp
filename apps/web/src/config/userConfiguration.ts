@@ -18,6 +18,7 @@ export const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
 /** Sync with profile page / header so server preferences merge correctly */
 export const PREFERENCE_THEME_STORAGE_KEY = "gpderp.profile.selectedTheme";
+export const PREFERENCE_THEME_SCALE_STORAGE_KEY = "gpderp.profile.selectedThemeScale";
 export const PREFERENCE_LOCALE_STORAGE_KEY = "gpderp.profile.selectedLanguage";
 
 export const isThemeName = (value: string): value is ThemeName =>

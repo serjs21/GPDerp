@@ -39,94 +39,158 @@ const PREVIEW_THEME_VARS = [
   "--footer-separator",
   "--footer-muted",
   "--border-color",
+  "--bg-art-opacity",
 ] as const;
 
 const THEME_STOPS: ThemeStop[] = [
   {
     progress: 0,
     vars: {
-      "--background": "#fff3d7",
-      "--background-color": "#fff3d7",
-      "--text-color": "#3f2f28",
-      "--text-muted": "#856b5b",
-      "--input-bg": "#fff7e8",
-      "--profile-surface-bg": "#fff8ec",
-      "--profile-surface-border": "#dfc8aa",
-      "--gradientStart": "#ffeac2",
-      "--gradientMid": "#fff4de",
-      "--surface-glass": "#fff8ece8",
-      "--surface-glass-strong": "#ffffff",
-      "--surface-border-soft": "#cba478",
-      "--accent-red": "#e08d3c",
-      "--hanko-red": "#e08d3c",
-      "--shrine-accent": "#e08d3c",
-      "--shrine-accent-soft": "#ecb173",
-      "--shrine-ink": "#574236",
-      "--shrine-ink-light": "#927663",
-      "--shrine-placeholder": "#a28a78",
-      "--sumi-ink": "#3f2f28",
-      "--footer-border": "#d8c1a1",
-      "--footer-separator": "#9e826a",
-      "--footer-muted": "#937863",
-      "--border-color": "#d6c0a3",
+      "--background": "#9fd3ff",
+      "--background-color": "#9fd3ff",
+      "--text-color": "#1d2531",
+      "--text-muted": "#3f556f",
+      "--input-bg": "#d5ecff",
+      "--profile-surface-bg": "#dff1ff",
+      "--profile-surface-border": "#7ca3c8",
+      "--gradientStart": "#79c1ff",
+      "--gradientMid": "#cbe9ff",
+      "--surface-glass": "#dcf1ffe0",
+      "--surface-glass-strong": "#eef8ffff",
+      "--surface-border-soft": "#5f8fbe",
+      "--accent-red": "#4a9de5",
+      "--hanko-red": "#4a9de5",
+      "--shrine-accent": "#4a9de5",
+      "--shrine-accent-soft": "#8fc6f5",
+      "--shrine-ink": "#223247",
+      "--shrine-ink-light": "#4d6988",
+      "--shrine-placeholder": "#5f7691",
+      "--sumi-ink": "#1d2531",
+      "--footer-border": "#7da8ce",
+      "--footer-separator": "#4d7398",
+      "--footer-muted": "#4f6f90",
+      "--border-color": "#78a4ca",
+      "--bg-art-opacity": "0.82",
+    },
+  },
+  {
+    progress: 25,
+    vars: {
+      "--background": "#b283d2",
+      "--background-color": "#b283d2",
+      "--text-color": "#231b2d",
+      "--text-muted": "#5b446f",
+      "--input-bg": "#d9bce9",
+      "--profile-surface-bg": "#dec5ec",
+      "--profile-surface-border": "#8e67aa",
+      "--gradientStart": "#8f63be",
+      "--gradientMid": "#c29adf",
+      "--surface-glass": "#dfc3ecdc",
+      "--surface-glass-strong": "#ebd8f5f0",
+      "--surface-border-soft": "#8058a2",
+      "--accent-red": "#9962ce",
+      "--hanko-red": "#9962ce",
+      "--shrine-accent": "#9962ce",
+      "--shrine-accent-soft": "#bf90e5",
+      "--shrine-ink": "#2b1f37",
+      "--shrine-ink-light": "#63497b",
+      "--shrine-placeholder": "#735a8b",
+      "--sumi-ink": "#231b2d",
+      "--footer-border": "#976fb3",
+      "--footer-separator": "#654b80",
+      "--footer-muted": "#694f84",
+      "--border-color": "#9a73b5",
+      "--bg-art-opacity": "0.8",
+    },
+  },
+  {
+    progress: 50,
+    vars: {
+      "--background": "#e58b62",
+      "--background-color": "#e58b62",
+      "--text-color": "#3a2420",
+      "--text-muted": "#7f4f43",
+      "--input-bg": "#f2b18d",
+      "--profile-surface-bg": "#f5b999",
+      "--profile-surface-border": "#ad553f",
+      "--gradientStart": "#cf5440",
+      "--gradientMid": "#f6c86e",
+      "--surface-glass": "#f0b292dc",
+      "--surface-glass-strong": "#f7c7aef0",
+      "--surface-border-soft": "#ab4d3c",
+      "--accent-red": "#db5c3e",
+      "--hanko-red": "#db5c3e",
+      "--shrine-accent": "#db5c3e",
+      "--shrine-accent-soft": "#f3b564",
+      "--shrine-ink": "#422a24",
+      "--shrine-ink-light": "#895544",
+      "--shrine-placeholder": "#9b6350",
+      "--sumi-ink": "#3a2420",
+      "--footer-border": "#b6624b",
+      "--footer-separator": "#7f4737",
+      "--footer-muted": "#845040",
+      "--border-color": "#b96853",
+      "--bg-art-opacity": "0.78",
     },
   },
   {
     progress: 75,
     vars: {
-      "--background": "#f0d5c6",
-      "--background-color": "#f0d5c6",
-      "--text-color": "#3f2c2c",
-      "--text-muted": "#7d5f60",
-      "--input-bg": "#f9e4d8",
-      "--profile-surface-bg": "#f8e3d8",
-      "--profile-surface-border": "#cfa7a3",
-      "--gradientStart": "#f4c8ac",
-      "--gradientMid": "#f2d6c8",
-      "--surface-glass": "#f8dfd3da",
-      "--surface-glass-strong": "#f6ddd2f2",
-      "--surface-border-soft": "#ba6a5c",
-      "--accent-red": "#d74844",
-      "--hanko-red": "#d74844",
-      "--shrine-accent": "#d74844",
-      "--shrine-accent-soft": "#e4806f",
-      "--shrine-ink": "#553b39",
-      "--shrine-ink-light": "#946d66",
-      "--shrine-placeholder": "#9f7b74",
-      "--sumi-ink": "#3f2c2c",
-      "--footer-border": "#c8968f",
-      "--footer-separator": "#8d6260",
-      "--footer-muted": "#8c6460",
-      "--border-color": "#c89c99",
+      "--background": "#4f4a86",
+      "--background-color": "#4f4a86",
+      "--text-color": "#f0e9ff",
+      "--text-muted": "#d0c2f3",
+      "--input-bg": "#66619e",
+      "--profile-surface-bg": "#6f6ba8",
+      "--profile-surface-border": "#b2a6dc",
+      "--gradientStart": "#51488f",
+      "--gradientMid": "#7d61af",
+      "--surface-glass": "#6a63a4d4",
+      "--surface-glass-strong": "#756db2e8",
+      "--surface-border-soft": "#afa2dc",
+      "--accent-red": "#8b79d0",
+      "--hanko-red": "#8b79d0",
+      "--shrine-accent": "#8b79d0",
+      "--shrine-accent-soft": "#b0a2e5",
+      "--shrine-ink": "#eee7ff",
+      "--shrine-ink-light": "#ccc0ef",
+      "--shrine-placeholder": "#b3a5dc",
+      "--sumi-ink": "#f0e9ff",
+      "--footer-border": "#a89fda",
+      "--footer-separator": "#cec2f1",
+      "--footer-muted": "#d4c9f4",
+      "--border-color": "#aba0db",
+      "--bg-art-opacity": "0.75",
     },
   },
   {
     progress: 100,
     vars: {
-      "--background": "#151b35",
-      "--background-color": "#151b35",
-      "--text-color": "#ece9f6",
-      "--text-muted": "#b6aacd",
-      "--input-bg": "#1f2748",
-      "--profile-surface-bg": "#232d54",
-      "--profile-surface-border": "#8d8bc0",
-      "--gradientStart": "#1c2244",
-      "--gradientMid": "#262e5d",
-      "--surface-glass": "#1f2647d4",
-      "--surface-glass-strong": "#252d55ed",
-      "--surface-border-soft": "#7a79b0",
-      "--accent-red": "#7764b2",
-      "--hanko-red": "#7764b2",
-      "--shrine-accent": "#7764b2",
-      "--shrine-accent-soft": "#9a89cd",
-      "--shrine-ink": "#e3dff2",
-      "--shrine-ink-light": "#b4a9d4",
-      "--shrine-placeholder": "#a39abe",
-      "--sumi-ink": "#ece9f6",
-      "--footer-border": "#6f73a6",
-      "--footer-separator": "#aaa5c8",
-      "--footer-muted": "#b1abcb",
-      "--border-color": "#8686b5",
+      "--background": "#0f1d4d",
+      "--background-color": "#0f1d4d",
+      "--text-color": "#fff4c9",
+      "--text-muted": "#d9cdad",
+      "--input-bg": "#1b2f6c",
+      "--profile-surface-bg": "#20367a",
+      "--profile-surface-border": "#8ea5de",
+      "--gradientStart": "#0d1945",
+      "--gradientMid": "#1d3372",
+      "--surface-glass": "#1a2f68db",
+      "--surface-glass-strong": "#223977ef",
+      "--surface-border-soft": "#93a9e4",
+      "--accent-red": "#f4d46a",
+      "--hanko-red": "#f4d46a",
+      "--shrine-accent": "#f4d46a",
+      "--shrine-accent-soft": "#fff0b8",
+      "--shrine-ink": "#fff2c2",
+      "--shrine-ink-light": "#ddcca1",
+      "--shrine-placeholder": "#c5b78f",
+      "--sumi-ink": "#fff4c9",
+      "--footer-border": "#8ca2dc",
+      "--footer-separator": "#dbcfae",
+      "--footer-muted": "#ded1af",
+      "--border-color": "#8ba2dc",
+      "--bg-art-opacity": "0.72",
     },
   },
 ];
@@ -178,6 +242,24 @@ const hexToRgba = (hex: string): Rgba => {
     b: (value >> 8) & 255,
     a: (value & 255) / 255,
   };
+};
+
+const cssColorToRgba = (value: string): Rgba => {
+  const color = value.trim();
+  if (color.startsWith("rgb")) {
+    const parts = color
+      .replace(/rgba?\(/, "")
+      .replace(")", "")
+      .split(",")
+      .map((part) => part.trim());
+    return {
+      r: Number.parseFloat(parts[0] ?? "0"),
+      g: Number.parseFloat(parts[1] ?? "0"),
+      b: Number.parseFloat(parts[2] ?? "0"),
+      a: parts[3] === undefined ? 1 : Number.parseFloat(parts[3]),
+    };
+  }
+  return hexToRgba(color);
 };
 
 const srgbToLinear = (channel: number) => {
@@ -233,6 +315,35 @@ const oklabToRgba = (color: Oklab, alpha: number): Rgba => {
   };
 };
 
+const rgbaOver = (foreground: Rgba, background: Rgba): Rgba => {
+  const outAlpha = foreground.a + background.a * (1 - foreground.a);
+  if (outAlpha <= 0) return { r: 0, g: 0, b: 0, a: 0 };
+  return {
+    r: Math.round((foreground.r * foreground.a + background.r * background.a * (1 - foreground.a)) / outAlpha),
+    g: Math.round((foreground.g * foreground.a + background.g * background.a * (1 - foreground.a)) / outAlpha),
+    b: Math.round((foreground.b * foreground.a + background.b * background.a * (1 - foreground.a)) / outAlpha),
+    a: outAlpha,
+  };
+};
+
+const relativeLuminance = (color: Rgba): number => {
+  const r = srgbToLinear(color.r);
+  const g = srgbToLinear(color.g);
+  const b = srgbToLinear(color.b);
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+
+const contrastRatio = (foreground: string, background: string): number => {
+  const fg = cssColorToRgba(foreground);
+  const bg = cssColorToRgba(background);
+  const composed = fg.a < 1 ? rgbaOver(fg, bg) : fg;
+  const l1 = relativeLuminance(composed);
+  const l2 = relativeLuminance(bg);
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+};
+
 // Perceptual interpolation in OKLab with eased ratio provides smoother, less muddy transitions.
 const mixColor = (from: string, to: string, ratio: number) => {
   const source = hexToRgba(from);
@@ -256,25 +367,51 @@ const mixColor = (from: string, to: string, ratio: number) => {
 };
 
 const persistedThemeFromProgress = (progress: number): ThemeName => {
-  if (progress < 75) return "sumie";
-  if (progress >= 90) return "night-sky";
+  if (progress < 35) return "sumie";
+  if (progress >= 75) return "night-sky";
   return "tokyo-dusk";
 };
 
 const getInterpolatedVars = (progress: number): ThemeVars => {
   const clamped = Math.min(100, Math.max(0, progress));
-  const from = clamped <= 75 ? THEME_STOPS[0] : THEME_STOPS[1];
-  const to = clamped <= 75 ? THEME_STOPS[1] : THEME_STOPS[2];
+  const stopIndex = THEME_STOPS.findIndex((stop) => clamped <= stop.progress);
+  const toIndex = stopIndex <= 0 ? 1 : stopIndex;
+  const fromIndex = Math.max(0, toIndex - 1);
+  const from = THEME_STOPS[fromIndex];
+  const to = THEME_STOPS[toIndex] ?? THEME_STOPS[THEME_STOPS.length - 1];
   const span = to.progress - from.progress;
   const ratio = span === 0 ? 0 : (clamped - from.progress) / span;
 
-  return PREVIEW_THEME_VARS.reduce(
+  const interpolated = PREVIEW_THEME_VARS.reduce(
     (acc, key) => {
       acc[key] = mixColor(from.vars[key], to.vars[key], ratio);
       return acc;
     },
     {} as ThemeVars,
   );
+
+  const targetText = mixColor("#1d2531", "#fff4c9", clamped / 100);
+  const background = interpolated["--background"];
+  const fallbackDark = "#1b1f2a";
+  const fallbackLight = "#fff7d5";
+  const targetContrast = contrastRatio(targetText, background);
+  const darkContrast = contrastRatio(fallbackDark, background);
+  const lightContrast = contrastRatio(fallbackLight, background);
+
+  let readableText = targetText;
+  if (targetContrast < 4.5) {
+    readableText = darkContrast > lightContrast ? fallbackDark : fallbackLight;
+  }
+  const mutedText = mixColor(readableText, background, 0.38);
+
+  interpolated["--text-color"] = readableText;
+  interpolated["--text-muted"] = mutedText;
+  interpolated["--sumi-ink"] = readableText;
+  interpolated["--shrine-ink"] = mixColor(readableText, "#fff7d5", 0.15);
+  interpolated["--shrine-ink-light"] = mixColor(mutedText, background, 0.2);
+  interpolated["--shrine-placeholder"] = mixColor(mutedText, background, 0.35);
+
+  return interpolated;
 };
 
 export const THEME_SCALE_POINTS: ThemeScalePoint[] = Array.from({ length: 101 }, (_, progress) => ({
