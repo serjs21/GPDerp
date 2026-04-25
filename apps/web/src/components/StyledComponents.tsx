@@ -13,6 +13,7 @@ export {
   Modal,
   Radio,
   Select,
+  Slider,
   Space,
   Tabs,
   Tag,

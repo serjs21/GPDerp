@@ -5,12 +5,8 @@
   flex-wrap: nowrap;
 }
 
-.select {
-  min-width: 7.5rem;
-  max-width: 10.5rem;
-  font-size: 0.8125rem;
-  min-height: 2.25rem;
-  padding-block: 0.2rem;
+.themeSelector {
+  min-width: 0;
 }
 
 .localeTrigger {
@@ -71,8 +67,7 @@
     justify-content: flex-end;
   }
 
-  .select {
-    min-width: 6.6rem;
-    max-width: 8rem;
+  .themeSelector {
+    min-width: 0;
   }
 }

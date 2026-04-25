@@ -1,10 +1,11 @@
 "use client";
 
 import { Dropdown, type MenuProps, message } from "@/components/StyledComponents";
-import { UIButton, UISelect } from "@/components/ui";
+import { UIButton } from "@/components/ui";
+import { ThemeSelector } from "@/components/ThemeSelector";
 import { Languages, ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, type ComponentType, useMemo } from "react";
+import { useCallback, useEffect, useState, type ComponentType, useMemo } from "react";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { updateOwnConfiguration } from "@/api/user";
 import {
@@ -18,6 +19,7 @@ import { useLocale } from "@/hooks/useLocale";
 import { useTheme } from "@/hooks/useTheme";
 import { useTranslations } from "next-intl";
 import { DE, ES, FR, IT, JP, PT, TH, US } from "country-flag-icons/react/3x2";
+import { getPersistedThemeFromScale, getThemeScaleVars } from "@/theme/themeScale";
 import styles from "./headerPreferences.module.css";
 
 type FlagComponent = ComponentType<{
@@ -41,8 +43,9 @@ export const HeaderPreferences = () => {
   const { isLoggedIn } = useAuthenticationState();
   const { theme, setTheme } = useTheme();
   const { locale, setLocale } = useLocale();
-  const { themeOptions, languageOptions } = useProfileI18n();
+  const { languageOptions } = useProfileI18n();
   const t = useTranslations("Profile");
+  const [themePreviewProgress, setThemePreviewProgress] = useState<number | null>(null);
 
   const persistIfLoggedIn = useCallback(
     async (body: { theme?: ThemeName; language?: AppLocale }) => {
@@ -61,11 +64,41 @@ export const HeaderPreferences = () => {
   );
 
   const onThemeChange = (next: ThemeName) => {
+    setThemePreviewProgress(null);
     setTheme(next);
     if (typeof window !== "undefined") {
       window.localStorage.setItem(PREFERENCE_THEME_STORAGE_KEY, next);
     }
     void persistIfLoggedIn({ theme: next });
+  };
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const rootStyle = document.documentElement.style;
+
+    if (themePreviewProgress === null) {
+      const keys = Object.keys(getThemeScaleVars(0));
+      for (const key of keys) {
+        rootStyle.removeProperty(key);
+      }
+      return;
+    }
+
+    const preview = getThemeScaleVars(themePreviewProgress);
+    for (const key of Object.keys(preview)) {
+      rootStyle.setProperty(key, preview[key]);
+    }
+
+    return () => {
+      const keys = Object.keys(getThemeScaleVars(0));
+      for (const key of keys) {
+        rootStyle.removeProperty(key);
+      }
+    };
+  }, [themePreviewProgress]);
+
+  const onThemeScaleCommit = (progress: number) => {
+    onThemeChange(getPersistedThemeFromScale(progress));
   };
 
   const onLocaleChange = (next: AppLocale) => {
@@ -119,12 +152,13 @@ export const HeaderPreferences = () => {
 
   return (
     <div className={styles.wrap} role="group" aria-label={t("preferencesGroupLabel")}>
-      <UISelect
-        className={styles.select}
+      <ThemeSelector
         value={theme}
-        onChange={(e) => onThemeChange(e.target.value as ThemeName)}
-        options={themeOptions}
-        aria-label={t("theme")}
+        onChange={onThemeChange}
+        onScaleCommit={onThemeScaleCommit}
+        onPreviewChange={setThemePreviewProgress}
+        className={styles.themeSelector}
+        ariaLabel={t("theme")}
       />
       <Dropdown
         trigger={["click"]}
