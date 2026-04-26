@@ -24,8 +24,8 @@
   overflow-y: auto;
   padding-right: 0.25rem;
   border-radius: 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--text-color, #2c2c2c) 12%, transparent);
-  background: color-mix(in srgb, var(--background-color, #fcfaf2) 85%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-color) 12%, transparent);
+  background: color-mix(in srgb, var(--background-color) 85%, transparent);
 }
 
 .heading {
@@ -33,7 +33,7 @@
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--text-color, #2c2c2c) 55%, transparent);
+  color: color-mix(in srgb, var(--text-color) 55%, transparent);
   margin: 0 0 0.25rem;
 }
 
@@ -54,7 +54,7 @@
 .empty {
   padding: 1rem 1.25rem;
   font-size: 0.9rem;
-  color: color-mix(in srgb, var(--text-color, #2c2c2c) 50%, transparent);
+  color: color-mix(in srgb, var(--text-color) 50%, transparent);
   font-style: italic;
 }
 

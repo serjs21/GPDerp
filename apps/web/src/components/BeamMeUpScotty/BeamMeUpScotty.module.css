@@ -11,11 +11,11 @@
   border: none;
   border-radius: 12px;
   overflow: hidden;
-  background: color-mix(in srgb, var(--profile-surface-bg, #f3f1ea) 92%, transparent);
-  border: 1px solid var(--profile-surface-border, rgb(45 45 45 / 0.16));
+  background: color-mix(in srgb, var(--profile-surface-bg) 92%, transparent);
+  border: 1px solid var(--profile-surface-border);
   box-shadow:
     0 1px 2px rgb(0 0 0 / 12%),
-    0 0 0 1px color-mix(in srgb, var(--text-color, #2d2d2d) 12%, transparent) inset;
+    0 0 0 1px color-mix(in srgb, var(--text-color) 12%, transparent) inset;
   cursor: pointer;
   text-decoration: none;
   transition:
@@ -27,11 +27,11 @@
   transform: translateY(-1px);
   box-shadow:
     0 3px 10px rgb(0 0 0 / 18%),
-    0 0 0 1px color-mix(in srgb, var(--text-color, #2d2d2d) 16%, transparent) inset;
+    0 0 0 1px color-mix(in srgb, var(--text-color) 16%, transparent) inset;
 }
 
 .link:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--gradientMid, #fff) 70%, #fff);
+  outline: 2px solid color-mix(in srgb, var(--gradientMid) 70%, var(--surface-glass-strong));
   outline-offset: 3px;
 }
 

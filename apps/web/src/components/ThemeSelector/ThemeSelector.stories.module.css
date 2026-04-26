@@ -9,7 +9,7 @@
   background:
     url("/background.webp"),
     radial-gradient(circle at 20% 18%, color-mix(in srgb, var(--story-accent-soft) 30%, transparent) 0%, transparent 55%),
-    radial-gradient(circle at 78% 20%, color-mix(in srgb, #fff 22%, transparent) 0%, transparent 58%),
+    radial-gradient(circle at 78% 20%, color-mix(in srgb, var(--story-surface-strong) 30%, transparent) 0%, transparent 58%),
     linear-gradient(180deg, var(--story-gradient-start) 0%, var(--story-gradient-mid) 56%, var(--story-background) 100%);
   background-size:
     cover,
@@ -83,3 +83,66 @@
   font-size: 0.75rem;
   opacity: 0.82;
 }
+
+.layoutStage {
+  min-height: 78vh;
+  width: 100%;
+}
+
+/* Fills space between header and footer like production `contentStretch` > `page` */
+.layoutStageInShell {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+.storyPageRoot {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.layoutControls {
+  width: 100%;
+  max-width: 37.5rem;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: clamp(0.75rem, 1.5vw, 1.1rem);
+}
+
+.storyHeaderAuth {
+  gap: 0.65rem;
+}
+
+.pageComponentShell {
+  width: 100%;
+  max-width: 26.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  z-index: 2;
+}
+
+.pageComponentShell :global(.shrine) {
+  align-self: center;
+  margin-top: 0.25rem;
+}
+
+.storyHaiku {
+  margin: 0;
+  white-space: pre-wrap;
+  text-align: center;
+  color: var(--text-color);
+  font-style: italic;
+  font-weight: 300;
+  letter-spacing: 0.03em;
+}
+
+/* Mock auth beside ThemeSelector in full-chrome story (matches app header rhythm) */
+.mockAuthRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+

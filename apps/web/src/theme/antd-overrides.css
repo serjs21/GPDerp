@@ -5,3 +5,57 @@
 .ant-modal-root {
   z-index: 1500;
 }
+
+/* Theme tokens for remaining Ant Design buttons (until migrated to UIButton) */
+.ant-btn.ant-btn-default,
+.ant-btn.ant-btn-dashed {
+  background: var(--input-bg);
+  border-color: var(--profile-surface-border);
+  color: var(--text-color);
+}
+
+.ant-btn.ant-btn-default:disabled,
+.ant-btn.ant-btn-dashed:disabled {
+  opacity: 0.55;
+}
+
+.ant-btn.ant-btn-primary {
+  background: var(--accent-red);
+  border-color: var(--accent-red);
+  color: var(--surface-glass-strong);
+}
+
+.ant-btn.ant-btn-primary:disabled {
+  opacity: 0.55;
+}
+
+.ant-btn.ant-btn-primary:not(:disabled):hover {
+  background: color-mix(in srgb, var(--accent-red) 90%, var(--text-color) 10%);
+  border-color: color-mix(in srgb, var(--accent-red) 90%, var(--text-color) 10%);
+  color: var(--surface-glass-strong);
+}
+
+.ant-btn.ant-btn-default:not(:disabled):hover {
+  border-color: color-mix(in srgb, var(--accent-red) 40%, var(--profile-surface-border) 60%);
+  color: var(--text-color);
+}
+
+.ant-btn.ant-btn-text {
+  color: var(--text-color);
+}
+
+.ant-btn.ant-btn-text:not(:disabled):hover {
+  background: color-mix(in srgb, var(--text-color) 8%, transparent);
+  color: var(--text-color);
+}
+
+.ant-btn.ant-btn-dangerous {
+  border-color: color-mix(in srgb, var(--accent-red) 70%, var(--text-color) 30%);
+  color: color-mix(in srgb, var(--accent-red) 85%, var(--text-color) 15%);
+}
+
+.ant-btn.ant-btn-dangerous.ant-btn-primary {
+  background: var(--accent-red);
+  border-color: var(--accent-red);
+  color: var(--surface-glass-strong);
+}

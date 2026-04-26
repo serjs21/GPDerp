@@ -74,6 +74,8 @@
 }
 
 .primaryCta {
+  width: 100%;
+  box-sizing: border-box;
   min-height: 46px;
   font-size: 1.02rem;
   font-weight: 600;

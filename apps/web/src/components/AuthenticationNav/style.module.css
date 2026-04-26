@@ -7,8 +7,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: color-mix(in srgb, var(--profile-surface-bg, #fff) 84%, transparent) !important;
-  border: 1px solid var(--profile-surface-border, rgb(45 45 45 / 0.16)) !important;
+  background: color-mix(in srgb, var(--profile-surface-bg) 84%, transparent) !important;
+  border: 1px solid var(--profile-surface-border) !important;
   color: var(--text-color);
 }
 
@@ -34,7 +34,7 @@
 .authCluster {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
@@ -45,9 +45,28 @@
   gap: 0.5rem;
 }
 
-.authButton {
+/* Themed nav links (valid <a>, matches UIButton tokens) */
+.authNavPill {
   width: 6.75rem;
   height: 2.75rem;
-  border-radius: 12px;
+  border-radius: 999px;
   font-weight: 600;
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-sizing: border-box;
+  line-height: 1.2;
+}
+
+.authNavPill.authNavSecondary {
+  background: color-mix(in srgb, var(--surface-glass-strong) 94%, var(--background) 6%);
+  border-color: color-mix(in srgb, var(--text-color) 14%, transparent);
+  color: var(--text-color);
+}
+
+.authNavPill.authNavSecondary:hover {
+  border-color: color-mix(in srgb, var(--accent-red) 45%, var(--text-color) 55%);
+  box-shadow: 0 3px 14px color-mix(in srgb, var(--accent-red) 16%, transparent);
 }

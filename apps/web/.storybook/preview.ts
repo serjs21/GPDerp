@@ -9,8 +9,9 @@ import '@/theme/antd-overrides.css';
 
 const preview: Preview = {
   decorators: [
-    (Story) =>
-      createElement(
+    (Story, context) => {
+      const fullscreen = context.parameters.layout === 'fullscreen';
+      return createElement(
         GoogleOAuthProvider,
         { clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || 'storybook-google-client-id' },
         createElement(
@@ -18,15 +19,18 @@ const preview: Preview = {
           {
             style: {
               minHeight: '100vh',
-              padding: '1rem',
-              background: 'var(--background)',
+              boxSizing: 'border-box',
+              padding: fullscreen ? 0 : '1rem',
+              margin: 0,
+              background: fullscreen ? 'transparent' : 'var(--background)',
               color: 'var(--text-color)',
               transition: 'background 160ms ease, color 160ms ease',
             },
           },
           createElement(Story),
         ),
-      ),
+      );
+    },
   ],
   parameters: {
     backgrounds: {

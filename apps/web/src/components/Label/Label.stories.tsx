@@ -25,7 +25,7 @@ export const Blue: Story = {
 export const HexColor: Story = {
   args: {
     name: "Custom",
-    color: "#8a2be2",
+    color: "var(--accent-red)",
   },
 };
 

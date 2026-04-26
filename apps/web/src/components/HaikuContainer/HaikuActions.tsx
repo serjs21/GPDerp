@@ -48,7 +48,7 @@ export const HaikuActions = (props: HaikuActionsProps) => {
       okText: "Delete",
       danger: true,
       cancelText: "Cancel",
-      icon: <WarningOutlined style={{ color: "#ff6b6b" }} />,
+      icon: <WarningOutlined style={{ color: "var(--accent-red)" }} />,
       onOk: async () => {
         try {
           await deleteHaiku(haiku.id);

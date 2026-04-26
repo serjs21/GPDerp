@@ -10,30 +10,30 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: #fff;
-  border: 1px solid #dadce0;
+  background: var(--surface-glass-strong);
+  border: 1px solid var(--profile-surface-border);
   border-radius: 4px;
   font-family: "Google Sans", Roboto, Arial, sans-serif;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #3c4043;
+  color: var(--text-color);
   cursor: pointer;
   transition: box-shadow 0.15s ease, background 0.15s ease;
   white-space: nowrap;
 }
 
 .loginButton:hover {
-  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.3);
-  background: #f8f9fa;
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--text-color) 30%, transparent);
+  background: color-mix(in srgb, var(--surface-glass-strong) 85%, var(--background) 15%);
 }
 
 .loginButton:active {
-  background: #f1f3f4;
+  background: color-mix(in srgb, var(--surface-glass-strong) 72%, var(--background) 28%);
 }
 
 .error {
   font-size: 0.8rem;
-  color: #d93025;
+  color: var(--accent-red);
   margin: 0;
 }
 
@@ -44,12 +44,12 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.25rem 0.75rem 0.25rem 0.25rem;
-  background: #fff;
-  border: 1px solid #dadce0;
+  background: var(--surface-glass-strong);
+  border: 1px solid var(--profile-surface-border);
   border-radius: 999px;
   font-family: "Google Sans", Roboto, Arial, sans-serif;
   font-size: 0.875rem;
-  color: #3c4043;
+  color: var(--text-color);
 }
 
 .avatar {
@@ -72,14 +72,14 @@
   margin-left: 0.25rem;
   padding: 0.2rem 0.6rem;
   background: transparent;
-  border: 1px solid #dadce0;
+  border: 1px solid var(--profile-surface-border);
   border-radius: 4px;
   font-size: 0.75rem;
-  color: #5f6368;
+  color: var(--text-muted);
   cursor: pointer;
   transition: background 0.15s ease;
 }
 
 .logoutButton:hover {
-  background: #f1f3f4;
+  background: color-mix(in srgb, var(--surface-glass-strong) 72%, var(--background) 28%);
 }

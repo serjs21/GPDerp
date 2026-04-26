@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, Form, GoogleLoginButton, Input, message } from "@/components/StyledComponents";
+import { Form, GoogleLoginButton, Input, message } from "@/components/StyledComponents";
+import { UIButton } from "@/components/ui";
 import axios from "axios";
 import authStyles from "@/app/auth.shared.module.css";
 import { useState } from "react";
@@ -168,9 +169,9 @@ export function LoginFlow({
           <Input.Password autoComplete="off" disabled />
         </Form.Item>
         <Form.Item className={authStyles.submitItem}>
-          <Button type="primary" htmlType="submit" block className={authStyles.primaryCta}>
+          <UIButton type="submit" variant="primary" className={authStyles.primaryCta}>
             Sign in
-          </Button>
+          </UIButton>
         </Form.Item>
       </Form>
     </div>

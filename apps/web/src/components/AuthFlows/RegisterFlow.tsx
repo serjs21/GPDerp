@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, Form, GoogleLoginButton, Input, message } from "@/components/StyledComponents";
+import { Form, GoogleLoginButton, Input, message } from "@/components/StyledComponents";
+import { UIButton } from "@/components/ui";
 import authStyles from "@/app/auth.shared.module.css";
 import { useRegistration, type RegisterFormValues } from "@/hooks/useRegistration";
 import { useState } from "react";
@@ -108,9 +109,9 @@ export function RegisterFlow({ onSuccess, showGoogle = false }: RegisterFlowProp
           <Input.Password autoComplete="new-password" />
         </Form.Item>
         <Form.Item className={authStyles.submitItem}>
-          <Button type="primary" htmlType="submit" block loading={submitting} className={authStyles.primaryCta}>
-            Create account
-          </Button>
+          <UIButton type="submit" variant="primary" loading={submitting} className={authStyles.primaryCta}>
+            {submitting ? "Creating account…" : "Create account"}
+          </UIButton>
         </Form.Item>
       </Form>
     </div>

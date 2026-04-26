@@ -12,9 +12,9 @@
 }
 
 .root {
-  --sakura-petal: #fe807d;
-  --sakura-petal-light: #ffb4b2;
-  --sakura-petal-deep: #e96b68;
+  --sakura-petal: color-mix(in srgb, var(--shrine-accent-soft) 75%, var(--accent-red) 25%);
+  --sakura-petal-light: color-mix(in srgb, var(--shrine-accent-soft) 48%, var(--surface-glass-strong) 52%);
+  --sakura-petal-deep: color-mix(in srgb, var(--accent-red) 82%, var(--text-color) 18%);
   --sakura-spin-period: 1.2s;
   /* 3s total:
    * 0–1s  : base radius (1rem)
@@ -115,7 +115,7 @@
     var(--sakura-petal) 52%,
     var(--sakura-petal-deep) 100%
   );
-  box-shadow: 0 0 0.3rem rgba(254, 128, 125, 0.35);
+  box-shadow: 0 0 0.3rem color-mix(in srgb, var(--sakura-petal) 35%, transparent);
   transform: translate(-50%, 0) rotate(16deg);
   transform-origin: center center;
   opacity: 0.45;

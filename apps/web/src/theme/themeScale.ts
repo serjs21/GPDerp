@@ -166,30 +166,30 @@ const THEME_STOPS: ThemeStop[] = [
   {
     progress: 100,
     vars: {
-      "--background": "#0f1d4d",
-      "--background-color": "#0f1d4d",
-      "--text-color": "#fff4c9",
-      "--text-muted": "#d9cdad",
-      "--input-bg": "#1b2f6c",
-      "--profile-surface-bg": "#20367a",
-      "--profile-surface-border": "#8ea5de",
-      "--gradientStart": "#0d1945",
-      "--gradientMid": "#1d3372",
-      "--surface-glass": "#1a2f68db",
-      "--surface-glass-strong": "#223977ef",
-      "--surface-border-soft": "#93a9e4",
-      "--accent-red": "#f4d46a",
-      "--hanko-red": "#f4d46a",
-      "--shrine-accent": "#f4d46a",
-      "--shrine-accent-soft": "#fff0b8",
-      "--shrine-ink": "#fff2c2",
+      "--background": "#091637",
+      "--background-color": "#091637",
+      "--text-color": "#fff3cc",
+      "--text-muted": "#d7caa2",
+      "--input-bg": "#1f438f",
+      "--profile-surface-bg": "#2753a8",
+      "--profile-surface-border": "#89a7e6",
+      "--gradientStart": "#14357f",
+      "--gradientMid": "#2e60bc",
+      "--surface-glass": "#1f4690dc",
+      "--surface-glass-strong": "#2954a8ef",
+      "--surface-border-soft": "#8fb0f0",
+      "--accent-red": "#ccb867",
+      "--hanko-red": "#ccb867",
+      "--shrine-accent": "#ccb867",
+      "--shrine-accent-soft": "#f4e6aa",
+      "--shrine-ink": "#fff2cb",
       "--shrine-ink-light": "#ddcca1",
-      "--shrine-placeholder": "#c5b78f",
-      "--sumi-ink": "#fff4c9",
-      "--footer-border": "#8ca2dc",
-      "--footer-separator": "#dbcfae",
-      "--footer-muted": "#ded1af",
-      "--border-color": "#8ba2dc",
+      "--shrine-placeholder": "#ccb98a",
+      "--sumi-ink": "#fff3cc",
+      "--footer-border": "#89a7e6",
+      "--footer-separator": "#e1d1a2",
+      "--footer-muted": "#dac999",
+      "--border-color": "#89a7e6",
       "--bg-art-opacity": "0.72",
     },
   },
@@ -214,6 +214,7 @@ const smoothstep = (t: number) => {
   const x = clamp01(t);
   return x * x * (3 - 2 * x);
 };
+const lerpNumber = (from: number, to: number, t: number) => from + (to - from) * clamp01(t);
 
 const hexToRgba = (hex: string): Rgba => {
   const normalized = hex.replace("#", "");
@@ -346,8 +347,8 @@ const contrastRatio = (foreground: string, background: string): number => {
 
 // Perceptual interpolation in OKLab with eased ratio provides smoother, less muddy transitions.
 const mixColor = (from: string, to: string, ratio: number) => {
-  const source = hexToRgba(from);
-  const target = hexToRgba(to);
+  const source = cssColorToRgba(from);
+  const target = cssColorToRgba(to);
   const start = rgbaToOklab(source);
   const end = rgbaToOklab(target);
   const t = smoothstep(ratio);
@@ -364,6 +365,16 @@ const mixColor = (from: string, to: string, ratio: number) => {
     return `rgba(${mixed.r}, ${mixed.g}, ${mixed.b}, ${Number(mixed.a.toFixed(3))})`;
   }
   return `rgb(${mixed.r}, ${mixed.g}, ${mixed.b})`;
+};
+
+const mixVar = (key: string, from: string, to: string, ratio: number) => {
+  if (key === "--bg-art-opacity") {
+    const fromValue = Number.parseFloat(from);
+    const toValue = Number.parseFloat(to);
+    const mixed = lerpNumber(Number.isNaN(fromValue) ? 0.8 : fromValue, Number.isNaN(toValue) ? 0.8 : toValue, ratio);
+    return mixed.toFixed(3);
+  }
+  return mixColor(from, to, ratio);
 };
 
 const persistedThemeFromProgress = (progress: number): ThemeName => {
@@ -384,7 +395,7 @@ const getInterpolatedVars = (progress: number): ThemeVars => {
 
   const interpolated = PREVIEW_THEME_VARS.reduce(
     (acc, key) => {
-      acc[key] = mixColor(from.vars[key], to.vars[key], ratio);
+      acc[key] = mixVar(key, from.vars[key], to.vars[key], ratio);
       return acc;
     },
     {} as ThemeVars,

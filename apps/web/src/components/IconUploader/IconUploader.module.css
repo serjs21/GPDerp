@@ -93,7 +93,7 @@
   display: grid;
   place-items: center;
   background: rgb(0 0 0 / 0.45);
-  color: #fff;
+  color: var(--surface-glass-strong);
   opacity: 0;
   transition: opacity 140ms ease;
   border-radius: 8px;

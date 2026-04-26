@@ -23,12 +23,12 @@ const MAX_ICON_OVERLAP_PX = 4;
 const ICON_BUTTON_PADDING_PX = 4;
 const ICON_SIZE_PX = 16;
 const ICON_CORNER_OFFSET_PX = (ICON_SIZE_PX - MAX_ICON_OVERLAP_PX) / Math.SQRT2;
-const MOON_ICON_COLOR = "#f4d46a";
-const SUN_ICON_COLOR = "#57a8f0";
-const MOUNTAIN_ICON_COLOR = "#ef8f5b";
-const MOON_STROKE_COLOR = "#fff6d0";
-const SUN_STROKE_COLOR = "#1f3550";
-const MOUNTAIN_STROKE_COLOR = "#5a2f30";
+const MOON_ICON_COLOR = "var(--moon-highlight)";
+const SUN_ICON_COLOR = "var(--sun-highlight)";
+const MOUNTAIN_ICON_COLOR = "var(--mountain-highlight)";
+const MOON_STROKE_COLOR = "var(--moon-stroke)";
+const SUN_STROKE_COLOR = "var(--sun-stroke)";
+const MOUNTAIN_STROKE_COLOR = "var(--mountain-stroke)";
 const MOON_FADE_START = 20;
 const MOON_HIDE_AT = 45;
 const SUN_APPEAR_AT = 55;
@@ -40,40 +40,6 @@ const SUN_OPACITY_FULL_AT = 80;
 const MOUNTAIN_VISIBLE_FROM = 15;
 const MOUNTAIN_VISIBLE_TO = 85;
 const EDGE_CENTER_WINDOW = 20;
-
-const hexToRgb = (hex: string) => {
-  const normalized = hex.replace("#", "");
-  const full = normalized.length === 3 ? normalized.split("").map((ch) => `${ch}${ch}`).join("") : normalized;
-  const value = Number.parseInt(full, 16);
-  return {
-    r: (value >> 16) & 255,
-    g: (value >> 8) & 255,
-    b: value & 255,
-  };
-};
-
-const mixHex = (from: string, to: string, ratio: number) => {
-  const a = hexToRgb(from);
-  const b = hexToRgb(to);
-  const t = Math.min(1, Math.max(0, ratio));
-  const r = Math.round(a.r + (b.r - a.r) * t);
-  const g = Math.round(a.g + (b.g - a.g) * t);
-  const bVal = Math.round(a.b + (b.b - a.b) * t);
-  return `rgb(${r}, ${g}, ${bVal})`;
-};
-
-const accentForProgress = (progress: number) => {
-  if (progress <= 25) {
-    return mixHex("#4a9de5", "#9962ce", progress / 25);
-  }
-  if (progress <= 50) {
-    return mixHex("#9962ce", "#db5c3e", (progress - 25) / 25);
-  }
-  if (progress <= 75) {
-    return mixHex("#db5c3e", "#8b79d0", (progress - 50) / 25);
-  }
-  return mixHex("#8b79d0", "#f4d46a", (progress - 75) / 25);
-};
 
 export const getNearestThemeByProgress = (progress: number): ThemeName => {
   const nearest = SAVABLE_THEME_POINTS.reduce((best, current) => {
@@ -176,10 +142,18 @@ export const ThemeSelector = ({
       className={`${styles.wrap}${className ? ` ${className}` : ""}`}
       style={
         {
-          "--slider-accent": accentForProgress(themeScaleProgress),
-          "--moon-highlight": MOON_ICON_COLOR,
-          "--sun-highlight": SUN_ICON_COLOR,
-          "--mountain-highlight": MOUNTAIN_ICON_COLOR,
+          "--moon-highlight": "color-mix(in srgb, var(--shrine-accent-soft) 75%, var(--surface-glass-strong) 25%)",
+          "--sun-highlight": "color-mix(in srgb, #ffd54a 78%, var(--surface-glass-strong) 22%)",
+          "--mountain-highlight": "color-mix(in srgb, var(--accent-red) 70%, var(--surface-glass-strong) 30%)",
+          "--moon-stroke": "color-mix(in srgb, var(--text-color) 40%, var(--surface-glass-strong) 60%)",
+          "--sun-stroke": "color-mix(in srgb, var(--text-color) 75%, var(--background) 25%)",
+          "--mountain-stroke": "color-mix(in srgb, var(--accent-red) 65%, var(--text-color) 35%)",
+          "--slider-accent": themeVars["--accent-red"],
+          "--slider-stop-1": getThemeScaleVars(0)["--gradientStart"],
+          "--slider-stop-2": getThemeScaleVars(25)["--gradientStart"],
+          "--slider-stop-3": getThemeScaleVars(50)["--accent-red"],
+          "--slider-stop-4": getThemeScaleVars(75)["--gradientMid"],
+          "--slider-stop-5": getThemeScaleVars(100)["--background"],
         } as CSSProperties
       }
     >
@@ -190,10 +164,18 @@ export const ThemeSelector = ({
         placement="bottom"
         styles={{
           root: {
-            "--slider-accent": accentForProgress(themeScaleProgress),
-            "--moon-highlight": MOON_ICON_COLOR,
-            "--sun-highlight": SUN_ICON_COLOR,
-            "--mountain-highlight": MOUNTAIN_ICON_COLOR,
+            "--slider-accent": themeVars["--accent-red"],
+            "--moon-highlight": "color-mix(in srgb, var(--shrine-accent-soft) 75%, var(--surface-glass-strong) 25%)",
+            "--sun-highlight": "color-mix(in srgb, #ffd54a 78%, var(--surface-glass-strong) 22%)",
+            "--mountain-highlight": "color-mix(in srgb, var(--accent-red) 70%, var(--surface-glass-strong) 30%)",
+            "--moon-stroke": "color-mix(in srgb, var(--text-color) 40%, var(--surface-glass-strong) 60%)",
+            "--sun-stroke": "color-mix(in srgb, var(--text-color) 75%, var(--background) 25%)",
+            "--mountain-stroke": "color-mix(in srgb, var(--accent-red) 65%, var(--text-color) 35%)",
+            "--slider-stop-1": getThemeScaleVars(0)["--gradientStart"],
+            "--slider-stop-2": getThemeScaleVars(25)["--gradientStart"],
+            "--slider-stop-3": getThemeScaleVars(50)["--accent-red"],
+            "--slider-stop-4": getThemeScaleVars(75)["--gradientMid"],
+            "--slider-stop-5": getThemeScaleVars(100)["--background"],
           } as CSSProperties,
         }}
         popupRender={() => (
@@ -281,7 +263,7 @@ export const ThemeSelector = ({
           title={`${Math.round(effectiveProgress)}%`}
           style={{
             "--icon-button-padding": `${ICON_BUTTON_PADDING_PX}px`,
-            background: "color-mix(in srgb, var(--background) 88%, #fff 12%)",
+            background: "color-mix(in srgb, var(--background) 88%, var(--surface-glass-strong) 12%)",
             color: themeVars["--text-color"],
           } as CSSProperties}
         >

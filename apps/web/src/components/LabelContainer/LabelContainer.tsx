@@ -28,7 +28,7 @@ export function LabelContainer({ accountId, label, onChanged }: LabelContainerPr
       okText: "Delete",
       danger: true,
       cancelText: "Cancel",
-      icon: <WarningOutlined style={{ color: "#ff6b6b" }} />,
+      icon: <WarningOutlined style={{ color: "var(--accent-red)" }} />,
       onOk: async () => {
         await deleteLabel({
           labelId: label.id,

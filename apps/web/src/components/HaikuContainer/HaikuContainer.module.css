@@ -1,7 +1,7 @@
 .root {
   position: relative;
   padding: 0.85rem 1rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--text-color, #2c2c2c) 8%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--text-color) 8%, transparent);
 }
 
 .root:last-child {
@@ -28,13 +28,13 @@
   font-size: 0.9rem;
   font-weight: 500;
   margin-bottom: 0.35rem;
-  color: var(--text-color, #2c2c2c);
+  color: var(--text-color);
   padding-right: 5rem;
 }
 
 .meta {
   font-size: 0.75rem;
-  color: color-mix(in srgb, var(--text-color, #2c2c2c) 45%, transparent);
+  color: color-mix(in srgb, var(--text-color) 45%, transparent);
   margin-bottom: 0.5rem;
 }
 

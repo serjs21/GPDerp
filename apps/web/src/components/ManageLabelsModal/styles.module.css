@@ -25,7 +25,7 @@
 }
 
 .tagClose {
-  color: #666;
+  color: var(--text-muted);
   padding: 0 2px;
   position: absolute;
   top: 0;

@@ -95,9 +95,9 @@ export function ShareLinkEntry({ link, onChanged }: ShareLinkEntryProps) {
     (linkPolicy === "limited" && maxViews != null && maxViews >= 1);
 
   const statusIcon = status.active ? (
-    <CheckCircleTwoTone twoToneColor="#389e0d" />
+    <CheckCircleTwoTone twoToneColor="color-mix(in srgb, var(--shrine-accent-soft) 80%, var(--text-color) 20%)" />
   ) : (
-    <CloseCircleTwoTone twoToneColor="#cf1322" />
+    <CloseCircleTwoTone twoToneColor="color-mix(in srgb, var(--accent-red) 75%, var(--text-color) 25%)" />
   );
 
   return (

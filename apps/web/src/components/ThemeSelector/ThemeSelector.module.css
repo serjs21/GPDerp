@@ -81,7 +81,7 @@
   width: 15.25rem;
   border-radius: 12px;
   border: 1px solid color-mix(in srgb, var(--text-color) 14%, transparent);
-  background: color-mix(in srgb, var(--background) 88%, #fff 12%);
+  background: color-mix(in srgb, var(--background) 88%, var(--surface-glass-strong) 12%);
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--background) 40%, transparent),
     0 10px 22px color-mix(in srgb, var(--background) 24%, transparent),
@@ -208,11 +208,11 @@
   border-radius: 999px;
   background: linear-gradient(
     90deg,
-    #57a8f0 0%,
-    #9f6dd0 24%,
-    #db5c3e 50%,
-    #8f63be 74%,
-    #0f1d4d 100%
+    var(--slider-stop-1) 0%,
+    var(--slider-stop-2) 24%,
+    var(--slider-stop-3) 50%,
+    var(--slider-stop-4) 74%,
+    var(--slider-stop-5) 100%
   );
   opacity: 0.86;
 }
@@ -268,7 +268,7 @@
 
 .slider:global(.ant-slider) :global(.ant-slider-handle::after) {
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--text-color) 20%, transparent);
-  border: 2px solid #fff;
+  border: 2px solid color-mix(in srgb, var(--surface-glass-strong) 80%, var(--background) 20%);
   background: var(--slider-accent, var(--accent-red));
 }
 

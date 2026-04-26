@@ -19,17 +19,22 @@
 .buttonPrimary {
   background: var(--accent-red);
   border-color: var(--accent-red);
-  color: #fff;
+  color: var(--surface-glass-strong);
 }
 
 .buttonDanger {
-  border-color: #b91c1c;
-  color: #b91c1c;
+  border-color: color-mix(in srgb, var(--accent-red) 75%, var(--text-color) 25%);
+  color: color-mix(in srgb, var(--accent-red) 75%, var(--text-color) 25%);
 }
 
 .button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.buttonLoading {
+  cursor: wait;
+  opacity: 0.88;
 }
 
 .button:hover:not(:disabled) {

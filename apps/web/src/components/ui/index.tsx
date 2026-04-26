@@ -8,11 +8,22 @@ const cx = (...tokens: Array<string | false | null | undefined>) => tokens.filte
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "default" | "primary" | "danger" | "tab";
   active?: boolean;
+  loading?: boolean;
 };
 
-export const UIButton = ({ variant = "default", active, className, ...props }: ButtonProps) => (
+export const UIButton = ({
+  variant = "default",
+  active,
+  loading = false,
+  className,
+  disabled,
+  children,
+  ...props
+}: ButtonProps) => (
   <button
     {...props}
+    disabled={disabled || loading}
+    aria-busy={loading || undefined}
     className={cx(
       "gp-ui-btn",
       styles.button,
@@ -20,9 +31,12 @@ export const UIButton = ({ variant = "default", active, className, ...props }: B
       variant === "danger" && styles.buttonDanger,
       variant === "tab" && styles.tab,
       active && styles.tabActive,
+      loading && styles.buttonLoading,
       className,
     )}
-  />
+  >
+    {children}
+  </button>
 );
 
 export const UICard = ({ title, children, className }: { title?: ReactNode; children: ReactNode; className?: string }) => (
