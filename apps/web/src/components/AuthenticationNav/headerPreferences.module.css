@@ -9,57 +9,8 @@
   min-width: 0;
 }
 
-.localeTrigger {
-  min-width: 2.5rem;
-  width: 2.5rem;
-  height: 2.5rem;
-  padding: 0 !important;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.15rem;
-  border-radius: 10px;
-}
-
-.localeFlag {
-  width: 1rem;
-  height: 1rem;
-  border-radius: 2px;
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--text-color) 15%, transparent);
-}
-
-.localeChevron {
-  width: 0.75rem;
-  height: 0.75rem;
-  opacity: 0.7;
-}
-
-.localeFallbackIcon {
-  width: 0.95rem;
-  height: 0.95rem;
-}
-
-.localeOption {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 14rem;
-}
-
-.localeOptionLabel {
-  flex: 1 1 auto;
-}
-
-.localeCode {
-  font-size: 0.72rem;
-  opacity: 0.7;
-  letter-spacing: 0.04em;
-}
-
-.localeCurrent {
-  font-size: 0.72rem;
-  color: var(--accent-red);
-  opacity: 0.95;
+.localeSelector {
+  min-width: 0;
 }
 
 @media (max-width: 480px) {
@@ -68,6 +19,10 @@
   }
 
   .themeSelector {
+    min-width: 0;
+  }
+
+  .localeSelector {
     min-width: 0;
   }
 }

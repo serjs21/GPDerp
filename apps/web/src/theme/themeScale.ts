@@ -168,7 +168,7 @@ const THEME_STOPS: ThemeStop[] = [
     vars: {
       "--background": "#091637",
       "--background-color": "#091637",
-      "--text-color": "#fff3cc",
+      "--text-color": "#e6efdb",
       "--text-muted": "#d7caa2",
       "--input-bg": "#1f438f",
       "--profile-surface-bg": "#2753a8",
@@ -185,7 +185,7 @@ const THEME_STOPS: ThemeStop[] = [
       "--shrine-ink": "#fff2cb",
       "--shrine-ink-light": "#ddcca1",
       "--shrine-placeholder": "#ccb98a",
-      "--sumi-ink": "#fff3cc",
+      "--sumi-ink": "#e6efdb",
       "--footer-border": "#89a7e6",
       "--footer-separator": "#e1d1a2",
       "--footer-muted": "#dac999",
@@ -401,7 +401,7 @@ const getInterpolatedVars = (progress: number): ThemeVars => {
     {} as ThemeVars,
   );
 
-  const targetText = mixColor("#1d2531", "#fff4c9", clamped / 100);
+  const targetText = mixColor("#1d2531", "#e6efdb", clamped / 100);
   const background = interpolated["--background"];
   const fallbackDark = "#1b1f2a";
   const fallbackLight = "#fff7d5";

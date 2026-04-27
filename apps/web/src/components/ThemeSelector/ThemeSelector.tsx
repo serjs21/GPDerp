@@ -259,13 +259,12 @@ export const ThemeSelector = ({
       >
         <UIButton
           className={styles.trigger}
-          aria-label={ariaLabel}
-          title={`${Math.round(effectiveProgress)}%`}
-          style={{
-            "--icon-button-padding": `${ICON_BUTTON_PADDING_PX}px`,
-            background: "color-mix(in srgb, var(--background) 88%, var(--surface-glass-strong) 12%)",
-            color: themeVars["--text-color"],
-          } as CSSProperties}
+          aria-label={`${ariaLabel}, ${Math.round(effectiveProgress)}%`}
+          style={
+            {
+              "--icon-button-padding": `${ICON_BUTTON_PADDING_PX}px`,
+            } as CSSProperties
+          }
         >
           <span className={styles.iconStack} aria-hidden>
             <Moon

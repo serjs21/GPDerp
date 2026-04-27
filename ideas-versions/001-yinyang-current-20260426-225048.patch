@@ -1,0 +1,2240 @@
+diff --git a/.gitignore b/.gitignore
+index 59e457237..97ced32ec 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -143,3 +143,8 @@ vite.config.ts.timestamp-*
+ .pnpm-store/*
+ 
+ .cursor/
++
++# Generated animation reference frames (run: pnpm snapshots:auth-nav in apps/web)
++apps/web/local/auth-nav-hover-snapshots/
++apps/web/local/auth-nav-hover-expected/
++apps/web/local/suggested-yinyang-standalone/
+diff --git a/apps/web/.storybook/preview.ts b/apps/web/.storybook/preview.ts
+index 70e8dfb92..ce32d0543 100644
+--- a/apps/web/.storybook/preview.ts
++++ b/apps/web/.storybook/preview.ts
+@@ -1,6 +1,8 @@
+ import type { Preview } from '@storybook/nextjs-vite'
+ import { GoogleOAuthProvider } from '@react-oauth/google';
++import { NextIntlClientProvider } from 'next-intl';
+ import { createElement } from 'react';
++import enMessages from '../messages/en.json';
+ import '@/theme/globals.css';
+ import '@/theme/themes/tokyo-dusk.css';
+ import '@/theme/themes/sumie.css';
+@@ -15,19 +17,23 @@ const preview: Preview = {
+         GoogleOAuthProvider,
+         { clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || 'storybook-google-client-id' },
+         createElement(
+-          'div',
+-          {
+-            style: {
+-              minHeight: '100vh',
+-              boxSizing: 'border-box',
+-              padding: fullscreen ? 0 : '1rem',
+-              margin: 0,
+-              background: fullscreen ? 'transparent' : 'var(--background)',
+-              color: 'var(--text-color)',
+-              transition: 'background 160ms ease, color 160ms ease',
++          NextIntlClientProvider,
++          { locale: 'en', messages: enMessages },
++          createElement(
++            'div',
++            {
++              style: {
++                minHeight: '100vh',
++                boxSizing: 'border-box',
++                padding: fullscreen ? 0 : '1rem',
++                margin: 0,
++                background: fullscreen ? 'transparent' : 'var(--background)',
++                color: 'var(--text-color)',
++                transition: 'background 160ms ease, color 160ms ease',
++              },
+             },
+-          },
+-          createElement(Story),
++            createElement(Story),
++          ),
+         ),
+       );
+     },
+diff --git a/apps/web/messages/de.json b/apps/web/messages/de.json
+index efbc40234..6a3e1096e 100644
+--- a/apps/web/messages/de.json
++++ b/apps/web/messages/de.json
+@@ -4,6 +4,9 @@
+     "saveProfile": "Profil speichern",
+     "theme": "Thema",
+     "language": "Sprache",
++    "languageSearchPlaceholder": "Sprachen durchsuchen",
++    "languageNoMatches": "Keine passenden Sprachen",
++    "languageCurrent": "Aktuell",
+     "preferencesGroupLabel": "Anzeige und Sprache",
+     "preferencesSaveError": "Einstellungen konnten nicht gespeichert werden"
+   },
+diff --git a/apps/web/messages/en.json b/apps/web/messages/en.json
+index 1e692f47d..d4749363d 100644
+--- a/apps/web/messages/en.json
++++ b/apps/web/messages/en.json
+@@ -4,6 +4,9 @@
+     "saveProfile": "Save profile",
+     "theme": "Theme",
+     "language": "Language",
++    "languageSearchPlaceholder": "Search languages",
++    "languageNoMatches": "No matching languages",
++    "languageCurrent": "Current",
+     "preferencesGroupLabel": "Display and language",
+     "preferencesSaveError": "Could not save your preferences"
+   },
+diff --git a/apps/web/messages/es.json b/apps/web/messages/es.json
+index 0280cbd85..62934632d 100644
+--- a/apps/web/messages/es.json
++++ b/apps/web/messages/es.json
+@@ -4,6 +4,9 @@
+     "saveProfile": "Guardar perfil",
+     "theme": "Tema",
+     "language": "Idioma",
++    "languageSearchPlaceholder": "Buscar idiomas",
++    "languageNoMatches": "Ningún idioma coincide",
++    "languageCurrent": "Actual",
+     "preferencesGroupLabel": "Pantalla e idioma",
+     "preferencesSaveError": "No se pudieron guardar las preferencias"
+   },
+diff --git a/apps/web/messages/fr.json b/apps/web/messages/fr.json
+index d71fcdcab..ad7046063 100644
+--- a/apps/web/messages/fr.json
++++ b/apps/web/messages/fr.json
+@@ -4,6 +4,9 @@
+     "saveProfile": "Enregistrer le profil",
+     "theme": "Theme",
+     "language": "Langue",
++    "languageSearchPlaceholder": "Rechercher une langue",
++    "languageNoMatches": "Aucune langue correspondante",
++    "languageCurrent": "Actuelle",
+     "preferencesGroupLabel": "Affichage et langue",
+     "preferencesSaveError": "Impossible d'enregistrer les preferences"
+   },
+diff --git a/apps/web/messages/it.json b/apps/web/messages/it.json
+index 8d14b58d2..5db431855 100644
+--- a/apps/web/messages/it.json
++++ b/apps/web/messages/it.json
+@@ -4,6 +4,9 @@
+     "saveProfile": "Salva profilo",
+     "theme": "Tema",
+     "language": "Lingua",
++    "languageSearchPlaceholder": "Cerca lingue",
++    "languageNoMatches": "Nessuna lingua corrispondente",
++    "languageCurrent": "Attuale",
+     "preferencesGroupLabel": "Schermo e lingua",
+     "preferencesSaveError": "Impossibile salvare le preferenze"
+   },
+diff --git a/apps/web/messages/ja.json b/apps/web/messages/ja.json
+index 11bd5af55..405c36255 100644
+--- a/apps/web/messages/ja.json
++++ b/apps/web/messages/ja.json
+@@ -4,6 +4,9 @@
+     "saveProfile": "プロフィールを保存",
+     "theme": "テーマ",
+     "language": "言語",
++    "languageSearchPlaceholder": "言語を検索",
++    "languageNoMatches": "該当する言語がありません",
++    "languageCurrent": "現在",
+     "preferencesGroupLabel": "表示と言語",
+     "preferencesSaveError": "設定を保存できませんでした"
+   },
+diff --git a/apps/web/messages/lol.json b/apps/web/messages/lol.json
+index 406048a2d..aaf76d2d8 100644
+--- a/apps/web/messages/lol.json
++++ b/apps/web/messages/lol.json
+@@ -4,6 +4,9 @@
+     "saveProfile": "Launch profile payload into orbit",
+     "theme": "Vibe Frequency Selector",
+     "language": "Tongue Firmware",
++    "languageSearchPlaceholder": "Probe the tongue list",
++    "languageNoMatches": "Zero hits in the tongue rolodex",
++    "languageCurrent": "LIVE",
+     "preferencesGroupLabel": "Cosmetics n chatter matrix",
+     "preferencesSaveError": "The cloud said no; try again later"
+   },
+diff --git a/apps/web/messages/pt.json b/apps/web/messages/pt.json
+index c4f71e90e..04aed8270 100644
+--- a/apps/web/messages/pt.json
++++ b/apps/web/messages/pt.json
+@@ -4,6 +4,9 @@
+     "saveProfile": "Salvar perfil",
+     "theme": "Tema",
+     "language": "Idioma",
++    "languageSearchPlaceholder": "Pesquisar idiomas",
++    "languageNoMatches": "Nenhum idioma correspondente",
++    "languageCurrent": "Atual",
+     "preferencesGroupLabel": "Exibicao e idioma",
+     "preferencesSaveError": "Nao foi possivel salvar as preferencias"
+   },
+diff --git a/apps/web/messages/th.json b/apps/web/messages/th.json
+index 4f227eef3..8eaa40d5b 100644
+--- a/apps/web/messages/th.json
++++ b/apps/web/messages/th.json
+@@ -4,6 +4,9 @@
+     "saveProfile": "บันทึกโปรไฟล์",
+     "theme": "ธีม",
+     "language": "ภาษา",
++    "languageSearchPlaceholder": "ค้นหาภาษา",
++    "languageNoMatches": "ไม่พบภาษาที่ตรงกัน",
++    "languageCurrent": "ปัจจุบัน",
+     "preferencesGroupLabel": "การแสดงผลและภาษา",
+     "preferencesSaveError": "บันทึกการตั้งค่าไม่สำเร็จ"
+   },
+diff --git a/apps/web/package.json b/apps/web/package.json
+index 38fe914e4..ff82729dd 100644
+--- a/apps/web/package.json
++++ b/apps/web/package.json
+@@ -13,6 +13,10 @@
+     "test:watch": "jest --watch",
+     "test:coverage": "jest --coverage",
+     "test:playwright": "playwright test",
++    "test:playwright:storybook-health": "playwright test tests/playwright/storybook-runtime-health.spec.ts",
++    "snapshots:auth-nav": "SNAPSHOT_AUTH_NAV=1 playwright test tests/playwright/auth-nav-hover-snapshots.spec.ts",
++    "snapshots:auth-nav:expected": "node scripts/generate-auth-nav-expected-snapshots.mjs",
++    "snapshots:standalone-yinyang": "node scripts/capture-standalone-yinyang-snapshots.mjs",
+     "storybook": "storybook dev -p 6006",
+     "build-storybook": "storybook build",
+     "generate-icons": "node scripts/generate-icons.mjs"
+diff --git a/apps/web/playwright.config.ts b/apps/web/playwright.config.ts
+index 8224dec6f..8d7db308a 100644
+--- a/apps/web/playwright.config.ts
++++ b/apps/web/playwright.config.ts
+@@ -2,6 +2,9 @@ import { defineConfig, devices } from "playwright/test";
+ 
+ export default defineConfig({
+   testDir: "./tests/playwright",
++  ...(process.env.SNAPSHOT_AUTH_NAV
++    ? {}
++    : { testIgnore: ["**/auth-nav-hover-snapshots.spec.ts"] }),
+   timeout: 30_000,
+   expect: { timeout: 5_000 },
+   fullyParallel: true,
+diff --git a/apps/web/src/app/layout.tsx b/apps/web/src/app/layout.tsx
+index 11e4ecf1a..366f17179 100644
+--- a/apps/web/src/app/layout.tsx
++++ b/apps/web/src/app/layout.tsx
+@@ -68,11 +68,11 @@ export default async function RootLayout({
+           <NextIntlClientProvider locale={initialLocale} messages={messages}>
+             <ThemeProvider initialTheme={initialTheme}>
+               <AuthenticationProvider>
+-                <LayoutProvider googleClientId={googleClientId}>
+-                  <AuthenticationVerificationProvider>
++                <AuthenticationVerificationProvider>
++                  <LayoutProvider googleClientId={googleClientId}>
+                     <QueryProvider>{children}</QueryProvider>
+-                  </AuthenticationVerificationProvider>
+-                </LayoutProvider>
++                  </LayoutProvider>
++                </AuthenticationVerificationProvider>
+               </AuthenticationProvider>
+             </ThemeProvider>
+           </NextIntlClientProvider>
+diff --git a/apps/web/src/components/AuthenticationNav/HeaderPreferences.tsx b/apps/web/src/components/AuthenticationNav/HeaderPreferences.tsx
+index 06d5e0b98..488f29725 100644
+--- a/apps/web/src/components/AuthenticationNav/HeaderPreferences.tsx
++++ b/apps/web/src/components/AuthenticationNav/HeaderPreferences.tsx
+@@ -1,11 +1,10 @@
+ "use client";
+ 
+-import { Dropdown, type MenuProps, message } from "@/components/StyledComponents";
+-import { UIButton } from "@/components/ui";
++import { message } from "@/components/StyledComponents";
++import { LocaleSelector } from "@/components/LocaleSelector";
+ import { ThemeSelector } from "@/components/ThemeSelector";
+-import { Languages, ChevronDown } from "lucide-react";
+ import { useRouter } from "next/navigation";
+-import { useCallback, useEffect, useState, type ComponentType, useMemo } from "react";
++import { useCallback, useEffect, useState } from "react";
+ import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
+ import { updateOwnConfiguration } from "@/api/user";
+ import {
+@@ -19,26 +18,9 @@ import { useProfileI18n } from "@/hooks/useProfileI18n";
+ import { useLocale } from "@/hooks/useLocale";
+ import { useTheme } from "@/hooks/useTheme";
+ import { useTranslations } from "next-intl";
+-import { DE, ES, FR, IT, JP, PT, TH, US } from "country-flag-icons/react/3x2";
+ import { getPersistedThemeFromScale, getThemeScaleVars } from "@/theme/themeScale";
+ import styles from "./headerPreferences.module.css";
+ 
+-type FlagComponent = ComponentType<{
+-  className?: string;
+-  "aria-hidden"?: boolean;
+-}>;
+-
+-const LOCALE_FLAGS: Partial<Record<AppLocale, FlagComponent>> = {
+-  en: US,
+-  ja: JP,
+-  es: ES,
+-  fr: FR,
+-  th: TH,
+-  de: DE,
+-  it: IT,
+-  pt: PT,
+-};
+-
+ const THEME_SCALE_FROM_THEME: Record<ThemeName, number> = {
+   sumie: 0,
+   "tokyo-dusk": 50,
+@@ -131,43 +113,6 @@ export const HeaderPreferences = () => {
+     void persistIfLoggedIn({ language: next });
+   };
+ 
+-  const localeLabelByValue = useMemo(
+-    () =>
+-      languageOptions.reduce(
+-        (acc, option) => {
+-          acc[option.value] = option.label;
+-          return acc;
+-        },
+-        {} as Record<AppLocale, string>,
+-      ),
+-    [languageOptions],
+-  );
+-
+-  const selectedLocaleLabel = localeLabelByValue[locale] ?? locale;
+-  const SelectedFlag = LOCALE_FLAGS[locale];
+-
+-  const localeMenuItems: MenuProps["items"] = languageOptions.map((option) => {
+-    const OptionFlag = LOCALE_FLAGS[option.value];
+-    const isSelected = option.value === locale;
+-    return {
+-      key: option.value,
+-      label: (
+-        <span className={styles.localeOption}>
+-          {OptionFlag ? (
+-            <OptionFlag className={styles.localeFlag} aria-hidden />
+-          ) : (
+-            <Languages className={styles.localeFallbackIcon} aria-hidden />
+-          )}
+-          <span className={styles.localeOptionLabel}>{option.label}</span>
+-          <span className={styles.localeCode} aria-hidden>
+-            {option.value.toUpperCase()}
+-          </span>
+-          {isSelected ? <span className={styles.localeCurrent}>Current</span> : null}
+-        </span>
+-      ),
+-    };
+-  });
+-
+   return (
+     <div className={styles.wrap} role="group" aria-label={t("preferencesGroupLabel")}>
+       <ThemeSelector
+@@ -179,29 +124,13 @@ export const HeaderPreferences = () => {
+         className={styles.themeSelector}
+         ariaLabel={t("theme")}
+       />
+-      <Dropdown
+-        trigger={["click"]}
+-        placement="bottomRight"
+-        menu={{
+-          items: localeMenuItems,
+-          selectedKeys: [locale],
+-          onClick: ({ key }) => onLocaleChange(key as AppLocale),
+-        }}
+-      >
+-        <UIButton
+-          className={styles.localeTrigger}
+-          aria-haspopup="menu"
+-          aria-label={`${t("language")}: ${selectedLocaleLabel}`}
+-          title={selectedLocaleLabel}
+-        >
+-          {SelectedFlag ? (
+-            <SelectedFlag className={styles.localeFlag} aria-hidden />
+-          ) : (
+-            <Languages className={styles.localeFallbackIcon} aria-hidden />
+-          )}
+-          <ChevronDown className={styles.localeChevron} aria-hidden />
+-        </UIButton>
+-      </Dropdown>
++      <LocaleSelector
++        value={locale}
++        options={languageOptions}
++        onChange={onLocaleChange}
++        className={styles.localeSelector}
++        getPopupContainer={(node) => node.parentElement ?? document.body}
++      />
+     </div>
+   );
+ };
+diff --git a/apps/web/src/components/AuthenticationNav/LoggedOutAuthLinks.stories.tsx b/apps/web/src/components/AuthenticationNav/LoggedOutAuthLinks.stories.tsx
+index fd7ae7a5d..11bfd8400 100644
+--- a/apps/web/src/components/AuthenticationNav/LoggedOutAuthLinks.stories.tsx
++++ b/apps/web/src/components/AuthenticationNav/LoggedOutAuthLinks.stories.tsx
+@@ -1,18 +1,109 @@
+ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
++import type { ReactNode } from "react";
+ 
+-import { LoggedOutAuthLinks } from "./LoggedOutAuthLinks";
++import { AuthenticationProvider } from "@/app/providers/AuthenticationProvider";
++import { AuthenticationVerificationProvider } from "@/app/providers/AuthenticationVerificationProvider";
++import { LoggedOutAuthLinks, YinYangSegmentBackground, type AuthNavYinHovered } from "./LoggedOutAuthLinks";
++import styles from "./style.module.css";
+ 
++const shellDecorator = (Story: () => ReactNode) => (
++  <div
++    style={{
++      padding: "2rem",
++      minHeight: 140,
++      background: "var(--background)",
++      color: "var(--text-color)",
++    }}
++  >
++    <Story />
++  </div>
++);
++
++const authProviders = (Story: () => ReactNode) => (
++  <AuthenticationProvider>
++    <AuthenticationVerificationProvider>
++      <Story />
++    </AuthenticationVerificationProvider>
++  </AuthenticationProvider>
++);
++
++/**
++ * ## Where to find this in Storybook
++ *
++ * Sidebar: **Components → LoggedOutAuthLinks** (search “LoggedOutAuth” or “yin”).
++ *
++ * ## DOM hooks
++ *
++ * - `data-auth-yin-hover` / `data-auth-yin-phase` on the pill (`seam` \| `split`).
++ * - `data-auth-yin-liquids` on the background SVG (`seam` \| `split`).
++ * - Hover duration: `AUTH_NAV_YIN_HOVER_DUR_S`.
++ */
+ const meta = {
+-  title: "Auth/AuthenticationNav/LoggedOutAuthLinks",
++  title: "Components/LoggedOutAuthLinks",
+   component: LoggedOutAuthLinks,
+   tags: ["autodocs"],
+   parameters: {
+-    layout: "centered",
++    layout: "fullscreen",
++    docs: {
++      description: {
++        component:
++          "Logged-out header pill (Login / Register). Yin–yang S seam morphs to a horizontal divider on hover (Motion). Default story uses real auth providers.",
++      },
++    },
+   },
++  decorators: [shellDecorator, authProviders],
+ } satisfies Meta<typeof LoggedOutAuthLinks>;
+ 
+ export default meta;
+ type Story = StoryObj<typeof meta>;
+ 
+-export const Default: Story = {};
++export const Default: Story = {
++  name: "Default (full component)",
++};
++
++function BackgroundOnlyFrame({
++  hovered,
++  reduceMotion,
++}: {
++  hovered: AuthNavYinHovered;
++  reduceMotion: boolean;
++}) {
++  return (
++    <div
++      className={styles.authNavYinYang}
++      data-testid="auth-yin-pill-story-shell"
++      data-auth-yin-hover={hovered ?? "idle"}
++      data-auth-yin-phase={hovered ? "split" : "seam"}
++      style={{ maxWidth: "22rem" }}
++    >
++      <div className={styles.authNavYinBackgroundWrap}>
++        <YinYangSegmentBackground hovered={hovered} reduceMotion={reduceMotion} />
++      </div>
++      <div className={styles.authNavYinLinks} aria-hidden style={{ pointerEvents: "none" }} />
++    </div>
++  );
++}
++
++export const BackgroundIdle: Story = {
++  name: "Background only (idle seam)",
++  decorators: [shellDecorator],
++  render: () => <BackgroundOnlyFrame hovered={null} reduceMotion={false} />,
++};
++
++export const BackgroundLoginHover: Story = {
++  name: "Background only (login hover)",
++  decorators: [shellDecorator],
++  render: () => <BackgroundOnlyFrame hovered="login" reduceMotion={false} />,
++};
++
++export const BackgroundRegisterHover: Story = {
++  name: "Background only (register hover)",
++  decorators: [shellDecorator],
++  render: () => <BackgroundOnlyFrame hovered="register" reduceMotion={false} />,
++};
+ 
++export const BackgroundReducedMotion: Story = {
++  name: "Background only (reduced motion)",
++  decorators: [shellDecorator],
++  render: () => <BackgroundOnlyFrame hovered="login" reduceMotion />,
++};
+diff --git a/apps/web/src/components/AuthenticationNav/LoggedOutAuthLinks.tsx b/apps/web/src/components/AuthenticationNav/LoggedOutAuthLinks.tsx
+index d5b397dfd..c21879180 100644
+--- a/apps/web/src/components/AuthenticationNav/LoggedOutAuthLinks.tsx
++++ b/apps/web/src/components/AuthenticationNav/LoggedOutAuthLinks.tsx
+@@ -1,18 +1,84 @@
+ "use client";
+ 
+-import Link from "next/link";
+-import uiStyles from "@/components/ui/ui.module.css";
++import { useState } from "react";
++import { useReducedMotion } from "motion/react";
++import { useAuthenticationVerification } from "@/app/providers/AuthenticationVerificationProvider";
++import { AuthNavYinBackgroundLayer, YinYangSegmentBackground } from "./AuthNavYinBackground";
++import { AuthNavYinSegmentControl } from "./AuthNavYinSegment";
++import {
++  AUTH_NAV_YIN_HOVER_DUR_REDUCED_S,
++  AUTH_NAV_YIN_HOVER_DUR_S,
++  authNavYinEase,
++  authNavYinFastFadeEase,
++  authNavYinHitOpacity,
++  authNavYinSegmentFlex,
++  type AuthNavYinHovered,
++} from "./authNavYinMotion";
+ import styles from "./style.module.css";
+ 
+ export const LoggedOutAuthLinks = () => {
++  const { openAuthenticationModal } = useAuthenticationVerification();
++  const [hovered, setHovered] = useState<AuthNavYinHovered>(null);
++  const reduceMotion = useReducedMotion();
++
++  const segmentTr = reduceMotion
++    ? { duration: 0.08 }
++    : { type: "tween" as const, duration: hovered !== null ? AUTH_NAV_YIN_HOVER_DUR_S : 0.2, ease: authNavYinEase };
++  const hitOpacityTr = reduceMotion
++    ? { duration: 0.08 }
++    : { type: "tween" as const, duration: hovered !== null ? 0.1 : 0.12, ease: authNavYinFastFadeEase };
++
++  const tapScale = reduceMotion ? undefined : { scale: 0.97 };
++
+   return (
+-    <nav className={styles.headerAuthNav}>
+-      <Link href="/login" className={`${uiStyles.button} ${styles.authNavPill} ${styles.authNavSecondary}`}>
+-        Login
+-      </Link>
+-      <Link href="/register" className={`${uiStyles.button} ${styles.authNavPill} ${uiStyles.buttonPrimary}`}>
+-        Register
+-      </Link>
++    <nav className={styles.headerAuthNav} aria-label="Account">
++      <div
++        className={styles.authNavYinYang}
++        data-testid="auth-yin-pill"
++        data-auth-yin-hover={hovered ?? "idle"}
++        data-auth-yin-phase={hovered ? "split" : "seam"}
++        onPointerLeave={() => setHovered(null)}
++      >
++        <AuthNavYinBackgroundLayer
++          hovered={hovered}
++          reduceMotion={!!reduceMotion}
++          phase={hovered ? "split" : "seam"}
++        />
++
++        <div className={styles.authNavYinLinks}>
++          <AuthNavYinSegmentControl
++            segment="login"
++            hovered={hovered}
++            onHover={setHovered}
++            onClick={() => openAuthenticationModal("login")}
++            segmentTransition={segmentTr}
++            hitTransition={hitOpacityTr}
++            tapScale={tapScale}
++          />
++          <AuthNavYinSegmentControl
++            segment="register"
++            hovered={hovered}
++            onHover={setHovered}
++            onClick={() => openAuthenticationModal("register")}
++            segmentTransition={segmentTr}
++            hitTransition={hitOpacityTr}
++            tapScale={tapScale}
++          />
++        </div>
++      </div>
+     </nav>
+   );
+ };
++
++export {
++  AUTH_NAV_YIN_HOVER_DUR_REDUCED_S,
++  AUTH_NAV_YIN_HOVER_DUR_S,
++  authNavYinHitOpacity,
++  authNavYinSegmentFlex,
++  type AuthNavYinHovered,
++  YinYangSegmentBackground,
++};
++
++/** @deprecated Use AUTH_NAV_YIN_HOVER_DUR_S */
++export const AUTH_NAV_YIN_LIQUID_DUR_S = AUTH_NAV_YIN_HOVER_DUR_S;
++export const AUTH_NAV_YIN_LIQUID_DUR_REDUCED_S = AUTH_NAV_YIN_HOVER_DUR_REDUCED_S;
+diff --git a/apps/web/src/components/AuthenticationNav/headerPreferences.module.css b/apps/web/src/components/AuthenticationNav/headerPreferences.module.css
+index 554155691..b80392588 100644
+--- a/apps/web/src/components/AuthenticationNav/headerPreferences.module.css
++++ b/apps/web/src/components/AuthenticationNav/headerPreferences.module.css
+@@ -9,57 +9,8 @@
+   min-width: 0;
+ }
+ 
+-.localeTrigger {
+-  min-width: 2.5rem;
+-  width: 2.5rem;
+-  height: 2.5rem;
+-  padding: 0 !important;
+-  display: inline-flex;
+-  align-items: center;
+-  justify-content: center;
+-  gap: 0.15rem;
+-  border-radius: 10px;
+-}
+-
+-.localeFlag {
+-  width: 1rem;
+-  height: 1rem;
+-  border-radius: 2px;
+-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--text-color) 15%, transparent);
+-}
+-
+-.localeChevron {
+-  width: 0.75rem;
+-  height: 0.75rem;
+-  opacity: 0.7;
+-}
+-
+-.localeFallbackIcon {
+-  width: 0.95rem;
+-  height: 0.95rem;
+-}
+-
+-.localeOption {
+-  display: inline-flex;
+-  align-items: center;
+-  gap: 0.5rem;
+-  min-width: 14rem;
+-}
+-
+-.localeOptionLabel {
+-  flex: 1 1 auto;
+-}
+-
+-.localeCode {
+-  font-size: 0.72rem;
+-  opacity: 0.7;
+-  letter-spacing: 0.04em;
+-}
+-
+-.localeCurrent {
+-  font-size: 0.72rem;
+-  color: var(--accent-red);
+-  opacity: 0.95;
++.localeSelector {
++  min-width: 0;
+ }
+ 
+ @media (max-width: 480px) {
+@@ -70,4 +21,8 @@
+   .themeSelector {
+     min-width: 0;
+   }
++
++  .localeSelector {
++    min-width: 0;
++  }
+ }
+diff --git a/apps/web/src/components/AuthenticationNav/style.module.css b/apps/web/src/components/AuthenticationNav/style.module.css
+index 238fd1fce..14deca60d 100644
+--- a/apps/web/src/components/AuthenticationNav/style.module.css
++++ b/apps/web/src/components/AuthenticationNav/style.module.css
+@@ -45,28 +45,161 @@
+   gap: 0.5rem;
+ }
+ 
+-/* Themed nav links (valid <a>, matches UIButton tokens) */
+-.authNavPill {
+-  width: 6.75rem;
++/*
++ * Single pill: SVG paints one continuous two-tone fill (curved seam, no overlap gap).
++ * Links are a 1×2 grid on top — equal hit targets, transparent backgrounds.
++ */
++.authNavYinYang {
++  --auth-yin-min-width: 17.25rem;
++  position: relative;
++  width: 100%;
++  min-width: var(--auth-yin-min-width);
++  max-width: 18rem;
+   height: 2.75rem;
+-  border-radius: 999px;
++  border-radius: 9999px;
++  overflow: hidden;
++  box-shadow: 0 0 0 1px color-mix(in srgb, var(--text-color) 14%, transparent);
++}
++
++/* Background + SVG morph live here; isolates paint from interactive row. */
++.authNavYinBackgroundWrap {
++  position: absolute;
++  inset: 0;
++  z-index: 0;
++  pointer-events: none;
++  border-radius: inherit;
++  overflow: hidden;
++  transform: translateZ(0);
++}
++
++/* Full-bleed background SVG: filled halves + stroked S / horizontal seam. */
++.authNavYinSvgLayer {
++  display: block;
++  width: 100%;
++  height: 100%;
++  pointer-events: none;
++}
++
++/* Register-side / accent pill fill. */
++.authNavYinFillAccent {
++  fill: var(--accent-red);
++}
++
++/* Login-side / glass pill fill. */
++.authNavYinFillGlass {
++  fill: color-mix(in srgb, var(--surface-glass-strong) 88%, var(--background) 12%);
++}
++
++.authNavYinDividerStroke {
++  stroke: color-mix(in srgb, var(--surface-glass-strong) 55%, var(--background) 45%);
++  stroke-width: 2.5;
++  vector-effect: non-scaling-stroke;
++}
++
++.authNavYinLinks {
++  position: absolute;
++  inset: 0;
++  z-index: 1;
++  display: flex;
++  flex-direction: row;
++  align-items: stretch;
++}
++
++/* Flex + hover target; Motion animates flexGrow here (not on <button>). */
++.authNavYinSegment {
++  flex-basis: 0;
++  min-width: 0;
++  display: flex;
++  align-items: stretch;
++  justify-content: center;
++  pointer-events: auto;
++}
++
++.authNavYinLinkLabel {
++  display: inline-block;
++  transform-origin: center center;
++}
++
++/* Ghost control: no chrome from .button (border/bg/transform) — pill SVG is the surface. */
++.authNavYinHitButton {
++  appearance: none;
++  flex: 1 1 auto;
++  align-self: stretch;
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  margin: 0;
++  padding: 4px 10px;
++  border: none;
++  border-radius: 0;
++  background: transparent;
++  box-shadow: none;
++  cursor: pointer;
++  font: inherit;
+   font-weight: 600;
+   font-size: 0.875rem;
+-  display: inline-flex;
++  line-height: 1.2;
++  min-width: 0;
++  color: inherit;
++  white-space: nowrap;
++  overflow: hidden;
++  transition: opacity 0.18s ease;
++}
++
++.authNavYinHitButton:hover {
++  box-shadow: none;
++  filter: none;
++}
++
++.authNavYinHitButton:focus-visible {
++  outline: none;
++}
++
++.authNavYinLink {
++  /* retained for story/class compatibility — real control uses authNavYinHitButton */
++  display: inline-flex !important;
+   align-items: center;
+   justify-content: center;
++  margin: 0 !important;
++  padding: 4px 10px !important;
++  border: none !important;
++  background: transparent !important;
++  box-shadow: none !important;
+   text-decoration: none;
+   box-sizing: border-box;
++  font-weight: 600;
++  font-size: 0.875rem;
+   line-height: 1.2;
++  flex: 1 1 0;
++  min-width: 0;
++  position: relative;
++  z-index: 1;
++  white-space: nowrap;
++  overflow: hidden;
++  transition: filter 0.2s ease;
+ }
+ 
+-.authNavPill.authNavSecondary {
+-  background: color-mix(in srgb, var(--surface-glass-strong) 94%, var(--background) 6%);
+-  border-color: color-mix(in srgb, var(--text-color) 14%, transparent);
+-  color: var(--text-color);
++.authNavYinLink:hover {
++  box-shadow: none !important;
++}
++
++.authNavYinLinkLogin {
++  color: var(--accent-red) !important;
++  text-shadow: 0 0 1px color-mix(in srgb, #fff 85%, transparent);
++}
++
++.authNavYinLinkRegister {
++  color: #fff !important;
++  text-shadow: 0 0 1px color-mix(in srgb, #000 22%, transparent);
++}
++
++.authNavYinLinkRegister:hover {
++  filter: none;
+ }
+ 
+-.authNavPill.authNavSecondary:hover {
+-  border-color: color-mix(in srgb, var(--accent-red) 45%, var(--text-color) 55%);
+-  box-shadow: 0 3px 14px color-mix(in srgb, var(--accent-red) 16%, transparent);
++.authNavYinHitButton:focus-visible,
++.authNavYinLink:focus-visible {
++  outline: 2px solid color-mix(in srgb, var(--accent-red) 70%, var(--text-color) 30%);
++  outline-offset: -4px;
++  z-index: 2;
+ }
+\ No newline at end of file
+diff --git a/apps/web/src/components/ThemeSelector/ThemeSelector.module.css b/apps/web/src/components/ThemeSelector/ThemeSelector.module.css
+index db0e5e982..fff631ef2 100644
+--- a/apps/web/src/components/ThemeSelector/ThemeSelector.module.css
++++ b/apps/web/src/components/ThemeSelector/ThemeSelector.module.css
+@@ -2,33 +2,41 @@
+   display: inline-flex;
+ }
+ 
++/* Icon-only: no rectangular frame (borderless trigger) */
+ .trigger {
+   width: 2.5rem;
+   min-width: 0;
+   height: 2.5rem;
+   box-sizing: border-box;
+   padding: var(--icon-button-padding, 4px) !important;
+-  border-radius: 10px;
+-  border: 1px solid color-mix(in srgb, var(--text-color) 16%, transparent) !important;
+-  box-shadow:
+-    0 0 0 1px color-mix(in srgb, var(--background) 42%, transparent),
+-    0 6px 14px color-mix(in srgb, var(--background) 28%, transparent),
+-    0 14px 28px color-mix(in srgb, var(--background) 14%, transparent);
++  border-radius: 0;
++  background: transparent !important;
++  border: none !important;
++  box-shadow: none !important;
++  color: var(--text-color);
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   transition:
+-    background-color 220ms cubic-bezier(0.2, 0, 0, 1),
+-    border-color 220ms cubic-bezier(0.2, 0, 0, 1),
+-    box-shadow 220ms cubic-bezier(0.2, 0, 0, 1),
+-    color 220ms cubic-bezier(0.2, 0, 0, 1);
++    color 0.3s ease,
++    background-color 0.3s ease;
++}
++
++.trigger:hover:not(:disabled) {
++  transform: none !important;
++  box-shadow: none !important;
++  background: color-mix(in srgb, var(--text-color) 8%, transparent) !important;
+ }
+ 
+-.trigger:hover,
+-.trigger:active,
+ .trigger:focus-visible {
+   transform: none !important;
+-  border-width: 1px !important;
++  box-shadow: none !important;
++  outline: 2px solid color-mix(in srgb, var(--accent-red) 55%, var(--text-muted) 45%);
++  outline-offset: 2px;
++}
++
++.trigger:active:not(:disabled) {
++  transform: scale(0.97) !important;
+ }
+ 
+ .iconStack {
+@@ -79,17 +87,15 @@
+   --slider-edge-padding: 0.41rem;
+   padding: 0.7rem 0.85rem 0.6rem;
+   width: 15.25rem;
+-  border-radius: 12px;
+-  border: 1px solid color-mix(in srgb, var(--text-color) 14%, transparent);
+-  background: color-mix(in srgb, var(--background) 88%, var(--surface-glass-strong) 12%);
+-  box-shadow:
+-    0 0 0 1px color-mix(in srgb, var(--background) 40%, transparent),
+-    0 10px 22px color-mix(in srgb, var(--background) 24%, transparent),
+-    0 20px 40px color-mix(in srgb, var(--background) 12%, transparent);
+-  transition:
+-    background-color 220ms cubic-bezier(0.2, 0, 0, 1),
+-    border-color 220ms cubic-bezier(0.2, 0, 0, 1),
+-    box-shadow 220ms cubic-bezier(0.2, 0, 0, 1);
++  font-family: var(--themed-chrome-serif);
++  font-weight: 400;
++  letter-spacing: 0.04em;
++  border-radius: 0;
++  border: none;
++  background: color-mix(in srgb, var(--background) 72%, var(--surface-glass) 28%);
++  box-shadow: none;
++  color: var(--text-color);
++  transition: background-color 0.3s ease;
+ }
+ 
+ .panelIcons {
+@@ -103,7 +109,7 @@
+ .panelIconButton {
+   position: absolute;
+   top: 50%;
+-  border: 0;
++  border: none;
+   padding: 0;
+   margin: 0;
+   background: transparent;
+@@ -116,11 +122,10 @@
+   align-items: center;
+   justify-content: center;
+   transform: translate(-50%, -50%);
+-  border-radius: 999px;
++  border-radius: 0;
+   transition:
+     color 140ms cubic-bezier(0.2, 0, 0, 1),
+-    background 180ms cubic-bezier(0.2, 0, 0, 1),
+-    box-shadow 140ms cubic-bezier(0.2, 0, 0, 1);
++    background 180ms cubic-bezier(0.2, 0, 0, 1);
+ }
+ 
+ .panelIconButton:first-child {
+@@ -138,7 +143,7 @@
+ .panelIconButton:focus-visible {
+   outline: 2px solid color-mix(in srgb, var(--slider-accent, var(--accent-red)) 50%, transparent);
+   outline-offset: 2px;
+-  border-radius: 999px;
++  border-radius: 0;
+ }
+ 
+ .panelIconButton:hover {
+@@ -164,32 +169,17 @@
+ 
+ .panelIconButton:first-child:hover {
+   color: var(--moon-highlight);
+-  background: radial-gradient(
+-    circle,
+-    color-mix(in srgb, var(--moon-highlight) 36%, transparent) 0%,
+-    color-mix(in srgb, var(--moon-highlight) 18%, transparent) 44%,
+-    transparent 80%
+-  );
++  background: color-mix(in srgb, var(--moon-highlight) 14%, transparent);
+ }
+ 
+ .panelIconButton:nth-child(2):hover {
+   color: var(--mountain-highlight);
+-  background: radial-gradient(
+-    circle,
+-    color-mix(in srgb, var(--mountain-highlight) 34%, transparent) 0%,
+-    color-mix(in srgb, var(--mountain-highlight) 16%, transparent) 44%,
+-    transparent 80%
+-  );
++  background: color-mix(in srgb, var(--mountain-highlight) 14%, transparent);
+ }
+ 
+ .panelIconButton:last-child:hover {
+   color: var(--sun-highlight);
+-  background: radial-gradient(
+-    circle,
+-    color-mix(in srgb, var(--sun-highlight) 36%, transparent) 0%,
+-    color-mix(in srgb, var(--sun-highlight) 18%, transparent) 44%,
+-    transparent 80%
+-  );
++  background: color-mix(in srgb, var(--sun-highlight) 14%, transparent);
+ }
+ 
+ .sliderWrap {
+@@ -205,7 +195,7 @@
+   top: 50%;
+   height: 4px;
+   transform: translateY(-50%);
+-  border-radius: 999px;
++  border-radius: 0;
+   background: linear-gradient(
+     90deg,
+     var(--slider-stop-1) 0%,
+@@ -228,7 +218,7 @@
+   top: 50%;
+   width: 0.38rem;
+   height: 0.38rem;
+-  border-radius: 999px;
++  border-radius: 0;
+   transform: translate(-50%, -50%);
+   background: color-mix(in srgb, var(--text-color) 38%, transparent);
+ }
+@@ -267,16 +257,15 @@
+ }
+ 
+ .slider:global(.ant-slider) :global(.ant-slider-handle::after) {
+-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--text-color) 20%, transparent);
+-  border: 2px solid color-mix(in srgb, var(--surface-glass-strong) 80%, var(--background) 20%);
++  box-shadow: none;
++  border: 2px solid color-mix(in srgb, var(--text-color) 28%, transparent);
+   background: var(--slider-accent, var(--accent-red));
+ }
+ 
+ .slider:global(.ant-slider) :global(.ant-slider-handle:hover::after),
+ .slider:global(.ant-slider) :global(.ant-slider-handle:active::after),
+ .slider:global(.ant-slider) :global(.ant-slider-handle:focus-visible::after) {
+-  box-shadow:
+-    0 0 0 1px color-mix(in srgb, var(--text-color) 24%, transparent),
+-    0 0 0 4px color-mix(in srgb, var(--slider-accent, var(--accent-red)) 26%, transparent);
++  box-shadow: none;
++  border-color: color-mix(in srgb, var(--text-color) 40%, transparent);
+ }
+ 
+diff --git a/apps/web/src/components/ThemeSelector/ThemeSelector.stories.tsx b/apps/web/src/components/ThemeSelector/ThemeSelector.stories.tsx
+index 6b0585e1e..5829b1a4b 100644
+--- a/apps/web/src/components/ThemeSelector/ThemeSelector.stories.tsx
++++ b/apps/web/src/components/ThemeSelector/ThemeSelector.stories.tsx
+@@ -6,7 +6,17 @@ import { Kasagi, Nuki, Pillars, Shimaki } from "@/components/Dividers";
+ import { BeamMeUpScotty } from "@/components/BeamMeUpScotty/BeamMeUpScotty";
+ import { SiteFooter } from "@/components/SiteFooter/SiteFooter";
+ import authNavStyles from "@/components/AuthenticationNav/style.module.css";
+-import { UIButton } from "@/components/ui";
++import {
++  AUTH_NAV_YIN_HOVER_DUR_S,
++  AUTH_NAV_YIN_HOVER_DUR_REDUCED_S,
++  YinYangSegmentBackground,
++  authNavYinHitOpacity,
++  authNavYinSegmentFlex,
++  type AuthNavYinHovered,
++} from "@/components/AuthenticationNav/LoggedOutAuthLinks";
++import { motion, useReducedMotion } from "motion/react";
++
++const authNavEase = [0.33, 1, 0.68, 1] as const;
+ import { ThemeSelector } from "./ThemeSelector";
+ import styles from "./ThemeSelector.stories.module.css";
+ import pageStyles from "@/app/page.module.css";
+@@ -144,8 +154,18 @@ const LayoutShellPreview = ({ initialTheme }: { initialTheme: ThemeName }) => {
+ const FullChromePreview = ({ initialTheme }: { initialTheme: ThemeName }) => {
+   const [theme, setTheme] = useState<ThemeName>(initialTheme);
+   const [preview, setPreview] = useState<number | null>(null);
++  const [authHovered, setAuthHovered] = useState<AuthNavYinHovered>(null);
++  const reduceMotion = useReducedMotion();
+   const activeScale = preview ?? (theme === "night-sky" ? 100 : theme === "tokyo-dusk" ? 50 : 0);
+   const themeVars = getThemeScaleVars(activeScale);
++  const authNavTransition = reduceMotion
++    ? { duration: AUTH_NAV_YIN_HOVER_DUR_REDUCED_S }
++    : {
++        type: "tween" as const,
++        duration: authHovered !== null ? AUTH_NAV_YIN_HOVER_DUR_S : 0.2,
++        ease: authNavEase,
++      };
++  const authNavTap = reduceMotion ? undefined : { scale: 0.97 };
+ 
+   return (
+     <div style={themeVars as CSSProperties}>
+@@ -164,22 +184,60 @@ const FullChromePreview = ({ initialTheme }: { initialTheme: ThemeName }) => {
+                 }}
+               />
+               <div className={styles.mockAuthRow}>
+-                <UIButton
+-                  type="button"
+-                  variant="default"
+-                  disabled
+-                  className={`${authNavStyles.authNavPill} ${authNavStyles.authNavSecondary}`}
+-                >
+-                  Login
+-                </UIButton>
+-                <UIButton
+-                  type="button"
+-                  variant="primary"
+-                  disabled
+-                  className={authNavStyles.authNavPill}
++                <div
++                  className={authNavStyles.authNavYinYang}
++                  data-testid="auth-yin-pill"
++                  data-auth-yin-phase={authHovered ? "split" : "seam"}
++                  onPointerLeave={() => setAuthHovered(null)}
+                 >
+-                  Register
+-                </UIButton>
++                  <div className={authNavStyles.authNavYinBackgroundWrap}>
++                    <YinYangSegmentBackground hovered={authHovered} reduceMotion={!!reduceMotion} />
++                  </div>
++                  <div className={authNavStyles.authNavYinLinks}>
++                    <motion.div
++                      className={authNavStyles.authNavYinSegment}
++                      initial={false}
++                      animate={{ flexGrow: authNavYinSegmentFlex(authHovered, "login") }}
++                      transition={authNavTransition}
++                      onPointerEnter={() => setAuthHovered("login")}
++                    >
++                      <motion.button
++                        type="button"
++                        className={`${authNavStyles.authNavYinHitButton} ${authNavStyles.authNavYinLinkLogin}`}
++                        initial={false}
++                        animate={{ opacity: authNavYinHitOpacity(authHovered, "login") }}
++                        transition={authNavTransition}
++                        whileTap={authNavTap}
++                        style={{ pointerEvents: authHovered === "register" ? "none" : "auto" }}
++                        onClick={(event) => event.preventDefault()}
++                        tabIndex={authHovered === "register" ? -1 : 0}
++                      >
++                        Login
++                      </motion.button>
++                    </motion.div>
++                    <motion.div
++                      className={authNavStyles.authNavYinSegment}
++                      initial={false}
++                      animate={{ flexGrow: authNavYinSegmentFlex(authHovered, "register") }}
++                      transition={authNavTransition}
++                      onPointerEnter={() => setAuthHovered("register")}
++                    >
++                      <motion.button
++                        type="button"
++                        className={`${authNavStyles.authNavYinHitButton} ${authNavStyles.authNavYinLinkRegister}`}
++                        initial={false}
++                        animate={{ opacity: authNavYinHitOpacity(authHovered, "register") }}
++                        transition={authNavTransition}
++                        whileTap={authNavTap}
++                        style={{ pointerEvents: authHovered === "login" ? "none" : "auto" }}
++                        onClick={(event) => event.preventDefault()}
++                        tabIndex={authHovered === "login" ? -1 : 0}
++                      >
++                        Register
++                      </motion.button>
++                    </motion.div>
++                  </div>
++                </div>
+               </div>
+             </div>
+           </div>
+diff --git a/apps/web/src/components/ThemeSelector/ThemeSelector.tsx b/apps/web/src/components/ThemeSelector/ThemeSelector.tsx
+index 705378167..c9bcd4286 100644
+--- a/apps/web/src/components/ThemeSelector/ThemeSelector.tsx
++++ b/apps/web/src/components/ThemeSelector/ThemeSelector.tsx
+@@ -259,13 +259,12 @@ export const ThemeSelector = ({
+       >
+         <UIButton
+           className={styles.trigger}
+-          aria-label={ariaLabel}
+-          title={`${Math.round(effectiveProgress)}%`}
+-          style={{
+-            "--icon-button-padding": `${ICON_BUTTON_PADDING_PX}px`,
+-            background: "color-mix(in srgb, var(--background) 88%, var(--surface-glass-strong) 12%)",
+-            color: themeVars["--text-color"],
+-          } as CSSProperties}
++          aria-label={`${ariaLabel}, ${Math.round(effectiveProgress)}%`}
++          style={
++            {
++              "--icon-button-padding": `${ICON_BUTTON_PADDING_PX}px`,
++            } as CSSProperties
++          }
+         >
+           <span className={styles.iconStack} aria-hidden>
+             <Moon
+diff --git a/apps/web/src/stories/Button.stories.ts b/apps/web/src/stories/Button.stories.ts
+deleted file mode 100644
+index 89e55d680..000000000
+--- a/apps/web/src/stories/Button.stories.ts
++++ /dev/null
+@@ -1,54 +0,0 @@
+-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+-
+-import { fn } from 'storybook/test';
+-
+-import { Button } from './Button';
+-
+-// More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
+-const meta = {
+-  title: 'Example/Button',
+-  component: Button,
+-  parameters: {
+-    // Optional parameter to center the component in the Canvas. More info: https://storybook.js.org/docs/configure/story-layout
+-    layout: 'centered',
+-  },
+-  // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
+-  tags: ['autodocs'],
+-  // More on argTypes: https://storybook.js.org/docs/api/argtypes
+-  argTypes: {
+-    backgroundColor: { control: 'color' },
+-  },
+-  // Use `fn` to spy on the onClick arg, which will appear in the actions panel once invoked: https://storybook.js.org/docs/essentials/actions#story-args
+-  args: { onClick: fn() },
+-} satisfies Meta<typeof Button>;
+-
+-export default meta;
+-type Story = StoryObj<typeof meta>;
+-
+-// More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
+-export const Primary: Story = {
+-  args: {
+-    primary: true,
+-    label: 'Button',
+-  },
+-};
+-
+-export const Secondary: Story = {
+-  args: {
+-    label: 'Button',
+-  },
+-};
+-
+-export const Large: Story = {
+-  args: {
+-    size: 'large',
+-    label: 'Button',
+-  },
+-};
+-
+-export const Small: Story = {
+-  args: {
+-    size: 'small',
+-    label: 'Button',
+-  },
+-};
+diff --git a/apps/web/src/stories/Button.tsx b/apps/web/src/stories/Button.tsx
+deleted file mode 100644
+index d96916cc4..000000000
+--- a/apps/web/src/stories/Button.tsx
++++ /dev/null
+@@ -1,39 +0,0 @@
+-import './button.css';
+-
+-export interface ButtonProps {
+-  /** Is this the principal call to action on the page? */
+-  primary?: boolean;
+-  /** What background color to use */
+-  backgroundColor?: string;
+-  /** How large should the button be? */
+-  size?: 'small' | 'medium' | 'large';
+-  /** Button contents */
+-  label: string;
+-  /** Optional click handler */
+-  onClick?: () => void;
+-}
+-
+-/** Primary UI component for user interaction */
+-export const Button = ({
+-  primary = false,
+-  size = 'medium',
+-  backgroundColor,
+-  label,
+-  ...props
+-}: ButtonProps) => {
+-  const mode = primary ? 'storybook-button--primary' : 'storybook-button--secondary';
+-  return (
+-    <button
+-      type="button"
+-      className={['storybook-button', `storybook-button--${size}`, mode].join(' ')}
+-      {...props}
+-    >
+-      {label}
+-      <style jsx>{`
+-        button {
+-          background-color: ${backgroundColor};
+-        }
+-      `}</style>
+-    </button>
+-  );
+-};
+diff --git a/apps/web/src/stories/Configure.mdx b/apps/web/src/stories/Configure.mdx
+deleted file mode 100644
+index 70fcc2a97..000000000
+--- a/apps/web/src/stories/Configure.mdx
++++ /dev/null
+@@ -1,446 +0,0 @@
+-import { Meta } from "@storybook/addon-docs/blocks";
+-import Image from "next/image";
+-
+-import Github from "./assets/github.svg";
+-import Discord from "./assets/discord.svg";
+-import Youtube from "./assets/youtube.svg";
+-import Tutorials from "./assets/tutorials.svg";
+-import Styling from "./assets/styling.png";
+-import Context from "./assets/context.png";
+-import Assets from "./assets/assets.png";
+-import Docs from "./assets/docs.png";
+-import Share from "./assets/share.png";
+-import FigmaPlugin from "./assets/figma-plugin.png";
+-import Testing from "./assets/testing.png";
+-import Accessibility from "./assets/accessibility.png";
+-import Theming from "./assets/theming.png";
+-import AddonLibrary from "./assets/addon-library.png";
+-
+-export const RightArrow = () => <svg 
+-    viewBox="0 0 14 14" 
+-    width="8px" 
+-    height="14px" 
+-    style={{ 
+-      marginLeft: '4px',
+-      display: 'inline-block',
+-      shapeRendering: 'inherit',
+-      verticalAlign: 'middle',
+-      fill: 'currentColor',
+-      'path fill': 'currentColor'
+-    }}
+->
+-  <path d="m11.1 7.35-5.5 5.5a.5.5 0 0 1-.7-.7L10.04 7 4.9 1.85a.5.5 0 1 1 .7-.7l5.5 5.5c.2.2.2.5 0 .7Z" />
+-</svg>
+-
+-<Meta title="Configure your project" />
+-
+-<div className="sb-container">
+-  <div className='sb-section-title'>
+-    # Configure your project
+-
+-    Because Storybook works separately from your app, you'll need to configure it for your specific stack and setup. Below, explore guides for configuring Storybook with popular frameworks and tools. If you get stuck, learn how you can ask for help from our community.
+-  </div>
+-  <div className="sb-section">
+-    <div className="sb-section-item">
+-      <Image
+-        src={Styling}
+-        alt="A wall of logos representing different styling technologies"
+-        width={0}
+-        height={0}
+-        style={{ width: '100%', height: 'auto' }}
+-      />
+-      <h4 className="sb-section-item-heading">Add styling and CSS</h4>
+-      <p className="sb-section-item-paragraph">Like with web applications, there are many ways to include CSS within Storybook. Learn more about setting up styling within Storybook.</p>
+-      <a
+-        href="https://storybook.js.org/docs/configure/styling-and-css/?renderer=react&ref=configure"
+-        target="_blank"
+-      >Learn more<RightArrow /></a>
+-    </div>
+-    <div className="sb-section-item">
+-      <Image 
+-        width={0}
+-        height={0}
+-        style={{ width: '100%', height: 'auto' }}
+-        src={Context}
+-        alt="An abstraction representing the composition of data for a component"
+-      />
+-      <h4 className="sb-section-item-heading">Provide context and mocking</h4>
+-      <p className="sb-section-item-paragraph">Often when a story doesn't render, it's because your component is expecting a specific environment or context (like a theme provider) to be available.</p>
+-      <a
+-        href="https://storybook.js.org/docs/writing-stories/decorators/?renderer=react&ref=configure#context-for-mocking"
+-        target="_blank"
+-      >Learn more<RightArrow /></a>
+-    </div>
+-    <div className="sb-section-item">
+-      <Image 
+-        width={0}
+-        height={0}
+-        style={{ width: '100%', height: 'auto' }} 
+-        src={Assets} 
+-        alt="A representation of typography and image assets" 
+-      />
+-      <div>
+-        <h4 className="sb-section-item-heading">Load assets and resources</h4>
+-        <p className="sb-section-item-paragraph">To link static files (like fonts) to your projects and stories, use the
+-        `staticDirs` configuration option to specify folders to load when
+-        starting Storybook.</p>
+-        <a
+-          href="https://storybook.js.org/docs/configure/images-and-assets/?renderer=react&ref=configure"
+-          target="_blank"
+-        >Learn more<RightArrow /></a>
+-      </div>
+-    </div>
+-  </div>
+-</div>
+-<div className="sb-container">
+-  <div className='sb-section-title'>
+-    # Do more with Storybook
+-
+-    Now that you know the basics, let's explore other parts of Storybook that will improve your experience. This list is just to get you started. You can customise Storybook in many ways to fit your needs.
+-  </div>
+-
+-  <div className="sb-section">
+-    <div className="sb-features-grid">
+-      <div className="sb-grid-item">
+-        <Image 
+-          width={0}
+-          height={0}
+-          style={{ width: '100%', height: 'auto' }} 
+-          src={Docs} 
+-          alt="A screenshot showing the autodocs tag being set, pointing a docs page being generated" 
+-        />
+-        <h4 className="sb-section-item-heading">Autodocs</h4>
+-        <p className="sb-section-item-paragraph">Auto-generate living,
+-          interactive reference documentation from your components and stories.</p>
+-        <a
+-          href="https://storybook.js.org/docs/writing-docs/autodocs/?renderer=react&ref=configure"
+-          target="_blank"
+-        >Learn more<RightArrow /></a>
+-      </div>
+-      <div className="sb-grid-item">
+-        <Image 
+-          width={0}
+-          height={0}
+-          style={{ width: '100%', height: 'auto' }} 
+-          src={Share} 
+-          alt="A browser window showing a Storybook being published to a chromatic.com URL" 
+-        />
+-        <h4 className="sb-section-item-heading">Publish to Chromatic</h4>
+-        <p className="sb-section-item-paragraph">Publish your Storybook to review and collaborate with your entire team.</p>
+-        <a
+-          href="https://storybook.js.org/docs/sharing/publish-storybook/?renderer=react&ref=configure#publish-storybook-with-chromatic"
+-          target="_blank"
+-        >Learn more<RightArrow /></a>
+-      </div>
+-      <div className="sb-grid-item">
+-        <Image 
+-          width={0}
+-          height={0}
+-          style={{ width: '100%', height: 'auto' }} 
+-          src={FigmaPlugin} 
+-          alt="Windows showing the Storybook plugin in Figma" 
+-        />
+-        <h4 className="sb-section-item-heading">Figma Plugin</h4>
+-        <p className="sb-section-item-paragraph">Embed your stories into Figma to cross-reference the design and live
+-          implementation in one place.</p>
+-        <a
+-          href="https://storybook.js.org/docs/sharing/design-integrations/?renderer=react&ref=configure#embed-storybook-in-figma-with-the-plugin"
+-          target="_blank"
+-        >Learn more<RightArrow /></a>
+-      </div>
+-      <div className="sb-grid-item">
+-        <Image 
+-          width={0}
+-          height={0}
+-          style={{ width: '100%', height: 'auto' }} 
+-          src={Testing} 
+-          alt="Screenshot of tests passing and failing" 
+-        />
+-        <h4 className="sb-section-item-heading">Testing</h4>
+-        <p className="sb-section-item-paragraph">Use stories to test a component in all its variations, no matter how
+-          complex.</p>
+-        <a
+-          href="https://storybook.js.org/docs/writing-tests/?renderer=react&ref=configure"
+-          target="_blank"
+-        >Learn more<RightArrow /></a>
+-      </div>
+-      <div className="sb-grid-item">
+-        <Image 
+-          width={0}
+-          height={0}
+-          style={{ width: '100%', height: 'auto' }} 
+-          src={Accessibility} 
+-          alt="Screenshot of accessibility tests passing and failing" 
+-        />
+-        <h4 className="sb-section-item-heading">Accessibility</h4>
+-        <p className="sb-section-item-paragraph">Automatically test your components for a11y issues as you develop.</p>
+-        <a
+-          href="https://storybook.js.org/docs/writing-tests/accessibility-testing/?renderer=react&ref=configure"
+-          target="_blank"
+-        >Learn more<RightArrow /></a>
+-      </div>
+-      <div className="sb-grid-item">
+-        <Image 
+-          width={0}
+-          height={0}
+-          style={{ width: '100%', height: 'auto' }} 
+-          src={Theming} 
+-          alt="Screenshot of Storybook in light and dark mode" 
+-        />
+-        <h4 className="sb-section-item-heading">Theming</h4>
+-        <p className="sb-section-item-paragraph">Theme Storybook's UI to personalize it to your project.</p>
+-        <a
+-          href="https://storybook.js.org/docs/configure/theming/?renderer=react&ref=configure"
+-          target="_blank"
+-        >Learn more<RightArrow /></a>
+-      </div>
+-    </div>
+-  </div>
+-</div>
+-<div className='sb-addon'>
+-  <div className='sb-addon-text'>
+-    <h4>Addons</h4>
+-    <p className="sb-section-item-paragraph">Integrate your tools with Storybook to connect workflows.</p>
+-    <a
+-        href="https://storybook.js.org/addons/?ref=configure"
+-        target="_blank"
+-      >Discover all addons<RightArrow /></a>
+-  </div>
+-  <div className='sb-addon-img'>
+-    <Image 
+-      width={650}
+-      height={347}
+-      src={AddonLibrary} 
+-      alt="Integrate your tools with Storybook to connect workflows." 
+-    />
+-  </div>
+-</div>
+-
+-<div className="sb-section sb-socials">
+-    <div className="sb-section-item">
+-      <Image 
+-        width={32}
+-        height={32}
+-        layout="fixed"
+-        src={Github} 
+-        alt="Github logo" 
+-        className="sb-explore-image"
+-      />
+-      Join our contributors building the future of UI development.
+-
+-      <a
+-        href="https://github.com/storybookjs/storybook"
+-        target="_blank"
+-      >Star on GitHub<RightArrow /></a>
+-    </div>
+-    <div className="sb-section-item">
+-      <Image 
+-        width={33}
+-        height={32}
+-        layout="fixed"
+-        src={Discord} 
+-        alt="Discord logo" 
+-        className="sb-explore-image"
+-      />
+-      <div>
+-        Get support and chat with frontend developers.
+-
+-        <a
+-          href="https://discord.gg/storybook"
+-          target="_blank"
+-        >Join Discord server<RightArrow /></a>
+-      </div>
+-    </div>
+-    <div className="sb-section-item">
+-      <Image 
+-        width={32}
+-        height={32}
+-        layout="fixed"
+-        src={Youtube} 
+-        alt="Youtube logo" 
+-        className="sb-explore-image"
+-      />
+-      <div>
+-        Watch tutorials, feature previews and interviews.
+-
+-        <a
+-          href="https://www.youtube.com/@chromaticui"
+-          target="_blank"
+-        >Watch on YouTube<RightArrow /></a>
+-      </div>
+-    </div>
+-    <div className="sb-section-item">
+-      <Image 
+-        width={33}
+-        height={32}
+-        layout="fixed"
+-        src={Tutorials} 
+-        alt="A book" 
+-        className="sb-explore-image"
+-      />
+-      <p>Follow guided walkthroughs on for key workflows.</p>
+-
+-      <a
+-          href="https://storybook.js.org/tutorials/?ref=configure"
+-          target="_blank"
+-        >Discover tutorials<RightArrow /></a>
+-    </div>
+-</div>
+-
+-<style>
+-  {`
+-  .sb-container {
+-    margin-bottom: 48px;
+-  }
+-
+-  .sb-section {
+-    width: 100%;
+-    display: flex;
+-    flex-direction: row;
+-    gap: 20px;
+-  }
+-
+-  img {
+-    object-fit: cover;
+-  }
+-
+-  .sb-section-title {
+-    margin-bottom: 32px;
+-  }
+-
+-  .sb-section a:not(h1 a, h2 a, h3 a) {
+-    font-size: 14px;
+-  }
+-
+-  .sb-section-item, .sb-grid-item {
+-    flex: 1;
+-    display: flex;
+-    flex-direction: column;
+-  }
+-
+-  .sb-section-item-heading {
+-    padding-top: 20px !important;
+-    padding-bottom: 5px !important;
+-    margin: 0 !important;
+-  }
+-  .sb-section-item-paragraph {
+-    margin: 0;
+-    padding-bottom: 10px;
+-  }
+-
+-  .sb-chevron {
+-    margin-left: 5px;
+-  }
+-
+-  .sb-features-grid {
+-    display: grid;
+-    grid-template-columns: repeat(2, 1fr);
+-    grid-gap: 32px 20px;
+-  }
+-
+-  .sb-socials {
+-    display: grid;
+-    grid-template-columns: repeat(4, 1fr);
+-  }
+-
+-  .sb-socials p {
+-    margin-bottom: 10px;
+-  }
+-
+-  .sb-explore-image {
+-    max-height: 32px;
+-    align-self: flex-start;
+-  }
+-
+-  .sb-addon {
+-    width: 100%;
+-    display: flex;
+-    align-items: center;
+-    position: relative;
+-    background-color: #EEF3F8;
+-    border-radius: 5px;
+-    border: 1px solid rgba(0, 0, 0, 0.05);
+-    background: #EEF3F8;
+-    height: 180px;
+-    margin-bottom: 48px;
+-    overflow: hidden;
+-  }
+-
+-  .sb-addon-text {
+-    padding-left: 48px;
+-    max-width: 240px;
+-  }
+-
+-  .sb-addon-text h4 {
+-    padding-top: 0px;
+-  }
+-
+-  .sb-addon-img {
+-    position: absolute;
+-    left: 345px;
+-    top: 0;
+-    height: 100%;
+-    width: 200%;
+-    overflow: hidden;
+-  }
+-
+-  .sb-addon-img img {
+-    width: 650px;
+-    transform: rotate(-15deg);
+-    margin-left: 40px;
+-    margin-top: -72px;
+-    box-shadow: 0 0 1px rgba(255, 255, 255, 0);
+-    backface-visibility: hidden;
+-  }
+-
+-  @media screen and (max-width: 800px) {
+-    .sb-addon-img {
+-      left: 300px;
+-    }
+-  }
+-
+-  @media screen and (max-width: 600px) {
+-    .sb-section {
+-      flex-direction: column;
+-    }
+-
+-    .sb-features-grid {
+-      grid-template-columns: repeat(1, 1fr);
+-    }
+-
+-    .sb-socials {
+-      grid-template-columns: repeat(2, 1fr);
+-    }
+-
+-    .sb-addon {
+-      height: 280px;
+-      align-items: flex-start;
+-      padding-top: 32px;
+-      overflow: hidden;
+-    }
+-
+-    .sb-addon-text {
+-      padding-left: 24px;
+-    }
+-
+-    .sb-addon-img {
+-      right: 0;
+-      left: 0;
+-      top: 130px;
+-      bottom: 0;
+-      overflow: hidden;
+-      height: auto;
+-      width: 124%;
+-    }
+-
+-    .sb-addon-img img {
+-      width: 1200px;
+-      transform: rotate(-12deg);
+-      margin-left: 0;
+-      margin-top: 48px;
+-      margin-bottom: -40px;
+-      margin-left: -24px;
+-    }
+-  }
+-  `}
+-</style>
+diff --git a/apps/web/src/stories/Header.stories.ts b/apps/web/src/stories/Header.stories.ts
+deleted file mode 100644
+index 29fff1ec5..000000000
+--- a/apps/web/src/stories/Header.stories.ts
++++ /dev/null
+@@ -1,34 +0,0 @@
+-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+-
+-import { fn } from 'storybook/test';
+-
+-import { Header } from './Header';
+-
+-const meta = {
+-  title: 'Example/Header',
+-  component: Header,
+-  // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
+-  tags: ['autodocs'],
+-  parameters: {
+-    // More on how to position stories at: https://storybook.js.org/docs/configure/story-layout
+-    layout: 'fullscreen',
+-  },
+-  args: {
+-    onLogin: fn(),
+-    onLogout: fn(),
+-    onCreateAccount: fn(),
+-  },
+-} satisfies Meta<typeof Header>;
+-
+-export default meta;
+-type Story = StoryObj<typeof meta>;
+-
+-export const LoggedIn: Story = {
+-  args: {
+-    user: {
+-      name: 'Jane Doe',
+-    },
+-  },
+-};
+-
+-export const LoggedOut: Story = {};
+diff --git a/apps/web/src/stories/Header.tsx b/apps/web/src/stories/Header.tsx
+deleted file mode 100644
+index d05ed4f67..000000000
+--- a/apps/web/src/stories/Header.tsx
++++ /dev/null
+@@ -1,54 +0,0 @@
+-import { Button } from './Button';
+-import './header.css';
+-
+-type User = {
+-  name: string;
+-};
+-
+-export interface HeaderProps {
+-  user?: User;
+-  onLogin?: () => void;
+-  onLogout?: () => void;
+-  onCreateAccount?: () => void;
+-}
+-
+-export const Header = ({ user, onLogin, onLogout, onCreateAccount }: HeaderProps) => (
+-  <header>
+-    <div className="storybook-header">
+-      <div>
+-        <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+-          <g fill="none" fillRule="evenodd">
+-            <path
+-              d="M10 0h12a10 10 0 0110 10v12a10 10 0 01-10 10H10A10 10 0 010 22V10A10 10 0 0110 0z"
+-              fill="#FFF"
+-            />
+-            <path
+-              d="M5.3 10.6l10.4 6v11.1l-10.4-6v-11zm11.4-6.2l9.7 5.5-9.7 5.6V4.4z"
+-              fill="#555AB9"
+-            />
+-            <path
+-              d="M27.2 10.6v11.2l-10.5 6V16.5l10.5-6zM15.7 4.4v11L6 10l9.7-5.5z"
+-              fill="#91BAF8"
+-            />
+-          </g>
+-        </svg>
+-        <h1>Acme</h1>
+-      </div>
+-      <div>
+-        {user ? (
+-          <>
+-            <span className="welcome">
+-              Welcome, <b>{user.name}</b>!
+-            </span>
+-            <Button size="small" onClick={onLogout} label="Log out" />
+-          </>
+-        ) : (
+-          <>
+-            <Button size="small" onClick={onLogin} label="Log in" />
+-            <Button primary size="small" onClick={onCreateAccount} label="Sign up" />
+-          </>
+-        )}
+-      </div>
+-    </div>
+-  </header>
+-);
+diff --git a/apps/web/src/stories/Page.stories.ts b/apps/web/src/stories/Page.stories.ts
+deleted file mode 100644
+index 44adf0285..000000000
+--- a/apps/web/src/stories/Page.stories.ts
++++ /dev/null
+@@ -1,33 +0,0 @@
+-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+-
+-import { expect, userEvent, within } from 'storybook/test';
+-
+-import { Page } from './Page';
+-
+-const meta = {
+-  title: 'Example/Page',
+-  component: Page,
+-  parameters: {
+-    // More on how to position stories at: https://storybook.js.org/docs/configure/story-layout
+-    layout: 'fullscreen',
+-  },
+-} satisfies Meta<typeof Page>;
+-
+-export default meta;
+-type Story = StoryObj<typeof meta>;
+-
+-export const LoggedOut: Story = {};
+-
+-// More on component testing: https://storybook.js.org/docs/writing-tests/interaction-testing
+-export const LoggedIn: Story = {
+-  play: async ({ canvasElement }) => {
+-    const canvas = within(canvasElement);
+-    const loginButton = canvas.getByRole('button', { name: /Log in/i });
+-    await expect(loginButton).toBeInTheDocument();
+-    await userEvent.click(loginButton);
+-    await expect(loginButton).not.toBeInTheDocument();
+-
+-    const logoutButton = canvas.getByRole('button', { name: /Log out/i });
+-    await expect(logoutButton).toBeInTheDocument();
+-  },
+-};
+diff --git a/apps/web/src/stories/Page.tsx b/apps/web/src/stories/Page.tsx
+deleted file mode 100644
+index e11748301..000000000
+--- a/apps/web/src/stories/Page.tsx
++++ /dev/null
+@@ -1,73 +0,0 @@
+-import React from 'react';
+-
+-import { Header } from './Header';
+-import './page.css';
+-
+-type User = {
+-  name: string;
+-};
+-
+-export const Page: React.FC = () => {
+-  const [user, setUser] = React.useState<User>();
+-
+-  return (
+-    <article>
+-      <Header
+-        user={user}
+-        onLogin={() => setUser({ name: 'Jane Doe' })}
+-        onLogout={() => setUser(undefined)}
+-        onCreateAccount={() => setUser({ name: 'Jane Doe' })}
+-      />
+-
+-      <section className="storybook-page">
+-        <h2>Pages in Storybook</h2>
+-        <p>
+-          We recommend building UIs with a{' '}
+-          <a href="https://componentdriven.org" target="_blank" rel="noopener noreferrer">
+-            <strong>component-driven</strong>
+-          </a>{' '}
+-          process starting with atomic components and ending with pages.
+-        </p>
+-        <p>
+-          Render pages with mock data. This makes it easy to build and review page states without
+-          needing to navigate to them in your app. Here are some handy patterns for managing page
+-          data in Storybook:
+-        </p>
+-        <ul>
+-          <li>
+-            Use a higher-level connected component. Storybook helps you compose such data from the
+-            "args" of child component stories
+-          </li>
+-          <li>
+-            Assemble data in the page component from your services. You can mock these services out
+-            using Storybook.
+-          </li>
+-        </ul>
+-        <p>
+-          Get a guided tutorial on component-driven development at{' '}
+-          <a href="https://storybook.js.org/tutorials/" target="_blank" rel="noopener noreferrer">
+-            Storybook tutorials
+-          </a>
+-          . Read more in the{' '}
+-          <a href="https://storybook.js.org/docs" target="_blank" rel="noopener noreferrer">
+-            docs
+-          </a>
+-          .
+-        </p>
+-        <div className="tip-wrapper">
+-          <span className="tip">Tip</span> Adjust the width of the canvas with the{' '}
+-          <svg width="10" height="10" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+-            <g fill="none" fillRule="evenodd">
+-              <path
+-                d="M1.5 5.2h4.8c.3 0 .5.2.5.4v5.1c-.1.2-.3.3-.4.3H1.4a.5.5 0 01-.5-.4V5.7c0-.3.2-.5.5-.5zm0-2.1h6.9c.3 0 .5.2.5.4v7a.5.5 0 01-1 0V4H1.5a.5.5 0 010-1zm0-2.1h9c.3 0 .5.2.5.4v9.1a.5.5 0 01-1 0V2H1.5a.5.5 0 010-1zm4.3 5.2H2V10h3.8V6.2z"
+-                id="a"
+-                fill="#999"
+-              />
+-            </g>
+-          </svg>
+-          Viewports addon in the toolbar
+-        </div>
+-      </section>
+-    </article>
+-  );
+-};
+diff --git a/apps/web/src/stories/assets/accessibility.png b/apps/web/src/stories/assets/accessibility.png
+deleted file mode 100644
+index 6ffe6feab..000000000
+Binary files a/apps/web/src/stories/assets/accessibility.png and /dev/null differ
+diff --git a/apps/web/src/stories/assets/accessibility.svg b/apps/web/src/stories/assets/accessibility.svg
+deleted file mode 100644
+index 107e93f83..000000000
+--- a/apps/web/src/stories/assets/accessibility.svg
++++ /dev/null
+@@ -1 +0,0 @@
+-<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 48 48"><title>Accessibility</title><circle cx="24.334" cy="24" r="24" fill="#A849FF" fill-opacity=".3"/><path fill="#A470D5" fill-rule="evenodd" d="M27.8609 11.585C27.8609 9.59506 26.2497 7.99023 24.2519 7.99023C22.254 7.99023 20.6429 9.65925 20.6429 11.585C20.6429 13.575 22.254 15.1799 24.2519 15.1799C26.2497 15.1799 27.8609 13.575 27.8609 11.585ZM21.8922 22.6473C21.8467 23.9096 21.7901 25.4788 21.5897 26.2771C20.9853 29.0462 17.7348 36.3314 17.3325 37.2275C17.1891 37.4923 17.1077 37.7955 17.1077 38.1178C17.1077 39.1519 17.946 39.9902 18.9802 39.9902C19.6587 39.9902 20.253 39.6293 20.5814 39.0889L20.6429 38.9874L24.2841 31.22C24.2841 31.22 27.5529 37.9214 27.9238 38.6591C28.2948 39.3967 28.8709 39.9902 29.7168 39.9902C30.751 39.9902 31.5893 39.1519 31.5893 38.1178C31.5893 37.7951 31.3639 37.2265 31.3639 37.2265C30.9581 36.3258 27.698 29.0452 27.0938 26.2771C26.8975 25.4948 26.847 23.9722 26.8056 22.7236C26.7927 22.333 26.7806 21.9693 26.7653 21.6634C26.7008 21.214 27.0231 20.8289 27.4097 20.7005L35.3366 18.3253C36.3033 18.0685 36.8834 16.9773 36.6256 16.0144C36.3678 15.0515 35.2722 14.4737 34.3055 14.7305C34.3055 14.7305 26.8619 17.1057 24.2841 17.1057C21.7062 17.1057 14.456 14.7947 14.456 14.7947C13.4893 14.5379 12.3937 14.9873 12.0715 15.9502C11.7493 16.9131 12.3293 18.0044 13.3604 18.3253L21.2873 20.7005C21.674 20.8289 21.9318 21.214 21.9318 21.6634C21.9174 21.9493 21.9053 22.2857 21.8922 22.6473Z" clip-rule="evenodd"/></svg>
+\ No newline at end of file
+diff --git a/apps/web/src/stories/assets/addon-library.png b/apps/web/src/stories/assets/addon-library.png
+deleted file mode 100644
+index 95deb38a8..000000000
+Binary files a/apps/web/src/stories/assets/addon-library.png and /dev/null differ
+diff --git a/apps/web/src/stories/assets/assets.png b/apps/web/src/stories/assets/assets.png
+deleted file mode 100644
+index cfba6817a..000000000
+Binary files a/apps/web/src/stories/assets/assets.png and /dev/null differ
+diff --git a/apps/web/src/stories/assets/avif-test-image.avif b/apps/web/src/stories/assets/avif-test-image.avif
+deleted file mode 100644
+index 530709bc1..000000000
+Binary files a/apps/web/src/stories/assets/avif-test-image.avif and /dev/null differ
+diff --git a/apps/web/src/stories/assets/context.png b/apps/web/src/stories/assets/context.png
+deleted file mode 100644
+index e5cd249a2..000000000
+Binary files a/apps/web/src/stories/assets/context.png and /dev/null differ
+diff --git a/apps/web/src/stories/assets/discord.svg b/apps/web/src/stories/assets/discord.svg
+deleted file mode 100644
+index d638958b6..000000000
+--- a/apps/web/src/stories/assets/discord.svg
++++ /dev/null
+@@ -1 +0,0 @@
+-<svg xmlns="http://www.w3.org/2000/svg" width="33" height="32" fill="none" viewBox="0 0 33 32"><g clip-path="url(#clip0_10031_177575)"><mask id="mask0_10031_177575" style="mask-type:luminance" width="33" height="25" x="0" y="4" maskUnits="userSpaceOnUse"><path fill="#fff" d="M32.5034 4.00195H0.503906V28.7758H32.5034V4.00195Z"/></mask><g mask="url(#mask0_10031_177575)"><path fill="#5865F2" d="M27.5928 6.20817C25.5533 5.27289 23.3662 4.58382 21.0794 4.18916C21.0378 4.18154 20.9962 4.20057 20.9747 4.23864C20.6935 4.73863 20.3819 5.3909 20.1637 5.90358C17.7042 5.53558 15.2573 5.53558 12.8481 5.90358C12.6299 5.37951 12.307 4.73863 12.0245 4.23864C12.003 4.20184 11.9614 4.18281 11.9198 4.18916C9.63431 4.58255 7.44721 5.27163 5.40641 6.20817C5.38874 6.21578 5.3736 6.22848 5.36355 6.24497C1.21508 12.439 0.078646 18.4809 0.636144 24.4478C0.638667 24.477 0.655064 24.5049 0.677768 24.5227C3.41481 26.5315 6.06609 27.7511 8.66815 28.5594C8.70979 28.5721 8.75392 28.5569 8.78042 28.5226C9.39594 27.6826 9.94461 26.7968 10.4151 25.8653C10.4428 25.8107 10.4163 25.746 10.3596 25.7244C9.48927 25.3945 8.66058 24.9922 7.86343 24.5354C7.80038 24.4986 7.79533 24.4084 7.85333 24.3653C8.02108 24.2397 8.18888 24.109 8.34906 23.977C8.37804 23.9529 8.41842 23.9478 8.45249 23.963C13.6894 26.3526 19.359 26.3526 24.5341 23.963C24.5682 23.9465 24.6086 23.9516 24.6388 23.9757C24.799 24.1077 24.9668 24.2397 25.1358 24.3653C25.1938 24.4084 25.19 24.4986 25.127 24.5354C24.3298 25.0011 23.5011 25.3945 22.6296 25.7232C22.5728 25.7447 22.5476 25.8107 22.5754 25.8653C23.0559 26.7955 23.6046 27.6812 24.2087 28.5213C24.234 28.5569 24.2794 28.5721 24.321 28.5594C26.9357 27.7511 29.5869 26.5315 32.324 24.5227C32.348 24.5049 32.3631 24.4783 32.3656 24.4491C33.0328 17.5506 31.2481 11.5584 27.6344 6.24623C27.6256 6.22848 27.6105 6.21578 27.5928 6.20817ZM11.1971 20.8146C9.62043 20.8146 8.32129 19.3679 8.32129 17.5913C8.32129 15.8146 9.59523 14.368 11.1971 14.368C12.8115 14.368 14.0981 15.8273 14.0729 17.5913C14.0729 19.3679 12.7989 20.8146 11.1971 20.8146ZM21.8299 20.8146C20.2533 20.8146 18.9541 19.3679 18.9541 17.5913C18.9541 15.8146 20.228 14.368 21.8299 14.368C23.4444 14.368 24.7309 15.8273 24.7057 17.5913C24.7057 19.3679 23.4444 20.8146 21.8299 20.8146Z"/></g></g><defs><clipPath id="clip0_10031_177575"><rect width="32" height="32" fill="#fff" transform="translate(0.5)"/></clipPath></defs></svg>
+\ No newline at end of file
+diff --git a/apps/web/src/stories/assets/docs.png b/apps/web/src/stories/assets/docs.png
+deleted file mode 100644
+index a749629df..000000000
+Binary files a/apps/web/src/stories/assets/docs.png and /dev/null differ
+diff --git a/apps/web/src/stories/assets/figma-plugin.png b/apps/web/src/stories/assets/figma-plugin.png
+deleted file mode 100644
+index 8f79b08cd..000000000
+Binary files a/apps/web/src/stories/assets/figma-plugin.png and /dev/null differ
+diff --git a/apps/web/src/stories/assets/github.svg b/apps/web/src/stories/assets/github.svg
+deleted file mode 100644
+index dc513528c..000000000
+--- a/apps/web/src/stories/assets/github.svg
++++ /dev/null
+@@ -1 +0,0 @@
+-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 32 32"><path fill="#161614" d="M16.0001 0C7.16466 0 0 7.17472 0 16.0256C0 23.1061 4.58452 29.1131 10.9419 31.2322C11.7415 31.3805 12.0351 30.8845 12.0351 30.4613C12.0351 30.0791 12.0202 28.8167 12.0133 27.4776C7.56209 28.447 6.62283 25.5868 6.62283 25.5868C5.89499 23.7345 4.8463 23.2419 4.8463 23.2419C3.39461 22.2473 4.95573 22.2678 4.95573 22.2678C6.56242 22.3808 7.40842 23.9192 7.40842 23.9192C8.83547 26.3691 11.1514 25.6609 12.0645 25.2514C12.2081 24.2156 12.6227 23.5087 13.0803 23.1085C9.52648 22.7032 5.7906 21.3291 5.7906 15.1886C5.7906 13.4389 6.41563 12.0094 7.43916 10.8871C7.27303 10.4834 6.72537 8.85349 7.59415 6.64609C7.59415 6.64609 8.93774 6.21539 11.9953 8.28877C13.2716 7.9337 14.6404 7.75563 16.0001 7.74953C17.3599 7.75563 18.7297 7.9337 20.0084 8.28877C23.0623 6.21539 24.404 6.64609 24.404 6.64609C25.2749 8.85349 24.727 10.4834 24.5608 10.8871C25.5868 12.0094 26.2075 13.4389 26.2075 15.1886C26.2075 21.3437 22.4645 22.699 18.9017 23.0957C19.4756 23.593 19.9869 24.5683 19.9869 26.0634C19.9869 28.2077 19.9684 29.9334 19.9684 30.4613C19.9684 30.8877 20.2564 31.3874 21.0674 31.2301C27.4213 29.1086 32 23.1037 32 16.0256C32 7.17472 24.8364 0 16.0001 0ZM5.99257 22.8288C5.95733 22.9084 5.83227 22.9322 5.71834 22.8776C5.60229 22.8253 5.53711 22.7168 5.57474 22.6369C5.60918 22.5549 5.7345 22.5321 5.85029 22.587C5.9666 22.6393 6.03284 22.7489 5.99257 22.8288ZM6.7796 23.5321C6.70329 23.603 6.55412 23.5701 6.45291 23.4581C6.34825 23.3464 6.32864 23.197 6.40601 23.125C6.4847 23.0542 6.62937 23.0874 6.73429 23.1991C6.83895 23.3121 6.85935 23.4605 6.7796 23.5321ZM7.31953 24.4321C7.2215 24.5003 7.0612 24.4363 6.96211 24.2938C6.86407 24.1513 6.86407 23.9804 6.96422 23.9119C7.06358 23.8435 7.2215 23.905 7.32191 24.0465C7.41968 24.1914 7.41968 24.3623 7.31953 24.4321ZM8.23267 25.4743C8.14497 25.5712 7.95818 25.5452 7.82146 25.413C7.68156 25.2838 7.64261 25.1004 7.73058 25.0035C7.81934 24.9064 8.00719 24.9337 8.14497 25.0648C8.28381 25.1938 8.3262 25.3785 8.23267 25.4743ZM9.41281 25.8262C9.37413 25.9517 9.19423 26.0088 9.013 25.9554C8.83203 25.9005 8.7136 25.7535 8.75016 25.6266C8.78778 25.5003 8.96848 25.4408 9.15104 25.4979C9.33174 25.5526 9.45044 25.6985 9.41281 25.8262ZM10.7559 25.9754C10.7604 26.1076 10.6067 26.2172 10.4165 26.2196C10.2252 26.2238 10.0704 26.1169 10.0683 25.9868C10.0683 25.8534 10.2185 25.7448 10.4098 25.7416C10.6001 25.7379 10.7559 25.8441 10.7559 25.9754ZM12.0753 25.9248C12.0981 26.0537 11.9658 26.1862 11.7769 26.2215C11.5912 26.2554 11.4192 26.1758 11.3957 26.0479C11.3726 25.9157 11.5072 25.7833 11.6927 25.7491C11.8819 25.7162 12.0512 25.7937 12.0753 25.9248Z"/></svg>
+\ No newline at end of file
+diff --git a/apps/web/src/stories/assets/share.png b/apps/web/src/stories/assets/share.png
+deleted file mode 100644
+index 8097a3707..000000000
+Binary files a/apps/web/src/stories/assets/share.png and /dev/null differ
+diff --git a/apps/web/src/stories/assets/styling.png b/apps/web/src/stories/assets/styling.png
+deleted file mode 100644
+index d341e8263..000000000
+Binary files a/apps/web/src/stories/assets/styling.png and /dev/null differ
+diff --git a/apps/web/src/stories/assets/testing.png b/apps/web/src/stories/assets/testing.png
+deleted file mode 100644
+index d4ac39a0c..000000000
+Binary files a/apps/web/src/stories/assets/testing.png and /dev/null differ
+diff --git a/apps/web/src/stories/assets/theming.png b/apps/web/src/stories/assets/theming.png
+deleted file mode 100644
+index 1535eb9b8..000000000
+Binary files a/apps/web/src/stories/assets/theming.png and /dev/null differ
+diff --git a/apps/web/src/stories/assets/tutorials.svg b/apps/web/src/stories/assets/tutorials.svg
+deleted file mode 100644
+index b492a9c66..000000000
+--- a/apps/web/src/stories/assets/tutorials.svg
++++ /dev/null
+@@ -1 +0,0 @@
+-<svg xmlns="http://www.w3.org/2000/svg" width="33" height="32" fill="none" viewBox="0 0 33 32"><g clip-path="url(#clip0_10031_177597)"><path fill="#B7F0EF" fill-rule="evenodd" d="M17 7.87059C17 6.48214 17.9812 5.28722 19.3431 5.01709L29.5249 2.99755C31.3238 2.64076 33 4.01717 33 5.85105V22.1344C33 23.5229 32.0188 24.7178 30.6569 24.9879L20.4751 27.0074C18.6762 27.3642 17 25.9878 17 24.1539L17 7.87059Z" clip-rule="evenodd" opacity=".7"/><path fill="#87E6E5" fill-rule="evenodd" d="M1 5.85245C1 4.01857 2.67623 2.64215 4.47507 2.99895L14.6569 5.01848C16.0188 5.28861 17 6.48354 17 7.87198V24.1553C17 25.9892 15.3238 27.3656 13.5249 27.0088L3.34311 24.9893C1.98119 24.7192 1 23.5242 1 22.1358V5.85245Z" clip-rule="evenodd"/><path fill="#61C1FD" fill-rule="evenodd" d="M15.543 5.71289C15.543 5.71289 16.8157 5.96289 17.4002 6.57653C17.9847 7.19016 18.4521 9.03107 18.4521 9.03107C18.4521 9.03107 18.4521 25.1106 18.4521 26.9629C18.4521 28.8152 19.3775 31.4174 19.3775 31.4174L17.4002 28.8947L16.2575 31.4174C16.2575 31.4174 15.543 29.0765 15.543 27.122C15.543 25.1674 15.543 5.71289 15.543 5.71289Z" clip-rule="evenodd"/></g><defs><clipPath id="clip0_10031_177597"><rect width="32" height="32" fill="#fff" transform="translate(0.5)"/></clipPath></defs></svg>
+\ No newline at end of file
+diff --git a/apps/web/src/stories/assets/youtube.svg b/apps/web/src/stories/assets/youtube.svg
+deleted file mode 100644
+index a7515d7e9..000000000
+--- a/apps/web/src/stories/assets/youtube.svg
++++ /dev/null
+@@ -1 +0,0 @@
+-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 32 32"><path fill="#ED1D24" d="M31.3313 8.44657C30.9633 7.08998 29.8791 6.02172 28.5022 5.65916C26.0067 5.00026 16 5.00026 16 5.00026C16 5.00026 5.99333 5.00026 3.4978 5.65916C2.12102 6.02172 1.03665 7.08998 0.668678 8.44657C0 10.9053 0 16.0353 0 16.0353C0 16.0353 0 21.1652 0.668678 23.6242C1.03665 24.9806 2.12102 26.0489 3.4978 26.4116C5.99333 27.0703 16 27.0703 16 27.0703C16 27.0703 26.0067 27.0703 28.5022 26.4116C29.8791 26.0489 30.9633 24.9806 31.3313 23.6242C32 21.1652 32 16.0353 32 16.0353C32 16.0353 32 10.9053 31.3313 8.44657Z"/><path fill="#fff" d="M12.7266 20.6934L21.0902 16.036L12.7266 11.3781V20.6934Z"/></svg>
+\ No newline at end of file
+diff --git a/apps/web/src/stories/button.css b/apps/web/src/stories/button.css
+deleted file mode 100644
+index 4e3620b0d..000000000
+--- a/apps/web/src/stories/button.css
++++ /dev/null
+@@ -1,30 +0,0 @@
+-.storybook-button {
+-  display: inline-block;
+-  cursor: pointer;
+-  border: 0;
+-  border-radius: 3em;
+-  font-weight: 700;
+-  line-height: 1;
+-  font-family: 'Nunito Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+-}
+-.storybook-button--primary {
+-  background-color: #555ab9;
+-  color: white;
+-}
+-.storybook-button--secondary {
+-  box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 0px 1px inset;
+-  background-color: transparent;
+-  color: #333;
+-}
+-.storybook-button--small {
+-  padding: 10px 16px;
+-  font-size: 12px;
+-}
+-.storybook-button--medium {
+-  padding: 11px 20px;
+-  font-size: 14px;
+-}
+-.storybook-button--large {
+-  padding: 12px 24px;
+-  font-size: 16px;
+-}
+diff --git a/apps/web/src/stories/header.css b/apps/web/src/stories/header.css
+deleted file mode 100644
+index 5efd46c26..000000000
+--- a/apps/web/src/stories/header.css
++++ /dev/null
+@@ -1,32 +0,0 @@
+-.storybook-header {
+-  display: flex;
+-  justify-content: space-between;
+-  align-items: center;
+-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+-  padding: 15px 20px;
+-  font-family: 'Nunito Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+-}
+-
+-.storybook-header svg {
+-  display: inline-block;
+-  vertical-align: top;
+-}
+-
+-.storybook-header h1 {
+-  display: inline-block;
+-  vertical-align: top;
+-  margin: 6px 0 6px 10px;
+-  font-weight: 700;
+-  font-size: 20px;
+-  line-height: 1;
+-}
+-
+-.storybook-header button + button {
+-  margin-left: 10px;
+-}
+-
+-.storybook-header .welcome {
+-  margin-right: 10px;
+-  color: #333;
+-  font-size: 14px;
+-}
+diff --git a/apps/web/src/stories/page.css b/apps/web/src/stories/page.css
+deleted file mode 100644
+index 77c81d2d5..000000000
+--- a/apps/web/src/stories/page.css
++++ /dev/null
+@@ -1,68 +0,0 @@
+-.storybook-page {
+-  margin: 0 auto;
+-  padding: 48px 20px;
+-  max-width: 600px;
+-  color: #333;
+-  font-size: 14px;
+-  line-height: 24px;
+-  font-family: 'Nunito Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+-}
+-
+-.storybook-page h2 {
+-  display: inline-block;
+-  vertical-align: top;
+-  margin: 0 0 4px;
+-  font-weight: 700;
+-  font-size: 32px;
+-  line-height: 1;
+-}
+-
+-.storybook-page p {
+-  margin: 1em 0;
+-}
+-
+-.storybook-page a {
+-  color: inherit;
+-}
+-
+-.storybook-page ul {
+-  margin: 1em 0;
+-  padding-left: 30px;
+-}
+-
+-.storybook-page li {
+-  margin-bottom: 8px;
+-}
+-
+-.storybook-page .tip {
+-  display: inline-block;
+-  vertical-align: top;
+-  margin-right: 10px;
+-  border-radius: 1em;
+-  background: #e7fdd8;
+-  padding: 4px 12px;
+-  color: #357a14;
+-  font-weight: 700;
+-  font-size: 11px;
+-  line-height: 12px;
+-}
+-
+-.storybook-page .tip-wrapper {
+-  margin-top: 40px;
+-  margin-bottom: 40px;
+-  font-size: 13px;
+-  line-height: 20px;
+-}
+-
+-.storybook-page .tip-wrapper svg {
+-  display: inline-block;
+-  vertical-align: top;
+-  margin-top: 3px;
+-  margin-right: 4px;
+-  width: 12px;
+-  height: 12px;
+-}
+-
+-.storybook-page .tip-wrapper svg path {
+-  fill: #1ea7fd;
+-}
+diff --git a/apps/web/src/theme/globals.css b/apps/web/src/theme/globals.css
+index 0ad8bdd1d..0b4f3b465 100644
+--- a/apps/web/src/theme/globals.css
++++ b/apps/web/src/theme/globals.css
+@@ -56,6 +56,8 @@
+   --speed: 4200ms;
+   --font-size: 1rem;
+   --line-height: 1.5;
++  /* Header theme / locale chrome: matches shrine “Compose” outline + serif */
++  --themed-chrome-serif: var(--font-noto-serif), ui-serif, Georgia, "Hiragino Mincho ProN", serif;
+ }
+ 
+ *,
+diff --git a/apps/web/src/theme/themeScale.ts b/apps/web/src/theme/themeScale.ts
+index 1924bf1bf..d5dcd8e6e 100644
+--- a/apps/web/src/theme/themeScale.ts
++++ b/apps/web/src/theme/themeScale.ts
+@@ -168,7 +168,7 @@ const THEME_STOPS: ThemeStop[] = [
+     vars: {
+       "--background": "#091637",
+       "--background-color": "#091637",
+-      "--text-color": "#fff3cc",
++      "--text-color": "#e6efdb",
+       "--text-muted": "#d7caa2",
+       "--input-bg": "#1f438f",
+       "--profile-surface-bg": "#2753a8",
+@@ -185,7 +185,7 @@ const THEME_STOPS: ThemeStop[] = [
+       "--shrine-ink": "#fff2cb",
+       "--shrine-ink-light": "#ddcca1",
+       "--shrine-placeholder": "#ccb98a",
+-      "--sumi-ink": "#fff3cc",
++      "--sumi-ink": "#e6efdb",
+       "--footer-border": "#89a7e6",
+       "--footer-separator": "#e1d1a2",
+       "--footer-muted": "#dac999",
+@@ -401,7 +401,7 @@ const getInterpolatedVars = (progress: number): ThemeVars => {
+     {} as ThemeVars,
+   );
+ 
+-  const targetText = mixColor("#1d2531", "#fff4c9", clamped / 100);
++  const targetText = mixColor("#1d2531", "#e6efdb", clamped / 100);
+   const background = interpolated["--background"];
+   const fallbackDark = "#1b1f2a";
+   const fallbackLight = "#fff7d5";
+diff --git a/apps/web/src/theme/themes/night-sky.css b/apps/web/src/theme/themes/night-sky.css
+index b06727f56..0b4e5d42b 100644
+--- a/apps/web/src/theme/themes/night-sky.css
++++ b/apps/web/src/theme/themes/night-sky.css
+@@ -1,7 +1,7 @@
+ :root[data-theme="night-sky"] {
+   --background: #091637;
+   --background-color: #091637;
+-  --text-color: #fff3cc;
++  --text-color: rgb(230 239 219);
+   --text-muted: #d7caa2;
+   --input-placeholder: #c5b98f;
+   --input-bg: rgba(22, 44, 94, 0.76);
+@@ -19,7 +19,7 @@
+   --shrine-ink: #fff2cb;
+   --shrine-ink-light: #ddcca1;
+   --shrine-placeholder: rgba(221, 204, 161, 0.56);
+-  --sumi-ink: #fff3cc;
++  --sumi-ink: rgb(230 239 219);
+   --border-color: rgba(137, 167, 230, 0.36);
+   --footer-border: rgba(137, 167, 230, 0.3);
+   --footer-separator: rgba(225, 209, 162, 0.58);

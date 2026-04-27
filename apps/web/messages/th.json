@@ -4,6 +4,9 @@
     "saveProfile": "บันทึกโปรไฟล์",
     "theme": "ธีม",
     "language": "ภาษา",
+    "languageSearchPlaceholder": "ค้นหาภาษา",
+    "languageNoMatches": "ไม่พบภาษาที่ตรงกัน",
+    "languageCurrent": "ปัจจุบัน",
     "preferencesGroupLabel": "การแสดงผลและภาษา",
     "preferencesSaveError": "บันทึกการตั้งค่าไม่สำเร็จ"
   },

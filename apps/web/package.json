@@ -13,6 +13,10 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:playwright": "playwright test",
+    "test:playwright:storybook-health": "playwright test tests/playwright/storybook-runtime-health.spec.ts",
+    "snapshots:auth-nav": "SNAPSHOT_AUTH_NAV=1 playwright test tests/playwright/auth-nav-hover-snapshots.spec.ts",
+    "snapshots:auth-nav:expected": "node scripts/generate-auth-nav-expected-snapshots.mjs",
+    "snapshots:standalone-yinyang": "node scripts/capture-standalone-yinyang-snapshots.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "generate-icons": "node scripts/generate-icons.mjs"

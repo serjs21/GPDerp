@@ -4,6 +4,9 @@
     "saveProfile": "Profil speichern",
     "theme": "Thema",
     "language": "Sprache",
+    "languageSearchPlaceholder": "Sprachen durchsuchen",
+    "languageNoMatches": "Keine passenden Sprachen",
+    "languageCurrent": "Aktuell",
     "preferencesGroupLabel": "Anzeige und Sprache",
     "preferencesSaveError": "Einstellungen konnten nicht gespeichert werden"
   },

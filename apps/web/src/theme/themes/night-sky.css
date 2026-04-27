@@ -1,7 +1,7 @@
 :root[data-theme="night-sky"] {
   --background: #091637;
   --background-color: #091637;
-  --text-color: #fff3cc;
+  --text-color: rgb(230 239 219);
   --text-muted: #d7caa2;
   --input-placeholder: #c5b98f;
   --input-bg: rgba(22, 44, 94, 0.76);
@@ -19,7 +19,7 @@
   --shrine-ink: #fff2cb;
   --shrine-ink-light: #ddcca1;
   --shrine-placeholder: rgba(221, 204, 161, 0.56);
-  --sumi-ink: #fff3cc;
+  --sumi-ink: rgb(230 239 219);
   --border-color: rgba(137, 167, 230, 0.36);
   --footer-border: rgba(137, 167, 230, 0.3);
   --footer-separator: rgba(225, 209, 162, 0.58);

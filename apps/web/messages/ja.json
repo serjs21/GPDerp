@@ -4,6 +4,9 @@
     "saveProfile": "プロフィールを保存",
     "theme": "テーマ",
     "language": "言語",
+    "languageSearchPlaceholder": "言語を検索",
+    "languageNoMatches": "該当する言語がありません",
+    "languageCurrent": "現在",
     "preferencesGroupLabel": "表示と言語",
     "preferencesSaveError": "設定を保存できませんでした"
   },

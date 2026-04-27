@@ -68,11 +68,11 @@ export default async function RootLayout({
           <NextIntlClientProvider locale={initialLocale} messages={messages}>
             <ThemeProvider initialTheme={initialTheme}>
               <AuthenticationProvider>
-                <LayoutProvider googleClientId={googleClientId}>
-                  <AuthenticationVerificationProvider>
+                <AuthenticationVerificationProvider>
+                  <LayoutProvider googleClientId={googleClientId}>
                     <QueryProvider>{children}</QueryProvider>
-                  </AuthenticationVerificationProvider>
-                </LayoutProvider>
+                  </LayoutProvider>
+                </AuthenticationVerificationProvider>
               </AuthenticationProvider>
             </ThemeProvider>
           </NextIntlClientProvider>

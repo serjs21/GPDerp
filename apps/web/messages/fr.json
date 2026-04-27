@@ -4,6 +4,9 @@
     "saveProfile": "Enregistrer le profil",
     "theme": "Theme",
     "language": "Langue",
+    "languageSearchPlaceholder": "Rechercher une langue",
+    "languageNoMatches": "Aucune langue correspondante",
+    "languageCurrent": "Actuelle",
     "preferencesGroupLabel": "Affichage et langue",
     "preferencesSaveError": "Impossible d'enregistrer les preferences"
   },

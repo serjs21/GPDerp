@@ -1,6 +1,8 @@
 import type { Preview } from '@storybook/nextjs-vite'
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { NextIntlClientProvider } from 'next-intl';
 import { createElement } from 'react';
+import enMessages from '../messages/en.json';
 import '@/theme/globals.css';
 import '@/theme/themes/tokyo-dusk.css';
 import '@/theme/themes/sumie.css';
@@ -15,19 +17,23 @@ const preview: Preview = {
         GoogleOAuthProvider,
         { clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || 'storybook-google-client-id' },
         createElement(
-          'div',
-          {
-            style: {
-              minHeight: '100vh',
-              boxSizing: 'border-box',
-              padding: fullscreen ? 0 : '1rem',
-              margin: 0,
-              background: fullscreen ? 'transparent' : 'var(--background)',
-              color: 'var(--text-color)',
-              transition: 'background 160ms ease, color 160ms ease',
+          NextIntlClientProvider,
+          { locale: 'en', messages: enMessages },
+          createElement(
+            'div',
+            {
+              style: {
+                minHeight: '100vh',
+                boxSizing: 'border-box',
+                padding: fullscreen ? 0 : '1rem',
+                margin: 0,
+                background: fullscreen ? 'transparent' : 'var(--background)',
+                color: 'var(--text-color)',
+                transition: 'background 160ms ease, color 160ms ease',
+              },
             },
-          },
-          createElement(Story),
+            createElement(Story),
+          ),
         ),
       );
     },

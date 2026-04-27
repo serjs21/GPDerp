@@ -4,6 +4,9 @@
     "saveProfile": "Save profile",
     "theme": "Theme",
     "language": "Language",
+    "languageSearchPlaceholder": "Search languages",
+    "languageNoMatches": "No matching languages",
+    "languageCurrent": "Current",
     "preferencesGroupLabel": "Display and language",
     "preferencesSaveError": "Could not save your preferences"
   },

@@ -4,6 +4,9 @@
     "saveProfile": "Launch profile payload into orbit",
     "theme": "Vibe Frequency Selector",
     "language": "Tongue Firmware",
+    "languageSearchPlaceholder": "Probe the tongue list",
+    "languageNoMatches": "Zero hits in the tongue rolodex",
+    "languageCurrent": "LIVE",
     "preferencesGroupLabel": "Cosmetics n chatter matrix",
     "preferencesSaveError": "The cloud said no; try again later"
   },

@@ -4,6 +4,9 @@
     "saveProfile": "Salva profilo",
     "theme": "Tema",
     "language": "Lingua",
+    "languageSearchPlaceholder": "Cerca lingue",
+    "languageNoMatches": "Nessuna lingua corrispondente",
+    "languageCurrent": "Attuale",
     "preferencesGroupLabel": "Schermo e lingua",
     "preferencesSaveError": "Impossibile salvare le preferenze"
   },

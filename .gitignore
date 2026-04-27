@@ -143,3 +143,8 @@ vite.config.ts.timestamp-*
 .pnpm-store/*
 
 .cursor/
+
+# Generated animation reference frames (run: pnpm snapshots:auth-nav in apps/web)
+apps/web/local/auth-nav-hover-snapshots/
+apps/web/local/auth-nav-hover-expected/
+apps/web/local/suggested-yinyang-standalone/

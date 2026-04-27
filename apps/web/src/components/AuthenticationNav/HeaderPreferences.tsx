@@ -1,11 +1,10 @@
 "use client";
 
-import { Dropdown, type MenuProps, message } from "@/components/StyledComponents";
-import { UIButton } from "@/components/ui";
+import { message } from "@/components/StyledComponents";
+import { LocaleSelector } from "@/components/LocaleSelector";
 import { ThemeSelector } from "@/components/ThemeSelector";
-import { Languages, ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState, type ComponentType, useMemo } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { updateOwnConfiguration } from "@/api/user";
 import {
@@ -19,25 +18,8 @@ import { useProfileI18n } from "@/hooks/useProfileI18n";
 import { useLocale } from "@/hooks/useLocale";
 import { useTheme } from "@/hooks/useTheme";
 import { useTranslations } from "next-intl";
-import { DE, ES, FR, IT, JP, PT, TH, US } from "country-flag-icons/react/3x2";
 import { getPersistedThemeFromScale, getThemeScaleVars } from "@/theme/themeScale";
 import styles from "./headerPreferences.module.css";
-
-type FlagComponent = ComponentType<{
-  className?: string;
-  "aria-hidden"?: boolean;
-}>;
-
-const LOCALE_FLAGS: Partial<Record<AppLocale, FlagComponent>> = {
-  en: US,
-  ja: JP,
-  es: ES,
-  fr: FR,
-  th: TH,
-  de: DE,
-  it: IT,
-  pt: PT,
-};
 
 const THEME_SCALE_FROM_THEME: Record<ThemeName, number> = {
   sumie: 0,
@@ -131,43 +113,6 @@ export const HeaderPreferences = () => {
     void persistIfLoggedIn({ language: next });
   };
 
-  const localeLabelByValue = useMemo(
-    () =>
-      languageOptions.reduce(
-        (acc, option) => {
-          acc[option.value] = option.label;
-          return acc;
-        },
-        {} as Record<AppLocale, string>,
-      ),
-    [languageOptions],
-  );
-
-  const selectedLocaleLabel = localeLabelByValue[locale] ?? locale;
-  const SelectedFlag = LOCALE_FLAGS[locale];
-
-  const localeMenuItems: MenuProps["items"] = languageOptions.map((option) => {
-    const OptionFlag = LOCALE_FLAGS[option.value];
-    const isSelected = option.value === locale;
-    return {
-      key: option.value,
-      label: (
-        <span className={styles.localeOption}>
-          {OptionFlag ? (
-            <OptionFlag className={styles.localeFlag} aria-hidden />
-          ) : (
-            <Languages className={styles.localeFallbackIcon} aria-hidden />
-          )}
-          <span className={styles.localeOptionLabel}>{option.label}</span>
-          <span className={styles.localeCode} aria-hidden>
-            {option.value.toUpperCase()}
-          </span>
-          {isSelected ? <span className={styles.localeCurrent}>Current</span> : null}
-        </span>
-      ),
-    };
-  });
-
   return (
     <div className={styles.wrap} role="group" aria-label={t("preferencesGroupLabel")}>
       <ThemeSelector
@@ -179,29 +124,13 @@ export const HeaderPreferences = () => {
         className={styles.themeSelector}
         ariaLabel={t("theme")}
       />
-      <Dropdown
-        trigger={["click"]}
-        placement="bottomRight"
-        menu={{
-          items: localeMenuItems,
-          selectedKeys: [locale],
-          onClick: ({ key }) => onLocaleChange(key as AppLocale),
-        }}
-      >
-        <UIButton
-          className={styles.localeTrigger}
-          aria-haspopup="menu"
-          aria-label={`${t("language")}: ${selectedLocaleLabel}`}
-          title={selectedLocaleLabel}
-        >
-          {SelectedFlag ? (
-            <SelectedFlag className={styles.localeFlag} aria-hidden />
-          ) : (
-            <Languages className={styles.localeFallbackIcon} aria-hidden />
-          )}
-          <ChevronDown className={styles.localeChevron} aria-hidden />
-        </UIButton>
-      </Dropdown>
+      <LocaleSelector
+        value={locale}
+        options={languageOptions}
+        onChange={onLocaleChange}
+        className={styles.localeSelector}
+        getPopupContainer={(node) => node.parentElement ?? document.body}
+      />
     </div>
   );
 };
