@@ -1,0 +1,20 @@
+diff --git a/apps/web/src/components/AuthenticationNav/SuggestedYinYangStandalone.stories.tsx b/apps/web/src/components/AuthenticationNav/SuggestedYinYangStandalone.stories.tsx
+index eec54c249..fcc9db788 100644
+--- a/apps/web/src/components/AuthenticationNav/SuggestedYinYangStandalone.stories.tsx
++++ b/apps/web/src/components/AuthenticationNav/SuggestedYinYangStandalone.stories.tsx
+@@ -1,6 +1,7 @@
+ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+ import { SuggestedYinYangPill } from "../../../local/suggested-yinyang-standalone/SuggestedYinYangPill";
+ import { SuggestedYinYangHoverLayout } from "../../../local/suggested-yinyang-standalone/SuggestedYinYangHoverLayout";
++import { SuggestedLineOnlyButton } from "../../../local/suggested-yinyang-standalone/SuggestedLineOnlyButton";
+ 
+ const meta = {
+   title: "Suggested/AuthenticationNav/MinimalStandaloneAnimated",
+@@ -26,3 +27,7 @@ export const WithBackgroundSideComponent: Story = {
+   render: () => <SuggestedYinYangHoverLayout />,
+ };
+ 
++export const LineOnlyAnimation: Story = {
++  render: () => <SuggestedLineOnlyButton />,
++};
++

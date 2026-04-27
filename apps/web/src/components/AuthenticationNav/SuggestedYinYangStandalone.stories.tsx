@@ -1,28 +1,31 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { SuggestedYinYangPill } from "../../../local/suggested-yinyang-standalone/SuggestedYinYangPill";
-import { SuggestedYinYangHoverLayout } from "../../../local/suggested-yinyang-standalone/SuggestedYinYangHoverLayout";
+import { SuggestedLineOnlyButton } from "../../../local/suggested-yinyang-standalone/SuggestedLineOnlyButton";
+import { SuggestedSquareBackgroundOnly } from "../../../local/suggested-yinyang-standalone/SuggestedSquareBackgroundOnly";
 
 const meta = {
   title: "Suggested/AuthenticationNav/MinimalStandaloneAnimated",
-  component: SuggestedYinYangPill,
+  component: SuggestedSquareBackgroundOnly,
   tags: ["autodocs"],
   parameters: {
     layout: "centered",
     docs: {
       description: {
         component:
-          "Standalone minimal animated yin-yang auth pill from local prototype folder (isolated from app implementation). Hover Login/Register to animate.",
+          "Standalone minimal DaoRotation-based prototype stories.",
       },
     },
   },
-} satisfies Meta<typeof SuggestedYinYangPill>;
+} satisfies Meta<typeof SuggestedSquareBackgroundOnly>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Animated: Story = {};
-
-export const WithBackgroundSideComponent: Story = {
-  render: () => <SuggestedYinYangHoverLayout />,
+export const LineWithSquareBackground: Story = {
+  render: () => (
+    <div className="yy-line-square-row">
+      <SuggestedLineOnlyButton />
+      <SuggestedSquareBackgroundOnly />
+    </div>
+  ),
 };
 
