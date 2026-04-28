@@ -17,6 +17,7 @@
     "snapshots:auth-nav": "SNAPSHOT_AUTH_NAV=1 playwright test tests/playwright/auth-nav-hover-snapshots.spec.ts",
     "snapshots:auth-nav:expected": "node scripts/generate-auth-nav-expected-snapshots.mjs",
     "snapshots:standalone-yinyang": "node scripts/capture-standalone-yinyang-snapshots.mjs",
+    "snapshots:suggested-liquid-toggle": "node scripts/capture-suggested-liquid-toggle-snapshots.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "generate-icons": "node scripts/generate-icons.mjs"
