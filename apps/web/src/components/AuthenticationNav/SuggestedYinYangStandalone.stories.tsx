@@ -3,171 +3,37 @@ import { useState, type CSSProperties } from "react";
 import type { ThemeName } from "@/config/userConfiguration";
 import { getPersistedThemeFromScale, getThemeScaleVars } from "@/theme/themeScale";
 import { ThemeSelector } from "@/components/ThemeSelector/ThemeSelector";
-import { SuggestedLineOnlyButton } from "../../../local/suggested-yinyang-standalone/SuggestedLineOnlyButton";
-import { DaoLogin } from "../../../local/suggested-yinyang-standalone/DaoLogin";
-import { SuggestedLiquidYinYangAuthToggle } from "../../../local/suggested-yinyang-standalone/SuggestedLiquidYinYangAuthToggle";
-import { SuggestedLiquidYinYangAuthToggleAnime } from "../../../local/suggested-yinyang-standalone/SuggestedLiquidYinYangAuthToggleAnime";
-import { SuggestedLiquidYinYangAuthToggleAnimeWash } from "../../../local/suggested-yinyang-standalone/SuggestedLiquidYinYangAuthToggleAnimeWash";
 import { SuggestedLiquidYinYangAuthToggleAnimeWhirlpool } from "../../../local/suggested-yinyang-standalone/SuggestedLiquidYinYangAuthToggleAnimeWhirlpool";
 import { WashInSea, type WashDirection } from "../../../local/suggested-yinyang-standalone/wash-in-sea/WashInSea";
 import { BlackHoleWhirlpool } from "../../../local/suggested-yinyang-standalone/wash-in-sea/BlackHoleWhirlpool";
 
 const meta = {
   title: "Suggested/AuthenticationNav/MinimalStandaloneAnimated",
-  component: DaoLogin,
+  component: SuggestedLiquidYinYangAuthToggleAnimeWhirlpool,
   tags: ["autodocs"],
   parameters: {
     layout: "centered",
     docs: {
       description: {
-        component:
-          "Standalone minimal DaoRotation-based prototype stories.",
+        component: "Selected standalone animated auth toggle + reusable text animations.",
       },
     },
   },
-} satisfies Meta<typeof DaoLogin>;
+} satisfies Meta<typeof SuggestedLiquidYinYangAuthToggleAnimeWhirlpool>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
-
-export const LineWithSquareBackground: Story = {
-  render: () => {
-    const [theme, setTheme] = useState<ThemeName>("tokyo-dusk");
-    const [preview, setPreview] = useState<number | null>(null);
-    const activeScale = preview ?? (theme === "night-sky" ? 100 : theme === "tokyo-dusk" ? 50 : 0);
-    const themeVars = getThemeScaleVars(activeScale);
-
-    return (
-      <div style={themeVars as CSSProperties}>
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
-          <ThemeSelector
-            value={theme}
-            onChange={setTheme}
-            onPreviewChange={setPreview}
-            onScaleCommit={(progress) => {
-              setPreview(progress);
-              setTheme(getPersistedThemeFromScale(progress));
-            }}
-          />
-        </div>
-        <div className="yy-line-square-row">
-          <SuggestedLineOnlyButton />
-          <DaoLogin />
-        </div>
-      </div>
-    );
-  },
+type WashInSeaStoryArgs = {
+  direction: WashDirection;
+  duration: number;
 };
-
-export const LiquidYinYangToggle: Story = {
-  render: () => {
-    const [theme, setTheme] = useState<ThemeName>("tokyo-dusk");
-    const [preview, setPreview] = useState<number | null>(null);
-    const activeScale = preview ?? (theme === "night-sky" ? 100 : theme === "tokyo-dusk" ? 50 : 0);
-    const themeVars = getThemeScaleVars(activeScale);
-
-    return (
-      <div style={themeVars as CSSProperties}>
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
-          <ThemeSelector
-            value={theme}
-            onChange={setTheme}
-            onPreviewChange={setPreview}
-            onScaleCommit={(progress) => {
-              setPreview(progress);
-              setTheme(getPersistedThemeFromScale(progress));
-            }}
-          />
-        </div>
-        <SuggestedLiquidYinYangAuthToggle />
-      </div>
-    );
-  },
-};
-
-export const LiquidYinYangToggleAnimeWaves: Story = {
-  render: () => {
-    const [theme, setTheme] = useState<ThemeName>("tokyo-dusk");
-    const [preview, setPreview] = useState<number | null>(null);
-    const [fxKey, setFxKey] = useState(0);
-    const activeScale = preview ?? (theme === "night-sky" ? 100 : theme === "tokyo-dusk" ? 50 : 0);
-    const themeVars = getThemeScaleVars(activeScale);
-
-    return (
-      <div style={themeVars as CSSProperties}>
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
-          <ThemeSelector
-            value={theme}
-            onChange={setTheme}
-            onPreviewChange={setPreview}
-            onScaleCommit={(progress) => {
-              setPreview(progress);
-              setTheme(getPersistedThemeFromScale(progress));
-            }}
-          />
-        </div>
-        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-          <SuggestedLiquidYinYangAuthToggleAnime />
-          <button
-            type="button"
-            onPointerEnter={() => setFxKey((v) => v + 1)}
-            onClick={() => setFxKey((v) => v + 1)}
-            style={{
-              width: 320,
-              height: 44,
-              borderRadius: 999,
-              border: "1px solid color-mix(in srgb, var(--text-color) 14%, transparent)",
-              background:
-                "linear-gradient(90deg, color-mix(in srgb, var(--surface-glass-strong) 88%, var(--background) 12%) 0%, var(--accent-red) 100%)",
-              color: "var(--text-color)",
-              fontSize: 15,
-              fontWeight: 700,
-              cursor: "pointer",
-              overflow: "hidden",
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <BlackHoleWhirlpool key={`bh-${fxKey}`} duration={5700}>
-              <WashInSea key={`ws-${fxKey}`} direction="right" duration={5700}>
-                Login
-              </WashInSea>
-            </BlackHoleWhirlpool>
-          </button>
-        </div>
-      </div>
-    );
-  },
-};
-
-export const LiquidYinYangToggleAnimeWashHover: Story = {
-  render: () => {
-    const [theme, setTheme] = useState<ThemeName>("tokyo-dusk");
-    const [preview, setPreview] = useState<number | null>(null);
-    const activeScale = preview ?? (theme === "night-sky" ? 100 : theme === "tokyo-dusk" ? 50 : 0);
-    const themeVars = getThemeScaleVars(activeScale);
-
-    return (
-      <div style={themeVars as CSSProperties}>
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
-          <ThemeSelector
-            value={theme}
-            onChange={setTheme}
-            onPreviewChange={setPreview}
-            onScaleCommit={(progress) => {
-              setPreview(progress);
-              setTheme(getPersistedThemeFromScale(progress));
-            }}
-          />
-        </div>
-        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-          <SuggestedLiquidYinYangAuthToggleAnime />
-          <SuggestedLiquidYinYangAuthToggleAnimeWash />
-        </div>
-      </div>
-    );
-  },
+type BlackHoleStoryArgs = {
+  duration: number;
+  rotationSpeed: number;
+  insideEaseInPower: number;
+  containerWidth: number;
+  containerHeight: number;
+  displayText: string;
 };
 
 export const LiquidYinYangToggleAnimeWhirlpoolHover: Story = {
@@ -191,7 +57,6 @@ export const LiquidYinYangToggleAnimeWhirlpoolHover: Story = {
           />
         </div>
         <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-          <SuggestedLiquidYinYangAuthToggleAnime />
           <SuggestedLiquidYinYangAuthToggleAnimeWhirlpool />
         </div>
       </div>
@@ -199,13 +64,10 @@ export const LiquidYinYangToggleAnimeWhirlpoolHover: Story = {
   },
 };
 
-export const WashInSeaAnimation: Story = {
+export const LiquidYinYangToggleAnimeWhirlpoolSquareCorners: Story = {
   render: () => {
     const [theme, setTheme] = useState<ThemeName>("tokyo-dusk");
     const [preview, setPreview] = useState<number | null>(null);
-    const [direction, setDirection] = useState<WashDirection>("right");
-    const [duration, setDuration] = useState(1900);
-    const [playKey, setPlayKey] = useState(0);
     const activeScale = preview ?? (theme === "night-sky" ? 100 : theme === "tokyo-dusk" ? 50 : 0);
     const themeVars = getThemeScaleVars(activeScale);
 
@@ -222,34 +84,54 @@ export const WashInSeaAnimation: Story = {
             }}
           />
         </div>
-        <div style={{ display: "flex", gap: 8, marginBottom: 12, justifyContent: "center", flexWrap: "wrap" }}>
-          <button type="button" onClick={() => setDirection("left")}>
-            Left
-          </button>
-          <button type="button" onClick={() => setDirection("right")}>
-            Right
-          </button>
-          <button type="button" onClick={() => setDirection("up")}>
-            Up
-          </button>
-          <button type="button" onClick={() => setDirection("down")}>
-            Down
-          </button>
-          <button type="button" onClick={() => setDuration((current) => Math.max(500, current - 300))}>
-            Faster
-          </button>
-          <button type="button" onClick={() => setDuration((current) => current + 300)}>
-            Slower
-          </button>
-          <button type="button" onClick={() => setPlayKey((v) => v + 1)}>
-            Replay
-          </button>
+        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+          <SuggestedLiquidYinYangAuthToggleAnimeWhirlpool borderRadius={0} width={220} />
+        </div>
+      </div>
+    );
+  },
+};
+
+export const WashInSeaAnimation: Story = {
+  args: {
+    direction: "right",
+    duration: 1900,
+  } as WashInSeaStoryArgs,
+  argTypes: {
+    direction: {
+      control: { type: "select" },
+      options: ["left", "right", "up", "down"],
+    },
+    duration: {
+      control: { type: "range", min: 500, max: 6000, step: 100 },
+    },
+  },
+  render: (args) => {
+    const { direction, duration } = args as WashInSeaStoryArgs;
+    const [theme, setTheme] = useState<ThemeName>("tokyo-dusk");
+    const [preview, setPreview] = useState<number | null>(null);
+    const activeScale = preview ?? (theme === "night-sky" ? 100 : theme === "tokyo-dusk" ? 50 : 0);
+    const themeVars = getThemeScaleVars(activeScale);
+    const animationKey = `${direction}-${duration}`;
+
+    return (
+      <div style={themeVars as CSSProperties}>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
+          <ThemeSelector
+            value={theme}
+            onChange={setTheme}
+            onPreviewChange={setPreview}
+            onScaleCommit={(progress) => {
+              setPreview(progress);
+              setTheme(getPersistedThemeFromScale(progress));
+            }}
+          />
         </div>
         <div style={{ display: "flex", justifyContent: "center", fontSize: 14, marginBottom: 8 }}>
           Direction: {direction} | Duration: {duration}ms
         </div>
         <div style={{ display: "flex", justifyContent: "center", fontSize: 32, fontWeight: 700, lineHeight: 1.2 }}>
-          <WashInSea key={playKey} direction={direction} duration={duration}>
+          <WashInSea key={animationKey} direction={direction} duration={duration}>
             Login Register — carried by sea
           </WashInSea>
         </div>
@@ -259,18 +141,48 @@ export const WashInSeaAnimation: Story = {
 };
 
 export const BlackHoleWhirlpoolAnimation: Story = {
-  render: () => {
+  args: {
+    duration: 1900,
+    rotationSpeed: 1,
+    insideEaseInPower: 2,
+    containerWidth: 520,
+    containerHeight: 120,
+    displayText: "Login Register - pulled into black hole",
+  } as BlackHoleStoryArgs,
+  argTypes: {
+    duration: {
+      control: { type: "range", min: 500, max: 6000, step: 100 },
+    },
+    rotationSpeed: {
+      control: { type: "range", min: 0.2, max: 4, step: 0.05 },
+    },
+    insideEaseInPower: {
+      control: { type: "range", min: 1, max: 5, step: 0.1 },
+    },
+    containerWidth: {
+      control: { type: "range", min: 180, max: 800, step: 10 },
+    },
+    containerHeight: {
+      control: { type: "range", min: 44, max: 260, step: 2 },
+    },
+    displayText: {
+      control: { type: "text" },
+    },
+  },
+  render: (args) => {
+    const {
+      duration,
+      rotationSpeed,
+      insideEaseInPower,
+      displayText,
+      containerWidth,
+      containerHeight,
+    } = args as BlackHoleStoryArgs;
     const [theme, setTheme] = useState<ThemeName>("tokyo-dusk");
     const [preview, setPreview] = useState<number | null>(null);
-    const [duration, setDuration] = useState(1900);
-    const [rotationSpeed, setRotationSpeed] = useState(1);
-    const [insideEaseInPower, setInsideEaseInPower] = useState(2);
-    const [displayText, setDisplayText] = useState("Login Register - pulled into black hole");
-    const [containerWidth, setContainerWidth] = useState(520);
-    const [containerHeight, setContainerHeight] = useState(120);
-    const [playKey, setPlayKey] = useState(0);
     const activeScale = preview ?? (theme === "night-sky" ? 100 : theme === "tokyo-dusk" ? 50 : 0);
     const themeVars = getThemeScaleVars(activeScale);
+    const animationKey = `${displayText}-${duration}-${rotationSpeed}-${insideEaseInPower}-${containerWidth}-${containerHeight}`;
 
     return (
       <div style={themeVars as CSSProperties}>
@@ -282,57 +194,6 @@ export const BlackHoleWhirlpoolAnimation: Story = {
             onScaleCommit={(progress) => {
               setPreview(progress);
               setTheme(getPersistedThemeFromScale(progress));
-            }}
-          />
-        </div>
-        <div style={{ display: "flex", gap: 8, marginBottom: 12, justifyContent: "center", flexWrap: "wrap" }}>
-          <button type="button" onClick={() => setDuration((current) => Math.max(500, current - 300))}>
-            Faster
-          </button>
-          <button type="button" onClick={() => setDuration((current) => current + 300)}>
-            Slower
-          </button>
-          <button type="button" onClick={() => setRotationSpeed((current) => Math.max(0.2, Number((current - 0.2).toFixed(2))))}>
-            Rotation -
-          </button>
-          <button type="button" onClick={() => setRotationSpeed((current) => Math.min(4, Number((current + 0.2).toFixed(2))))}>
-            Rotation +
-          </button>
-          <button type="button" onClick={() => setInsideEaseInPower((current) => Math.max(1, Number((current - 0.25).toFixed(2))))}>
-            Transform Ease -
-          </button>
-          <button type="button" onClick={() => setInsideEaseInPower((current) => Math.min(5, Number((current + 0.25).toFixed(2))))}>
-            Transform Ease +
-          </button>
-          <button type="button" onClick={() => setContainerWidth((current) => Math.max(180, current - 20))}>
-            Width -
-          </button>
-          <button type="button" onClick={() => setContainerWidth((current) => current + 20)}>
-            Width +
-          </button>
-          <button type="button" onClick={() => setContainerHeight((current) => Math.max(44, current - 10))}>
-            Height -
-          </button>
-          <button type="button" onClick={() => setContainerHeight((current) => current + 10)}>
-            Height +
-          </button>
-          <button type="button" onClick={() => setPlayKey((v) => v + 1)}>
-            Replay
-          </button>
-        </div>
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
-          <input
-            type="text"
-            value={displayText}
-            onChange={(event) => setDisplayText(event.target.value)}
-            placeholder="Text to animate"
-            style={{
-              width: "min(680px, 92vw)",
-              padding: "8px 10px",
-              borderRadius: 8,
-              border: "1px solid color-mix(in srgb, var(--text-color) 20%, transparent)",
-              background: "var(--surface-glass-strong)",
-              color: "var(--text-color)",
             }}
           />
         </div>
@@ -350,7 +211,7 @@ export const BlackHoleWhirlpoolAnimation: Story = {
             }}
           >
             <div style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.2, whiteSpace: "nowrap" }}>
-              <BlackHoleWhirlpool key={playKey} duration={duration} rotationSpeed={rotationSpeed} insideTransformEaseInPower={insideEaseInPower}>
+              <BlackHoleWhirlpool key={animationKey} duration={duration} rotationSpeed={rotationSpeed} insideTransformEaseInPower={insideEaseInPower}>
                 {displayText}
               </BlackHoleWhirlpool>
             </div>
@@ -360,4 +221,3 @@ export const BlackHoleWhirlpoolAnimation: Story = {
     );
   },
 };
-
