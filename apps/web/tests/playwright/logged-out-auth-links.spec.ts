@@ -1,24 +1,15 @@
-import { expect, test, type Locator } from "playwright/test";
+import { expect, test } from "playwright/test";
 
 const LOGGED_OUT_AUTH_STORY =
   "/iframe.html?id=components-loggedoutauthlinks--default&viewMode=story";
 const FULL_CHROME_STORY =
   "/iframe.html?id=auth-themeselector--with-header-and-footer&viewMode=story";
 
-const svgRectOpacity = async (locator: Locator) =>
-  locator.evaluate((el) => {
-    const svg = el as SVGRectElement;
-    const o = getComputedStyle(svg).opacity;
-    if (o && o !== "") return o;
-    const a = svg.getAttribute("opacity");
-    return a ?? "";
-  });
-
-test.describe("LoggedOutAuthLinks yin-yang pill", () => {
-  test("hovering one auth link hides the other until the pointer leaves the pill", async ({ page }) => {
+test.describe("LoggedOutAuthLinks auth duality toggle", () => {
+  test("hovering a side expands it and shrinks the other side", async ({ page }) => {
     await page.goto(LOGGED_OUT_AUTH_STORY);
 
-    const pill = page.getByTestId("auth-yin-pill");
+    const pill = page.getByTestId("auth-duality-toggle");
     const login = page.getByRole("button", { name: "Login" });
     const register = page.getByRole("button", { name: "Register" });
 
@@ -26,51 +17,28 @@ test.describe("LoggedOutAuthLinks yin-yang pill", () => {
     await expect(login).toBeVisible();
     await expect(register).toBeVisible();
 
+    const loginInitialBox = await login.boundingBox();
+    const registerInitialBox = await register.boundingBox();
+    if (!loginInitialBox || !registerInitialBox) throw new Error("initial button bounds missing");
+
     await login.hover();
-    await expect.poll(async () => register.evaluate((el) => getComputedStyle(el).opacity), { timeout: 8000 }).toBe("0");
-    await expect.poll(async () => login.evaluate((el) => getComputedStyle(el).opacity), { timeout: 8000 }).toBe("1");
+    await page.waitForTimeout(300);
+    const loginHoverBox = await login.boundingBox();
+    const registerHoverBox = await register.boundingBox();
+    if (!loginHoverBox || !registerHoverBox) throw new Error("hover button bounds missing");
+    expect(loginHoverBox.width).toBeGreaterThan(loginInitialBox.width);
+    expect(registerHoverBox.width).toBeLessThan(registerInitialBox.width);
 
-    const box = await pill.boundingBox();
-    if (!box) throw new Error("pill box missing");
-    await page.mouse.move(box.x - 8, box.y + box.height / 2);
-
+    const pillBox = await pill.boundingBox();
+    if (!pillBox) throw new Error("pill box missing");
+    await page.mouse.move(pillBox.x - 16, pillBox.y + pillBox.height / 2);
     await register.hover();
-    await expect.poll(async () => login.evaluate((el) => getComputedStyle(el).opacity), { timeout: 8000 }).toBe("0");
-    await expect.poll(async () => register.evaluate((el) => getComputedStyle(el).opacity), { timeout: 8000 }).toBe("1");
-
-    const endBox = await pill.boundingBox();
-    if (!endBox) throw new Error("pill box missing");
-    await page.mouse.move(endBox.x - 8, endBox.y + endBox.height / 2);
-    await expect.poll(async () => login.evaluate((el) => getComputedStyle(el).opacity), { timeout: 8000 }).toBe("1");
-    await expect.poll(async () => register.evaluate((el) => getComputedStyle(el).opacity), { timeout: 8000 }).toBe("1");
-  });
-
-  test("login hover morphs background to split phase (horizontal seam)", async ({ page }) => {
-    await page.goto(LOGGED_OUT_AUTH_STORY);
-    const pill = page.getByTestId("auth-yin-pill");
-    const login = page.getByRole("button", { name: "Login" });
-    const liquids = page.getByTestId("auth-yin-liquids");
-    const accentPath = page.getByTestId("auth-yin-liquid-accent");
-    const glassPath = page.getByTestId("auth-yin-liquid-glass");
-
-    await expect(liquids).toBeVisible();
-    await expect(pill).toHaveAttribute("data-auth-yin-phase", "seam");
-    await expect(liquids).toHaveAttribute("data-auth-yin-liquids", "seam");
-
-    await expect.poll(async () => svgRectOpacity(accentPath), { timeout: 4000 }).toBe("1");
-    await expect.poll(async () => svgRectOpacity(glassPath), { timeout: 4000 }).toBe("1");
-
-    await login.hover();
-    await expect.poll(() => pill.getAttribute("data-auth-yin-phase"), { timeout: 6000 }).toBe("split");
-    await expect.poll(() => liquids.getAttribute("data-auth-yin-liquids"), { timeout: 6000 }).toBe("split");
-    await expect.poll(async () => accentPath.getAttribute("d"), { timeout: 6000 }).toMatch(/L 0 22/);
-
-    const box = await pill.boundingBox();
-    if (!box) throw new Error("pill box missing");
-    await page.mouse.move(box.x - 8, box.y + box.height / 2);
-
-    await page.getByRole("button", { name: "Register" }).hover();
-    await expect.poll(async () => glassPath.getAttribute("d"), { timeout: 6000 }).toMatch(/L 0 22/);
+    await page.waitForTimeout(300);
+    const loginRegisterHoverBox = await login.boundingBox();
+    const registerRegisterHoverBox = await register.boundingBox();
+    if (!loginRegisterHoverBox || !registerRegisterHoverBox) throw new Error("register hover button bounds missing");
+    expect(registerRegisterHoverBox.width).toBeGreaterThan(registerInitialBox.width);
+    expect(loginRegisterHoverBox.width).toBeLessThan(loginInitialBox.width);
   });
 
   test("Login opens auth modal with Sign in tab", async ({ page }) => {
@@ -84,18 +52,29 @@ test.describe("LoggedOutAuthLinks yin-yang pill", () => {
   test("full chrome story: auth pill hides inactive label on hover", async ({ page }) => {
     await page.goto(FULL_CHROME_STORY);
 
-    const pill = page.getByTestId("auth-yin-pill");
+    const pill = page.getByTestId("auth-duality-toggle");
     await expect(pill).toBeVisible();
 
     const login = page.getByRole("button", { name: "Login" });
     const register = page.getByRole("button", { name: "Register" });
 
-    await login.hover();
-    await expect.poll(async () => register.evaluate((el) => getComputedStyle(el).opacity), { timeout: 8000 }).toBe("0");
+    const loginInitialBox = await login.boundingBox();
+    const registerInitialBox = await register.boundingBox();
+    if (!loginInitialBox || !registerInitialBox) throw new Error("initial button bounds missing");
 
-    // Expanded login hit target covers the pill; leave before hovering Register.
-    await page.getByLabel("Theme").hover();
+    await login.hover();
+    await page.waitForTimeout(300);
+    const registerAfterLoginHover = await register.boundingBox();
+    if (!registerAfterLoginHover) throw new Error("register hover box missing");
+    expect(registerAfterLoginHover.width).toBeLessThan(registerInitialBox.width);
+
+    const pillBox = await pill.boundingBox();
+    if (!pillBox) throw new Error("pill box missing");
+    await page.mouse.move(pillBox.x - 16, pillBox.y + pillBox.height / 2);
     await register.hover();
-    await expect.poll(async () => login.evaluate((el) => getComputedStyle(el).opacity), { timeout: 8000 }).toBe("0");
+    await page.waitForTimeout(300);
+    const loginAfterRegisterHover = await login.boundingBox();
+    if (!loginAfterRegisterHover) throw new Error("login hover box missing");
+    expect(loginAfterRegisterHover.width).toBeLessThan(loginInitialBox.width);
   });
 });

@@ -8,16 +8,18 @@ import styles from "./style.module.css";
 const MotionSegment = motion.div;
 const MotionHitButton = motion.button;
 
+type CubicBezier = [number, number, number, number];
+
 type AuthNavYinSegmentProps = {
   segment: AuthNavYinSegment;
   hovered: AuthNavYinHovered;
   onHover: (segment: AuthNavYinSegment) => void;
   onClick: () => void;
-  segmentTransition: { duration: number } | { type: "tween"; duration: number; ease: readonly number[] };
+  segmentTransition: { duration: number } | { type: "tween"; duration: number; ease: CubicBezier };
   hitTransition:
     | { duration: number }
     | { type: "tween"; duration: number; ease: "easeOut" }
-    | { type: "tween"; duration: number; ease: readonly number[] };
+    | { type: "tween"; duration: number; ease: CubicBezier };
   tapScale: { scale: number } | undefined;
 };
 

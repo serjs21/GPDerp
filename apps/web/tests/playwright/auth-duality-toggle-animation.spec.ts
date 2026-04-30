@@ -2,17 +2,17 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { expect, test } from "playwright/test";
 
-const STORY = "/iframe.html?id=suggested-authenticationnav-minimalstandaloneanimated--liquid-yin-yang-toggle-anime-waves&viewMode=story";
-const OUT_DIR = path.join(process.cwd(), "local/suggested-yinyang-standalone/snapshots-liquid-toggle-anime-test");
+const STORY = "/iframe.html?id=components-authenticationnav-authdualitytoggle--default&viewMode=story";
+const OUT_DIR = path.join(process.cwd(), "local/auth-duality/snapshots-animation-test");
 
-test.describe("Suggested liquid anime waves toggle", () => {
+test.describe("Auth duality toggle animation", () => {
   test("exports wave animation keyframes", async ({ page }) => {
     await fs.mkdir(OUT_DIR, { recursive: true });
     const existing = await fs.readdir(OUT_DIR);
     await Promise.all(existing.filter((name) => name.endsWith(".png")).map((name) => fs.unlink(path.join(OUT_DIR, name))));
 
     await page.goto(STORY);
-    const toggle = page.getByTestId("yy-liquid-toggle-anime");
+    const toggle = page.getByTestId("auth-duality-toggle");
     await expect(toggle).toBeVisible();
 
     await toggle.screenshot({ path: path.join(OUT_DIR, "pw-anime--idle.png") });

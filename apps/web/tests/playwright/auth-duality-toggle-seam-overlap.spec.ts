@@ -1,11 +1,11 @@
 import { expect, test } from "playwright/test";
 
 const STORY =
-  "/iframe.html?id=suggested-authenticationnav-minimalstandaloneanimated--liquid-yin-yang-toggle-anime-whirlpool-hover&viewMode=story";
+  "/iframe.html?id=components-authenticationnav-authdualitytoggle--default&viewMode=story";
 
 async function collectOverlapFrames(page: Parameters<typeof test>[0]["page"], sampleMs: number) {
   return page.evaluate(async ({ sampleMs: ms }) => {
-    const root = document.querySelector('[data-testid="yy-liquid-toggle-anime-whirlpool"]') as HTMLElement | null;
+    const root = document.querySelector('[data-testid="auth-duality-toggle"]') as HTMLElement | null;
     const seam = root?.querySelector(".syl-anime-seam") as SVGPathElement | null;
     if (!root || !seam) return { error: "missing root/seam", overlapFrames: -1, totalFrames: 0 };
 
@@ -69,10 +69,10 @@ async function collectOverlapFrames(page: Parameters<typeof test>[0]["page"], sa
   }, { sampleMs: sampleMs });
 }
 
-test.describe("Suggested whirlpool toggle seam/text overlap", () => {
+test.describe("Auth duality toggle seam/text overlap", () => {
   test("never shows visible overlap between S seam and text/icon glyphs", async ({ page }) => {
     await page.goto(STORY);
-    const toggle = page.getByTestId("yy-liquid-toggle-anime-whirlpool");
+    const toggle = page.getByTestId("auth-duality-toggle");
     await expect(toggle).toBeVisible();
 
     const loginButton = page.getByRole("button", { name: "Login" }).first();

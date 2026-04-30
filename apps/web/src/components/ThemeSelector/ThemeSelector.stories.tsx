@@ -5,18 +5,8 @@ import { getPersistedThemeFromScale, getThemeScaleVars } from "@/theme/themeScal
 import { Kasagi, Nuki, Pillars, Shimaki } from "@/components/Dividers";
 import { BeamMeUpScotty } from "@/components/BeamMeUpScotty/BeamMeUpScotty";
 import { SiteFooter } from "@/components/SiteFooter/SiteFooter";
-import authNavStyles from "@/components/AuthenticationNav/style.module.css";
-import {
-  AUTH_NAV_YIN_HOVER_DUR_S,
-  AUTH_NAV_YIN_HOVER_DUR_REDUCED_S,
-  YinYangSegmentBackground,
-  authNavYinHitOpacity,
-  authNavYinSegmentFlex,
-  type AuthNavYinHovered,
-} from "@/components/AuthenticationNav/LoggedOutAuthLinks";
-import { motion, useReducedMotion } from "motion/react";
+import { AuthDualityToggle } from "@/components/AuthenticationNav/components/AuthDualityToggle/AuthDualityToggle";
 
-const authNavEase = [0.33, 1, 0.68, 1] as const;
 import { ThemeSelector } from "./ThemeSelector";
 import styles from "./ThemeSelector.stories.module.css";
 import pageStyles from "@/app/page.module.css";
@@ -154,18 +144,8 @@ const LayoutShellPreview = ({ initialTheme }: { initialTheme: ThemeName }) => {
 const FullChromePreview = ({ initialTheme }: { initialTheme: ThemeName }) => {
   const [theme, setTheme] = useState<ThemeName>(initialTheme);
   const [preview, setPreview] = useState<number | null>(null);
-  const [authHovered, setAuthHovered] = useState<AuthNavYinHovered>(null);
-  const reduceMotion = useReducedMotion();
   const activeScale = preview ?? (theme === "night-sky" ? 100 : theme === "tokyo-dusk" ? 50 : 0);
   const themeVars = getThemeScaleVars(activeScale);
-  const authNavTransition = reduceMotion
-    ? { duration: AUTH_NAV_YIN_HOVER_DUR_REDUCED_S }
-    : {
-        type: "tween" as const,
-        duration: authHovered !== null ? AUTH_NAV_YIN_HOVER_DUR_S : 0.2,
-        ease: authNavEase,
-      };
-  const authNavTap = reduceMotion ? undefined : { scale: 0.97 };
 
   return (
     <div style={themeVars as CSSProperties}>
@@ -184,60 +164,10 @@ const FullChromePreview = ({ initialTheme }: { initialTheme: ThemeName }) => {
                 }}
               />
               <div className={styles.mockAuthRow}>
-                <div
-                  className={authNavStyles.authNavYinYang}
-                  data-testid="auth-yin-pill"
-                  data-auth-yin-phase={authHovered ? "split" : "seam"}
-                  onPointerLeave={() => setAuthHovered(null)}
-                >
-                  <div className={authNavStyles.authNavYinBackgroundWrap}>
-                    <YinYangSegmentBackground hovered={authHovered} reduceMotion={!!reduceMotion} />
-                  </div>
-                  <div className={authNavStyles.authNavYinLinks}>
-                    <motion.div
-                      className={authNavStyles.authNavYinSegment}
-                      initial={false}
-                      animate={{ flexGrow: authNavYinSegmentFlex(authHovered, "login") }}
-                      transition={authNavTransition}
-                      onPointerEnter={() => setAuthHovered("login")}
-                    >
-                      <motion.button
-                        type="button"
-                        className={`${authNavStyles.authNavYinHitButton} ${authNavStyles.authNavYinLinkLogin}`}
-                        initial={false}
-                        animate={{ opacity: authNavYinHitOpacity(authHovered, "login") }}
-                        transition={authNavTransition}
-                        whileTap={authNavTap}
-                        style={{ pointerEvents: authHovered === "register" ? "none" : "auto" }}
-                        onClick={(event) => event.preventDefault()}
-                        tabIndex={authHovered === "register" ? -1 : 0}
-                      >
-                        Login
-                      </motion.button>
-                    </motion.div>
-                    <motion.div
-                      className={authNavStyles.authNavYinSegment}
-                      initial={false}
-                      animate={{ flexGrow: authNavYinSegmentFlex(authHovered, "register") }}
-                      transition={authNavTransition}
-                      onPointerEnter={() => setAuthHovered("register")}
-                    >
-                      <motion.button
-                        type="button"
-                        className={`${authNavStyles.authNavYinHitButton} ${authNavStyles.authNavYinLinkRegister}`}
-                        initial={false}
-                        animate={{ opacity: authNavYinHitOpacity(authHovered, "register") }}
-                        transition={authNavTransition}
-                        whileTap={authNavTap}
-                        style={{ pointerEvents: authHovered === "login" ? "none" : "auto" }}
-                        onClick={(event) => event.preventDefault()}
-                        tabIndex={authHovered === "login" ? -1 : 0}
-                      >
-                        Register
-                      </motion.button>
-                    </motion.div>
-                  </div>
-                </div>
+                <AuthDualityToggle
+                  onLoginClick={() => undefined}
+                  onRegisterClick={() => undefined}
+                />
               </div>
             </div>
           </div>

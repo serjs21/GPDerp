@@ -11,6 +11,7 @@ type AuthenticationVerificationContextValue = {
   requestAuthentication: (initialMode?: AuthModalMode) => boolean;
   openAuthenticationModal: (initialMode?: AuthModalMode) => void;
   closeAuthenticationModal: () => void;
+  authModalCloseToken: number;
 };
 
 const AuthenticationVerificationContext = createContext<AuthenticationVerificationContextValue | undefined>(
@@ -21,9 +22,11 @@ export function AuthenticationVerificationProvider({ children }: { children: Rea
   const { initialized, isLoggedIn, checkAuthentication } = useAuthenticationState();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<AuthModalMode>("login");
+  const [authModalCloseToken, setAuthModalCloseToken] = useState(0);
 
   const closeAuthenticationModal = useCallback(() => {
     setIsAuthModalOpen(false);
+    setAuthModalCloseToken((previous) => previous + 1);
   }, []);
 
   const openAuthenticationModal = useCallback((initialMode: AuthModalMode = "login") => {
@@ -54,8 +57,8 @@ export function AuthenticationVerificationProvider({ children }: { children: Rea
   }, [initialized, isLoggedIn, openAuthenticationModal]);
 
   const contextValue = useMemo(
-    () => ({ requestAuthentication, openAuthenticationModal, closeAuthenticationModal }),
-    [closeAuthenticationModal, openAuthenticationModal, requestAuthentication],
+    () => ({ requestAuthentication, openAuthenticationModal, closeAuthenticationModal, authModalCloseToken }),
+    [authModalCloseToken, closeAuthenticationModal, openAuthenticationModal, requestAuthentication],
   );
 
   return (

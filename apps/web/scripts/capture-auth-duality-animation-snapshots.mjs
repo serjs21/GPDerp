@@ -2,9 +2,9 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { chromium } from "playwright";
 
-const OUT_DIR = path.join(process.cwd(), "local/suggested-yinyang-standalone/snapshots-liquid-toggle-anime");
+const OUT_DIR = path.join(process.cwd(), "local/auth-duality/snapshots-animation");
 const STORY_URL =
-  "http://127.0.0.1:6006/iframe.html?id=suggested-authenticationnav-minimalstandaloneanimated--liquid-yin-yang-toggle-anime-waves&viewMode=story";
+  "http://127.0.0.1:6006/iframe.html?id=components-authenticationnav-authdualitytoggle--default&viewMode=story";
 
 async function run() {
   await fs.mkdir(OUT_DIR, { recursive: true });
@@ -15,7 +15,7 @@ async function run() {
   const page = await browser.newPage({ viewport: { width: 1200, height: 560 } });
   await page.goto(STORY_URL, { waitUntil: "networkidle" });
 
-  const toggle = page.getByTestId("yy-liquid-toggle-anime");
+  const toggle = page.getByTestId("auth-duality-toggle");
   await toggle.waitFor({ state: "visible" });
   await toggle.screenshot({ path: path.join(OUT_DIR, "anime--idle.png") });
 

@@ -2,11 +2,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { expect, test } from "playwright/test";
 
-const SUGGESTED_LIQUID_STORY =
-  "/iframe.html?id=suggested-authenticationnav-minimalstandaloneanimated--liquid-yin-yang-toggle&viewMode=story";
-const OUT_DIR = path.join(process.cwd(), "local/suggested-yinyang-standalone/snapshots-liquid-toggle-test");
+const AUTH_DUALITY_STORY =
+  "/iframe.html?id=components-authenticationnav-authdualitytoggle--default&viewMode=story";
+const OUT_DIR = path.join(process.cwd(), "local/auth-duality/snapshots-hover-test");
 
-test.describe("Suggested liquid toggle snapshots for designer review", () => {
+test.describe("Auth duality toggle snapshots for designer review", () => {
   test("exports keyframes for login/register transitions", async ({ page }) => {
     await fs.mkdir(OUT_DIR, { recursive: true });
     const existing = await fs.readdir(OUT_DIR);
@@ -14,8 +14,8 @@ test.describe("Suggested liquid toggle snapshots for designer review", () => {
       existing.filter((name) => name.endsWith(".png")).map((name) => fs.unlink(path.join(OUT_DIR, name))),
     );
 
-    await page.goto(SUGGESTED_LIQUID_STORY);
-    const toggle = page.getByTestId("yy-liquid-toggle");
+    await page.goto(AUTH_DUALITY_STORY);
+    const toggle = page.getByTestId("auth-duality-toggle");
     await expect(toggle).toBeVisible();
 
     const login = page.getByRole("button", { name: "Login" });
@@ -42,8 +42,8 @@ test.describe("Suggested liquid toggle snapshots for designer review", () => {
   });
 
   test("keeps outer size stable during hover animation", async ({ page }) => {
-    await page.goto(SUGGESTED_LIQUID_STORY);
-    const toggle = page.getByTestId("yy-liquid-toggle");
+    await page.goto(AUTH_DUALITY_STORY);
+    const toggle = page.getByTestId("auth-duality-toggle");
     await expect(toggle).toBeVisible();
 
     const before = await toggle.boundingBox();

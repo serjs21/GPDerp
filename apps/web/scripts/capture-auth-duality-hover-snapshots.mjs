@@ -2,9 +2,9 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { chromium } from "playwright";
 
-const OUT_DIR = path.join(process.cwd(), "local/suggested-yinyang-standalone/snapshots-liquid-toggle");
+const OUT_DIR = path.join(process.cwd(), "local/auth-duality/snapshots-hover");
 const STORY_URL =
-  "http://127.0.0.1:6006/iframe.html?id=suggested-authenticationnav-minimalstandaloneanimated--liquid-yin-yang-toggle&viewMode=story";
+  "http://127.0.0.1:6006/iframe.html?id=components-authenticationnav-authdualitytoggle--default&viewMode=story";
 
 const HOVER_DURATION_MS = 200;
 const TEXT_DURATION_MS = 280;
@@ -20,7 +20,7 @@ async function run() {
   const page = await browser.newPage({ viewport: { width: 1200, height: 560 } });
   await page.goto(STORY_URL, { waitUntil: "networkidle" });
 
-  const toggle = page.getByTestId("yy-liquid-toggle");
+  const toggle = page.getByTestId("auth-duality-toggle");
   await toggle.waitFor({ state: "visible" });
 
   const login = page.getByRole("button", { name: "Login" });

@@ -1,0 +1,38 @@
+.wash-sea-root {
+  --wash-width: 100%;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: inline-block;
+}
+
+.wash-sea-content {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.wash-sea-char {
+  display: inline-block;
+  will-change: transform, opacity, filter;
+  transform-origin: center center;
+}
+
+.wash-sea-clip {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--wash-width);
+  pointer-events: none;
+}
+
+.wash-sea-root[data-direction="left"] .wash-sea-clip {
+  right: 0;
+  left: auto;
+}
+
+.wash-sea-root[data-direction="up"] .wash-sea-clip,
+.wash-sea-root[data-direction="down"] .wash-sea-clip {
+  width: var(--wash-width);
+}
