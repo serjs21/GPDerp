@@ -52,6 +52,7 @@ export function useWebSocket({
   const shouldRunRef = useRef(false);
   const retryCountRef = useRef(0);
   const reconnectTimerRef = useRef<number | null>(null);
+  const connectRef = useRef<() => void>(() => {});
 
   // Queue messages until socket is OPEN
   const sendQueueRef = useRef<string[]>([]);
@@ -95,8 +96,6 @@ export function useWebSocket({
     safeCloseCurrent(1000, "reinit");
     const ws = new WebSocket(url, [...(Array.isArray(protocols) ? protocols : protocols ? [protocols] : []), `tabId.${getTabId()}`]);
     wsRef.current = ws;
-    (ws as any)['uid'] = crypto.randomUUID();
-
     ws.onopen = () => {
       retryCountRef.current = 0;
       setConnected(true);
@@ -129,11 +128,14 @@ export function useWebSocket({
 
       clearReconnectTimer();
       reconnectTimerRef.current = window.setTimeout(() => {
-        connect();
+        connectRef.current();
       }, delay);
     };
   // url/protocols/enabled/reconnect delays are safe deps because connect is used by effect
   }, [url, protocols, enabled, reconnect, minReconnectDelayMs, maxReconnectDelayMs]);
+  useEffect(() => {
+    connectRef.current = connect;
+  }, [connect]);
 
   // lifecycle: start/stop
   useEffect(() => {
@@ -182,7 +184,7 @@ export function useWebSocket({
   }, [connect, enabled]);
 
   return {
-    ws: wsRef.current,
+    ws: null,
     connected,
     send,
     close,

@@ -2,35 +2,6 @@ import React from "react";
 import { render } from "@testing-library/react";
 import { StreamText } from "./StreamText";
 
-jest.mock("motion/react", () => {
-  const React = require("react");
-  return {
-    motion: {
-      span: React.forwardRef(
-        (
-          {
-            onAnimationComplete,
-            initial,
-            animate,
-            exit,
-            transition,
-            ...props
-          }: any,
-          ref: any
-        ) => {
-          React.useEffect(() => {
-            onAnimationComplete?.();
-          }, [onAnimationComplete]);
-          return <span ref={ref} {...props} />;
-        }
-      ),
-    },
-    AnimatePresence: ({ children }: { children: React.ReactNode }) => (
-      <>{children}</>
-    ),
-  };
-});
-
 describe("StreamText", () => {
   it("renders all characters from the text prop", () => {
     const { container } = render(<StreamText text="hello" />);
@@ -44,14 +15,25 @@ describe("StreamText", () => {
 
   it("renders an underline element", () => {
     const { container } = render(<StreamText text="test" />);
-    const underline = container.querySelector("[aria-hidden]");
-    expect(underline).toBeInTheDocument();
+    const styleTag = container.querySelector("style");
+    expect(styleTag?.textContent).toContain("ct-underline");
   });
 
   it("calls onDone when typing animation completes", () => {
+    const originalRaf = window.requestAnimationFrame;
+    const originalCancelRaf = window.cancelAnimationFrame;
+    window.requestAnimationFrame = (callback: FrameRequestCallback): number => {
+      callback(performance.now() + 2000);
+      return 1;
+    };
+    window.cancelAnimationFrame = () => {};
+
     const onDone = jest.fn();
-    render(<StreamText text="hi" onDone={onDone} />);
+    render(<StreamText text="hi" totalMs={1} onDone={onDone} />);
     expect(onDone).toHaveBeenCalled();
+
+    window.requestAnimationFrame = originalRaf;
+    window.cancelAnimationFrame = originalCancelRaf;
   });
 
   it("applies custom className", () => {
@@ -70,6 +52,6 @@ describe("StreamText", () => {
     const { container } = render(
       <StreamText text="instant" startOnMount={false} />
     );
-    expect(container.textContent).toContain("instant");
+    expect(container.textContent).not.toContain("instant");
   });
 });

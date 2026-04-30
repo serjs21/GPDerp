@@ -1,0 +1,16 @@
+{
+  "$schema": "https://unpkg.com/knip@latest/schema-jsonc.json",
+  "entry": [
+    "src/**/*.{ts,tsx}",
+    "tests/playwright/**/*.ts",
+    "infra-tests/**/*.ts?(x)"
+  ],
+  "ignore": [
+    "local/**",
+    "public/**",
+    "scripts/**"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}"
+  ]
+}

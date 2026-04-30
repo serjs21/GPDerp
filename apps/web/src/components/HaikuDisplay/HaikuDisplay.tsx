@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useMemo } from "react";
-import { motion, useScroll, useTransform } from "motion/react";
+import { motion } from "motion/react";
 import { StreamText } from "../StreamText";
 import styles from "./styles.module.css";
 
@@ -19,24 +19,10 @@ export interface HaikuDisplayProps {
 
 const EntryCard = ({
   log,
-  containerRef,
 }: {
   log: ChatLog;
-  containerRef: React.RefObject<HTMLDivElement | null>;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
-
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    container: containerRef,
-    offset: ["start end", "end start"],
-  });
-
-  // Gentle scale pop: small at edges, full size in the middle
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.85, 1, 0.85]);
-
-  // Soft fade at the very edges only
-  const opacity = useTransform(scrollYProgress, [0, 0.1, 0.9, 1], [0.5, 1, 1, 1]);
 
   return (
     <motion.div
@@ -57,7 +43,6 @@ const EntryCard = ({
 
 export const HaikuDisplay = ({ chatLogs, scrollContainerRef }: HaikuDisplayProps) => {
   const fallbackRef = useRef<HTMLDivElement>(null);
-  const motionScrollRef = scrollContainerRef ?? fallbackRef;
 
   const sortedEntries = useMemo(
     () => Object.entries(chatLogs).reverse(),
@@ -71,7 +56,7 @@ export const HaikuDisplay = ({ chatLogs, scrollContainerRef }: HaikuDisplayProps
   return (
     <div ref={scrollContainerRef ? undefined : fallbackRef} className={rootClassName}>
       {sortedEntries.map(([id, log]) => (
-        <EntryCard key={id} log={log} containerRef={motionScrollRef} />
+        <EntryCard key={id} log={log} />
       ))}
     </div>
   );

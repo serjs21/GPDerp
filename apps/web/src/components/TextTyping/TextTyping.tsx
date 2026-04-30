@@ -1,7 +1,7 @@
 "use client";
 
 import chunk from "lodash-es/chunk";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import styles from "./TextTyping.module.css";
 
 export type TextTypingProps = {
@@ -51,27 +51,35 @@ const splitIntoChunks = (text: string): Piece[] => {
 
 export const TextTyping = ({ text }: TextTypingProps) => {
   const pieces = splitIntoChunks(text);
-  let chunkIndex = 0;
+  const { nodes } = pieces.reduce<{ chunkIndex: number; nodes: ReactNode[] }>(
+    (acc, piece) => {
+      if (piece.isNewline) {
+        return {
+          ...acc,
+          nodes: [...acc.nodes, <br key={piece.key} />],
+        };
+      }
 
-  return (
-    <>
-      {pieces.map((piece) => {
-        if (piece.isNewline) {
-          return <br key={piece.key} />;
-        }
-        const style = { "--chunk-index": chunkIndex } as CSSProperties;
-        chunkIndex += 1;
-        return (
-          <span
-            key={piece.key}
-            className={styles.chunk}
-            style={style}
-            data-chunk-number={chunkIndex}
-          >
-            {piece.value}
-          </span>
-        );
-      })}
-    </>
+      const nextChunkIndex = acc.chunkIndex + 1;
+      const style = { "--chunk-index": acc.chunkIndex } as CSSProperties;
+      const node = (
+        <span
+          key={piece.key}
+          className={styles.chunk}
+          style={style}
+          data-chunk-number={nextChunkIndex}
+        >
+          {piece.value}
+        </span>
+      );
+
+      return {
+        chunkIndex: nextChunkIndex,
+        nodes: [...acc.nodes, node],
+      };
+    },
+    { chunkIndex: 0, nodes: [] },
   );
+
+  return <>{nodes}</>;
 };

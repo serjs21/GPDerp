@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Modal, Tabs, Typography } from "@/components/StyledComponents";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { LoginFlow } from "@/components/AuthFlows/LoginFlow";
 import { RegisterFlow } from "@/components/AuthFlows/RegisterFlow";
 import styles from "./styles.module.css";
@@ -22,14 +22,6 @@ export function AuthGateModal({
   onAuthenticated,
   initialMode = "login",
 }: AuthGateModalProps) {
-  const [mode, setMode] = useState<ViewMode>(initialMode);
-
-  useEffect(() => {
-    if (open) {
-      setMode(initialMode);
-    }
-  }, [initialMode, open]);
-
   return (
     <Modal
       open={open}
@@ -39,6 +31,29 @@ export function AuthGateModal({
       destroyOnHidden
       className={styles.modal}
     >
+      {open ? (
+        <AuthGateModalInner
+          key={initialMode}
+          initialMode={initialMode}
+          onClose={onClose}
+          onAuthenticated={onAuthenticated}
+        />
+      ) : null}
+    </Modal>
+  );
+}
+
+type AuthGateModalInnerProps = {
+  initialMode: ViewMode;
+  onClose: () => void;
+  onAuthenticated: () => void;
+};
+
+function AuthGateModalInner({ initialMode, onClose, onAuthenticated }: AuthGateModalInnerProps) {
+  const [mode, setMode] = useState<ViewMode>(initialMode);
+
+  return (
+    <>
       <Typography.Paragraph type="secondary" className={styles.subtitle}>
         Sign in or create an account to compose and save haiku.
       </Typography.Paragraph>
@@ -92,6 +107,6 @@ export function AuthGateModal({
           },
         ]}
       />
-    </Modal>
+    </>
   );
 }

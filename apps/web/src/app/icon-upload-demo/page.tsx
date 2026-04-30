@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { IconUploader } from "@/components/IconUploader";
 
@@ -30,9 +31,12 @@ export default function IconUploadDemoPage() {
           <a href={uploaded.publicUrl} target="_blank" rel="noreferrer">
             {uploaded.publicUrl}
           </a>
-          <img
+          <Image
             src={uploaded.publicUrl}
             alt="Uploaded icon"
+            width={120}
+            height={120}
+            unoptimized
             style={{ width: 120, height: 120, objectFit: "contain", border: "1px solid #ddd", borderRadius: 8 }}
           />
         </section>

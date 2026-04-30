@@ -1,9 +1,8 @@
 "use client";
 
 import { Modal, Select, Typography, message } from "@/components/StyledComponents";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { HaikuDto } from "@/api/haikus";
-import { Label } from "@/components/Label/Label";
 import { LabelCreateAction } from "@/components/LabelCreateAction/LabelCreateAction";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
@@ -39,15 +38,6 @@ export function ManageLabelsModal({
     value: label.id,
     color: label.color,
   }));
-
-  const labelById = useMemo(() => {
-    const labelById = new Map(availableLabels.map((l) => [l.id, { name: l.name, color: l.color }]));
-    // Keep selected labels visible even if list not fetched yet.
-    for (const l of haiku.labels) {
-      if (!labelById.has(l.id)) labelById.set(l.id, { name: l.name, color: l.color });
-    }
-    return labelById;
-  }, [availableLabels, haiku.labels]);
 
   const submit = () => {
     if (showLoading) {

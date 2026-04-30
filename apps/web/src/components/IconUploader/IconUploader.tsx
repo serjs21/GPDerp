@@ -1,7 +1,8 @@
 "use client";
 
 import { EditOutlined, LoadingOutlined } from "@ant-design/icons";
-import { useEffect, useId, useState } from "react";
+import Image from "next/image";
+import { useId, useState } from "react";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import styles from "./IconUploader.module.css";
 
@@ -31,20 +32,16 @@ export function IconUploader({
   onUploaded,
 }: IconUploaderProps) {
   const inputId = useId();
-  const [remoteImageFailed, setRemoteImageFailed] = useState(false);
+  const [failedRemoteImageUrl, setFailedRemoteImageUrl] = useState<string | null>(null);
   const { previewUrl, error, success, isUploading, isDragActive, progress, onInputChange, onDragOver, onDragLeave, onDrop } =
     useFileUpload({
       disabled,
       onUploaded,
     });
   const displayUrl = previewUrl || iconUrl;
-  const showRemoteImage = Boolean(displayUrl && !previewUrl && !remoteImageFailed);
+  const showRemoteImage = Boolean(displayUrl && !previewUrl && failedRemoteImageUrl !== displayUrl);
   const showPreviewImage = Boolean(previewUrl);
   const placeholderChar = (fallbackChar?.trim().slice(0, 1) || "?").toUpperCase();
-
-  useEffect(() => {
-    setRemoteImageFailed(false);
-  }, [iconUrl]);
 
   const interactive = !disabled && !isUploading;
   const inputDisabled = disabled || isUploading;
@@ -52,16 +49,24 @@ export function IconUploader({
   const inner = (
     <>
       {showPreviewImage && displayUrl ? (
-        <img src={displayUrl} alt={alt} className={styles.iconImage} decoding="async" />
-      ) : showRemoteImage ? (
-        <img
+        <Image
           src={displayUrl}
           alt={alt}
           className={styles.iconImage}
-          decoding="async"
-          loading="lazy"
+          width={44}
+          height={44}
+          unoptimized
+        />
+      ) : showRemoteImage ? (
+        <Image
+          src={displayUrl}
+          alt={alt}
+          className={styles.iconImage}
+          width={44}
+          height={44}
+          unoptimized
           referrerPolicy="no-referrer"
-          onError={() => setRemoteImageFailed(true)}
+          onError={() => setFailedRemoteImageUrl(displayUrl)}
         />
       ) : (
         <span className={styles.placeholder} aria-hidden>

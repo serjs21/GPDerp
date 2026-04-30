@@ -1,23 +1,13 @@
 "use client";
 
 import "@/axios.setup";
-import { useState } from "react";
-import { createContext, useContext, useEffect, type ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import { useAuthentication, type AuthenticationResult } from "@/hooks/useAuthentication";
 
 const AuthenticationContext = createContext<AuthenticationResult | undefined>(undefined);
 
 export const AuthenticationProvider = ({ children }: { children: ReactNode }) => {
-  const [isMounted, setIsMounted] = useState(false);
   const authState = useAuthentication();
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) {
-    return null;
-  }
 
   return (
     <AuthenticationContext.Provider value={authState}>

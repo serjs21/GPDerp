@@ -5,11 +5,7 @@ import type { ChatLog } from "./HaikuDisplay";
 
 jest.mock("motion/react", () => ({
   motion: {
-    div: React.forwardRef(
-      (props: React.HTMLAttributes<HTMLDivElement>, ref: React.Ref<HTMLDivElement>) => (
-        <div ref={ref} {...props} />
-      )
-    ),
+    div: (props: React.HTMLAttributes<HTMLDivElement>) => <div {...props} />,
   },
   useScroll: () => ({ scrollYProgress: { get: () => 0, on: () => () => {} } }),
   useTransform: () => ({ get: () => 0, on: () => () => {} }),

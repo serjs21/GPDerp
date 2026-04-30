@@ -180,6 +180,8 @@ export const useAuthentication = (): AuthenticationResult => {
     fetchAuthUser();
   };
 
+  // Intentionally run auth check once on mount; checkAuthentication has unstable references by design.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(checkAuthentication, []);
 
   return { ...authenticationState, isLoggedIn: !!authenticationState?.user?.id, logout, checkAuthentication };

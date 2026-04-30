@@ -7,6 +7,8 @@ export interface WritingLoaderProps {
     variant?: keyof typeof VARIANT_EMOJIS;
 }
 
+const DOTS = ["", ".", "..", "..."];
+
 const VARIANT_EMOJIS = {
     feather: '🪶',
     pen: '🖊️',
@@ -18,14 +20,13 @@ const VARIANT_EMOJIS = {
 
 
 export const WritingLoader = ({ variant = 'feather' }: WritingLoaderProps) => {
-    const dots = ['', '.', '..', '...'];
     const [dotIndex, setDotIndex] = useState(0);
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setDotIndex((prev) => (prev + 1) % dots.length);
+            setDotIndex((prev) => (prev + 1) % DOTS.length);
         }, 500);
         return () => clearInterval(interval);
     }, []);
-  return <div className={styles.container}>{dots[dotIndex]} <span className={styles.writing}>{VARIANT_EMOJIS[variant]}</span></div>;
+  return <div className={styles.container}>{DOTS[dotIndex]} <span className={styles.writing}>{VARIANT_EMOJIS[variant]}</span></div>;
 }

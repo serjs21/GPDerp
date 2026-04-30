@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import styles from "./style.module.css";
 
@@ -50,8 +51,9 @@ export function decodeJwtPayload(token: string): GoogleUser {
 export const GoogleAuthentication = ({
   clientId,
   onLogin,
-  onLogout,
+  onLogout: _onLogout,
 }: GoogleAuthenticationProps) => {
+  void _onLogout;
   const [user, setUser] = useState<GoogleUser | null>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
   const initialised = useRef(false);
@@ -61,13 +63,6 @@ export const GoogleAuthentication = ({
     setCookie(COOKIE_NAME, credential);
     setUser(profile);
     onLogin?.(profile);
-  };
-
-  const handleLogout = () => {
-    deleteCookie(COOKIE_NAME);
-    window.google?.accounts.id.disableAutoSelect();
-    setUser(null);
-    onLogout?.();
   };
 
   useEffect(() => {
@@ -134,10 +129,13 @@ export const GoogleAuthentication = ({
   if (user) {
     return (
       <div className={styles.signedIn} data-testid="signed-in">
-        <img
+        <Image
           src={user.picture}
           alt={user.name}
           className={styles.avatar}
+          width={32}
+          height={32}
+          unoptimized
           referrerPolicy="no-referrer"
         />
         <span className={styles.name}>{user.name}</span>

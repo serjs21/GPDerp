@@ -96,9 +96,11 @@ export const StreamText = ({
           <span
             key={i}
             className="ct-ch"
-            style={{
-              ["--d" as any]: `${(i / (Math.max(1, chars.length) * 100 )) * (totalMs * 10)}ms`,
-            }}
+            style={
+              {
+                "--d": `${(i / (Math.max(1, chars.length) * 100)) * (totalMs * 10)}ms`,
+              } as React.CSSProperties & Record<"--d", string>
+            }
           >
             {ch === " " ? "\u00A0" : ch}
           </span>
