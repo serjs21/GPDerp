@@ -10,6 +10,7 @@ import { BeamMeUpScotty } from "@/components/BeamMeUpScotty/BeamMeUpScotty";
 import { SiteFooter } from "@/components/SiteFooter/SiteFooter";
 import { CompleteRegistrationRedirect } from "@/components/AuthFlows/CompleteRegistrationRedirect";
 import { GoogleOAuthAvailabilityProvider } from "./GoogleOAuthAvailabilityProvider";
+import { AuthenticationVerificationProvider } from "./AuthenticationVerificationProvider";
 
 export interface LayoutProviderProps {
   children: React.ReactNode;
@@ -18,34 +19,36 @@ export interface LayoutProviderProps {
 
 export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps): React.JSX.Element => {
   const clientId = googleClientId || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-useMarkHydrated();
+  useMarkHydrated();
 
-  const inner = (
-    <>
-      <AxiosInit />
-      <div className={layoutStyles.shell}>
-        <header className={styles.header}>
-          <div className={styles.headerBar}>
-            <BeamMeUpScotty />
-            <div className={styles.headerAuth}>
-              <AuthNavigation />
+  const withAuthVerification = (
+    <AuthenticationVerificationProvider>
+      <>
+        <AxiosInit />
+        <div className={layoutStyles.shell}>
+          <header className={styles.header}>
+            <div className={styles.headerBar}>
+              <BeamMeUpScotty />
+              <div className={styles.headerAuth}>
+                <AuthNavigation />
+              </div>
             </div>
-          </div>
-        </header>
-        <main className={layoutStyles.contentMain}>
-          <CompleteRegistrationRedirect />
-          <div className={layoutStyles.contentStretch}>{children}</div>
-        </main>
-        <footer className={layoutStyles.footerSlot}>
-          <SiteFooter />
-        </footer>
-      </div>
-    </>
+          </header>
+          <main className={layoutStyles.contentMain}>
+            <CompleteRegistrationRedirect />
+            <div className={layoutStyles.contentStretch}>{children}</div>
+          </main>
+          <footer className={layoutStyles.footerSlot}>
+            <SiteFooter />
+          </footer>
+        </div>
+      </>
+    </AuthenticationVerificationProvider>
   );
 
   const withGoogleAvailability = (
     <GoogleOAuthAvailabilityProvider enabled={Boolean(clientId)}>
-      {inner}
+      {withAuthVerification}
     </GoogleOAuthAvailabilityProvider>
   );
 

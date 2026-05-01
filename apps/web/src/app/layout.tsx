@@ -8,7 +8,6 @@ import "@/theme/antd-overrides.css";
 import "@/axios.setup";
 import { LayoutProvider } from "./providers/LayoutProviders";
 import { AuthenticationProvider } from "./providers/AuthenticationProvider";
-import { AuthenticationVerificationProvider } from "./providers/AuthenticationVerificationProvider";
 import { QueryProvider } from "./providers/QueryProvider";
 import { HtmlLoader } from "@/components/Loaders";
 import { ThemeProvider } from "@/theme/ThemeProvider";
@@ -68,11 +67,9 @@ export default async function RootLayout({
           <NextIntlClientProvider locale={initialLocale} messages={messages}>
             <ThemeProvider initialTheme={initialTheme}>
               <AuthenticationProvider>
-                <AuthenticationVerificationProvider>
-                  <LayoutProvider googleClientId={googleClientId}>
-                    <QueryProvider>{children}</QueryProvider>
-                  </LayoutProvider>
-                </AuthenticationVerificationProvider>
+                <LayoutProvider googleClientId={googleClientId}>
+                  <QueryProvider>{children}</QueryProvider>
+                </LayoutProvider>
               </AuthenticationProvider>
             </ThemeProvider>
           </NextIntlClientProvider>
