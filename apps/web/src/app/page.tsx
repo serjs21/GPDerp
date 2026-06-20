@@ -1,5 +1,5 @@
 import styles from "./page.module.css";
-import { HaikuGenerationChat } from "@/components/HaikuGenerationChat/HaikuGenerationChat";
+import { HaikuGenerationStickyNote } from "@/components/HaikuGenerationStickyNote";
 
 export default function Home() {
   return (
@@ -9,11 +9,7 @@ export default function Home() {
         <div className={styles.vgMountains} />
       </div>
       <main className={styles.main}>
-        <HaikuGenerationChat />
-
-        <footer className={`${styles.footerText} poetic-footer`}>
-          {"Stars blink, I wonder—\nAm I just dust in the void,\nOr meaning’s whisper?"}
-        </footer>
+        <HaikuGenerationStickyNote />
       </main>
     </div>
   );

@@ -1,0 +1,10 @@
+.card {
+  margin-bottom: 0.75rem;
+}
+
+.labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  max-width: 360px;
+}

@@ -1,0 +1,27 @@
+.wrapper {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  padding: 0 1rem;
+  max-height: calc(100% - 200px);
+  max-width: 37.5rem;
+  box-sizing: border-box;
+  margin: 0 auto;
+  min-width: min(28rem, 100%);
+  gap: 0.75rem;
+}
+
+.inputSection {
+  flex: 0 0 auto;
+}
+
+.scrollArea {
+  flex: 1;
+  min-width: 0;
+  min-height: 12.5rem;
+  max-height: min(70vh, 720px);
+  overflow: auto;
+  padding: 0.25rem 0.15rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+}

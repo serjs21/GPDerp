@@ -1,0 +1,64 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid color-mix(in srgb, var(--text-color) 28%, transparent);
+  padding: 0.35rem 0.15rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-color);
+  outline: none;
+  transition: border-color 0.2s ease;
+  letter-spacing: 0.02em;
+}
+
+.input::placeholder {
+  color: color-mix(in srgb, var(--text-color) 45%, transparent);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.input:focus {
+  border-bottom-color: color-mix(in srgb, var(--shrine-accent-soft) 70%, var(--text-color) 30%);
+}
+
+.input:disabled {
+  opacity: 0.55;
+}
+
+.submit {
+  align-self: flex-end;
+  background: transparent;
+  border: 2px solid color-mix(in srgb, var(--text-color) 28%, transparent);
+  color: var(--text-color);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  padding: 0.45rem 1.25rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.submit:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--shrine-accent-soft) 70%, var(--text-color) 30%);
+  color: color-mix(in srgb, var(--shrine-accent) 80%, var(--text-color) 20%);
+}
+
+.submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.submitLoader {
+  min-width: 3rem;
+  min-height: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
