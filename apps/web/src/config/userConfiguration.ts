@@ -20,6 +20,7 @@ export const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 export const PREFERENCE_THEME_STORAGE_KEY = "gpderp.profile.selectedTheme";
 export const PREFERENCE_THEME_SCALE_STORAGE_KEY = "gpderp.profile.selectedThemeScale";
 export const PREFERENCE_LOCALE_STORAGE_KEY = "gpderp.profile.selectedLanguage";
+export const PENDING_HAIKU_SUBJECT_STORAGE_KEY = "gpderp.pendingHaikuSubject";
 
 export const isThemeName = (value: string): value is ThemeName =>
   (Object.values(THEMES) as string[]).includes(value);

@@ -2,7 +2,7 @@
 
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/StyledComponents";
-import { useCallback, useMemo, useRef, type RefObject } from "react";
+import { useCallback, useMemo, useRef, type ComponentType, type RefObject } from "react";
 import {
   fetchHaikusPage,
   flattenInfiniteHaikuPages,
@@ -11,7 +11,7 @@ import {
   type HaikuDto,
 } from "@/api/haikus";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
-import { HaikuContainer } from "@/components/HaikuContainer/HaikuContainer";
+import { HaikuContainer, type HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { useEndOfContentScroll } from "@/hooks/useEndOfContentScroll";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
@@ -31,6 +31,8 @@ export type SavedHaikusListViewProps = {
   /** When true, omits heading and inner scroll box; parent must supply `scrollRootRef` as the scrolling element. */
   embedded?: boolean;
   scrollRootRef?: RefObject<HTMLDivElement | null>;
+  HaikuCardComponent?: ComponentType<HaikuContainerProps>;
+  showEmptyMessage?: boolean;
 };
 
 export function SavedHaikusListView({
@@ -45,6 +47,8 @@ export function SavedHaikusListView({
   generatingDraft = null,
   embedded = false,
   scrollRootRef: externalScrollRootRef,
+  HaikuCardComponent = HaikuContainer,
+  showEmptyMessage = true,
 }: SavedHaikusListViewProps) {
   const internalScrollRef = useRef<HTMLDivElement>(null);
   const scrollRootRef = externalScrollRootRef ?? internalScrollRef;
@@ -61,13 +65,13 @@ export function SavedHaikusListView({
   const listInner = (
     <>
       {generatingDraft ? (
-        <HaikuContainer generatingDraft={generatingDraft} />
+        <HaikuCardComponent generatingDraft={generatingDraft} />
       ) : null}
-      {haikus.length === 0 && !isError && !generatingDraft ? (
+      {showEmptyMessage && haikus.length === 0 && !isError && !generatingDraft ? (
         <p className={styles.empty}>No saved haikus yet.</p>
       ) : null}
       {haikus.map((h) => (
-        <HaikuContainer key={h.id} haiku={h} onDeleted={onHaikuDeleted} onChanged={onHaikuDeleted} />
+        <HaikuCardComponent key={h.id} haiku={h} onDeleted={onHaikuDeleted} onChanged={onHaikuDeleted} />
       ))}
       <div ref={sentinelRef} className={styles.sentinel} aria-hidden />
       {isFetchingNextPage ? (
@@ -124,12 +128,16 @@ export type SavedHaikusListProps = {
   embedded?: boolean;
   scrollRootRef?: RefObject<HTMLDivElement | null>;
   generatingDraft?: GeneratingDraft | null;
+  HaikuCardComponent?: ComponentType<HaikuContainerProps>;
+  showEmptyMessage?: boolean;
 };
 
 export function SavedHaikusList({
   embedded,
   scrollRootRef,
   generatingDraft,
+  HaikuCardComponent,
+  showEmptyMessage,
 }: SavedHaikusListProps = {}) {
   const { isLoggedIn, initialized } = useAuthenticationState();
   const queryClient = useQueryClient();
@@ -169,6 +177,8 @@ export function SavedHaikusList({
       generatingDraft={generatingDraft}
       embedded={embedded}
       scrollRootRef={scrollRootRef}
+      HaikuCardComponent={HaikuCardComponent}
+      showEmptyMessage={showEmptyMessage}
     />
   );
 }
