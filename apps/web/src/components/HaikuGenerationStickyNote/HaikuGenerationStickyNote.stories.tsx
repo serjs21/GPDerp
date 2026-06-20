@@ -7,6 +7,7 @@ import { HaikuGenerationStickyNote } from "./HaikuGenerationStickyNote";
 import { HaikuGenerationStickyNoteInitial } from "./HaikuGenerationStickyNoteInitial/HaikuGenerationStickyNoteInitial";
 import { HaikuGenerationStickyNoteInput } from "./HaikuGenerationStickyNoteInput/HaikuGenerationStickyNoteInput";
 import { HaikuGenerationStickyNoteCard } from "./HaikuGenerationStickyNoteCard/HaikuGenerationStickyNoteCard";
+import { haikuGenerationStickyNoteListStyles } from "./HaikuGenerationStickyNoteList/HaikuGenerationStickyNoteList";
 import styles from "./HaikuGenerationStickyNote.module.css";
 
 const meta: Meta<typeof HaikuGenerationStickyNote> = {
@@ -33,7 +34,6 @@ type Story = StoryObj<typeof HaikuGenerationStickyNote>;
 export const InitialOnly: Story = {
   render: function InitialOnlyStory() {
     const [subject, setSubject] = useState("");
-    const scrollRef = useRef<HTMLDivElement>(null);
 
     return (
       <div className={styles.wrapper}>
@@ -44,7 +44,7 @@ export const InitialOnly: Story = {
             onSubmit={(e) => e.preventDefault()}
           />
         </div>
-        <div ref={scrollRef} className={styles.scrollArea}>
+        <div className={styles.displayArea}>
           <HaikuGenerationStickyNoteInitial />
         </div>
       </div>
@@ -55,7 +55,6 @@ export const InitialOnly: Story = {
 export const FirstGeneration: Story = {
   render: function FirstGenerationStory() {
     const [subject, setSubject] = useState("Morning mist");
-    const scrollRef = useRef<HTMLDivElement>(null);
 
     return (
       <div className={styles.wrapper}>
@@ -67,16 +66,18 @@ export const FirstGeneration: Story = {
             isLoading
           />
         </div>
-        <div ref={scrollRef} className={styles.scrollArea}>
-          <HaikuGenerationStickyNoteInitial washingOut />
-          <HaikuGenerationStickyNoteCard
-            generatingDraft={{
-              requestId: "demo-1",
-              subject: "Morning mist",
-              content: "Dew on the grass —\n",
-              createdAtLabel: "9:00 AM",
-            }}
-          />
+        <div className={styles.displayArea}>
+          <div className={haikuGenerationStickyNoteListStyles.scrollArea}>
+            <HaikuGenerationStickyNoteCard
+              generatingDraft={{
+                requestId: "demo-1",
+                subject: "Morning mist",
+                content: "Dew on the grass —\n",
+                createdAtLabel: "9:00 AM",
+              }}
+            />
+          </div>
+          <HaikuGenerationStickyNoteInitial />
         </div>
       </div>
     );
@@ -117,8 +118,9 @@ export const LoggedInWithList: Story = {
             onSubmit={(e) => e.preventDefault()}
           />
         </div>
-        <div ref={scrollRef} className={styles.scrollArea}>
-          <SavedHaikusListView
+        <div className={styles.displayArea}>
+          <div ref={scrollRef} className={haikuGenerationStickyNoteListStyles.scrollArea}>
+            <SavedHaikusListView
             haikus={haikus}
             isInitialLoading={false}
             isFetchingNextPage={false}
@@ -131,10 +133,15 @@ export const LoggedInWithList: Story = {
             showEmptyMessage={false}
             embedded
           />
+          </div>
         </div>
       </div>
     );
   },
+};
+
+export const LoggedInWithExistingHaikus: Story = {
+  ...LoggedInWithList,
 };
 
 export const LiveComponent: Story = {};

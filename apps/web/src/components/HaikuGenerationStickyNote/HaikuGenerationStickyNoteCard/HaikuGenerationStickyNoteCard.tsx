@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "motion/react";
 import type { HaikuDto } from "@/api/haikus";
 import { Label } from "@/components/Label/Label";
+import { GENERATING_HAIKU_CARD_MOTION } from "@/components/HaikuContainer/haikuCardMotion";
 import { formatCreatedAt } from "@/utils/date";
 import { formatHaikuTitle } from "@/utils/strings";
 import { HaikuActions } from "@/components/HaikuContainer/HaikuActions";
@@ -10,26 +12,49 @@ import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuConta
 import { HaikuGenerationStickyNoteShell } from "../HaikuGenerationStickyNoteShell/HaikuGenerationStickyNoteShell";
 import styles from "./HaikuGenerationStickyNoteCard.module.css";
 
+function GeneratingStickyNoteCard({
+  subject,
+  content,
+  createdAtLabel,
+}: {
+  subject: string;
+  content: string;
+  createdAtLabel: string;
+}) {
+  const [entryComplete, setEntryComplete] = useState(false);
+
+  return (
+    <motion.div
+      className={styles.card}
+      data-haiku-generating
+      initial={GENERATING_HAIKU_CARD_MOTION.initial}
+      animate={GENERATING_HAIKU_CARD_MOTION.animate}
+      transition={GENERATING_HAIKU_CARD_MOTION.transition}
+      style={{ overflow: entryComplete ? "visible" : "hidden" }}
+      onAnimationComplete={() => setEntryComplete(true)}
+    >
+      <HaikuGenerationStickyNoteShell
+        actions={<HaikuActions variant="generating" />}
+        title={subject}
+        meta={createdAtLabel}
+        body={content}
+        rotate={0.6}
+      />
+    </motion.div>
+  );
+}
+
 export function HaikuGenerationStickyNoteCard(props: HaikuContainerProps) {
   if ("generatingDraft" in props && props.generatingDraft) {
     const { subject, content, createdAtLabel } = props.generatingDraft;
 
     return (
-      <motion.div
-        className={styles.card}
-        layout
-        initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <HaikuGenerationStickyNoteShell
-          actions={<HaikuActions variant="generating" />}
-          title={subject}
-          meta={createdAtLabel}
-          body={content}
-          rotate={0.6}
-        />
-      </motion.div>
+      <GeneratingStickyNoteCard
+        key={props.generatingDraft.requestId}
+        subject={subject}
+        content={content}
+        createdAtLabel={createdAtLabel}
+      />
     );
   }
 
@@ -40,7 +65,7 @@ export function HaikuGenerationStickyNoteCard(props: HaikuContainerProps) {
   };
 
   return (
-    <motion.div className={styles.card} layout>
+    <div className={styles.card}>
       <HaikuGenerationStickyNoteShell
         actions={
           <HaikuActions variant="saved" haiku={haiku} onDeleted={onDeleted} onChanged={onChanged} />
@@ -59,6 +84,6 @@ export function HaikuGenerationStickyNoteCard(props: HaikuContainerProps) {
         }
         rotate={-0.8}
       />
-    </motion.div>
+    </div>
   );
 }

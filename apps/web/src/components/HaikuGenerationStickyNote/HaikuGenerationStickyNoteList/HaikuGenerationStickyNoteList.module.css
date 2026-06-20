@@ -4,7 +4,7 @@
   min-height: 12.5rem;
   max-height: min(70vh, 720px);
   overflow: auto;
-  padding: 0.75rem 0.25rem 0.5rem;
+  padding: 0.25rem 0.15rem 0.5rem;
   display: flex;
   flex-direction: column;
 }

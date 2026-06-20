@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { useHaikuGenerationFlow } from "./hooks/useHaikuGenerationFlow";
-import { HaikuGenerationStickyNoteInitial } from "./HaikuGenerationStickyNoteInitial/HaikuGenerationStickyNoteInitial";
+import { useSavedHaikuCount } from "./hooks/useSavedHaikuCount";
+import { InitialHaikuGate } from "./InitialHaikuGate";
 import { HaikuGenerationStickyNoteInput } from "./HaikuGenerationStickyNoteInput/HaikuGenerationStickyNoteInput";
 import { HaikuGenerationStickyNoteList } from "./HaikuGenerationStickyNoteList/HaikuGenerationStickyNoteList";
 import styles from "./HaikuGenerationStickyNote.module.css";
@@ -13,16 +13,12 @@ export function HaikuGenerationStickyNote() {
     setSubject,
     isLoading,
     generatingDraft,
-    hasUserGenerated,
-    streamScrollRef,
-    endOfContentRef,
     inputRef,
     onSubmit,
     contextHolder,
   } = useHaikuGenerationFlow();
 
-  const [initialDismissed, setInitialDismissed] = useState(false);
-  const showInitial = !initialDismissed;
+  const { count, isListReady, isLoggedIn } = useSavedHaikuCount();
 
   return (
     <div className={styles.wrapper}>
@@ -36,18 +32,13 @@ export function HaikuGenerationStickyNote() {
         />
       </div>
 
-      <div ref={streamScrollRef} className={styles.scrollArea}>
-        {showInitial ? (
-          <HaikuGenerationStickyNoteInitial
-            washingOut={hasUserGenerated}
-            onWashedOut={() => setInitialDismissed(true)}
-          />
-        ) : null}
-        <HaikuGenerationStickyNoteList
-          scrollRootRef={streamScrollRef}
-          generatingDraft={generatingDraft}
+      <div className={styles.displayArea}>
+        <HaikuGenerationStickyNoteList generatingDraft={generatingDraft} />
+        <InitialHaikuGate
+          key={isLoggedIn ? "logged-in" : "logged-out"}
+          count={count}
+          isListReady={isListReady}
         />
-        <div ref={endOfContentRef} aria-hidden="true" />
       </div>
 
       {contextHolder}

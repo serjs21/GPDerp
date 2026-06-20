@@ -8,14 +8,11 @@ import {
   prependHaikuToInfiniteCache,
 } from "@/api/haikus";
 import { useHaikuSocket } from "@/hooks/useHaikuSocket";
-import { useEndOfContentScroll } from "@/hooks/useEndOfContentScroll";
 import { useAuthenticationVerification } from "@/app/providers/AuthenticationVerificationProvider";
 import { usePendingHaikuSubmit } from "./usePendingHaikuSubmit";
 
 export function useHaikuGenerationFlow() {
   const queryClient = useQueryClient();
-  const streamScrollRef = useRef<HTMLDivElement | null>(null);
-  const endOfContentRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [subject, setSubject] = useState("");
@@ -27,22 +24,6 @@ export function useHaikuGenerationFlow() {
       prependHaikuToInfiniteCache(queryClient, HAIKU_LIST_PAGE_SIZE, haiku);
     },
   });
-
-  const hasUserGenerated = Boolean(generatingDraft) || isLoading;
-
-  useEndOfContentScroll(
-    streamScrollRef,
-    endOfContentRef,
-    () => {
-      const el = streamScrollRef.current;
-      if (!el) return;
-      el.scrollTo({
-        top: el.scrollHeight,
-        behavior: "smooth",
-      });
-    },
-    { enabled: Boolean(generatingDraft) },
-  );
 
   const onError = useCallback(() => {
     api.error({
@@ -87,9 +68,6 @@ export function useHaikuGenerationFlow() {
     setSubject,
     isLoading,
     generatingDraft,
-    hasUserGenerated,
-    streamScrollRef,
-    endOfContentRef,
     inputRef,
     onSubmit,
     contextHolder,

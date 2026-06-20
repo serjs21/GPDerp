@@ -7,6 +7,7 @@ import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { formatCreatedAt } from "@/utils/date";
 import { formatHaikuTitle } from "@/utils/strings";
 import { HaikuActions } from "./HaikuActions";
+import { GENERATING_HAIKU_CARD_MOTION } from "./haikuCardMotion";
 import styles from "./HaikuContainer.module.css";
 
 export type HaikuContainerProps =
@@ -30,9 +31,9 @@ export const HaikuContainer = (props: HaikuContainerProps) => {
     return (
       <motion.article
         className={styles.root}
-        initial={{ opacity: 0, x: -100, y: -20, minHeight: 0, height: 0 }}
-        animate={{ opacity: 1, x: 0, y: 0, minHeight: "185px", height: "fit-content" }}
-        transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }}
+        initial={GENERATING_HAIKU_CARD_MOTION.initial}
+        animate={GENERATING_HAIKU_CARD_MOTION.animate}
+        transition={GENERATING_HAIKU_CARD_MOTION.transition}
       >
         <div className={styles.actions}>
           <HaikuActions variant="generating" />
