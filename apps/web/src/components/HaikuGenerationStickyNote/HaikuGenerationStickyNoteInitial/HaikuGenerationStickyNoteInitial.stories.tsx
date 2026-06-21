@@ -21,9 +21,9 @@ export const FullyTyped: Story = {
   },
 };
 
-export const WashingOut: Story = {
+export const FlyingAway: Story = {
   args: {
     washingOut: true,
   },
-  render: (args) => <HaikuGenerationStickyNoteInitial key="wash-out" {...args} />,
+  render: (args) => <HaikuGenerationStickyNoteInitial key="fly-away" {...args} />,
 };

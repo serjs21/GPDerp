@@ -115,6 +115,15 @@
   opacity: 0.86;
 }
 
+/* Sticky-note paper-plane exit: above scenic bg, below main UI (z-index 2) */
+.paperPlaneFlyLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: visible;
+}
+
 .main {
   position: relative;
   z-index: 2;

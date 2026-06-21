@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { SavedHaikusList } from "@/components/SavedHaikusList/SavedHaikusList";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { useScrollTopCardIntoView } from "../hooks/useScrollTopCardIntoView";
-import { HaikuGenerationStickyNoteCard } from "../HaikuGenerationStickyNoteCard/HaikuGenerationStickyNoteCard";
+import { HaikuGenerationStickyNoteCardExit } from "../HaikuGenerationStickyNoteCardExit/HaikuGenerationStickyNoteCardExit";
 import styles from "./HaikuGenerationStickyNoteList.module.css";
 
 export type HaikuGenerationStickyNoteListProps = {
@@ -24,7 +24,7 @@ export function HaikuGenerationStickyNoteList({
         embedded
         scrollRootRef={scrollRootRef}
         generatingDraft={generatingDraft}
-        HaikuCardComponent={HaikuGenerationStickyNoteCard}
+        HaikuCardComponent={HaikuGenerationStickyNoteCardExit}
         showEmptyMessage={false}
       />
     </div>

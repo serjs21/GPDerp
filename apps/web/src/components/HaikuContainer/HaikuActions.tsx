@@ -21,6 +21,8 @@ export type HaikuActionsProps =
       haiku: HaikuDto;
       onDeleted?: () => void;
       onChanged?: () => void;
+      /** When set, confirm delegates delete to this handler (animation + API orchestration). */
+      onDelete?: () => Promise<void>;
     };
 
 export const HaikuActions = (props: HaikuActionsProps) => {
@@ -39,7 +41,7 @@ export const HaikuActions = (props: HaikuActionsProps) => {
     );
   }
 
-  const { haiku, onDeleted, onChanged } = props;
+  const { haiku, onDeleted, onChanged, onDelete } = props;
 
   const openDeleteConfirm = () => {
     openConfirm({
@@ -51,10 +53,15 @@ export const HaikuActions = (props: HaikuActionsProps) => {
       icon: <WarningOutlined style={{ color: "var(--accent-red)" }} />,
       onOk: async () => {
         try {
+          if (onDelete) {
+            await onDelete();
+            return;
+          }
           await deleteHaiku(haiku.id);
           message.success("Haiku deleted");
           onDeleted?.();
         } catch (e) {
+          if (onDelete) throw e;
           if (axios.isAxiosError(e) && e.response?.status === 403) {
             message.error("You are not allowed to delete this haiku.");
           } else {

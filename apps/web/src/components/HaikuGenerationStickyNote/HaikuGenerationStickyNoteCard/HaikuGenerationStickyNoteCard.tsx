@@ -1,74 +1,56 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "motion/react";
 import type { HaikuDto } from "@/api/haikus";
 import { Label } from "@/components/Label/Label";
-import { GENERATING_HAIKU_CARD_MOTION } from "@/components/HaikuContainer/haikuCardMotion";
 import { formatCreatedAt } from "@/utils/date";
 import { formatHaikuTitle } from "@/utils/strings";
 import { HaikuActions } from "@/components/HaikuContainer/HaikuActions";
 import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
 import { HaikuGenerationStickyNoteShell } from "../HaikuGenerationStickyNoteShell/HaikuGenerationStickyNoteShell";
+import shellStyles from "../HaikuGenerationStickyNoteShell/HaikuGenerationStickyNoteShell.module.css";
 import styles from "./HaikuGenerationStickyNoteCard.module.css";
 
-function GeneratingStickyNoteCard({
-  subject,
-  content,
-  createdAtLabel,
-}: {
-  subject: string;
-  content: string;
-  createdAtLabel: string;
-}) {
-  const [entryComplete, setEntryComplete] = useState(false);
+export type HaikuGenerationStickyNoteCardProps = HaikuContainerProps & {
+  onDelete?: () => Promise<void>;
+};
 
-  return (
-    <motion.div
-      className={styles.card}
-      data-haiku-generating
-      initial={GENERATING_HAIKU_CARD_MOTION.initial}
-      animate={GENERATING_HAIKU_CARD_MOTION.animate}
-      transition={GENERATING_HAIKU_CARD_MOTION.transition}
-      style={{ overflow: entryComplete ? "visible" : "hidden" }}
-      onAnimationComplete={() => setEntryComplete(true)}
-    >
-      <HaikuGenerationStickyNoteShell
-        actions={<HaikuActions variant="generating" />}
-        title={subject}
-        meta={createdAtLabel}
-        body={content}
-        rotate={0.6}
-      />
-    </motion.div>
-  );
-}
-
-export function HaikuGenerationStickyNoteCard(props: HaikuContainerProps) {
+export function HaikuGenerationStickyNoteCard(props: HaikuGenerationStickyNoteCardProps) {
   if ("generatingDraft" in props && props.generatingDraft) {
     const { subject, content, createdAtLabel } = props.generatingDraft;
 
     return (
-      <GeneratingStickyNoteCard
-        key={props.generatingDraft.requestId}
-        subject={subject}
-        content={content}
-        createdAtLabel={createdAtLabel}
-      />
+      <div className={styles.card} data-haiku-generating>
+        <HaikuGenerationStickyNoteShell
+          className={shellStyles.shellFill}
+          actions={<HaikuActions variant="generating" />}
+          title={subject}
+          meta={createdAtLabel}
+          body={content}
+          rotate={0.6}
+        />
+      </div>
     );
   }
 
-  const { haiku, onDeleted, onChanged } = props as {
+  const { haiku, onDeleted, onChanged, onDelete } = props as {
     haiku: HaikuDto;
     onDeleted?: () => void;
     onChanged?: () => void;
+    onDelete?: () => Promise<void>;
   };
 
   return (
     <div className={styles.card}>
       <HaikuGenerationStickyNoteShell
+        className={shellStyles.shellFill}
         actions={
-          <HaikuActions variant="saved" haiku={haiku} onDeleted={onDeleted} onChanged={onChanged} />
+          <HaikuActions
+            variant="saved"
+            haiku={haiku}
+            onDeleted={onDeleted}
+            onChanged={onChanged}
+            onDelete={onDelete}
+          />
         }
         title={formatHaikuTitle(haiku)}
         meta={formatCreatedAt(haiku.createdAt)}
