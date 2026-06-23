@@ -1,8 +1,8 @@
 .sun {
   position: absolute;
   z-index: 2;
-  left: 50%;
-  top: 16%;
+  right: 6%;
+  top: 6%;
   width: clamp(3.5rem, 11vw, 5.5rem);
   height: clamp(3.5rem, 11vw, 5.5rem);
   border-radius: 50%;

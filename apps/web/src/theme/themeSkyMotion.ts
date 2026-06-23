@@ -20,8 +20,13 @@ const MOUNTAIN_VISIBLE_TO = 85;
 const EDGE_CENTER_WINDOW = 20;
 
 const ICON_CORNER_OFFSET_PX = (16 - 4) / Math.SQRT2;
-const SKY_CORNER_OFFSET_VW = 18;
-const SKY_CENTER_OFFSET_VW = 8;
+
+const SKY_MOON_OPACITY_FULL_UNTIL = 25;
+const SKY_MOON_OPACITY_FADE_FROM = 75;
+const SKY_SUN_SET_START = 100;
+const SKY_SUN_SET_END = 25;
+const SKY_SUN_SET_Y_MAX = 38;
+const SKY_SUN_OPACITY_FADE_END = SKY_SUN_SET_END + 10;
 
 export const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 
@@ -74,33 +79,32 @@ export const getIconMotionState = (uiProgress: number) => {
   };
 };
 
+export const getSkyMoonOpacity = (uiProgress: number) => {
+  if (uiProgress <= SKY_MOON_OPACITY_FULL_UNTIL) return 1;
+  if (uiProgress >= SKY_MOON_OPACITY_FADE_FROM) return 0;
+  return (SKY_MOON_OPACITY_FADE_FROM - uiProgress) / 50;
+};
+
 export const getSkyMotionState = (themeScaleProgress: number): SkyMotionState => {
   const uiProgress = themeScaleToUiProgress(themeScaleProgress);
-  const icon = getIconMotionState(uiProgress);
-
-  const moonEdgeCenter = easeInOut(clamp01(1 - uiProgress / EDGE_CENTER_WINDOW));
-  const sunEdgeCenter = easeInOut(
-    clamp01((uiProgress - (100 - EDGE_CENTER_WINDOW)) / EDGE_CENTER_WINDOW),
-  );
-
-  const moonX = lerp(-SKY_CORNER_OFFSET_VW, SKY_CENTER_OFFSET_VW, moonEdgeCenter);
-  const sunX = lerp(SKY_CORNER_OFFSET_VW, -SKY_CENTER_OFFSET_VW, sunEdgeCenter);
+  const moonOpacity = getSkyMoonOpacity(uiProgress);
+  const sunSetPhase = phaseBetween(uiProgress, SKY_SUN_SET_END, SKY_SUN_SET_START);
   const cloudDrift = lerp(-4, 4, themeScaleProgress / 100);
 
   return {
     moon: {
-      x: moonX,
-      y: lerp(-12, 4, moonEdgeCenter),
-      scale: icon.moon.scale,
-      opacity: icon.moon.opacity,
+      x: 0,
+      y: 0,
+      scale: lerp(0.9, 1, moonOpacity),
+      opacity: moonOpacity,
     },
     sun: {
-      x: sunX,
-      y: lerp(-14, 2, sunEdgeCenter),
-      scale: icon.sun.scale,
-      opacity: icon.sun.opacity,
+      x: 0,
+      y: lerp(SKY_SUN_SET_Y_MAX, 0, sunSetPhase),
+      scale: lerp(0.85, 1, sunSetPhase),
+      opacity: phaseBetween(uiProgress, SKY_SUN_SET_END, SKY_SUN_OPACITY_FADE_END),
     },
-    mountain: icon.mountain,
+    mountain: { opacity: 1 },
     clouds: {
       driftX: cloudDrift,
       opacity: lerp(0.55, 0.35, themeScaleProgress / 100),

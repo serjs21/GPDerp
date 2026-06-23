@@ -1,8 +1,8 @@
 .moon {
   position: absolute;
   z-index: 2;
-  left: 50%;
-  top: 14%;
+  left: 25%;
+  top: 25%;
   width: clamp(2.75rem, 8vw, 4.25rem);
   height: clamp(2.75rem, 8vw, 4.25rem);
   border-radius: 50%;
