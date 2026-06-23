@@ -33,6 +33,7 @@ export type SavedHaikusListViewProps = {
   scrollRootRef?: RefObject<HTMLDivElement | null>;
   HaikuCardComponent?: ComponentType<HaikuContainerProps>;
   showEmptyMessage?: boolean;
+  embeddedListClassName?: string;
 };
 
 export function SavedHaikusListView({
@@ -49,6 +50,7 @@ export function SavedHaikusListView({
   scrollRootRef: externalScrollRootRef,
   HaikuCardComponent = HaikuContainer,
   showEmptyMessage = true,
+  embeddedListClassName,
 }: SavedHaikusListViewProps) {
   const internalScrollRef = useRef<HTMLDivElement>(null);
   const scrollRootRef = externalScrollRootRef ?? internalScrollRef;
@@ -92,7 +94,7 @@ export function SavedHaikusListView({
 
   if (embedded) {
     return (
-      <div className={styles.embedded}>
+      <div className={[styles.embedded, embeddedListClassName].filter(Boolean).join(" ")}>
         {isInitialLoading ? (
           <div className={styles.loaderRow}>
             <SakuraPetalLoader />
@@ -130,6 +132,7 @@ export type SavedHaikusListProps = {
   generatingDraft?: GeneratingDraft | null;
   HaikuCardComponent?: ComponentType<HaikuContainerProps>;
   showEmptyMessage?: boolean;
+  embeddedListClassName?: string;
 };
 
 export function SavedHaikusList({
@@ -138,6 +141,7 @@ export function SavedHaikusList({
   generatingDraft,
   HaikuCardComponent,
   showEmptyMessage,
+  embeddedListClassName,
 }: SavedHaikusListProps = {}) {
   const { isLoggedIn, initialized } = useAuthenticationState();
   const queryClient = useQueryClient();
@@ -179,6 +183,7 @@ export function SavedHaikusList({
       scrollRootRef={scrollRootRef}
       HaikuCardComponent={HaikuCardComponent}
       showEmptyMessage={showEmptyMessage}
+      embeddedListClassName={embeddedListClassName}
     />
   );
 }

@@ -6,6 +6,12 @@ import { Dropdown, Slider } from "@/components/StyledComponents";
 import { UIButton } from "@/components/ui";
 import { useState, type CSSProperties } from "react";
 import { getThemeScaleVars } from "@/theme/themeScale";
+import {
+  clamp01,
+  getIconMotionState,
+  themeScaleToUiProgress,
+  uiProgressToThemeScale,
+} from "@/theme/themeSkyMotion";
 import styles from "./ThemeSelector.module.css";
 
 const THEME_PROGRESS: Record<ThemeName, number> = {
@@ -19,27 +25,14 @@ const SAVABLE_THEME_POINTS: Array<{ theme: ThemeName; progress: number }> = [
   { theme: "tokyo-dusk", progress: 50 },
   { theme: "sumie", progress: 100 },
 ];
-const MAX_ICON_OVERLAP_PX = 4;
+
 const ICON_BUTTON_PADDING_PX = 4;
-const ICON_SIZE_PX = 16;
-const ICON_CORNER_OFFSET_PX = (ICON_SIZE_PX - MAX_ICON_OVERLAP_PX) / Math.SQRT2;
 const MOON_ICON_COLOR = "var(--moon-highlight)";
 const SUN_ICON_COLOR = "var(--sun-highlight)";
 const MOUNTAIN_ICON_COLOR = "var(--mountain-highlight)";
 const MOON_STROKE_COLOR = "var(--moon-stroke)";
 const SUN_STROKE_COLOR = "var(--sun-stroke)";
 const MOUNTAIN_STROKE_COLOR = "var(--mountain-stroke)";
-const MOON_FADE_START = 20;
-const MOON_HIDE_AT = 45;
-const SUN_APPEAR_AT = 55;
-const SUN_MAX_SCALE_AT = 80;
-const MOON_OPACITY_FADE_START = 20;
-const MOON_OPACITY_HIDE_AT = 45;
-const SUN_OPACITY_SHOW_AT = 55;
-const SUN_OPACITY_FULL_AT = 80;
-const MOUNTAIN_VISIBLE_FROM = 15;
-const MOUNTAIN_VISIBLE_TO = 85;
-const EDGE_CENTER_WINDOW = 20;
 
 export const getNearestThemeByProgress = (progress: number): ThemeName => {
   const nearest = SAVABLE_THEME_POINTS.reduce((best, current) => {
@@ -53,9 +46,9 @@ export const getNearestThemeByProgress = (progress: number): ThemeName => {
 type ThemeSelectorProps = {
   value: ThemeName;
   scaleValue?: number;
-  onChange: (next: ThemeName) => void; // committed theme
-  onPreviewChange?: (progress: number) => void; // smooth slider preview 0..100
-  onScaleCommit?: (progress: number) => void; // exact 0..100 commit
+  onChange: (next: ThemeName) => void;
+  onPreviewChange?: (progress: number) => void;
+  onScaleCommit?: (progress: number) => void;
   className?: string;
   ariaLabel?: string;
 };
@@ -73,14 +66,14 @@ export const ThemeSelector = ({
   const [interacting, setInteracting] = useState(false);
   const [hasManualPosition, setHasManualPosition] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const toThemeScaleProgress = (uiProgress: number) => 100 - uiProgress;
   const effectiveProgress =
-    hasManualPosition || scaleValue === undefined ? progress : Math.max(0, Math.min(100, 100 - scaleValue));
-  const themeScaleProgress = toThemeScaleProgress(effectiveProgress);
+    hasManualPosition || scaleValue === undefined ? progress : themeScaleToUiProgress(scaleValue);
+  const themeScaleProgress = uiProgressToThemeScale(effectiveProgress);
   const themeVars = getThemeScaleVars(themeScaleProgress);
+  const iconMotion = getIconMotionState(effectiveProgress);
 
   const commitTheme = (nextProgress: number) => {
-    const themeProgress = toThemeScaleProgress(nextProgress);
+    const themeProgress = uiProgressToThemeScale(nextProgress);
     if (onScaleCommit) {
       onScaleCommit(themeProgress);
       return;
@@ -88,39 +81,9 @@ export const ThemeSelector = ({
     onChange(getNearestThemeByProgress(nextProgress));
   };
 
-  const phaseBetween = (value: number, start: number, end: number) => {
-    if (value <= start) return 0;
-    if (value >= end) return 1;
-    return (value - start) / (end - start);
-  };
-
-  const moonFadeProgress = phaseBetween(effectiveProgress, MOON_FADE_START, MOON_HIDE_AT);
-  const moonPhase = 1 - moonFadeProgress;
-  const mountainVisible = effectiveProgress >= MOUNTAIN_VISIBLE_FROM && effectiveProgress <= MOUNTAIN_VISIBLE_TO;
-  const sunPhase = phaseBetween(effectiveProgress, SUN_APPEAR_AT, SUN_MAX_SCALE_AT);
-  const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
-  const lerp = (from: number, to: number, t: number) => from + (to - from) * clamp01(t);
-  const easeInOut = (t: number) => {
-    const x = clamp01(t);
-    return x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2;
-  };
   const iconTransform = (x: number, y: number, scale: number) =>
     `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(${scale})`;
 
-  const moonEdgeCenter = easeInOut(clamp01(1 - effectiveProgress / EDGE_CENTER_WINDOW));
-  const sunEdgeCenter = easeInOut(
-    clamp01((effectiveProgress - (100 - EDGE_CENTER_WINDOW)) / EDGE_CENTER_WINDOW),
-  );
-
-  const moonX = lerp(-ICON_CORNER_OFFSET_PX, 0, moonEdgeCenter);
-  const moonY = lerp(-ICON_CORNER_OFFSET_PX, 0, moonEdgeCenter);
-  const sunX = lerp(ICON_CORNER_OFFSET_PX, 0, sunEdgeCenter);
-  const sunY = lerp(-ICON_CORNER_OFFSET_PX, 0, sunEdgeCenter);
-
-  const sunScale = 0.7 + sunPhase * 0.3;
-  const moonScale = 0.66 + moonPhase * 0.34;
-  const moonOpacity = 1 - phaseBetween(effectiveProgress, MOON_OPACITY_FADE_START, MOON_OPACITY_HIDE_AT);
-  const sunOpacity = phaseBetween(effectiveProgress, SUN_OPACITY_SHOW_AT, SUN_OPACITY_FULL_AT);
   const colorInfluence = (anchor: number) => clamp01(1 - Math.abs(effectiveProgress - anchor) / 50);
   const moonInfluence = colorInfluence(0);
   const mountainInfluence = colorInfluence(50);
@@ -129,55 +92,38 @@ export const ThemeSelector = ({
     `color-mix(in srgb, ${themeVars["--text-muted"]} ${Math.round((1 - influence) * 100)}%, ${targetColor} ${Math.round(influence * 100)}%)`;
   const blendedStrokeColor = (targetColor: string, influence: number) =>
     `color-mix(in srgb, ${themeVars["--text-color"]} ${Math.round((1 - influence) * 100)}%, ${targetColor} ${Math.round(influence * 100)}%)`;
+
   const selectPresetProgress = (nextProgress: number) => {
     setProgress(nextProgress);
     setHasManualPosition(true);
     setInteracting(false);
-    onPreviewChange?.(toThemeScaleProgress(nextProgress));
+    onPreviewChange?.(uiProgressToThemeScale(nextProgress));
     commitTheme(nextProgress);
   };
 
+  const sliderStyle = {
+    "--slider-accent": themeVars["--accent-red"],
+    "--moon-highlight": "color-mix(in srgb, var(--shrine-accent-soft) 75%, var(--surface-glass-strong) 25%)",
+    "--sun-highlight": "color-mix(in srgb, #ffd54a 78%, var(--surface-glass-strong) 22%)",
+    "--mountain-highlight": "color-mix(in srgb, var(--accent-red) 70%, var(--surface-glass-strong) 30%)",
+    "--moon-stroke": "color-mix(in srgb, var(--text-color) 40%, var(--surface-glass-strong) 60%)",
+    "--sun-stroke": "color-mix(in srgb, var(--text-color) 75%, var(--background) 25%)",
+    "--mountain-stroke": "color-mix(in srgb, var(--accent-red) 65%, var(--text-color) 35%)",
+    "--slider-stop-1": getThemeScaleVars(0)["--gradientStart"],
+    "--slider-stop-2": getThemeScaleVars(25)["--gradientStart"],
+    "--slider-stop-3": getThemeScaleVars(50)["--accent-red"],
+    "--slider-stop-4": getThemeScaleVars(75)["--gradientMid"],
+    "--slider-stop-5": getThemeScaleVars(100)["--background"],
+  } as CSSProperties;
+
   return (
-    <div
-      className={`${styles.wrap}${className ? ` ${className}` : ""}`}
-      style={
-        {
-          "--moon-highlight": "color-mix(in srgb, var(--shrine-accent-soft) 75%, var(--surface-glass-strong) 25%)",
-          "--sun-highlight": "color-mix(in srgb, #ffd54a 78%, var(--surface-glass-strong) 22%)",
-          "--mountain-highlight": "color-mix(in srgb, var(--accent-red) 70%, var(--surface-glass-strong) 30%)",
-          "--moon-stroke": "color-mix(in srgb, var(--text-color) 40%, var(--surface-glass-strong) 60%)",
-          "--sun-stroke": "color-mix(in srgb, var(--text-color) 75%, var(--background) 25%)",
-          "--mountain-stroke": "color-mix(in srgb, var(--accent-red) 65%, var(--text-color) 35%)",
-          "--slider-accent": themeVars["--accent-red"],
-          "--slider-stop-1": getThemeScaleVars(0)["--gradientStart"],
-          "--slider-stop-2": getThemeScaleVars(25)["--gradientStart"],
-          "--slider-stop-3": getThemeScaleVars(50)["--accent-red"],
-          "--slider-stop-4": getThemeScaleVars(75)["--gradientMid"],
-          "--slider-stop-5": getThemeScaleVars(100)["--background"],
-        } as CSSProperties
-      }
-    >
+    <div className={`${styles.wrap}${className ? ` ${className}` : ""}`} style={sliderStyle}>
       <Dropdown
         open={isOpen}
         onOpenChange={setIsOpen}
         trigger={["click"]}
         placement="bottom"
-        styles={{
-          root: {
-            "--slider-accent": themeVars["--accent-red"],
-            "--moon-highlight": "color-mix(in srgb, var(--shrine-accent-soft) 75%, var(--surface-glass-strong) 25%)",
-            "--sun-highlight": "color-mix(in srgb, #ffd54a 78%, var(--surface-glass-strong) 22%)",
-            "--mountain-highlight": "color-mix(in srgb, var(--accent-red) 70%, var(--surface-glass-strong) 30%)",
-            "--moon-stroke": "color-mix(in srgb, var(--text-color) 40%, var(--surface-glass-strong) 60%)",
-            "--sun-stroke": "color-mix(in srgb, var(--text-color) 75%, var(--background) 25%)",
-            "--mountain-stroke": "color-mix(in srgb, var(--accent-red) 65%, var(--text-color) 35%)",
-            "--slider-stop-1": getThemeScaleVars(0)["--gradientStart"],
-            "--slider-stop-2": getThemeScaleVars(25)["--gradientStart"],
-            "--slider-stop-3": getThemeScaleVars(50)["--accent-red"],
-            "--slider-stop-4": getThemeScaleVars(75)["--gradientMid"],
-            "--slider-stop-5": getThemeScaleVars(100)["--background"],
-          } as CSSProperties,
-        }}
+        styles={{ root: sliderStyle }}
         popupRender={() => (
           <div className={styles.panel}>
             <div className={styles.panelIcons}>
@@ -243,7 +189,7 @@ export const ThemeSelector = ({
                   if (!interacting) setInteracting(true);
                   if (!hasManualPosition) setHasManualPosition(true);
                   setProgress(value);
-                  onPreviewChange?.(toThemeScaleProgress(value));
+                  onPreviewChange?.(uiProgressToThemeScale(value));
                 }}
                 onChangeComplete={(value) => {
                   if (typeof value !== "number") return;
@@ -260,29 +206,21 @@ export const ThemeSelector = ({
         <UIButton
           className={styles.trigger}
           aria-label={`${ariaLabel}, ${Math.round(effectiveProgress)}%`}
-          style={
-            {
-              "--icon-button-padding": `${ICON_BUTTON_PADDING_PX}px`,
-            } as CSSProperties
-          }
+          style={{ "--icon-button-padding": `${ICON_BUTTON_PADDING_PX}px` } as CSSProperties}
         >
           <span className={styles.iconStack} aria-hidden>
             <Moon
               className={`${styles.icon} ${styles.moonIcon}`}
               style={{
-                opacity: moonOpacity,
-                transform: iconTransform(
-                  moonX,
-                  moonY,
-                  moonScale,
-                ),
+                opacity: iconMotion.moon.opacity,
+                transform: iconTransform(iconMotion.moon.x, iconMotion.moon.y, iconMotion.moon.scale),
                 fill: MOON_ICON_COLOR,
               }}
             />
             <Mountain
               className={`${styles.icon} ${styles.mountainIcon}`}
               style={{
-                opacity: mountainVisible ? 1 : 0,
+                opacity: iconMotion.mountain.opacity,
                 transform: iconTransform(0, 0, 1),
                 fill: MOUNTAIN_ICON_COLOR,
               }}
@@ -290,12 +228,8 @@ export const ThemeSelector = ({
             <Sun
               className={`${styles.icon} ${styles.sunIcon}`}
               style={{
-                opacity: sunOpacity,
-                transform: iconTransform(
-                  sunX,
-                  sunY,
-                  sunScale,
-                ),
+                opacity: iconMotion.sun.opacity,
+                transform: iconTransform(iconMotion.sun.x, iconMotion.sun.y, iconMotion.sun.scale),
                 fill: SUN_ICON_COLOR,
               }}
             />

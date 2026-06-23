@@ -5,7 +5,7 @@ import { getPersistedThemeFromScale, getThemeScaleVars } from "@/theme/themeScal
 import { Kasagi, Nuki, Pillars, Shimaki } from "@/components/Dividers";
 import { BeamMeUpScotty } from "@/components/BeamMeUpScotty/BeamMeUpScotty";
 import { SiteFooter } from "@/components/SiteFooter/SiteFooter";
-import { AuthDualityToggle } from "@/components/AuthenticationNav/components/AuthDualityToggle/AuthDualityToggle";
+import { DaylightBackgroundScene } from "@/components/DaylightBackground/DaylightBackgroundScene";
 
 import { ThemeSelector } from "./ThemeSelector";
 import styles from "./ThemeSelector.stories.module.css";
@@ -104,10 +104,7 @@ const LayoutShellPreview = ({ initialTheme }: { initialTheme: ThemeName }) => {
   return (
     <div className={styles.storyPageRoot} style={themeVars as CSSProperties}>
       <div className={`${pageStyles.page} ${styles.layoutStageInShell}`}>
-        <div className={pageStyles.vgBg} aria-hidden>
-          <div className={pageStyles.vgArt} />
-          <div className={pageStyles.vgMountains} />
-        </div>
+        <DaylightBackgroundScene progress={activeScale} />
         <main className={pageStyles.main}>
           <div className={styles.layoutControls}>
             <SelectorControlCard
@@ -163,22 +160,13 @@ const FullChromePreview = ({ initialTheme }: { initialTheme: ThemeName }) => {
                   setTheme(getPersistedThemeFromScale(progress));
                 }}
               />
-              <div className={styles.mockAuthRow}>
-                <AuthDualityToggle
-                  onLoginClick={() => undefined}
-                  onRegisterClick={() => undefined}
-                />
-              </div>
             </div>
           </div>
         </header>
         <main className={layoutStyles.contentMain}>
           <div className={layoutStyles.contentStretch}>
             <div className={`${pageStyles.page} ${styles.layoutStageInShell}`}>
-              <div className={pageStyles.vgBg} aria-hidden>
-                <div className={pageStyles.vgArt} />
-                <div className={pageStyles.vgMountains} />
-              </div>
+              <DaylightBackgroundScene progress={activeScale} />
               <main className={pageStyles.main}>
                 <div className={styles.pageComponentShell}>
                   <form className={chatStyles.shrine} onSubmit={(event) => event.preventDefault()}>

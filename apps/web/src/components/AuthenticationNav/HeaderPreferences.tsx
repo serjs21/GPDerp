@@ -4,13 +4,12 @@ import { message } from "@/components/StyledComponents";
 import { LocaleSelector } from "@/components/LocaleSelector";
 import { ThemeSelector } from "@/components/ThemeSelector";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
+import { useThemeScaleContext } from "@/app/providers/ThemeScaleProvider";
 import { updateOwnConfiguration } from "@/api/user";
 import {
   PREFERENCE_LOCALE_STORAGE_KEY,
-  PREFERENCE_THEME_STORAGE_KEY,
-  PREFERENCE_THEME_SCALE_STORAGE_KEY,
   type AppLocale,
   type ThemeName,
 } from "@/config/userConfiguration";
@@ -18,7 +17,6 @@ import { useProfileI18n } from "@/hooks/useProfileI18n";
 import { useLocale } from "@/hooks/useLocale";
 import { useTheme } from "@/hooks/useTheme";
 import { useTranslations } from "next-intl";
-import { getPersistedThemeFromScale, getThemeScaleVars } from "@/theme/themeScale";
 import styles from "./headerPreferences.module.css";
 
 const THEME_SCALE_FROM_THEME: Record<ThemeName, number> = {
@@ -27,23 +25,14 @@ const THEME_SCALE_FROM_THEME: Record<ThemeName, number> = {
   "night-sky": 100,
 };
 
-const readStoredThemeScale = (theme: ThemeName): number => {
-  if (typeof window === "undefined") return THEME_SCALE_FROM_THEME[theme];
-  const storedScale = window.localStorage.getItem(PREFERENCE_THEME_SCALE_STORAGE_KEY);
-  if (!storedScale) return THEME_SCALE_FROM_THEME[theme];
-  const parsedScale = Number.parseInt(storedScale, 10);
-  if (Number.isNaN(parsedScale)) return THEME_SCALE_FROM_THEME[theme];
-  return Math.max(0, Math.min(100, parsedScale));
-};
-
 export const HeaderPreferences = () => {
   const router = useRouter();
   const { isLoggedIn } = useAuthenticationState();
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
   const { locale, setLocale } = useLocale();
   const { languageOptions } = useProfileI18n();
   const t = useTranslations("Profile");
-  const [themePreviewProgress, setThemePreviewProgress] = useState<number | null>(() => readStoredThemeScale(theme));
+  const { progress, setPreviewProgress, commitScale } = useThemeScaleContext();
 
   const persistIfLoggedIn = useCallback(
     async (body: { theme?: ThemeName; language?: AppLocale }) => {
@@ -61,44 +50,8 @@ export const HeaderPreferences = () => {
     [isLoggedIn, locale, router, t, theme],
   );
 
-  const onThemeChange = (next: ThemeName, scaleOverride?: number) => {
-    const nextScale = scaleOverride ?? THEME_SCALE_FROM_THEME[next];
-    setThemePreviewProgress(nextScale);
-    setTheme(next);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(PREFERENCE_THEME_STORAGE_KEY, next);
-      window.localStorage.setItem(PREFERENCE_THEME_SCALE_STORAGE_KEY, String(nextScale));
-    }
-    void persistIfLoggedIn({ theme: next });
-  };
-
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    const rootStyle = document.documentElement.style;
-
-    if (themePreviewProgress === null) {
-      const keys = Object.keys(getThemeScaleVars(0));
-      for (const key of keys) {
-        rootStyle.removeProperty(key);
-      }
-      return;
-    }
-
-    const preview = getThemeScaleVars(themePreviewProgress);
-    for (const key of Object.keys(preview)) {
-      rootStyle.setProperty(key, preview[key]);
-    }
-
-    return () => {
-      const keys = Object.keys(getThemeScaleVars(0));
-      for (const key of keys) {
-        rootStyle.removeProperty(key);
-      }
-    };
-  }, [themePreviewProgress]);
-
-  const onThemeScaleCommit = (progress: number) => {
-    onThemeChange(getPersistedThemeFromScale(progress), progress);
+  const onThemeChange = (next: ThemeName) => {
+    commitScale(THEME_SCALE_FROM_THEME[next]);
   };
 
   const onLocaleChange = (next: AppLocale) => {
@@ -117,10 +70,10 @@ export const HeaderPreferences = () => {
     <div className={styles.wrap} role="group" aria-label={t("preferencesGroupLabel")}>
       <ThemeSelector
         value={theme}
-        scaleValue={themePreviewProgress ?? THEME_SCALE_FROM_THEME[theme]}
+        scaleValue={progress}
         onChange={onThemeChange}
-        onScaleCommit={onThemeScaleCommit}
-        onPreviewChange={setThemePreviewProgress}
+        onScaleCommit={commitScale}
+        onPreviewChange={setPreviewProgress}
         className={styles.themeSelector}
         ariaLabel={t("theme")}
       />

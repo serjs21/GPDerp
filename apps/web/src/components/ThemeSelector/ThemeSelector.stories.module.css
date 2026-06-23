@@ -7,7 +7,7 @@
   overflow: hidden;
   border: 1px solid var(--story-border);
   background:
-    url("/background.webp"),
+    /* url("/background.webp"), */
     radial-gradient(circle at 20% 18%, color-mix(in srgb, var(--story-accent-soft) 30%, transparent) 0%, transparent 55%),
     radial-gradient(circle at 78% 20%, color-mix(in srgb, var(--story-surface-strong) 30%, transparent) 0%, transparent 58%),
     linear-gradient(180deg, var(--story-gradient-start) 0%, var(--story-gradient-mid) 56%, var(--story-background) 100%);

@@ -2,8 +2,7 @@
 
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { HeaderPreferences } from "./HeaderPreferences";
-import { LoggedOutAuthLinks } from "./LoggedOutAuthLinks";
-import { LoggedInUserDropdown } from "./LoggedInUserDropdown";
+import { LoggedInUserNav } from "./LoggedInUserNav";
 import styles from "./style.module.css";
 
 export const AuthNavigation = () => {
@@ -13,7 +12,7 @@ export const AuthNavigation = () => {
   return (
     <div className={styles.authCluster}>
       <HeaderPreferences />
-      {isLoggedIn ? <LoggedInUserDropdown user={user} onLogout={logout} /> : <LoggedOutAuthLinks />}
+      {isLoggedIn ? <LoggedInUserNav user={user} onLogout={logout} /> : null}
     </div>
   );
 };

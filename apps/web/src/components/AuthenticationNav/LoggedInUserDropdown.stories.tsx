@@ -4,14 +4,10 @@ import { fn } from "storybook/test";
 import type { UserObject } from "@/types";
 import { AuthProvider } from "@/types";
 
-import { LoggedInUserDropdown } from "./LoggedInUserDropdown";
+import { LoggedInUserNav } from "./LoggedInUserNav";
 
 const avatarAristotle =
   "https://cdn.britannica.com/84/87984-050-7C5547FE/Detail-Roman-copy-portrait-bust-Aristotle-Greek.jpg";
-const avatarPlato =
-  "https://images.imagerenderer.com/images-medium-large/plato-ancient-greek-philosopher-sheila-terry.jpg";
-const avatarSunzi =
-  "https://cdn.britannica.com/36/259536-050-C6DC3D1F/Sunzi-Sun-Tzu-Chinese-strategist-Art-of-War.jpg";
 
 function makeUser({
   userName,
@@ -34,65 +30,41 @@ function makeUser({
 }
 
 const meta = {
-  title: "Auth/AuthenticationNav/LoggedInUserDropdown",
-  component: LoggedInUserDropdown,
+  title: "Auth/AuthenticationNav/LoggedInUserNav",
+  component: LoggedInUserNav,
   tags: ["autodocs"],
   parameters: {
     layout: "centered",
   },
   args: {
     onLogout: fn(),
+    user: makeUser({ userName: "Aristotle", avatar: avatarAristotle }),
   },
-} satisfies Meta<typeof LoggedInUserDropdown>;
+} satisfies Meta<typeof LoggedInUserNav>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const ShortDisplayNameWithAvatar: Story = {
-  args: {
-    user: makeUser({ userName: "Aristotle", avatar: avatarAristotle }),
+export const Desktop: Story = {
+  parameters: {
+    viewport: { defaultViewport: "desktop" },
   },
 };
 
-export const LongDisplayNameWithAvatar: Story = {
-  args: {
-    user: makeUser({
-      userName: "Plato the Philosopher",
-      avatar: avatarPlato,
-    }),
+export const Mobile: Story = {
+  parameters: {
+    viewport: { defaultViewport: "mobile1" },
   },
 };
 
-export const ExtraLongDisplayNameWithAvatar: Story = {
+export const LongDisplayName: Story = {
   args: {
     user: makeUser({
       userName: "Sun-Tzu Sunzi: Master Strategist of the Art of War",
-      avatar: avatarSunzi,
+      avatar: avatarAristotle,
     }),
   },
-};
-
-export const ShortDisplayNameWithoutAvatar: Story = {
-  args: {
-    user: makeUser({ userName: "Aristotle", avatar: "" }),
+  parameters: {
+    viewport: { defaultViewport: "desktop" },
   },
 };
-
-export const LongDisplayNameWithoutAvatar: Story = {
-  args: {
-    user: makeUser({
-      userName: "Plato the Philosopher",
-      avatar: "",
-    }),
-  },
-};
-
-export const ExtraLongDisplayNameWithoutAvatar: Story = {
-  args: {
-    user: makeUser({
-      userName: "Sun-Tzu Sunzi: Master Strategist of the Art of War",
-      avatar: "",
-    }),
-  },
-};
-
