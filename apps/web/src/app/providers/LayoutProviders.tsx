@@ -6,7 +6,6 @@ import styles from "./headerStyles.module.css";
 import layoutStyles from "./layoutProviders.module.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthNavigation } from "@/components/AuthenticationNav/AuthNavigation";
-import { BeamMeUpScotty } from "@/components/BeamMeUpScotty/BeamMeUpScotty";
 import { SiteFooter } from "@/components/SiteFooter/SiteFooter";
 import { CompleteRegistrationRedirect } from "@/components/AuthFlows/CompleteRegistrationRedirect";
 import { GoogleOAuthAvailabilityProvider } from "./GoogleOAuthAvailabilityProvider";
@@ -28,10 +27,7 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
         <div className={layoutStyles.shell}>
           <header className={styles.header}>
             <div className={styles.headerBar}>
-              <BeamMeUpScotty />
-              <div className={styles.headerAuth}>
-                <AuthNavigation />
-              </div>
+              <AuthNavigation />
             </div>
           </header>
           <main className={layoutStyles.contentMain}>

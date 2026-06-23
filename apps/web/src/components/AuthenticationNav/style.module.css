@@ -34,9 +34,18 @@
 .authCluster {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  width: 100%;
+  min-width: 0;
+}
+
+.headerNavSlot {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  flex: 1;
 }
 
 .headerAuthNav {

@@ -9,7 +9,8 @@ import { DaylightMoon } from "./placeholders/DaylightMoon";
 import { DaylightMountains } from "./placeholders/DaylightMountains";
 import { DaylightSun } from "./placeholders/DaylightSun";
 
-const sunTransform = (y: number, scale: number) => `translateY(${y}vh) scale(${scale})`;
+const sunTransform = (x: number, y: number, scale: number) =>
+  `translate(${x}vw, ${y}vh) scale(${scale})`;
 
 const moonTransform = (scale: number) => `translate(-50%, -50%) scale(${scale})`;
 
@@ -50,7 +51,7 @@ export const DaylightBackgroundView = ({ progress }: DaylightBackgroundViewProps
         style={
           {
             opacity: motion.sun.opacity,
-            transform: sunTransform(motion.sun.y, motion.sun.scale),
+            transform: sunTransform(motion.sun.x, motion.sun.y, motion.sun.scale),
           } as CSSProperties
         }
       />

@@ -45,17 +45,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Desktop: Story = {
-  parameters: {
-    viewport: { defaultViewport: "desktop" },
-  },
-};
-
-export const Mobile: Story = {
-  parameters: {
-    viewport: { defaultViewport: "mobile1" },
-  },
-};
+export const Default: Story = {};
 
 export const LongDisplayName: Story = {
   args: {
@@ -63,8 +53,5 @@ export const LongDisplayName: Story = {
       userName: "Sun-Tzu Sunzi: Master Strategist of the Art of War",
       avatar: avatarAristotle,
     }),
-  },
-  parameters: {
-    viewport: { defaultViewport: "desktop" },
   },
 };

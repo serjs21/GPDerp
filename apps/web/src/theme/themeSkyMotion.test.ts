@@ -35,9 +35,10 @@ describe("getSkyMotionState", () => {
     expect(motion.sun.opacity).toBe(1);
   });
 
-  it("sets sun below the ridge at dusk", () => {
+  it("sets sun diagonally toward center at dusk", () => {
     const motion = getSkyMotionState(75);
     expect(motion.sun.y).toBeGreaterThan(30);
+    expect(motion.sun.x).toBeLessThan(-20);
     expect(motion.sun.opacity).toBe(0);
   });
 

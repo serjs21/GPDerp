@@ -26,6 +26,7 @@ const SKY_MOON_OPACITY_FADE_FROM = 75;
 const SKY_SUN_SET_START = 100;
 const SKY_SUN_SET_END = 25;
 const SKY_SUN_SET_Y_MAX = 38;
+const SKY_SUN_SET_X_MAX = 28;
 const SKY_SUN_OPACITY_FADE_END = SKY_SUN_SET_END + 10;
 
 export const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
@@ -99,7 +100,7 @@ export const getSkyMotionState = (themeScaleProgress: number): SkyMotionState =>
       opacity: moonOpacity,
     },
     sun: {
-      x: 0,
+      x: lerp(-SKY_SUN_SET_X_MAX, 0, sunSetPhase),
       y: lerp(SKY_SUN_SET_Y_MAX, 0, sunSetPhase),
       scale: lerp(0.85, 1, sunSetPhase),
       opacity: phaseBetween(uiProgress, SKY_SUN_SET_END, SKY_SUN_OPACITY_FADE_END),

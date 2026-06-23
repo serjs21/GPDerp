@@ -3,7 +3,6 @@ import { useState, type CSSProperties } from "react";
 import type { ThemeName } from "@/config/userConfiguration";
 import { getPersistedThemeFromScale, getThemeScaleVars } from "@/theme/themeScale";
 import { Kasagi, Nuki, Pillars, Shimaki } from "@/components/Dividers";
-import { BeamMeUpScotty } from "@/components/BeamMeUpScotty/BeamMeUpScotty";
 import { SiteFooter } from "@/components/SiteFooter/SiteFooter";
 import { DaylightBackgroundScene } from "@/components/DaylightBackground/DaylightBackgroundScene";
 
@@ -149,7 +148,6 @@ const FullChromePreview = ({ initialTheme }: { initialTheme: ThemeName }) => {
       <div className={layoutStyles.shell}>
         <header className={headerStyles.header}>
           <div className={headerStyles.headerBar}>
-            <BeamMeUpScotty />
             <div className={`${headerStyles.headerAuth} ${styles.storyHeaderAuth}`}>
               <ThemeSelector
                 value={theme}

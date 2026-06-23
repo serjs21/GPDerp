@@ -11,8 +11,10 @@ export const AuthNavigation = () => {
   if (!initialized) return null;
   return (
     <div className={styles.authCluster}>
+      <div className={styles.headerNavSlot}>
+        {isLoggedIn ? <LoggedInUserNav user={user} onLogout={logout} /> : null}
+      </div>
       <HeaderPreferences />
-      {isLoggedIn ? <LoggedInUserNav user={user} onLogout={logout} /> : null}
     </div>
   );
 };
