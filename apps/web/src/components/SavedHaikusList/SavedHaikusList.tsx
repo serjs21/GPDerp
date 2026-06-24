@@ -1,19 +1,13 @@
 "use client";
 
-import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/StyledComponents";
-import { useCallback, useMemo, useRef, type ComponentType, type RefObject } from "react";
-import {
-  fetchHaikusPage,
-  flattenInfiniteHaikuPages,
-  haikuQueryKeys,
-  HAIKU_LIST_PAGE_SIZE,
-  type HaikuDto,
-} from "@/api/haikus";
+import { useCallback, useRef, type ComponentType, type RefObject } from "react";
+import type { HaikuDto } from "@/api/haikus";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { HaikuContainer, type HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { useEndOfContentScroll } from "@/hooks/useEndOfContentScroll";
+import { useInfiniteHaikusQuery } from "@/hooks/useInfiniteHaikusQuery";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import styles from "./SavedHaikusList.module.css";
 
@@ -143,26 +137,8 @@ export function SavedHaikusList({
   showEmptyMessage,
   embeddedListClassName,
 }: SavedHaikusListProps = {}) {
-  const { isLoggedIn, initialized } = useAuthenticationState();
-  const queryClient = useQueryClient();
-
-  const query = useInfiniteQuery({
-    queryKey: haikuQueryKeys.infiniteList(HAIKU_LIST_PAGE_SIZE),
-    queryFn: ({ pageParam }) =>
-      fetchHaikusPage({ offset: pageParam as number, pageSize: HAIKU_LIST_PAGE_SIZE }),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage) => {
-      const { offset, haikus, total } = lastPage.data;
-      const loaded = offset + haikus.length;
-      return loaded < total ? loaded : undefined;
-    },
-    enabled: initialized && isLoggedIn,
-  });
-
-  const haikus = useMemo(
-    () => flattenInfiniteHaikuPages(query.data?.pages ?? []),
-    [query.data?.pages],
-  );
+  const { initialized, isLoggedIn } = useAuthenticationState();
+  const query = useInfiniteHaikusQuery();
 
   if (!initialized || !isLoggedIn) {
     return null;
@@ -170,14 +146,14 @@ export function SavedHaikusList({
 
   return (
     <SavedHaikusListView
-      haikus={haikus}
-      isInitialLoading={query.isPending}
+      haikus={query.haikus}
+      isInitialLoading={query.isInitialLoading}
       isFetchingNextPage={query.isFetchingNextPage}
       isError={query.isError}
-      hasNextPage={query.hasNextPage ?? false}
-      onLoadMore={() => void query.fetchNextPage()}
-      onRetry={() => void query.refetch()}
-      onHaikuDeleted={() => void queryClient.invalidateQueries({ queryKey: haikuQueryKeys.all })}
+      hasNextPage={query.hasNextPage}
+      onLoadMore={query.fetchNextPage}
+      onRetry={query.refetch}
+      onHaikuDeleted={query.invalidate}
       generatingDraft={generatingDraft}
       embedded={embedded}
       scrollRootRef={scrollRootRef}

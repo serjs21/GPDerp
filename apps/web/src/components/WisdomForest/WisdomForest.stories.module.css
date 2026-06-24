@@ -1,0 +1,79 @@
+.stage {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+.focusLabel {
+  margin: 0;
+  font-size: 0.8rem;
+  color: color-mix(in srgb, var(--text-color) 70%, transparent);
+}
+
+.scrollButton {
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--text-color) 22%, transparent);
+  background: color-mix(in srgb, var(--text-color) 6%, transparent);
+  color: var(--text-color);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.scrollButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.forestShell {
+  position: relative;
+}
+
+.scrollForest {
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--text-color) 5%, transparent) 0,
+      color-mix(in srgb, var(--text-color) 5%, transparent) 47px,
+      color-mix(in srgb, var(--text-color) 10%, transparent) 47px,
+      color-mix(in srgb, var(--text-color) 10%, transparent) 48px
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--text-color) 4%, transparent) 0%,
+      transparent 35%,
+      color-mix(in srgb, var(--text-color) 6%, transparent) 100%
+    );
+}
+
+.ruler {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  width: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.rulerTick {
+  height: 2px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--text-color) 20%, transparent);
+  transition: background 150ms ease-out, transform 150ms ease-out;
+}
+
+.rulerTickActive {
+  background: color-mix(in srgb, var(--text-color) 55%, transparent);
+  transform: scaleX(1.35);
+}
