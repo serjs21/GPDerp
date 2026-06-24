@@ -1,6 +1,9 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { useRef } from "react";
-import { getStackSlotHeightPx } from "../wisdomForestStackScroll";
+import {
+  getCardsListBottomPaddingPx,
+  getStackSlotHeightPx,
+} from "../wisdomForestStackScroll";
 import { useWisdomForestStackScroll } from "./useWisdomForestStackScroll";
 
 type IoInstance = {
@@ -10,6 +13,9 @@ type IoInstance = {
 };
 
 let lastIo: IoInstance | null = null;
+
+const ROOT_FONT_SIZE = 16;
+const CLIENT_HEIGHT = 600;
 
 beforeEach(() => {
   lastIo = null;
@@ -49,8 +55,7 @@ function Harness({
   hasNextPage?: boolean;
 }) {
   const scrollRootRef = useRef<HTMLDivElement>(null);
-  const clientHeight = 600;
-  const slotHeight = getStackSlotHeightPx(clientHeight);
+  const slotHeight = getStackSlotHeightPx(ROOT_FONT_SIZE);
   const { activeCardIndex, sentinelRef } = useWisdomForestStackScroll({
     scrollRootRef,
     cardCount,
@@ -62,10 +67,14 @@ function Harness({
   const bindForestRef = (node: HTMLDivElement | null) => {
     scrollRootRef.current = node;
     if (!node) return;
-    Object.defineProperty(node, "clientHeight", { configurable: true, value: clientHeight });
+    Object.defineProperty(node, "clientHeight", { configurable: true, value: CLIENT_HEIGHT });
     Object.defineProperty(node, "scrollHeight", {
       configurable: true,
-      value: slotHeight * cardCount + (clientHeight - slotHeight),
+      value: slotHeight * cardCount + getCardsListBottomPaddingPx(CLIENT_HEIGHT, cardCount, ROOT_FONT_SIZE),
+    });
+    Object.defineProperty(window, "getComputedStyle", {
+      configurable: true,
+      value: () => ({ fontSize: `${ROOT_FONT_SIZE}px` }),
     });
   };
 
@@ -74,12 +83,12 @@ function Harness({
       <div
         ref={bindForestRef}
         data-testid="forest"
-        style={{ height: clientHeight, overflow: "auto" }}
+        style={{ height: CLIENT_HEIGHT, overflow: "auto", fontSize: `${ROOT_FONT_SIZE}px` }}
       >
         {Array.from({ length: cardCount }, (_, i) => (
           <div key={i} style={{ height: slotHeight }} />
         ))}
-        <li ref={sentinelRef} data-testid="sentinel" />
+        <div ref={sentinelRef} data-testid="sentinel" />
       </div>
       <p data-testid="active-index">{activeCardIndex}</p>
     </div>
@@ -90,7 +99,7 @@ describe("useWisdomForestStackScroll", () => {
   it("reports active card index from scroll position", async () => {
     render(<Harness />);
     const forest = screen.getByTestId("forest");
-    const slot = getStackSlotHeightPx(600);
+    const slot = getStackSlotHeightPx(ROOT_FONT_SIZE);
 
     await act(async () => {
       Object.defineProperty(forest, "scrollTop", { configurable: true, value: slot * 2, writable: true });

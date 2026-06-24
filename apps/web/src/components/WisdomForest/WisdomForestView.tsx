@@ -58,15 +58,20 @@ function WisdomForestScrollBody({
     <>
       {showEmpty ? <p className={styles.empty}>No saved haikus yet.</p> : null}
       {cardCount > 0 ? (
-        <WisdomForestCards
-          haikus={haikus}
-          generatingDraft={generatingDraft}
-          isFetchingNextPage={isFetchingNextPage}
-          onHaikuDeleted={onHaikuDeleted}
-          PreviewCard={PreviewCard}
-          Loader={Loader}
-          sentinelRef={sentinelRef}
-        />
+        <>
+          <WisdomForestCards
+            haikus={haikus}
+            generatingDraft={generatingDraft}
+            onHaikuDeleted={onHaikuDeleted}
+            PreviewCard={PreviewCard}
+          />
+          <div ref={sentinelRef} className={styles.sentinel} aria-hidden />
+          {isFetchingNextPage ? (
+            <div className={styles.loaderRow}>
+              <Loader />
+            </div>
+          ) : null}
+        </>
       ) : null}
       {isError ? <WisdomForestErrorFooter onRetry={onRetry} /> : null}
     </>

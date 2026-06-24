@@ -1,5 +1,4 @@
-import { render, screen } from "@testing-library/react";
-import { createRef } from "react";
+import { render } from "@testing-library/react";
 import { WisdomForestCards } from "./WisdomForestCards";
 
 const mockHaikus = [
@@ -27,42 +26,21 @@ const mockHaikus = [
 
 describe("WisdomForestCards", () => {
   it("renders sticky stack list with index vars", () => {
-    const sentinelRef = createRef<HTMLLIElement>();
     const { container } = render(
       <WisdomForestCards
         haikus={mockHaikus}
         generatingDraft={null}
-        isFetchingNextPage={false}
         PreviewCard={() => <div data-testid="card">card</div>}
-        Loader={() => null}
-        sentinelRef={sentinelRef}
       />,
     );
 
     const list = container.querySelector("ol");
     expect(list).toBeInTheDocument();
 
-    const cards = Array.from(container.querySelectorAll("li")).filter(
-      (li) => !li.hasAttribute("aria-hidden") && !li.textContent?.includes("loading"),
-    );
+    const cards = container.querySelectorAll("li");
     expect(cards).toHaveLength(2);
     expect(cards[0]?.getAttribute("style")).toContain("--index");
     expect(container.querySelectorAll('[class*="cardContent"]')).toHaveLength(2);
-  });
-
-  it("renders loader row when paginating", () => {
-    const sentinelRef = createRef<HTMLLIElement>();
-    render(
-      <WisdomForestCards
-        haikus={mockHaikus}
-        generatingDraft={null}
-        isFetchingNextPage
-        PreviewCard={() => null}
-        Loader={() => <span>loading</span>}
-        sentinelRef={sentinelRef}
-      />,
-    );
-
-    expect(screen.getByText("loading")).toBeInTheDocument();
+    expect(container.querySelector('[class*="sentinel"]')).not.toBeInTheDocument();
   });
 });

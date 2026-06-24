@@ -1,27 +1,21 @@
 import type { HaikuDto } from "@/api/haikus";
 import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
-import type { ComponentType, CSSProperties, RefObject } from "react";
+import type { ComponentType, CSSProperties } from "react";
 import styles from "./WisdomForest.module.css";
 
 type WisdomForestCardsProps = {
   haikus: HaikuDto[];
   generatingDraft: GeneratingDraft | null;
-  isFetchingNextPage: boolean;
   onHaikuDeleted?: () => void;
   PreviewCard: ComponentType<HaikuContainerProps>;
-  Loader: ComponentType;
-  sentinelRef: RefObject<HTMLLIElement | null>;
 };
 
 export function WisdomForestCards({
   haikus,
   generatingDraft,
-  isFetchingNextPage,
   onHaikuDeleted,
   PreviewCard,
-  Loader,
-  sentinelRef,
 }: WisdomForestCardsProps) {
   const cardCount = haikus.length + (generatingDraft ? 1 : 0);
 
@@ -45,12 +39,6 @@ export function WisdomForestCards({
           </div>
         </li>
       ))}
-      <li ref={sentinelRef} className={styles.sentinel} aria-hidden />
-      {isFetchingNextPage ? (
-        <li className={styles.loaderRow}>
-          <Loader />
-        </li>
-      ) : null}
     </ol>
   );
 }

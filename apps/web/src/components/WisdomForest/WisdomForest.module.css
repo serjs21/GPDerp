@@ -10,12 +10,20 @@
 }
 
 .cards {
-  --wisdom-forest-slot-height: 12vh;
+  --wisdom-forest-card-gap: 1rem;
+  --wisdom-forest-slot-height: calc(12.5rem + var(--wisdom-forest-card-gap));
   --wisdom-forest-stack-top: 1.25rem;
   --wisdom-forest-stack-tab-step: 0.65rem;
   list-style: none;
   margin: 0;
-  padding: 0 0 calc(var(--wisdom-forest-height) - var(--wisdom-forest-slot-height));
+  padding: 0 0
+    calc(
+      var(--wisdom-forest-slot-height) * 1.5
+    );
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(var(--numcards), var(--wisdom-forest-slot-height));
+  gap: var(--wisdom-forest-card-gap);
   view-timeline-name: --wisdom-forest-cards;
   view-timeline-axis: block;
 }
@@ -24,7 +32,10 @@
   --index0: calc(var(--index) - 1);
   --reverse-index: calc(var(--numcards) - var(--index0));
   --reverse-index0: calc(var(--reverse-index) - 1);
-  min-height: var(--wisdom-forest-slot-height);
+  position: sticky;
+  top: var(--wisdom-forest-stack-top);
+  padding-top: calc(var(--index) * var(--wisdom-forest-stack-tab-step));
+  z-index: var(--index);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -35,12 +46,6 @@
 .cardContent {
   --start-range: calc(var(--index0) / var(--numcards) * 100%);
   --end-range: calc(var(--index) / var(--numcards) * 100%);
-  --stack-top: calc(
-    var(--wisdom-forest-stack-top) + var(--index0) * var(--wisdom-forest-stack-tab-step)
-  );
-  position: sticky;
-  top: var(--stack-top);
-  z-index: var(--index);
   width: 100%;
   max-width: 100%;
   display: flex;
@@ -48,7 +53,8 @@
   justify-content: center;
   padding: 0 1rem;
   box-sizing: border-box;
-  transform-origin: center top;
+  transform-origin: 50% 0%;
+  will-change: transform;
   filter: drop-shadow(0 6px 14px color-mix(in srgb, var(--text-color) 16%, transparent));
 }
 
@@ -62,7 +68,7 @@
 
 @keyframes wisdomForestStackScale {
   to {
-    transform: scale(calc(1 - calc(0.1 * var(--reverse-index0))));
+    transform: scale(calc(1.1 - calc(0.1 * var(--reverse-index))));
   }
 }
 

@@ -3,32 +3,41 @@ import {
   getActiveCardIndex,
   getAnimationRangePercents,
   getCardsListBottomPaddingPx,
+  getReverseIndex,
   getReverseIndex0,
   getScrollTopForCardIndex,
+  getStackPaddingTopRem,
   getStackScale,
   getStackSlotHeightPx,
-  getStackStickyTopRem,
+  getStackTabStepPx,
+  STACK_SCALE_BASE,
   STACK_SCALE_STEP,
+  STACK_SLOT_HEIGHT_REM,
   STACK_TAB_STEP_REM,
-  STACK_TOP_REM,
 } from "./wisdomForestStackScroll";
 
+const ROOT_FONT_SIZE = 16;
 const VIEWPORT = 600;
 
 describe("getStackSlotHeightPx", () => {
-  it("returns 12vh of viewport height in pixels", () => {
-    expect(getStackSlotHeightPx(VIEWPORT)).toBe(72);
+  it("returns rem-based slot height in pixels", () => {
+    expect(getStackSlotHeightPx(ROOT_FONT_SIZE)).toBe(STACK_SLOT_HEIGHT_REM * ROOT_FONT_SIZE);
   });
 });
 
 describe("getCardsListBottomPaddingPx", () => {
   it("pads list so the last card can reach sticky top", () => {
-    expect(getCardsListBottomPaddingPx(VIEWPORT)).toBe(528);
+    const cardCount = 6;
+    const slot = getStackSlotHeightPx(ROOT_FONT_SIZE);
+    const tabStep = getStackTabStepPx(ROOT_FONT_SIZE);
+    expect(getCardsListBottomPaddingPx(VIEWPORT, cardCount, ROOT_FONT_SIZE)).toBe(
+      cardCount * tabStep + VIEWPORT - slot,
+    );
   });
 });
 
 describe("getActiveCardIndex", () => {
-  const slot = getStackSlotHeightPx(VIEWPORT);
+  const slot = getStackSlotHeightPx(ROOT_FONT_SIZE);
 
   it("returns 0 at scroll top", () => {
     expect(getActiveCardIndex(0, slot, 6)).toBe(0);
@@ -45,7 +54,7 @@ describe("getActiveCardIndex", () => {
 });
 
 describe("computeStackStep", () => {
-  const slot = getStackSlotHeightPx(VIEWPORT);
+  const slot = getStackSlotHeightPx(ROOT_FONT_SIZE);
   const maxScroll = slot * 5;
 
   it("steps forward one card slot", () => {
@@ -63,7 +72,7 @@ describe("computeStackStep", () => {
 
 describe("getScrollTopForCardIndex", () => {
   it("maps index to slot offsets", () => {
-    const slot = getStackSlotHeightPx(VIEWPORT);
+    const slot = getStackSlotHeightPx(ROOT_FONT_SIZE);
     expect(getScrollTopForCardIndex(2, slot)).toBe(slot * 2);
   });
 });
@@ -76,22 +85,24 @@ describe("getAnimationRangePercents", () => {
   });
 });
 
-describe("getStackStickyTopRem", () => {
-  it("offsets each card sticky anchor to form visible stack tabs", () => {
-    expect(getStackStickyTopRem(1)).toBe(STACK_TOP_REM);
-    expect(getStackStickyTopRem(2)).toBe(STACK_TOP_REM + STACK_TAB_STEP_REM);
-    expect(getStackStickyTopRem(4)).toBe(STACK_TOP_REM + STACK_TAB_STEP_REM * 3);
+describe("getStackPaddingTopRem", () => {
+  it("offsets each card padding-top to form visible stack tabs", () => {
+    expect(getStackPaddingTopRem(1)).toBe(STACK_TAB_STEP_REM);
+    expect(getStackPaddingTopRem(2)).toBe(STACK_TAB_STEP_REM * 2);
+    expect(getStackPaddingTopRem(4)).toBe(STACK_TAB_STEP_REM * 4);
   });
 });
 
 describe("getStackScale", () => {
   it("mirrors CSS keyframe scale reduction", () => {
-    expect(getStackScale(0)).toBe(1);
-    expect(getStackScale(1)).toBeCloseTo(1 - STACK_SCALE_STEP);
+    expect(getStackScale(1)).toBe(STACK_SCALE_BASE - STACK_SCALE_STEP);
+    expect(getStackScale(4)).toBeCloseTo(STACK_SCALE_BASE - STACK_SCALE_STEP * 4);
   });
 
   it("matches reverse index from card position", () => {
-    expect(getReverseIndex0(1, 4)).toBe(3);
-    expect(getStackScale(getReverseIndex0(1, 4))).toBeCloseTo(1 - STACK_SCALE_STEP * 3);
+    expect(getReverseIndex(1, 4)).toBe(4);
+    expect(getStackScale(getReverseIndex(1, 4))).toBeCloseTo(STACK_SCALE_BASE - STACK_SCALE_STEP * 4);
+    expect(getReverseIndex0(4, 4)).toBe(0);
+    expect(getStackScale(getReverseIndex(4, 4))).toBe(1);
   });
 });

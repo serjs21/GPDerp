@@ -1,14 +1,32 @@
-export const STACK_SLOT_HEIGHT_VH = 12;
+export const STACK_CARD_HEIGHT_REM = 12.5;
+export const STACK_CARD_GAP_REM = 1;
+export const STACK_SLOT_HEIGHT_REM = STACK_CARD_HEIGHT_REM + STACK_CARD_GAP_REM;
 export const STACK_TOP_REM = 1.25;
+export const STACK_SCALE_BASE = 1.1;
 export const STACK_SCALE_STEP = 0.1;
 export const STACK_TAB_STEP_REM = 0.65;
 
-export function getStackSlotHeightPx(viewportHeightPx: number): number {
-  return (viewportHeightPx * STACK_SLOT_HEIGHT_VH) / 100;
+export function getRootFontSizePx(root: HTMLElement): number {
+  const fontSize = Number.parseFloat(getComputedStyle(root).fontSize);
+  return Number.isFinite(fontSize) && fontSize > 0 ? fontSize : 16;
 }
 
-export function getCardsListBottomPaddingPx(viewportHeightPx: number): number {
-  return viewportHeightPx - getStackSlotHeightPx(viewportHeightPx);
+export function getStackSlotHeightPx(rootFontSizePx: number): number {
+  return STACK_SLOT_HEIGHT_REM * rootFontSizePx;
+}
+
+export function getStackTabStepPx(rootFontSizePx: number): number {
+  return STACK_TAB_STEP_REM * rootFontSizePx;
+}
+
+export function getCardsListBottomPaddingPx(
+  viewportHeightPx: number,
+  cardCount: number,
+  rootFontSizePx: number,
+): number {
+  const slotHeightPx = getStackSlotHeightPx(rootFontSizePx);
+  const tabStepPx = getStackTabStepPx(rootFontSizePx);
+  return cardCount * tabStepPx + viewportHeightPx - slotHeightPx;
 }
 
 export function getActiveCardIndex(
@@ -51,16 +69,19 @@ export function getAnimationRangePercents(
   return { start: `${start}%`, end: `${end}%` };
 }
 
-export function getStackScale(reverseIndex0: number): number {
-  return Math.max(0, 1 - STACK_SCALE_STEP * reverseIndex0);
+export function getReverseIndex(index: number, cardCount: number): number {
+  const index0 = index - 1;
+  return cardCount - index0;
 }
 
-export function getStackStickyTopRem(index: number): number {
-  return STACK_TOP_REM + (index - 1) * STACK_TAB_STEP_REM;
+export function getStackScale(reverseIndex: number): number {
+  return Math.max(0, STACK_SCALE_BASE - STACK_SCALE_STEP * reverseIndex);
+}
+
+export function getStackPaddingTopRem(index: number): number {
+  return index * STACK_TAB_STEP_REM;
 }
 
 export function getReverseIndex0(index: number, cardCount: number): number {
-  const index0 = index - 1;
-  const reverseIndex = cardCount - index0;
-  return reverseIndex - 1;
+  return getReverseIndex(index, cardCount) - 1;
 }

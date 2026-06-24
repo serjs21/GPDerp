@@ -82,7 +82,7 @@ export const StackingPreview: Story = {
     docs: {
       description: {
         story:
-          "Cody House sticky stack: cards stick with offset top tabs visible behind the front card, scaling down as you scroll deeper into older haikus.",
+          "Cody House sticky stack: cards stick with padding-top tabs visible behind the front card; scroll-driven scale matches the official demo.",
       },
     },
   },
@@ -98,7 +98,7 @@ export const DepthWalkthrough: Story = {
     docs: {
       description: {
         story:
-          "Six cards with scroll-driven scale animation (Chrome 115+). Each card slot is 12vh; sticky content scales via view-timeline as you scroll.",
+          "Six cards with scroll-driven scale animation (Chrome 115+). Each card slot matches haiku card height; sticky padding-top forms the stack tabs.",
       },
     },
   },

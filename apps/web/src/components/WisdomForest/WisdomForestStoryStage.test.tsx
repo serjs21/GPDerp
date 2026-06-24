@@ -2,9 +2,13 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import type { RefObject } from "react";
 import {
   computeStackStep,
+  getCardsListBottomPaddingPx,
   getStackSlotHeightPx,
 } from "./wisdomForestStackScroll";
 import { WisdomForestStoryStage } from "./WisdomForestStoryStage";
+
+const ROOT_FONT_SIZE = 16;
+const CLIENT_HEIGHT = 600;
 
 jest.mock("./WisdomForestView", () => ({
   WisdomForestView: ({
@@ -16,10 +20,10 @@ jest.mock("./WisdomForestView", () => ({
     className?: string;
     onActiveCardIndexChange?: (index: number) => void;
   }) => {
-    const clientHeight = 600;
-    const slotHeight = getStackSlotHeightPx(clientHeight);
+    const slotHeight = getStackSlotHeightPx(ROOT_FONT_SIZE);
     const cardCount = 6;
-    const listHeight = slotHeight * cardCount + (clientHeight - slotHeight);
+    const listHeight =
+      slotHeight * cardCount + getCardsListBottomPaddingPx(CLIENT_HEIGHT, cardCount, ROOT_FONT_SIZE);
 
     const bindRef = (node: HTMLDivElement | null) => {
       if (scrollRootRef) {
@@ -27,7 +31,7 @@ jest.mock("./WisdomForestView", () => ({
       }
       if (!node || (node as HTMLDivElement & { __bound?: boolean }).__bound) return;
       (node as HTMLDivElement & { __bound?: boolean }).__bound = true;
-      Object.defineProperty(node, "clientHeight", { configurable: true, value: clientHeight });
+      Object.defineProperty(node, "clientHeight", { configurable: true, value: CLIENT_HEIGHT });
       Object.defineProperty(node, "scrollHeight", { configurable: true, value: listHeight });
       Object.defineProperty(node, "scrollTop", { configurable: true, writable: true, value: 0 });
     };
@@ -38,7 +42,7 @@ jest.mock("./WisdomForestView", () => ({
         data-testid="forest"
         className={className}
         aria-label="Haiku preview forest"
-        style={{ height: clientHeight, overflow: "auto" }}
+        style={{ height: CLIENT_HEIGHT, overflow: "auto", fontSize: `${ROOT_FONT_SIZE}px` }}
         onScroll={(e) => {
           const top = e.currentTarget.scrollTop;
           const index = Math.round(top / slotHeight);
@@ -99,7 +103,7 @@ describe("WisdomForestStoryStage", () => {
   it("disables Older at the last card", () => {
     render(<WisdomForestStoryStage {...stageProps} />);
     const older = screen.getByRole("button", { name: "Older" });
-    const slot = getStackSlotHeightPx(600);
+    const slot = getStackSlotHeightPx(ROOT_FONT_SIZE);
 
     for (let i = 0; i < 5; i += 1) {
       fireEvent.click(older);

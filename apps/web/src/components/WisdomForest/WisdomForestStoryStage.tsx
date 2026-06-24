@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState, type ComponentProps } from "react";
 import {
   computeStackStep,
+  getRootFontSizePx,
   getStackSlotHeightPx,
 } from "./wisdomForestStackScroll";
 import { WisdomForestView } from "./WisdomForestView";
@@ -21,7 +22,7 @@ export function WisdomForestStoryStage(props: WisdomForestStoryStageProps) {
   const stepScroll = useCallback((direction: -1 | 1) => {
     const root = forestRef.current;
     if (!root) return;
-    const slotHeightPx = getStackSlotHeightPx(root.clientHeight);
+    const slotHeightPx = getStackSlotHeightPx(getRootFontSizePx(root));
     const maxScroll = Math.max(0, root.scrollHeight - root.clientHeight);
     const { scrollTop, activeCardIndex: nextIndex } = computeStackStep(
       root.scrollTop,
