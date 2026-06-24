@@ -29,6 +29,17 @@ export function getCardsListBottomPaddingPx(
   return cardCount * tabStepPx + viewportHeightPx - slotHeightPx;
 }
 
+export function getMaxContentScrollTop(
+  cardCount: number,
+  slotHeightPx: number,
+): number {
+  return getScrollTopForCardIndex(Math.max(0, cardCount - 1), slotHeightPx);
+}
+
+export function getDefaultScrollTop(cardCount: number, slotHeightPx: number): number {
+  return getMaxContentScrollTop(cardCount, slotHeightPx);
+}
+
 export function getActiveCardIndex(
   scrollTop: number,
   slotHeightPx: number,

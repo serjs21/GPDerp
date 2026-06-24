@@ -1,12 +1,29 @@
-.forest {
+.forestClip {
   --wisdom-forest-height: 60vh;
   --wisdom-forest-width: 100%;
   width: var(--wisdom-forest-width);
   height: var(--wisdom-forest-height);
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.forest {
+  width: 100%;
+  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
   box-sizing: border-box;
+}
+
+.scrollContent {
+  --wisdom-forest-card-gap: 1rem;
+  --wisdom-forest-slot-height: calc(12.5rem + var(--wisdom-forest-card-gap));
+  --wisdom-forest-stack-tab-step: 0.65rem;
+  --wisdom-forest-stack-end-padding: calc(
+      var(--wisdom-forest-slot-height) * 1.5
+  );
 }
 
 .cards {
@@ -16,10 +33,7 @@
   --wisdom-forest-stack-tab-step: 0.65rem;
   list-style: none;
   margin: 0;
-  padding: 0 0
-    calc(
-      var(--wisdom-forest-slot-height) * 1.5
-    );
+  padding: 0;
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(var(--numcards), var(--wisdom-forest-slot-height));
@@ -70,6 +84,14 @@
   to {
     transform: scale(calc(1.1 - calc(0.1 * var(--reverse-index))));
   }
+}
+
+.stackEndPad {
+  height: var(--wisdom-forest-stack-end-padding);
+  margin-bottom: calc(-1 * var(--wisdom-forest-stack-end-padding));
+  flex-shrink: 0;
+  pointer-events: none;
+  visibility: hidden;
 }
 
 .sentinel {

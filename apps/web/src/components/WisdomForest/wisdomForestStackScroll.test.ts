@@ -3,6 +3,8 @@ import {
   getActiveCardIndex,
   getAnimationRangePercents,
   getCardsListBottomPaddingPx,
+  getDefaultScrollTop,
+  getMaxContentScrollTop,
   getReverseIndex,
   getReverseIndex0,
   getScrollTopForCardIndex,
@@ -33,6 +35,14 @@ describe("getCardsListBottomPaddingPx", () => {
     expect(getCardsListBottomPaddingPx(VIEWPORT, cardCount, ROOT_FONT_SIZE)).toBe(
       cardCount * tabStep + VIEWPORT - slot,
     );
+  });
+});
+
+describe("getMaxContentScrollTop", () => {
+  it("returns scroll offset for the last card", () => {
+    const slot = getStackSlotHeightPx(ROOT_FONT_SIZE);
+    expect(getMaxContentScrollTop(6, slot)).toBe(slot * 5);
+    expect(getDefaultScrollTop(6, slot)).toBe(slot * 5);
   });
 });
 

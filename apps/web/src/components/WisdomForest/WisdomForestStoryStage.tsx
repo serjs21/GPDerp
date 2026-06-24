@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState, type ComponentProps } from "react";
 import {
   computeStackStep,
+  getMaxContentScrollTop,
   getRootFontSizePx,
   getStackSlotHeightPx,
 } from "./wisdomForestStackScroll";
@@ -13,17 +14,16 @@ type WisdomForestStoryStageProps = ComponentProps<typeof WisdomForestView>;
 
 export function WisdomForestStoryStage(props: WisdomForestStoryStageProps) {
   const forestRef = useRef<HTMLDivElement>(null);
-  const [activeCardIndex, setActiveCardIndex] = useState(0);
-
-  const cardCount =
-    props.haikus.length + (props.generatingDraft ? 1 : 0);
+  const cardCount = props.haikus.length + (props.generatingDraft ? 1 : 0);
   const maxCardIndex = Math.max(0, cardCount - 1);
+  const [activeCardIndex, setActiveCardIndex] = useState(maxCardIndex);
 
   const stepScroll = useCallback((direction: -1 | 1) => {
     const root = forestRef.current;
     if (!root) return;
-    const slotHeightPx = getStackSlotHeightPx(getRootFontSizePx(root));
-    const maxScroll = Math.max(0, root.scrollHeight - root.clientHeight);
+    const rootFontSizePx = getRootFontSizePx(root);
+    const slotHeightPx = getStackSlotHeightPx(rootFontSizePx);
+    const maxScroll = getMaxContentScrollTop(cardCount, slotHeightPx);
     const { scrollTop, activeCardIndex: nextIndex } = computeStackStep(
       root.scrollTop,
       direction,

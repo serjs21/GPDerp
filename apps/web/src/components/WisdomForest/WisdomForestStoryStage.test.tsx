@@ -1,10 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import type { RefObject } from "react";
-import {
-  computeStackStep,
-  getCardsListBottomPaddingPx,
-  getStackSlotHeightPx,
-} from "./wisdomForestStackScroll";
+import { getDefaultScrollTop, getStackSlotHeightPx } from "./wisdomForestStackScroll";
 import { WisdomForestStoryStage } from "./WisdomForestStoryStage";
 
 const ROOT_FONT_SIZE = 16;
@@ -22,8 +18,7 @@ jest.mock("./WisdomForestView", () => ({
   }) => {
     const slotHeight = getStackSlotHeightPx(ROOT_FONT_SIZE);
     const cardCount = 6;
-    const listHeight =
-      slotHeight * cardCount + getCardsListBottomPaddingPx(CLIENT_HEIGHT, cardCount, ROOT_FONT_SIZE);
+    const defaultScrollTop = getDefaultScrollTop(cardCount, slotHeight);
 
     const bindRef = (node: HTMLDivElement | null) => {
       if (scrollRootRef) {
@@ -32,8 +27,16 @@ jest.mock("./WisdomForestView", () => ({
       if (!node || (node as HTMLDivElement & { __bound?: boolean }).__bound) return;
       (node as HTMLDivElement & { __bound?: boolean }).__bound = true;
       Object.defineProperty(node, "clientHeight", { configurable: true, value: CLIENT_HEIGHT });
-      Object.defineProperty(node, "scrollHeight", { configurable: true, value: listHeight });
-      Object.defineProperty(node, "scrollTop", { configurable: true, writable: true, value: 0 });
+      Object.defineProperty(node, "scrollHeight", {
+        configurable: true,
+        value: defaultScrollTop + CLIENT_HEIGHT,
+      });
+      Object.defineProperty(node, "scrollTop", {
+        configurable: true,
+        writable: true,
+        value: defaultScrollTop,
+      });
+      onActiveCardIndexChange?.(cardCount - 1);
     };
 
     return (
@@ -49,7 +52,7 @@ jest.mock("./WisdomForestView", () => ({
           onActiveCardIndexChange?.(index);
         }}
       >
-        <div data-testid="scroll-list" style={{ height: listHeight }} />
+        <div data-testid="scroll-list" style={{ height: defaultScrollTop + CLIENT_HEIGHT }} />
       </div>
     );
   },
@@ -83,34 +86,35 @@ function cardLabel(active: number, total: number): string {
 }
 
 describe("WisdomForestStoryStage", () => {
-  it("updates card label when Older is pressed", () => {
+  it("starts at the last card", () => {
     render(<WisdomForestStoryStage {...stageProps} />);
-    expect(screen.getByText(cardLabel(1, 6))).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole("button", { name: "Older" }));
-
-    expect(screen.getByText(cardLabel(2, 6))).toBeInTheDocument();
+    expect(screen.getByText(cardLabel(6, 6))).toBeInTheDocument();
   });
 
-  it("updates card label when Newer is pressed after stepping older", () => {
+  it("updates card label when Newer is pressed from the default bottom position", () => {
     render(<WisdomForestStoryStage {...stageProps} />);
-    fireEvent.click(screen.getByRole("button", { name: "Older" }));
     fireEvent.click(screen.getByRole("button", { name: "Newer" }));
 
-    expect(screen.getByText(cardLabel(1, 6))).toBeInTheDocument();
+    expect(screen.getByText(cardLabel(5, 6))).toBeInTheDocument();
   });
 
-  it("disables Older at the last card", () => {
+  it("updates card label when Older is pressed after stepping newer", () => {
     render(<WisdomForestStoryStage {...stageProps} />);
-    const older = screen.getByRole("button", { name: "Older" });
-    const slot = getStackSlotHeightPx(ROOT_FONT_SIZE);
+    fireEvent.click(screen.getByRole("button", { name: "Newer" }));
+    fireEvent.click(screen.getByRole("button", { name: "Older" }));
+
+    expect(screen.getByText(cardLabel(6, 6))).toBeInTheDocument();
+  });
+
+  it("disables Newer at the first card", () => {
+    render(<WisdomForestStoryStage {...stageProps} />);
+    const newer = screen.getByRole("button", { name: "Newer" });
 
     for (let i = 0; i < 5; i += 1) {
-      fireEvent.click(older);
+      fireEvent.click(newer);
     }
 
-    expect(computeStackStep(slot * 5, 1, slot, slot * 5, 6).activeCardIndex).toBe(5);
-    expect(screen.getByText(cardLabel(6, 6))).toBeInTheDocument();
-    expect(older).toBeDisabled();
+    expect(screen.getByText(cardLabel(1, 6))).toBeInTheDocument();
+    expect(newer).toBeDisabled();
   });
 });

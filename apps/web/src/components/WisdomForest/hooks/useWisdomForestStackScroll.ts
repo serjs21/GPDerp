@@ -4,6 +4,7 @@ import { useEndOfContentScroll } from "@/hooks/useEndOfContentScroll";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import {
   getActiveCardIndex,
+  getDefaultScrollTop,
   getRootFontSizePx,
   getStackSlotHeightPx,
 } from "../wisdomForestStackScroll";
@@ -26,7 +27,7 @@ export function useWisdomForestStackScroll({
   enabled = true,
 }: UseWisdomForestStackScrollOptions) {
   const sentinelRef = useRef<HTMLDivElement>(null);
-  const [activeCardIndex, setActiveCardIndex] = useState(0);
+  const [activeCardIndex, setActiveCardIndex] = useState(() => Math.max(0, cardCount - 1));
   const [rootFontSizePx, setRootFontSizePx] = useState(16);
 
   useLayoutEffect(() => {
@@ -41,6 +42,19 @@ export function useWisdomForestStackScroll({
   }, [scrollRootRef]);
 
   const slotHeightPx = getStackSlotHeightPx(rootFontSizePx);
+
+  const scrollToDefault = useCallback(() => {
+    const root = scrollRootRef.current;
+    if (!root || cardCount <= 0) return;
+
+    root.scrollTop = getDefaultScrollTop(cardCount, slotHeightPx);
+    setActiveCardIndex(getActiveCardIndex(root.scrollTop, slotHeightPx, cardCount));
+  }, [cardCount, scrollRootRef, slotHeightPx]);
+
+  useLayoutEffect(() => {
+    if (!enabled || cardCount <= 0) return;
+    scrollToDefault();
+  }, [cardCount, enabled, scrollToDefault]);
 
   const handleEnd = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) onLoadMore();
@@ -63,5 +77,5 @@ export function useWisdomForestStackScroll({
     return () => root.removeEventListener("scroll", sync);
   }, [cardCount, scrollRootRef, slotHeightPx]);
 
-  return { activeCardIndex, sentinelRef, slotHeightPx };
+  return { activeCardIndex, sentinelRef, slotHeightPx, scrollToDefault };
 }
