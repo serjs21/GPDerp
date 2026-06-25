@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { ReactNode } from "react";
 import type { HaikuDto } from "@/api/haikus";
 import { HaikuGenerationStickyNoteCard } from "./HaikuGenerationStickyNoteCard";
 
@@ -20,9 +22,22 @@ Self slips through the cracks.
 
 -Jean-Paul Sartickle`;
 
+function storyProviders(Story: () => ReactNode) {
+  const qc = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+
+  return (
+    <QueryClientProvider client={qc}>
+      <Story />
+    </QueryClientProvider>
+  );
+}
+
 const meta: Meta<typeof HaikuGenerationStickyNoteCard> = {
   title: "Haiku/HaikuGenerationStickyNoteCard",
   component: HaikuGenerationStickyNoteCard,
+  decorators: [storyProviders],
 };
 
 export default meta;

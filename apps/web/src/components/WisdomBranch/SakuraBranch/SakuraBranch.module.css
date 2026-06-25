@@ -1,0 +1,36 @@
+.branch {
+  --branch-angle: 0deg;
+  --branch-scale: 1;
+
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+  background-image: url("/branch-base.png");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center bottom;
+  mix-blend-mode: lighten;
+  transform: rotate(var(--branch-angle)) scale(var(--branch-scale));
+  transform-origin: center bottom;
+  animation: sakuraBranchSway 8s ease-in-out infinite;
+}
+
+@keyframes sakuraBranchSway {
+  0%,
+  100% {
+    transform: rotate(var(--branch-angle)) scale(var(--branch-scale));
+  }
+
+  50% {
+    transform: rotate(calc(var(--branch-angle) + 0.5deg)) scale(var(--branch-scale));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .branch {
+    animation: none;
+  }
+}

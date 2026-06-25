@@ -5,6 +5,7 @@ import type { HaikuDto } from "@/api/haikus";
 import { AuthenticationProvider } from "@/app/providers/AuthenticationProvider";
 import { AuthenticationVerificationProvider } from "@/app/providers/AuthenticationVerificationProvider";
 import { HaikuGenerationStickyNoteCard } from "@/components/HaikuGenerationStickyNote/HaikuGenerationStickyNoteCard/HaikuGenerationStickyNoteCard";
+import { WisdomBranch } from "@/components/WisdomBranch";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { fn } from "storybook/test";
 import { WisdomForest } from "./WisdomForest";
@@ -87,11 +88,14 @@ export const Default: Story = {};
 
 export const StackingPreview: Story = {
   render: (args) => <WisdomForestStoryStage {...args} />,
+  args: {
+    PreviewCard: WisdomBranch,
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "Cody House sticky stack: cards stick with padding-top tabs visible behind the front card; scroll-driven scale matches the official demo.",
+          "Cody House sticky stack with WisdomBranch sakura-branch preview cards: tabs peek behind the front card; scroll-driven scale matches the official demo.",
       },
     },
   },
@@ -100,6 +104,7 @@ export const StackingPreview: Story = {
 export const DepthWalkthrough: Story = {
   render: (args) => <WisdomForestStoryStage {...args} />,
   args: {
+    PreviewCard: WisdomBranch,
     haikus: mockHaikus.slice(0, 6),
     hasNextPage: false,
   },
@@ -107,7 +112,7 @@ export const DepthWalkthrough: Story = {
     docs: {
       description: {
         story:
-          "Six cards with scroll-driven scale animation (Chrome 115+). Each card slot matches haiku card height; sticky padding-top forms the stack tabs.",
+          "Six WisdomBranch cards with scroll-driven scale animation (Chrome 115+). Each slot matches haiku card height; sticky padding-top forms the stack tabs.",
       },
     },
   },

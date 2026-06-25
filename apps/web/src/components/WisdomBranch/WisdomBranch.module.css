@@ -1,0 +1,35 @@
+.wrapper {
+  --wisdom-branch-note-width: calc(var(--haiku-card-width, 28rem) + 4rem);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(var(--wisdom-branch-note-width), 100%);
+  height: 12.5rem;
+  max-width: 100%;
+  box-sizing: border-box;
+  filter: drop-shadow(0 4px 12px color-mix(in srgb, var(--sumi-ink) 12%, transparent));
+}
+
+.branchZone {
+  position: relative;
+  width: 100%;
+  height: 3.25rem;
+  flex-shrink: 0;
+}
+
+.noteZone {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.noteZone > div {
+  --haiku-card-width: var(--wisdom-branch-note-width);
+  height: 100%;
+  width: 100%;
+  max-width: var(--wisdom-branch-note-width);
+}
