@@ -1,3 +1,6 @@
+import type { HaikuDto } from "@/api/haikus";
+import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
+
 export const STACK_CARD_HEIGHT_REM = 12.5;
 export const STACK_CARD_GAP_REM = 1;
 export const STACK_SLOT_HEIGHT_REM = STACK_CARD_HEIGHT_REM + STACK_CARD_GAP_REM;
@@ -5,6 +8,13 @@ export const STACK_TOP_REM = 1.25;
 export const STACK_SCALE_BASE = 1.1;
 export const STACK_SCALE_STEP = 0.1;
 export const STACK_TAB_STEP_REM = 0.65;
+
+export function getWisdomForestCardCount(
+  haikus: HaikuDto[],
+  generatingDraft: GeneratingDraft | null,
+): number {
+  return haikus.length + (generatingDraft ? 1 : 0);
+}
 
 export function getRootFontSizePx(root: HTMLElement): number {
   const fontSize = Number.parseFloat(getComputedStyle(root).fontSize);

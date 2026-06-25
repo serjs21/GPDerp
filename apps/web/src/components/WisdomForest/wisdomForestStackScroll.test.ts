@@ -6,6 +6,7 @@ import {
   getDefaultScrollTop,
   getMaxContentScrollTop,
   getReverseIndex,
+  getWisdomForestCardCount,
   getReverseIndex0,
   getScrollTopForCardIndex,
   getStackPaddingTopRem,
@@ -20,6 +21,21 @@ import {
 
 const ROOT_FONT_SIZE = 16;
 const VIEWPORT = 600;
+
+describe("getWisdomForestCardCount", () => {
+  it("counts haikus plus generating draft", () => {
+    expect(getWisdomForestCardCount([], null)).toBe(0);
+    expect(getWisdomForestCardCount([{ id: "1" } as never], null)).toBe(1);
+    expect(
+      getWisdomForestCardCount([], {
+        requestId: "r",
+        subject: "s",
+        content: "c",
+        createdAtLabel: "t",
+      }),
+    ).toBe(1);
+  });
+});
 
 describe("getStackSlotHeightPx", () => {
   it("returns rem-based slot height in pixels", () => {

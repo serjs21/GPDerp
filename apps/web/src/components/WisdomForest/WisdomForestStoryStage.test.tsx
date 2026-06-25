@@ -6,8 +6,8 @@ import { WisdomForestStoryStage } from "./WisdomForestStoryStage";
 const ROOT_FONT_SIZE = 16;
 const CLIENT_HEIGHT = 600;
 
-jest.mock("./WisdomForestView", () => ({
-  WisdomForestView: ({
+jest.mock("./WisdomForest", () => ({
+  WisdomForest: ({
     scrollRootRef,
     className,
     onActiveCardIndexChange,

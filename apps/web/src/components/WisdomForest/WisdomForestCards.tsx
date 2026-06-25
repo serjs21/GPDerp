@@ -2,6 +2,7 @@ import type { HaikuDto } from "@/api/haikus";
 import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import type { ComponentType, CSSProperties } from "react";
+import { getWisdomForestCardCount } from "./wisdomForestStackScroll";
 import styles from "./WisdomForest.module.css";
 
 type WisdomForestCardsProps = {
@@ -17,7 +18,7 @@ export function WisdomForestCards({
   onHaikuDeleted,
   PreviewCard,
 }: WisdomForestCardsProps) {
-  const cardCount = haikus.length + (generatingDraft ? 1 : 0);
+  const cardCount = getWisdomForestCardCount(haikus, generatingDraft);
 
   return (
     <ol className={styles.cards} style={{ "--numcards": cardCount } as CSSProperties}>

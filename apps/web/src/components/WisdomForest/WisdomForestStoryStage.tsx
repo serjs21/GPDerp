@@ -1,39 +1,18 @@
 "use client";
 
-import { useCallback, useRef, useState, type ComponentProps } from "react";
-import {
-  computeStackStep,
-  getMaxContentScrollTop,
-  getRootFontSizePx,
-  getStackSlotHeightPx,
-} from "./wisdomForestStackScroll";
-import { WisdomForestView } from "./WisdomForestView";
+import type { ComponentProps } from "react";
+import { useWisdomForestStepScroll } from "./hooks/useWisdomForestStepScroll";
+import { WisdomForest } from "./WisdomForest";
 import styles from "./WisdomForest.stories.module.css";
 
-type WisdomForestStoryStageProps = ComponentProps<typeof WisdomForestView>;
+type WisdomForestStoryStageProps = ComponentProps<typeof WisdomForest>;
 
 export function WisdomForestStoryStage(props: WisdomForestStoryStageProps) {
-  const forestRef = useRef<HTMLDivElement>(null);
-  const cardCount = props.haikus.length + (props.generatingDraft ? 1 : 0);
-  const maxCardIndex = Math.max(0, cardCount - 1);
-  const [activeCardIndex, setActiveCardIndex] = useState(maxCardIndex);
-
-  const stepScroll = useCallback((direction: -1 | 1) => {
-    const root = forestRef.current;
-    if (!root) return;
-    const rootFontSizePx = getRootFontSizePx(root);
-    const slotHeightPx = getStackSlotHeightPx(rootFontSizePx);
-    const maxScroll = getMaxContentScrollTop(cardCount, slotHeightPx);
-    const { scrollTop, activeCardIndex: nextIndex } = computeStackStep(
-      root.scrollTop,
-      direction,
-      slotHeightPx,
-      maxScroll,
-      cardCount,
-    );
-    root.scrollTop = scrollTop;
-    setActiveCardIndex(nextIndex);
-  }, [cardCount]);
+  const { forestRef, activeCardIndex, setActiveCardIndex, stepScroll, maxCardIndex, cardCount } =
+    useWisdomForestStepScroll({
+      haikus: props.haikus ?? [],
+      generatingDraft: props.generatingDraft,
+    });
 
   const forestClass = [styles.scrollForest, props.className].filter(Boolean).join(" ");
 
@@ -76,7 +55,7 @@ export function WisdomForestStoryStage(props: WisdomForestStoryStageProps) {
             ))}
           </div>
         ) : null}
-        <WisdomForestView
+        <WisdomForest
           {...props}
           scrollRootRef={forestRef}
           className={forestClass}

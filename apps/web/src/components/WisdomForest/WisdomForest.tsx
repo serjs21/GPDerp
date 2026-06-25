@@ -1,13 +1,16 @@
 "use client";
 
+import type { HaikuDto } from "@/api/haikus";
 import { HAIKU_LIST_PAGE_SIZE } from "@/api/haikus";
 import { HaikuGenerationStickyNoteCard } from "@/components/HaikuGenerationStickyNote/HaikuGenerationStickyNoteCard/HaikuGenerationStickyNoteCard";
 import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
 import { SakuraPetalLoader } from "@/components/Loaders";
-import { useInfiniteHaikusQuery } from "@/hooks/useInfiniteHaikusQuery";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
-import type { ComponentType } from "react";
-import { WisdomForestView } from "./WisdomForestView";
+import { useRef, type ComponentType, type CSSProperties, type RefObject } from "react";
+import { useWisdomForestStackScroll } from "./hooks/useWisdomForestStackScroll";
+import { useWisdomForestState } from "./hooks/useWisdomForestState";
+import { ForestShell, WisdomForestBody } from "./WisdomForestBody";
+import styles from "./WisdomForest.module.css";
 
 export type WisdomForestProps = {
   height?: string;
@@ -17,6 +20,16 @@ export type WisdomForestProps = {
   PreviewCard?: ComponentType<HaikuContainerProps>;
   Loader?: ComponentType;
   className?: string;
+  scrollRootRef?: RefObject<HTMLDivElement | null>;
+  onActiveCardIndexChange?: (index: number) => void;
+  haikus?: HaikuDto[];
+  isInitialLoading?: boolean;
+  isFetchingNextPage?: boolean;
+  isError?: boolean;
+  hasNextPage?: boolean;
+  onLoadMore?: () => void;
+  onRetry?: () => void;
+  onHaikuDeleted?: () => void;
 };
 
 export function WisdomForest({
@@ -27,29 +40,82 @@ export function WisdomForest({
   PreviewCard = HaikuGenerationStickyNoteCard,
   Loader = SakuraPetalLoader,
   className,
+  scrollRootRef: externalScrollRootRef,
+  onActiveCardIndexChange,
+  haikus,
+  isInitialLoading,
+  isFetchingNextPage,
+  isError,
+  hasNextPage,
+  onLoadMore,
+  onRetry,
+  onHaikuDeleted,
 }: WisdomForestProps) {
-  const query = useInfiniteHaikusQuery({ pageSize });
+  const internalScrollRootRef = useRef<HTMLDivElement>(null);
+  const scrollRootRef = externalScrollRootRef ?? internalScrollRootRef;
+  const forestStyle = {
+    "--wisdom-forest-height": height,
+    "--wisdom-forest-width": width,
+  } as CSSProperties;
+  const forestClass = [styles.forest, className].filter(Boolean).join(" ");
 
-  if (!query.initialized || !query.isLoggedIn) {
+  const state = useWisdomForestState({
+    pageSize,
+    generatingDraft,
+    haikus,
+    isInitialLoading,
+    isFetchingNextPage,
+    isError,
+    hasNextPage,
+    onLoadMore,
+    onRetry,
+    onHaikuDeleted,
+  });
+
+  const { sentinelRef } = useWisdomForestStackScroll({
+    scrollRootRef,
+    cardCount: state.cardCount,
+    hasNextPage: state.hasNextPage,
+    isFetchingNextPage: state.isFetchingNextPage,
+    onLoadMore: state.onLoadMore,
+    onActiveCardIndexChange,
+    enabled: !state.isError && state.cardCount > 0 && !state.isInitialLoading,
+  });
+
+  if (!state.ready) {
     return null;
   }
 
+  if (state.isInitialLoading) {
+    return (
+      <ForestShell
+        forestStyle={forestStyle}
+        forestClass={forestClass}
+        scrollRootRef={scrollRootRef}
+        ariaBusy
+        ariaLabel="Loading haikus"
+      >
+        <div className={styles.initialLoader}>
+          <Loader />
+        </div>
+      </ForestShell>
+    );
+  }
+
   return (
-    <WisdomForestView
-      haikus={query.haikus}
-      isInitialLoading={query.isInitialLoading}
-      isFetchingNextPage={query.isFetchingNextPage}
-      isError={query.isError}
-      hasNextPage={query.hasNextPage}
-      onLoadMore={query.fetchNextPage}
-      onRetry={query.refetch}
-      onHaikuDeleted={query.invalidate}
-      generatingDraft={generatingDraft}
-      height={height}
-      width={width}
-      className={className}
-      PreviewCard={PreviewCard}
-      Loader={Loader}
-    />
+    <ForestShell
+      forestStyle={forestStyle}
+      forestClass={forestClass}
+      scrollRootRef={scrollRootRef}
+      ariaLabel="Haiku preview forest"
+    >
+      <WisdomForestBody
+        state={state}
+        generatingDraft={generatingDraft}
+        PreviewCard={PreviewCard}
+        Loader={Loader}
+        sentinelRef={sentinelRef}
+      />
+    </ForestShell>
   );
 }

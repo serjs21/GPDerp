@@ -1,12 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { ReactNode } from "react";
 import type { HaikuDto } from "@/api/haikus";
+import { AuthenticationProvider } from "@/app/providers/AuthenticationProvider";
+import { AuthenticationVerificationProvider } from "@/app/providers/AuthenticationVerificationProvider";
 import { HaikuGenerationStickyNoteCard } from "@/components/HaikuGenerationStickyNote/HaikuGenerationStickyNoteCard/HaikuGenerationStickyNoteCard";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { fn } from "storybook/test";
 import { WisdomForest } from "./WisdomForest";
 import { WisdomForestStoryStage } from "./WisdomForestStoryStage";
-import { WisdomForestView } from "./WisdomForestView";
 
 function makeMockHaiku(partial: Partial<HaikuDto> & Pick<HaikuDto, "id" | "body">): HaikuDto {
   return {
@@ -38,43 +40,50 @@ const mockHaikus: HaikuDto[] = BODIES.map((body, i) =>
   }),
 );
 
-const viewDefaults = {
+const storyDefaults = {
   PreviewCard: HaikuGenerationStickyNoteCard,
   Loader: SakuraPetalLoader,
   onLoadMore: fn(),
   onRetry: fn(),
   height: "60vh",
   width: "100%",
+  haikus: mockHaikus,
+  isInitialLoading: false,
+  isFetchingNextPage: false,
+  isError: false,
+  hasNextPage: true,
 };
 
-const meta = {
-  title: "Components/WisdomForest",
-  component: WisdomForestView,
-  parameters: { layout: "fullscreen" },
-  decorators: [
-    (Story) => {
-      const qc = new QueryClient();
-      return (
-        <QueryClientProvider client={qc}>
+function storyProviders(Story: () => ReactNode) {
+  const qc = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+
+  return (
+    <QueryClientProvider client={qc}>
+      <AuthenticationProvider>
+        <AuthenticationVerificationProvider>
           <div style={{ padding: "1.5rem", maxWidth: "48rem", margin: "0 auto" }}>
             <Story />
           </div>
-        </QueryClientProvider>
-      );
-    },
-  ],
-  args: {
-    ...viewDefaults,
-    haikus: mockHaikus,
-    isInitialLoading: false,
-    isFetchingNextPage: false,
-    isError: false,
-    hasNextPage: true,
-  },
-} satisfies Meta<typeof WisdomForestView>;
+        </AuthenticationVerificationProvider>
+      </AuthenticationProvider>
+    </QueryClientProvider>
+  );
+}
+
+const meta = {
+  title: "Components/WisdomForest",
+  component: WisdomForest,
+  parameters: { layout: "fullscreen" },
+  decorators: [storyProviders],
+  args: storyDefaults,
+} satisfies Meta<typeof WisdomForest>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {};
 
 export const StackingPreview: Story = {
   render: (args) => <WisdomForestStoryStage {...args} />,
@@ -145,6 +154,14 @@ export const Empty: Story = {
   },
 };
 
+export const ErrorState: Story = {
+  args: {
+    haikus: [],
+    isError: true,
+    hasNextPage: false,
+  },
+};
+
 export const CustomSize: Story = {
   args: {
     height: "80vh",
@@ -158,6 +175,14 @@ export const CustomLoader: Story = {
   },
 };
 
-export const LoggedInContainer: StoryObj<typeof WisdomForest> = {
+export const Connected: Story = {
   render: () => <WisdomForest />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Connected mode (no haikus prop): fetches from the API when logged in. Renders nothing in Storybook unless the session is authenticated.",
+      },
+    },
+  },
 };

@@ -50,10 +50,12 @@ function Harness({
   cardCount = 6,
   onLoadMore = jest.fn(),
   hasNextPage = true,
+  onActiveCardIndexChange,
 }: {
   cardCount?: number;
   onLoadMore?: () => void;
   hasNextPage?: boolean;
+  onActiveCardIndexChange?: (index: number) => void;
 }) {
   const scrollRootRef = useRef<HTMLDivElement>(null);
   const slotHeight = getStackSlotHeightPx(ROOT_FONT_SIZE);
@@ -63,6 +65,7 @@ function Harness({
     hasNextPage,
     isFetchingNextPage: false,
     onLoadMore,
+    onActiveCardIndexChange,
   });
 
   const bindForestRef = (node: HTMLDivElement | null) => {
@@ -133,5 +136,16 @@ describe("useWisdomForestStackScroll", () => {
     );
 
     expect(onLoadMore).toHaveBeenCalledTimes(1);
+  });
+
+  it("notifies onActiveCardIndexChange when scroll position changes", async () => {
+    const onActiveCardIndexChange = jest.fn();
+    render(<Harness onActiveCardIndexChange={onActiveCardIndexChange} />);
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(onActiveCardIndexChange).toHaveBeenCalled();
   });
 });

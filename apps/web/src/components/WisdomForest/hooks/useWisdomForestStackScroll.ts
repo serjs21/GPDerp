@@ -15,6 +15,7 @@ type UseWisdomForestStackScrollOptions = {
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   onLoadMore: () => void;
+  onActiveCardIndexChange?: (index: number) => void;
   enabled?: boolean;
 };
 
@@ -24,6 +25,7 @@ export function useWisdomForestStackScroll({
   hasNextPage,
   isFetchingNextPage,
   onLoadMore,
+  onActiveCardIndexChange,
   enabled = true,
 }: UseWisdomForestStackScrollOptions) {
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -76,6 +78,10 @@ export function useWisdomForestStackScroll({
     root.addEventListener("scroll", sync, { passive: true });
     return () => root.removeEventListener("scroll", sync);
   }, [cardCount, scrollRootRef, slotHeightPx]);
+
+  useEffect(() => {
+    onActiveCardIndexChange?.(activeCardIndex);
+  }, [activeCardIndex, onActiveCardIndexChange]);
 
   return { activeCardIndex, sentinelRef, slotHeightPx, scrollToDefault };
 }
