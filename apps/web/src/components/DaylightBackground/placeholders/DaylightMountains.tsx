@@ -1,4 +1,6 @@
 import type { CSSProperties } from "react";
+import { DAYLIGHT_ASSETS } from "../daylightAssets";
+import { DaylightArtImage } from "../DaylightArtImage";
 import styles from "./DaylightMountains.module.css";
 
 type DaylightMountainsProps = {
@@ -6,7 +8,9 @@ type DaylightMountainsProps = {
 };
 
 export const DaylightMountains = ({ style }: DaylightMountainsProps) => (
-  <div className={styles.mountains} style={style} aria-hidden>
-    <div className={styles.ridge} />
-  </div>
+  <DaylightArtImage
+    src={DAYLIGHT_ASSETS.mountains}
+    className={styles.mountains}
+    style={style}
+  />
 );

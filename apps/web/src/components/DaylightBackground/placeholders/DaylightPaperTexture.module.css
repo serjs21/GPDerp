@@ -1,0 +1,19 @@
+.texture {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.12;
+  background-image:
+    repeating-radial-gradient(
+      circle at 17% 23%,
+      color-mix(in srgb, var(--sumi-ink) 6%, transparent) 0 0.5px,
+      transparent 0.5px 3px
+    ),
+    repeating-radial-gradient(
+      circle at 73% 61%,
+      color-mix(in srgb, var(--sumi-ink) 5%, transparent) 0 0.4px,
+      transparent 0.4px 2.5px
+    );
+  background-size: 4px 4px, 3px 3px;
+}

@@ -3,16 +3,21 @@
 import type { CSSProperties } from "react";
 import { useThemeScaleProgress } from "@/hooks/useThemeScaleProgress";
 import { getSkyMotionState } from "@/theme/themeSkyMotion";
+import { DAYLIGHT_ASSETS } from "./daylightAssets";
 import styles from "./DaylightBackground.module.css";
 import { DaylightCloud } from "./placeholders/DaylightCloud";
 import { DaylightMoon } from "./placeholders/DaylightMoon";
 import { DaylightMountains } from "./placeholders/DaylightMountains";
+import { DaylightPaperTexture } from "./placeholders/DaylightPaperTexture";
+import { DaylightShrine } from "./placeholders/DaylightShrine";
+import { DaylightStars } from "./placeholders/DaylightStars";
 import { DaylightSun } from "./placeholders/DaylightSun";
+import { DaylightWater } from "./placeholders/DaylightWater";
 
 const sunTransform = (x: number, y: number, scale: number) =>
   `translate(${x}vw, ${y}vh) scale(${scale})`;
 
-const moonTransform = (scale: number) => `translate(-50%, -50%) scale(${scale})`;
+const moonTransform = (scale: number) => `scale(${scale})`;
 
 type DaylightBackgroundViewProps = {
   progress: number;
@@ -26,7 +31,10 @@ export const DaylightBackgroundView = ({ progress }: DaylightBackgroundViewProps
   return (
     <div className={styles.root} aria-hidden>
       <div className={styles.sky} />
+      <DaylightPaperTexture />
+      <DaylightStars style={{ opacity: motion.moon.opacity }} />
       <DaylightCloud
+        src={DAYLIGHT_ASSETS.clouds[0]}
         className={`${motionClass} ${styles.cloudA}`}
         style={{
           opacity: motion.clouds.opacity,
@@ -34,6 +42,7 @@ export const DaylightBackgroundView = ({ progress }: DaylightBackgroundViewProps
         }}
       />
       <DaylightCloud
+        src={DAYLIGHT_ASSETS.clouds[1]}
         className={`${motionClass} ${styles.cloudB}`}
         style={{
           opacity: motion.clouds.opacity * 0.9,
@@ -41,6 +50,7 @@ export const DaylightBackgroundView = ({ progress }: DaylightBackgroundViewProps
         }}
       />
       <DaylightCloud
+        src={DAYLIGHT_ASSETS.clouds[2]}
         className={`${motionClass} ${styles.cloudC}`}
         style={{
           opacity: motion.clouds.opacity * 0.75,
@@ -68,6 +78,8 @@ export const DaylightBackgroundView = ({ progress }: DaylightBackgroundViewProps
           opacity: motion.mountain.opacity,
         }}
       />
+      <DaylightWater />
+      <DaylightShrine />
     </div>
   );
 };

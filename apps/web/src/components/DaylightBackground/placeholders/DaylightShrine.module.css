@@ -1,0 +1,9 @@
+.shrine {
+  z-index: 5;
+  left: 2%;
+  bottom: 6%;
+  top: auto;
+  width: clamp(4.5rem, 14vw, 7.5rem);
+  height: auto;
+  transform-origin: center bottom;
+}

@@ -1,4 +1,6 @@
 import type { CSSProperties } from "react";
+import { DAYLIGHT_ASSETS } from "../daylightAssets";
+import { DaylightArtImage } from "../DaylightArtImage";
 import styles from "./DaylightMoon.module.css";
 
 type DaylightMoonProps = {
@@ -6,5 +8,5 @@ type DaylightMoonProps = {
 };
 
 export const DaylightMoon = ({ style }: DaylightMoonProps) => (
-  <div className={styles.moon} style={style} aria-hidden />
+  <DaylightArtImage src={DAYLIGHT_ASSETS.moon} className={styles.moon} style={style} />
 );

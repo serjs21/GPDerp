@@ -1,9 +1,10 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { Decorator, Meta, StoryObj } from "@storybook/nextjs-vite";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import type { CSSProperties, ReactNode } from "react";
 import type { HaikuDto } from "@/api/haikus";
-import { ThemeStage } from "@/components/HaikuGenerationStickyNote/storybook/themeStage";
+import type { ThemeName } from "@/config/userConfiguration";
+import { WisdomBranchStoryStage } from "./storybook/WisdomBranchStoryStage";
 import { WisdomBranch } from "./WisdomBranch";
+import styles from "./WisdomBranch.stories.module.css";
 
 function makeMockHaiku(partial: Partial<HaikuDto> & Pick<HaikuDto, "id" | "body">): HaikuDto {
   return {
@@ -27,24 +28,28 @@ const autumnBody = `Leaves fall —
 Silence gathers on the path,
 Winter waits ahead.`;
 
-function storyProviders(Story: () => ReactNode) {
+const withStoryStage: Decorator = (Story, { parameters }) => {
+  const initialTheme = (parameters.initialTheme as ThemeName | undefined) ?? "tokyo-dusk";
   const qc = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
 
   return (
     <QueryClientProvider client={qc}>
-      <Story />
+      <WisdomBranchStoryStage initialTheme={initialTheme}>
+        <Story />
+      </WisdomBranchStoryStage>
     </QueryClientProvider>
   );
-}
+};
 
 const meta: Meta<typeof WisdomBranch> = {
   title: "Haiku/WisdomBranch",
   component: WisdomBranch,
-  decorators: [storyProviders],
+  decorators: [withStoryStage],
   parameters: {
-    layout: "centered",
+    layout: "fullscreen",
+    initialTheme: "tokyo-dusk" satisfies ThemeName,
   },
 };
 
@@ -83,17 +88,8 @@ export const WithoutAuthor: Story = {
 };
 
 export const TiltVariants: Story = {
-  parameters: { layout: "fullscreen" },
   render: () => (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "1.5rem",
-        padding: "2rem",
-        justifyContent: "center",
-      }}
-    >
+    <div className={styles.gallery}>
       <WisdomBranch
         angle={-12}
         scale={0.9}
@@ -125,12 +121,8 @@ export const TiltVariants: Story = {
   ),
 };
 
-export const ThemeNightSky: Story = {
-  render: (args) => (
-    <ThemeStage theme="night-sky">
-      <WisdomBranch {...args} />
-    </ThemeStage>
-  ),
+export const NightSky: Story = {
+  parameters: { initialTheme: "night-sky" satisfies ThemeName },
   args: {
     haiku: makeMockHaiku({
       id: "story-haiku-3",
@@ -140,14 +132,8 @@ export const ThemeNightSky: Story = {
   },
 };
 
-export const ThemeSumie: Story = {
-  render: (args) => (
-    <ThemeStage theme="sumie">
-      <div style={{ padding: "2rem" } as CSSProperties}>
-        <WisdomBranch {...args} />
-      </div>
-    </ThemeStage>
-  ),
+export const Sumie: Story = {
+  parameters: { initialTheme: "sumie" satisfies ThemeName },
   args: {
     haiku: makeMockHaiku({
       id: "story-haiku-4",

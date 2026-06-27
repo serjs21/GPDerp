@@ -1,30 +1,14 @@
 .connectors {
-  --branch-mid: color-mix(in srgb, var(--text-color) 55%, transparent);
-
-  position: relative;
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: 0.85rem;
-  margin: 0 auto;
-  flex-shrink: 0;
+  height: 100%;
+  overflow: visible;
   pointer-events: none;
 }
 
-.lineLeft,
-.lineRight {
-  position: absolute;
-  top: 0;
-  width: 1px;
-  height: 100%;
-  background: color-mix(in srgb, var(--branch-mid) 85%, transparent);
-  transform-origin: top center;
-}
-
-.lineLeft {
-  left: 0;
-  transform: rotate(14deg);
-}
-
-.lineRight {
-  right: 0;
-  transform: rotate(-14deg);
+.line {
+  stroke: color-mix(in srgb, var(--text-color) 48%, transparent);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
 }

@@ -10,7 +10,7 @@ export type SakuraBranchProps = {
 };
 
 export function SakuraBranch({ className, angle = 0, scale = 1 }: SakuraBranchProps) {
-  const rootClass = [styles.branch, className].filter(Boolean).join(" ");
+  const rootClass = [styles.root, className].filter(Boolean).join(" ");
 
   return (
     <span
@@ -22,6 +22,14 @@ export function SakuraBranch({ className, angle = 0, scale = 1 }: SakuraBranchPr
           "--branch-scale": scale,
         } as CSSProperties
       }
-    />
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element -- decorative branch art from /public */}
+      <img
+        className={styles.image}
+        src="/branch-base.png"
+        alt=""
+        draggable={false}
+      />
+    </span>
   );
 }

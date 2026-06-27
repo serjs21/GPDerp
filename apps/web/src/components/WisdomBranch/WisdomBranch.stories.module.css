@@ -1,0 +1,65 @@
+.stageRoot {
+  min-height: 100vh;
+  width: 100%;
+  color: var(--text-color);
+  background: var(--background);
+}
+
+.stagePage {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.stageMain {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 1rem 2rem;
+  box-sizing: border-box;
+}
+
+.stageControls {
+  width: 100%;
+  max-width: 37.5rem;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1.5rem;
+}
+
+.selectorCard {
+  padding: 0.85rem 0.95rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-glass-strong) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border-color) 72%, transparent);
+  backdrop-filter: blur(5px);
+}
+
+.themeLabel {
+  margin: 0.65rem 0 0;
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.stageContent {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  width: 100%;
+  padding: 0.5rem 0;
+}

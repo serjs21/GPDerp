@@ -1,0 +1,22 @@
+.field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  transition: opacity 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--surface-glass-strong) 92%, var(--shrine-accent-soft) 8%);
+  box-shadow: 0 0 3px color-mix(in srgb, var(--shrine-accent-soft) 35%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field {
+    transition: none;
+  }
+}

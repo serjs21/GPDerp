@@ -1,35 +1,44 @@
 .wrapper {
-  --wisdom-branch-note-width: calc(var(--haiku-card-width, 28rem) + 4rem);
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: min(var(--wisdom-branch-note-width), 100%);
-  height: 12.5rem;
+  position: relative;
+  width: min(var(--wisdom-branch-width), 100%);
+  height: var(--wisdom-branch-wrapper-height, 12.5rem);
   max-width: 100%;
   box-sizing: border-box;
   filter: drop-shadow(0 4px 12px color-mix(in srgb, var(--sumi-ink) 12%, transparent));
 }
 
-.branchZone {
-  position: relative;
+.branchSlot {
+  position: absolute;
+  top: -16.5rem;
+  left: -3rem;
   width: 100%;
-  height: 3.25rem;
-  flex-shrink: 0;
 }
 
-.noteZone {
-  flex: 1;
-  min-height: 0;
-  width: 100%;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
+.note {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--wisdom-branch-note-width);
+  box-sizing: border-box;
 }
 
-.noteZone > div {
+.note > div {
   --haiku-card-width: var(--wisdom-branch-note-width);
-  height: 100%;
   width: 100%;
   max-width: var(--wisdom-branch-note-width);
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    --wisdom-branch-overshoot: 2rem;
+    --wisdom-branch-width: calc(var(--wisdom-branch-note-width) + 4rem);
+    --wisdom-branch-band-height: min(
+      calc(var(--wisdom-branch-width) / var(--wisdom-branch-image-aspect)),
+      3.25rem
+    );
+    --wisdom-branch-note-height: calc(
+      var(--wisdom-branch-wrapper-height) - var(--wisdom-branch-band-height)
+    );
+  }
 }

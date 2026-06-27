@@ -1,0 +1,250 @@
+Implement the celestial day/night theme system in the existing Haiku / WisdomBranch scene.
+
+A utility module already exists at:
+
+src/.../celestialTheme.ts
+
+Use that module instead of duplicating astronomy, color interpolation, contrast, or CSS-variable logic.
+
+Goal:
+Make the background, sky, note/card colors, sun, moon, and static texture overlay react continuously to a selected date/time and geographic coordinates. The result should resemble a calm Japanese watercolor scene: subtle peach sunset, faded blue/purple night, paper note readable at every time, sun/moon moving naturally across the screen.
+
+Important constraints:
+- Do not rewrite unrelated Haiku components.
+- Preserve the current Storybook stories and existing note/card content.
+- Keep all positioning responsive. Do not use fixed pixel coordinates for celestial body placement.
+- Do not use a timer or animation loop for the base implementation. Re-render only when selected date/time, coordinates, or relevant Storybook controls change.
+- Keep `celestialTheme.ts` as the single source of truth for palette interpolation, contrast checks, and celestial positioning.
+- Do not add a graphics-heavy canvas implementation. Use regular React + CSS first.
+
+Implementation steps:
+
+1. Find the main scene component
+Look for the component that renders the WisdomBranch / Haiku background, branch, sky, sticky note, sun, moon, and Storybook saved theme.
+
+Integrate the theme at the highest scene/container level, ideally the component that owns:
+- the scene background
+- branch illustration
+- note/card
+- sun/moon decoration
+
+2. Install SunCalc only if it is not already installed
+
+npm install suncalc
+
+If TypeScript reports missing types, resolve it using the project’s preferred typing approach. Do not replace the existing `celestialTheme.ts` import style unless necessary.
+
+3. Import and use the existing helpers
+
+Use:
+
+import {
+  getThemeAt,
+  getCelestialLayout,
+  getSceneCssVariables,
+  STATIC_OVERLAY,
+  type GeoCoordinates,
+} from ".../celestialTheme";
+
+For the selected time and location:
+
+const coordinates: GeoCoordinates = {
+  latitude: 13.7563,
+  longitude: 100.5018,
+};
+
+const selectedDate = new Date(...);
+
+const theme = getThemeAt(selectedDate, coordinates);
+
+const celestialLayout = getCelestialLayout(selectedDate, coordinates, {
+  cameraAzimuthDeg: 180,
+  mirrorScene: true,
+  horizonY: 82,
+  zenithY: 10,
+  horizontalPadding: 5,
+});
+
+const sceneVars = getSceneCssVariables(
+  theme,
+  celestialLayout,
+  STATIC_OVERLAY,
+);
+
+Pass the variables to the outer scene element:
+
+<div
+  className={styles.scene}
+  style={sceneVars as React.CSSProperties}
+>
+  ...
+</div>
+
+Do not manually calculate colors, contrast, sun positions, moon positions, or CSS variables in the component.
+
+4. Add / update scene CSS
+
+Create or adapt styles matching this structure:
+
+.scene {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+
+  background: linear-gradient(
+    180deg,
+    var(--sky-top) 0%,
+    var(--sky-mid) 54%,
+    var(--sky-horizon) 100%
+  );
+}
+
+.scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background-image: var(--overlay-image);
+  background-repeat: var(--overlay-repeat);
+  background-size: var(--overlay-size);
+  background-position: var(--overlay-position);
+
+  mix-blend-mode: var(--overlay-blend-mode);
+  opacity: var(--overlay-opacity);
+}
+
+The overlay must work when `STATIC_OVERLAY.src` is null. In that case it should effectively render nothing.
+
+Place visual layers in this order:
+
+- sky background
+- optional static texture overlay
+- mountains / distant landscape
+- branch
+- sun and moon
+- note/card
+- controls, if any
+
+Use z-index deliberately. The note must always remain above the branch and sky.
+
+5. Render responsive sun and moon
+
+Use `layout.sun` and `layout.moon` from `getCelestialLayout`.
+
+Example:
+
+<div
+  className={styles.sun}
+  aria-hidden="true"
+  style={{
+    left: `${celestialLayout.sun.x}%`,
+    top: `${celestialLayout.sun.y}%`,
+    opacity: celestialLayout.sun.opacity,
+  }}
+/>
+
+<div
+  className={styles.moon}
+  aria-hidden="true"
+  style={{
+    left: `${celestialLayout.moon.x}%`,
+    top: `${celestialLayout.moon.y}%`,
+    opacity: celestialLayout.moon.opacity,
+    transform: `translate(-50%, -50%) rotate(${celestialLayout.moon.limbAngleDeg}deg)`,
+  }}
+/>
+
+Use percentages for left/top. Use a responsive size such as:
+
+width: clamp(32px, 8vmin, 112px);
+
+Do not make the sun or moon stretch with viewport aspect ratio.
+
+The sun should use `var(--sun-color)`.
+The moon should use `var(--moon-color)`.
+
+Moon requirements:
+- Keep the current crescent visual treatment if one already exists.
+- Rotate the moon visual using `limbAngleDeg`.
+- Moon opacity must come from the utility output.
+- Do not force the moon to always be visible; its astronomical placement should control it.
+
+6. Make the note/card accessible
+
+Update the haiku note/card styles to use:
+
+background: var(--paper);
+color: var(--ink);
+
+For interactive states:
+
+outline-color: var(--highlight);
+border-color: color-mix(in srgb, var(--highlight) 30%, transparent);
+
+Use `theme.inkOnPaper` and `theme.highlightOnPaper` through `getSceneCssVariables`, not raw `ink` and `highlight`, because those are contrast-protected values.
+
+Do not use low-opacity text over the note background.
+Do not put body text directly over the sky.
+
+7. Add Storybook controls
+
+Add Storybook args/controls so the scene can be tested through the entire day.
+
+Required controls:
+- date/time or a simple `timeOfDay` value
+- latitude
+- longitude
+- mirrorScene
+- cameraAzimuthDeg
+- optional `showCelestialBodies`
+
+Use Bangkok defaults:
+
+latitude: 13.7563
+longitude: 100.5018
+
+Provide useful named stories or presets:
+
+- Pre-dawn
+- Sunrise
+- Day
+- Golden hour
+- Sunset
+- Blue night
+- Deep night
+
+Choose fixed dates/times for these stories so screenshots remain stable.
+
+Do not base Storybook output on the current system time.
+
+8. Visual direction
+
+Match the existing scene’s visual language:
+- muted watercolor colors
+- low-saturation peach, dusty pink, faded lavender, soft blue
+- no neon gradients
+- soft atmospheric sky
+- elegant paper note contrast
+- celestial bodies should feel decorative, not like a weather dashboard
+
+Keep the existing branch and note composition. Only make their surrounding lighting/theme responsive.
+
+9. Validation
+
+Before finishing:
+- Run TypeScript checks.
+- Run the relevant Storybook story.
+- Verify all named time presets render without errors.
+- Verify card text remains readable at day, sunset, and night.
+- Verify no layout shift or overflow at mobile portrait, desktop, and ultrawide widths.
+- Verify the overlay placeholder works with `STATIC_OVERLAY.src === null`.
+- Verify no sun/moon is rendered outside the visible scene because of invalid percentage values.
+
+Return:
+1. A concise summary of changed files.
+2. Any dependency added.
+3. A short explanation of how to set the selected date/time and location from the parent component.
+4. Any assumptions or parts that need a final design decision.

@@ -1,12 +1,5 @@
 .cloud {
-  position: absolute;
   z-index: 1;
-  width: 7rem;
-  height: 2.25rem;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--surface-glass-strong) 72%, var(--background) 28%);
-  box-shadow:
-    -1.5rem 0.35rem 0 -0.25rem color-mix(in srgb, var(--surface-glass-strong) 68%, var(--background) 32%),
-    1.75rem 0.2rem 0 -0.35rem color-mix(in srgb, var(--surface-glass-strong) 65%, var(--background) 35%),
-    0 -0.65rem 0 -0.15rem color-mix(in srgb, var(--surface-glass-strong) 70%, var(--background) 30%);
+  width: min(42vw, 22rem);
+  height: auto;
 }
