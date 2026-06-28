@@ -4,7 +4,6 @@ import type { CSSProperties } from "react";
 import type { SelectorBackgroundBodies } from "@/theme/celestialSelectorLayout";
 import { getSkyMotionState } from "@/theme/themeSkyMotion";
 import { useCelestialTheme } from "@/app/providers/CelestialThemeProvider";
-import { SELECTOR_BODY_SIZE_VMIN } from "@/components/CelestialThemeDial";
 import { DAYLIGHT_ASSETS } from "./daylightAssets";
 import styles from "./DaylightBackground.module.css";
 import { DaylightCloud } from "./placeholders/DaylightCloud";
@@ -21,7 +20,7 @@ const sunTransform = (x: number, y: number, scale: number) =>
 
 const moonTransform = (scale: number) => `scale(${scale})`;
 
-const celestialBodyWidth = `${SELECTOR_BODY_SIZE_VMIN}vmin`;
+const celestialBodyWidth = "6rem";
 
 type DaylightBackgroundScaleProps = {
   mode?: "scale";

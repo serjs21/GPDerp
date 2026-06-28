@@ -2,11 +2,6 @@
   position: relative;
 }
 
-.root:focus-within :global([class*="face"]) {
-  outline: 2px solid color-mix(in srgb, var(--highlight, var(--accent-red)) 65%, transparent);
-  outline-offset: 3px;
-}
-
 .rangeInput {
   position: absolute;
   width: 1px;

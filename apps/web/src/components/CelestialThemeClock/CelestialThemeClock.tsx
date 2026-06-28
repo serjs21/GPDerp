@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 import {
   CELESTIAL_FIXED_DATE,
   CELESTIAL_SLOTS_PER_DAY,
@@ -21,18 +21,29 @@ export type CelestialThemeClockProps = {
   className?: string;
 };
 
+export type CelestialThemeClockHandle = {
+  focus: () => void;
+};
+
 /**
  * Earth-centered celestial dial for theme time selection.
  * Future drop-in: mz-react-round-slider `RoundSlider` with pathStartAngle 270.
  */
-export function CelestialThemeClock({
-  value,
-  onChange,
-  onCommit,
-  coordinates,
-  ariaLabel = "Time of day",
-  className,
-}: CelestialThemeClockProps) {
+export const CelestialThemeClock = forwardRef<
+  CelestialThemeClockHandle,
+  CelestialThemeClockProps
+>(function CelestialThemeClock(
+  {
+    value,
+    onChange,
+    onCommit,
+    coordinates,
+    ariaLabel = "Time of day",
+    className,
+  },
+  ref,
+) {
+  const inputRef = useRef<HTMLInputElement>(null);
   const timeLabel = formatClockLabel(value);
   const layout = useMemo(
     () => getSelectorDialLayoutFromSlot(value, coordinates),
@@ -42,6 +53,12 @@ export function CelestialThemeClock({
     onChange,
     onDragEnd: onCommit,
   });
+
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      inputRef.current?.focus();
+    },
+  }));
 
   return (
     <div className={`${styles.root}${className ? ` ${className}` : ""}`}>
@@ -54,6 +71,7 @@ export function CelestialThemeClock({
       />
 
       <input
+        ref={inputRef}
         className={styles.rangeInput}
         type="range"
         min={0}
@@ -69,4 +87,4 @@ export function CelestialThemeClock({
       />
     </div>
   );
-}
+});
