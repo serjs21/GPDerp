@@ -6,3 +6,9 @@
   height: auto;
   transform-origin: center;
 }
+
+.celestial {
+  width: clamp(32px, 8vmin, 112px);
+  height: auto;
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--sun-color, transparent) 45%, transparent));
+}

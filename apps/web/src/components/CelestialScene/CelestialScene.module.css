@@ -1,0 +1,28 @@
+.scene {
+  position: relative;
+  min-height: 100svh;
+  width: 100%;
+  overflow: hidden;
+  isolation: isolate;
+  color: var(--ink, var(--text-color));
+  background: linear-gradient(
+    180deg,
+    var(--sky-top) 0%,
+    var(--sky-mid) 54%,
+    var(--sky-horizon) 100%
+  );
+}
+
+.scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: var(--overlay-image, none);
+  background-repeat: var(--overlay-repeat, no-repeat);
+  background-size: var(--overlay-size, cover);
+  background-position: var(--overlay-position, center);
+  mix-blend-mode: var(--overlay-blend-mode, normal);
+  opacity: var(--overlay-opacity, 0);
+}

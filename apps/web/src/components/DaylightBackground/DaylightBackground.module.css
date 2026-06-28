@@ -12,10 +12,9 @@
   z-index: 0;
   background: linear-gradient(
     to bottom,
-    color-mix(in srgb, var(--gradientStart) 92%, var(--background) 8%) 0%,
-    color-mix(in srgb, var(--gradientMid) 84%, var(--background) 16%) 42%,
-    color-mix(in srgb, var(--gradientMid) 38%, var(--background) 62%) 68%,
-    color-mix(in srgb, var(--background) 90%, var(--gradientStart) 10%) 100%
+    var(--sky-top, color-mix(in srgb, var(--gradientStart) 92%, var(--background) 8%)) 0%,
+    var(--sky-mid, color-mix(in srgb, var(--gradientMid) 84%, var(--background) 16%)) 54%,
+    var(--sky-horizon, color-mix(in srgb, var(--gradientMid) 38%, var(--background) 62%)) 100%
   );
 }
 

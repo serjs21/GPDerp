@@ -2,6 +2,7 @@ import type { Decorator, Meta, StoryObj } from "@storybook/nextjs-vite";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { HaikuDto } from "@/api/haikus";
 import type { ThemeName } from "@/config/userConfiguration";
+import type { CelestialPresetName } from "@/theme/celestialPresets";
 import { WisdomBranchStoryStage } from "./storybook/WisdomBranchStoryStage";
 import { WisdomBranch } from "./WisdomBranch";
 import styles from "./WisdomBranch.stories.module.css";
@@ -28,15 +29,26 @@ const autumnBody = `Leaves fall —
 Silence gathers on the path,
 Winter waits ahead.`;
 
+type StoryStageParameters = {
+  initialTheme?: ThemeName;
+  initialCelestialMode?: boolean;
+  initialCelestialPreset?: CelestialPresetName;
+};
+
 const withStoryStage: Decorator = (Story, { parameters }) => {
-  const initialTheme = (parameters.initialTheme as ThemeName | undefined) ?? "tokyo-dusk";
+  const stageParams = parameters as StoryStageParameters;
+  const initialTheme = stageParams.initialTheme ?? "tokyo-dusk";
   const qc = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
 
   return (
     <QueryClientProvider client={qc}>
-      <WisdomBranchStoryStage initialTheme={initialTheme}>
+      <WisdomBranchStoryStage
+        initialTheme={initialTheme}
+        initialCelestialMode={stageParams.initialCelestialMode}
+        initialCelestialPreset={stageParams.initialCelestialPreset}
+      >
         <Story />
       </WisdomBranchStoryStage>
     </QueryClientProvider>
@@ -139,6 +151,104 @@ export const Sumie: Story = {
       id: "story-haiku-4",
       body: exampleBody,
       title: "Jean-Paul Sartickle",
+    }),
+  },
+};
+
+export const CelestialPreDawn: Story = {
+  parameters: {
+    initialCelestialMode: true,
+    initialCelestialPreset: "preDawn" satisfies CelestialPresetName,
+  },
+  args: {
+    haiku: makeMockHaiku({
+      id: "celestial-pre-dawn",
+      body: exampleBody,
+      title: "Pre-dawn branch",
+    }),
+  },
+};
+
+export const CelestialSunrise: Story = {
+  parameters: {
+    initialCelestialMode: true,
+    initialCelestialPreset: "sunrise" satisfies CelestialPresetName,
+  },
+  args: {
+    haiku: makeMockHaiku({
+      id: "celestial-sunrise",
+      body: exampleBody,
+      title: "Sunrise branch",
+    }),
+  },
+};
+
+export const CelestialDay: Story = {
+  parameters: {
+    initialCelestialMode: true,
+    initialCelestialPreset: "day" satisfies CelestialPresetName,
+  },
+  args: {
+    haiku: makeMockHaiku({
+      id: "celestial-day",
+      body: exampleBody,
+      title: "Midday branch",
+    }),
+  },
+};
+
+export const CelestialGoldenHour: Story = {
+  parameters: {
+    initialCelestialMode: true,
+    initialCelestialPreset: "goldenHour" satisfies CelestialPresetName,
+  },
+  args: {
+    haiku: makeMockHaiku({
+      id: "celestial-golden-hour",
+      body: exampleBody,
+      title: "Golden hour branch",
+    }),
+  },
+};
+
+export const CelestialSunset: Story = {
+  parameters: {
+    initialCelestialMode: true,
+    initialCelestialPreset: "sunset" satisfies CelestialPresetName,
+  },
+  args: {
+    haiku: makeMockHaiku({
+      id: "celestial-sunset",
+      body: exampleBody,
+      title: "Sunset branch",
+    }),
+  },
+};
+
+export const CelestialBlueNight: Story = {
+  parameters: {
+    initialCelestialMode: true,
+    initialCelestialPreset: "blueNight" satisfies CelestialPresetName,
+  },
+  args: {
+    haiku: makeMockHaiku({
+      id: "celestial-blue-night",
+      body: exampleBody,
+      title: "Blue night branch",
+    }),
+  },
+};
+
+export const CelestialDeepNight: Story = {
+  parameters: {
+    initialCelestialMode: true,
+    initialCelestialPreset: "deepNight" satisfies CelestialPresetName,
+  },
+  args: {
+    haiku: makeMockHaiku({
+      id: "celestial-deep-night",
+      body: exampleBody,
+      title: "Deep night branch",
     }),
   },
 };

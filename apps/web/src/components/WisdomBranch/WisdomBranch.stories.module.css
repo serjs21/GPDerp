@@ -1,8 +1,12 @@
 .stageRoot {
   min-height: 100vh;
   width: 100%;
-  color: var(--text-color);
-  background: var(--background);
+  color: var(--ink, var(--text-color));
+  background: var(--sky-top, var(--background));
+}
+
+.celestialScene {
+  min-height: 100vh;
 }
 
 .stagePage {

@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
+import type { CelestialLayout } from "@/theme/celestialTheme";
 import { useThemeScaleProgress } from "@/hooks/useThemeScaleProgress";
 import { getSkyMotionState } from "@/theme/themeSkyMotion";
 import { DAYLIGHT_ASSETS } from "./daylightAssets";
@@ -19,17 +20,34 @@ const sunTransform = (x: number, y: number, scale: number) =>
 
 const moonTransform = (scale: number) => `scale(${scale})`;
 
-type DaylightBackgroundViewProps = {
+type DaylightBackgroundScaleProps = {
+  mode?: "scale";
   progress: number;
 };
 
-export const DaylightBackgroundView = ({ progress }: DaylightBackgroundViewProps) => {
+type DaylightBackgroundCelestialProps = {
+  mode: "celestial";
+  layout: CelestialLayout;
+  showCelestialBodies?: boolean;
+};
+
+export type DaylightBackgroundViewProps =
+  | DaylightBackgroundScaleProps
+  | DaylightBackgroundCelestialProps;
+
+function isCelestialMode(
+  props: DaylightBackgroundViewProps,
+): props is DaylightBackgroundCelestialProps {
+  return props.mode === "celestial";
+}
+
+function ScaleBackground({ progress }: DaylightBackgroundScaleProps) {
   const motion = getSkyMotionState(progress);
   const motionClass = styles.motionLayer;
   const cloudDrift = motion.clouds.driftX;
 
   return (
-    <div className={styles.root} aria-hidden>
+    <>
       <div className={styles.sky} />
       <DaylightPaperTexture />
       <DaylightStars style={{ opacity: motion.moon.opacity }} />
@@ -80,9 +98,67 @@ export const DaylightBackgroundView = ({ progress }: DaylightBackgroundViewProps
       />
       <DaylightWater />
       <DaylightShrine />
-    </div>
+    </>
   );
-};
+}
+
+function CelestialBackground({
+  layout,
+  showCelestialBodies = true,
+}: DaylightBackgroundCelestialProps) {
+  return (
+    <>
+      <DaylightStars style={{ opacity: layout.moon.opacity }} />
+      <DaylightCloud
+        src={DAYLIGHT_ASSETS.clouds[0]}
+        className={styles.cloudA}
+        style={{ opacity: 0.45 }}
+      />
+      <DaylightCloud
+        src={DAYLIGHT_ASSETS.clouds[1]}
+        className={styles.cloudB}
+        style={{ opacity: 0.4 }}
+      />
+      <DaylightCloud
+        src={DAYLIGHT_ASSETS.clouds[2]}
+        className={styles.cloudC}
+        style={{ opacity: 0.32 }}
+      />
+      {showCelestialBodies ? (
+        <>
+          <DaylightSun
+            celestial={{
+              x: layout.sun.x,
+              y: layout.sun.y,
+              opacity: layout.sun.opacity,
+            }}
+          />
+          <DaylightMoon
+            celestial={{
+              x: layout.moon.x,
+              y: layout.moon.y,
+              opacity: layout.moon.opacity,
+              limbAngleDeg: layout.moon.limbAngleDeg,
+            }}
+          />
+        </>
+      ) : null}
+      <DaylightMountains style={{ opacity: 1 }} />
+      <DaylightWater />
+      <DaylightShrine />
+    </>
+  );
+}
+
+export const DaylightBackgroundView = (props: DaylightBackgroundViewProps) => (
+  <div className={styles.root} aria-hidden>
+    {isCelestialMode(props) ? (
+      <CelestialBackground {...props} />
+    ) : (
+      <ScaleBackground {...props} />
+    )}
+  </div>
+);
 
 export const DaylightBackground = () => {
   const progress = useThemeScaleProgress();
