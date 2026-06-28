@@ -55,21 +55,21 @@ export function CelestialThemeClock({
             opacity: layout.sun.opacity,
           }}
         />
+        <ThemeSelectorIcon
+          variant="moon"
+          className={styles.bodyMoon}
+          style={{
+            left: `${layout.moon.x}%`,
+            top: `${layout.moon.y}%`,
+            opacity: layout.moon.opacity,
+          }}
+        />
 
         <div
           className={styles.earthFrame}
           style={{ transform: `rotate(${layout.earthRotationDeg}deg)` }}
         >
           <ThemeSelectorIcon variant="earth" className={styles.earth} />
-          <ThemeSelectorIcon
-            variant="moon"
-            className={styles.bodyMoon}
-            style={{
-              left: `${layout.moon.x}%`,
-              top: `${layout.moon.y}%`,
-              opacity: layout.moon.opacity,
-            }}
-          />
         </div>
       </div>
 

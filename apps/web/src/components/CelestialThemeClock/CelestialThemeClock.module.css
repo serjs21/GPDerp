@@ -16,6 +16,8 @@
     0 8px 20px color-mix(in srgb, var(--ink, var(--text-color)) 8%, transparent);
   touch-action: none;
   cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .earthFrame {
@@ -31,6 +33,10 @@
   width: 36%;
   height: auto;
   transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
   z-index: 1;
 }
 
@@ -41,6 +47,9 @@
   height: auto;
   transform: translate(-50%, -50%);
   pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
   z-index: 2;
 }
 

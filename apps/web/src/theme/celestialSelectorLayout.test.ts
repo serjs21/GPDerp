@@ -12,14 +12,14 @@ describe("celestialSelectorLayout", () => {
     const morning = slotToSunDialPosition(24);
 
     expect(midnight.x).toBeCloseTo(50, 0);
-    expect(midnight.y).toBeCloseTo(12, 0);
-    expect(morning.x).toBeCloseTo(88, 0);
+    expect(midnight.y).toBeCloseTo(88, 0);
+    expect(morning.x).toBeCloseTo(12, 0);
     expect(morning.y).toBeCloseTo(50, 0);
   });
 
-  it("rotates earth to match the selected sun angle", () => {
-    expect(slotToEarthRotationDeg(0)).toBe(slotToHandDegrees(0));
-    expect(slotToEarthRotationDeg(24)).toBe(slotToHandDegrees(24));
+  it("rotates earth opposite the selected sun angle", () => {
+    expect(slotToEarthRotationDeg(0)).toBe(-90);
+    expect(slotToEarthRotationDeg(48)).toBe(-270);
   });
 
   it("keeps sun and moon positions inside the dial bounds", () => {
@@ -38,8 +38,8 @@ describe("celestialSelectorLayout", () => {
     const dusk = getSelectorDialLayoutFromSlot(72, BANGKOK_COORDINATES);
 
     expect(dawn.sun.x).not.toBeCloseTo(dusk.sun.x, 0);
-    expect(dawn.sun.x).toBeGreaterThan(50);
-    expect(dusk.sun.x).toBeLessThan(50);
+    expect(dawn.sun.x).toBeLessThan(50);
+    expect(dusk.sun.x).toBeGreaterThan(50);
   });
 
   it("fades but does not hide the sun below the horizon", () => {

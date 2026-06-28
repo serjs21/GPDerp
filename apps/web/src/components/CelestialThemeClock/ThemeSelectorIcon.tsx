@@ -31,6 +31,7 @@ export function ThemeSelectorIcon({
       draggable={false}
       className={className}
       style={imageStyle}
+      onDragStart={(event) => event.preventDefault()}
       {...props}
     />
   );

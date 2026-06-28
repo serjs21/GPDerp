@@ -5,6 +5,9 @@ export const CELESTIAL_SLOTS_PER_DAY = 96;
 
 const SLOT_DEGREES = 360 / CELESTIAL_SLOTS_PER_DAY;
 
+/** Rotates the celestial selector dial so midnight sits opposite the default orientation. */
+export const SELECTOR_ROTATION_OFFSET_DEG = 180;
+
 export function clampSlot(slot: number) {
   return Math.min(CELESTIAL_SLOTS_PER_DAY - 1, Math.max(0, Math.round(slot)));
 }
@@ -43,11 +46,14 @@ export function dateToSlot(date: Date) {
 }
 
 export function slotToHandDegrees(slot: number) {
-  return clampSlot(slot) * SLOT_DEGREES - 90;
+  return clampSlot(slot) * SLOT_DEGREES - 90 + SELECTOR_ROTATION_OFFSET_DEG;
 }
 
 export function angleToSlot(angleDeg: number) {
-  return clampSlot(Math.round((angleDeg + 90) / SLOT_DEGREES));
+  const normalized =
+    ((angleDeg + 90 - SELECTOR_ROTATION_OFFSET_DEG) % 360 + 360) % 360;
+  const slot = Math.round(normalized / SLOT_DEGREES) % CELESTIAL_SLOTS_PER_DAY;
+  return clampSlot(slot);
 }
 
 export function isOnFixedCelestialDate(date: Date) {

@@ -41,6 +41,7 @@ export function useDialPointerSelection({
 
   const handlePointerDown = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
+      event.preventDefault();
       draggingRef.current = true;
       event.currentTarget.setPointerCapture(event.pointerId);
       updateFromPointer(event.clientX, event.clientY);
@@ -51,6 +52,7 @@ export function useDialPointerSelection({
   const handlePointerMove = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
       if (!draggingRef.current) return;
+      event.preventDefault();
       updateFromPointer(event.clientX, event.clientY);
     },
     [updateFromPointer],

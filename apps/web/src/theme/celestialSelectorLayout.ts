@@ -74,10 +74,11 @@ export function slotToEarthRotationDeg(
   slot: number,
   artOffsetDeg = EARTH_ART_OFFSET_DEG,
 ) {
-  return slotToHandDegrees(slot) + artOffsetDeg;
+  return -slotToHandDegrees(slot) + artOffsetDeg;
 }
 
-export function getMoonOffsetInEarthFrame(
+export function getMoonDialPositionFromSlot(
+  slot: number,
   date: Date,
   coordinates: GeoCoordinates,
   orbitRadiusPercent = DEFAULT_ORBIT_RADIUS_PERCENT,
@@ -97,7 +98,8 @@ export function getMoonOffsetInEarthFrame(
   const moonIllumination = SunCalc.getMoonIllumination(date);
 
   const relativeAzimuth = wrapDegrees(moonPosition.azimuth - sunPosition.azimuth);
-  const { x, y } = dialPositionFromAngleDeg(relativeAzimuth - 90, orbitRadiusPercent);
+  const moonAngleDeg = slotToHandDegrees(slot) + relativeAzimuth;
+  const { x, y } = dialPositionFromAngleDeg(moonAngleDeg, orbitRadiusPercent);
   const isNight = sunPosition.altitude <= -6;
   const dayMoonVisibility = isNight ? 1 : 0.28;
   const moonBaseOpacity = sunOpacityFromAltitude(moonPosition.altitude);
@@ -135,6 +137,6 @@ export function getSelectorDialLayoutFromSlot(
       opacity: sunOpacityFromAltitude(sunPosition.altitude),
     },
     earthRotationDeg: slotToEarthRotationDeg(slot, earthArtOffsetDeg),
-    moon: getMoonOffsetInEarthFrame(date, coordinates, orbitRadiusPercent),
+    moon: getMoonDialPositionFromSlot(slot, date, coordinates, orbitRadiusPercent),
   };
 }

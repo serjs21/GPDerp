@@ -30,15 +30,27 @@ describe("celestialTime", () => {
     expect(slotToDate(120).getTime()).toBe(slotToDate(95).getTime());
   });
 
-  it("places slot 0 hand at twelve o'clock", () => {
-    expect(slotToHandDegrees(0)).toBe(-90);
-    expect(slotToHandDegrees(24)).toBe(0);
+  it("places slot 0 hand at six o'clock after the 180 degree dial offset", () => {
+    expect(slotToHandDegrees(0)).toBe(90);
+    expect(slotToHandDegrees(24)).toBe(180);
   });
 
   it("converts dial angles back to slots", () => {
-    expect(angleToSlot(-90)).toBe(0);
-    expect(angleToSlot(0)).toBe(24);
-    expect(angleToSlot(90)).toBe(48);
+    expect(angleToSlot(90)).toBe(0);
+    expect(angleToSlot(180)).toBe(24);
+    expect(angleToSlot(-90)).toBe(48);
+    expect(angleToSlot(0)).toBe(72);
+  });
+
+  it("maps the evening quadrant without collapsing to midnight", () => {
+    expect(angleToSlot(135)).toBe(12);
+    expect(angleToSlot(170)).toBe(21);
+  });
+
+  it("wraps the end of the day back to slot 0", () => {
+    expect(angleToSlot(slotToHandDegrees(95))).toBe(95);
+    expect(angleToSlot(slotToHandDegrees(0))).toBe(0);
+    expect(angleToSlot(86.25)).toBe(95);
   });
 
   it("keeps preset dates on the fixed reference day", () => {
