@@ -8,15 +8,18 @@ const DEFAULT_DEAD_ZONE_RADIUS_PERCENT = 18;
 
 type UseDialPointerSelectionOptions = {
   onChange: (slot: number) => void;
+  onDragEnd?: (slot: number) => void;
   deadZoneRadiusPercent?: number;
 };
 
 export function useDialPointerSelection({
   onChange,
+  onDragEnd,
   deadZoneRadiusPercent = DEFAULT_DEAD_ZONE_RADIUS_PERCENT,
 }: UseDialPointerSelectionOptions) {
   const faceRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
+  const lastSlotRef = useRef(0);
 
   const updateFromPointer = useCallback(
     (clientX: number, clientY: number) => {
@@ -34,7 +37,9 @@ export function useDialPointerSelection({
       if (distance < deadZoneRadius) return;
 
       const angleDeg = (Math.atan2(dy, dx) * 180) / Math.PI;
-      onChange(angleToSlot(angleDeg));
+      const slot = angleToSlot(angleDeg);
+      lastSlotRef.current = slot;
+      onChange(slot);
     },
     [deadZoneRadiusPercent, onChange],
   );
@@ -58,13 +63,17 @@ export function useDialPointerSelection({
     [updateFromPointer],
   );
 
-  const endDrag = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!draggingRef.current) return;
-    draggingRef.current = false;
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-  }, []);
+  const endDrag = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      if (!draggingRef.current) return;
+      draggingRef.current = false;
+      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+      }
+      onDragEnd?.(lastSlotRef.current);
+    },
+    [onDragEnd],
+  );
 
   return {
     faceRef,

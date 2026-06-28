@@ -4,6 +4,10 @@ import { CelestialScene } from "@/components/CelestialScene";
 import { DaylightBackgroundView } from "@/components/DaylightBackground/DaylightBackground";
 import { CelestialThemeClock } from "@/components/CelestialThemeClock";
 import { slotToDate } from "@/theme/celestialTime";
+import {
+  getSelectorDialLayoutFromSlot,
+  selectorLayoutToBackgroundBodies,
+} from "@/theme/celestialSelectorLayout";
 import { BANGKOK_COORDINATES, useCelestialScene } from "@/theme/useCelestialScene";
 import styles from "./CelestialThemeClock.stories.module.css";
 
@@ -50,12 +54,17 @@ const CelestialScenePreview = () => {
     date: slotToDate(slot),
     coordinates: BANGKOK_COORDINATES,
   });
+  const selectorLayout = getSelectorDialLayoutFromSlot(slot, BANGKOK_COORDINATES);
+  const backgroundBodies = selectorLayoutToBackgroundBodies(
+    selectorLayout,
+    celestialScene.layout.moon.limbAngleDeg,
+  );
 
   return (
     <CelestialScene sceneVars={celestialScene.sceneVars} className={styles.scene}>
       <DaylightBackgroundView
         mode="celestial"
-        layout={celestialScene.layout}
+        backgroundBodies={backgroundBodies}
         showCelestialBodies
       />
       <div className={styles.controls}>

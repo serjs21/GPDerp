@@ -1,5 +1,6 @@
 import {
   getSelectorDialLayoutFromSlot,
+  selectorLayoutToBackgroundBodies,
   slotToEarthRotationDeg,
   slotToSunDialPosition,
 } from "./celestialSelectorLayout";
@@ -63,5 +64,16 @@ describe("celestialSelectorLayout", () => {
     for (const slot of [0, 24, 48, 72, 95]) {
       expect(angleToSlot(slotToHandDegrees(slot))).toBe(slot);
     }
+  });
+
+  it("maps selector layout to background body coordinates", () => {
+    const layout = getSelectorDialLayoutFromSlot(48, BANGKOK_COORDINATES);
+    const bodies = selectorLayoutToBackgroundBodies(layout, 12);
+
+    expect(bodies.sun.x).toBe(layout.sun.x);
+    expect(bodies.sun.y).toBe(layout.sun.y);
+    expect(bodies.moon.x).toBe(layout.moon.x);
+    expect(bodies.moon.y).toBe(layout.moon.y);
+    expect(bodies.moon.limbAngleDeg).toBe(12);
   });
 });

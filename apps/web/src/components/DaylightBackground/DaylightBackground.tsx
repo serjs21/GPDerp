@@ -1,9 +1,10 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import type { CelestialLayout } from "@/theme/celestialTheme";
-import { useThemeScaleProgress } from "@/hooks/useThemeScaleProgress";
+import type { SelectorBackgroundBodies } from "@/theme/celestialSelectorLayout";
 import { getSkyMotionState } from "@/theme/themeSkyMotion";
+import { useCelestialTheme } from "@/app/providers/CelestialThemeProvider";
+import { SELECTOR_BODY_SIZE_VMIN } from "@/components/CelestialThemeDial";
 import { DAYLIGHT_ASSETS } from "./daylightAssets";
 import styles from "./DaylightBackground.module.css";
 import { DaylightCloud } from "./placeholders/DaylightCloud";
@@ -20,6 +21,8 @@ const sunTransform = (x: number, y: number, scale: number) =>
 
 const moonTransform = (scale: number) => `scale(${scale})`;
 
+const celestialBodyWidth = `${SELECTOR_BODY_SIZE_VMIN}vmin`;
+
 type DaylightBackgroundScaleProps = {
   mode?: "scale";
   progress: number;
@@ -27,7 +30,7 @@ type DaylightBackgroundScaleProps = {
 
 type DaylightBackgroundCelestialProps = {
   mode: "celestial";
-  layout: CelestialLayout;
+  backgroundBodies: SelectorBackgroundBodies;
   showCelestialBodies?: boolean;
 };
 
@@ -103,12 +106,14 @@ function ScaleBackground({ progress }: DaylightBackgroundScaleProps) {
 }
 
 function CelestialBackground({
-  layout,
+  backgroundBodies,
   showCelestialBodies = true,
 }: DaylightBackgroundCelestialProps) {
+  const bodySizeStyle = { width: celestialBodyWidth } as CSSProperties;
+
   return (
     <>
-      <DaylightStars style={{ opacity: layout.moon.opacity }} />
+      <DaylightStars style={{ opacity: backgroundBodies.moon.opacity }} />
       <DaylightCloud
         src={DAYLIGHT_ASSETS.clouds[0]}
         className={styles.cloudA}
@@ -128,18 +133,20 @@ function CelestialBackground({
         <>
           <DaylightSun
             celestial={{
-              x: layout.sun.x,
-              y: layout.sun.y,
-              opacity: layout.sun.opacity,
+              x: backgroundBodies.sun.x,
+              y: backgroundBodies.sun.y,
+              opacity: backgroundBodies.sun.opacity,
             }}
+            style={bodySizeStyle}
           />
           <DaylightMoon
             celestial={{
-              x: layout.moon.x,
-              y: layout.moon.y,
-              opacity: layout.moon.opacity,
-              limbAngleDeg: layout.moon.limbAngleDeg,
+              x: backgroundBodies.moon.x,
+              y: backgroundBodies.moon.y,
+              opacity: backgroundBodies.moon.opacity,
+              limbAngleDeg: backgroundBodies.moon.limbAngleDeg,
             }}
+            style={bodySizeStyle}
           />
         </>
       ) : null}
@@ -161,6 +168,13 @@ export const DaylightBackgroundView = (props: DaylightBackgroundViewProps) => (
 );
 
 export const DaylightBackground = () => {
-  const progress = useThemeScaleProgress();
-  return <DaylightBackgroundView progress={progress} />;
+  const { backgroundBodies } = useCelestialTheme();
+
+  return (
+    <DaylightBackgroundView
+      mode="celestial"
+      backgroundBodies={backgroundBodies}
+      showCelestialBodies
+    />
+  );
 };

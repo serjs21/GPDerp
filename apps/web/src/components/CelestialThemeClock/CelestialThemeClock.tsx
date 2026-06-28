@@ -8,13 +8,14 @@ import {
 } from "@/theme/celestialTime";
 import type { GeoCoordinates } from "@/theme/celestialTheme";
 import { getSelectorDialLayoutFromSlot } from "@/theme/celestialSelectorLayout";
+import { CelestialThemeDial } from "@/components/CelestialThemeDial";
 import { useDialPointerSelection } from "./hooks/useDialPointerSelection";
-import { ThemeSelectorIcon } from "./ThemeSelectorIcon";
 import styles from "./CelestialThemeClock.module.css";
 
 export type CelestialThemeClockProps = {
   value: number;
   onChange: (slot: number) => void;
+  onCommit?: (slot: number) => void;
   coordinates: GeoCoordinates;
   ariaLabel?: string;
   className?: string;
@@ -27,6 +28,7 @@ export type CelestialThemeClockProps = {
 export function CelestialThemeClock({
   value,
   onChange,
+  onCommit,
   coordinates,
   ariaLabel = "Time of day",
   className,
@@ -36,42 +38,20 @@ export function CelestialThemeClock({
     () => getSelectorDialLayoutFromSlot(value, coordinates),
     [value, coordinates],
   );
-  const { faceRef, pointerHandlers } = useDialPointerSelection({ onChange });
+  const { faceRef, pointerHandlers } = useDialPointerSelection({
+    onChange,
+    onDragEnd: onCommit,
+  });
 
   return (
     <div className={`${styles.root}${className ? ` ${className}` : ""}`}>
-      <div
-        ref={faceRef}
-        className={styles.face}
-        aria-hidden
-        {...pointerHandlers}
-      >
-        <ThemeSelectorIcon
-          variant="sun"
-          className={styles.bodySun}
-          style={{
-            left: `${layout.sun.x}%`,
-            top: `${layout.sun.y}%`,
-            opacity: layout.sun.opacity,
-          }}
-        />
-        <ThemeSelectorIcon
-          variant="moon"
-          className={styles.bodyMoon}
-          style={{
-            left: `${layout.moon.x}%`,
-            top: `${layout.moon.y}%`,
-            opacity: layout.moon.opacity,
-          }}
-        />
-
-        <div
-          className={styles.earthFrame}
-          style={{ transform: `rotate(${layout.earthRotationDeg}deg)` }}
-        >
-          <ThemeSelectorIcon variant="earth" className={styles.earth} />
-        </div>
-      </div>
+      <CelestialThemeDial
+        variant="panel"
+        layout={layout}
+        faceRef={faceRef}
+        pointerHandlers={pointerHandlers}
+        interactive
+      />
 
       <input
         className={styles.rangeInput}

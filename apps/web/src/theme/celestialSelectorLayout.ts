@@ -140,3 +140,27 @@ export function getSelectorDialLayoutFromSlot(
     moon: getMoonDialPositionFromSlot(slot, date, coordinates, orbitRadiusPercent),
   };
 }
+
+export type SelectorBackgroundBodies = {
+  sun: { x: number; y: number; opacity: number };
+  moon: { x: number; y: number; opacity: number; limbAngleDeg: number };
+};
+
+export function selectorLayoutToBackgroundBodies(
+  layout: SelectorDialLayout,
+  moonLimbAngleDeg: number,
+): SelectorBackgroundBodies {
+  return {
+    sun: {
+      x: layout.sun.x,
+      y: layout.sun.y,
+      opacity: layout.sun.opacity,
+    },
+    moon: {
+      x: layout.moon.x,
+      y: layout.moon.y,
+      opacity: layout.moon.opacity,
+      limbAngleDeg: moonLimbAngleDeg,
+    },
+  };
+}

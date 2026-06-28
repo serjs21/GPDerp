@@ -8,6 +8,10 @@ import {
 import type { CelestialPresetName } from "@/theme/celestialPresets";
 import { getCelestialPresetDate } from "@/theme/celestialPresets";
 import { dateToSlot, slotToDate } from "@/theme/celestialTime";
+import {
+  getSelectorDialLayoutFromSlot,
+  selectorLayoutToBackgroundBodies,
+} from "@/theme/celestialSelectorLayout";
 import { getThemeScaleVars } from "@/theme/themeScale";
 import {
   BANGKOK_COORDINATES,
@@ -62,11 +66,19 @@ const InteractiveBackground = ({
     coordinates: celestialState.coordinates,
     projection: celestialState.projection,
   });
+  const selectorLayout = getSelectorDialLayoutFromSlot(
+    dateToSlot(celestialState.selectedDate),
+    celestialState.coordinates,
+  );
+  const backgroundBodies = selectorLayoutToBackgroundBodies(
+    selectorLayout,
+    celestialScene.layout.moon.limbAngleDeg,
+  );
 
   const background = celestialState.useCelestialMode ? (
     <DaylightBackgroundView
       mode="celestial"
-      layout={celestialScene.layout}
+      backgroundBodies={backgroundBodies}
       showCelestialBodies={celestialState.showCelestialBodies}
     />
   ) : (
