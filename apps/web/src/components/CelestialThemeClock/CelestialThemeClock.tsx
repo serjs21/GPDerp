@@ -1,10 +1,11 @@
 "use client";
 
-import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
+import { forwardRef, useImperativeHandle, useMemo, useRef, type KeyboardEvent } from "react";
 import {
   CELESTIAL_FIXED_DATE,
   CELESTIAL_SLOTS_PER_DAY,
   formatClockLabel,
+  stepSlot,
 } from "@/theme/celestialTime";
 import type { GeoCoordinates } from "@/theme/celestialTheme";
 import { getSelectorDialLayoutFromSlot } from "@/theme/celestialSelectorLayout";
@@ -60,6 +61,24 @@ export const CelestialThemeClock = forwardRef<
     },
   }));
 
+  const maxSlot = CELESTIAL_SLOTS_PER_DAY - 1;
+
+  const handleRangeKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    const isDecrease = event.key === "ArrowDown" || event.key === "ArrowLeft";
+    const isIncrease = event.key === "ArrowUp" || event.key === "ArrowRight";
+
+    if (isDecrease && value === 0) {
+      event.preventDefault();
+      onChange(stepSlot(value, -1));
+      return;
+    }
+
+    if (isIncrease && value === maxSlot) {
+      event.preventDefault();
+      onChange(stepSlot(value, 1));
+    }
+  };
+
   return (
     <div className={`${styles.root}${className ? ` ${className}` : ""}`}>
       <CelestialThemeDial
@@ -75,15 +94,16 @@ export const CelestialThemeClock = forwardRef<
         className={styles.rangeInput}
         type="range"
         min={0}
-        max={CELESTIAL_SLOTS_PER_DAY - 1}
+        max={maxSlot}
         step={1}
         value={value}
         aria-label={ariaLabel}
         aria-valuemin={0}
-        aria-valuemax={CELESTIAL_SLOTS_PER_DAY - 1}
+        aria-valuemax={maxSlot}
         aria-valuenow={value}
         aria-valuetext={`${timeLabel}, ${CELESTIAL_FIXED_DATE}`}
         onChange={(event) => onChange(Number(event.target.value))}
+        onKeyDown={handleRangeKeyDown}
       />
     </div>
   );

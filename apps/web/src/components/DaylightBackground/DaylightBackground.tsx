@@ -4,6 +4,10 @@ import type { CSSProperties } from "react";
 import type { SelectorBackgroundBodies } from "@/theme/celestialSelectorLayout";
 import { getSkyMotionState } from "@/theme/themeSkyMotion";
 import { useCelestialTheme } from "@/app/providers/CelestialThemeProvider";
+import {
+  CELESTIAL_MOON_BODY_WIDTH_REM,
+  CELESTIAL_SUN_BODY_WIDTH_REM,
+} from "@/components/CelestialThemeDial/celestialDialProportions";
 import { DAYLIGHT_ASSETS } from "./daylightAssets";
 import styles from "./DaylightBackground.module.css";
 import { DaylightCloud } from "./placeholders/DaylightCloud";
@@ -20,7 +24,8 @@ const sunTransform = (x: number, y: number, scale: number) =>
 
 const moonTransform = (scale: number) => `scale(${scale})`;
 
-const celestialBodyWidth = "6rem";
+const celestialSunWidth = `${CELESTIAL_SUN_BODY_WIDTH_REM}rem`;
+const celestialMoonWidth = `${CELESTIAL_MOON_BODY_WIDTH_REM}rem`;
 
 type DaylightBackgroundScaleProps = {
   mode?: "scale";
@@ -108,7 +113,8 @@ function CelestialBackground({
   backgroundBodies,
   showCelestialBodies = true,
 }: DaylightBackgroundCelestialProps) {
-  const bodySizeStyle = { width: celestialBodyWidth } as CSSProperties;
+  const sunSizeStyle = { width: celestialSunWidth } as CSSProperties;
+  const moonSizeStyle = { width: celestialMoonWidth } as CSSProperties;
 
   return (
     <>
@@ -136,7 +142,7 @@ function CelestialBackground({
               y: backgroundBodies.sun.y,
               opacity: backgroundBodies.sun.opacity,
             }}
-            style={bodySizeStyle}
+            style={sunSizeStyle}
           />
           <DaylightMoon
             celestial={{
@@ -145,7 +151,7 @@ function CelestialBackground({
               opacity: backgroundBodies.moon.opacity,
               limbAngleDeg: backgroundBodies.moon.limbAngleDeg,
             }}
-            style={bodySizeStyle}
+            style={moonSizeStyle}
           />
         </>
       ) : null}

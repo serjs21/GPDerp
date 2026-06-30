@@ -4,7 +4,16 @@ import type { CSSProperties, PointerEventHandler, Ref } from "react";
 import type { SelectorDialLayout } from "@/theme/celestialSelectorLayout";
 import { earthSunGradientAngleDeg } from "@/theme/celestialSelectorLayout";
 import { ThemeSelectorIcon } from "@/components/CelestialThemeClock/ThemeSelectorIcon";
+import {
+  SELECTOR_MOON_SIZE_RATIO,
+  SELECTOR_SUN_SIZE_RATIO,
+} from "./celestialDialProportions";
 import styles from "./CelestialThemeDial.module.css";
+
+const dialBodySizeVars = {
+  "--dial-sun-size": `${SELECTOR_SUN_SIZE_RATIO * 100}%`,
+  "--dial-moon-size": `${SELECTOR_MOON_SIZE_RATIO * 100}%`,
+} as CSSProperties;
 
 export type CelestialThemeDialPointerHandlers = {
   onPointerDown?: PointerEventHandler<HTMLDivElement>;
@@ -34,7 +43,10 @@ export function CelestialThemeDial({
   const interactiveClass = interactive ? styles.interactive : "";
 
   return (
-    <div className={`${styles.root} ${variantClass}${className ? ` ${className}` : ""}`}>
+    <div
+      className={`${styles.root} ${variantClass}${className ? ` ${className}` : ""}`}
+      style={dialBodySizeVars}
+    >
       <div
         ref={faceRef}
         className={`${styles.face}${interactiveClass ? ` ${interactiveClass}` : ""}`}

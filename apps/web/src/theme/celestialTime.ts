@@ -12,6 +12,13 @@ export function clampSlot(slot: number) {
   return Math.min(CELESTIAL_SLOTS_PER_DAY - 1, Math.max(0, Math.round(slot)));
 }
 
+export function stepSlot(slot: number, delta: number): number {
+  const normalized =
+    (((clampSlot(slot) + delta) % CELESTIAL_SLOTS_PER_DAY) + CELESTIAL_SLOTS_PER_DAY) %
+    CELESTIAL_SLOTS_PER_DAY;
+  return normalized;
+}
+
 export function slotToMinutes(slot: number) {
   return clampSlot(slot) * CELESTIAL_MINUTES_STEP;
 }

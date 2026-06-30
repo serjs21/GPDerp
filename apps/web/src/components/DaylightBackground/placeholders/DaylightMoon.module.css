@@ -3,7 +3,7 @@
   right: 14%;
   top: 10%;
   left: auto;
-  width: clamp(2.5rem, 7vw, 4rem);
+  width: clamp(calc(3.25rem * 0.991), calc(10vw * 0.991), calc(5.25rem * 0.991));
   height: auto;
   transform-origin: center;
 }

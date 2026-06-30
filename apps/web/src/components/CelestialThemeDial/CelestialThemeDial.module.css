@@ -1,6 +1,7 @@
 .root {
   --dial-earth-size: 36%;
-  --dial-body-size: 20%;
+  --dial-sun-size: 20%;
+  --dial-moon-size: 19.82%;
   position: relative;
   aspect-ratio: 1;
   margin-inline: auto;
@@ -64,7 +65,6 @@
 .bodySun,
 .bodyMoon {
   position: absolute;
-  width: var(--dial-body-size);
   height: auto;
   transform: translate(-50%, -50%);
   pointer-events: none;
@@ -75,5 +75,10 @@
 }
 
 .bodySun {
+  width: var(--dial-sun-size);
   z-index: 3;
+}
+
+.bodyMoon {
+  width: var(--dial-moon-size);
 }

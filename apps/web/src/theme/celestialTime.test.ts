@@ -7,6 +7,7 @@ import {
   isOnFixedCelestialDate,
   slotToDate,
   slotToHandDegrees,
+  stepSlot,
 } from "./celestialTime";
 import { getCelestialPresetDate } from "./celestialPresets";
 import { BANGKOK_COORDINATES } from "./useCelestialScene";
@@ -51,6 +52,13 @@ describe("celestialTime", () => {
     expect(angleToSlot(slotToHandDegrees(95))).toBe(95);
     expect(angleToSlot(slotToHandDegrees(0))).toBe(0);
     expect(angleToSlot(86.25)).toBe(95);
+  });
+
+  it("steps slots with wrap at day boundaries", () => {
+    expect(stepSlot(0, -1)).toBe(95);
+    expect(stepSlot(95, 1)).toBe(0);
+    expect(stepSlot(48, 1)).toBe(49);
+    expect(stepSlot(48, -1)).toBe(47);
   });
 
   it("keeps preset dates on the fixed reference day", () => {
