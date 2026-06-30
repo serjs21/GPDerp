@@ -1,0 +1,46 @@
+.wrap {
+  display: inline-flex;
+}
+
+.trigger {
+  width: 4.5rem;
+  min-width: 0;
+  height: 4.5rem;
+  box-sizing: border-box;
+  padding: var(--icon-button-padding, 4px) !important;
+  border-radius: 0;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--text-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    color 0.3s ease,
+    background-color 0.3s ease;
+}
+
+.trigger:hover:not(:disabled) {
+  transform: none !important;
+  box-shadow: none !important;
+  background: color-mix(in srgb, var(--text-color) 8%, transparent) !important;
+}
+
+.trigger:focus-visible {
+  transform: none !important;
+  box-shadow: none !important;
+  outline: 2px solid color-mix(in srgb, var(--accent-red) 55%, var(--text-muted) 45%);
+  outline-offset: 2px;
+}
+
+.trigger:active:not(:disabled) {
+  transform: scale(0.97) !important;
+}
+
+.dialTrigger {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  pointer-events: none;
+}

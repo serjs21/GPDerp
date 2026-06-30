@@ -23,7 +23,7 @@ export const HeaderPreferences = () => {
   const { locale, setLocale } = useLocale();
   const { languageOptions } = useProfileI18n();
   const t = useTranslations("Profile");
-  const { effectiveSlot, setPreviewSlot, commitSlot } = useCelestialTheme();
+  const { effectiveSlot, setPreviewSlot, commitSlot, scene } = useCelestialTheme();
 
   const persistIfLoggedIn = useCallback(
     async (body: { language?: AppLocale }) => {
@@ -58,6 +58,7 @@ export const HeaderPreferences = () => {
         slot={effectiveSlot}
         onChange={commitSlot}
         onPreviewChange={setPreviewSlot}
+        sceneVars={scene.sceneVars}
         className={styles.themeSelector}
         ariaLabel={t("theme")}
       />

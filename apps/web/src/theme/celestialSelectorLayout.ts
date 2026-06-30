@@ -164,3 +164,11 @@ export function selectorLayoutToBackgroundBodies(
     },
   };
 }
+
+/** Earth-local linear-gradient angle so the bright stop points at the dial sun icon. */
+export function earthSunGradientAngleDeg(layout: SelectorDialLayout): number {
+  const dx = layout.sun.x - 50;
+  const dy = layout.sun.y - 50;
+  const dialAngleDeg = (Math.atan2(dx, -dy) * 180) / Math.PI;
+  return dialAngleDeg - layout.earthRotationDeg;
+}

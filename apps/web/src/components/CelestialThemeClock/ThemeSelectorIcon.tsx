@@ -1,14 +1,20 @@
-import type { CSSProperties, ImgHTMLAttributes } from "react";
+import type { CSSProperties, HTMLAttributes } from "react";
+import {
+  EARTH_SKY_FADE_OUTER_RADIUS_PERCENT,
+  EARTH_SKY_INNER_RADIUS_PERCENT,
+} from "@/components/CelestialThemeDial/celestialDialProportions";
+import styles from "./ThemeSelectorIcon.module.css";
 
-const THEME_SELECTOR_ASSETS = {
-  earth: "/theme-selector/earth.png",
-  sun: "/theme-selector/sun.png",
-  moon: "/theme-selector/moon.png",
-} as const;
+type ThemeSelectorIconVariant = "earth" | "sun" | "moon";
 
-type ThemeSelectorIconProps = Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "alt"> & {
-  variant: keyof typeof THEME_SELECTOR_ASSETS;
+type ThemeSelectorIconProps = Omit<HTMLAttributes<HTMLSpanElement>, "children"> & {
+  variant: ThemeSelectorIconVariant;
 };
+
+const earthSkyFadeVars = {
+  "--earth-sky-inner": `${EARTH_SKY_INNER_RADIUS_PERCENT}%`,
+  "--earth-sky-fade-outer": `${EARTH_SKY_FADE_OUTER_RADIUS_PERCENT}%`,
+} as CSSProperties;
 
 export function ThemeSelectorIcon({
   variant,
@@ -17,22 +23,37 @@ export function ThemeSelectorIcon({
   ...props
 }: ThemeSelectorIconProps) {
   const { opacity, ...rest } = style ?? {};
-  const imageStyle = {
+  const iconStyle = {
     ...rest,
     opacity: opacity ?? 1,
   } as CSSProperties;
 
+  if (variant === "earth") {
+    return (
+      <span
+        className={`${styles.earthRoot}${className ? ` ${className}` : ""}`}
+        style={{ ...earthSkyFadeVars, ...iconStyle }}
+        aria-hidden
+        {...props}
+      >
+        <span className={styles.earthSky} aria-hidden />
+        <span className={styles.earthMask} aria-hidden />
+      </span>
+    );
+  }
+
+  const glowClass = variant === "sun" ? styles.sunGlow : styles.moonGlow;
+  const maskedClass = variant === "sun" ? styles.sunMasked : styles.moonMasked;
+
   return (
-    // eslint-disable-next-line @next/next/no-img-element -- static theme-selector art from /public
-    <img
-      src={THEME_SELECTOR_ASSETS[variant]}
-      alt=""
+    <span
+      className={`${styles.bodyRoot}${className ? ` ${className}` : ""}`}
+      style={iconStyle}
       aria-hidden
-      draggable={false}
-      className={className}
-      style={imageStyle}
-      onDragStart={(event) => event.preventDefault()}
       {...props}
-    />
+    >
+      <span className={glowClass} aria-hidden />
+      <span className={`${styles.maskedIcon} ${maskedClass}`} aria-hidden />
+    </span>
   );
 }

@@ -1,4 +1,5 @@
 import {
+  earthSunGradientAngleDeg,
   getSelectorDialLayoutFromSlot,
   selectorLayoutToBackgroundBodies,
   slotToEarthRotationDeg,
@@ -75,5 +76,18 @@ describe("celestialSelectorLayout", () => {
     expect(bodies.moon.x).toBe(layout.moon.x);
     expect(bodies.moon.y).toBe(layout.moon.y);
     expect(bodies.moon.limbAngleDeg).toBe(12);
+  });
+
+  it("aims earth sky gradient toward the dial sun after earth rotation", () => {
+    for (const slot of [0, 24, 48, 72]) {
+      const layout = getSelectorDialLayoutFromSlot(slot, BANGKOK_COORDINATES);
+      const dx = layout.sun.x - 50;
+      const dy = layout.sun.y - 50;
+      const dialAngleDeg = (Math.atan2(dx, -dy) * 180) / Math.PI;
+      const earthAngle = earthSunGradientAngleDeg(layout);
+      const effectiveAngle = earthAngle + layout.earthRotationDeg;
+
+      expect(effectiveAngle).toBeCloseTo(dialAngleDeg, 0);
+    }
   });
 });

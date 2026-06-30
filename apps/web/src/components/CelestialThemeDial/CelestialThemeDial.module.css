@@ -1,0 +1,79 @@
+.root {
+  --dial-earth-size: 36%;
+  --dial-body-size: 20%;
+  position: relative;
+  aspect-ratio: 1;
+  margin-inline: auto;
+}
+
+.panel {
+  width: clamp(9rem, 28vw, 14rem);
+}
+
+.trigger {
+  width: 4.5rem;
+  height: 4.5rem;
+}
+
+.face {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.3);
+  border: 2px solid color-mix(in srgb, var(--highlight, var(--accent-red)) 42%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--ink, var(--text-color)) 10%, transparent),
+    0 8px 20px color-mix(in srgb, var(--ink, var(--text-color)) 8%, transparent);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.trigger .face {
+  border-width: 1.5px;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--ink, var(--text-color)) 8%, transparent),
+    0 4px 10px color-mix(in srgb, var(--ink, var(--text-color)) 6%, transparent);
+}
+
+.interactive {
+  cursor: pointer;
+}
+
+.earthFrame {
+  position: absolute;
+  inset: 0;
+  transform-origin: center center;
+}
+
+.earth {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--dial-earth-size);
+  height: auto;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  z-index: 1;
+}
+
+.bodySun,
+.bodyMoon {
+  position: absolute;
+  width: var(--dial-body-size);
+  height: auto;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  z-index: 2;
+}
+
+.bodySun {
+  z-index: 3;
+}
