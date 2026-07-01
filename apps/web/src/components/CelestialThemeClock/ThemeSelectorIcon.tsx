@@ -5,7 +5,7 @@ import {
 } from "@/components/CelestialThemeDial/celestialDialProportions";
 import styles from "./ThemeSelectorIcon.module.css";
 
-type ThemeSelectorIconVariant = "earth" | "sun" | "moon";
+type ThemeSelectorIconVariant = "earth" | "sun" | "moon" | "star";
 
 type ThemeSelectorIconProps = Omit<HTMLAttributes<HTMLSpanElement>, "children"> & {
   variant: ThemeSelectorIconVariant;
@@ -43,6 +43,20 @@ export function ThemeSelectorIcon({
           <span className={styles.earthSky} aria-hidden />
         </span>
         <span className={styles.earthMask} aria-hidden />
+      </span>
+    );
+  }
+
+  if (variant === "star") {
+    return (
+      <span
+        className={`${styles.starRoot}${className ? ` ${className}` : ""}`}
+        style={iconStyle}
+        aria-hidden
+        {...props}
+      >
+        <span className={styles.starGlow} aria-hidden />
+        <span className={styles.starBody} aria-hidden />
       </span>
     );
   }

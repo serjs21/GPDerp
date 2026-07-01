@@ -1,0 +1,13 @@
+.field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.star {
+  position: absolute;
+  width: var(--selector-star-size, 2px);
+  height: var(--selector-star-size, 2px);
+  transform: translate(-50%, -50%);
+}

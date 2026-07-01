@@ -54,20 +54,20 @@ export const HeaderPreferences = () => {
 
   return (
     <div className={styles.wrap} role="group" aria-label={t("preferencesGroupLabel")}>
-      <CelestialThemeSelector
-        slot={effectiveSlot}
-        onChange={commitSlot}
-        onPreviewChange={setPreviewSlot}
-        sceneVars={scene.sceneVars}
-        className={styles.themeSelector}
-        ariaLabel={t("theme")}
-      />
       <LocaleSelector
         value={locale}
         options={languageOptions}
         onChange={onLocaleChange}
         className={styles.localeSelector}
         getPopupContainer={(node) => node.parentElement ?? document.body}
+      />
+    <CelestialThemeSelector
+        slot={effectiveSlot}
+        onChange={commitSlot}
+        onPreviewChange={setPreviewSlot}
+        sceneVars={scene.sceneVars}
+        className={styles.themeSelector}
+        ariaLabel={t("theme")}
       />
     </div>
   );
