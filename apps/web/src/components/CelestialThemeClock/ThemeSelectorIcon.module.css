@@ -23,6 +23,7 @@
 .sunMasked {
   -webkit-mask-image: url("/theme-selector/sun.png");
   mask-image: url("/theme-selector/sun.png");
+  background-color: color-mix(in srgb, #f8dbc2 70%, var(--highlight, #fff 50%));
   filter: none;
 }
 
