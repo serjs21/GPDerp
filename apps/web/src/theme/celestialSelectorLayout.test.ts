@@ -1,7 +1,9 @@
 import {
   earthSunGradientAngleDeg,
   getSelectorDialLayoutFromSlot,
+  selectorButtonModeFromSunY,
   selectorLayoutToBackgroundBodies,
+  selectorSunBorderPosition,
   slotToEarthRotationDeg,
   slotToSunDialPosition,
 } from "./celestialSelectorLayout";
@@ -22,6 +24,26 @@ describe("celestialSelectorLayout", () => {
   it("rotates earth opposite the selected sun angle", () => {
     expect(slotToEarthRotationDeg(0)).toBe(-90);
     expect(slotToEarthRotationDeg(48)).toBe(-270);
+  });
+
+  it("classifies button mode from sun dial y", () => {
+    expect(selectorButtonModeFromSunY(12)).toBe("day");
+    expect(selectorButtonModeFromSunY(50)).toBe("day");
+    expect(selectorButtonModeFromSunY(88)).toBe("night");
+  });
+
+  it("places expanded sun on the controller border at the slot angle", () => {
+    const layout = getSelectorDialLayoutFromSlot(48, BANGKOK_COORDINATES);
+    const border = selectorSunBorderPosition(layout);
+
+    expect(border.x).toBeCloseTo(50, 0);
+    expect(border.y).toBeCloseTo(10, 0);
+
+    const midnight = getSelectorDialLayoutFromSlot(0, BANGKOK_COORDINATES);
+    const midnightBorder = selectorSunBorderPosition(midnight);
+
+    expect(midnightBorder.x).toBeCloseTo(50, 0);
+    expect(midnightBorder.y).toBeCloseTo(90, 0);
   });
 
   it("keeps sun and moon positions inside the dial bounds", () => {

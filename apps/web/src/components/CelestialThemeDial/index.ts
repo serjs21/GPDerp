@@ -7,6 +7,7 @@ export {
 export type { ThemeSelectorStarPosition } from "./themeSelectorStars.config";
 export type {
   CelestialThemeDialPointerHandlers,
+  CelestialThemeDialPresentation,
   CelestialThemeDialProps,
 } from "./CelestialThemeDial";
 export {

@@ -1,4 +1,5 @@
 import * as SunCalc from "suncalc";
+import { SELECTOR_SUN_SIZE_RATIO } from "@/components/CelestialThemeDial/celestialDialProportions";
 import { clampSlot, slotToDate, slotToHandDegrees } from "./celestialTime";
 import type { GeoCoordinates } from "./celestialTheme";
 
@@ -191,4 +192,25 @@ export function earthSunGradientAngleDeg(layout: SelectorDialLayout): number {
   const dy = layout.sun.y - 50;
   const dialAngleDeg = (Math.atan2(dx, -dy) * 180) / Math.PI;
   return dialAngleDeg - layout.earthRotationDeg;
+}
+
+/** Closed-button day (top arc) vs night (bottom arc) from dial sun y. */
+export function selectorButtonModeFromSunY(yPercent: number): "day" | "night" {
+  return yPercent > 50 ? "night" : "day";
+}
+
+/** Expanded dial: sun center on the controller rim at the selected slot angle. */
+export function selectorSunBorderPosition(
+  layout: SelectorDialLayout,
+  sunSizePercent = SELECTOR_SUN_SIZE_RATIO * 100,
+) {
+  const dx = layout.sun.x - 50;
+  const dy = layout.sun.y - 50;
+  const angleRad = Math.atan2(dy, dx);
+  const borderRadius = 50 - sunSizePercent / 2;
+
+  return {
+    x: 50 + borderRadius * Math.cos(angleRad),
+    y: 50 + borderRadius * Math.sin(angleRad),
+  };
 }

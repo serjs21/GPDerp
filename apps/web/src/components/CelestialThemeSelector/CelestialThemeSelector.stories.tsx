@@ -44,6 +44,21 @@ export const Default: Story = {
   render: () => <SelectorStory initialSlot={48} />,
 };
 
+export const DayModeButton: Story = {
+  name: "Day mode button",
+  render: () => <SelectorStory initialSlot={48} />,
+};
+
+export const NightModeButton: Story = {
+  name: "Night mode button",
+  render: () => <SelectorStory initialSlot={0} />,
+};
+
+export const OpenTransition: Story = {
+  name: "Open transition",
+  render: () => <SelectorStory initialSlot={72} withPreview />,
+};
+
 export const Interactive: Story = {
   render: () => <SelectorStory initialSlot={72} withPreview />,
 };

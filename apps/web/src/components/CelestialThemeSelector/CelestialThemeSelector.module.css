@@ -2,6 +2,24 @@
   display: inline-flex;
 }
 
+.perspectiveRoot {
+  perspective: 900px;
+  transform-style: preserve-3d;
+}
+
+.triggerAnchor {
+  display: inline-flex;
+}
+
+.panel {
+  position: fixed;
+  top: var(--panel-top, 0);
+  left: var(--panel-left, 0);
+  transform: translateX(-50%);
+  z-index: 1100;
+  pointer-events: auto;
+}
+
 .trigger {
   width: 4.5rem;
   min-width: 0;
@@ -17,8 +35,8 @@
   align-items: center;
   justify-content: center;
   transition:
-    color 0.3s ease,
-    background-color 0.3s ease;
+    color 3.3s ease,
+    background-color 3.3s ease;
 }
 
 .trigger:hover:not(:disabled) {
