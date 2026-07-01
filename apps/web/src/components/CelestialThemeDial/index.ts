@@ -1,4 +1,10 @@
 export { CelestialThemeDial } from "./CelestialThemeDial";
+export { ThemeSelectorStars } from "./ThemeSelectorStars";
+export {
+  THEME_SELECTOR_STAR_APPEARANCE,
+  THEME_SELECTOR_STAR_POSITIONS,
+} from "./themeSelectorStars.config";
+export type { ThemeSelectorStarPosition } from "./themeSelectorStars.config";
 export type {
   CelestialThemeDialPointerHandlers,
   CelestialThemeDialProps,

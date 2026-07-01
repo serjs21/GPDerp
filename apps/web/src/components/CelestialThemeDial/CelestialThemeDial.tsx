@@ -8,9 +8,9 @@ import {
 } from "@/theme/celestialSelectorLayout";
 import { ThemeSelectorIcon } from "@/components/CelestialThemeClock/ThemeSelectorIcon";
 import {
-  SELECTOR_MOON_SIZE_RATIO,
   SELECTOR_SUN_SIZE_RATIO,
 } from "./celestialDialProportions";
+import { ThemeSelectorStars } from "./ThemeSelectorStars";
 import styles from "./CelestialThemeDial.module.css";
 
 const dialBodySizeVars = {
@@ -60,6 +60,7 @@ export function CelestialThemeDial({
         aria-hidden
         {...pointerHandlers}
       >
+        <ThemeSelectorStars opacity={moonOpacity} />
         <ThemeSelectorIcon
           variant="sun"
           className={styles.bodySun}

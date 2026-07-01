@@ -38,7 +38,10 @@ export function ThemeSelectorIcon({
         aria-hidden
         {...props}
       >
-        <span className={styles.earthSky} aria-hidden />
+        <span className={styles.earthTerminator} aria-hidden>
+          <span className={styles.earthGlow} aria-hidden />
+          <span className={styles.earthSky} aria-hidden />
+        </span>
         <span className={styles.earthMask} aria-hidden />
       </span>
     );
