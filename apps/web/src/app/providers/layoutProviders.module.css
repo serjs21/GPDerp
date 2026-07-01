@@ -13,8 +13,6 @@
   height: auto !important;
   background: transparent !important;
 }
-
-/* Ant Layout defaults use min-height:0 on content so the middle scrolls inside the viewport; we want document scroll + footer after long pages */
 .contentMain {
   display: flex !important;
   flex-direction: column !important;

@@ -75,7 +75,7 @@ body {
 
 body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
-  background: var(--background);
+  background: transparent;
   color: var(--text-color);
 }
 

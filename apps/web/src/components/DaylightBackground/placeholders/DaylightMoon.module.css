@@ -11,5 +11,5 @@
 .celestial {
   width: inherit;
   height: auto;
-  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--moon-color, transparent) 35%, transparent));
+  filter: drop-shadow(0 0 1rem color-mix(in srgb, #f1f1e2 70%, transparent));
 }

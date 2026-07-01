@@ -18,6 +18,7 @@ export type CelestialThemeClockProps = {
   onChange: (slot: number) => void;
   onCommit?: (slot: number) => void;
   coordinates: GeoCoordinates;
+  showBodyGlow?: boolean;
   ariaLabel?: string;
   className?: string;
 };
@@ -39,6 +40,7 @@ export const CelestialThemeClock = forwardRef<
     onChange,
     onCommit,
     coordinates,
+    showBodyGlow = false,
     ariaLabel = "Time of day",
     className,
   },
@@ -84,6 +86,7 @@ export const CelestialThemeClock = forwardRef<
       <CelestialThemeDial
         variant="panel"
         layout={layout}
+        showBodyGlow={showBodyGlow}
         faceRef={faceRef}
         pointerHandlers={pointerHandlers}
         interactive

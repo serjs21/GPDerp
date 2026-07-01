@@ -9,6 +9,7 @@ type ThemeSelectorIconVariant = "earth" | "sun" | "moon";
 
 type ThemeSelectorIconProps = Omit<HTMLAttributes<HTMLSpanElement>, "children"> & {
   variant: ThemeSelectorIconVariant;
+  showGlow?: boolean;
 };
 
 const earthSkyFadeVars = {
@@ -18,6 +19,7 @@ const earthSkyFadeVars = {
 
 export function ThemeSelectorIcon({
   variant,
+  showGlow = false,
   className,
   style,
   ...props
@@ -44,10 +46,11 @@ export function ThemeSelectorIcon({
 
   const glowClass = variant === "sun" ? styles.sunGlow : styles.moonGlow;
   const maskedClass = variant === "sun" ? styles.sunMasked : styles.moonMasked;
+  const showGlowClass = variant === "sun" && showGlow ? ` ${styles.showGlow}` : "";
 
   return (
     <span
-      className={`${styles.bodyRoot}${className ? ` ${className}` : ""}`}
+      className={`${styles.bodyRoot}${showGlowClass}${className ? ` ${className}` : ""}`}
       style={iconStyle}
       aria-hidden
       {...props}

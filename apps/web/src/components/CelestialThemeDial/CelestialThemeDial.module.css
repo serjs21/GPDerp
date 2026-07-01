@@ -1,7 +1,7 @@
 .root {
   --dial-earth-size: 36%;
   --dial-sun-size: 20%;
-  --dial-moon-size: 19.82%;
+  --dial-moon-size: 12.82%;
   position: relative;
   aspect-ratio: 1;
   margin-inline: auto;
@@ -22,10 +22,10 @@
   height: 100%;
   border-radius: 50%;
   background: rgb(0 0 0 / 0.3);
-  border: 2px solid color-mix(in srgb, var(--highlight, var(--accent-red)) 42%, transparent);
-  box-shadow:
+  /* border: 2px solid color-mix(in srgb, var(--highlight, var(--accent-red)) 42%, transparent); */
+  /* box-shadow:
     inset 0 0 0 1px color-mix(in srgb, var(--ink, var(--text-color)) 10%, transparent),
-    0 8px 20px color-mix(in srgb, var(--ink, var(--text-color)) 8%, transparent);
+    0 8px 20px color-mix(in srgb, var(--ink, var(--text-color)) 8%, transparent); */
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;

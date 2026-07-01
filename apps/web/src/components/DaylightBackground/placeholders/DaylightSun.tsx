@@ -15,12 +15,14 @@ type DaylightSunProps = {
 };
 
 export const DaylightSun = ({ style, celestial }: DaylightSunProps) => {
+  const glowStrength = celestial?.opacity ?? 1;
   const celestialStyle: CSSProperties | undefined = celestial
     ? {
         left: `${celestial.x}%`,
         top: `${celestial.y}%`,
         opacity: celestial.opacity,
         transform: "translate(-50%, -50%)",
+        "--sun-glow-strength": String(glowStrength),
       }
     : undefined;
 

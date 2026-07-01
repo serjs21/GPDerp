@@ -76,6 +76,18 @@ describe("celestialSelectorLayout", () => {
     expect(bodies.moon.x).toBe(layout.moon.x);
     expect(bodies.moon.y).toBe(layout.moon.y);
     expect(bodies.moon.limbAngleDeg).toBe(12);
+    expect(bodies.sun.opacity).toBeGreaterThan(0);
+  });
+
+  it("hides background sun on the dial bottom arc and shows full moon", () => {
+    const midnight = getSelectorDialLayoutFromSlot(0, BANGKOK_COORDINATES);
+    const noon = getSelectorDialLayoutFromSlot(48, BANGKOK_COORDINATES);
+    const midnightBodies = selectorLayoutToBackgroundBodies(midnight, 0);
+    const noonBodies = selectorLayoutToBackgroundBodies(noon, 0);
+
+    expect(midnightBodies.sun.opacity).toBe(0);
+    expect(midnightBodies.moon.opacity).toBe(1);
+    expect(noonBodies.sun.opacity).toBeGreaterThan(0);
   });
 
   it("aims earth sky gradient toward the dial sun after earth rotation", () => {

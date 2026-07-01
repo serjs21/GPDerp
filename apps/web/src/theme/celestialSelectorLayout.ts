@@ -146,20 +146,40 @@ export type SelectorBackgroundBodies = {
   moon: { x: number; y: number; opacity: number; limbAngleDeg: number };
 };
 
+const BACKGROUND_SUN_ARC_FADE_BAND_PERCENT = 8;
+
+/** Sun hidden when dial y is below horizon (50%); smooth fade near the line. */
+export function backgroundSunVisibilityFromDialY(yPercent: number): number {
+  const horizonY = 50;
+  if (yPercent <= horizonY - BACKGROUND_SUN_ARC_FADE_BAND_PERCENT) return 1;
+  if (yPercent >= horizonY + BACKGROUND_SUN_ARC_FADE_BAND_PERCENT) return 0;
+  return (
+    1 -
+    smoothstep(
+      (yPercent - (horizonY - BACKGROUND_SUN_ARC_FADE_BAND_PERCENT)) /
+        (2 * BACKGROUND_SUN_ARC_FADE_BAND_PERCENT),
+    )
+  );
+}
+
 export function selectorLayoutToBackgroundBodies(
   layout: SelectorDialLayout,
   moonLimbAngleDeg: number,
 ): SelectorBackgroundBodies {
+  const arcVisibility = backgroundSunVisibilityFromDialY(layout.sun.y);
+  const sunOpacity = layout.sun.opacity * arcVisibility;
+  const moonOpacity = sunOpacity === 0 ? 1 : layout.moon.opacity;
+
   return {
     sun: {
       x: layout.sun.x,
       y: layout.sun.y,
-      opacity: layout.sun.opacity,
+      opacity: sunOpacity,
     },
     moon: {
       x: layout.moon.x,
       y: layout.moon.y,
-      opacity: layout.moon.opacity,
+      opacity: moonOpacity,
       limbAngleDeg: moonLimbAngleDeg,
     },
   };

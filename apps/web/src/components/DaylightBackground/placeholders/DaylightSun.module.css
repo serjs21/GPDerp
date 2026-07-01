@@ -10,5 +10,12 @@
 .celestial {
   width: inherit;
   height: auto;
-  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--sun-color, transparent) 45%, transparent));
+  filter: drop-shadow(
+    0 0 calc(3rem * var(--sun-glow-strength, 1))
+      color-mix(
+        in srgb,
+        var(--sun-color, transparent) calc(45% * var(--sun-glow-strength, 1)),
+        transparent
+      )
+  );
 }

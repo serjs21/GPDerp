@@ -11,7 +11,7 @@
   aspect-ratio: 1;
   position: relative;
   z-index: 1;
-  background-color: var(--highlight, var(--accent-red));
+  background-color: color-mix(in srgb, #367052 50%, var(--accent-red));
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
@@ -23,38 +23,76 @@
 .sunMasked {
   -webkit-mask-image: url("/theme-selector/sun.png");
   mask-image: url("/theme-selector/sun.png");
-  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--sun-color, transparent) 45%, transparent));
+  filter: none;
+}
+
+.showGlow .sunGlow {
+  animation: selectorSunGlowIn 0.25s ease forwards;
+}
+
+.showGlow .sunMasked {
+  animation: selectorSunShadowIn 0.25s ease forwards;
+}
+
+@keyframes selectorSunGlowIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes selectorSunShadowIn {
+  from {
+    filter: drop-shadow(0 0 0 color-mix(in srgb, var(--sun-color, transparent) 0%, transparent));
+  }
+
+  to {
+    filter: drop-shadow(0 0 1rem color-mix(in srgb, var(--sun-color, transparent) 45%, transparent));
+  }
 }
 
 .moonMasked {
   -webkit-mask-image: url("/theme-selector/moon.png");
   mask-image: url("/theme-selector/moon.png");
-  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--moon-color, transparent) 35%, transparent));
+  background-color: #c4c1c1;
 }
 
 .sunGlow,
 .moonGlow {
   position: absolute;
-  inset: -20%;
   border-radius: 50%;
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 
 .sunGlow {
+  inset: -35%;
   background: radial-gradient(
     circle,
-    color-mix(in srgb, var(--sun-color, var(--accent-red)) 50%, transparent) 0%,
-    transparent 70%
+    color-mix(in srgb, var(--sun-color, var(--accent-red)) 35%, transparent) 0%,
+    transparent 40%
   );
 }
 
+.sunGlow.glowVisible {
+  opacity: 1;
+}
+
 .moonGlow {
+  inset: -35%;
+  opacity: 1;
   background: radial-gradient(
     circle,
-    color-mix(in srgb, var(--moon-color, var(--text-muted)) 38%, transparent) 0%,
-    transparent 70%
+    color-mix(in srgb, #f1f1e2 40%, transparent) 1%,
+    transparent 55%
   );
+  filter: blur(1rem);
 }
+
 
 .earthRoot {
   display: block;
@@ -69,8 +107,8 @@
   border-radius: 50%;
   background: linear-gradient(
     var(--earth-sun-angle, 180deg),
-    var(--sky-horizon, var(--background)) 0%,
-    var(--sky-mid, var(--gradientMid, var(--background))) 52%,
+    var(--sky-horizon, #41abfc) 0%,
+    var(--sky-mid, var(--gradientMid, #41abfc)) 52%,
     var(--sky-top, var(--background)) 100%
   );
   -webkit-mask-image: radial-gradient(
@@ -90,7 +128,7 @@
 .earthMask {
   position: absolute;
   inset: 0;
-  background-color: var(--highlight, var(--accent-red));
+  background-color: color-mix(in srgb, #367052 70%, var(--highlight, #fff 50%));
   -webkit-mask-image: url("/theme-selector/earth.png");
   mask-image: url("/theme-selector/earth.png");
   mask-repeat: no-repeat;
@@ -99,4 +137,11 @@
   -webkit-mask-repeat: no-repeat;
   -webkit-mask-position: center;
   -webkit-mask-size: contain;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sunGlow,
+  .sunMasked {
+    transition: none;
+  }
 }

@@ -10,6 +10,7 @@ import { SiteFooter } from "@/components/SiteFooter/SiteFooter";
 import { CompleteRegistrationRedirect } from "@/components/AuthFlows/CompleteRegistrationRedirect";
 import { GoogleOAuthAvailabilityProvider } from "./GoogleOAuthAvailabilityProvider";
 import { AuthenticationVerificationProvider } from "./AuthenticationVerificationProvider";
+import { CelestialAppShell } from "./CelestialAppShell";
 
 export interface LayoutProviderProps {
   children: React.ReactNode;
@@ -24,7 +25,7 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
     <AuthenticationVerificationProvider>
       <>
         <AxiosInit />
-        <div className={layoutStyles.shell}>
+        <CelestialAppShell className={layoutStyles.shell}>
           <header className={styles.header}>
             <div className={styles.headerBar}>
               <AuthNavigation />
@@ -37,7 +38,7 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
           <footer className={layoutStyles.footerSlot}>
             <SiteFooter />
           </footer>
-        </div>
+        </CelestialAppShell>
       </>
     </AuthenticationVerificationProvider>
   );

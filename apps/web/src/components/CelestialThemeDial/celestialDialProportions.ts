@@ -20,8 +20,8 @@ export const CELESTIAL_MOON_BODY_WIDTH_REM =
   CELESTIAL_SUN_BODY_WIDTH_REM * MOON_TO_SUN_APPARENT_SIZE_RATIO;
 
 /** Earth sky fill fades from opaque inner disk to transparent at the PNG ring. */
-export const EARTH_SKY_INNER_RADIUS_PERCENT = 36;
-export const EARTH_SKY_FADE_OUTER_RADIUS_PERCENT = 48;
+export const EARTH_SKY_INNER_RADIUS_PERCENT = 60;
+export const EARTH_SKY_FADE_OUTER_RADIUS_PERCENT = 65;
 
 /** Background sun width as vmin, matching dial sun ratio on a unit circle. */
 export const SELECTOR_BODY_SIZE_VMIN = SELECTOR_SUN_SIZE_RATIO * 100;

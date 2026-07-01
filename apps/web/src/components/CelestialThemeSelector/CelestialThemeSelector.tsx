@@ -88,6 +88,7 @@ export function CelestialThemeSelector({
               onChange={handlePreview}
               onCommit={handleCommit}
               coordinates={coordinates}
+              showBodyGlow={isOpen}
               ariaLabel={ariaLabel}
             />
           </div>
@@ -101,6 +102,7 @@ export function CelestialThemeSelector({
           <CelestialThemeDial
             variant="trigger"
             layout={triggerLayout}
+            showBodyGlow={false}
             className={styles.dialTrigger}
           />
         </UIButton>

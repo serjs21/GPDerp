@@ -2,7 +2,10 @@
 
 import type { CSSProperties, PointerEventHandler, Ref } from "react";
 import type { SelectorDialLayout } from "@/theme/celestialSelectorLayout";
-import { earthSunGradientAngleDeg } from "@/theme/celestialSelectorLayout";
+import {
+  backgroundSunVisibilityFromDialY,
+  earthSunGradientAngleDeg,
+} from "@/theme/celestialSelectorLayout";
 import { ThemeSelectorIcon } from "@/components/CelestialThemeClock/ThemeSelectorIcon";
 import {
   SELECTOR_MOON_SIZE_RATIO,
@@ -12,7 +15,7 @@ import styles from "./CelestialThemeDial.module.css";
 
 const dialBodySizeVars = {
   "--dial-sun-size": `${SELECTOR_SUN_SIZE_RATIO * 100}%`,
-  "--dial-moon-size": `${SELECTOR_MOON_SIZE_RATIO * 100}%`,
+  "--dial-moon-size": `12%`,
 } as CSSProperties;
 
 export type CelestialThemeDialPointerHandlers = {
@@ -25,6 +28,7 @@ export type CelestialThemeDialPointerHandlers = {
 export type CelestialThemeDialProps = {
   layout: SelectorDialLayout;
   variant?: "panel" | "trigger";
+  showBodyGlow?: boolean;
   className?: string;
   faceRef?: Ref<HTMLDivElement>;
   pointerHandlers?: CelestialThemeDialPointerHandlers;
@@ -34,6 +38,7 @@ export type CelestialThemeDialProps = {
 export function CelestialThemeDial({
   layout,
   variant = "panel",
+  showBodyGlow = false,
   className,
   faceRef,
   pointerHandlers,
@@ -41,6 +46,8 @@ export function CelestialThemeDial({
 }: CelestialThemeDialProps) {
   const variantClass = variant === "trigger" ? styles.trigger : styles.panel;
   const interactiveClass = interactive ? styles.interactive : "";
+  const arcHidden = backgroundSunVisibilityFromDialY(layout.sun.y) === 0;
+  const moonOpacity = arcHidden ? 1 : layout.moon.opacity;
 
   return (
     <div
@@ -56,10 +63,11 @@ export function CelestialThemeDial({
         <ThemeSelectorIcon
           variant="sun"
           className={styles.bodySun}
+          showGlow={showBodyGlow}
           style={{
             left: `${layout.sun.x}%`,
             top: `${layout.sun.y}%`,
-            opacity: layout.sun.opacity,
+            opacity: 1,
           }}
         />
         <ThemeSelectorIcon
@@ -68,7 +76,7 @@ export function CelestialThemeDial({
           style={{
             left: `${layout.moon.x}%`,
             top: `${layout.moon.y}%`,
-            opacity: layout.moon.opacity,
+            opacity: moonOpacity,
           }}
         />
         <div
