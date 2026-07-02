@@ -1,0 +1,8 @@
+.northStar {
+  position: absolute;
+  width: var(--north-star-size, 6%);
+  height: auto;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
