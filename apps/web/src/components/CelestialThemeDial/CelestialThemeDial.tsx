@@ -5,24 +5,30 @@ import type { CSSProperties, PointerEventHandler, ReactNode, Ref } from "react";
 import type { SelectorDialLayout } from "@/theme/celestialSelectorLayout";
 import {
   backgroundSunVisibilityFromDialY,
+  clampDialBodyCenterToFace,
   earthSunGradientAngleDeg,
-  selectorSunBorderPosition,
 } from "@/theme/celestialSelectorLayout";
 import { ThemeSelectorIcon } from "@/components/CelestialThemeClock/ThemeSelectorIcon";
+import { celestialSelectorTransition } from "@/components/CelestialThemeSelector/celestialSelectorMotion";
 import {
-  celestialSelectorTransition,
-} from "@/components/CelestialThemeSelector/celestialSelectorMotion";
+  CELESTIAL_SELECTOR_MOON_GLOW_BLEED_PERCENT,
+  CELESTIAL_SELECTOR_SUN_GLOW_BLEED_PERCENT,
+} from "@/components/CelestialThemeSelector/celestialSelectorNorthStar.config";
 import {
   selectorButtonStackFromPresentation,
   type ButtonBodyPlacement,
 } from "@/components/CelestialThemeSelector/celestialSelectorButton.config";
 import { SELECTOR_SUN_SIZE_RATIO } from "./celestialDialProportions";
+import { ThemeSelectorNorthStar } from "./ThemeSelectorNorthStar";
 import { ThemeSelectorStars } from "./ThemeSelectorStars";
 import styles from "./CelestialThemeDial.module.css";
 
+const SUN_SIZE_PERCENT = SELECTOR_SUN_SIZE_RATIO * 100;
+const MOON_SIZE_PERCENT = 12;
+
 const dialBodySizeVars = {
-  "--dial-sun-size": `${SELECTOR_SUN_SIZE_RATIO * 100}%`,
-  "--dial-moon-size": `12%`,
+  "--dial-sun-size": `${SUN_SIZE_PERCENT}%`,
+  "--dial-moon-size": `${MOON_SIZE_PERCENT}%`,
 } as CSSProperties;
 
 const MOTION_PERSPECTIVE_PX = 900;
@@ -118,16 +124,28 @@ function getSunMoonStyles(
   moonOpacity: number,
 ) {
   if (isOrbit || !buttonStack) {
-    const sunBorder = selectorSunBorderPosition(layout);
+    const sun = clampDialBodyCenterToFace(
+      layout.sun.x,
+      layout.sun.y,
+      SUN_SIZE_PERCENT,
+      CELESTIAL_SELECTOR_SUN_GLOW_BLEED_PERCENT,
+    );
+    const moon = clampDialBodyCenterToFace(
+      layout.moon.x,
+      layout.moon.y,
+      MOON_SIZE_PERCENT,
+      CELESTIAL_SELECTOR_MOON_GLOW_BLEED_PERCENT,
+    );
+
     return {
       sunStyle: {
-        left: `${sunBorder.x}%`,
-        top: `${sunBorder.y}%`,
+        left: `${sun.x}%`,
+        top: `${sun.y}%`,
         opacity: 1,
       } as CSSProperties,
       moonStyle: {
-        left: `${layout.moon.x}%`,
-        top: `${layout.moon.y}%`,
+        left: `${moon.x}%`,
+        top: `${moon.y}%`,
         opacity: moonOpacity,
       } as CSSProperties,
       sunClassName: styles.bodySun,
@@ -174,6 +192,21 @@ export function CelestialThemeDial({
     moonOpacity,
   );
 
+  const northStarNode = layoutEnabled ? (
+    <MotionLayer
+      layoutId={layoutId("north-star")}
+      layoutEnabled={layoutEnabled}
+      transition={transition}
+      className={styles.bodyNorthStar}
+    >
+      <ThemeSelectorNorthStar layout={layout} />
+    </MotionLayer>
+  ) : (
+    <div className={styles.bodyNorthStar}>
+      <ThemeSelectorNorthStar layout={layout} />
+    </div>
+  );
+
   const faceNode = (
     <MotionLayer
       layoutId={layoutId("face")}
@@ -184,6 +217,7 @@ export function CelestialThemeDial({
       pointerHandlers={interactive ? pointerHandlers : undefined}
     >
       {isOrbit ? <ThemeSelectorStars opacity={moonOpacity} /> : null}
+      {northStarNode}
       <MotionLayer
         layoutId={layoutId("sun")}
         layoutEnabled={layoutEnabled}

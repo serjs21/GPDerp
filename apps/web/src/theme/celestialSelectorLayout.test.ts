@@ -1,9 +1,10 @@
 import {
+  clampDialBodyCenterToFace,
   earthSunGradientAngleDeg,
   getSelectorDialLayoutFromSlot,
   selectorButtonModeFromSunY,
   selectorLayoutToBackgroundBodies,
-  selectorSunBorderPosition,
+  selectorSelectionBorderPosition,
   slotToEarthRotationDeg,
   slotToSunDialPosition,
 } from "./celestialSelectorLayout";
@@ -32,18 +33,29 @@ describe("celestialSelectorLayout", () => {
     expect(selectorButtonModeFromSunY(88)).toBe("night");
   });
 
-  it("places expanded sun on the controller border at the slot angle", () => {
+  it("places selection marker on the controller border at the slot angle", () => {
     const layout = getSelectorDialLayoutFromSlot(48, BANGKOK_COORDINATES);
-    const border = selectorSunBorderPosition(layout);
+    const border = selectorSelectionBorderPosition(layout, 6);
 
     expect(border.x).toBeCloseTo(50, 0);
-    expect(border.y).toBeCloseTo(10, 0);
+    expect(border.y).toBeCloseTo(3, 0);
 
     const midnight = getSelectorDialLayoutFromSlot(0, BANGKOK_COORDINATES);
-    const midnightBorder = selectorSunBorderPosition(midnight);
+    const midnightBorder = selectorSelectionBorderPosition(midnight, 6);
 
     expect(midnightBorder.x).toBeCloseTo(50, 0);
-    expect(midnightBorder.y).toBeCloseTo(90, 0);
+    expect(midnightBorder.y).toBeCloseTo(97, 0);
+  });
+
+  it("clamps dial bodies inside the circular face", () => {
+    const layout = getSelectorDialLayoutFromSlot(0, BANGKOK_COORDINATES);
+    const sun = clampDialBodyCenterToFace(layout.sun.x, layout.sun.y, 20, 4);
+    const moon = clampDialBodyCenterToFace(layout.moon.x, layout.moon.y, 12, 3);
+
+    for (const body of [sun, moon]) {
+      const radius = Math.hypot(body.x - 50, body.y - 50);
+      expect(radius).toBeLessThanOrEqual(50);
+    }
   });
 
   it("keeps sun and moon positions inside the dial bounds", () => {

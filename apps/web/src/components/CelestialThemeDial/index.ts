@@ -1,4 +1,5 @@
 export { CelestialThemeDial } from "./CelestialThemeDial";
+export { ThemeSelectorNorthStar } from "./ThemeSelectorNorthStar";
 export { ThemeSelectorStars } from "./ThemeSelectorStars";
 export {
   THEME_SELECTOR_STAR_APPEARANCE,

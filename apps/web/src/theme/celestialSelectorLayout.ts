@@ -1,5 +1,4 @@
 import * as SunCalc from "suncalc";
-import { SELECTOR_SUN_SIZE_RATIO } from "@/components/CelestialThemeDial/celestialDialProportions";
 import { clampSlot, slotToDate, slotToHandDegrees } from "./celestialTime";
 import type { GeoCoordinates } from "./celestialTheme";
 
@@ -199,18 +198,41 @@ export function selectorButtonModeFromSunY(yPercent: number): "day" | "night" {
   return yPercent > 50 ? "night" : "day";
 }
 
-/** Expanded dial: sun center on the controller rim at the selected slot angle. */
-export function selectorSunBorderPosition(
+/** Rim marker at the selected slot angle (north star selection indicator). */
+export function selectorSelectionBorderPosition(
   layout: SelectorDialLayout,
-  sunSizePercent = SELECTOR_SUN_SIZE_RATIO * 100,
+  markerSizePercent: number,
 ) {
   const dx = layout.sun.x - 50;
   const dy = layout.sun.y - 50;
   const angleRad = Math.atan2(dy, dx);
-  const borderRadius = 50 - sunSizePercent / 2;
+  const borderRadius = 50 - markerSizePercent / 2;
 
   return {
     x: 50 + borderRadius * Math.cos(angleRad),
     y: 50 + borderRadius * Math.sin(angleRad),
+  };
+}
+
+/** @deprecated Use selectorSelectionBorderPosition */
+export const selectorSunBorderPosition = selectorSelectionBorderPosition;
+
+/** Keep dial body center inside the circular face including icon size and glow bleed. */
+export function clampDialBodyCenterToFace(
+  x: number,
+  y: number,
+  bodySizePercent: number,
+  glowBleedPercent = 0,
+) {
+  const dx = x - 50;
+  const dy = y - 50;
+  const angleRad = Math.atan2(dy, dx);
+  const currentRadius = Math.hypot(dx, dy);
+  const maxRadius = Math.max(0, 50 - bodySizePercent / 2 - glowBleedPercent);
+  const clampedRadius = Math.min(currentRadius, maxRadius);
+
+  return {
+    x: 50 + clampedRadius * Math.cos(angleRad),
+    y: 50 + clampedRadius * Math.sin(angleRad),
   };
 }

@@ -21,6 +21,7 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
+  overflow: hidden;
   background: rgb(0 0 0 / 0.3);
   /* border: 2px solid color-mix(in srgb, var(--highlight, var(--accent-red)) 42%, transparent); */
   /* box-shadow:
@@ -91,4 +92,10 @@
   user-select: none;
   -webkit-user-select: none;
   -webkit-user-drag: none;
+}
+
+.bodyNorthStar {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }

@@ -14,6 +14,7 @@ export const DEFAULT_LOCALE: AppLocale = "en";
 
 export const THEME_COOKIE = "gpderp-theme";
 export const LOCALE_COOKIE = "gpderp-locale";
+export const CELESTIAL_SLOT_COOKIE = "gpderp-celestial-slot";
 export const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
 /** Sync with profile page / header so server preferences merge correctly */
@@ -28,3 +29,11 @@ export const isThemeName = (value: string): value is ThemeName =>
 
 export const isAppLocale = (value: string): value is AppLocale =>
   (SUPPORTED_LOCALES as readonly string[]).includes(value);
+
+const CELESTIAL_SLOT_MAX = 95;
+
+export const isCelestialSlot = (value: string): boolean => {
+  const parsed = Number.parseInt(value, 10);
+  if (Number.isNaN(parsed)) return false;
+  return parsed >= 0 && parsed <= CELESTIAL_SLOT_MAX;
+};

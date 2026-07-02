@@ -4,11 +4,16 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
-import { PREFERENCE_CELESTIAL_SLOT_STORAGE_KEY } from "@/config/userConfiguration";
+import {
+  COOKIE_MAX_AGE,
+  CELESTIAL_SLOT_COOKIE,
+  PREFERENCE_CELESTIAL_SLOT_STORAGE_KEY,
+} from "@/config/userConfiguration";
 import {
   getSelectorDialLayoutFromSlot,
   selectorLayoutToBackgroundBodies,
@@ -22,13 +27,9 @@ import {
 
 const DEFAULT_CELESTIAL_SLOT = 48;
 
-const readStoredSlot = (): number => {
-  if (typeof window === "undefined") return DEFAULT_CELESTIAL_SLOT;
-  const stored = window.localStorage.getItem(PREFERENCE_CELESTIAL_SLOT_STORAGE_KEY);
-  if (!stored) return DEFAULT_CELESTIAL_SLOT;
-  const parsed = Number.parseInt(stored, 10);
-  if (Number.isNaN(parsed)) return DEFAULT_CELESTIAL_SLOT;
-  return clampSlot(parsed);
+const writeCelestialSlotCookie = (slot: number) => {
+  if (typeof document === "undefined") return;
+  document.cookie = `${CELESTIAL_SLOT_COOKIE}=${slot}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
 };
 
 type CelestialThemeContextValue = {
@@ -44,12 +45,22 @@ type CelestialThemeContextValue = {
 
 const CelestialThemeContext = createContext<CelestialThemeContextValue | null>(null);
 
-export function CelestialThemeProvider({ children }: { children: ReactNode }) {
-  const [slot, setSlot] = useState(() =>
-    typeof window !== "undefined" ? readStoredSlot() : DEFAULT_CELESTIAL_SLOT,
-  );
+type CelestialThemeProviderProps = {
+  children: ReactNode;
+  initialSlot?: number;
+};
+
+export function CelestialThemeProvider({
+  children,
+  initialSlot = DEFAULT_CELESTIAL_SLOT,
+}: CelestialThemeProviderProps) {
+  const [slot, setSlot] = useState(() => clampSlot(initialSlot));
   const [previewSlot, setPreviewSlotState] = useState<number | null>(null);
   const coordinates = BANGKOK_COORDINATES;
+
+  useEffect(() => {
+    writeCelestialSlotCookie(slot);
+  }, [slot]);
 
   const effectiveSlot = previewSlot ?? slot;
   const scene = useCelestialScene({
@@ -76,6 +87,7 @@ export function CelestialThemeProvider({ children }: { children: ReactNode }) {
     if (typeof window !== "undefined") {
       window.localStorage.setItem(PREFERENCE_CELESTIAL_SLOT_STORAGE_KEY, String(clamped));
     }
+    writeCelestialSlotCookie(clamped);
   }, []);
 
   const value = useMemo(

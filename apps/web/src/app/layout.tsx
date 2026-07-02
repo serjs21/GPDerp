@@ -56,7 +56,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { initialTheme, initialLocale } = await getSsrThemeSettings();
+  const { initialTheme, initialLocale, initialCelestialSlot } = await getSsrThemeSettings();
   const messages = await getMessages({ locale: initialLocale });
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? process.env.GOOGLE_CLIENT_ID;
   
@@ -68,7 +68,7 @@ export default async function RootLayout({
           <NextIntlClientProvider locale={initialLocale} messages={messages}>
             <ThemeProvider initialTheme={initialTheme}>
               <AuthenticationProvider>
-                <CelestialThemeProvider>
+                <CelestialThemeProvider initialSlot={initialCelestialSlot}>
                   <LayoutProvider googleClientId={googleClientId}>
                     <QueryProvider>{children}</QueryProvider>
                   </LayoutProvider>
