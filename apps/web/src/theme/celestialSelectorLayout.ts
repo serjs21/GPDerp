@@ -1,4 +1,12 @@
 import * as SunCalc from "suncalc";
+import { CELESTIAL_SELECTOR_DEPTH } from "@/components/CelestialThemeSelector/celestialSelectorDepth.config";
+import {
+  buttonPlacementOffsetFromCenter,
+  CELESTIAL_SELECTOR_ORBIT_SPREAD_FACTOR,
+  selectorButtonPresentationFromMode,
+  selectorButtonStackFromPresentation,
+  type SelectorButtonMode,
+} from "@/components/CelestialThemeSelector/celestialSelectorButton.config";
 import { clampSlot, slotToDate, slotToHandDegrees } from "./celestialTime";
 import type { GeoCoordinates } from "./celestialTheme";
 
@@ -198,6 +206,59 @@ export function selectorButtonModeFromSunY(yPercent: number): "day" | "night" {
   return yPercent > 50 ? "night" : "day";
 }
 
+function rotateOffset(dx: number, dy: number, angleRad: number) {
+  const cos = Math.cos(angleRad);
+  const sin = Math.sin(angleRad);
+  return {
+    dx: dx * cos - dy * sin,
+    dy: dx * sin + dy * cos,
+  };
+}
+
+/** Open-orbit sun/moon: same arrangement as the closed button stack, rotated with slot and spread from earth. */
+export function selectorOrbitBodiesFromButtonStack(
+  slot: number,
+  mode: SelectorButtonMode,
+  spreadFactor = CELESTIAL_SELECTOR_ORBIT_SPREAD_FACTOR,
+) {
+  const stack = selectorButtonStackFromPresentation(
+    selectorButtonPresentationFromMode(mode),
+  );
+  const sunOff = buttonPlacementOffsetFromCenter(stack.sun);
+  const moonOff = buttonPlacementOffsetFromCenter(stack.moon);
+  const primaryOff = mode === "day" ? sunOff : moonOff;
+  const refAngle = Math.atan2(primaryOff.dy, primaryOff.dx);
+  const slotAngle = slotToHandDegrees(slot) * DEG_TO_RAD;
+  const rotRad = slotAngle - refAngle;
+  const rotSun = rotateOffset(sunOff.dx, sunOff.dy, rotRad);
+  const rotMoon = rotateOffset(moonOff.dx, moonOff.dy, rotRad);
+
+  return {
+    sun: {
+      x: 50 + rotSun.dx * spreadFactor,
+      y: 50 + rotSun.dy * spreadFactor,
+    },
+    moon: {
+      x: 50 + rotMoon.dx * spreadFactor,
+      y: 50 + rotMoon.dy * spreadFactor,
+    },
+  };
+}
+
+export function selectorOrbitDisplayLayout(
+  slot: number,
+  layout: SelectorDialLayout,
+): SelectorDialLayout {
+  const mode = selectorButtonModeFromSunY(layout.sun.y);
+  const bodies = selectorOrbitBodiesFromButtonStack(slot, mode);
+
+  return {
+    ...layout,
+    sun: { ...layout.sun, ...bodies.sun },
+    moon: { ...layout.moon, ...bodies.moon },
+  };
+}
+
 /** Rim marker at the selected slot angle (north star selection indicator). */
 export function selectorSelectionBorderPosition(
   layout: SelectorDialLayout,
@@ -216,6 +277,31 @@ export function selectorSelectionBorderPosition(
 
 /** @deprecated Use selectorSelectionBorderPosition */
 export const selectorSunBorderPosition = selectorSelectionBorderPosition;
+
+export type DialBodyRole = "sun" | "moon";
+
+const lerp = (from: number, to: number, t: number) => from + (to - from) * t;
+
+/** Depth scale from sun orbit hemisphere: moon nearer on bottom/night arc, sun on top/day. */
+export function dialBodyDepthScale(sunYPercent: number, role: DialBodyRole) {
+  const t = smoothstep(
+    (sunYPercent - 50) / CELESTIAL_SELECTOR_DEPTH.hemisphereBandPercent,
+  );
+
+  if (role === "moon") {
+    return lerp(
+      CELESTIAL_SELECTOR_DEPTH.moonFarScale,
+      CELESTIAL_SELECTOR_DEPTH.moonNearScale,
+      t,
+    );
+  }
+
+  return lerp(
+    CELESTIAL_SELECTOR_DEPTH.sunNearScale,
+    CELESTIAL_SELECTOR_DEPTH.sunFarScale,
+    t,
+  );
+}
 
 /** Keep dial body center inside the circular face including icon size and glow bleed. */
 export function clampDialBodyCenterToFace(

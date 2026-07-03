@@ -77,3 +77,17 @@ export function selectorButtonStackFromPresentation(
     ? CELESTIAL_SELECTOR_BUTTON_NIGHT
     : CELESTIAL_SELECTOR_BUTTON_DAY;
 }
+
+/** Orbit mode: scale button-stack offsets from earth center (1 = closed button). */
+export const CELESTIAL_SELECTOR_ORBIT_SPREAD_FACTOR = 2.1;
+
+export function parseButtonPlacementPercent(value: string): number {
+  return Number.parseFloat(value.replace("%", ""));
+}
+
+export function buttonPlacementOffsetFromCenter(placement: ButtonBodyPlacement) {
+  return {
+    dx: parseButtonPlacementPercent(placement.left) - 50,
+    dy: parseButtonPlacementPercent(placement.top) - 50,
+  };
+}

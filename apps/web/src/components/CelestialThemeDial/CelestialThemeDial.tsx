@@ -6,8 +6,11 @@ import type { SelectorDialLayout } from "@/theme/celestialSelectorLayout";
 import {
   backgroundSunVisibilityFromDialY,
   clampDialBodyCenterToFace,
+  dialBodyDepthScale,
   earthSunGradientAngleDeg,
+  selectorOrbitDisplayLayout,
 } from "@/theme/celestialSelectorLayout";
+import { CELESTIAL_SELECTOR_DEPTH } from "@/components/CelestialThemeSelector/celestialSelectorDepth.config";
 import { ThemeSelectorIcon } from "@/components/CelestialThemeClock/ThemeSelectorIcon";
 import { celestialSelectorTransition } from "@/components/CelestialThemeSelector/celestialSelectorMotion";
 import {
@@ -47,6 +50,7 @@ export type CelestialThemeDialPointerHandlers = {
 
 export type CelestialThemeDialProps = {
   layout: SelectorDialLayout;
+  slot?: number;
   variant?: "panel" | "trigger";
   presentation?: CelestialThemeDialPresentation;
   showBodyGlow?: boolean;
@@ -119,21 +123,27 @@ function bodyPlacementStyle(placement: ButtonBodyPlacement): CSSProperties {
 
 function getSunMoonStyles(
   isOrbit: boolean,
-  layout: SelectorDialLayout,
+  bodyLayout: SelectorDialLayout,
   buttonStack: ReturnType<typeof selectorButtonStackFromPresentation> | null,
   moonOpacity: number,
 ) {
   if (isOrbit || !buttonStack) {
+    const sunDepth = dialBodyDepthScale(bodyLayout.sun.y, "sun");
+    const moonDepth = dialBodyDepthScale(bodyLayout.sun.y, "moon");
+    const sunEffectiveSize = SUN_SIZE_PERCENT * sunDepth;
+    const moonEffectiveSize = MOON_SIZE_PERCENT * moonDepth;
+    const isNightHemisphere = bodyLayout.sun.y > 50;
+
     const sun = clampDialBodyCenterToFace(
-      layout.sun.x,
-      layout.sun.y,
-      SUN_SIZE_PERCENT,
+      bodyLayout.sun.x,
+      bodyLayout.sun.y,
+      sunEffectiveSize,
       CELESTIAL_SELECTOR_SUN_GLOW_BLEED_PERCENT,
     );
     const moon = clampDialBodyCenterToFace(
-      layout.moon.x,
-      layout.moon.y,
-      MOON_SIZE_PERCENT,
+      bodyLayout.moon.x,
+      bodyLayout.moon.y,
+      moonEffectiveSize,
       CELESTIAL_SELECTOR_MOON_GLOW_BLEED_PERCENT,
     );
 
@@ -142,14 +152,22 @@ function getSunMoonStyles(
         left: `${sun.x}%`,
         top: `${sun.y}%`,
         opacity: 1,
+        transform: `translate(-50%, -50%) scale(${sunDepth})`,
+        zIndex: isNightHemisphere
+          ? CELESTIAL_SELECTOR_DEPTH.zIndexFar
+          : CELESTIAL_SELECTOR_DEPTH.zIndexNear,
       } as CSSProperties,
       moonStyle: {
         left: `${moon.x}%`,
         top: `${moon.y}%`,
         opacity: moonOpacity,
+        transform: `translate(-50%, -50%) scale(${moonDepth})`,
+        zIndex: isNightHemisphere
+          ? CELESTIAL_SELECTOR_DEPTH.zIndexNear
+          : CELESTIAL_SELECTOR_DEPTH.zIndexFar,
       } as CSSProperties,
-      sunClassName: styles.bodySun,
-      moonClassName: styles.bodyMoon,
+      sunClassName: `${styles.bodySun} ${styles.bodyMotion}`,
+      moonClassName: `${styles.bodyMoon} ${styles.bodyMotion}`,
     };
   }
 
@@ -163,6 +181,7 @@ function getSunMoonStyles(
 
 export function CelestialThemeDial({
   layout,
+  slot,
   variant = "panel",
   presentation = "orbit",
   showBodyGlow = false,
@@ -176,6 +195,10 @@ export function CelestialThemeDial({
   const variantClass = variant === "trigger" ? styles.trigger : styles.panel;
   const interactiveClass = interactive ? styles.interactive : "";
   const isOrbit = presentation === "orbit";
+  const bodyLayout =
+    isOrbit && slot !== undefined
+      ? selectorOrbitDisplayLayout(slot, layout)
+      : layout;
   const buttonStack = isOrbit
     ? null
     : selectorButtonStackFromPresentation(presentation);
@@ -187,7 +210,7 @@ export function CelestialThemeDial({
     motionLayoutIdPrefix ? `${motionLayoutIdPrefix}-${suffix}` : undefined;
   const { sunStyle, moonStyle, sunClassName, moonClassName } = getSunMoonStyles(
     isOrbit,
-    layout,
+    bodyLayout,
     buttonStack,
     moonOpacity,
   );
@@ -248,7 +271,7 @@ export function CelestialThemeDial({
           className={styles.earth}
           style={
             {
-              "--earth-sun-angle": `${earthSunGradientAngleDeg(layout)}deg`,
+              "--earth-sun-angle": `${earthSunGradientAngleDeg(bodyLayout)}deg`,
             } as CSSProperties
           }
         />

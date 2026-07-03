@@ -1,13 +1,21 @@
 import {
   clampDialBodyCenterToFace,
+  dialBodyDepthScale,
   earthSunGradientAngleDeg,
   getSelectorDialLayoutFromSlot,
   selectorButtonModeFromSunY,
   selectorLayoutToBackgroundBodies,
+  selectorOrbitBodiesFromButtonStack,
+  selectorOrbitDisplayLayout,
   selectorSelectionBorderPosition,
   slotToEarthRotationDeg,
   slotToSunDialPosition,
 } from "./celestialSelectorLayout";
+import {
+  CELESTIAL_SELECTOR_BUTTON_DAY,
+  CELESTIAL_SELECTOR_ORBIT_SPREAD_FACTOR,
+  buttonPlacementOffsetFromCenter,
+} from "@/components/CelestialThemeSelector/celestialSelectorButton.config";
 import { angleToSlot, slotToHandDegrees } from "./celestialTime";
 import { BANGKOK_COORDINATES } from "./useCelestialScene";
 
@@ -56,6 +64,41 @@ describe("celestialSelectorLayout", () => {
       const radius = Math.hypot(body.x - 50, body.y - 50);
       expect(radius).toBeLessThanOrEqual(50);
     }
+  });
+
+  it("scales moon up and sun down on the bottom night arc", () => {
+    const midnight = getSelectorDialLayoutFromSlot(0, BANGKOK_COORDINATES);
+    const moonScale = dialBodyDepthScale(midnight.sun.y, "moon");
+    const sunScale = dialBodyDepthScale(midnight.sun.y, "sun");
+
+    expect(moonScale).toBeGreaterThan(sunScale);
+    expect(sunScale).toBeCloseTo(0.7, 1);
+    expect(moonScale).toBeCloseTo(1.3, 1);
+  });
+
+  it("scales sun up and moon down on the top day arc", () => {
+    const noon = getSelectorDialLayoutFromSlot(48, BANGKOK_COORDINATES);
+    const moonScale = dialBodyDepthScale(noon.sun.y, "moon");
+    const sunScale = dialBodyDepthScale(noon.sun.y, "sun");
+
+    expect(sunScale).toBeGreaterThan(moonScale);
+    expect(sunScale).toBeCloseTo(1.15, 1);
+    expect(moonScale).toBeCloseTo(0.85, 1);
+  });
+
+  it("keeps scaled sun inside the dial face at midnight", () => {
+    const layout = getSelectorDialLayoutFromSlot(0, BANGKOK_COORDINATES);
+    const sunScale = dialBodyDepthScale(layout.sun.y, "sun");
+    const sunEffectiveSize = 20 * sunScale;
+    const sun = clampDialBodyCenterToFace(
+      layout.sun.x,
+      layout.sun.y,
+      sunEffectiveSize,
+      4,
+    );
+    const outerRadius = Math.hypot(sun.x - 50, sun.y - 50) + sunEffectiveSize / 2;
+
+    expect(outerRadius).toBeLessThanOrEqual(50);
   });
 
   it("keeps sun and moon positions inside the dial bounds", () => {
@@ -127,13 +170,46 @@ describe("celestialSelectorLayout", () => {
   it("aims earth sky gradient toward the dial sun after earth rotation", () => {
     for (const slot of [0, 24, 48, 72]) {
       const layout = getSelectorDialLayoutFromSlot(slot, BANGKOK_COORDINATES);
-      const dx = layout.sun.x - 50;
-      const dy = layout.sun.y - 50;
+      const displayLayout = selectorOrbitDisplayLayout(slot, layout);
+      const dx = displayLayout.sun.x - 50;
+      const dy = displayLayout.sun.y - 50;
       const dialAngleDeg = (Math.atan2(dx, -dy) * 180) / Math.PI;
-      const earthAngle = earthSunGradientAngleDeg(layout);
-      const effectiveAngle = earthAngle + layout.earthRotationDeg;
+      const earthAngle = earthSunGradientAngleDeg(displayLayout);
+      const effectiveAngle = earthAngle + displayLayout.earthRotationDeg;
 
       expect(effectiveAngle).toBeCloseTo(dialAngleDeg, 0);
     }
+  });
+
+  it("spaces orbit bodies farther from earth than the closed button stacks", () => {
+    const layout = getSelectorDialLayoutFromSlot(48, BANGKOK_COORDINATES);
+    const mode = selectorButtonModeFromSunY(layout.sun.y);
+    const orbit = selectorOrbitBodiesFromButtonStack(48, mode);
+    const sunOff = buttonPlacementOffsetFromCenter(CELESTIAL_SELECTOR_BUTTON_DAY.sun);
+    const buttonRadius = Math.hypot(sunOff.dx, sunOff.dy);
+    const orbitRadius = Math.hypot(orbit.sun.x - 50, orbit.sun.y - 50);
+
+    expect(orbitRadius).toBeGreaterThan(buttonRadius);
+    expect(orbitRadius).toBeCloseTo(
+      buttonRadius * CELESTIAL_SELECTOR_ORBIT_SPREAD_FACTOR,
+      0,
+    );
+  });
+
+  it("preserves moon offset distance from sun relative to the button stack in orbit mode", () => {
+    const mode = "day" as const;
+    const orbit = selectorOrbitBodiesFromButtonStack(24, mode);
+    const sunOff = buttonPlacementOffsetFromCenter(CELESTIAL_SELECTOR_BUTTON_DAY.sun);
+    const moonOff = buttonPlacementOffsetFromCenter(CELESTIAL_SELECTOR_BUTTON_DAY.moon);
+    const buttonSeparation = Math.hypot(moonOff.dx - sunOff.dx, moonOff.dy - sunOff.dy);
+    const orbitSeparation = Math.hypot(
+      orbit.moon.x - orbit.sun.x,
+      orbit.moon.y - orbit.sun.y,
+    );
+
+    expect(orbitSeparation).toBeCloseTo(
+      buttonSeparation * CELESTIAL_SELECTOR_ORBIT_SPREAD_FACTOR,
+      0,
+    );
   });
 });

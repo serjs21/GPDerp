@@ -90,6 +90,7 @@ export const CelestialThemeClock = forwardRef<
       <CelestialThemeDial
         variant="panel"
         layout={layout}
+        slot={value}
         presentation="orbit"
         showBodyGlow={showBodyGlow}
         motionLayoutIdPrefix={motionLayoutIdPrefix}

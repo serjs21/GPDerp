@@ -8,7 +8,7 @@
 }
 
 .panel {
-  width: clamp(9rem, 28vw, 14rem);
+  width: clamp(9rem, 28vw, 16rem);
 }
 
 .trigger {
@@ -77,11 +77,24 @@
 
 .bodySun {
   width: var(--dial-sun-size);
-  z-index: 3;
 }
 
 .bodyMoon {
   width: var(--dial-moon-size);
+}
+
+.bodyMotion {
+  transition:
+    left 180ms cubic-bezier(0.2, 0, 0, 1),
+    top 180ms cubic-bezier(0.2, 0, 0, 1),
+    opacity 180ms cubic-bezier(0.2, 0, 0, 1),
+    transform 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bodyMotion {
+    transition: none;
+  }
 }
 
 .bodyStacked {
