@@ -8,7 +8,8 @@ import {
   clampDialBodyCenterToFace,
   dialBodyDepthScale,
   earthSunGradientAngleDeg,
-  selectorOrbitDisplayLayout,
+  selectorCosmicRotationDeg,
+  selectorViewerSunYPercent,
 } from "@/theme/celestialSelectorLayout";
 import { CELESTIAL_SELECTOR_DEPTH } from "@/components/CelestialThemeSelector/celestialSelectorDepth.config";
 import { ThemeSelectorIcon } from "@/components/CelestialThemeClock/ThemeSelectorIcon";
@@ -17,10 +18,6 @@ import {
   CELESTIAL_SELECTOR_MOON_GLOW_BLEED_PERCENT,
   CELESTIAL_SELECTOR_SUN_GLOW_BLEED_PERCENT,
 } from "@/components/CelestialThemeSelector/celestialSelectorNorthStar.config";
-import {
-  selectorButtonStackFromPresentation,
-  type ButtonBodyPlacement,
-} from "@/components/CelestialThemeSelector/celestialSelectorButton.config";
 import { SELECTOR_SUN_SIZE_RATIO } from "./celestialDialProportions";
 import { ThemeSelectorNorthStar } from "./ThemeSelectorNorthStar";
 import { ThemeSelectorStars } from "./ThemeSelectorStars";
@@ -36,11 +33,6 @@ const dialBodySizeVars = {
 
 const MOTION_PERSPECTIVE_PX = 900;
 
-export type CelestialThemeDialPresentation =
-  | "orbit"
-  | "buttonDay"
-  | "buttonNight";
-
 export type CelestialThemeDialPointerHandlers = {
   onPointerDown?: PointerEventHandler<HTMLDivElement>;
   onPointerMove?: PointerEventHandler<HTMLDivElement>;
@@ -50,9 +42,8 @@ export type CelestialThemeDialPointerHandlers = {
 
 export type CelestialThemeDialProps = {
   layout: SelectorDialLayout;
-  slot?: number;
+  slot: number;
   variant?: "panel" | "trigger";
-  presentation?: CelestialThemeDialPresentation;
   showBodyGlow?: boolean;
   motionLayoutIdPrefix?: string;
   motionInstant?: boolean;
@@ -111,71 +102,49 @@ function MotionLayer({
   );
 }
 
-function bodyPlacementStyle(placement: ButtonBodyPlacement): CSSProperties {
-  return {
-    left: placement.left,
-    top: placement.top,
-    width: placement.width,
-    zIndex: placement.zIndex,
-    opacity: placement.opacity,
-  };
-}
-
 function getSunMoonStyles(
-  isOrbit: boolean,
-  bodyLayout: SelectorDialLayout,
-  buttonStack: ReturnType<typeof selectorButtonStackFromPresentation> | null,
+  layout: SelectorDialLayout,
+  viewerSunY: number,
   moonOpacity: number,
 ) {
-  if (isOrbit || !buttonStack) {
-    const sunDepth = dialBodyDepthScale(bodyLayout.sun.y, "sun");
-    const moonDepth = dialBodyDepthScale(bodyLayout.sun.y, "moon");
-    const sunEffectiveSize = SUN_SIZE_PERCENT * sunDepth;
-    const moonEffectiveSize = MOON_SIZE_PERCENT * moonDepth;
-    const isNightHemisphere = bodyLayout.sun.y > 50;
+  const sunDepth = dialBodyDepthScale(viewerSunY, "sun");
+  const moonDepth = dialBodyDepthScale(viewerSunY, "moon");
+  const sunEffectiveSize = SUN_SIZE_PERCENT * sunDepth;
+  const moonEffectiveSize = MOON_SIZE_PERCENT * moonDepth;
+  const isNightHemisphere = viewerSunY > 50;
 
-    const sun = clampDialBodyCenterToFace(
-      bodyLayout.sun.x,
-      bodyLayout.sun.y,
-      sunEffectiveSize,
-      CELESTIAL_SELECTOR_SUN_GLOW_BLEED_PERCENT,
-    );
-    const moon = clampDialBodyCenterToFace(
-      bodyLayout.moon.x,
-      bodyLayout.moon.y,
-      moonEffectiveSize,
-      CELESTIAL_SELECTOR_MOON_GLOW_BLEED_PERCENT,
-    );
-
-    return {
-      sunStyle: {
-        left: `${sun.x}%`,
-        top: `${sun.y}%`,
-        opacity: 1,
-        transform: `translate(-50%, -50%) scale(${sunDepth})`,
-        zIndex: isNightHemisphere
-          ? CELESTIAL_SELECTOR_DEPTH.zIndexFar
-          : CELESTIAL_SELECTOR_DEPTH.zIndexNear,
-      } as CSSProperties,
-      moonStyle: {
-        left: `${moon.x}%`,
-        top: `${moon.y}%`,
-        opacity: moonOpacity,
-        transform: `translate(-50%, -50%) scale(${moonDepth})`,
-        zIndex: isNightHemisphere
-          ? CELESTIAL_SELECTOR_DEPTH.zIndexNear
-          : CELESTIAL_SELECTOR_DEPTH.zIndexFar,
-      } as CSSProperties,
-      sunClassName: `${styles.bodySun} ${styles.bodyMotion}`,
-      moonClassName: `${styles.bodyMoon} ${styles.bodyMotion}`,
-    };
-  }
+  const sun = clampDialBodyCenterToFace(
+    layout.sun.x,
+    layout.sun.y,
+    sunEffectiveSize,
+    CELESTIAL_SELECTOR_SUN_GLOW_BLEED_PERCENT,
+  );
+  const moon = clampDialBodyCenterToFace(
+    layout.moon.x,
+    layout.moon.y,
+    moonEffectiveSize,
+    CELESTIAL_SELECTOR_MOON_GLOW_BLEED_PERCENT,
+  );
 
   return {
-    sunStyle: bodyPlacementStyle(buttonStack.sun),
-    moonStyle: bodyPlacementStyle(buttonStack.moon),
-    sunClassName: styles.bodyStacked,
-    moonClassName: styles.bodyStacked,
+    sunStyle: {
+      left: `24%`,
+      top: `16%`,
+      opacity: 1,
+      transform: `translate(-50%, -50%) scale(${sunDepth})`,
+      zIndex: isNightHemisphere
+        ? CELESTIAL_SELECTOR_DEPTH.zIndexFar
+        : CELESTIAL_SELECTOR_DEPTH.zIndexNear,
+    } as CSSProperties,
+    moonStyle: {
+      left: `62%`,
+      top: `72%`,
+      opacity: moonOpacity,
+      transform: `translate(-50%, -50%) scale(${moonDepth})`,
+      zIndex: isNightHemisphere
+        ? CELESTIAL_SELECTOR_DEPTH.zIndexNear
+        : CELESTIAL_SELECTOR_DEPTH.zIndexFar,
+    } as CSSProperties,
   };
 }
 
@@ -183,7 +152,6 @@ export function CelestialThemeDial({
   layout,
   slot,
   variant = "panel",
-  presentation = "orbit",
   showBodyGlow = false,
   motionLayoutIdPrefix,
   motionInstant = false,
@@ -194,39 +162,92 @@ export function CelestialThemeDial({
 }: CelestialThemeDialProps) {
   const variantClass = variant === "trigger" ? styles.trigger : styles.panel;
   const interactiveClass = interactive ? styles.interactive : "";
-  const isOrbit = presentation === "orbit";
-  const bodyLayout =
-    isOrbit && slot !== undefined
-      ? selectorOrbitDisplayLayout(slot, layout)
-      : layout;
-  const buttonStack = isOrbit
-    ? null
-    : selectorButtonStackFromPresentation(presentation);
-  const arcHidden = backgroundSunVisibilityFromDialY(layout.sun.y) === 0;
+  const viewerSunY = selectorViewerSunYPercent(slot);
+  const cosmicRotationDeg = selectorCosmicRotationDeg(slot);
+  const arcHidden = backgroundSunVisibilityFromDialY(viewerSunY) === 0;
   const moonOpacity = arcHidden ? 1 : layout.moon.opacity;
   const layoutEnabled = Boolean(motionLayoutIdPrefix);
   const transition = celestialSelectorTransition(motionInstant);
   const layoutId = (suffix: string) =>
     motionLayoutIdPrefix ? `${motionLayoutIdPrefix}-${suffix}` : undefined;
-  const { sunStyle, moonStyle, sunClassName, moonClassName } = getSunMoonStyles(
-    isOrbit,
-    bodyLayout,
-    buttonStack,
+  const { sunStyle, moonStyle } = getSunMoonStyles(
+    layout,
+    viewerSunY,
     moonOpacity,
   );
+  const earthSunAngle = earthSunGradientAngleDeg(layout);
 
-  const northStarNode = layoutEnabled ? (
+  const northStarNode = (
+    <ThemeSelectorNorthStar slot={slot} />
+  );
+
+  const cosmicFrameNode = layoutEnabled ? (
     <MotionLayer
-      layoutId={layoutId("north-star")}
+      layoutId={layoutId("cosmic-frame")}
       layoutEnabled={layoutEnabled}
       transition={transition}
-      className={styles.bodyNorthStar}
+      className={styles.cosmicFrame}
+      style={{ transform: `rotate(${cosmicRotationDeg}deg)` }}
     >
-      <ThemeSelectorNorthStar layout={layout} />
+      <ThemeSelectorStars opacity={moonOpacity} />
+      <MotionLayer
+        layoutId={layoutId("sun")}
+        layoutEnabled={layoutEnabled}
+        transition={transition}
+        className={`${styles.bodySun} ${styles.bodyLocal}`}
+        style={sunStyle}
+      >
+        <ThemeSelectorIcon variant="sun" showGlow={showBodyGlow} />
+      </MotionLayer>
+      <MotionLayer
+        layoutId={layoutId("moon")}
+        layoutEnabled={layoutEnabled}
+        transition={transition}
+        className={`${styles.bodyMoon} ${styles.bodyLocal}`}
+        style={moonStyle}
+      >
+        <ThemeSelectorIcon variant="moon" />
+      </MotionLayer>
+      <MotionLayer
+        layoutId={layoutId("earth")}
+        layoutEnabled={layoutEnabled}
+        transition={transition}
+        className={styles.earthFrame}
+      >
+        <ThemeSelectorIcon
+          variant="earth"
+          className={styles.earth}
+          style={
+            {
+              "--earth-sun-angle": `${earthSunAngle}deg`,
+            } as CSSProperties
+          }
+        />
+      </MotionLayer>
     </MotionLayer>
   ) : (
-    <div className={styles.bodyNorthStar}>
-      <ThemeSelectorNorthStar layout={layout} />
+    <div
+      className={styles.cosmicFrame}
+      style={{ transform: `rotate(${cosmicRotationDeg}deg)` }}
+    >
+      <ThemeSelectorStars opacity={moonOpacity} />
+      <div className={`${styles.bodySun} ${styles.bodyLocal}`} style={sunStyle}>
+        <ThemeSelectorIcon variant="sun" showGlow={showBodyGlow} />
+      </div>
+      <div className={`${styles.bodyMoon} ${styles.bodyLocal}`} style={moonStyle}>
+        <ThemeSelectorIcon variant="moon" />
+      </div>
+      <div className={styles.earthFrame}>
+        <ThemeSelectorIcon
+          variant="earth"
+          className={styles.earth}
+          style={
+            {
+              "--earth-sun-angle": `${earthSunAngle}deg`,
+            } as CSSProperties
+          }
+        />
+      </div>
     </div>
   );
 
@@ -239,43 +260,8 @@ export function CelestialThemeDial({
       elementRef={faceRef}
       pointerHandlers={interactive ? pointerHandlers : undefined}
     >
-      {isOrbit ? <ThemeSelectorStars opacity={moonOpacity} /> : null}
       {northStarNode}
-      <MotionLayer
-        layoutId={layoutId("sun")}
-        layoutEnabled={layoutEnabled}
-        transition={transition}
-        className={sunClassName}
-        style={sunStyle}
-      >
-        <ThemeSelectorIcon variant="sun" showGlow={showBodyGlow && isOrbit} />
-      </MotionLayer>
-      <MotionLayer
-        layoutId={layoutId("moon")}
-        layoutEnabled={layoutEnabled}
-        transition={transition}
-        className={moonClassName}
-        style={moonStyle}
-      >
-        <ThemeSelectorIcon variant="moon" />
-      </MotionLayer>
-      <MotionLayer
-        layoutId={layoutId("earth")}
-        layoutEnabled={layoutEnabled}
-        transition={transition}
-        className={styles.earthFrame}
-        style={{ transform: `rotate(${layout.earthRotationDeg}deg)` }}
-      >
-        <ThemeSelectorIcon
-          variant="earth"
-          className={styles.earth}
-          style={
-            {
-              "--earth-sun-angle": `${earthSunGradientAngleDeg(bodyLayout)}deg`,
-            } as CSSProperties
-          }
-        />
-      </MotionLayer>
+      {cosmicFrameNode}
     </MotionLayer>
   );
 

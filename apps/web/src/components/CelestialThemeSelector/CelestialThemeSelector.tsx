@@ -11,12 +11,8 @@ import {
 import { CelestialThemeDial } from "@/components/CelestialThemeDial";
 import { formatClockLabel } from "@/theme/celestialTime";
 import type { GeoCoordinates } from "@/theme/celestialTheme";
-import {
-  getSelectorDialLayoutFromSlot,
-  selectorButtonModeFromSunY,
-} from "@/theme/celestialSelectorLayout";
+import { getSelectorDialLayoutFromSlot } from "@/theme/celestialSelectorLayout";
 import { BANGKOK_COORDINATES } from "@/theme/useCelestialScene";
-import { selectorButtonPresentationFromMode } from "./celestialSelectorButton.config";
 import { CELESTIAL_SELECTOR_LAYOUT_ID_PREFIX } from "./celestialSelectorMotion";
 import { useCelestialSelectorOpenTransition } from "./useCelestialSelectorOpenTransition";
 import styles from "./CelestialThemeSelector.module.css";
@@ -45,9 +41,6 @@ export function CelestialThemeSelector({
   const triggerLayout = useMemo(
     () => getSelectorDialLayoutFromSlot(slot, coordinates),
     [slot, coordinates],
-  );
-  const buttonPresentation = selectorButtonPresentationFromMode(
-    selectorButtonModeFromSunY(triggerLayout.sun.y),
   );
   const timeLabel = formatClockLabel(slot);
   const sceneStyle = sceneVars as CSSProperties | undefined;
@@ -133,7 +126,7 @@ export function CelestialThemeSelector({
               <CelestialThemeDial
                 variant="trigger"
                 layout={triggerLayout}
-                presentation={buttonPresentation}
+                slot={slot}
                 showBodyGlow={false}
                 motionLayoutIdPrefix={CELESTIAL_SELECTOR_LAYOUT_ID_PREFIX}
                 motionInstant={reduceMotion ?? false}

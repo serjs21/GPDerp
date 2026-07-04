@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import type { SelectorDialLayout } from "@/theme/celestialSelectorLayout";
 import { selectorSelectionBorderPosition } from "@/theme/celestialSelectorLayout";
 import { ThemeSelectorIcon } from "@/components/CelestialThemeClock/ThemeSelectorIcon";
 import { CELESTIAL_SELECTOR_NORTH_STAR } from "@/components/CelestialThemeSelector/celestialSelectorNorthStar.config";
@@ -13,16 +12,16 @@ const northStarFieldVars = {
 } as CSSProperties;
 
 type ThemeSelectorNorthStarProps = {
-  layout: SelectorDialLayout;
+  slot: number;
   className?: string;
 };
 
 export function ThemeSelectorNorthStar({
-  layout,
+  slot,
   className,
 }: ThemeSelectorNorthStarProps) {
   const position = selectorSelectionBorderPosition(
-    layout,
+    slot,
     CELESTIAL_SELECTOR_NORTH_STAR.sizePercent,
   );
 

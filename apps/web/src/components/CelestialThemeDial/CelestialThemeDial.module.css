@@ -1,7 +1,7 @@
 .root {
-  --dial-earth-size: 36%;
-  --dial-sun-size: 20%;
-  --dial-moon-size: 12.82%;
+  --dial-earth-size: 17%;
+  --dial-sun-size: 12%;
+  --dial-moon-size: 8%;
   position: relative;
   aspect-ratio: 1;
   margin-inline: auto;
@@ -23,10 +23,6 @@
   border-radius: 50%;
   overflow: hidden;
   background: rgb(0 0 0 / 0.3);
-  /* border: 2px solid color-mix(in srgb, var(--highlight, var(--accent-red)) 42%, transparent); */
-  /* box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--ink, var(--text-color)) 10%, transparent),
-    0 8px 20px color-mix(in srgb, var(--ink, var(--text-color)) 8%, transparent); */
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
@@ -83,28 +79,29 @@
   width: var(--dial-moon-size);
 }
 
-.bodyMotion {
+.cosmicFrame {
+  position: absolute;
+  inset: 0;
+  transform-origin: center center;
+  transition: transform 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cosmicFrame {
+    transition: none;
+  }
+}
+
+.bodyLocal {
   transition:
-    left 180ms cubic-bezier(0.2, 0, 0, 1),
-    top 180ms cubic-bezier(0.2, 0, 0, 1),
     opacity 180ms cubic-bezier(0.2, 0, 0, 1),
     transform 180ms cubic-bezier(0.2, 0, 0, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bodyMotion {
+  .bodyLocal {
     transition: none;
   }
-}
-
-.bodyStacked {
-  position: absolute;
-  height: auto;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-user-drag: none;
 }
 
 .bodyNorthStar {

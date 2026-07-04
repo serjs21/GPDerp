@@ -72,8 +72,13 @@ export function CelestialThemeProvider({
     [effectiveSlot, coordinates],
   );
   const backgroundBodies = useMemo(
-    () => selectorLayoutToBackgroundBodies(layout, scene.layout.moon.limbAngleDeg),
-    [layout, scene.layout.moon.limbAngleDeg],
+    () =>
+      selectorLayoutToBackgroundBodies(
+        effectiveSlot,
+        layout,
+        scene.layout.moon.limbAngleDeg,
+      ),
+    [effectiveSlot, layout, scene.layout.moon.limbAngleDeg],
   );
 
   const setPreviewSlot = useCallback((next: number | null) => {

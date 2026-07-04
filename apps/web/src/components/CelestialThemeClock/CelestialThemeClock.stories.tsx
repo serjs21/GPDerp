@@ -56,6 +56,7 @@ const CelestialScenePreview = () => {
   });
   const selectorLayout = getSelectorDialLayoutFromSlot(slot, BANGKOK_COORDINATES);
   const backgroundBodies = selectorLayoutToBackgroundBodies(
+    slot,
     selectorLayout,
     celestialScene.layout.moon.limbAngleDeg,
   );

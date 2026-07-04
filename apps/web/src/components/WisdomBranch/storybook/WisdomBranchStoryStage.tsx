@@ -86,11 +86,13 @@ export function WisdomBranchStoryStage({
     coordinates: celestialState.coordinates,
     projection: celestialState.projection,
   });
+  const celestialSlot = dateToSlot(celestialState.selectedDate);
   const selectorLayout = getSelectorDialLayoutFromSlot(
-    dateToSlot(celestialState.selectedDate),
+    celestialSlot,
     celestialState.coordinates,
   );
   const backgroundBodies = selectorLayoutToBackgroundBodies(
+    celestialSlot,
     selectorLayout,
     celestialScene.layout.moon.limbAngleDeg,
   );

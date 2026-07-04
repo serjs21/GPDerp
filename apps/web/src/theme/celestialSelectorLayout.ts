@@ -1,12 +1,10 @@
 import * as SunCalc from "suncalc";
 import { CELESTIAL_SELECTOR_DEPTH } from "@/components/CelestialThemeSelector/celestialSelectorDepth.config";
 import {
-  buttonPlacementOffsetFromCenter,
-  CELESTIAL_SELECTOR_ORBIT_SPREAD_FACTOR,
-  selectorButtonPresentationFromMode,
-  selectorButtonStackFromPresentation,
-  type SelectorButtonMode,
-} from "@/components/CelestialThemeSelector/celestialSelectorButton.config";
+  CELESTIAL_LOCAL_SUN_ANGLE_DEG,
+  CELESTIAL_OPPOSITION_RADIUS_PERCENT,
+  CELESTIAL_OPPOSITION_REFERENCE_SLOT,
+} from "@/components/CelestialThemeSelector/celestialSelectorOpposition.config";
 import { clampSlot, slotToDate, slotToHandDegrees } from "./celestialTime";
 import type { GeoCoordinates } from "./celestialTheme";
 
@@ -29,8 +27,7 @@ export type SelectorDialLayout = {
 };
 
 export type SelectorDialOptions = {
-  orbitRadiusPercent?: number;
-  earthArtOffsetDeg?: number;
+  oppositionRadiusPercent?: number;
 };
 
 const clamp = (value: number, min: number, max: number) =>
@@ -42,8 +39,6 @@ const smoothstep = (value: number) => {
   const t = clamp01(value);
   return t * t * (3 - 2 * t);
 };
-
-const wrapDegrees = (value: number) => ((value + 180) % 360 + 360) % 360 - 180;
 
 function assertCoordinates({ latitude, longitude }: GeoCoordinates) {
   if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90) {
@@ -78,19 +73,67 @@ export function slotToSunDialPosition(
   return dialPositionFromAngleDeg(slotToHandDegrees(slot), orbitRadiusPercent);
 }
 
-export function slotToEarthRotationDeg(
-  slot: number,
-  artOffsetDeg = EARTH_ART_OFFSET_DEG,
+function rotatePointAroundCenter(
+  x: number,
+  y: number,
+  rotationDeg: number,
 ) {
-  return -slotToHandDegrees(slot) + artOffsetDeg;
+  const dx = x - 50;
+  const dy = y - 50;
+  const angleRad = rotationDeg * DEG_TO_RAD;
+  const cos = Math.cos(angleRad);
+  const sin = Math.sin(angleRad);
+  return {
+    x: 50 + dx * cos - dy * sin,
+    y: 50 + dx * sin + dy * cos,
+  };
 }
 
-export function getMoonDialPositionFromSlot(
+/** Fixed sun/moon in the local cosmic frame (180° apart). */
+export function selectorOppositionLocalBodies(
+  radiusPercent = CELESTIAL_OPPOSITION_RADIUS_PERCENT,
+) {
+  const sun = dialPositionFromAngleDeg(
+    CELESTIAL_LOCAL_SUN_ANGLE_DEG,
+    radiusPercent,
+  );
+  const moon = dialPositionFromAngleDeg(
+    CELESTIAL_LOCAL_SUN_ANGLE_DEG + 180,
+    radiusPercent,
+  );
+  return { sun, moon };
+}
+
+/** Whole cosmic frame rotation for the selected slot (0 at reference noon). */
+export function selectorCosmicRotationDeg(
   slot: number,
+  referenceSlot = CELESTIAL_OPPOSITION_REFERENCE_SLOT,
+) {
+  return slotToHandDegrees(slot) - slotToHandDegrees(referenceSlot);
+}
+
+/** Viewer-space sun/moon after cosmic frame rotation. */
+export function selectorOppositionViewerBodies(
+  slot: number,
+  radiusPercent = CELESTIAL_OPPOSITION_RADIUS_PERCENT,
+) {
+  const local = selectorOppositionLocalBodies(radiusPercent);
+  const rotationDeg = selectorCosmicRotationDeg(slot);
+  return {
+    sun: rotatePointAroundCenter(local.sun.x, local.sun.y, rotationDeg),
+    moon: rotatePointAroundCenter(local.moon.x, local.moon.y, rotationDeg),
+  };
+}
+
+/** Virtual sun y in viewer space for hemisphere / depth (slot-derived). */
+export function selectorViewerSunYPercent(slot: number) {
+  return slotToSunDialPosition(slot).y;
+}
+
+function getMoonOpacityFromSlot(
   date: Date,
   coordinates: GeoCoordinates,
-  orbitRadiusPercent = DEFAULT_ORBIT_RADIUS_PERCENT,
-): SelectorDialBody {
+): number {
   assertCoordinates(coordinates);
 
   const sunPosition = SunCalc.getPosition(
@@ -104,22 +147,15 @@ export function getMoonDialPositionFromSlot(
     coordinates.longitude,
   );
   const moonIllumination = SunCalc.getMoonIllumination(date);
-
-  const relativeAzimuth = wrapDegrees(moonPosition.azimuth - sunPosition.azimuth);
-  const moonAngleDeg = slotToHandDegrees(slot) + relativeAzimuth;
-  const { x, y } = dialPositionFromAngleDeg(moonAngleDeg, orbitRadiusPercent);
   const isNight = sunPosition.altitude <= -6;
   const dayMoonVisibility = isNight ? 1 : 0.28;
   const moonBaseOpacity = sunOpacityFromAltitude(moonPosition.altitude);
 
-  return {
-    x,
-    y,
-    opacity:
-      moonBaseOpacity *
-      (0.25 + moonIllumination.fraction * 0.75) *
-      dayMoonVisibility,
-  };
+  return (
+    moonBaseOpacity *
+    (0.25 + moonIllumination.fraction * 0.75) *
+    dayMoonVisibility
+  );
 }
 
 export function getSelectorDialLayoutFromSlot(
@@ -129,23 +165,26 @@ export function getSelectorDialLayoutFromSlot(
 ): SelectorDialLayout {
   assertCoordinates(coordinates);
 
-  const orbitRadiusPercent = options.orbitRadiusPercent ?? DEFAULT_ORBIT_RADIUS_PERCENT;
-  const earthArtOffsetDeg = options.earthArtOffsetDeg ?? EARTH_ART_OFFSET_DEG;
+  const radiusPercent =
+    options.oppositionRadiusPercent ?? CELESTIAL_OPPOSITION_RADIUS_PERCENT;
   const date = slotToDate(clampSlot(slot));
   const sunPosition = SunCalc.getPosition(
     date,
     coordinates.latitude,
     coordinates.longitude,
   );
-  const sunPositionOnDial = slotToSunDialPosition(slot, orbitRadiusPercent);
+  const local = selectorOppositionLocalBodies(radiusPercent);
 
   return {
     sun: {
-      ...sunPositionOnDial,
+      ...local.sun,
       opacity: sunOpacityFromAltitude(sunPosition.altitude),
     },
-    earthRotationDeg: slotToEarthRotationDeg(slot, earthArtOffsetDeg),
-    moon: getMoonDialPositionFromSlot(slot, date, coordinates, orbitRadiusPercent),
+    earthRotationDeg: 0,
+    moon: {
+      ...local.moon,
+      opacity: getMoonOpacityFromSlot(date, coordinates),
+    },
   };
 }
 
@@ -156,7 +195,7 @@ export type SelectorBackgroundBodies = {
 
 const BACKGROUND_SUN_ARC_FADE_BAND_PERCENT = 8;
 
-/** Sun hidden when dial y is below horizon (50%); smooth fade near the line. */
+/** Sun hidden when viewer sun y is below horizon (50%); smooth fade near the line. */
 export function backgroundSunVisibilityFromDialY(yPercent: number): number {
   const horizonY = 50;
   if (yPercent <= horizonY - BACKGROUND_SUN_ARC_FADE_BAND_PERCENT) return 1;
@@ -171,102 +210,49 @@ export function backgroundSunVisibilityFromDialY(yPercent: number): number {
 }
 
 export function selectorLayoutToBackgroundBodies(
+  slot: number,
   layout: SelectorDialLayout,
   moonLimbAngleDeg: number,
 ): SelectorBackgroundBodies {
-  const arcVisibility = backgroundSunVisibilityFromDialY(layout.sun.y);
+  const viewer = selectorOppositionViewerBodies(slot);
+  const viewerSunY = selectorViewerSunYPercent(slot);
+  const arcVisibility = backgroundSunVisibilityFromDialY(viewerSunY);
   const sunOpacity = layout.sun.opacity * arcVisibility;
   const moonOpacity = sunOpacity === 0 ? 1 : layout.moon.opacity;
 
   return {
     sun: {
-      x: layout.sun.x,
-      y: layout.sun.y,
+      x: viewer.sun.x,
+      y: viewer.sun.y,
       opacity: sunOpacity,
     },
     moon: {
-      x: layout.moon.x,
-      y: layout.moon.y,
+      x: viewer.moon.x,
+      y: viewer.moon.y,
       opacity: moonOpacity,
       limbAngleDeg: moonLimbAngleDeg,
     },
   };
 }
 
-/** Earth-local linear-gradient angle so the bright stop points at the dial sun icon. */
+/** Earth-local linear-gradient angle toward the local sun (constant in the rotating frame). */
 export function earthSunGradientAngleDeg(layout: SelectorDialLayout): number {
   const dx = layout.sun.x - 50;
   const dy = layout.sun.y - 50;
-  const dialAngleDeg = (Math.atan2(dx, -dy) * 180) / Math.PI;
-  return dialAngleDeg - layout.earthRotationDeg;
+  return (Math.atan2(dx, -dy) * 180) / Math.PI;
 }
 
-/** Closed-button day (top arc) vs night (bottom arc) from dial sun y. */
+/** Day (top arc) vs night (bottom arc) from viewer sun y. */
 export function selectorButtonModeFromSunY(yPercent: number): "day" | "night" {
   return yPercent > 50 ? "night" : "day";
 }
 
-function rotateOffset(dx: number, dy: number, angleRad: number) {
-  const cos = Math.cos(angleRad);
-  const sin = Math.sin(angleRad);
-  return {
-    dx: dx * cos - dy * sin,
-    dy: dx * sin + dy * cos,
-  };
-}
-
-/** Open-orbit sun/moon: same arrangement as the closed button stack, rotated with slot and spread from earth. */
-export function selectorOrbitBodiesFromButtonStack(
-  slot: number,
-  mode: SelectorButtonMode,
-  spreadFactor = CELESTIAL_SELECTOR_ORBIT_SPREAD_FACTOR,
-) {
-  const stack = selectorButtonStackFromPresentation(
-    selectorButtonPresentationFromMode(mode),
-  );
-  const sunOff = buttonPlacementOffsetFromCenter(stack.sun);
-  const moonOff = buttonPlacementOffsetFromCenter(stack.moon);
-  const primaryOff = mode === "day" ? sunOff : moonOff;
-  const refAngle = Math.atan2(primaryOff.dy, primaryOff.dx);
-  const slotAngle = slotToHandDegrees(slot) * DEG_TO_RAD;
-  const rotRad = slotAngle - refAngle;
-  const rotSun = rotateOffset(sunOff.dx, sunOff.dy, rotRad);
-  const rotMoon = rotateOffset(moonOff.dx, moonOff.dy, rotRad);
-
-  return {
-    sun: {
-      x: 50 + rotSun.dx * spreadFactor,
-      y: 50 + rotSun.dy * spreadFactor,
-    },
-    moon: {
-      x: 50 + rotMoon.dx * spreadFactor,
-      y: 50 + rotMoon.dy * spreadFactor,
-    },
-  };
-}
-
-export function selectorOrbitDisplayLayout(
-  slot: number,
-  layout: SelectorDialLayout,
-): SelectorDialLayout {
-  const mode = selectorButtonModeFromSunY(layout.sun.y);
-  const bodies = selectorOrbitBodiesFromButtonStack(slot, mode);
-
-  return {
-    ...layout,
-    sun: { ...layout.sun, ...bodies.sun },
-    moon: { ...layout.moon, ...bodies.moon },
-  };
-}
-
 /** Rim marker at the selected slot angle (north star selection indicator). */
 export function selectorSelectionBorderPosition(
-  layout: SelectorDialLayout,
+  slot: number,
   markerSizePercent: number,
 ) {
-  const dx = layout.sun.x - 50;
-  const dy = layout.sun.y - 50;
-  const angleRad = Math.atan2(dy, dx);
+  const angleRad = slotToHandDegrees(slot) * DEG_TO_RAD;
   const borderRadius = 50 - markerSizePercent / 2;
 
   return {
@@ -282,7 +268,7 @@ export type DialBodyRole = "sun" | "moon";
 
 const lerp = (from: number, to: number, t: number) => from + (to - from) * t;
 
-/** Depth scale from sun orbit hemisphere: moon nearer on bottom/night arc, sun on top/day. */
+/** Depth scale from viewer sun hemisphere: moon nearer on bottom/night arc, sun on top/day. */
 export function dialBodyDepthScale(sunYPercent: number, role: DialBodyRole) {
   const t = smoothstep(
     (sunYPercent - 50) / CELESTIAL_SELECTOR_DEPTH.hemisphereBandPercent,
