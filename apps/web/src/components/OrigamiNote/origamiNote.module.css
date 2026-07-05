@@ -1,0 +1,55 @@
+.square {
+  --origami-size: 280px;
+  --origami-line: #000000;
+
+  position: relative;
+  width: var(--origami-size);
+  height: var(--origami-size);
+  aspect-ratio: 1 / 1;
+  overflow: visible;
+  perspective: 1200px;
+  perspective-origin: 50% 45%;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.panel {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.contentSlot {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 12%;
+  pointer-events: none;
+}
+
+.guides {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.guides rect,
+.guides line {
+  stroke: var(--origami-line);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.guides rect {
+  fill: none;
+}
