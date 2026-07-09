@@ -1,0 +1,105 @@
+.stage {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  background:
+    radial-gradient(ellipse at 70% 18%, rgba(240, 236, 228, 0.16), transparent 42%),
+    radial-gradient(ellipse at 30% 80%, rgba(20, 24, 40, 0.55), transparent 55%),
+    linear-gradient(165deg, #1a1c24 0%, #2a2e3a 48%, #14161c 100%);
+}
+
+.stepsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1.5rem 2rem;
+  min-height: 100vh;
+  padding: 3rem 2rem 4rem;
+  background:
+    radial-gradient(ellipse at 72% 12%, rgba(245, 240, 230, 0.14), transparent 40%),
+    linear-gradient(165deg, #16181f 0%, #242833 50%, #12141a 100%);
+}
+
+.stepCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.stepLabel {
+  margin: 0;
+  font-family: var(--font-noto-serif), ui-serif, Georgia, serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(235, 230, 220, 0.72);
+}
+
+.scrollRoot {
+  height: 100vh;
+  overflow: auto;
+  background:
+    radial-gradient(ellipse at 78% 8%, rgba(250, 245, 235, 0.18), transparent 36%),
+    linear-gradient(180deg, #12141a 0%, #1e2230 42%, #0e1016 100%);
+}
+
+.scrollTrack {
+  position: relative;
+  height: 320vh;
+}
+
+.scrollSticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.scrollHud {
+  position: absolute;
+  top: 1.25rem;
+  left: 1.25rem;
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: rgba(235, 230, 220, 0.7);
+}
+
+.scrollLantern {
+  /* Anchor flight path visually toward lower-left of the sticky stage */
+  margin-right: 18vw;
+  margin-top: 12vh;
+}
+
+.writtenList {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-evenly;
+  gap: 0;
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 3rem clamp(1rem, 3vw, 2.5rem) 4rem;
+  background:
+    radial-gradient(ellipse at 70% 10%, rgba(250, 245, 235, 0.16), transparent 38%),
+    radial-gradient(ellipse at 20% 85%, rgba(12, 16, 28, 0.55), transparent 50%),
+    linear-gradient(165deg, #14161c 0%, #222733 48%, #101218 100%);
+}
+
+.writtenItem {
+  flex: 1 1 0;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.writtenItem :global(article) {
+  --lantern-width: clamp(7.5rem, 16vw, 11rem);
+}
+

@@ -58,6 +58,8 @@
   --line-height: 1.5;
   /* Header theme / locale chrome: matches shrine “Compose” outline + serif */
   --themed-chrome-serif: var(--font-noto-serif), ui-serif, Georgia, "Hiragino Mincho ProN", serif;
+  /* Brush script for lantern / handwritten haiku (Zen Kurenaido via next/font) */
+  --font-lantern-script: var(--font-zen-kurenaido), "Zen Kurenaido", cursive;
 }
 
 *,

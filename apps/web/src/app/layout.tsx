@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Noto_Serif_JP } from "next/font/google"; 
+import { Geist, Geist_Mono, Noto_Serif_JP, Zen_Kurenaido } from "next/font/google";
 import "@/theme/globals.css";
 import "@/theme/themes/tokyo-dusk.css";
 import "@/theme/themes/sumie.css";
@@ -33,6 +33,13 @@ const notoSerifJP = Noto_Serif_JP({
   weight: ["300", "500", "700"],
 });
 
+// Handwritten brush script for lantern haiku text
+const zenKurenaido = Zen_Kurenaido({
+  variable: "--font-zen-kurenaido",
+  subsets: ["latin"],
+  weight: "400",
+});
+
 export const metadata: Metadata = {
   title: "GPDerp",
   description: "AI, but useless",
@@ -62,7 +69,7 @@ export default async function RootLayout({
   
   return (
     <html lang={initialLocale} data-theme={initialTheme}>
-      <body className={`${notoSerifJP.variable} ${geistSans.variable} ${geistMono.variable}`}>
+      <body className={`${notoSerifJP.variable} ${zenKurenaido.variable} ${geistSans.variable} ${geistMono.variable}`}>
         <AntdRegistry>
           <HtmlLoader />
           <NextIntlClientProvider locale={initialLocale} messages={messages}>

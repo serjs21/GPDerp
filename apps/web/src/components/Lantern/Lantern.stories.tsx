@@ -1,0 +1,199 @@
+"use client";
+
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { useEffect, useRef, useState } from "react";
+import type { HaikuDto } from "@/api/haikus";
+import { ThemeStage } from "@/components/HaikuGenerationStickyNote/storybook/themeStage";
+import { Lantern } from "./Lantern";
+import styles from "./Lantern.stories.module.css";
+
+function makeMockHaiku(partial: Partial<HaikuDto> & Pick<HaikuDto, "id" | "body">): HaikuDto {
+  return {
+    title: "Mock subject",
+    titleSuffix: 0,
+    createdAt: new Date("2026-01-15T12:00:00.000Z").toISOString(),
+    accountId: "00000000-0000-4000-8000-000000000001",
+    createdById: "00000000-0000-4000-8000-000000000002",
+    labels: [],
+    ...partial,
+  };
+}
+
+const exampleBody = `Shadow questions rise,
+a void whispers, "Who are you?"
+Self slips through the cracks.`;
+
+const autumnBody = `Leaves fall —
+Silence gathers on the path,
+Winter waits ahead.`;
+
+const meta: Meta<typeof Lantern> = {
+  title: "Haiku/Lantern",
+  component: Lantern,
+  parameters: {
+    layout: "fullscreen",
+  },
+  decorators: [
+    (Story) => (
+      <ThemeStage theme="night-sky">
+        <Story />
+      </ThemeStage>
+    ),
+  ],
+};
+
+export default meta;
+type Story = StoryObj<typeof Lantern>;
+
+export const Default: Story = {
+  render: (args) => (
+    <div className={styles.stage}>
+      <Lantern {...args} />
+    </div>
+  ),
+  args: {
+    haiku: makeMockHaiku({
+      id: "lantern-default",
+      title: "Night questions",
+      body: exampleBody,
+    }),
+  },
+};
+
+export const Generating: Story = {
+  render: (args) => (
+    <div className={styles.stage}>
+      <Lantern {...args} />
+    </div>
+  ),
+  args: {
+    generatingDraft: {
+      requestId: "lantern-req-1",
+      subject: "Autumn wind",
+      content: "Leaves fall —\n",
+      createdAtLabel: "2:30 PM",
+    },
+  },
+};
+
+export const StaticSteps: Story = {
+  render: () => {
+    const haiku = makeMockHaiku({
+      id: "lantern-steps",
+      title: "Ascending",
+      body: autumnBody,
+    });
+
+    return (
+      <div className={styles.stepsGrid}>
+        {[0, 1, 2, 3, 4, 5].map((step) => (
+          <div key={step} className={styles.stepCard}>
+            <p className={styles.stepLabel}>{step === 0 ? "Ready" : `Step 0${step}`}</p>
+            <Lantern haiku={haiku} step={step} />
+          </div>
+        ))}
+      </div>
+    );
+  },
+};
+
+function ScrollPathDemo() {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    const onScroll = () => {
+      const max = root.scrollHeight - root.clientHeight;
+      setProgress(max <= 0 ? 0 : Math.min(1, Math.max(0, root.scrollTop / max)));
+    };
+
+    onScroll();
+    root.addEventListener("scroll", onScroll, { passive: true });
+    return () => root.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return (
+    <div ref={rootRef} className={styles.scrollRoot}>
+      <div className={styles.scrollTrack}>
+        <div className={styles.scrollSticky}>
+          <p className={styles.scrollHud}>progress {(progress * 100).toFixed(0)}%</p>
+          <Lantern
+            className={styles.scrollLantern}
+            progress={progress}
+            maxSteps={5}
+            haiku={makeMockHaiku({
+              id: "lantern-scroll",
+              title: "Sky lantern",
+              body: exampleBody,
+            })}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export const ScrollPath: Story = {
+  render: () => <ScrollPathDemo />,
+};
+
+const WRITTEN_HAIKUS = [
+  {
+    id: "written-1",
+    title: "Empty pond",
+    body: `Old pond—
+a frog jumps in,
+water's sound.`,
+  },
+  {
+    id: "written-2",
+    title: "Summer grass",
+    body: `Summer grasses—
+all that remains
+of warriors' dreams.`,
+  },
+  {
+    id: "written-3",
+    title: "Autumn eve",
+    body: `On a withered branch
+a crow has settled—
+autumn evening.`,
+  },
+  {
+    id: "written-4",
+    title: "Moon road",
+    body: `The moon is the road
+home—lanterns rise
+into the blue dark.`,
+  },
+  {
+    id: "written-5",
+    title: "First snow",
+    body: `First snow—
+the village temple bell
+softens the night.`,
+  },
+] as const;
+
+export const WrittenOnLanterns: Story = {
+  name: "Written on lanterns",
+  render: () => (
+    <div className={styles.writtenList} role="list" aria-label="Haikus written on lanterns">
+      {WRITTEN_HAIKUS.map((item) => (
+        <div key={item.id} className={styles.writtenItem} role="listitem">
+          <Lantern
+            bodyOnly
+            haiku={makeMockHaiku({
+              id: item.id,
+              title: item.title,
+              body: item.body,
+            })}
+          />
+        </div>
+      ))}
+    </div>
+  ),
+};

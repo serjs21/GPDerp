@@ -1,0 +1,140 @@
+.forestClip {
+  --wf2-height: 60vh;
+  --wf2-width: 100%;
+  width: var(--wf2-width);
+  height: var(--wf2-height);
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.forest {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.scrollContent {
+  --wf2-card-gap: 1rem;
+  --wf2-slot-height: calc(12.5rem + var(--wf2-card-gap));
+  --wf2-lift-step: 0.65rem;
+  --wf2-scale-base: 1;
+  --wf2-scale-step: 0.08;
+  --wf2-stack-end-padding: calc(var(--wf2-slot-height) * 1.5);
+}
+
+.cards {
+  --wf2-card-gap: 1rem;
+  --wf2-slot-height: calc(12.5rem + var(--wf2-card-gap));
+  --wf2-stack-top: 1.25rem;
+  --wf2-lift-step: 0.65rem;
+  --wf2-scale-base: 1;
+  --wf2-scale-step: 0.08;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(var(--numcards), var(--wf2-slot-height));
+  gap: var(--wf2-card-gap);
+  view-timeline-name: --wf2-cards;
+  view-timeline-axis: block;
+}
+
+.card {
+  --index0: calc(var(--index) - 1);
+  --reverse-index: calc(var(--numcards) - var(--index0));
+  --reverse-index0: calc(var(--reverse-index) - 1);
+  position: sticky;
+  top: var(--wf2-stack-top);
+  padding-top: calc(var(--reverse-index0) * var(--wf2-lift-step));
+  z-index: var(--index);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+}
+
+.cardContent {
+  --start-range: calc(var(--index0) / var(--numcards) * 100%);
+  --end-range: calc(var(--index) / var(--numcards) * 100%);
+  --scale-from: calc(var(--wf2-scale-base) - var(--reverse-index0) * var(--wf2-scale-step));
+  --scale-to: calc(
+    var(--wf2-scale-base) - (var(--reverse-index0) + 1) * var(--wf2-scale-step)
+  );
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0 1rem;
+  box-sizing: border-box;
+  transform: scale(var(--scale-from));
+  transform-origin: 50% 0%;
+  opacity: 1;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 6px 14px color-mix(in srgb, var(--text-color) 16%, transparent));
+}
+
+@supports (animation-timeline: view()) {
+  .cardContent {
+    animation: wf2CardExit linear forwards;
+    animation-timeline: --wf2-cards;
+    animation-range: exit-crossing var(--start-range) exit-crossing var(--end-range);
+  }
+}
+
+@keyframes wf2CardExit {
+  from {
+    transform: scale(var(--scale-from));
+    opacity: 1;
+  }
+
+  to {
+    transform: scale(var(--scale-to));
+    opacity: 0;
+  }
+}
+
+.stackEndPad {
+  height: var(--wf2-stack-end-padding);
+  margin-bottom: calc(-1 * var(--wf2-stack-end-padding));
+  flex-shrink: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.sentinel {
+  width: 100%;
+  height: 1px;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.loaderRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 4rem;
+  padding: 1rem;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--wf2-height);
+  margin: 0;
+  color: color-mix(in srgb, var(--text-color) 55%, transparent);
+  font-size: 0.9rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cardContent {
+    animation: none;
+  }
+}
