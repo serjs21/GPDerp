@@ -2,30 +2,17 @@
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useEffect, useRef, useState } from "react";
-import type { HaikuDto } from "@/api/haikus";
-import { ThemeStage } from "@/components/HaikuGenerationStickyNote/storybook/themeStage";
+import {
+  AUTUMN_HAIKU_BODY,
+  composeDecorators,
+  EXAMPLE_HAIKU_BODY,
+  makeMockHaiku,
+  withQueryClient,
+  withThemeStage,
+} from "@/storybook";
 import { Lantern } from "./Lantern";
+import { LanternCard } from "./LanternCard";
 import styles from "./Lantern.stories.module.css";
-
-function makeMockHaiku(partial: Partial<HaikuDto> & Pick<HaikuDto, "id" | "body">): HaikuDto {
-  return {
-    title: "Mock subject",
-    titleSuffix: 0,
-    createdAt: new Date("2026-01-15T12:00:00.000Z").toISOString(),
-    accountId: "00000000-0000-4000-8000-000000000001",
-    createdById: "00000000-0000-4000-8000-000000000002",
-    labels: [],
-    ...partial,
-  };
-}
-
-const exampleBody = `Shadow questions rise,
-a void whispers, "Who are you?"
-Self slips through the cracks.`;
-
-const autumnBody = `Leaves fall —
-Silence gathers on the path,
-Winter waits ahead.`;
 
 const meta: Meta<typeof Lantern> = {
   title: "Haiku/Lantern",
@@ -33,13 +20,7 @@ const meta: Meta<typeof Lantern> = {
   parameters: {
     layout: "fullscreen",
   },
-  decorators: [
-    (Story) => (
-      <ThemeStage theme="night-sky">
-        <Story />
-      </ThemeStage>
-    ),
-  ],
+  decorators: [composeDecorators(withQueryClient, withThemeStage("night-sky"))],
 };
 
 export default meta;
@@ -55,7 +36,7 @@ export const Default: Story = {
     haiku: makeMockHaiku({
       id: "lantern-default",
       title: "Night questions",
-      body: exampleBody,
+      body: EXAMPLE_HAIKU_BODY,
     }),
   },
 };
@@ -81,7 +62,7 @@ export const StaticSteps: Story = {
     const haiku = makeMockHaiku({
       id: "lantern-steps",
       title: "Ascending",
-      body: autumnBody,
+      body: AUTUMN_HAIKU_BODY,
     });
 
     return (
@@ -127,7 +108,7 @@ function ScrollPathDemo() {
             haiku={makeMockHaiku({
               id: "lantern-scroll",
               title: "Sky lantern",
-              body: exampleBody,
+              body: EXAMPLE_HAIKU_BODY,
             })}
           />
         </div>
@@ -186,6 +167,78 @@ export const WrittenOnLanterns: Story = {
         <div key={item.id} className={styles.writtenItem} role="listitem">
           <Lantern
             bodyOnly
+            haiku={makeMockHaiku({
+              id: item.id,
+              title: item.title,
+              body: item.body,
+            })}
+          />
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+export const CardSaved: StoryObj<typeof LanternCard> = {
+  name: "Card / Saved",
+  render: (args) => (
+    <div className={styles.stage}>
+      <LanternCard {...args} />
+    </div>
+  ),
+  args: {
+    haiku: makeMockHaiku({
+      id: "lantern-card-saved",
+      title: "Night questions",
+      body: EXAMPLE_HAIKU_BODY,
+    }),
+  },
+};
+
+export const CardGenerating: StoryObj<typeof LanternCard> = {
+  name: "Card / Generating",
+  render: (args) => (
+    <div className={styles.stage}>
+      <LanternCard {...args} />
+    </div>
+  ),
+  args: {
+    generatingDraft: {
+      requestId: "lantern-card-req-1",
+      subject: "Autumn wind",
+      content: "Leaves fall —\n",
+      createdAtLabel: "2:30 PM",
+    },
+  },
+};
+
+export const CardWithLabels: StoryObj<typeof LanternCard> = {
+  name: "Card / With labels",
+  render: (args) => (
+    <div className={styles.stage}>
+      <LanternCard {...args} />
+    </div>
+  ),
+  args: {
+    haiku: makeMockHaiku({
+      id: "lantern-card-labels",
+      title: "Evening breeze",
+      body: AUTUMN_HAIKU_BODY,
+      labels: [
+        { id: "lbl-1", name: "nature", color: "green" },
+        { id: "lbl-2", name: "autumn", color: "orange" },
+      ],
+    }),
+  },
+};
+
+export const CardWrittenList: StoryObj<typeof LanternCard> = {
+  name: "Card / Written list",
+  render: () => (
+    <div className={styles.writtenList} role="list" aria-label="Interactive lantern haikus">
+      {WRITTEN_HAIKUS.map((item) => (
+        <div key={item.id} className={styles.writtenItem} role="listitem">
+          <LanternCard
             haiku={makeMockHaiku({
               id: item.id,
               title: item.title,

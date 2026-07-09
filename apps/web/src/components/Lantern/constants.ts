@@ -8,6 +8,9 @@ export const LANTERN_ASSET_SRC = "/lantern_base.png";
 /** Default display width in rem (keeps aspect via CSS). */
 export const LANTERN_WIDTH_REM = 17.5;
 
+/** Slightly wider interactive card so action icons fit in the paper inset. */
+export const LANTERN_CARD_WIDTH_REM = 19.5;
+
 /**
  * Text panel inset as fractions of the lantern box.
  * Clears side frames and the dark wooden base with flame.

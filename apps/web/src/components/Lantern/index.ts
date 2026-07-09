@@ -1,6 +1,9 @@
 export { Lantern, type LanternProps, type LanternTransform } from "./Lantern";
+export { LanternCard, type LanternCardProps } from "./LanternCard";
+export { LanternFrame, type LanternFrameProps } from "./LanternFrame";
 export {
   LANTERN_ASSET_SRC,
+  LANTERN_CARD_WIDTH_REM,
   LANTERN_DEFAULT_MAX_STEPS,
   LANTERN_IMAGE_ASPECT,
   LANTERN_IMAGE_HEIGHT,
@@ -18,4 +21,5 @@ export {
   getLanternTransformAtStep,
   lanternTransformToCssVars,
   lerp,
+  resolveLanternTransform,
 } from "./lanternTransform";

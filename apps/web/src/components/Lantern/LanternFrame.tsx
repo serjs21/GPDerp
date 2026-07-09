@@ -1,0 +1,74 @@
+"use client";
+
+import type { CSSProperties, ReactNode } from "react";
+import {
+  LANTERN_ASSET_SRC,
+  LANTERN_IMAGE_HEIGHT,
+  LANTERN_IMAGE_WIDTH,
+  LANTERN_WIDTH_REM,
+} from "./constants";
+import {
+  lanternTransformToCssVars,
+  resolveLanternTransform,
+  type LanternTransform,
+  type LanternTransformInput,
+} from "./lanternTransform";
+import styles from "./Lantern.module.css";
+
+export type LanternFrameProps = LanternTransformInput & {
+  className?: string;
+  contentClassName?: string;
+  ariaLabel: string;
+  widthRem?: number;
+  generating?: boolean;
+  children: ReactNode;
+};
+
+export function LanternFrame({
+  className,
+  contentClassName,
+  ariaLabel,
+  widthRem = LANTERN_WIDTH_REM,
+  generating = false,
+  children,
+  step,
+  progress,
+  maxSteps,
+  transform,
+}: LanternFrameProps) {
+  const resolved = resolveLanternTransform({ step, progress, maxSteps, transform });
+
+  const rootStyle = {
+    ...lanternTransformToCssVars(resolved),
+    "--lantern-width": `${widthRem}rem`,
+  } as CSSProperties;
+
+  const contentClass = [styles.content, contentClassName].filter(Boolean).join(" ");
+
+  return (
+    <article
+      className={`${styles.root}${className ? ` ${className}` : ""}`}
+      style={rootStyle}
+      aria-label={ariaLabel}
+      {...(generating ? { "data-haiku-generating": true } : {})}
+    >
+      <div className={styles.shell} aria-hidden>
+        {/* eslint-disable-next-line @next/next/no-img-element -- decorative lantern art from /public */}
+        <img
+          className={styles.image}
+          src={LANTERN_ASSET_SRC}
+          alt=""
+          width={LANTERN_IMAGE_WIDTH}
+          height={LANTERN_IMAGE_HEIGHT}
+          draggable={false}
+          decoding="async"
+        />
+        <span className={styles.flame} />
+      </div>
+
+      <div className={contentClass}>{children}</div>
+    </article>
+  );
+}
+
+export type { LanternTransform };

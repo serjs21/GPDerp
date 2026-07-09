@@ -1,22 +1,12 @@
 "use client";
 
-import { type CSSProperties } from "react";
 import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { formatCreatedAt } from "@/utils/date";
 import { formatHaikuTitle } from "@/utils/strings";
-import {
-  LANTERN_ASSET_SRC,
-  LANTERN_IMAGE_HEIGHT,
-  LANTERN_IMAGE_WIDTH,
-  LANTERN_WIDTH_REM,
-} from "./constants";
-import {
-  getLanternTransformAtProgress,
-  getLanternTransformAtStep,
-  lanternTransformToCssVars,
-  type LanternTransform,
-} from "./lanternTransform";
+import { LANTERN_WIDTH_REM } from "./constants";
+import { LanternFrame } from "./LanternFrame";
+import type { LanternTransform } from "./lanternTransform";
 import styles from "./Lantern.module.css";
 
 export type LanternProps = HaikuContainerProps & {
@@ -38,6 +28,7 @@ function resolveContent(props: HaikuContainerProps): {
   body: string;
   meta?: string;
   ariaLabel: string;
+  generating: boolean;
 } {
   if ("generatingDraft" in props && props.generatingDraft) {
     const draft: GeneratingDraft = props.generatingDraft;
@@ -46,6 +37,7 @@ function resolveContent(props: HaikuContainerProps): {
       body: draft.content,
       meta: draft.createdAtLabel,
       ariaLabel: `Generating haiku: ${draft.subject}`,
+      generating: true,
     };
   }
 
@@ -56,73 +48,37 @@ function resolveContent(props: HaikuContainerProps): {
     body: haiku.body,
     meta: formatCreatedAt(haiku.createdAt),
     ariaLabel: `Haiku lantern: ${title}`,
+    generating: false,
   };
 }
 
-function resolveTransform(props: Pick<LanternProps, "step" | "progress" | "maxSteps" | "transform">): LanternTransform {
-  if (props.transform) {
-    const base =
-      props.step !== undefined
-        ? getLanternTransformAtStep(props.step)
-        : props.progress !== undefined
-          ? getLanternTransformAtProgress(props.progress, props.maxSteps)
-          : getLanternTransformAtStep(0);
-    return {
-      x: props.transform.x ?? base.x,
-      y: props.transform.y ?? base.y,
-      scale: props.transform.scale ?? base.scale,
-      rotate: props.transform.rotate ?? base.rotate,
-    };
-  }
-
-  if (props.step !== undefined) {
-    return getLanternTransformAtStep(props.step);
-  }
-
-  if (props.progress !== undefined) {
-    return getLanternTransformAtProgress(props.progress, props.maxSteps);
-  }
-
-  return getLanternTransformAtStep(0);
-}
-
 export function Lantern(props: LanternProps) {
-  const { className, step, progress, maxSteps, transform, bodyOnly = false, ...noteProps } =
-    props;
-  const { title, body, meta, ariaLabel } = resolveContent(noteProps);
-  const resolved = resolveTransform({ step, progress, maxSteps, transform });
-
-  const rootStyle = {
-    ...lanternTransformToCssVars(resolved),
-    "--lantern-width": `${LANTERN_WIDTH_REM}rem`,
-  } as CSSProperties;
+  const {
+    className,
+    step,
+    progress,
+    maxSteps,
+    transform,
+    bodyOnly = false,
+    ...noteProps
+  } = props;
+  const { title, body, meta, ariaLabel, generating } = resolveContent(noteProps);
 
   return (
-    <article
-      className={`${styles.root}${className ? ` ${className}` : ""}`}
-      style={rootStyle}
-      aria-label={ariaLabel}
+    <LanternFrame
+      className={className}
+      ariaLabel={ariaLabel}
+      widthRem={LANTERN_WIDTH_REM}
+      generating={generating}
+      step={step}
+      progress={progress}
+      maxSteps={maxSteps}
+      transform={transform}
     >
-      <div className={styles.shell} aria-hidden>
-        {/* eslint-disable-next-line @next/next/no-img-element -- decorative lantern art from /public */}
-        <img
-          className={styles.image}
-          src={LANTERN_ASSET_SRC}
-          alt=""
-          width={LANTERN_IMAGE_WIDTH}
-          height={LANTERN_IMAGE_HEIGHT}
-          draggable={false}
-          decoding="async"
-        />
-        <span className={styles.flame} />
-      </div>
-
-      <div className={styles.content}>
-        {bodyOnly ? null : <p className={styles.title}>{title}</p>}
-        <p className={styles.body}>{body}</p>
-        {bodyOnly || !meta ? null : <p className={styles.meta}>{meta}</p>}
-      </div>
-    </article>
+      {bodyOnly ? null : <p className={styles.title}>{title}</p>}
+      <p className={styles.body}>{body}</p>
+      {bodyOnly || !meta ? null : <p className={styles.meta}>{meta}</p>}
+    </LanternFrame>
   );
 }
 

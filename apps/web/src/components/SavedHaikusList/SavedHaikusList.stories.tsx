@@ -1,57 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { HaikuDto } from "@/api/haikus";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
+import { makeMockHaiku, TEXT_STREAM_STYLE_HAIKUS, withQueryClient } from "@/storybook";
 import { SavedHaikusListView } from "./SavedHaikusList";
-
-/**
- * Sample bodies aligned with `apps/api/src/mocks/textStream.ts` (HAIKUS array).
- */
-const TEXT_STREAM_STYLE_HAIKUS = [
-  `Shadow questions rise,
-a void whispers, "Who are you?"
-Self slips through the cracks.
-
--Jean-Paul Sartickle`,
-
-  `Nietzsche’s whisper fades,
-Empty sky and silent bells—
-Doubt’s garden grows wild.
-
-—Holy Ghostwriter`,
-
-  `Infernal flames burn,
-Whispers echo endless pain—
-Hope lost to the void.
-
-— Dante Fuego`,
-];
-
-function makeMockHaiku(partial: Partial<HaikuDto> & Pick<HaikuDto, "id" | "body">): HaikuDto {
-  return {
-    title: "Mock subject",
-    titleSuffix: 0,
-    createdAt: new Date("2026-01-15T12:00:00.000Z").toISOString(),
-    accountId: "00000000-0000-4000-8000-000000000001",
-    createdById: "00000000-0000-4000-8000-000000000002",
-    labels: [],
-    ...partial,
-  };
-}
 
 const meta: Meta<typeof SavedHaikusListView> = {
   title: "Haiku/SavedHaikusList",
   component: SavedHaikusListView,
-  decorators: [
-    (Story) => {
-      const qc = new QueryClient();
-      return (
-        <QueryClientProvider client={qc}>
-          <Story />
-        </QueryClientProvider>
-      );
-    },
-  ],
+  decorators: [withQueryClient],
   args: {
     onLoadMore: () => undefined,
     onRetry: () => undefined,

@@ -74,3 +74,37 @@ export function lanternTransformToCssVars(transform: LanternTransform): CSSPrope
     "--lantern-rotate": `${transform.rotate}deg`,
   } as CSSProperties;
 }
+
+export type LanternTransformInput = {
+  step?: number;
+  progress?: number;
+  maxSteps?: number;
+  transform?: Partial<LanternTransform>;
+};
+
+export function resolveLanternTransform(props: LanternTransformInput): LanternTransform {
+  if (props.transform) {
+    const base =
+      props.step !== undefined
+        ? getLanternTransformAtStep(props.step)
+        : props.progress !== undefined
+          ? getLanternTransformAtProgress(props.progress, props.maxSteps)
+          : getLanternTransformAtStep(0);
+    return {
+      x: props.transform.x ?? base.x,
+      y: props.transform.y ?? base.y,
+      scale: props.transform.scale ?? base.scale,
+      rotate: props.transform.rotate ?? base.rotate,
+    };
+  }
+
+  if (props.step !== undefined) {
+    return getLanternTransformAtStep(props.step);
+  }
+
+  if (props.progress !== undefined) {
+    return getLanternTransformAtProgress(props.progress, props.maxSteps);
+  }
+
+  return getLanternTransformAtStep(0);
+}

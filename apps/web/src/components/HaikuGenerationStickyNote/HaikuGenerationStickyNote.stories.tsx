@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import type { HaikuDto } from "@/api/haikus";
+import { composeDecorators, makeMockHaiku, withFullscreenShell, withQueryClient } from "@/storybook";
 import { SavedHaikusListView } from "@/components/SavedHaikusList/SavedHaikusList";
 import { HaikuGenerationStickyNote } from "./HaikuGenerationStickyNote";
 import { HaikuGenerationStickyNoteInitial } from "./HaikuGenerationStickyNoteInitial/HaikuGenerationStickyNoteInitial";
@@ -13,18 +12,7 @@ import styles from "./HaikuGenerationStickyNote.module.css";
 const meta: Meta<typeof HaikuGenerationStickyNote> = {
   title: "Haiku/HaikuGenerationStickyNote",
   component: HaikuGenerationStickyNote,
-  decorators: [
-    (Story) => {
-      const qc = new QueryClient();
-      return (
-        <QueryClientProvider client={qc}>
-          <div style={{ minHeight: "100dvh", width: "100%" }}>
-            <Story />
-          </div>
-        </QueryClientProvider>
-      );
-    },
-  ],
+  decorators: [composeDecorators(withQueryClient, withFullscreenShell)],
   parameters: {
     layout: "fullscreen",
   },
@@ -116,18 +104,6 @@ export const FirstGeneration: Story = {
     );
   },
 };
-
-function makeMockHaiku(partial: Partial<HaikuDto> & Pick<HaikuDto, "id" | "body">): HaikuDto {
-  return {
-    title: "Mock subject",
-    titleSuffix: 0,
-    createdAt: new Date("2026-01-15T12:00:00.000Z").toISOString(),
-    accountId: "00000000-0000-4000-8000-000000000001",
-    createdById: "00000000-0000-4000-8000-000000000002",
-    labels: [],
-    ...partial,
-  };
-}
 
 export const LoggedInWithList: Story = {
   render: function LoggedInWithListStory() {

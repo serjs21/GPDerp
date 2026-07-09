@@ -1,36 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useRef } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { HaikuDto } from "@/api/haikus";
+import { makeMockHaiku, TEXT_STREAM_STYLE_HAIKUS, withQueryClient } from "@/storybook";
 import { SavedHaikusListView } from "@/components/SavedHaikusList/SavedHaikusList";
 import { HaikuGenerationStickyNoteCard } from "../HaikuGenerationStickyNoteCard/HaikuGenerationStickyNoteCard";
 import { haikuGenerationStickyNoteListStyles } from "./HaikuGenerationStickyNoteList";
-
-function makeMockHaiku(partial: Partial<HaikuDto> & Pick<HaikuDto, "id" | "body">): HaikuDto {
-  return {
-    title: "Mock subject",
-    titleSuffix: 0,
-    createdAt: new Date("2026-01-15T12:00:00.000Z").toISOString(),
-    accountId: "00000000-0000-4000-8000-000000000001",
-    createdById: "00000000-0000-4000-8000-000000000002",
-    labels: [],
-    ...partial,
-  };
-}
-
-const TEXT_STREAM_STYLE_HAIKUS = [
-  `Shadow questions rise,
-a void whispers, "Who are you?"
-Self slips through the cracks.
-
--Jean-Paul Sartickle`,
-
-  `Nietzsche's whisper fades,
-Empty sky and silent bells—
-Doubt's garden grows wild.
-
-—Holy Ghostwriter`,
-];
 
 const exampleHaikus: HaikuDto[] = TEXT_STREAM_STYLE_HAIKUS.map((body, i) =>
   makeMockHaiku({
@@ -60,16 +34,7 @@ const ListPreview = (
 const meta: Meta<typeof ListPreview> = {
   title: "Haiku/HaikuGenerationStickyNoteList",
   component: ListPreview,
-  decorators: [
-    (Story) => {
-      const qc = new QueryClient();
-      return (
-        <QueryClientProvider client={qc}>
-          <Story />
-        </QueryClientProvider>
-      );
-    },
-  ],
+  decorators: [withQueryClient],
   args: {
     onLoadMore: () => undefined,
     onRetry: () => undefined,

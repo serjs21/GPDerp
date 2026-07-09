@@ -1,28 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import type { HaikuDto } from "@/api/haikus";
+import { EXAMPLE_HAIKU_BODY, makeMockHaiku, withQueryClient } from "@/storybook";
 import { HaikuGenerationStickyNoteCardExit } from "./HaikuGenerationStickyNoteCardExit";
-
-function makeMockHaiku(partial: Partial<HaikuDto> & Pick<HaikuDto, "id" | "body">): HaikuDto {
-  return {
-    title: "Mock subject",
-    titleSuffix: 0,
-    createdAt: new Date("2026-01-15T12:00:00.000Z").toISOString(),
-    accountId: "00000000-0000-4000-8000-000000000001",
-    createdById: "00000000-0000-4000-8000-000000000002",
-    labels: [],
-    ...partial,
-  };
-}
-
-const exampleBody = `Shadow questions rise,
-a void whispers, "Who are you?"
-Self slips through the cracks.
-
--Jean-Paul Sartickle`;
 
 const meta: Meta<typeof HaikuGenerationStickyNoteCardExit> = {
   title: "Haiku/HaikuGenerationStickyNoteCardExit",
   component: HaikuGenerationStickyNoteCardExit,
+  decorators: [withQueryClient],
   parameters: { layout: "padded" },
 };
 
@@ -33,7 +16,7 @@ export const Saved: Story = {
   args: {
     haiku: makeMockHaiku({
       id: "story-exit-haiku-1",
-      body: exampleBody,
+      body: EXAMPLE_HAIKU_BODY,
       title: "Jean-Paul Sartickle",
     }),
   },
