@@ -5,7 +5,7 @@ import {
   CELESTIAL_OPPOSITION_RADIUS_PERCENT,
   CELESTIAL_OPPOSITION_REFERENCE_SLOT,
 } from "@/components/CelestialThemeSelector/celestialSelectorOpposition.config";
-import { clampSlot, slotToDate, slotToHandDegrees } from "./celestialTime";
+import { angleToSlot, clampSlot, slotToDate, slotToHandDegrees } from "./celestialTime";
 import type { GeoCoordinates } from "./celestialTheme";
 
 const DEG_TO_RAD = Math.PI / 180;
@@ -215,10 +215,7 @@ export function selectorLayoutToBackgroundBodies(
   moonLimbAngleDeg: number,
 ): SelectorBackgroundBodies {
   const viewer = selectorOppositionViewerBodies(slot);
-  const viewerSunY = selectorViewerSunYPercent(slot);
-  const arcVisibility = backgroundSunVisibilityFromDialY(viewerSunY);
-  const sunOpacity = layout.sun.opacity * arcVisibility;
-  const moonOpacity = sunOpacity === 0 ? 1 : layout.moon.opacity;
+  const { sunOpacity, moonOpacity } = complementaryCelestialOpacities(slot, layout);
 
   return {
     sun: {
@@ -235,6 +232,17 @@ export function selectorLayoutToBackgroundBodies(
   };
 }
 
+/** Continuous sun/moon opacities that always sum to 1 (horizon crossfade). */
+export function complementaryCelestialOpacities(
+  slot: number,
+  layout: SelectorDialLayout,
+): { sunOpacity: number; moonOpacity: number } {
+  const viewerSunY = selectorViewerSunYPercent(slot);
+  const arcVisibility = backgroundSunVisibilityFromDialY(viewerSunY);
+  const sunOpacity = clamp01(layout.sun.opacity * arcVisibility);
+  return { sunOpacity, moonOpacity: 1 - sunOpacity };
+}
+
 /** Earth-local linear-gradient angle toward the local sun (constant in the rotating frame). */
 export function earthSunGradientAngleDeg(layout: SelectorDialLayout): number {
   const dx = layout.sun.x - 50;
@@ -247,12 +255,29 @@ export function selectorButtonModeFromSunY(yPercent: number): "day" | "night" {
   return yPercent > 50 ? "night" : "day";
 }
 
-/** Rim marker at the selected slot angle (north star selection indicator). */
+/** Viewer-space angle of the sun (and selection star) for a slot. */
+export function slotToViewerSunAngleDeg(slot: number) {
+  return CELESTIAL_LOCAL_SUN_ANGLE_DEG + selectorCosmicRotationDeg(slot);
+}
+
+/**
+ * Map a dial click angle (atan2 screen degrees) to a slot so the selection
+ * star lands on the click — same frame as the background/dial sun.
+ */
+export function viewerSunAngleToSlot(angleDeg: number) {
+  const handDegrees =
+    angleDeg -
+    CELESTIAL_LOCAL_SUN_ANGLE_DEG +
+    slotToHandDegrees(CELESTIAL_OPPOSITION_REFERENCE_SLOT);
+  return angleToSlot(handDegrees);
+}
+
+/** Rim marker on the same ray as the viewer/background sun. */
 export function selectorSelectionBorderPosition(
   slot: number,
   markerSizePercent: number,
 ) {
-  const angleRad = slotToHandDegrees(slot) * DEG_TO_RAD;
+  const angleRad = slotToViewerSunAngleDeg(slot) * DEG_TO_RAD;
   const borderRadius = 50 - markerSizePercent / 2;
 
   return {

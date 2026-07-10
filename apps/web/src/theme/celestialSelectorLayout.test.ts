@@ -1,9 +1,12 @@
 import {
+  CELESTIAL_LOCAL_SUN_ANGLE_DEG,
   CELESTIAL_OPPOSITION_RADIUS_PERCENT,
 } from "@/components/CelestialThemeSelector/celestialSelectorOpposition.config";
 import {
   clampDialBodyCenterToFace,
+  complementaryCelestialOpacities,
   dialBodyDepthScale,
+  dialPositionFromAngleDeg,
   earthSunGradientAngleDeg,
   getSelectorDialLayoutFromSlot,
   selectorButtonModeFromSunY,
@@ -14,6 +17,8 @@ import {
   selectorSelectionBorderPosition,
   selectorViewerSunYPercent,
   slotToSunDialPosition,
+  slotToViewerSunAngleDeg,
+  viewerSunAngleToSlot,
 } from "./celestialSelectorLayout";
 import { angleToSlot, slotToHandDegrees } from "./celestialTime";
 import { BANGKOK_COORDINATES } from "./useCelestialScene";
@@ -29,16 +34,24 @@ describe("celestialSelectorLayout", () => {
     expect(noon.moon.y).toBe(midnight.moon.y);
 
     const local = selectorOppositionLocalBodies();
+    const expectedSun = dialPositionFromAngleDeg(
+      CELESTIAL_LOCAL_SUN_ANGLE_DEG,
+      CELESTIAL_OPPOSITION_RADIUS_PERCENT,
+    );
+    const expectedMoon = dialPositionFromAngleDeg(
+      CELESTIAL_LOCAL_SUN_ANGLE_DEG + 180,
+      CELESTIAL_OPPOSITION_RADIUS_PERCENT,
+    );
     const separation = Math.hypot(
       local.moon.x - local.sun.x,
       local.moon.y - local.sun.y,
     );
 
     expect(separation).toBeCloseTo(2 * CELESTIAL_OPPOSITION_RADIUS_PERCENT, 0);
-    expect(local.sun.x).toBeCloseTo(50, 0);
-    expect(local.sun.y).toBeCloseTo(50 - CELESTIAL_OPPOSITION_RADIUS_PERCENT, 0);
-    expect(local.moon.x).toBeCloseTo(50, 0);
-    expect(local.moon.y).toBeCloseTo(50 + CELESTIAL_OPPOSITION_RADIUS_PERCENT, 0);
+    expect(local.sun.x).toBeCloseTo(expectedSun.x, 0);
+    expect(local.sun.y).toBeCloseTo(expectedSun.y, 0);
+    expect(local.moon.x).toBeCloseTo(expectedMoon.x, 0);
+    expect(local.moon.y).toBeCloseTo(expectedMoon.y, 0);
   });
 
   it("pins earth rotation to zero in the rotating cosmic frame", () => {
@@ -67,16 +80,48 @@ describe("celestialSelectorLayout", () => {
     expect(selectorButtonModeFromSunY(selectorViewerSunYPercent(0))).toBe("night");
   });
 
-  it("places selection marker on the controller border at the slot angle", () => {
-    const border = selectorSelectionBorderPosition(48, 6);
+  it("places selection marker on the viewer-sun ray at the dial rim", () => {
+    const markerSize = 6;
+    const borderRadius = 50 - markerSize / 2;
+    const noonAngleDeg = slotToViewerSunAngleDeg(48);
+    const midnightAngleDeg = slotToViewerSunAngleDeg(0);
+    const noonRad = (noonAngleDeg * Math.PI) / 180;
+    const midnightRad = (midnightAngleDeg * Math.PI) / 180;
 
-    expect(border.x).toBeCloseTo(50, 0);
-    expect(border.y).toBeCloseTo(3, 0);
+    const border = selectorSelectionBorderPosition(48, markerSize);
+    expect(border.x).toBeCloseTo(50 + borderRadius * Math.cos(noonRad), 0);
+    expect(border.y).toBeCloseTo(50 + borderRadius * Math.sin(noonRad), 0);
 
-    const midnightBorder = selectorSelectionBorderPosition(0, 6);
+    const midnightBorder = selectorSelectionBorderPosition(0, markerSize);
+    expect(midnightBorder.x).toBeCloseTo(
+      50 + borderRadius * Math.cos(midnightRad),
+      0,
+    );
+    expect(midnightBorder.y).toBeCloseTo(
+      50 + borderRadius * Math.sin(midnightRad),
+      0,
+    );
+  });
 
-    expect(midnightBorder.x).toBeCloseTo(50, 0);
-    expect(midnightBorder.y).toBeCloseTo(97, 0);
+  it("round-trips dial click angles through viewerSunAngleToSlot", () => {
+    for (const slot of [0, 24, 48, 72, 95]) {
+      expect(viewerSunAngleToSlot(slotToViewerSunAngleDeg(slot))).toBe(slot);
+    }
+  });
+
+  it("keeps background sun and moon opacities complementary", () => {
+    for (const slot of [0, 24, 48, 72, 95]) {
+      const layout = getSelectorDialLayoutFromSlot(slot, BANGKOK_COORDINATES);
+      const { sunOpacity, moonOpacity } = complementaryCelestialOpacities(
+        slot,
+        layout,
+      );
+      const bodies = selectorLayoutToBackgroundBodies(slot, layout, 0);
+
+      expect(sunOpacity + moonOpacity).toBeCloseTo(1, 5);
+      expect(bodies.sun.opacity).toBeCloseTo(sunOpacity, 5);
+      expect(bodies.moon.opacity).toBeCloseTo(moonOpacity, 5);
+    }
   });
 
   it("clamps dial bodies inside the circular face", () => {

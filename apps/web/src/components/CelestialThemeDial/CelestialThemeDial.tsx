@@ -4,7 +4,7 @@ import { motion, type Transition } from "motion/react";
 import type { CSSProperties, PointerEventHandler, ReactNode, Ref } from "react";
 import type { SelectorDialLayout } from "@/theme/celestialSelectorLayout";
 import {
-  backgroundSunVisibilityFromDialY,
+  complementaryCelestialOpacities,
   clampDialBodyCenterToFace,
   dialBodyDepthScale,
   earthSunGradientAngleDeg,
@@ -105,6 +105,7 @@ function MotionLayer({
 function getSunMoonStyles(
   layout: SelectorDialLayout,
   viewerSunY: number,
+  sunOpacity: number,
   moonOpacity: number,
 ) {
   const sunDepth = dialBodyDepthScale(viewerSunY, "sun");
@@ -130,7 +131,7 @@ function getSunMoonStyles(
     sunStyle: {
       left: `${sun.x}%`,
       top: `${sun.y}%`,
-      opacity: 1,
+      opacity: sunOpacity,
       transform: `translate(-50%, -50%) scale(${sunDepth})`,
       zIndex: isNightHemisphere
         ? CELESTIAL_SELECTOR_DEPTH.zIndexFar
@@ -164,8 +165,7 @@ export function CelestialThemeDial({
   const interactiveClass = interactive ? styles.interactive : "";
   const viewerSunY = selectorViewerSunYPercent(slot);
   const cosmicRotationDeg = selectorCosmicRotationDeg(slot);
-  const arcHidden = backgroundSunVisibilityFromDialY(viewerSunY) === 0;
-  const moonOpacity = arcHidden ? 1 : layout.moon.opacity;
+  const { sunOpacity, moonOpacity } = complementaryCelestialOpacities(slot, layout);
   const layoutEnabled = Boolean(motionLayoutIdPrefix);
   const transition = celestialSelectorTransition(motionInstant);
   const layoutId = (suffix: string) =>
@@ -173,6 +173,7 @@ export function CelestialThemeDial({
   const { sunStyle, moonStyle } = getSunMoonStyles(
     layout,
     viewerSunY,
+    sunOpacity,
     moonOpacity,
   );
   const earthSunAngle = earthSunGradientAngleDeg(layout);

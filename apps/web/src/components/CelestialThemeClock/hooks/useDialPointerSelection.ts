@@ -2,7 +2,7 @@
 
 import { useCallback, useRef } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
-import { angleToSlot } from "@/theme/celestialTime";
+import { viewerSunAngleToSlot } from "@/theme/celestialSelectorLayout";
 
 const DEFAULT_DEAD_ZONE_RADIUS_PERCENT = 18;
 
@@ -37,7 +37,7 @@ export function useDialPointerSelection({
       if (distance < deadZoneRadius) return;
 
       const angleDeg = (Math.atan2(dy, dx) * 180) / Math.PI;
-      const slot = angleToSlot(angleDeg);
+      const slot = viewerSunAngleToSlot(angleDeg);
       lastSlotRef.current = slot;
       onChange(slot);
     },
