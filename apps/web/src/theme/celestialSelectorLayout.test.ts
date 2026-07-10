@@ -1,3 +1,4 @@
+import { CELESTIAL_SELECTOR_BODY_SIZE } from "@/components/CelestialThemeSelector/celestialSelectorBodySize.config";
 import {
   CELESTIAL_LOCAL_SUN_ANGLE_DEG,
   CELESTIAL_OPPOSITION_RADIUS_PERCENT,
@@ -6,6 +7,8 @@ import {
   clampDialBodyCenterToFace,
   complementaryCelestialOpacities,
   dialBodyDepthScale,
+  dialBodyOpacityScale,
+  dialBodyVisualScale,
   dialPositionFromAngleDeg,
   earthSunGradientAngleDeg,
   getSelectorDialLayoutFromSlot,
@@ -108,7 +111,9 @@ describe("celestialSelectorLayout", () => {
       expect(viewerSunAngleToSlot(slotToViewerSunAngleDeg(slot))).toBe(slot);
     }
   });
+});
 
+describe("celestialSelectorLayout depth and background", () => {
   it("keeps background sun and moon opacities complementary", () => {
     for (const slot of [0, 24, 48, 72, 95]) {
       const layout = getSelectorDialLayoutFromSlot(slot, BANGKOK_COORDINATES);
@@ -158,8 +163,14 @@ describe("celestialSelectorLayout", () => {
   it("keeps scaled sun inside the dial face at midnight", () => {
     const viewer = selectorOppositionViewerBodies(0);
     const viewerSunY = selectorViewerSunYPercent(0);
-    const sunScale = dialBodyDepthScale(viewerSunY, "sun");
-    const sunEffectiveSize = 20 * sunScale;
+    const layout = getSelectorDialLayoutFromSlot(0, BANGKOK_COORDINATES);
+    const { sunOpacity } = complementaryCelestialOpacities(0, layout);
+    const sunScale = dialBodyVisualScale(
+      dialBodyDepthScale(viewerSunY, "sun"),
+      sunOpacity,
+    );
+    const sunEffectiveSize =
+      CELESTIAL_SELECTOR_BODY_SIZE.sunSizePercent * sunScale;
     const sun = clampDialBodyCenterToFace(
       viewer.sun.x,
       viewer.sun.y,
@@ -170,7 +181,9 @@ describe("celestialSelectorLayout", () => {
 
     expect(outerRadius).toBeLessThanOrEqual(50);
   });
+});
 
+describe("celestialSelectorLayout opposition and sky", () => {
   it("keeps viewer opposition positions inside the dial bounds", () => {
     for (const slot of [0, 24, 48, 72, 95]) {
       const viewer = selectorOppositionViewerBodies(slot);
@@ -261,6 +274,42 @@ describe("celestialSelectorLayout", () => {
     expect(selectorViewerSunYPercent(0)).toBeCloseTo(
       slotToSunDialPosition(0).y,
       0,
+    );
+  });
+});
+
+describe("dialBodyVisualScale", () => {
+  it("boosts visual scale at full opacity and fades twice as fast below", () => {
+    const depth = 1.15;
+    const { fullOpacityBoost, opacityFadeRate, minScale } =
+      CELESTIAL_SELECTOR_BODY_SIZE;
+
+    expect(dialBodyOpacityScale(1)).toBe(fullOpacityBoost);
+    expect(dialBodyVisualScale(depth, 1)).toBeCloseTo(depth * fullOpacityBoost, 5);
+
+    const midOpacity = 1 - 0.5 / opacityFadeRate; // 0.75 when fadeRate is 2
+    expect(dialBodyOpacityScale(midOpacity)).toBeCloseTo(
+      fullOpacityBoost * 0.5,
+      5,
+    );
+    expect(dialBodyVisualScale(depth, midOpacity)).toBeCloseTo(
+      depth * fullOpacityBoost * 0.5,
+      5,
+    );
+
+    expect(dialBodyOpacityScale(0.5)).toBeCloseTo(fullOpacityBoost * minScale, 5);
+  });
+
+  it("keeps higher opacity at least as large as lower opacity for the same depth", () => {
+    const depth = 1;
+    expect(dialBodyVisualScale(depth, 1)).toBeGreaterThanOrEqual(
+      dialBodyVisualScale(depth, 0.75),
+    );
+    expect(dialBodyVisualScale(depth, 0.75)).toBeGreaterThanOrEqual(
+      dialBodyVisualScale(depth, 0.5),
+    );
+    expect(dialBodyVisualScale(depth, 0.5)).toBeGreaterThanOrEqual(
+      dialBodyVisualScale(depth, 0),
     );
   });
 });

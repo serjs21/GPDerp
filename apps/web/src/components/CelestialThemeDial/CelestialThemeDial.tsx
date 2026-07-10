@@ -7,10 +7,12 @@ import {
   complementaryCelestialOpacities,
   clampDialBodyCenterToFace,
   dialBodyDepthScale,
+  dialBodyVisualScale,
   earthSunGradientAngleDeg,
   selectorCosmicRotationDeg,
   selectorViewerSunYPercent,
 } from "@/theme/celestialSelectorLayout";
+import { CELESTIAL_SELECTOR_BODY_SIZE } from "@/components/CelestialThemeSelector/celestialSelectorBodySize.config";
 import { CELESTIAL_SELECTOR_DEPTH } from "@/components/CelestialThemeSelector/celestialSelectorDepth.config";
 import { ThemeSelectorIcon } from "@/components/CelestialThemeClock/ThemeSelectorIcon";
 import { celestialSelectorTransition } from "@/components/CelestialThemeSelector/celestialSelectorMotion";
@@ -18,17 +20,13 @@ import {
   CELESTIAL_SELECTOR_MOON_GLOW_BLEED_PERCENT,
   CELESTIAL_SELECTOR_SUN_GLOW_BLEED_PERCENT,
 } from "@/components/CelestialThemeSelector/celestialSelectorNorthStar.config";
-import { SELECTOR_SUN_SIZE_RATIO } from "./celestialDialProportions";
 import { ThemeSelectorNorthStar } from "./ThemeSelectorNorthStar";
 import { ThemeSelectorStars } from "./ThemeSelectorStars";
 import styles from "./CelestialThemeDial.module.css";
 
-const SUN_SIZE_PERCENT = SELECTOR_SUN_SIZE_RATIO * 100;
-const MOON_SIZE_PERCENT = 12;
-
 const dialBodySizeVars = {
-  "--dial-sun-size": `${SUN_SIZE_PERCENT}%`,
-  "--dial-moon-size": `${MOON_SIZE_PERCENT}%`,
+  "--dial-sun-size": `${CELESTIAL_SELECTOR_BODY_SIZE.sunSizePercent}%`,
+  "--dial-moon-size": `${CELESTIAL_SELECTOR_BODY_SIZE.moonSizePercent}%`,
 } as CSSProperties;
 
 const MOTION_PERSPECTIVE_PX = 900;
@@ -110,8 +108,11 @@ function getSunMoonStyles(
 ) {
   const sunDepth = dialBodyDepthScale(viewerSunY, "sun");
   const moonDepth = dialBodyDepthScale(viewerSunY, "moon");
-  const sunEffectiveSize = SUN_SIZE_PERCENT * sunDepth;
-  const moonEffectiveSize = MOON_SIZE_PERCENT * moonDepth;
+  const sunScale = dialBodyVisualScale(sunDepth, sunOpacity);
+  const moonScale = dialBodyVisualScale(moonDepth, moonOpacity);
+  const sunEffectiveSize = CELESTIAL_SELECTOR_BODY_SIZE.sunSizePercent * sunScale;
+  const moonEffectiveSize =
+    CELESTIAL_SELECTOR_BODY_SIZE.moonSizePercent * moonScale;
   const isNightHemisphere = viewerSunY > 50;
 
   const sun = clampDialBodyCenterToFace(
@@ -132,7 +133,7 @@ function getSunMoonStyles(
       left: `${sun.x}%`,
       top: `${sun.y}%`,
       opacity: sunOpacity,
-      transform: `translate(-50%, -50%) scale(${sunDepth})`,
+      transform: `translate(-50%, -50%) scale(${sunScale})`,
       zIndex: isNightHemisphere
         ? CELESTIAL_SELECTOR_DEPTH.zIndexFar
         : CELESTIAL_SELECTOR_DEPTH.zIndexNear,
@@ -141,7 +142,7 @@ function getSunMoonStyles(
       left: `${moon.x}%`,
       top: `${moon.y}%`,
       opacity: moonOpacity,
-      transform: `translate(-50%, -50%) scale(${moonDepth})`,
+      transform: `translate(-50%, -50%) scale(${moonScale})`,
       zIndex: isNightHemisphere
         ? CELESTIAL_SELECTOR_DEPTH.zIndexNear
         : CELESTIAL_SELECTOR_DEPTH.zIndexFar,
@@ -177,10 +178,6 @@ export function CelestialThemeDial({
     moonOpacity,
   );
   const earthSunAngle = earthSunGradientAngleDeg(layout);
-
-  const northStarNode = (
-    <ThemeSelectorNorthStar slot={slot} />
-  );
 
   const cosmicFrameNode = layoutEnabled ? (
     <MotionLayer
@@ -252,26 +249,22 @@ export function CelestialThemeDial({
     </div>
   );
 
-  const faceNode = (
-    <MotionLayer
-      layoutId={layoutId("face")}
-      layoutEnabled={layoutEnabled}
-      transition={transition}
-      className={`${styles.face}${interactiveClass ? ` ${interactiveClass}` : ""}`}
-      elementRef={faceRef}
-      pointerHandlers={interactive ? pointerHandlers : undefined}
-    >
-      {northStarNode}
-      {cosmicFrameNode}
-    </MotionLayer>
-  );
-
   return (
     <div
       className={`${styles.root} ${variantClass}${className ? ` ${className}` : ""}`}
       style={dialBodySizeVars}
     >
-      {faceNode}
+      <MotionLayer
+        layoutId={layoutId("face")}
+        layoutEnabled={layoutEnabled}
+        transition={transition}
+        className={`${styles.face}${interactiveClass ? ` ${interactiveClass}` : ""}`}
+        elementRef={faceRef}
+        pointerHandlers={interactive ? pointerHandlers : undefined}
+      >
+        <ThemeSelectorNorthStar slot={slot} />
+        {cosmicFrameNode}
+      </MotionLayer>
     </div>
   );
 }

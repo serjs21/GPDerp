@@ -1,4 +1,5 @@
 import * as SunCalc from "suncalc";
+import { CELESTIAL_SELECTOR_BODY_SIZE } from "@/components/CelestialThemeSelector/celestialSelectorBodySize.config";
 import { CELESTIAL_SELECTOR_DEPTH } from "@/components/CelestialThemeSelector/celestialSelectorDepth.config";
 import {
   CELESTIAL_LOCAL_SUN_ANGLE_DEG,
@@ -312,6 +313,25 @@ export function dialBodyDepthScale(sunYPercent: number, role: DialBodyRole) {
     CELESTIAL_SELECTOR_DEPTH.sunFarScale,
     t,
   );
+}
+
+/**
+ * Opacity-linked scale factor: fullOpacityBoost at opacity 1, then fades at
+ * opacityFadeRate × the opacity drop when opacity < 1.
+ */
+export function dialBodyOpacityScale(opacity: number) {
+  const { fullOpacityBoost, opacityFadeRate, minScale } =
+    CELESTIAL_SELECTOR_BODY_SIZE;
+  if (opacity >= 1) {
+    return fullOpacityBoost;
+  }
+  const fade = 1 - opacityFadeRate * (1 - opacity);
+  return fullOpacityBoost * Math.min(1, Math.max(minScale, fade));
+}
+
+/** Depth reference size modulated by opacity (bigger when more opaque). */
+export function dialBodyVisualScale(depthScale: number, opacity: number) {
+  return depthScale * dialBodyOpacityScale(opacity);
 }
 
 /** Keep dial body center inside the circular face including icon size and glow bleed. */
