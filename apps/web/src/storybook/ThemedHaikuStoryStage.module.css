@@ -1,0 +1,54 @@
+.shell {
+  min-height: 100vh;
+  width: 100%;
+}
+
+.stageMain {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 1rem 2rem;
+  box-sizing: border-box;
+  min-height: 100vh;
+}
+
+.stageControls {
+  width: 100%;
+  max-width: 37.5rem;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1.5rem;
+}
+
+.selectorCard {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-glass-strong) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border-color) 72%, transparent);
+  backdrop-filter: blur(5px);
+}
+
+.timeLabel {
+  margin: 0;
+  font-size: 0.8rem;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.stageContent {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.stageContentWide {
+  align-items: stretch;
+}

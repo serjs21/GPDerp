@@ -128,8 +128,8 @@ function getSunMoonStyles(
 
   return {
     sunStyle: {
-      left: `24%`,
-      top: `16%`,
+      left: `${sun.x}%`,
+      top: `${sun.y}%`,
       opacity: 1,
       transform: `translate(-50%, -50%) scale(${sunDepth})`,
       zIndex: isNightHemisphere
@@ -137,8 +137,8 @@ function getSunMoonStyles(
         : CELESTIAL_SELECTOR_DEPTH.zIndexNear,
     } as CSSProperties,
     moonStyle: {
-      left: `62%`,
-      top: `72%`,
+      left: `${moon.x}%`,
+      top: `${moon.y}%`,
       opacity: moonOpacity,
       transform: `translate(-50%, -50%) scale(${moonDepth})`,
       zIndex: isNightHemisphere

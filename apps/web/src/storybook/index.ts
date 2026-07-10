@@ -1,5 +1,11 @@
 export { createStoryQueryClient } from "./queryClient";
 export { ThemeStage, themeStageStyle } from "./ThemeStage";
+export {
+  ThemedHaikuStoryStage,
+  type ThemedHaikuStoryStageProps,
+  type ThemedStoryStageParameters,
+} from "./ThemedHaikuStoryStage";
+export { withThemedStoryStage } from "./decorators/withThemedStoryStage";
 export { withAuthProviders } from "./decorators/withAuthProviders";
 export { composeDecorators } from "./decorators/composeDecorators";
 export { withFullscreenShell } from "./decorators/withFullscreenShell";

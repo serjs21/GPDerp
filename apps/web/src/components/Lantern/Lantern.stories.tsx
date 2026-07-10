@@ -2,13 +2,14 @@
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useEffect, useRef, useState } from "react";
+import type { CelestialPresetName } from "@/theme/celestialPresets";
 import {
   AUTUMN_HAIKU_BODY,
   composeDecorators,
   EXAMPLE_HAIKU_BODY,
   makeMockHaiku,
   withQueryClient,
-  withThemeStage,
+  withThemedStoryStage,
 } from "@/storybook";
 import { Lantern } from "./Lantern";
 import { LanternCard } from "./LanternCard";
@@ -19,8 +20,9 @@ const meta: Meta<typeof Lantern> = {
   component: Lantern,
   parameters: {
     layout: "fullscreen",
+    initialCelestialPreset: "blueNight" satisfies CelestialPresetName,
   },
-  decorators: [composeDecorators(withQueryClient, withThemeStage("night-sky"))],
+  decorators: [composeDecorators(withQueryClient, withThemedStoryStage)],
 };
 
 export default meta;
@@ -58,6 +60,7 @@ export const Generating: Story = {
 };
 
 export const StaticSteps: Story = {
+  parameters: { wideContent: true },
   render: () => {
     const haiku = makeMockHaiku({
       id: "lantern-steps",
@@ -118,6 +121,7 @@ function ScrollPathDemo() {
 }
 
 export const ScrollPath: Story = {
+  parameters: { wideContent: true },
   render: () => <ScrollPathDemo />,
 };
 
@@ -161,6 +165,7 @@ softens the night.`,
 
 export const WrittenOnLanterns: Story = {
   name: "Written on lanterns",
+  parameters: { wideContent: true },
   render: () => (
     <div className={styles.writtenList} role="list" aria-label="Haikus written on lanterns">
       {WRITTEN_HAIKUS.map((item) => (
@@ -234,6 +239,7 @@ export const CardWithLabels: StoryObj<typeof LanternCard> = {
 
 export const CardWrittenList: StoryObj<typeof LanternCard> = {
   name: "Card / Written list",
+  parameters: { wideContent: true },
   render: () => (
     <div className={styles.writtenList} role="list" aria-label="Interactive lantern haikus">
       {WRITTEN_HAIKUS.map((item) => (
@@ -249,4 +255,25 @@ export const CardWrittenList: StoryObj<typeof LanternCard> = {
       ))}
     </div>
   ),
+};
+
+export const CelestialDeepNight: Story = {
+  ...Default,
+  parameters: {
+    initialCelestialPreset: "deepNight" satisfies CelestialPresetName,
+  },
+};
+
+export const CelestialSunset: Story = {
+  ...Default,
+  parameters: {
+    initialCelestialPreset: "sunset" satisfies CelestialPresetName,
+  },
+};
+
+export const CelestialDay: Story = {
+  ...Default,
+  parameters: {
+    initialCelestialPreset: "day" satisfies CelestialPresetName,
+  },
 };

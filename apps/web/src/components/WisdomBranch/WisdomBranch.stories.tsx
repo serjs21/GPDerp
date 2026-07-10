@@ -1,45 +1,23 @@
-import type { Decorator, Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import {
   AUTUMN_HAIKU_BODY,
   composeDecorators,
   EXAMPLE_HAIKU_BODY,
   makeMockHaiku,
   withQueryClient,
+  withThemedStoryStage,
 } from "@/storybook";
-import type { ThemeName } from "@/config/userConfiguration";
 import type { CelestialPresetName } from "@/theme/celestialPresets";
-import { WisdomBranchStoryStage } from "./storybook/WisdomBranchStoryStage";
 import { WisdomBranch } from "./WisdomBranch";
 import styles from "./WisdomBranch.stories.module.css";
-
-type StoryStageParameters = {
-  initialTheme?: ThemeName;
-  initialCelestialMode?: boolean;
-  initialCelestialPreset?: CelestialPresetName;
-};
-
-const withStoryStage: Decorator = (Story, { parameters }) => {
-  const stageParams = parameters as StoryStageParameters;
-  const initialTheme = stageParams.initialTheme ?? "tokyo-dusk";
-
-  return (
-    <WisdomBranchStoryStage
-      initialTheme={initialTheme}
-      initialCelestialMode={stageParams.initialCelestialMode}
-      initialCelestialPreset={stageParams.initialCelestialPreset}
-    >
-      <Story />
-    </WisdomBranchStoryStage>
-  );
-};
 
 const meta: Meta<typeof WisdomBranch> = {
   title: "Haiku/WisdomBranch",
   component: WisdomBranch,
-  decorators: [composeDecorators(withQueryClient, withStoryStage)],
+  decorators: [composeDecorators(withQueryClient, withThemedStoryStage)],
   parameters: {
     layout: "fullscreen",
-    initialTheme: "tokyo-dusk" satisfies ThemeName,
+    initialCelestialPreset: "goldenHour" satisfies CelestialPresetName,
   },
 };
 
@@ -112,7 +90,7 @@ export const TiltVariants: Story = {
 };
 
 export const NightSky: Story = {
-  parameters: { initialTheme: "night-sky" satisfies ThemeName },
+  parameters: { initialCelestialPreset: "deepNight" satisfies CelestialPresetName },
   args: {
     haiku: makeMockHaiku({
       id: "story-haiku-3",
@@ -122,8 +100,8 @@ export const NightSky: Story = {
   },
 };
 
-export const Sumie: Story = {
-  parameters: { initialTheme: "sumie" satisfies ThemeName },
+export const Day: Story = {
+  parameters: { initialCelestialPreset: "day" satisfies CelestialPresetName },
   args: {
     haiku: makeMockHaiku({
       id: "story-haiku-4",
@@ -135,7 +113,6 @@ export const Sumie: Story = {
 
 export const CelestialPreDawn: Story = {
   parameters: {
-    initialCelestialMode: true,
     initialCelestialPreset: "preDawn" satisfies CelestialPresetName,
   },
   args: {
@@ -149,7 +126,6 @@ export const CelestialPreDawn: Story = {
 
 export const CelestialSunrise: Story = {
   parameters: {
-    initialCelestialMode: true,
     initialCelestialPreset: "sunrise" satisfies CelestialPresetName,
   },
   args: {
@@ -163,7 +139,6 @@ export const CelestialSunrise: Story = {
 
 export const CelestialDay: Story = {
   parameters: {
-    initialCelestialMode: true,
     initialCelestialPreset: "day" satisfies CelestialPresetName,
   },
   args: {
@@ -177,7 +152,6 @@ export const CelestialDay: Story = {
 
 export const CelestialGoldenHour: Story = {
   parameters: {
-    initialCelestialMode: true,
     initialCelestialPreset: "goldenHour" satisfies CelestialPresetName,
   },
   args: {
@@ -191,7 +165,6 @@ export const CelestialGoldenHour: Story = {
 
 export const CelestialSunset: Story = {
   parameters: {
-    initialCelestialMode: true,
     initialCelestialPreset: "sunset" satisfies CelestialPresetName,
   },
   args: {
@@ -205,7 +178,6 @@ export const CelestialSunset: Story = {
 
 export const CelestialBlueNight: Story = {
   parameters: {
-    initialCelestialMode: true,
     initialCelestialPreset: "blueNight" satisfies CelestialPresetName,
   },
   args: {
@@ -219,7 +191,6 @@ export const CelestialBlueNight: Story = {
 
 export const CelestialDeepNight: Story = {
   parameters: {
-    initialCelestialMode: true,
     initialCelestialPreset: "deepNight" satisfies CelestialPresetName,
   },
   args: {

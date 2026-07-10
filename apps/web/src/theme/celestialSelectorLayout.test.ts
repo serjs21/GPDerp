@@ -35,10 +35,10 @@ describe("celestialSelectorLayout", () => {
     );
 
     expect(separation).toBeCloseTo(2 * CELESTIAL_OPPOSITION_RADIUS_PERCENT, 0);
-    expect(local.sun.x).toBeLessThan(50);
-    expect(local.sun.y).toBeLessThan(50);
-    expect(local.moon.y).toBeGreaterThan(50);
-    expect(local.moon.x).toBeGreaterThan(50);
+    expect(local.sun.x).toBeCloseTo(50, 0);
+    expect(local.sun.y).toBeCloseTo(50 - CELESTIAL_OPPOSITION_RADIUS_PERCENT, 0);
+    expect(local.moon.x).toBeCloseTo(50, 0);
+    expect(local.moon.y).toBeCloseTo(50 + CELESTIAL_OPPOSITION_RADIUS_PERCENT, 0);
   });
 
   it("pins earth rotation to zero in the rotating cosmic frame", () => {

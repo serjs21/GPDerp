@@ -1,12 +1,9 @@
 .stage {
-  min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: 2rem;
-  background:
-    radial-gradient(ellipse at 70% 18%, rgba(240, 236, 228, 0.16), transparent 42%),
-    radial-gradient(ellipse at 30% 80%, rgba(20, 24, 40, 0.55), transparent 55%),
-    linear-gradient(165deg, #1a1c24 0%, #2a2e3a 48%, #14161c 100%);
+  width: 100%;
+  min-height: min(70vh, 32rem);
+  padding: 1rem;
 }
 
 .stepsGrid {
@@ -15,11 +12,9 @@
   align-items: flex-end;
   justify-content: center;
   gap: 1.5rem 2rem;
-  min-height: 100vh;
-  padding: 3rem 2rem 4rem;
-  background:
-    radial-gradient(ellipse at 72% 12%, rgba(245, 240, 230, 0.14), transparent 40%),
-    linear-gradient(165deg, #16181f 0%, #242833 50%, #12141a 100%);
+  width: 100%;
+  min-height: min(70vh, 36rem);
+  padding: 1rem 0 2rem;
 }
 
 .stepCard {
@@ -35,26 +30,26 @@
   font-size: 0.7rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(235, 230, 220, 0.72);
+  color: color-mix(in srgb, var(--text-color) 72%, transparent);
 }
 
 .scrollRoot {
-  height: 100vh;
+  width: 100%;
+  height: min(80vh, 40rem);
   overflow: auto;
-  background:
-    radial-gradient(ellipse at 78% 8%, rgba(250, 245, 235, 0.18), transparent 36%),
-    linear-gradient(180deg, #12141a 0%, #1e2230 42%, #0e1016 100%);
+  border-radius: 8px;
 }
 
 .scrollTrack {
   position: relative;
-  height: 320vh;
+  height: 320%;
 }
 
 .scrollSticky {
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: 100%;
+  min-height: 20rem;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -68,11 +63,10 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.75rem;
   letter-spacing: 0.04em;
-  color: rgba(235, 230, 220, 0.7);
+  color: color-mix(in srgb, var(--text-color) 70%, transparent);
 }
 
 .scrollLantern {
-  /* Anchor flight path visually toward lower-left of the sticky stage */
   margin-right: 18vw;
   margin-top: 12vh;
 }
@@ -83,13 +77,9 @@
   justify-content: space-evenly;
   gap: 0;
   width: 100%;
-  min-height: 100vh;
+  min-height: min(70vh, 36rem);
   box-sizing: border-box;
-  padding: 3rem clamp(1rem, 3vw, 2.5rem) 4rem;
-  background:
-    radial-gradient(ellipse at 70% 10%, rgba(250, 245, 235, 0.16), transparent 38%),
-    radial-gradient(ellipse at 20% 85%, rgba(12, 16, 28, 0.55), transparent 50%),
-    linear-gradient(165deg, #14161c 0%, #222733 48%, #101218 100%);
+  padding: 1rem 0 2rem;
 }
 
 .writtenItem {
@@ -102,4 +92,3 @@
 .writtenItem :global(article) {
   --lantern-width: clamp(7.5rem, 16vw, 11rem);
 }
-
