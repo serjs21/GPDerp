@@ -8,16 +8,11 @@ import {
   CELESTIAL_MOON_BODY_WIDTH_REM,
   CELESTIAL_SUN_BODY_WIDTH_REM,
 } from "@/components/CelestialThemeDial/celestialDialProportions";
+import { backgroundGradeFromDayFactor } from "./daylightBackgroundGrade.config";
 import { DAYLIGHT_ASSETS } from "./daylightAssets";
 import styles from "./DaylightBackground.module.css";
-import { DaylightCloud } from "./placeholders/DaylightCloud";
 import { DaylightMoon } from "./placeholders/DaylightMoon";
-import { DaylightMountains } from "./placeholders/DaylightMountains";
-import { DaylightPaperTexture } from "./placeholders/DaylightPaperTexture";
-import { DaylightShrine } from "./placeholders/DaylightShrine";
-import { DaylightStars } from "./placeholders/DaylightStars";
 import { DaylightSun } from "./placeholders/DaylightSun";
-import { DaylightWater } from "./placeholders/DaylightWater";
 
 const sunTransform = (x: number, y: number, scale: number) =>
   `translate(${x}vw, ${y}vh) scale(${scale})`;
@@ -48,40 +43,41 @@ function isCelestialMode(
   return props.mode === "celestial";
 }
 
-function ScaleBackground({ progress }: DaylightBackgroundScaleProps) {
-  const motion = getSkyMotionState(progress);
-  const motionClass = styles.motionLayer;
-  const cloudDrift = motion.clouds.driftX;
+function gradeStyle(dayFactor: number): CSSProperties {
+  const grade = backgroundGradeFromDayFactor(dayFactor);
+  return {
+    "--bg-brightness": String(grade.brightness),
+    "--bg-contrast": String(grade.contrast),
+    "--bg-saturate": String(grade.saturate),
+    "--bg-soft-light-opacity": String(grade.softLightOpacity),
+    "--bg-multiply-opacity": String(grade.multiplyOpacity),
+    "--bg-balance-red-opacity": String(grade.redOpacity),
+    "--bg-balance-blue-opacity": String(grade.blueOpacity),
+    "--bg-balance-yellow-opacity": String(grade.yellowOpacity),
+    "--bg-scene-art": `url("${DAYLIGHT_ASSETS.background}")`,
+  } as CSSProperties;
+}
 
+function SceneGradeLayers() {
   return (
     <>
-      <div className={styles.sky} />
-      <DaylightPaperTexture />
-      <DaylightStars style={{ opacity: motion.moon.opacity }} />
-      <DaylightCloud
-        src={DAYLIGHT_ASSETS.clouds[0]}
-        className={`${motionClass} ${styles.cloudA}`}
-        style={{
-          opacity: motion.clouds.opacity,
-          transform: `translateX(${cloudDrift}vw)`,
-        }}
-      />
-      <DaylightCloud
-        src={DAYLIGHT_ASSETS.clouds[1]}
-        className={`${motionClass} ${styles.cloudB}`}
-        style={{
-          opacity: motion.clouds.opacity * 0.9,
-          transform: `translateX(${cloudDrift * 1.4}vw)`,
-        }}
-      />
-      <DaylightCloud
-        src={DAYLIGHT_ASSETS.clouds[2]}
-        className={`${motionClass} ${styles.cloudC}`}
-        style={{
-          opacity: motion.clouds.opacity * 0.75,
-          transform: `translateX(${cloudDrift * 0.7}vw)`,
-        }}
-      />
+      <div className={styles.sceneArt} />
+      <div className={styles.themeSoftLight} />
+      <div className={styles.balanceRed} />
+      <div className={styles.balanceYellow} />
+      <div className={styles.balanceBlue} />
+      <div className={styles.themeMultiply} />
+    </>
+  );
+}
+
+function ScaleBackground({ progress }: DaylightBackgroundScaleProps) {
+  const motion = getSkyMotionState(progress);
+  const dayFactor = motion.sun.opacity;
+
+  return (
+    <div className={styles.scene} style={gradeStyle(dayFactor)}>
+      <SceneGradeLayers />
       <DaylightSun
         style={
           {
@@ -98,14 +94,7 @@ function ScaleBackground({ progress }: DaylightBackgroundScaleProps) {
           } as CSSProperties
         }
       />
-      <DaylightMountains
-        style={{
-          opacity: motion.mountain.opacity,
-        }}
-      />
-      <DaylightWater />
-      <DaylightShrine />
-    </>
+    </div>
   );
 }
 
@@ -115,25 +104,11 @@ function CelestialBackground({
 }: DaylightBackgroundCelestialProps) {
   const sunSizeStyle = { width: celestialSunWidth } as CSSProperties;
   const moonSizeStyle = { width: celestialMoonWidth } as CSSProperties;
+  const dayFactor = backgroundBodies.sun.opacity;
 
   return (
-    <>
-      <DaylightStars style={{ opacity: backgroundBodies.moon.opacity }} />
-      <DaylightCloud
-        src={DAYLIGHT_ASSETS.clouds[0]}
-        className={styles.cloudA}
-        style={{ opacity: 0.45 }}
-      />
-      <DaylightCloud
-        src={DAYLIGHT_ASSETS.clouds[1]}
-        className={styles.cloudB}
-        style={{ opacity: 0.4 }}
-      />
-      <DaylightCloud
-        src={DAYLIGHT_ASSETS.clouds[2]}
-        className={styles.cloudC}
-        style={{ opacity: 0.32 }}
-      />
+    <div className={styles.scene} style={gradeStyle(dayFactor)}>
+      <SceneGradeLayers />
       {showCelestialBodies ? (
         <>
           <DaylightSun
@@ -155,10 +130,7 @@ function CelestialBackground({
           />
         </>
       ) : null}
-      <DaylightMountains style={{ opacity: 1 }} />
-      <DaylightWater />
-      <DaylightShrine />
-    </>
+    </div>
   );
 }
 

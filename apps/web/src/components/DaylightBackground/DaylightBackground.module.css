@@ -6,41 +6,90 @@
   overflow: hidden;
 }
 
-.sky {
+.scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.sceneArt {
   position: absolute;
   inset: 0;
   z-index: 0;
+  background-image: var(--bg-scene-art);
+  background-repeat: no-repeat;
+  background-size: auto 100%;
+  background-position: center top;
+  filter: brightness(var(--bg-brightness, 1))
+    contrast(var(--bg-contrast, 1))
+    saturate(var(--bg-saturate, 1));
+  transition: filter 320ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.themeSoftLight {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
   background: linear-gradient(
-    to bottom,
+    180deg,
     var(--sky-top, color-mix(in srgb, var(--gradientStart) 92%, var(--background) 8%)) 0%,
     var(--sky-mid, color-mix(in srgb, var(--gradientMid) 84%, var(--background) 16%)) 54%,
     var(--sky-horizon, color-mix(in srgb, var(--gradientMid) 38%, var(--background) 62%)) 100%
   );
-}
-
-.motionLayer {
+  mix-blend-mode: soft-light;
+  opacity: var(--bg-soft-light-opacity, 0.35);
   transition:
-    transform 180ms cubic-bezier(0.2, 0, 0, 1),
-    opacity 180ms cubic-bezier(0.2, 0, 0, 1);
+    opacity 320ms cubic-bezier(0.2, 0, 0, 1),
+    background 320ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-.cloudA {
-  left: 12%;
-  top: 22%;
+.balanceRed,
+.balanceYellow,
+.balanceBlue {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  transition: opacity 320ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-.cloudB {
-  left: 58%;
-  top: 14%;
+.balanceRed {
+  background: #ff2a1a;
+  opacity: var(--bg-balance-red-opacity, 0);
 }
 
-.cloudC {
-  left: 34%;
-  top: 30%;
+.balanceYellow {
+  background: #ffd45a;
+  opacity: var(--bg-balance-yellow-opacity, 0);
+}
+
+.balanceBlue {
+  background: #2a5cff;
+  opacity: var(--bg-balance-blue-opacity, 0);
+}
+
+.themeMultiply {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: var(--sky-top, #171a33);
+  mix-blend-mode: multiply;
+  opacity: var(--bg-multiply-opacity, 0);
+  transition:
+    opacity 320ms cubic-bezier(0.2, 0, 0, 1),
+    background 320ms cubic-bezier(0.2, 0, 0, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .motionLayer {
+  .sceneArt,
+  .themeSoftLight,
+  .balanceRed,
+  .balanceYellow,
+  .balanceBlue,
+  .themeMultiply {
     transition: none;
   }
 }

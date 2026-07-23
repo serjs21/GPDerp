@@ -1,4 +1,5 @@
 export const DAYLIGHT_ASSETS = {
+  background: "/background.png",
   moon: "/moon.png",
   sun: "/sun.png",
   mountains: "/mountains.png",
