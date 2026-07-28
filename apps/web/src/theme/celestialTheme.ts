@@ -216,6 +216,14 @@ const clamp = (value: number, min = 0, max = 1) =>
 
 const clamp01 = (value: number) => clamp(value, 0, 1);
 
+/** Stable string formatting for SSR/client hydration of inline CSS values. */
+const formatCssNumber = (value: number, fractionDigits = 4) =>
+  Number(value.toFixed(fractionDigits)).toString();
+
+const formatCssPercent = (value: number) => `${formatCssNumber(value)}%`;
+
+const formatCssDegrees = (value: number) => `${formatCssNumber(value)}deg`;
+
 const smoothstep = (value: number) => {
   const t = clamp01(value);
   return t * t * (3 - 2 * t);
@@ -573,15 +581,15 @@ export function getSceneCssVariables(
     "--highlight": theme.highlightOnPaper,
     "--sun-color": theme.sun,
     "--moon-color": theme.moon,
-    "--sun-x": `${layout.sun.x}%`,
-    "--sun-y": `${layout.sun.y}%`,
-    "--sun-opacity": `${layout.sun.opacity}`,
-    "--moon-x": `${layout.moon.x}%`,
-    "--moon-y": `${layout.moon.y}%`,
-    "--moon-opacity": `${layout.moon.opacity}`,
-    "--moon-limb-angle": `${layout.moon.limbAngleDeg}deg`,
+    "--sun-x": formatCssPercent(layout.sun.x),
+    "--sun-y": formatCssPercent(layout.sun.y),
+    "--sun-opacity": formatCssNumber(layout.sun.opacity),
+    "--moon-x": formatCssPercent(layout.moon.x),
+    "--moon-y": formatCssPercent(layout.moon.y),
+    "--moon-opacity": formatCssNumber(layout.moon.opacity),
+    "--moon-limb-angle": formatCssDegrees(layout.moon.limbAngleDeg),
     "--overlay-image": overlay.src ? `url("${overlay.src}")` : "none",
-    "--overlay-opacity": `${clamp01(overlay.opacity)}`,
+    "--overlay-opacity": formatCssNumber(clamp01(overlay.opacity)),
     "--overlay-blend-mode": overlay.blendMode,
     "--overlay-size": overlay.size,
     "--overlay-position": overlay.position,

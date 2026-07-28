@@ -1,5 +1,5 @@
 .sun {
-  z-index: 2;
+  z-index: 3;
   left: 34%;
   top: 48%;
   width: clamp(3.25rem, 10vw, 5.25rem);

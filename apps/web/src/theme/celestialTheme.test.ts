@@ -1,6 +1,7 @@
 import {
   contrastRatio,
   getCelestialLayout,
+  getSceneCssVariables,
   getThemeAt,
   mixHexOklab,
   type GeoCoordinates,
@@ -56,5 +57,25 @@ describe("getCelestialLayout", () => {
     expect(layout.moon.x).toBeLessThanOrEqual(95);
     expect(layout.moon.opacity).toBeGreaterThanOrEqual(0);
     expect(layout.moon.opacity).toBeLessThanOrEqual(1);
+  });
+});
+
+describe("getSceneCssVariables", () => {
+  it("formats layout numbers with stable precision for hydration", () => {
+    const date = new Date("2023-03-15T22:00:00+07:00");
+    const theme = getThemeAt(date, BANGKOK);
+    const layout = getCelestialLayout(date, BANGKOK, {
+      cameraAzimuthDeg: 180,
+      mirrorScene: true,
+      horizonY: 82,
+      zenithY: 10,
+      horizontalPadding: 5,
+    });
+    const sceneVars = getSceneCssVariables(theme, layout);
+
+    expect(sceneVars["--moon-x"]).toMatch(/^-?\d+(\.\d{1,4})?%$/);
+    expect(sceneVars["--sun-x"]).toMatch(/^-?\d+(\.\d{1,4})?%$/);
+    expect(sceneVars["--moon-limb-angle"]).toMatch(/^-?\d+(\.\d{1,4})?deg$/);
+    expect(sceneVars["--moon-opacity"]).toMatch(/^-?\d+(\.\d{1,4})?$/);
   });
 });

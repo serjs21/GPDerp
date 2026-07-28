@@ -2,14 +2,30 @@
 
 import type { CSSProperties } from "react";
 import type { SelectorBackgroundBodies } from "@/theme/celestialSelectorLayout";
+import { slotToDate } from "@/theme/celestialTime";
+import { getThemeAt, type ThemeColors } from "@/theme/celestialTheme";
 import { getSkyMotionState } from "@/theme/themeSkyMotion";
+import { BANGKOK_COORDINATES } from "@/theme/useCelestialScene";
 import { useCelestialTheme } from "@/app/providers/CelestialThemeProvider";
 import {
   CELESTIAL_MOON_BODY_WIDTH_REM,
   CELESTIAL_SUN_BODY_WIDTH_REM,
 } from "@/components/CelestialThemeDial/celestialDialProportions";
-import { backgroundGradeFromDayFactor } from "./daylightBackgroundGrade.config";
+import {
+  cycleDirectionFromScaleProgress,
+  cycleDirectionFromSlot,
+  geographicMaskLayersFromTheme,
+  getBackgroundCycleState,
+  slotFromScaleProgress,
+  solarElevationFromScaleProgress,
+  themeSkyGradient,
+  type BackgroundCycleState,
+  type GeographicMaskLayers,
+} from "./daylightBackgroundCycle";
+import { DAYLIGHT_BACKGROUND_MASK_STRENGTH } from "./daylightBackgroundMaskStrength.config";
+import { DAYLIGHT_BACKGROUND_Z } from "./daylightBackgroundMasks.config";
 import { DAYLIGHT_ASSETS } from "./daylightAssets";
+import { DaylightMaskLayer } from "./DaylightMaskLayer";
 import styles from "./DaylightBackground.module.css";
 import { DaylightMoon } from "./placeholders/DaylightMoon";
 import { DaylightSun } from "./placeholders/DaylightSun";
@@ -31,6 +47,9 @@ type DaylightBackgroundCelestialProps = {
   mode: "celestial";
   backgroundBodies: SelectorBackgroundBodies;
   showCelestialBodies?: boolean;
+  solarElevationDeg: number;
+  slot: number;
+  theme: ThemeColors;
 };
 
 export type DaylightBackgroundViewProps =
@@ -43,41 +62,81 @@ function isCelestialMode(
   return props.mode === "celestial";
 }
 
-function gradeStyle(dayFactor: number): CSSProperties {
-  const grade = backgroundGradeFromDayFactor(dayFactor);
+function sceneStyle(cycle: BackgroundCycleState): CSSProperties {
   return {
-    "--bg-brightness": String(grade.brightness),
-    "--bg-contrast": String(grade.contrast),
-    "--bg-saturate": String(grade.saturate),
-    "--bg-soft-light-opacity": String(grade.softLightOpacity),
-    "--bg-multiply-opacity": String(grade.multiplyOpacity),
-    "--bg-balance-red-opacity": String(grade.redOpacity),
-    "--bg-balance-blue-opacity": String(grade.blueOpacity),
-    "--bg-balance-yellow-opacity": String(grade.yellowOpacity),
+    "--bg-brightness": String(cycle.brightness),
+    "--bg-saturate": String(cycle.saturation),
     "--bg-scene-art": `url("${DAYLIGHT_ASSETS.background}")`,
   } as CSSProperties;
 }
 
-function SceneGradeLayers() {
+function SceneArtAndSky({ theme }: { theme: ThemeColors }) {
+  const gradient = themeSkyGradient(theme);
+  const { skyOpacity, horizonOpacity } = DAYLIGHT_BACKGROUND_MASK_STRENGTH;
+
   return (
     <>
       <div className={styles.sceneArt} />
-      <div className={styles.themeSoftLight} />
-      <div className={styles.balanceRed} />
-      <div className={styles.balanceYellow} />
-      <div className={styles.balanceBlue} />
-      <div className={styles.themeMultiply} />
+      <DaylightMaskLayer
+        maskUrl={DAYLIGHT_ASSETS.masks.sky}
+        gradient={gradient}
+        opacity={skyOpacity}
+        blendMode="normal"
+        zIndex={DAYLIGHT_BACKGROUND_Z.sky}
+      />
+      <DaylightMaskLayer
+        maskUrl={DAYLIGHT_ASSETS.masks.horizon}
+        gradient={gradient}
+        opacity={horizonOpacity}
+        blendMode="normal"
+        zIndex={DAYLIGHT_BACKGROUND_Z.horizon}
+      />
+    </>
+  );
+}
+
+function GeographicMaskLayers({ layers }: { layers: GeographicMaskLayers }) {
+  return (
+    <>
+      <DaylightMaskLayer
+        maskUrl={DAYLIGHT_ASSETS.masks.mountain}
+        color={layers.mountain.color}
+        opacity={layers.mountain.opacity}
+        blendMode={layers.mountain.blendMode}
+        zIndex={DAYLIGHT_BACKGROUND_Z.mountain}
+      />
+      <DaylightMaskLayer
+        maskUrl={DAYLIGHT_ASSETS.masks.midground}
+        color={layers.midground.color}
+        opacity={layers.midground.opacity}
+        blendMode={layers.midground.blendMode}
+        zIndex={DAYLIGHT_BACKGROUND_Z.midground}
+      />
+      <DaylightMaskLayer
+        maskUrl={DAYLIGHT_ASSETS.masks.foreground}
+        color={layers.foreground.color}
+        opacity={layers.foreground.opacity}
+        blendMode={layers.foreground.blendMode}
+        zIndex={DAYLIGHT_BACKGROUND_Z.foreground}
+      />
     </>
   );
 }
 
 function ScaleBackground({ progress }: DaylightBackgroundScaleProps) {
   const motion = getSkyMotionState(progress);
-  const dayFactor = motion.sun.opacity;
+  const elevation = solarElevationFromScaleProgress(progress);
+  const direction = cycleDirectionFromScaleProgress(progress);
+  const cycle = getBackgroundCycleState(elevation, direction);
+  const theme = getThemeAt(
+    slotToDate(slotFromScaleProgress(progress)),
+    BANGKOK_COORDINATES,
+  );
+  const geographicLayers = geographicMaskLayersFromTheme(theme, cycle);
 
   return (
-    <div className={styles.scene} style={gradeStyle(dayFactor)}>
-      <SceneGradeLayers />
+    <div className={styles.scene} style={sceneStyle(cycle)}>
+      <SceneArtAndSky theme={theme} />
       <DaylightSun
         style={
           {
@@ -94,6 +153,7 @@ function ScaleBackground({ progress }: DaylightBackgroundScaleProps) {
           } as CSSProperties
         }
       />
+      <GeographicMaskLayers layers={geographicLayers} />
     </div>
   );
 }
@@ -101,14 +161,21 @@ function ScaleBackground({ progress }: DaylightBackgroundScaleProps) {
 function CelestialBackground({
   backgroundBodies,
   showCelestialBodies = true,
+  solarElevationDeg,
+  slot,
+  theme,
 }: DaylightBackgroundCelestialProps) {
   const sunSizeStyle = { width: celestialSunWidth } as CSSProperties;
   const moonSizeStyle = { width: celestialMoonWidth } as CSSProperties;
-  const dayFactor = backgroundBodies.sun.opacity;
+  const cycle = getBackgroundCycleState(
+    solarElevationDeg,
+    cycleDirectionFromSlot(slot),
+  );
+  const geographicLayers = geographicMaskLayersFromTheme(theme, cycle);
 
   return (
-    <div className={styles.scene} style={gradeStyle(dayFactor)}>
-      <SceneGradeLayers />
+    <div className={styles.scene} style={sceneStyle(cycle)}>
+      <SceneArtAndSky theme={theme} />
       {showCelestialBodies ? (
         <>
           <DaylightSun
@@ -130,6 +197,7 @@ function CelestialBackground({
           />
         </>
       ) : null}
+      <GeographicMaskLayers layers={geographicLayers} />
     </div>
   );
 }
@@ -145,13 +213,16 @@ export const DaylightBackgroundView = (props: DaylightBackgroundViewProps) => (
 );
 
 export const DaylightBackground = () => {
-  const { backgroundBodies } = useCelestialTheme();
+  const { backgroundBodies, scene, effectiveSlot } = useCelestialTheme();
 
   return (
     <DaylightBackgroundView
       mode="celestial"
       backgroundBodies={backgroundBodies}
       showCelestialBodies
+      solarElevationDeg={scene.layout.sun.altitudeDeg}
+      slot={effectiveSlot}
+      theme={scene.theme}
     />
   );
 };

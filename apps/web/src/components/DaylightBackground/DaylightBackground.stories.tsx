@@ -82,6 +82,9 @@ const InteractiveBackground = ({
       mode="celestial"
       backgroundBodies={backgroundBodies}
       showCelestialBodies={celestialState.showCelestialBodies}
+      solarElevationDeg={celestialScene.layout.sun.altitudeDeg}
+      slot={celestialSlot}
+      theme={celestialScene.theme}
     />
   ) : (
     <DaylightBackgroundView progress={progress} />

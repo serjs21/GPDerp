@@ -67,6 +67,9 @@ const CelestialScenePreview = () => {
         mode="celestial"
         backgroundBodies={backgroundBodies}
         showCelestialBodies
+        solarElevationDeg={celestialScene.layout.sun.altitudeDeg}
+        slot={slot}
+        theme={celestialScene.theme}
       />
       <div className={styles.controls}>
         <CelestialThemeClock
