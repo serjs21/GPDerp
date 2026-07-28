@@ -1,0 +1,56 @@
+.shell {
+  --layout-chrome-bottom: 10.5rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  width: 100%;
+  position: relative;
+  color: var(--ink, var(--text-color));
+}
+
+.stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: calc(100dvh - var(--layout-chrome-bottom));
+  overflow: hidden;
+}
+
+.controls {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+  display: grid;
+  gap: 0.85rem;
+  width: min(22rem, calc(100% - 2rem));
+  padding: 0.85rem 1rem;
+  border-radius: 0.85rem;
+  background: color-mix(in srgb, var(--surface-glass-strong, #fff) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border-color, #ccc) 70%, transparent);
+  box-shadow: 0 0.5rem 1.5rem color-mix(in srgb, var(--sumi-ink, #000) 10%, transparent);
+  pointer-events: auto;
+}
+
+.selectorRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.timeLabel {
+  margin: 0;
+  font-size: 0.8rem;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.footerSlot {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 768px) {
+  .shell {
+    --layout-chrome-bottom: 8.25rem;
+  }
+}

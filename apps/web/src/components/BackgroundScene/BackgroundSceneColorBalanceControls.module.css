@@ -1,0 +1,27 @@
+.panel {
+  display: grid;
+  gap: 0.65rem;
+  min-width: min(20rem, 100%);
+}
+
+.title {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.field {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--accent-red, #bc002d);
+}
+
+.value {
+  opacity: 0.8;
+  font-variant-numeric: tabular-nums;
+}
