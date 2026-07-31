@@ -19,3 +19,11 @@ export {
   backgroundSceneMaskLayout,
 } from "./backgroundSceneMaskLayout";
 export type { BackgroundSceneMaskLayout } from "./backgroundSceneMaskLayout";
+export {
+  colorBalanceFromThemeSelection,
+} from "./backgroundSceneThemeColorBalance";
+export type {
+  ThemeColorBalanceInput,
+  ThemeColorBalanceResult,
+} from "./backgroundSceneThemeColorBalance";
+export { BACKGROUND_SCENE_THEME_COLOR_BALANCE } from "./backgroundSceneThemeColorBalance.config";

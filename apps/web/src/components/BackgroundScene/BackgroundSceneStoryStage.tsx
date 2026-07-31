@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import { CelestialThemeProvider, useCelestialTheme } from "@/app/providers/CelestialThemeProvider";
 import { CelestialThemeSelector } from "@/components/CelestialThemeSelector";
 import { SiteFooter } from "@/components/SiteFooter/SiteFooter";
@@ -17,6 +17,7 @@ import {
   DEFAULT_COLOR_BALANCE,
   type ColorBalanceValues,
 } from "./backgroundSceneColorBalance";
+import { colorBalanceFromThemeSelection } from "./backgroundSceneThemeColorBalance";
 import styles from "./BackgroundSceneStoryStage.module.css";
 
 const DEFAULT_CELESTIAL_SLOT = 48;
@@ -47,6 +48,19 @@ function BackgroundSceneStoryStageInner({ children }: { children?: ReactNode }) 
   const [mountainColorBalance, setMountainColorBalance] = useState<ColorBalanceValues>(
     DEFAULT_COLOR_BALANCE,
   );
+  const themeBalance = useMemo(
+    () =>
+      colorBalanceFromThemeSelection({
+        theme: scene.theme,
+        solarElevationDeg: scene.layout.sun.altitudeDeg,
+      }),
+    [scene.theme, scene.layout.sun.altitudeDeg],
+  );
+
+  useEffect(() => {
+    setColorBalance(themeBalance.global);
+    setMountainColorBalance(themeBalance.mountain);
+  }, [themeBalance]);
 
   return (
     <div
