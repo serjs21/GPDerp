@@ -16,10 +16,11 @@ import {
   type ColorBalanceValues,
 } from "./backgroundSceneColorBalance";
 import { useBackgroundSceneMaskLayout } from "./useBackgroundSceneMaskLayout";
+import { BackgroundSceneStars } from "./BackgroundSceneStars";
 import styles from "./BackgroundScene.module.css";
 
 export type BackgroundSceneProps = {
-  theme: Pick<ThemeColors, "skyTop" | "skyMid" | "skyHorizon">;
+  theme: Pick<ThemeColors, "skyTop" | "skyMid" | "skyHorizon" | "moon">;
   backgroundBodies: SelectorBackgroundBodies;
   colorBalance?: ColorBalanceValues;
   mountainColorBalance?: ColorBalanceValues;
@@ -53,6 +54,10 @@ export function BackgroundScene({
     >
       <div className={styles.scene}>
         <div className={styles.celestialLayer}>
+          <BackgroundSceneStars
+            opacity={backgroundBodies.moon.opacity}
+            moonColor={theme.moon}
+          />
           <DaylightSun
             celestial={{
               x: backgroundBodies.sun.x,

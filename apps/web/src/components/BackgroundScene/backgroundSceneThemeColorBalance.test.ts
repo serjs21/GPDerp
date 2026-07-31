@@ -12,25 +12,24 @@ describe("colorBalanceFromThemeSelection", () => {
     expect(result.mountain).toEqual({ cyanRed: 0, magentaGreen: 0, yellowBlue: 0 });
   });
 
-  it("shifts global balance cool at night without crushing darkness", () => {
+  it("matches tuned night global and mountain balance at full night", () => {
     const result = colorBalanceFromThemeSelection({
       theme: THEME_STOPS.night,
       solarElevationDeg: -15,
     });
 
-    expect(result.global.yellowBlue).toBeLessThan(0);
-    expect(result.global.yellowBlue).toBeGreaterThanOrEqual(-35);
-    expect(result.global.cyanRed).toBeGreaterThanOrEqual(-18);
+    expect(result.global).toEqual({ cyanRed: -6, magentaGreen: 0, yellowBlue: 29 });
+    expect(result.mountain).toEqual({ cyanRed: -52, magentaGreen: -38, yellowBlue: -8 });
   });
 
-  it("keeps mountain darker and cooler than global at night", () => {
+  it("keeps mountain darker than global at night", () => {
     const result = colorBalanceFromThemeSelection({
       theme: THEME_STOPS.night,
       solarElevationDeg: -15,
     });
 
-    expect(result.mountain.yellowBlue).toBeLessThan(result.global.yellowBlue);
     expect(result.mountain.cyanRed).toBeLessThan(result.global.cyanRed);
+    expect(result.mountain.magentaGreen).toBeLessThan(result.global.magentaGreen);
   });
 
   it("applies warm shift at sunrise theme", () => {

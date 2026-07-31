@@ -51,17 +51,6 @@ function scaleBalance(values: ColorBalanceValues, scale: number): ColorBalanceVa
   });
 }
 
-function addBalance(
-  left: ColorBalanceValues,
-  right: ColorBalanceValues,
-): ColorBalanceValues {
-  return normalizeColorBalance({
-    cyanRed: left.cyanRed + right.cyanRed,
-    magentaGreen: left.magentaGreen + right.magentaGreen,
-    yellowBlue: left.yellowBlue + right.yellowBlue,
-  });
-}
-
 function lerpBalance(
   from: ColorBalanceValues,
   to: ColorBalanceValues,
@@ -119,11 +108,11 @@ function themeDeltaBalance(theme: Pick<ThemeColors, "skyHorizon" | "moon">): Col
 }
 
 function clampNightGlobal(values: ColorBalanceValues): ColorBalanceValues {
-  const { nightGlobalCaps } = BACKGROUND_SCENE_THEME_COLOR_BALANCE;
+  const { nightGlobalFloors } = BACKGROUND_SCENE_THEME_COLOR_BALANCE;
   return normalizeColorBalance({
-    cyanRed: Math.max(nightGlobalCaps.cyanRed, values.cyanRed),
-    magentaGreen: Math.max(nightGlobalCaps.magentaGreen, values.magentaGreen),
-    yellowBlue: Math.max(nightGlobalCaps.yellowBlue, values.yellowBlue),
+    cyanRed: Math.max(nightGlobalFloors.cyanRed, values.cyanRed),
+    magentaGreen: Math.max(nightGlobalFloors.magentaGreen, values.magentaGreen),
+    yellowBlue: Math.max(nightGlobalFloors.yellowBlue, values.yellowBlue),
   });
 }
 
@@ -138,7 +127,7 @@ export function colorBalanceFromThemeSelection({
 
   const {
     nightGlobalTarget,
-    mountainNightExtra,
+    nightMountainTarget,
   } = BACKGROUND_SCENE_THEME_COLOR_BALANCE;
 
   const fromTheme = scaleBalance(
@@ -150,10 +139,7 @@ export function colorBalanceFromThemeSelection({
     lerpBalance(fromTheme, nightGlobalTarget, nightT),
   );
 
-  const mountain = addBalance(
-    global,
-    scaleBalance(mountainNightExtra, nightT),
-  );
+  const mountain = lerpBalance(global, nightMountainTarget, nightT);
 
   const delta = themeDeltaBalance(theme);
   const nearNoon =

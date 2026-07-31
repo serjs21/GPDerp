@@ -1,4 +1,5 @@
 export { BackgroundScene } from "./BackgroundScene";
+export { BackgroundSceneStars } from "./BackgroundSceneStars";
 export type { BackgroundSceneProps } from "./BackgroundScene";
 export { BackgroundSceneColorBalanceControls } from "./BackgroundSceneColorBalanceControls";
 export type { BackgroundSceneColorBalanceControlsProps } from "./BackgroundSceneColorBalanceControls";

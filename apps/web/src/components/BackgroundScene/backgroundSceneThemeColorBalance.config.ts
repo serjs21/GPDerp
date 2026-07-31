@@ -6,23 +6,23 @@ export const BACKGROUND_SCENE_THEME_COLOR_BALANCE = {
   moonSampleWeight: 0.4,
   /** Scales linear RGB delta into slider units (−100…100). */
   rgbToSliderGain: 110,
-  /** Full-night global target (moonlit, readable foreground). */
+  /** Full-night global target (moonlit foreground from Storybook tuning). */
   nightGlobalTarget: {
-    cyanRed: -5,
-    magentaGreen: -2,
-    yellowBlue: -22,
+    cyanRed: -6,
+    magentaGreen: 0,
+    yellowBlue: 29,
   } satisfies ColorBalanceValues,
-  /** Added on top of global at full night so mountain reads darker/cooler. */
-  mountainNightExtra: {
-    cyanRed: -7,
-    magentaGreen: -3,
-    yellowBlue: -16,
+  /** Full-night mountain target (darker/cooler than foreground). */
+  nightMountainTarget: {
+    cyanRed: -52,
+    magentaGreen: -38,
+    yellowBlue: -8,
   } satisfies ColorBalanceValues,
-  /** Per-channel minimum (most negative) allowed for global night balance. */
-  nightGlobalCaps: {
+  /** Per-channel minimum allowed for global night balance (floors only). */
+  nightGlobalFloors: {
     cyanRed: -18,
     magentaGreen: -12,
-    yellowBlue: -35,
+    yellowBlue: -100,
   } satisfies ColorBalanceValues,
   /** Solar elevation (deg) where night blend begins / ends. */
   nightElevationStart: 6,
