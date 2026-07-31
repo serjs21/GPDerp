@@ -7,6 +7,8 @@ import {
 import styles from "./BackgroundSceneColorBalanceControls.module.css";
 
 export type BackgroundSceneColorBalanceControlsProps = {
+  title?: string;
+  resetLabel?: string;
   value: ColorBalanceValues;
   onChange: (next: ColorBalanceValues) => void;
 };
@@ -20,6 +22,8 @@ const FIELDS: { key: BalanceField; label: string }[] = [
 ];
 
 export function BackgroundSceneColorBalanceControls({
+  title = "Color balance",
+  resetLabel = "Reset balance",
   value,
   onChange,
 }: BackgroundSceneColorBalanceControlsProps) {
@@ -29,7 +33,7 @@ export function BackgroundSceneColorBalanceControls({
 
   return (
     <div className={styles.panel}>
-      <p className={styles.title}>Color balance</p>
+      <p className={styles.title}>{title}</p>
       {FIELDS.map(({ key, label }) => (
         <label key={key} className={styles.field}>
           <span>
@@ -55,7 +59,7 @@ export function BackgroundSceneColorBalanceControls({
         className={styles.value}
         onClick={() => onChange(DEFAULT_COLOR_BALANCE)}
       >
-        Reset balance
+        {resetLabel}
       </button>
     </div>
   );

@@ -22,13 +22,33 @@
   overflow: hidden;
 }
 
-.baseArt {
+.baseArtStack {
   position: relative;
   z-index: 2;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.baseArt {
+  position: relative;
   display: block;
   width: 100%;
   height: auto;
-  flex-shrink: 0;
+}
+
+.mountainArt {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  -webkit-mask-image: var(--mountain-mask-image);
+  mask-image: var(--mountain-mask-image);
+  -webkit-mask-source-type: luminance;
+  mask-mode: luminance;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
 }
 
 .filterDefs {

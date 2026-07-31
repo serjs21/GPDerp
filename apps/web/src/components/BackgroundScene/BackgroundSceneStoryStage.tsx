@@ -12,6 +12,7 @@ import { dateToSlot, formatClockLabel } from "@/theme/celestialTime";
 import { BANGKOK_COORDINATES } from "@/theme/useCelestialScene";
 import { BackgroundScene } from "./BackgroundScene";
 import { BackgroundSceneColorBalanceControls } from "./BackgroundSceneColorBalanceControls";
+import { BackgroundSceneMountainColorBalanceControls } from "./BackgroundSceneMountainColorBalanceControls";
 import {
   DEFAULT_COLOR_BALANCE,
   type ColorBalanceValues,
@@ -43,6 +44,9 @@ function BackgroundSceneStoryStageInner({ children }: { children?: ReactNode }) 
   const [colorBalance, setColorBalance] = useState<ColorBalanceValues>(
     DEFAULT_COLOR_BALANCE,
   );
+  const [mountainColorBalance, setMountainColorBalance] = useState<ColorBalanceValues>(
+    DEFAULT_COLOR_BALANCE,
+  );
 
   return (
     <div
@@ -55,6 +59,7 @@ function BackgroundSceneStoryStageInner({ children }: { children?: ReactNode }) 
           theme={scene.theme}
           backgroundBodies={backgroundBodies}
           colorBalance={colorBalance}
+          mountainColorBalance={mountainColorBalance}
         />
         {children}
       </div>
@@ -71,8 +76,14 @@ function BackgroundSceneStoryStageInner({ children }: { children?: ReactNode }) 
           <p className={styles.timeLabel}>{formatClockLabel(effectiveSlot)}</p>
         </div>
         <BackgroundSceneColorBalanceControls
+          title="Global color balance"
+          resetLabel="Reset global balance"
           value={colorBalance}
           onChange={setColorBalance}
+        />
+        <BackgroundSceneMountainColorBalanceControls
+          value={mountainColorBalance}
+          onChange={setMountainColorBalance}
         />
       </div>
 
