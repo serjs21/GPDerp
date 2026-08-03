@@ -132,18 +132,26 @@ function FlightPathDemo({ lanternCount }: FlightPathArgs) {
             (a, b) =>
               sampleLanternFlightPath(a.pathS).scale - sampleLanternFlightPath(b.pathS).scale,
           )
-          .map(({ item, pathS }) => (
-            <Lantern
-              key={item.id}
-              className={styles.flightPathLantern}
-              progress={pathS}
-              haiku={makeMockHaiku({
-                id: item.id,
-                title: item.title,
-                body: item.body,
-              })}
-            />
-          ))}
+          .map(({ item, index, pathS }) => {
+            const nextPathS =
+              index < lanterns.length - 1
+                ? getLanternQueuePathProgress(scrollProgress, index + 1, spacing)
+                : undefined;
+
+            return (
+              <Lantern
+                key={item.id}
+                className={styles.flightPathLantern}
+                progress={pathS}
+                nextLanternPathProgress={nextPathS}
+                haiku={makeMockHaiku({
+                  id: item.id,
+                  title: item.title,
+                  body: item.body,
+                })}
+              />
+            );
+          })}
       </div>
     </div>
   );

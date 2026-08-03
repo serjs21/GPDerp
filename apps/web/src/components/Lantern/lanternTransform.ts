@@ -41,9 +41,12 @@ export function getLanternTransformAtStep(step: number, maxSteps: number = LANTE
  */
 export function getLanternTransformAtProgress(
   progress: number,
+  options: { nextLanternPathProgress?: number } = {},
 ): LanternTransform {
   const clamped = Math.min(1, Math.max(0, progress));
-  return getLanternFlightTransform(clamped);
+  return getLanternFlightTransform(clamped, {
+    nextLanternPathT: options.nextLanternPathProgress,
+  });
 }
 
 export function lanternTransformToCssVars(transform: LanternTransform): CSSProperties {
@@ -82,7 +85,9 @@ export function resolveLanternTransform(props: LanternTransformInput): LanternTr
       props.step !== undefined
         ? getLanternTransformAtStep(props.step, props.maxSteps)
         : props.progress !== undefined
-          ? getLanternTransformAtProgress(props.progress)
+          ? getLanternTransformAtProgress(props.progress, {
+              nextLanternPathProgress: props.nextLanternPathProgress,
+            })
           : getLanternTransformAtStep(0, props.maxSteps);
     return {
       x: props.transform.x ?? base.x,
@@ -99,7 +104,9 @@ export function resolveLanternTransform(props: LanternTransformInput): LanternTr
   }
 
   if (props.progress !== undefined) {
-    return getLanternTransformAtProgress(props.progress);
+    return getLanternTransformAtProgress(props.progress, {
+      nextLanternPathProgress: props.nextLanternPathProgress,
+    });
   }
 
   return getLanternTransformAtStep(0, props.maxSteps);
