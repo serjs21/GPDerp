@@ -42,13 +42,12 @@ describe("lanternTransform", () => {
     it("fades after the initial point when the next lantern has not arrived", () => {
       const faded = getLanternTransformAtProgress(LANTERN_FLIGHT_PATH_INITIAL + 0.05);
       expect(faded.opacity).toBeLessThan(1);
+      expect(faded.opacity).toBeGreaterThan(0);
     });
 
-    it("hides when the next lantern reaches initial", () => {
-      const hidden = getLanternTransformAtProgress(LANTERN_FLIGHT_PATH_INITIAL + 0.05, {
-        nextLanternPathProgress: LANTERN_FLIGHT_PATH_INITIAL,
-      });
-      expect(hidden.opacity).toBe(0);
+    it("restores full opacity when returning to initial", () => {
+      const atInitial = getLanternTransformAtProgress(LANTERN_FLIGHT_PATH_INITIAL);
+      expect(atInitial.opacity).toBe(1);
     });
 
     it("clamps progress outside 0–1", () => {

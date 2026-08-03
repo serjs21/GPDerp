@@ -26,8 +26,8 @@
   position: absolute;
   left: var(--lantern-left);
   top: var(--lantern-top);
-  transform: translate(-50%, -50%) scale(var(--lantern-scale)) rotate(var(--lantern-rotate));
-  transform-origin: center center;
+  transform: translate(-50%, -100%) scale(var(--lantern-scale)) rotate(var(--lantern-rotate));
+  transform-origin: center bottom;
 }
 
 .shell {

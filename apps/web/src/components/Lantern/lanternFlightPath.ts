@@ -69,22 +69,10 @@ export function sampleLanternFlightPath(pathS: number): LanternFlightPathSample 
 
 export type LanternFlightOpacityInput = {
   pathT: number;
-  nextLanternPathT?: number;
 };
 
-/** Opacity along path: full before INITIAL; fades after; hidden when superseded. */
-export function getLanternFlightOpacity({
-  pathT,
-  nextLanternPathT,
-}: LanternFlightOpacityInput): number {
-  if (
-    nextLanternPathT !== undefined &&
-    nextLanternPathT >= LANTERN_FLIGHT_PATH_INITIAL &&
-    pathT > LANTERN_FLIGHT_PATH_INITIAL
-  ) {
-    return 0;
-  }
-
+/** Opacity along path: full at/before INITIAL; linear fade to 0 at path exit. */
+export function getLanternFlightOpacity({ pathT }: LanternFlightOpacityInput): number {
   if (pathT <= LANTERN_FLIGHT_PATH_INITIAL) {
     return 1;
   }
@@ -99,17 +87,11 @@ export type LanternFlightTransform = LanternFlightPathSample & {
   positionMode: "percent";
 };
 
-export function getLanternFlightTransform(
-  pathT: number,
-  options: { nextLanternPathT?: number } = {},
-): LanternFlightTransform {
+export function getLanternFlightTransform(pathT: number): LanternFlightTransform {
   const sample = sampleLanternFlightPath(pathT);
   return {
     ...sample,
-    opacity: getLanternFlightOpacity({
-      pathT,
-      nextLanternPathT: options.nextLanternPathT,
-    }),
+    opacity: getLanternFlightOpacity({ pathT }),
     positionMode: "percent",
   };
 }
@@ -121,9 +103,9 @@ export function getLanternQueuePathProgress(
   spacing: number = LANTERN_FLIGHT_QUEUE_SPACING,
 ): number {
   const clampedScroll = clamp01(scrollProgress);
-  const totalSpan = 1 + spacing * Math.max(0, index);
-  const pathS = clampedScroll * totalSpan - index * spacing;
-  return Math.max(0, pathS);
+  const exitSpan = 1 - LANTERN_FLIGHT_PATH_INITIAL;
+  const leadPathS = LANTERN_FLIGHT_PATH_INITIAL + clampedScroll * exitSpan;
+  return Math.max(0, leadPathS - index * spacing);
 }
 
 /** Evenly spaced arc-length samples for discrete step previews. */

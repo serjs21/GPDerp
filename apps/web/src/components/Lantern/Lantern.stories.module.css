@@ -6,159 +6,36 @@
   padding: 1rem;
 }
 
-.stepsGrid {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 1.5rem 2rem;
-  width: 100%;
-  min-height: min(70vh, 36rem);
-  padding: 1rem 0 2rem;
-}
-
-.stepCard {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.stepLabel {
-  margin: 0;
-  font-family: var(--font-noto-serif), ui-serif, Georgia, serif;
-  font-size: 0.7rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--text-color) 72%, transparent);
-}
-
-.scrollRoot {
-  width: 100%;
-  height: min(80vh, 40rem);
-  overflow: auto;
-  border-radius: 8px;
-}
-
-.scrollTrack {
+.flightPathViewport {
   position: relative;
-  height: 320%;
-}
-
-.scrollSticky {
-  position: sticky;
-  top: 0;
-  height: 100%;
-  min-height: 20rem;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-}
-
-.scrollHud {
-  position: absolute;
-  top: 1.25rem;
-  left: 1.25rem;
-  margin: 0;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-  color: color-mix(in srgb, var(--text-color) 70%, transparent);
-}
-
-.scrollLantern {
-  margin-right: 18vw;
-  margin-top: 12vh;
-}
-
-.writtenList {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-evenly;
-  gap: 0;
   width: 100%;
-  min-height: min(70vh, 36rem);
-  box-sizing: border-box;
-  padding: 1rem 0 2rem;
-}
-
-.writtenItem {
-  flex: 1 1 0;
-  display: flex;
-  justify-content: center;
-  min-width: 0;
-}
-
-.writtenItem :global(article) {
-  --lantern-width: clamp(7.5rem, 16vw, 11rem);
+  min-height: min(72vh, 38rem);
+  overscroll-behavior: contain;
+  touch-action: none;
 }
 
 .flightPathStage {
   position: relative;
   width: 100%;
-  min-height: min(72vh, 38rem);
+  min-height: min(68vh, 36rem);
   margin: 0 auto;
-  overflow: hidden;
-}
-
-.flightPathGuide {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center;
-  opacity: 0.24;
-  filter: brightness(0) invert(1);
-  pointer-events: none;
-  user-select: none;
+  padding: 2rem 1rem 3rem;
+  overflow: visible;
 }
 
 .flightPathLantern {
   --lantern-width: clamp(4.5rem, 9vw, 8.5rem);
 }
 
-.flightPathLabel {
+.flightPathHud {
   position: absolute;
-  z-index: 2;
-  margin: 0;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.62rem;
-  letter-spacing: 0.04em;
-  color: color-mix(in srgb, var(--text-color) 65%, transparent);
-  transform: translate(-50%, -140%);
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.flightPathScrollRoot {
-  width: 100%;
-  height: min(82vh, 42rem);
-  overflow: auto;
-  border-radius: 8px;
-}
-
-.flightPathScrollTrack {
-  position: relative;
-  height: 360%;
-}
-
-.flightPathScrollSticky {
-  position: sticky;
-  top: 0;
-  height: 100%;
-  min-height: 22rem;
-  overflow: hidden;
-}
-
-.flightPathScrollHud {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
+  top: 0.5rem;
+  left: 0.5rem;
   z-index: 3;
   margin: 0;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.72rem;
   letter-spacing: 0.04em;
   color: color-mix(in srgb, var(--text-color) 72%, transparent);
+  pointer-events: none;
 }

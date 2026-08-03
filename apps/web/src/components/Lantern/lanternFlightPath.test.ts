@@ -67,43 +67,42 @@ describe("lanternFlightPath", () => {
       expect(getLanternFlightOpacity({ pathT: LANTERN_FLIGHT_PATH_INITIAL })).toBe(1);
     });
 
-    it("fades after the initial point", () => {
+    it("fades linearly after the initial point", () => {
       const midFade = getLanternFlightOpacity({ pathT: LANTERN_FLIGHT_PATH_INITIAL + 0.05 });
       const endFade = getLanternFlightOpacity({ pathT: 1 });
       expect(midFade).toBeLessThan(1);
       expect(endFade).toBeLessThan(midFade);
       expect(endFade).toBeCloseTo(0, 1);
     });
-
-    it("forces invisibility when the next lantern reaches initial", () => {
-      expect(
-        getLanternFlightOpacity({
-          pathT: LANTERN_FLIGHT_PATH_INITIAL + 0.05,
-          nextLanternPathT: LANTERN_FLIGHT_PATH_INITIAL,
-        }),
-      ).toBe(0);
-    });
   });
 
   describe("getLanternFlightTransform", () => {
-    it("returns percent positioning with opacity", () => {
-      const transform = getLanternFlightTransform(LANTERN_FLIGHT_PATH_INITIAL + 0.05, {
-        nextLanternPathT: LANTERN_FLIGHT_PATH_INITIAL,
-      });
+    it("returns percent positioning with partial fade past initial", () => {
+      const transform = getLanternFlightTransform(LANTERN_FLIGHT_PATH_INITIAL + 0.05);
       expect(transform.positionMode).toBe("percent");
-      expect(transform.opacity).toBe(0);
+      expect(transform.opacity).toBeLessThan(1);
+      expect(transform.opacity).toBeGreaterThan(0);
     });
   });
 
   describe("getLanternQueuePathProgress", () => {
+    it("places the lead lantern at initial when scroll is 0", () => {
+      expect(getLanternQueuePathProgress(0, 0, LANTERN_FLIGHT_QUEUE_SPACING)).toBe(
+        LANTERN_FLIGHT_PATH_INITIAL,
+      );
+    });
+
+    it("staggers followers behind the lead at scroll 0", () => {
+      expect(getLanternQueuePathProgress(0, 1, LANTERN_FLIGHT_QUEUE_SPACING)).toBeCloseTo(
+        LANTERN_FLIGHT_PATH_INITIAL - LANTERN_FLIGHT_QUEUE_SPACING,
+        5,
+      );
+    });
+
     it("staggers lanterns along scroll progress", () => {
       const first = getLanternQueuePathProgress(0.5, 0, LANTERN_FLIGHT_QUEUE_SPACING);
       const second = getLanternQueuePathProgress(0.5, 1, LANTERN_FLIGHT_QUEUE_SPACING);
       expect(second).toBeLessThan(first);
-    });
-
-    it("starts later lanterns off-path until scroll advances", () => {
-      expect(getLanternQueuePathProgress(0, 1, LANTERN_FLIGHT_QUEUE_SPACING)).toBe(0);
     });
 
     it("reaches path end when scroll completes", () => {
