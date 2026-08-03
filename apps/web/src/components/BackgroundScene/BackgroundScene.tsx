@@ -7,8 +7,7 @@ import {
   CELESTIAL_MOON_BODY_WIDTH_REM,
   CELESTIAL_SUN_BODY_WIDTH_REM,
 } from "@/components/CelestialThemeDial/celestialDialProportions";
-import { DaylightMoon } from "@/components/DaylightBackground/placeholders/DaylightMoon";
-import { DaylightSun } from "@/components/DaylightBackground/placeholders/DaylightSun";
+import { DaylightMoon, DaylightSun } from "@/components/CelestialBackgroundBodies";
 import { BACKGROUND_SCENE_ASSETS } from "./backgroundSceneAssets";
 import {
   colorBalanceToMatrix,

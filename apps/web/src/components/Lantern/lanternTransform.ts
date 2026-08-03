@@ -1,17 +1,19 @@
 import type { CSSProperties } from "react";
+import { LANTERN_DEFAULT_MAX_STEPS } from "./constants";
 import {
-  LANTERN_DEFAULT_MAX_STEPS,
-  LANTERN_ROTATE_DEG,
-  LANTERN_SCALE_PER_STEP,
-  LANTERN_STEP_X_PX,
-  LANTERN_STEP_Y_PX,
-} from "./constants";
+  getLanternFlightTransform,
+  lanternFlightPathAtStep,
+} from "./lanternFlightPath";
+
+export type LanternPositionMode = "translate" | "percent";
 
 export type LanternTransform = {
   x: number;
   y: number;
   scale: number;
   rotate: number;
+  opacity?: number;
+  positionMode?: LanternPositionMode;
 };
 
 export function lerp(a: number, b: number, t: number): number {
@@ -24,54 +26,48 @@ export function easeInOutCubic(t: number): number {
 }
 
 /**
- * Discrete flight step from the concept sheet.
- * Step 0 is front-facing primary; later steps scale down and zig-zag rotate.
+ * Discrete flight step mapped to evenly spaced path samples.
+ * Step 0 is the path start; maxSteps lands near the path exit.
  */
-export function getLanternTransformAtStep(step: number): LanternTransform {
-  const s = Math.max(0, Math.floor(step));
-  const scale = LANTERN_SCALE_PER_STEP ** s;
-  const rotate =
-    s === 0 ? 0 : s % 2 === 1 ? -LANTERN_ROTATE_DEG : LANTERN_ROTATE_DEG;
-
-  return {
-    x: s === 0 ? 0 : s * LANTERN_STEP_X_PX,
-    y: s === 0 ? 0 : s * LANTERN_STEP_Y_PX,
-    scale,
-    rotate,
-  };
+export function getLanternTransformAtStep(step: number, maxSteps: number = LANTERN_DEFAULT_MAX_STEPS): LanternTransform {
+  const flooredStep = Math.max(0, Math.floor(step));
+  const pathT = lanternFlightPathAtStep(flooredStep, maxSteps);
+  return getLanternFlightTransform(pathT);
 }
 
 /**
- * Continuous progress `t ∈ [0, 1]` along `maxSteps` discrete landmarks.
- * Interpolates position, scale, and rotation for smooth scroll driving.
+ * Continuous progress `t ∈ [0, 1]` along the flight path.
+ * `LANERN_FLIGHT_PATH_INITIAL` (~0.78) is the primary rest pose at the right dip.
  */
 export function getLanternTransformAtProgress(
   progress: number,
-  maxSteps: number = LANTERN_DEFAULT_MAX_STEPS,
+  options: { nextLanternPathProgress?: number } = {},
 ): LanternTransform {
   const clamped = Math.min(1, Math.max(0, progress));
-  const eased = easeInOutCubic(clamped);
-  const continuous = eased * maxSteps;
-  const step0 = Math.floor(continuous);
-  const step1 = Math.min(maxSteps, step0 + 1);
-  const localT = continuous - step0;
-  const a = getLanternTransformAtStep(step0);
-  const b = getLanternTransformAtStep(step1);
-
-  return {
-    x: lerp(a.x, b.x, localT),
-    y: lerp(a.y, b.y, localT),
-    scale: lerp(a.scale, b.scale, localT),
-    rotate: lerp(a.rotate, b.rotate, localT),
-  };
+  return getLanternFlightTransform(clamped, {
+    nextLanternPathT: options.nextLanternPathProgress,
+  });
 }
 
 export function lanternTransformToCssVars(transform: LanternTransform): CSSProperties {
+  const opacity = transform.opacity ?? 1;
+
+  if (transform.positionMode === "percent") {
+    return {
+      "--lantern-left": `${transform.x * 100}%`,
+      "--lantern-top": `${transform.y * 100}%`,
+      "--lantern-scale": String(transform.scale),
+      "--lantern-rotate": `${transform.rotate}deg`,
+      "--lantern-opacity": String(opacity),
+    } as CSSProperties;
+  }
+
   return {
     "--lantern-x": `${transform.x}px`,
     "--lantern-y": `${transform.y}px`,
     "--lantern-scale": String(transform.scale),
     "--lantern-rotate": `${transform.rotate}deg`,
+    "--lantern-opacity": String(opacity),
   } as CSSProperties;
 }
 
@@ -79,6 +75,7 @@ export type LanternTransformInput = {
   step?: number;
   progress?: number;
   maxSteps?: number;
+  nextLanternPathProgress?: number;
   transform?: Partial<LanternTransform>;
 };
 
@@ -86,25 +83,31 @@ export function resolveLanternTransform(props: LanternTransformInput): LanternTr
   if (props.transform) {
     const base =
       props.step !== undefined
-        ? getLanternTransformAtStep(props.step)
+        ? getLanternTransformAtStep(props.step, props.maxSteps)
         : props.progress !== undefined
-          ? getLanternTransformAtProgress(props.progress, props.maxSteps)
-          : getLanternTransformAtStep(0);
+          ? getLanternTransformAtProgress(props.progress, {
+              nextLanternPathProgress: props.nextLanternPathProgress,
+            })
+          : getLanternTransformAtStep(0, props.maxSteps);
     return {
       x: props.transform.x ?? base.x,
       y: props.transform.y ?? base.y,
       scale: props.transform.scale ?? base.scale,
       rotate: props.transform.rotate ?? base.rotate,
+      opacity: props.transform.opacity ?? base.opacity,
+      positionMode: props.transform.positionMode ?? base.positionMode,
     };
   }
 
   if (props.step !== undefined) {
-    return getLanternTransformAtStep(props.step);
+    return getLanternTransformAtStep(props.step, props.maxSteps);
   }
 
   if (props.progress !== undefined) {
-    return getLanternTransformAtProgress(props.progress, props.maxSteps);
+    return getLanternTransformAtProgress(props.progress, {
+      nextLanternPathProgress: props.nextLanternPathProgress,
+    });
   }
 
-  return getLanternTransformAtStep(0);
+  return getLanternTransformAtStep(0, props.maxSteps);
 }

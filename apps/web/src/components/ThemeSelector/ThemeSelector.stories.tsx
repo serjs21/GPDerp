@@ -4,7 +4,7 @@ import type { ThemeName } from "@/config/userConfiguration";
 import { getPersistedThemeFromScale, getThemeScaleVars } from "@/theme/themeScale";
 import { Kasagi, Nuki, Pillars, Shimaki } from "@/components/Dividers";
 import { SiteFooter } from "@/components/SiteFooter/SiteFooter";
-import { DaylightBackgroundScene } from "@/components/DaylightBackground/DaylightBackgroundScene";
+import { DaylightBackgroundScene } from "@/deprecated/daylight-background-2026-07-31/DaylightBackgroundScene";
 
 import { ThemeSelector } from "./ThemeSelector";
 import styles from "./ThemeSelector.stories.module.css";

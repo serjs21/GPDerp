@@ -23,3 +23,17 @@ export {
   lerp,
   resolveLanternTransform,
 } from "./lanternTransform";
+export {
+  equalArcLengthSamples,
+  getLanternFlightOpacity,
+  getLanternFlightTransform,
+  getLanternQueuePathProgress,
+  LANTERN_FLIGHT_PATH_INITIAL,
+  LANTERN_FLIGHT_QUEUE_SPACING,
+  sampleLanternFlightPath,
+} from "./lanternFlightPath";
+export {
+  LANTERN_FLIGHT_PATH_D,
+  LANTERN_FLIGHT_PATH_VIEWBOX,
+  pointAtArcLength,
+} from "./lanternFlightPathSvg";

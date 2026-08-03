@@ -13,8 +13,10 @@ export type LanternProps = HaikuContainerProps & {
   className?: string;
   /** Discrete flight step from the concept sheet (overrides progress). */
   step?: number;
-  /** Continuous flight progress 0–1 (used when step is omitted). */
+  /** Continuous flight-path progress 0–1 (used when step is omitted). */
   progress?: number;
+  /** Next lantern path progress for queue handoff opacity. */
+  nextLanternPathProgress?: number;
   /** Max discrete steps when mapping progress. */
   maxSteps?: number;
   /** Explicit transform; wins over step/progress when provided. */
@@ -58,6 +60,7 @@ export function Lantern(props: LanternProps) {
     step,
     progress,
     maxSteps,
+    nextLanternPathProgress,
     transform,
     bodyOnly = false,
     ...noteProps
@@ -73,6 +76,7 @@ export function Lantern(props: LanternProps) {
       step={step}
       progress={progress}
       maxSteps={maxSteps}
+      nextLanternPathProgress={nextLanternPathProgress}
       transform={transform}
     >
       {bodyOnly ? null : <p className={styles.title}>{title}</p>}

@@ -1,4 +1,6 @@
 export { BackgroundScene } from "./BackgroundScene";
+export { BackgroundSceneCelestial } from "./BackgroundSceneCelestial";
+export { useBackgroundSceneThemeBalance } from "./useBackgroundSceneThemeBalance";
 export { BackgroundSceneStars } from "./BackgroundSceneStars";
 export type { BackgroundSceneProps } from "./BackgroundScene";
 export { BackgroundSceneColorBalanceControls } from "./BackgroundSceneColorBalanceControls";

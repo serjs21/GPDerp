@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState, type CSSProperties } from "react";
 import { CelestialScene } from "@/components/CelestialScene";
-import { DaylightBackgroundView } from "@/components/DaylightBackground/DaylightBackground";
+import { DaylightBackgroundView } from "@/deprecated/daylight-background-2026-07-31/DaylightBackground";
 import { CelestialThemeClock } from "@/components/CelestialThemeClock";
 import { slotToDate } from "@/theme/celestialTime";
 import {

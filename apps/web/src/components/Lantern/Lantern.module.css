@@ -3,8 +3,11 @@
 .root {
   --lantern-x: 0px;
   --lantern-y: 0px;
+  --lantern-left: 50%;
+  --lantern-top: 50%;
   --lantern-scale: 1;
   --lantern-rotate: 0deg;
+  --lantern-opacity: 1;
   --lantern-width: 11.5rem;
 
   position: relative;
@@ -14,8 +17,17 @@
   transform: translate(var(--lantern-x), var(--lantern-y))
     scale(var(--lantern-scale)) rotate(var(--lantern-rotate));
   transform-origin: center bottom;
-  will-change: transform;
+  opacity: var(--lantern-opacity);
+  will-change: transform, opacity;
   animation: lanternReveal 280ms ease both;
+}
+
+.pathPositioned {
+  position: absolute;
+  left: var(--lantern-left);
+  top: var(--lantern-top);
+  transform: translate(-50%, -50%) scale(var(--lantern-scale)) rotate(var(--lantern-rotate));
+  transform-origin: center center;
 }
 
 .shell {

@@ -2,7 +2,7 @@
 
 import type { CSSProperties, ReactNode } from "react";
 import { CelestialScene } from "@/components/CelestialScene";
-import { DaylightBackground } from "@/components/DaylightBackground";
+import { BackgroundSceneCelestial } from "@/components/BackgroundScene";
 import { useCelestialTheme } from "@/app/providers/CelestialThemeProvider";
 import styles from "./CelestialAppShell.module.css";
 
@@ -23,7 +23,7 @@ export function CelestialAppShell({ children, className }: CelestialAppShellProp
     >
       <div className={styles.backdrop} aria-hidden>
         <CelestialScene sceneVars={scene.sceneVars} className={styles.backdropScene}>
-          <DaylightBackground />
+          <BackgroundSceneCelestial />
         </CelestialScene>
       </div>
       <div className={styles.content}>{children}</div>

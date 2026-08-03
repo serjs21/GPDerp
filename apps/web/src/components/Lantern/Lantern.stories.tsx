@@ -1,7 +1,7 @@
 "use client";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import type { CelestialPresetName } from "@/theme/celestialPresets";
 import {
   AUTUMN_HAIKU_BODY,
@@ -13,7 +13,21 @@ import {
 } from "@/storybook";
 import { Lantern } from "./Lantern";
 import { LanternCard } from "./LanternCard";
+import {
+  equalArcLengthSamples,
+  getLanternQueuePathProgress,
+  LANTERN_FLIGHT_PATH_INITIAL,
+  LANTERN_FLIGHT_QUEUE_SPACING,
+  sampleLanternFlightPath,
+} from "./lanternFlightPath";
 import styles from "./Lantern.stories.module.css";
+
+function FlightPathGuide() {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- storybook path guide from public SVG
+    <img className={styles.flightPathGuide} src="/fly_path.svg" alt="" aria-hidden />
+  );
+}
 
 const meta: Meta<typeof Lantern> = {
   title: "Haiku/Lantern",
@@ -27,6 +41,44 @@ const meta: Meta<typeof Lantern> = {
 
 export default meta;
 type Story = StoryObj<typeof Lantern>;
+
+const WRITTEN_HAIKUS = [
+  {
+    id: "written-1",
+    title: "Empty pond",
+    body: `Old pond—
+a frog jumps in,
+water's sound.`,
+  },
+  {
+    id: "written-2",
+    title: "Summer grass",
+    body: `Summer grasses—
+all that remains
+of warriors' dreams.`,
+  },
+  {
+    id: "written-3",
+    title: "Autumn eve",
+    body: `On a withered branch
+a crow has settled—
+autumn evening.`,
+  },
+  {
+    id: "written-4",
+    title: "Moon road",
+    body: `The moon is the road
+home—lanterns rise
+into the blue dark.`,
+  },
+  {
+    id: "written-5",
+    title: "First snow",
+    body: `First snow—
+the village temple bell
+softens the night.`,
+  },
+] as const;
 
 export const Default: Story = {
   render: (args) => (
@@ -69,21 +121,61 @@ export const StaticSteps: Story = {
     });
 
     return (
-      <div className={styles.stepsGrid}>
+      <div className={styles.flightPathStage}>
+        <FlightPathGuide />
         {[0, 1, 2, 3, 4, 5].map((step) => (
-          <div key={step} className={styles.stepCard}>
-            <p className={styles.stepLabel}>{step === 0 ? "Ready" : `Step 0${step}`}</p>
-            <Lantern haiku={haiku} step={step} />
-          </div>
+          <Lantern
+            key={step}
+            className={styles.flightPathLantern}
+            haiku={haiku}
+            step={step}
+            maxSteps={5}
+          />
         ))}
       </div>
     );
   },
 };
 
-function ScrollPathDemo() {
+const FLIGHT_PATH_LIST_COUNT = 7;
+const FLIGHT_PATH_SAMPLES = equalArcLengthSamples(FLIGHT_PATH_LIST_COUNT);
+
+export const FlightPathList: Story = {
+  name: "Flight path / List",
+  parameters: { wideContent: true },
+  render: () => (
+    <div className={styles.flightPathStage} aria-label="Lanterns along the flight path">
+      <FlightPathGuide />
+      {FLIGHT_PATH_SAMPLES.map((pathS, index) => {
+        const haiku = WRITTEN_HAIKUS[index % WRITTEN_HAIKUS.length];
+        const sample = sampleLanternFlightPath(pathS);
+        return (
+          <Fragment key={`${pathS}-${haiku.id}`}>
+            <p
+              className={styles.flightPathLabel}
+              style={{ left: `${sample.x * 100}%`, top: `${sample.y * 100}%` }}
+            >
+              s={pathS.toFixed(2)}
+            </p>
+            <Lantern
+              className={styles.flightPathLantern}
+              progress={pathS}
+              haiku={makeMockHaiku({
+                id: `flight-path-${haiku.id}`,
+                title: haiku.title,
+                body: haiku.body,
+              })}
+            />
+          </Fragment>
+        );
+      })}
+    </div>
+  ),
+};
+
+function FlightPathScrollDemo() {
   const rootRef = useRef<HTMLDivElement>(null);
-  const [progress, setProgress] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -91,7 +183,7 @@ function ScrollPathDemo() {
 
     const onScroll = () => {
       const max = root.scrollHeight - root.clientHeight;
-      setProgress(max <= 0 ? 0 : Math.min(1, Math.max(0, root.scrollTop / max)));
+      setScrollProgress(max <= 0 ? 0 : Math.min(1, Math.max(0, root.scrollTop / max)));
     };
 
     onScroll();
@@ -99,69 +191,71 @@ function ScrollPathDemo() {
     return () => root.removeEventListener("scroll", onScroll);
   }, []);
 
+  const activeIndex = WRITTEN_HAIKUS.findIndex((_, index) => {
+    const pathT = getLanternQueuePathProgress(
+      scrollProgress,
+      index,
+      LANTERN_FLIGHT_QUEUE_SPACING,
+    );
+    return pathT >= LANTERN_FLIGHT_PATH_INITIAL - 0.02 && pathT <= LANTERN_FLIGHT_PATH_INITIAL + 0.06;
+  });
+
   return (
-    <div ref={rootRef} className={styles.scrollRoot}>
-      <div className={styles.scrollTrack}>
-        <div className={styles.scrollSticky}>
-          <p className={styles.scrollHud}>progress {(progress * 100).toFixed(0)}%</p>
-          <Lantern
-            className={styles.scrollLantern}
-            progress={progress}
-            maxSteps={5}
-            haiku={makeMockHaiku({
-              id: "lantern-scroll",
-              title: "Sky lantern",
-              body: EXAMPLE_HAIKU_BODY,
+    <div ref={rootRef} className={styles.flightPathScrollRoot}>
+      <div className={styles.flightPathScrollTrack}>
+        <div className={styles.flightPathScrollSticky}>
+          <p className={styles.flightPathScrollHud}>
+            scroll {(scrollProgress * 100).toFixed(0)}%
+            {activeIndex >= 0 ? ` · active #${activeIndex + 1}` : ""}
+          </p>
+          <div className={styles.flightPathStage}>
+            <FlightPathGuide />
+            {WRITTEN_HAIKUS.map((item, index) => {
+              const pathT = getLanternQueuePathProgress(
+                scrollProgress,
+                index,
+                LANTERN_FLIGHT_QUEUE_SPACING,
+              );
+              const nextPathT =
+                index < WRITTEN_HAIKUS.length - 1
+                  ? getLanternQueuePathProgress(
+                      scrollProgress,
+                      index + 1,
+                      LANTERN_FLIGHT_QUEUE_SPACING,
+                    )
+                  : undefined;
+
+              return (
+                <Lantern
+                  key={item.id}
+                  className={styles.flightPathLantern}
+                  progress={pathT}
+                  nextLanternPathProgress={nextPathT}
+                  haiku={makeMockHaiku({
+                    id: item.id,
+                    title: item.title,
+                    body: item.body,
+                  })}
+                />
+              );
             })}
-          />
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-export const ScrollPath: Story = {
+export const FlightPathScroll: Story = {
+  name: "Flight path / Scroll",
   parameters: { wideContent: true },
-  render: () => <ScrollPathDemo />,
+  render: () => <FlightPathScrollDemo />,
 };
 
-const WRITTEN_HAIKUS = [
-  {
-    id: "written-1",
-    title: "Empty pond",
-    body: `Old pond—
-a frog jumps in,
-water's sound.`,
-  },
-  {
-    id: "written-2",
-    title: "Summer grass",
-    body: `Summer grasses—
-all that remains
-of warriors' dreams.`,
-  },
-  {
-    id: "written-3",
-    title: "Autumn eve",
-    body: `On a withered branch
-a crow has settled—
-autumn evening.`,
-  },
-  {
-    id: "written-4",
-    title: "Moon road",
-    body: `The moon is the road
-home—lanterns rise
-into the blue dark.`,
-  },
-  {
-    id: "written-5",
-    title: "First snow",
-    body: `First snow—
-the village temple bell
-softens the night.`,
-  },
-] as const;
+export const ScrollPath: Story = {
+  parameters: { wideContent: true },
+  render: () => <FlightPathScrollDemo />,
+};
 
 export const WrittenOnLanterns: Story = {
   name: "Written on lanterns",

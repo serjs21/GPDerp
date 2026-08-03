@@ -34,20 +34,35 @@ export function LanternFrame({
   step,
   progress,
   maxSteps,
+  nextLanternPathProgress,
   transform,
 }: LanternFrameProps) {
-  const resolved = resolveLanternTransform({ step, progress, maxSteps, transform });
+  const resolved = resolveLanternTransform({
+    step,
+    progress,
+    maxSteps,
+    nextLanternPathProgress,
+    transform,
+  });
 
   const rootStyle = {
     ...lanternTransformToCssVars(resolved),
     "--lantern-width": `${widthRem}rem`,
   } as CSSProperties;
 
+  const rootClass = [
+    styles.root,
+    resolved.positionMode === "percent" ? styles.pathPositioned : "",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   const contentClass = [styles.content, contentClassName].filter(Boolean).join(" ");
 
   return (
     <article
-      className={`${styles.root}${className ? ` ${className}` : ""}`}
+      className={rootClass}
       style={rootStyle}
       aria-label={ariaLabel}
       {...(generating ? { "data-haiku-generating": true } : {})}
