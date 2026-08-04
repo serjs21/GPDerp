@@ -351,10 +351,9 @@ export function pointAtFlightArcLength(flightS: number): SvgPoint {
 /** Tangent angle in degrees at flight arc-length fraction `flightS`. */
 export function tangentAtFlightArcLength(flightS: number): number {
   const epsilon = FLIGHT_ARC.arcLength / LUT_SAMPLES;
-  const a = pointAtFlightArcLength(Math.max(0, flightS - epsilon / FLIGHT_ARC.arcLength));
-  const b = pointAtFlightArcLength(
-    Math.min(1, flightS + epsilon / FLIGHT_ARC.arcLength),
-  );
+  const delta = epsilon / FLIGHT_ARC.arcLength;
+  const a = pointAtFlightArcLength(flightS - delta);
+  const b = pointAtFlightArcLength(flightS + delta);
   return (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
 }
 
@@ -382,4 +381,48 @@ export function getFlightArcLength(): number {
 
 export function getArcLengthTable(): readonly ArcLengthEntry[] {
   return ARC_LENGTH_TABLE;
+}
+
+/** Map perimeter fraction to flight `pathS` (negative = black approach). */
+export function perimeterSToFlightS(perimeterS: number): number {
+  const initial = LANTERN_FLIGHT_PATH_PERIMETER_INITIAL;
+  const forwardDist = arcLengthBetween(initial, perimeterS, TOTAL_ARC_LENGTH);
+  const backwardDist = TOTAL_ARC_LENGTH - forwardDist;
+  const epsilon = TOTAL_ARC_LENGTH * 0.001;
+
+  if (forwardDist <= FLIGHT_ARC.arcLength + epsilon) {
+    return forwardDist / FLIGHT_ARC.arcLength;
+  }
+
+  return -backwardDist / FLIGHT_ARC.arcLength;
+}
+
+function nearestPerimeterS(cx: number, cy: number): number {
+  let bestDistance = Number.POSITIVE_INFINITY;
+  let bestPerimeterS = 0;
+
+  for (const entry of ARC_LENGTH_TABLE) {
+    const dx = entry.x - cx;
+    const dy = entry.y - cy;
+    const distance = dx * dx + dy * dy;
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      bestPerimeterS = entry.s / TOTAL_ARC_LENGTH;
+    }
+  }
+
+  return bestPerimeterS;
+}
+
+/** Project a viewBox point onto the route; returns nearest `pathS`. */
+export function projectViewBoxPointToFlightS(cx: number, cy: number): number {
+  return perimeterSToFlightS(nearestPerimeterS(cx, cy));
+}
+
+/** Project onto the black approach (always negative `pathS`). */
+export function projectViewBoxPointToBlackPathS(cx: number, cy: number): number {
+  const initial = LANTERN_FLIGHT_PATH_PERIMETER_INITIAL;
+  const perimeterS = nearestPerimeterS(cx, cy);
+  const backwardDist = TOTAL_ARC_LENGTH - arcLengthBetween(initial, perimeterS, TOTAL_ARC_LENGTH);
+  return -backwardDist / FLIGHT_ARC.arcLength;
 }

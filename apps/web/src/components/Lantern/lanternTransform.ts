@@ -43,8 +43,7 @@ export function getLanternTransformAtProgress(
   progress: number,
   options: { nextLanternPathProgress?: number } = {},
 ): LanternTransform {
-  const clamped = Math.min(1, Math.max(0, progress));
-  return getLanternFlightTransform(clamped, {
+  return getLanternFlightTransform(progress, {
     nextLanternPathT: options.nextLanternPathProgress,
   });
 }

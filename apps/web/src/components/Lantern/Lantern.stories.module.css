@@ -35,6 +35,25 @@
   user-select: none;
 }
 
+.flightPathFadeGuide {
+  position: absolute;
+  inset: 2rem 1rem 3rem;
+  z-index: 0;
+  width: calc(100% - 2rem);
+  height: calc(100% - 5rem);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.flightPathFadeGuideLine {
+  fill: none;
+  stroke: #fe1939;
+  stroke-width: 0.55;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
 .flightPathStop {
   position: absolute;
   z-index: 1;
@@ -42,17 +61,39 @@
   height: 0.55rem;
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  background: color-mix(in srgb, var(--text-color) 45%, transparent);
-  border: 1px solid color-mix(in srgb, var(--text-color) 60%, transparent);
+  background: #1718fe;
+  border: 1px solid color-mix(in srgb, #1718fe 70%, white);
   pointer-events: none;
 }
 
 .flightPathStopActive {
   width: 0.75rem;
   height: 0.75rem;
-  background: color-mix(in srgb, var(--accent-color, #e8c87a) 85%, white);
-  border-color: color-mix(in srgb, var(--accent-color, #e8c87a) 95%, white);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color, #e8c87a) 35%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #1718fe 35%, transparent);
+}
+
+.flightPathStopExit {
+  opacity: 0.55;
+}
+
+.flightPathStopLabel {
+  position: absolute;
+  z-index: 1;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fe00fb;
+  transform: translate(0.35rem, -1.1rem);
+  pointer-events: none;
+  user-select: none;
+}
+
+.flightPathStopLabelInitial {
+  transform: translate(0.35rem, 0.15rem);
+}
+
+.flightPathStopLabelExit {
+  transform: translate(-1rem, -0.85rem);
 }
 
 .flightPathLantern {

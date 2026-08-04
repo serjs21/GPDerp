@@ -1,39 +1,73 @@
 import {
+  LANTERN_FLIGHT_PATH_FADE,
   LANTERN_FLIGHT_PATH_INITIAL,
   LANTERN_FLIGHT_PATH_REST_EPSILON,
-  LANTERN_FLIGHT_QUEUE_SPACING,
 } from "./lanternFlightPath.config";
 import {
   equalArcLengthSamples,
   getLanternFlightOpacity,
   getLanternFlightTransform,
   getLanternQueuePathProgress,
+  getLanternQueueRestPathS,
   isLanternFlightPathVisible,
+  lanternExitPathS,
+  lanternInitialPathS,
+  LANTERN_FLIGHT_PATH_STOPS,
   sampleLanternFlightPath,
 } from "./lanternFlightPath";
+import {
+  LANTERN_CAROUSEL_STOP_IDS,
+  LANTERN_FLIGHT_PATH_EXIT_STOP_ID,
+  LANTERN_FLIGHT_PATH_INITIAL_STOP_ID,
+  routeStopById,
+} from "./lanternRouteStops";
 import {
   getArcLengthTable,
   LANTERN_FLIGHT_PATH_VIEWBOX,
   pointAtFlightArcLength,
+  projectViewBoxPointToFlightS,
 } from "./lanternFlightPathSvg";
 
 describe("lanternFlightPath", () => {
   describe("sampleLanternFlightPath", () => {
     it("is full scale and opaque at rest", () => {
-      const rest = sampleLanternFlightPath(0);
+      const rest = sampleLanternFlightPath(lanternInitialPathS());
       expect(rest.scale).toBeCloseTo(1, 5);
-      expect(getLanternFlightOpacity({ pathT: 0 })).toBe(1);
+      expect(getLanternFlightOpacity({ pathT: lanternInitialPathS() })).toBe(1);
     });
 
-    it("shrinks to zero at the exit", () => {
-      const exit = sampleLanternFlightPath(1);
-      expect(exit.scale).toBe(0);
-      expect(getLanternFlightOpacity({ pathT: 1 })).toBe(0);
+    it("keeps full scale and opacity on black-path stops", () => {
+      const blackPathS = LANTERN_FLIGHT_PATH_STOPS.find((pathS) => pathS < -0.05) ?? -0.5;
+      const black = sampleLanternFlightPath(blackPathS);
+      expect(black.scale).toBeCloseTo(1, 5);
+      expect(getLanternFlightOpacity({ pathT: blackPathS })).toBe(1);
+      expect(black.x).toBeGreaterThan(0);
+      expect(black.y).toBeGreaterThan(0);
+    });
+
+    it("reaches fade floor and exit scale at the exit stop", () => {
+      const exit = sampleLanternFlightPath(lanternExitPathS());
+      expect(exit.scale).toBeCloseTo(LANTERN_FLIGHT_PATH_FADE.exitScale, 2);
+      expect(getLanternFlightOpacity({ pathT: lanternExitPathS() })).toBeCloseTo(
+        LANTERN_FLIGHT_PATH_FADE.minOpacity,
+        2,
+      );
+    });
+
+    it("interpolates opacity and scale in the fade zone", () => {
+      const midPathS = (lanternInitialPathS() + lanternExitPathS()) / 2;
+      const mid = sampleLanternFlightPath(midPathS);
+      expect(mid.scale).toBeGreaterThan(1);
+      expect(mid.scale).toBeLessThan(LANTERN_FLIGHT_PATH_FADE.exitScale);
+      expect(getLanternFlightOpacity({ pathT: midPathS })).toBeLessThan(1);
+      expect(getLanternFlightOpacity({ pathT: midPathS })).toBeGreaterThan(
+        LANTERN_FLIGHT_PATH_FADE.minOpacity,
+      );
     });
 
     it("moves upward along the flight segment", () => {
-      const rest = sampleLanternFlightPath(0);
-      const exit = sampleLanternFlightPath(1);
+      const rest = sampleLanternFlightPath(lanternInitialPathS());
+      const exit = sampleLanternFlightPath(lanternExitPathS());
       expect(exit.y).toBeLessThan(rest.y);
     });
 
@@ -41,28 +75,39 @@ describe("lanternFlightPath", () => {
       const table = getArcLengthTable();
       const maxEntryY =
         Math.max(...table.map((entry) => entry.y)) / LANTERN_FLIGHT_PATH_VIEWBOX.height;
-      const restPoint = pointAtFlightArcLength(0);
+      const restPoint = pointAtFlightArcLength(lanternInitialPathS());
       expect(restPoint.y).toBeCloseTo(maxEntryY, 3);
     });
 
-    it("places exit near the global min Y on the perimeter", () => {
-      const table = getArcLengthTable();
-      const minEntryY =
-        Math.min(...table.map((entry) => entry.y)) / LANTERN_FLIGHT_PATH_VIEWBOX.height;
-      const exitPoint = pointAtFlightArcLength(1);
-      expect(Math.abs(exitPoint.y - minEntryY)).toBeLessThan(0.002);
-      expect(exitPoint.y).toBeLessThan(pointAtFlightArcLength(0).y);
+    it("hides samples past the exit", () => {
+      expect(sampleLanternFlightPath(lanternExitPathS() + 0.1).scale).toBe(0);
+      expect(isLanternFlightPathVisible(lanternExitPathS() + 0.1)).toBe(false);
     });
+  });
 
-    it("hides samples outside the flight segment", () => {
-      expect(sampleLanternFlightPath(-0.2).scale).toBe(0);
-      expect(sampleLanternFlightPath(1.2).scale).toBe(0);
-      expect(isLanternFlightPathVisible(-0.2)).toBe(false);
+  describe("projectViewBoxPointToFlightS", () => {
+    it("returns finite pathS for authored stop coordinates", () => {
+      const initial = routeStopById(LANTERN_FLIGHT_PATH_INITIAL_STOP_ID);
+      const exit = routeStopById(LANTERN_FLIGHT_PATH_EXIT_STOP_ID);
+      expect(initial).toBeDefined();
+      expect(exit).toBeDefined();
+      if (!initial || !exit) return;
+
+      expect(Number.isFinite(projectViewBoxPointToFlightS(initial.cx, initial.cy))).toBe(true);
+      expect(Number.isFinite(projectViewBoxPointToFlightS(exit.cx, exit.cy))).toBe(true);
+    });
+  });
+
+  describe("LANTERN_FLIGHT_PATH_STOPS", () => {
+    it("lists carousel stops in stop-id order", () => {
+      expect(LANTERN_FLIGHT_PATH_STOPS.length).toBe(16);
+      expect(LANTERN_CAROUSEL_STOP_IDS[0]).toBe(LANTERN_FLIGHT_PATH_INITIAL_STOP_ID);
+      expect(LANTERN_CAROUSEL_STOP_IDS.at(-1)).toBe(16);
     });
   });
 
   describe("equalArcLengthSamples", () => {
-    it("produces roughly equal Euclidean spacing along the SVG path", () => {
+    it("produces roughly equal Euclidean spacing along the fade segment", () => {
       const samples = equalArcLengthSamples(8);
       const distances = samples.slice(1).map((s, index) => {
         const a = pointAtFlightArcLength(samples[index]);
@@ -80,55 +125,55 @@ describe("lanternFlightPath", () => {
   });
 
   describe("getLanternFlightOpacity", () => {
-    it("fades along the flight segment", () => {
-      const midFade = getLanternFlightOpacity({ pathT: 0.5 });
-      const endFade = getLanternFlightOpacity({ pathT: 1 });
+    it("fades along the red segment only", () => {
+      const blackPathS = LANTERN_FLIGHT_PATH_STOPS[2] ?? -0.25;
+      expect(getLanternFlightOpacity({ pathT: blackPathS })).toBe(1);
+      const midFade = getLanternFlightOpacity({
+        pathT: (lanternInitialPathS() + lanternExitPathS()) / 2,
+      });
+      const endFade = getLanternFlightOpacity({ pathT: lanternExitPathS() });
       expect(midFade).toBeLessThan(1);
-      expect(endFade).toBe(0);
+      expect(endFade).toBeCloseTo(LANTERN_FLIGHT_PATH_FADE.minOpacity, 2);
+    });
+  });
+
+  describe("getLanternQueuePathProgress", () => {
+    it("places the newest lantern at stop-1 when scroll is 0", () => {
+      expect(getLanternQueuePathProgress(0, 2, 3)).toBeCloseTo(lanternInitialPathS(), 3);
     });
 
-    it("forces invisibility when the next lantern reaches rest", () => {
-      expect(
-        getLanternFlightOpacity({
-          pathT: 0.05,
-          nextLanternPathT: LANTERN_FLIGHT_PATH_REST_EPSILON,
-        }),
-      ).toBe(0);
+    it("assigns older lanterns to higher stop ids at rest", () => {
+      expect(getLanternQueueRestPathS(1, 3)).toBeCloseTo(LANTERN_FLIGHT_PATH_STOPS[1] ?? 0, 3);
+      expect(getLanternQueueRestPathS(0, 3)).toBeCloseTo(LANTERN_FLIGHT_PATH_STOPS[2] ?? 0, 3);
+    });
+
+    it("moves the lead lantern toward exit on scroll", () => {
+      const start = getLanternQueuePathProgress(0, 2, 3);
+      const end = getLanternQueuePathProgress(1, 2, 3);
+      expect(end).toBeGreaterThan(start);
+      expect(end).toBeCloseTo(lanternExitPathS(), 2);
+    });
+
+    it("keeps followers on black-path stops at scroll 0", () => {
+      expect(getLanternQueuePathProgress(0, 1, 3)).toBeCloseTo(LANTERN_FLIGHT_PATH_STOPS[1] ?? 0, 3);
+      expect(getLanternQueuePathProgress(0, 0, 3)).toBeCloseTo(LANTERN_FLIGHT_PATH_STOPS[2] ?? 0, 3);
     });
   });
 
   describe("getLanternFlightTransform", () => {
     it("returns percent positioning with opacity", () => {
-      const transform = getLanternFlightTransform(0.05, {
-        nextLanternPathT: LANTERN_FLIGHT_PATH_REST_EPSILON,
-      });
+      const transform = getLanternFlightTransform(lanternExitPathS());
       expect(transform.positionMode).toBe("percent");
-      expect(transform.opacity).toBe(0);
+      expect(transform.opacity).toBeCloseTo(LANTERN_FLIGHT_PATH_FADE.minOpacity, 2);
     });
   });
 
-  describe("getLanternQueuePathProgress", () => {
-    it("anchors the lead lantern at rest when scroll is 0", () => {
-      expect(getLanternQueuePathProgress(0, 0, LANTERN_FLIGHT_QUEUE_SPACING)).toBe(
+  describe("getLanternQueuePathProgress legacy anchor", () => {
+    it("anchors the lead lantern at rest when scroll is 0 for a single lantern", () => {
+      expect(getLanternQueuePathProgress(0, 0, 1)).toBeCloseTo(
         LANTERN_FLIGHT_PATH_INITIAL,
+        3,
       );
-    });
-
-    it("staggers followers behind the lead at scroll 0", () => {
-      expect(getLanternQueuePathProgress(0, 1, LANTERN_FLIGHT_QUEUE_SPACING)).toBeCloseTo(
-        -LANTERN_FLIGHT_QUEUE_SPACING,
-        5,
-      );
-    });
-
-    it("staggers lanterns along scroll progress", () => {
-      const first = getLanternQueuePathProgress(0.5, 0, LANTERN_FLIGHT_QUEUE_SPACING);
-      const second = getLanternQueuePathProgress(0.5, 1, LANTERN_FLIGHT_QUEUE_SPACING);
-      expect(second).toBeLessThan(first);
-    });
-
-    it("reaches the exit when scroll completes", () => {
-      expect(getLanternQueuePathProgress(1, 0, LANTERN_FLIGHT_QUEUE_SPACING)).toBe(1);
     });
   });
 });

@@ -1,5 +1,9 @@
 import { LANTERN_DEFAULT_MAX_STEPS } from "./constants";
-import { LANTERN_FLIGHT_PATH_REST_EPSILON } from "./lanternFlightPath.config";
+import { LANTERN_FLIGHT_PATH_FADE } from "./lanternFlightPath.config";
+import {
+  lanternExitPathS,
+  lanternInitialPathS,
+} from "./lanternRouteStops";
 import {
   easeInOutCubic,
   getLanternTransformAtProgress,
@@ -17,10 +21,10 @@ describe("lanternTransform", () => {
       expect(start.opacity).toBe(1);
     });
 
-    it("shrinks toward the path exit at the final step", () => {
+    it("reaches fade floor and exit scale at the final step", () => {
       const end = getLanternTransformAtStep(LANTERN_DEFAULT_MAX_STEPS, LANTERN_DEFAULT_MAX_STEPS);
-      expect(end.scale).toBe(0);
-      expect(end.opacity).toBe(0);
+      expect(end.scale).toBeCloseTo(LANTERN_FLIGHT_PATH_FADE.exitScale, 2);
+      expect(end.opacity).toBeCloseTo(LANTERN_FLIGHT_PATH_FADE.minOpacity, 2);
     });
 
     it("floors fractional and clamps negative steps", () => {
@@ -31,31 +35,33 @@ describe("lanternTransform", () => {
 
   describe("getLanternTransformAtProgress", () => {
     it("matches the rest pose at path progress 0", () => {
-      const rest = getLanternTransformAtProgress(0);
+      const rest = getLanternTransformAtProgress(lanternInitialPathS());
       expect(rest.scale).toBeCloseTo(1, 1);
       expect(rest.opacity).toBe(1);
     });
 
-    it("hides when the next lantern reaches rest", () => {
-      const faded = getLanternTransformAtProgress(0.05, {
-        nextLanternPathProgress: LANTERN_FLIGHT_PATH_REST_EPSILON,
+    it("keeps opacity on fade segment when next lantern reaches rest", () => {
+      const exiting = getLanternTransformAtProgress(lanternExitPathS(), {
+        nextLanternPathProgress: lanternInitialPathS(),
       });
-      expect(faded.opacity).toBe(0);
+      expect(exiting.opacity).toBeCloseTo(LANTERN_FLIGHT_PATH_FADE.minOpacity, 2);
     });
 
-    it("vanishes at the exit", () => {
-      const exit = getLanternTransformAtProgress(1);
-      expect(exit.scale).toBe(0);
-      expect(exit.opacity).toBe(0);
+    it("reaches fade floor and exit scale at the exit stop", () => {
+      const exit = getLanternTransformAtProgress(lanternExitPathS());
+      expect(exit.scale).toBeCloseTo(LANTERN_FLIGHT_PATH_FADE.exitScale, 2);
+      expect(exit.opacity).toBeCloseTo(LANTERN_FLIGHT_PATH_FADE.minOpacity, 2);
     });
 
-    it("clamps progress outside 0–1", () => {
-      expect(getLanternTransformAtProgress(-1).scale).toBe(
-        getLanternTransformAtProgress(0).scale,
-      );
-      expect(getLanternTransformAtProgress(2).scale).toBe(
-        getLanternTransformAtProgress(1).scale,
-      );
+    it("supports black-path progress values", () => {
+      const black = getLanternTransformAtProgress(-0.5);
+      expect(black.scale).toBeCloseTo(1, 1);
+      expect(black.opacity).toBe(1);
+    });
+
+    it("hides past the exit", () => {
+      expect(getLanternTransformAtProgress(lanternExitPathS() + 0.1).scale).toBe(0);
+      expect(getLanternTransformAtProgress(lanternExitPathS() + 0.1).opacity).toBe(0);
     });
   });
 

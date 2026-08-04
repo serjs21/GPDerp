@@ -1,4 +1,4 @@
-/** Rest pose along the flight segment (pathS = 0). */
+/** Rest pose along the flight segment (pathS = 0, purple label "1"). */
 export const LANTERN_FLIGHT_PATH_INITIAL = 0;
 
 /** Epsilon for rest-pose handoff and visibility. */
@@ -9,3 +9,12 @@ export const LANTERN_FLIGHT_PATH_ROTATE_GAIN = 8;
 
 /** Arc-length spacing between queued lanterns (normalized 0–1 along flight segment). */
 export const LANTERN_FLIGHT_QUEUE_SPACING = 0.14;
+
+/** Fade zone from initial (pathS 0) to exit (pathS 1, purple label "0"). */
+export const LANTERN_FLIGHT_PATH_FADE = {
+  initialPathS: 0,
+  exitPathS: 1,
+  minOpacity: 0.2,
+  /** Slight scale-up at exit — simulates getting closer to the viewport. */
+  exitScale: 1.08,
+} as const;
