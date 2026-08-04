@@ -23,8 +23,49 @@
   overflow: visible;
 }
 
+.flightPathGuide {
+  position: absolute;
+  inset: 2rem 1rem 3rem;
+  z-index: 0;
+  width: calc(100% - 2rem);
+  height: calc(100% - 5rem);
+  object-fit: contain;
+  opacity: 0.35;
+  pointer-events: none;
+  user-select: none;
+}
+
+.flightPathStop {
+  position: absolute;
+  z-index: 1;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: color-mix(in srgb, var(--text-color) 45%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-color) 60%, transparent);
+  pointer-events: none;
+}
+
+.flightPathStopActive {
+  width: 0.75rem;
+  height: 0.75rem;
+  background: color-mix(in srgb, var(--accent-color, #e8c87a) 85%, white);
+  border-color: color-mix(in srgb, var(--accent-color, #e8c87a) 95%, white);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color, #e8c87a) 35%, transparent);
+}
+
 .flightPathLantern {
   --lantern-width: clamp(4.5rem, 9vw, 8.5rem);
+}
+
+.flightPathStopLantern {
+  z-index: 2;
+  transition:
+    left 320ms ease,
+    top 320ms ease,
+    transform 320ms ease,
+    opacity 320ms ease;
 }
 
 .flightPathHud {
@@ -38,4 +79,46 @@
   letter-spacing: 0.04em;
   color: color-mix(in srgb, var(--text-color) 72%, transparent);
   pointer-events: none;
+}
+
+.flightPathControls {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 50%;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transform: translateX(-50%);
+}
+
+.flightPathControlButton {
+  min-width: 2.5rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--border-color) 72%, transparent);
+  background: color-mix(in srgb, var(--surface-glass-strong, #1a1a2e) 84%, transparent);
+  color: var(--text-color);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(5px);
+}
+
+.flightPathControlButton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.flightPathControlButton:not(:disabled):hover {
+  border-color: color-mix(in srgb, var(--accent-color, #e8c87a) 55%, transparent);
+}
+
+.flightPathControlLabel {
+  min-width: 5.5rem;
+  text-align: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--text-color) 72%, transparent);
 }

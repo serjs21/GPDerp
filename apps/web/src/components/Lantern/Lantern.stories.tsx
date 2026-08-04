@@ -16,6 +16,8 @@ import {
   isLanternFlightPathVisible,
   sampleLanternFlightPath,
 } from "./lanternFlightPath";
+import { lanternFlightPathStops } from "./lanternFlightPathStops.config";
+import { pointAtFlightArcLength } from "./lanternFlightPathSvg";
 import styles from "./Lantern.stories.module.css";
 
 const meta: Meta<typeof Lantern> = {
@@ -158,6 +160,90 @@ function FlightPathDemo({ lanternCount }: FlightPathArgs) {
   );
 }
 
+type FlightPathStopCarouselArgs = {
+  stopCount: number;
+};
+
+function FlightPathStopCarouselDemo({ stopCount }: FlightPathStopCarouselArgs) {
+  const [stepIndex, setStepIndex] = useState(0);
+  const stops = useMemo(() => lanternFlightPathStops(stopCount), [stopCount]);
+  const maxIndex = stops.length - 1;
+  const pathS = stops[Math.min(stepIndex, maxIndex)] ?? 0;
+  const activeStepIndex = Math.min(stepIndex, maxIndex);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") {
+        setStepIndex((index) => Math.max(0, index - 1));
+      }
+      if (event.key === "ArrowRight") {
+        setStepIndex((index) => Math.min(maxIndex, index + 1));
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [maxIndex]);
+
+  return (
+    <div className={styles.flightPathViewport}>
+      <p className={styles.flightPathHud}>
+        stop {activeStepIndex + 1} / {stops.length} · pathS {pathS.toFixed(3)}
+      </p>
+      <div className={styles.flightPathStage} aria-label="Lantern flight path stops">
+        {/* eslint-disable-next-line @next/next/no-img-element -- storybook path guide from public SVG */}
+        <img className={styles.flightPathGuide} src="/flight_path.svg" alt="" aria-hidden />
+        {stops.map((stopPathS, index) => {
+          const point = pointAtFlightArcLength(stopPathS);
+          return (
+            <span
+              key={index}
+              className={`${styles.flightPathStop} ${index === activeStepIndex ? styles.flightPathStopActive : ""}`}
+              style={{
+                left: `${point.x * 100}%`,
+                top: `${point.y * 100}%`,
+              }}
+              aria-hidden
+            />
+          );
+        })}
+        <Lantern
+          className={`${styles.flightPathLantern} ${styles.flightPathStopLantern}`}
+          progress={pathS}
+          haiku={makeMockHaiku({
+            id: "flight-path-stop-lantern",
+            title: "Empty pond",
+            body: WRITTEN_HAIKUS[0].body,
+          })}
+        />
+      </div>
+      <div className={styles.flightPathControls}>
+        <button
+          type="button"
+          className={styles.flightPathControlButton}
+          aria-label="Previous stop"
+          disabled={activeStepIndex <= 0}
+          onClick={() => setStepIndex((index) => Math.max(0, index - 1))}
+        >
+          ←
+        </button>
+        <span className={styles.flightPathControlLabel}>
+          {activeStepIndex + 1} / {stops.length}
+        </span>
+        <button
+          type="button"
+          className={styles.flightPathControlButton}
+          aria-label="Next stop"
+          disabled={activeStepIndex >= maxIndex}
+          onClick={() => setStepIndex((index) => Math.min(maxIndex, index + 1))}
+        >
+          →
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export const Default: Story = {
   render: (args) => (
     <div className={styles.stage}>
@@ -181,4 +267,16 @@ export const FlightPath: StoryObj<FlightPathArgs> = {
   },
   args: { lanternCount: 5 },
   render: ({ lanternCount }) => <FlightPathDemo lanternCount={lanternCount} />,
+};
+
+export const FlightPathStops: StoryObj<FlightPathStopCarouselArgs> = {
+  name: "Flight path stops",
+  parameters: { wideContent: true },
+  argTypes: {
+    stopCount: { control: { type: "range", min: 3, max: 12, step: 1 } },
+  },
+  args: { stopCount: 7 },
+  render: ({ stopCount }) => (
+    <FlightPathStopCarouselDemo key={stopCount} stopCount={stopCount} />
+  ),
 };
