@@ -1,21 +1,27 @@
 import {
-  LANTERN_FLIGHT_PATH_INITIAL,
-  LANTERN_FLIGHT_PATH_MAX_SCALE,
-  LANTERN_FLIGHT_PATH_MIN_SCALE,
+  LANTERN_FLIGHT_PATH_REST_EPSILON,
   LANTERN_FLIGHT_PATH_ROTATE_GAIN,
   LANTERN_FLIGHT_QUEUE_SPACING,
 } from "./lanternFlightPath.config";
-import { pointAtArcLength, tangentAtArcLength } from "./lanternFlightPathSvg";
+import { pointAtFlightArcLength, tangentAtFlightArcLength } from "./lanternFlightPathSvg";
 
 export { LANTERN_FLIGHT_PATH_INITIAL } from "./lanternFlightPath.config";
-export { LANTERN_FLIGHT_QUEUE_SPACING } from "./lanternFlightPath.config";
+export {
+  LANTERN_FLIGHT_PATH_REST_EPSILON,
+  LANTERN_FLIGHT_QUEUE_SPACING,
+} from "./lanternFlightPath.config";
 export {
   LANTERN_FLIGHT_PATH_D,
+  LANTERN_FLIGHT_PATH_PERIMETER_EXIT,
+  LANTERN_FLIGHT_PATH_PERIMETER_INITIAL,
   LANTERN_FLIGHT_PATH_VIEWBOX,
   getArcLengthTable,
+  getFlightArcLength,
   getTotalArcLength,
   pointAtArcLength,
+  pointAtFlightArcLength,
   tangentAtArcLength,
+  tangentAtFlightArcLength,
 } from "./lanternFlightPathSvg";
 
 export type LanternFlightPathSample = {
@@ -27,44 +33,35 @@ export type LanternFlightPathSample = {
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 
-function lerp(a: number, b: number, t: number): number {
-  return a + (b - a) * t;
+function scaleAtFlightArcLength(pathS: number): number {
+  if (pathS < 0 || pathS > 1) return 0;
+  return 1 - pathS;
 }
 
-function scaleAtArcLength(s: number): number {
-  const pathS = Math.max(0, s);
-
-  if (pathS <= LANTERN_FLIGHT_PATH_INITIAL) {
-    if (LANTERN_FLIGHT_PATH_INITIAL <= 0) return 1;
-    return lerp(
-      LANTERN_FLIGHT_PATH_MIN_SCALE,
-      1,
-      pathS / LANTERN_FLIGHT_PATH_INITIAL,
-    );
-  }
-
-  const fadeSpan = 1 - LANTERN_FLIGHT_PATH_INITIAL;
-  if (fadeSpan <= 0) return LANTERN_FLIGHT_PATH_MAX_SCALE;
-
-  return lerp(
-    1,
-    LANTERN_FLIGHT_PATH_MAX_SCALE,
-    (pathS - LANTERN_FLIGHT_PATH_INITIAL) / fadeSpan,
-  );
+function opacityAtFlightArcLength(pathS: number): number {
+  if (pathS < 0 || pathS > 1) return 0;
+  return 1 - pathS;
 }
 
-/** Sample position, scale, and tangent rotation at normalized arc length `s` (0–1). */
+/** Sample position, scale, and tangent rotation at flight arc length `pathS` (0 = rest, 1 = exit). */
 export function sampleLanternFlightPath(pathS: number): LanternFlightPathSample {
-  const s = clamp01(pathS);
-  const point = pointAtArcLength(s);
-  const tangentDeg = tangentAtArcLength(s);
+  const flightS = clamp01(pathS);
+  const point =
+    pathS < 0 || pathS > 1
+      ? pointAtFlightArcLength(Math.min(1, Math.max(0, pathS)))
+      : pointAtFlightArcLength(flightS);
+  const tangentDeg = tangentAtFlightArcLength(flightS);
 
   return {
     x: point.x,
     y: point.y,
-    scale: scaleAtArcLength(s),
+    scale: scaleAtFlightArcLength(pathS),
     rotate: tangentDeg * (LANTERN_FLIGHT_PATH_ROTATE_GAIN / 90),
   };
+}
+
+export function isLanternFlightPathVisible(pathS: number): boolean {
+  return sampleLanternFlightPath(pathS).scale > 0;
 }
 
 export type LanternFlightOpacityInput = {
@@ -72,26 +69,24 @@ export type LanternFlightOpacityInput = {
   nextLanternPathT?: number;
 };
 
-/** Opacity along path: full before INITIAL; fades after; hidden when superseded. */
+/** Opacity along flight path; hidden when superseded or out of range. */
 export function getLanternFlightOpacity({
   pathT,
   nextLanternPathT,
 }: LanternFlightOpacityInput): number {
+  if (pathT < 0 || pathT > 1) {
+    return 0;
+  }
+
   if (
     nextLanternPathT !== undefined &&
-    nextLanternPathT >= LANTERN_FLIGHT_PATH_INITIAL &&
-    pathT > LANTERN_FLIGHT_PATH_INITIAL
+    nextLanternPathT <= LANTERN_FLIGHT_PATH_REST_EPSILON &&
+    pathT > LANTERN_FLIGHT_PATH_REST_EPSILON
   ) {
     return 0;
   }
 
-  if (pathT <= LANTERN_FLIGHT_PATH_INITIAL) {
-    return 1;
-  }
-
-  const fadeSpan = 1 - LANTERN_FLIGHT_PATH_INITIAL;
-  const fadeT = clamp01((pathT - LANTERN_FLIGHT_PATH_INITIAL) / fadeSpan);
-  return 1 - fadeT;
+  return opacityAtFlightArcLength(pathT);
 }
 
 export type LanternFlightTransform = LanternFlightPathSample & {
@@ -114,16 +109,14 @@ export function getLanternFlightTransform(
   };
 }
 
-/** Map scroll progress to per-lantern arc-length position in a queue. */
+/** Map scroll progress to per-lantern flight arc position (0 = rest, 1 = exit). */
 export function getLanternQueuePathProgress(
   scrollProgress: number,
   index: number,
   spacing: number = LANTERN_FLIGHT_QUEUE_SPACING,
 ): number {
-  const clampedScroll = clamp01(scrollProgress);
-  const totalSpan = 1 + spacing * Math.max(0, index);
-  const pathS = clampedScroll * totalSpan - index * spacing;
-  return Math.max(0, pathS);
+  const leadPathS = clamp01(scrollProgress);
+  return leadPathS - index * spacing;
 }
 
 /** Evenly spaced arc-length samples for discrete step previews. */

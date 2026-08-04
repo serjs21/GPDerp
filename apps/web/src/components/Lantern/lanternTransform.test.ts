@@ -1,5 +1,5 @@
 import { LANTERN_DEFAULT_MAX_STEPS } from "./constants";
-import { LANTERN_FLIGHT_PATH_INITIAL } from "./lanternFlightPath.config";
+import { LANTERN_FLIGHT_PATH_REST_EPSILON } from "./lanternFlightPath.config";
 import {
   easeInOutCubic,
   getLanternTransformAtProgress,
@@ -10,20 +10,17 @@ import {
 
 describe("lanternTransform", () => {
   describe("getLanternTransformAtStep", () => {
-    it("keeps step 0 at the path start with percent positioning", () => {
+    it("keeps step 0 at rest with percent positioning", () => {
       const start = getLanternTransformAtStep(0);
       expect(start.positionMode).toBe("percent");
-      expect(start.scale).toBeLessThan(1);
+      expect(start.scale).toBeCloseTo(1, 1);
       expect(start.opacity).toBe(1);
     });
 
-    it("maps the final step near the path exit", () => {
+    it("shrinks toward the path exit at the final step", () => {
       const end = getLanternTransformAtStep(LANTERN_DEFAULT_MAX_STEPS, LANTERN_DEFAULT_MAX_STEPS);
-      const initial = getLanternTransformAtStep(
-        Math.round(LANTERN_FLIGHT_PATH_INITIAL * LANTERN_DEFAULT_MAX_STEPS),
-        LANTERN_DEFAULT_MAX_STEPS,
-      );
-      expect(end.scale).toBeGreaterThan(initial.scale);
+      expect(end.scale).toBe(0);
+      expect(end.opacity).toBe(0);
     });
 
     it("floors fractional and clamps negative steps", () => {
@@ -33,22 +30,23 @@ describe("lanternTransform", () => {
   });
 
   describe("getLanternTransformAtProgress", () => {
-    it("matches the initial trough at the configured progress", () => {
-      const initial = getLanternTransformAtProgress(LANTERN_FLIGHT_PATH_INITIAL);
-      expect(initial.scale).toBeCloseTo(1, 1);
-      expect(initial.opacity).toBe(1);
+    it("matches the rest pose at path progress 0", () => {
+      const rest = getLanternTransformAtProgress(0);
+      expect(rest.scale).toBeCloseTo(1, 1);
+      expect(rest.opacity).toBe(1);
     });
 
-    it("hides when the next lantern reaches initial", () => {
-      const faded = getLanternTransformAtProgress(LANTERN_FLIGHT_PATH_INITIAL + 0.05, {
-        nextLanternPathProgress: LANTERN_FLIGHT_PATH_INITIAL,
+    it("hides when the next lantern reaches rest", () => {
+      const faded = getLanternTransformAtProgress(0.05, {
+        nextLanternPathProgress: LANTERN_FLIGHT_PATH_REST_EPSILON,
       });
       expect(faded.opacity).toBe(0);
     });
 
-    it("restores full opacity when returning to initial", () => {
-      const atInitial = getLanternTransformAtProgress(LANTERN_FLIGHT_PATH_INITIAL);
-      expect(atInitial.opacity).toBe(1);
+    it("vanishes at the exit", () => {
+      const exit = getLanternTransformAtProgress(1);
+      expect(exit.scale).toBe(0);
+      expect(exit.opacity).toBe(0);
     });
 
     it("clamps progress outside 0–1", () => {

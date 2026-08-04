@@ -13,7 +13,7 @@ import {
 import { Lantern } from "./Lantern";
 import {
   getLanternQueuePathProgress,
-  LANTERN_FLIGHT_PATH_INITIAL,
+  isLanternFlightPathVisible,
   sampleLanternFlightPath,
 } from "./lanternFlightPath";
 import styles from "./Lantern.stories.module.css";
@@ -112,7 +112,7 @@ function FlightPathDemo({ lanternCount }: FlightPathArgs) {
 
   const activeIndex = lanterns.findIndex((_, index) => {
     const pathS = getLanternQueuePathProgress(scrollProgress, index, spacing);
-    return pathS >= LANTERN_FLIGHT_PATH_INITIAL - 0.02 && pathS <= LANTERN_FLIGHT_PATH_INITIAL + 0.06;
+    return pathS >= -0.02 && pathS <= 0.06;
   });
 
   return (
@@ -128,6 +128,7 @@ function FlightPathDemo({ lanternCount }: FlightPathArgs) {
             index,
             pathS: getLanternQueuePathProgress(scrollProgress, index, spacing),
           }))
+          .filter(({ pathS }) => isLanternFlightPathVisible(pathS))
           .sort(
             (a, b) =>
               sampleLanternFlightPath(a.pathS).scale - sampleLanternFlightPath(b.pathS).scale,
