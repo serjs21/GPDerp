@@ -55,17 +55,25 @@ describe("lanternFlightPath", () => {
   });
 
   describe("scaleAtStopIndex", () => {
-    const fullHeightPx = 17.5 * 16 * (505 / 330);
-
     it("is full scale at stop-1 and collapses at stop-16", () => {
       expect(scaleAtStopIndex(0)).toBeCloseTo(1, 5);
       expect(scaleAtStopIndex(15)).toBeCloseTo(0, 5);
       expect(scaleAtStopIndex(16)).toBe(0);
     });
 
-    it("shrinks exponentially in the tail (stop-14 ≈ 24px, stop-15 ≈ 12px)", () => {
-      expect(scaleAtStopIndex(13) * fullHeightPx).toBeCloseTo(24, 0);
-      expect(scaleAtStopIndex(14) * fullHeightPx).toBeCloseTo(12, 0);
+    it("shrinks with ease-out depth (fast early, slow tail)", () => {
+      expect(scaleAtStopIndex(1)).toBeCloseTo(0.8, 1);
+      expect(scaleAtStopIndex(2)).toBeCloseTo(0.65, 1);
+      expect(scaleAtStopIndex(3)).toBeCloseTo(0.5, 1);
+      expect(scaleAtStopIndex(14)).toBeCloseTo(0.01, 2);
+    });
+  });
+
+  describe("getLanternJourneyTransform", () => {
+    it("stacks path-front lanterns above those further along the journey", () => {
+      const front = getLanternJourneyTransform(0);
+      const mid = getLanternJourneyTransform(0.5);
+      expect(front.stackOrder).toBeGreaterThan(mid.stackOrder ?? 0);
     });
   });
 

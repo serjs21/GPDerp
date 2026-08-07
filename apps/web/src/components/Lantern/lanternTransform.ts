@@ -15,6 +15,8 @@ export type LanternTransform = {
   rotate: number;
   opacity?: number;
   positionMode?: LanternPositionMode;
+  /** Paint order for path-positioned lanterns (higher = on top). */
+  stackOrder?: number;
 };
 
 export function lerp(a: number, b: number, t: number): number {
@@ -25,6 +27,9 @@ export function lerp(a: number, b: number, t: number): number {
 export function easeInOutCubic(t: number): number {
   return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
 }
+
+/** Fast-at-start easing for depth scale along carousel stops. */
+export { easeOutCubic } from "./lanternFlightPath.config";
 
 /**
  * Discrete flight step mapped to evenly spaced path samples.
@@ -60,6 +65,7 @@ export function lanternTransformToCssVars(transform: LanternTransform): CSSPrope
       "--lantern-scale": String(transform.scale),
       "--lantern-rotate": `${transform.rotate}deg`,
       "--lantern-opacity": String(opacity),
+      ...(transform.stackOrder !== undefined ? { zIndex: 10 + transform.stackOrder } : {}),
       ...(collapsed
         ? {
             "--lantern-width": "0px",
@@ -110,6 +116,7 @@ export function resolveLanternTransform(props: LanternTransformInput): LanternTr
       rotate: props.transform.rotate ?? base.rotate,
       opacity: props.transform.opacity ?? base.opacity,
       positionMode: props.transform.positionMode ?? base.positionMode,
+      stackOrder: props.transform.stackOrder ?? base.stackOrder,
     };
   }
 

@@ -88,7 +88,6 @@
 }
 
 .flightPathStopLantern {
-  z-index: 2;
   transition:
     transform 320ms ease,
     opacity 320ms ease;

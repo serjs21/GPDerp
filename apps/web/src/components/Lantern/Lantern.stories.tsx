@@ -314,9 +314,7 @@ function FlightPathStopCarouselDemo() {
               1
             </span>
           ) : null}
-          {[...Array.from({ length: CAROUSEL_LANTERN_COUNT }, (_, offset) => offset)]
-            .sort((a, b) => (lanternJourneyS[a] ?? 0) - (lanternJourneyS[b] ?? 0))
-            .map((offset) => {
+          {Array.from({ length: CAROUSEL_LANTERN_COUNT }, (_, offset) => {
               const slotJourneyS = lanternJourneyS[offset];
               if (slotJourneyS === undefined || !isLanternJourneyVisible(slotJourneyS)) return null;
 

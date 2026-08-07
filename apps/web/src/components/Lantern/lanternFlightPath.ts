@@ -150,6 +150,7 @@ export function getLanternFlightOpacity({
 export type LanternFlightTransform = LanternFlightPathSample & {
   opacity: number;
   positionMode: "percent";
+  stackOrder?: number;
 };
 
 export function getLanternJourneyTransform(journeyS: number): LanternFlightTransform {
@@ -158,6 +159,7 @@ export function getLanternJourneyTransform(journeyS: number): LanternFlightTrans
     ...sample,
     opacity: getLanternJourneyOpacity(journeyS),
     positionMode: "percent",
+    stackOrder: Math.round((1 - clamp01(journeyS)) * 100),
   };
 }
 
