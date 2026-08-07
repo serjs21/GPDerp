@@ -15,6 +15,8 @@ export type LanternProps = HaikuContainerProps & {
   step?: number;
   /** Continuous flight-path progress 0–1 (used when step is omitted). */
   progress?: number;
+  /** Carousel journey position 0–1 (stop-1 … stop-16); overrides progress when set. */
+  journeyS?: number;
   /** Next lantern path progress for queue handoff opacity. */
   nextLanternPathProgress?: number;
   /** Max discrete steps when mapping progress. */
@@ -59,6 +61,7 @@ export function Lantern(props: LanternProps) {
     className,
     step,
     progress,
+    journeyS,
     maxSteps,
     nextLanternPathProgress,
     transform,
@@ -75,6 +78,7 @@ export function Lantern(props: LanternProps) {
       generating={generating}
       step={step}
       progress={progress}
+      journeyS={journeyS}
       maxSteps={maxSteps}
       nextLanternPathProgress={nextLanternPathProgress}
       transform={transform}

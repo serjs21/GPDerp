@@ -27,10 +27,16 @@ export {
   equalArcLengthSamples,
   getLanternFlightOpacity,
   getLanternFlightTransform,
+  getLanternJourneyTransform,
   getLanternQueuePathProgress,
+  isLanternJourneyVisible,
+  journeySBetweenCarouselSteps,
+  journeySForCarouselStep,
   LANTERN_FLIGHT_PATH_INITIAL,
   LANTERN_FLIGHT_QUEUE_SPACING,
+  resolveLanternQueueSlot,
   sampleLanternFlightPath,
+  sampleLanternJourney,
 } from "./lanternFlightPath";
 export {
   LANTERN_FLIGHT_PATH_D,

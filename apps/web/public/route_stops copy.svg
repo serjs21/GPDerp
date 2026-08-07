@@ -8,10 +8,10 @@
 
 
     <g id="stops" fill="black">
-<circle id="stop-0" cx="1909.23" cy="101.90" r="7" />
-<circle id="stop-1" cx="1325.15" cy="903.69" r="7" />
-<circle id="stop-2" cx="642.59" cy="557.93" r="7"  />
-<circle id="stop-3" cx="209.59" cy="599.90" r="7" />
+<circle id="stop-0" cx="1909.23" cy="101.90" r="7" />1
+<circle id="stop-1" cx="1325.15" cy="903.69" r="7" />2
+<circle id="stop-2" cx="642.59" cy="557.93" r="7"  />3
+<circle id="stop-3" cx="209.59" cy="599.90" r="7" />4
 <circle id="stop-4" cx="966.39" cy="360.96" r="7"  />
 <circle id="stop-5" cx="559.29" cy="356.57" r="7"  />
 <circle id="stop-6" cx="209.78" cy="255.50" r="7"  />

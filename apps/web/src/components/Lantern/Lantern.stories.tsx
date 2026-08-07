@@ -1,7 +1,7 @@
 "use client";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { CelestialPresetName } from "@/theme/celestialPresets";
 import {
   composeDecorators,
@@ -12,15 +12,19 @@ import {
 } from "@/storybook";
 import { Lantern } from "./Lantern";
 import {
-  getLanternFlightTransform,
-  getLanternQueuePathProgress,
+  getLanternJourneyTransform,
   isLanternFlightPathVisible,
+  isLanternJourneyVisible,
+  journeySForCarouselStep,
+  lanternInitialJourneyS,
   lanternInitialPathS,
   LANTERN_CAROUSEL_STOP_IDS,
   LANTERN_FLIGHT_PATH_EXIT_STOP_ID,
   LANTERN_FLIGHT_PATH_INITIAL_STOP_ID,
+  resolveLanternQueueSlot,
   routeStopById,
 } from "./lanternFlightPath";
+import { easeInOutCubic } from "./lanternTransform";
 import styles from "./Lantern.stories.module.css";
 
 const meta: Meta<typeof Lantern> = {
@@ -74,11 +78,29 @@ softens the night.`,
   },
 ] as const;
 
+const CAROUSEL_TRANSITION_MS = 320;
+
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 
 type FlightPathArgs = {
   lanternCount: number;
 };
+
+function FlightPathGuideBox({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={[styles.flightPathGuideBox, className].filter(Boolean).join(" ")}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- storybook route guide from public SVG */}
+      <img src="/route-split-segments-exact.svg" alt="" aria-hidden />
+      {children}
+    </div>
+  );
+}
 
 function FlightPathDemo({ lanternCount }: FlightPathArgs) {
   const stageRef = useRef<HTMLDivElement>(null);
@@ -107,9 +129,13 @@ function FlightPathDemo({ lanternCount }: FlightPathArgs) {
   }, []);
 
   const activeIndex = lanterns.findIndex((_, index) => {
-    const pathS = getLanternQueuePathProgress(scrollProgress, index, lanternCount);
+    const slot = resolveLanternQueueSlot(scrollProgress, index, lanternCount);
+    if (slot.journeyS !== undefined) {
+      return slot.journeyS <= lanternInitialJourneyS() + 0.02;
+    }
     return (
-      pathS >= lanternInitialPathS() - 0.02 && pathS <= lanternInitialPathS() + 0.06
+      (slot.pathS ?? lanternInitialPathS()) >= lanternInitialPathS() - 0.02 &&
+      (slot.pathS ?? lanternInitialPathS()) <= lanternInitialPathS() + 0.06
     );
   });
 
@@ -120,34 +146,45 @@ function FlightPathDemo({ lanternCount }: FlightPathArgs) {
         {activeIndex >= 0 ? ` · active #${activeIndex + 1}` : ""}
       </p>
       <div className={styles.flightPathStage} aria-label="Lantern flight path">
-        {[...lanterns]
-          .map((item, index) => ({
-            item,
-            index,
-            pathS: getLanternQueuePathProgress(scrollProgress, index, lanternCount),
-          }))
-          .filter(({ pathS }) => isLanternFlightPathVisible(pathS))
-          .sort((a, b) => a.pathS - b.pathS)
-          .map(({ item, index, pathS }) => {
-            const nextPathS =
-              index < lanterns.length - 1
-                ? getLanternQueuePathProgress(scrollProgress, index + 1, lanternCount)
-                : undefined;
+        <FlightPathGuideBox>
+          {[...lanterns]
+            .map((item, index) => ({
+              item,
+              index,
+              slot: resolveLanternQueueSlot(scrollProgress, index, lanternCount),
+            }))
+            .filter(({ slot }) =>
+              slot.journeyS !== undefined
+                ? isLanternJourneyVisible(slot.journeyS)
+                : isLanternFlightPathVisible(slot.pathS ?? lanternInitialPathS()),
+            )
+            .sort((a, b) => {
+              const aValue = a.slot.pathS ?? a.slot.journeyS ?? 0;
+              const bValue = b.slot.pathS ?? b.slot.journeyS ?? 0;
+              return aValue - bValue;
+            })
+            .map(({ item, index, slot }) => {
+              const nextSlot =
+                index < lanterns.length - 1
+                  ? resolveLanternQueueSlot(scrollProgress, index + 1, lanternCount)
+                  : undefined;
 
-            return (
-              <Lantern
-                key={item.id}
-                className={styles.flightPathLantern}
-                progress={pathS}
-                nextLanternPathProgress={nextPathS}
-                haiku={makeMockHaiku({
-                  id: item.id,
-                  title: item.title,
-                  body: item.body,
-                })}
-              />
-            );
-          })}
+              return (
+                <Lantern
+                  key={item.id}
+                  className={styles.flightPathLantern}
+                  journeyS={slot.journeyS}
+                  progress={slot.pathS}
+                  nextLanternPathProgress={nextSlot?.pathS ?? nextSlot?.journeyS}
+                  haiku={makeMockHaiku({
+                    id: item.id,
+                    title: item.title,
+                    body: item.body,
+                  })}
+                />
+              );
+            })}
+        </FlightPathGuideBox>
       </div>
     </div>
   );
@@ -155,97 +192,127 @@ function FlightPathDemo({ lanternCount }: FlightPathArgs) {
 
 function FlightPathStopCarouselDemo() {
   const [stepIndex, setStepIndex] = useState(0);
+  const [journeyS, setJourneyS] = useState(() => journeySForCarouselStep(0));
+  const animationRef = useRef<number | null>(null);
+  const journeySRef = useRef(journeyS);
+  const stepIndexRef = useRef(stepIndex);
+  const goToStepRef = useRef<(nextIndex: number) => void>(() => {});
+  journeySRef.current = journeyS;
+  stepIndexRef.current = stepIndex;
   const stopIds = LANTERN_CAROUSEL_STOP_IDS;
   const maxIndex = stopIds.length - 1;
   const activeStepIndex = Math.min(stepIndex, maxIndex);
   const activeStopId = stopIds[activeStepIndex] ?? LANTERN_FLIGHT_PATH_INITIAL_STOP_ID;
-  const activeStop = routeStopById(activeStopId);
-  const pathS = activeStop?.pathS ?? lanternInitialPathS();
-  const lanternTransform = getLanternFlightTransform(pathS);
+  const lanternTransform = getLanternJourneyTransform(journeyS);
   const exitStop = routeStopById(LANTERN_FLIGHT_PATH_EXIT_STOP_ID);
   const initialStop = routeStopById(LANTERN_FLIGHT_PATH_INITIAL_STOP_ID);
+
+  const goToStep = (nextIndex: number) => {
+    const clamped = Math.max(0, Math.min(maxIndex, nextIndex));
+    const atRest = animationRef.current === null;
+    if (clamped === stepIndexRef.current && atRest) return;
+
+    if (animationRef.current !== null) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+
+    const fromJourneyS = journeySRef.current;
+    const toJourneyS = journeySForCarouselStep(clamped);
+    setStepIndex(clamped);
+
+    const start = performance.now();
+    const tick = (now: number) => {
+      const linearT = clamp01((now - start) / CAROUSEL_TRANSITION_MS);
+      const easedT = easeInOutCubic(linearT);
+      const nextJourneyS = fromJourneyS + (toJourneyS - fromJourneyS) * easedT;
+      journeySRef.current = nextJourneyS;
+      setJourneyS(nextJourneyS);
+      if (linearT < 1) {
+        animationRef.current = requestAnimationFrame(tick);
+      } else {
+        animationRef.current = null;
+        journeySRef.current = toJourneyS;
+        setJourneyS(toJourneyS);
+      }
+    };
+
+    animationRef.current = requestAnimationFrame(tick);
+  };
+
+  goToStepRef.current = goToStep;
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowLeft") {
-        setStepIndex((index) => Math.max(0, index - 1));
+        goToStepRef.current(stepIndexRef.current - 1);
       }
       if (event.key === "ArrowRight") {
-        setStepIndex((index) => Math.min(maxIndex, index + 1));
+        goToStepRef.current(stepIndexRef.current + 1);
       }
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [maxIndex]);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (animationRef.current !== null) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className={styles.flightPathViewport}>
       <p className={styles.flightPathHud}>
-        stop-{activeStopId} · pathS {pathS.toFixed(3)} · opacity {lanternTransform.opacity.toFixed(2)}
+        stop-{activeStopId} · journeyS {journeyS.toFixed(3)} · scale {lanternTransform.scale.toFixed(2)}
       </p>
       <div className={styles.flightPathStage} aria-label="Lantern flight path stops">
-        {/* eslint-disable-next-line @next/next/no-img-element -- storybook route guide from public SVG */}
-        <img className={styles.flightPathGuide} src="/route_stops.svg" alt="" aria-hidden />
-        {stopIds.map((stopId, index) => {
-          const stop = routeStopById(stopId);
-          if (!stop) return null;
-
-          return (
+        <FlightPathGuideBox>
+          {exitStop ? (
             <span
-              key={stopId}
-              className={`${styles.flightPathStop} ${index === activeStepIndex ? styles.flightPathStopActive : ""}`}
+              className={`${styles.flightPathStopLabel} ${styles.flightPathStopLabelExit}`}
               style={{
-                left: `${stop.x * 100}%`,
-                top: `${stop.y * 100}%`,
+                left: `${exitStop.x * 100}%`,
+                top: `${exitStop.y * 100}%`,
               }}
               aria-hidden
-            />
-          );
-        })}
-        {exitStop ? (
+            >
+              0
+            </span>
+          ) : null}
+          {initialStop ? (
+            <span
+              className={`${styles.flightPathStopLabel} ${styles.flightPathStopLabelInitial}`}
+              style={{
+                left: `${initialStop.x * 100}%`,
+                top: `${initialStop.y * 100}%`,
+              }}
+              aria-hidden
+            >
+              1
+            </span>
+          ) : null}
+          <Lantern
+            className={`${styles.flightPathLantern} ${styles.flightPathStopLantern}`}
+            journeyS={journeyS}
+            haiku={makeMockHaiku({
+              id: "flight-path-stop-lantern",
+              title: "Empty pond",
+              body: WRITTEN_HAIKUS[0].body,
+            })}
+          />
           <span
-            className={`${styles.flightPathStop} ${styles.flightPathStopExit}`}
+            className={`${styles.flightPathStop} ${styles.flightPathStopActive}`}
             style={{
-              left: `${exitStop.x * 100}%`,
-              top: `${exitStop.y * 100}%`,
+              left: `${lanternTransform.x * 100}%`,
+              top: `${lanternTransform.y * 100}%`,
             }}
             aria-hidden
           />
-        ) : null}
-        {initialStop ? (
-          <span
-            className={`${styles.flightPathStopLabel} ${styles.flightPathStopLabelInitial}`}
-            style={{
-              left: `${initialStop.x * 100}%`,
-              top: `${initialStop.y * 100}%`,
-            }}
-            aria-hidden
-          >
-            1
-          </span>
-        ) : null}
-        {exitStop ? (
-          <span
-            className={`${styles.flightPathStopLabel} ${styles.flightPathStopLabelExit}`}
-            style={{
-              left: `${exitStop.x * 100}%`,
-              top: `${exitStop.y * 100}%`,
-            }}
-            aria-hidden
-          >
-            0
-          </span>
-        ) : null}
-        <Lantern
-          className={`${styles.flightPathLantern} ${styles.flightPathStopLantern}`}
-          progress={pathS}
-          haiku={makeMockHaiku({
-            id: "flight-path-stop-lantern",
-            title: "Empty pond",
-            body: WRITTEN_HAIKUS[0].body,
-          })}
-        />
+        </FlightPathGuideBox>
       </div>
       <div className={styles.flightPathControls}>
         <button
@@ -253,7 +320,7 @@ function FlightPathStopCarouselDemo() {
           className={styles.flightPathControlButton}
           aria-label="Previous stop"
           disabled={activeStepIndex <= 0}
-          onClick={() => setStepIndex((index) => Math.max(0, index - 1))}
+          onClick={() => goToStep(stepIndex - 1)}
         >
           ←
         </button>
@@ -265,7 +332,7 @@ function FlightPathStopCarouselDemo() {
           className={styles.flightPathControlButton}
           aria-label="Next stop"
           disabled={activeStepIndex >= maxIndex}
-          onClick={() => setStepIndex((index) => Math.min(maxIndex, index + 1))}
+          onClick={() => goToStep(stepIndex + 1)}
         >
           →
         </button>

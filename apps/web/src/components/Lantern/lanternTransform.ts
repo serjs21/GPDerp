@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { LANTERN_DEFAULT_MAX_STEPS } from "./constants";
 import {
   getLanternFlightTransform,
+  getLanternJourneyTransform,
   lanternFlightPathAtStep,
 } from "./lanternFlightPath";
 
@@ -50,6 +51,7 @@ export function getLanternTransformAtProgress(
 
 export function lanternTransformToCssVars(transform: LanternTransform): CSSProperties {
   const opacity = transform.opacity ?? 1;
+  const collapsed = transform.scale <= 0;
 
   if (transform.positionMode === "percent") {
     return {
@@ -58,6 +60,14 @@ export function lanternTransformToCssVars(transform: LanternTransform): CSSPrope
       "--lantern-scale": String(transform.scale),
       "--lantern-rotate": `${transform.rotate}deg`,
       "--lantern-opacity": String(opacity),
+      ...(collapsed
+        ? {
+            "--lantern-width": "0px",
+            width: 0,
+            height: 0,
+            overflow: "hidden",
+          }
+        : {}),
     } as CSSProperties;
   }
 
@@ -73,12 +83,17 @@ export function lanternTransformToCssVars(transform: LanternTransform): CSSPrope
 export type LanternTransformInput = {
   step?: number;
   progress?: number;
+  journeyS?: number;
   maxSteps?: number;
   nextLanternPathProgress?: number;
   transform?: Partial<LanternTransform>;
 };
 
 export function resolveLanternTransform(props: LanternTransformInput): LanternTransform {
+  if (props.journeyS !== undefined) {
+    return getLanternJourneyTransform(props.journeyS);
+  }
+
   if (props.transform) {
     const base =
       props.step !== undefined
