@@ -13,6 +13,15 @@ export const LANTERN_FLIGHT_QUEUE_SPACING = 0.14;
 /** Carousel scale at stop-16 (fully collapsed). */
 export const LANTERN_CAROUSEL_MIN_SCALE = 0;
 
+/**
+ * Exponential height targets for carousel shrink (px at 16px root rem).
+ * stop-15 ≈ 12px tall, stop-14 ≈ 24px; each step back doubles until capped at full size.
+ */
+export const LANTERN_CAROUSEL_SCALE_TAIL = {
+  heightAtStop15Px: 12,
+  doublingAnchorStopIndex: 14,
+} as const;
+
 /** Fade zone from initial (pathS 0) to exit (pathS 1, purple label "0"). */
 export const LANTERN_FLIGHT_PATH_FADE = {
   initialPathS: 0,

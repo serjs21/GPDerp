@@ -1,10 +1,15 @@
-import { LANTERN_FLIGHT_PATH_FADE } from "./lanternFlightPath.config";
+import { LANTERN_FLIGHT_PATH_FADE, LANTERN_CAROUSEL_SCALE_TAIL } from "./lanternFlightPath.config";
 import {
   LANTERN_CAROUSEL_STOP_IDS,
   lanternExitPathS,
   lanternInitialPathS,
   LANTERN_ROUTE_JOURNEY,
 } from "./lanternRouteStops";
+import {
+  LANTERN_IMAGE_HEIGHT,
+  LANTERN_IMAGE_WIDTH,
+  LANTERN_WIDTH_REM,
+} from "./constants";
 
 export {
   LANTERN_CAROUSEL_STOP_IDS,
@@ -27,11 +32,26 @@ function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }
 
+/** Native lantern height at scale 1 (px at 16px root rem). */
+const LANTERN_FULL_HEIGHT_PX =
+  LANTERN_WIDTH_REM * 16 * (LANTERN_IMAGE_HEIGHT / LANTERN_IMAGE_WIDTH);
+
+function targetHeightPxAtStopIndex(stopIndex: number): number {
+  const lastIndex = LANTERN_CAROUSEL_STOP_IDS.length - 1;
+  if (stopIndex >= lastIndex) return 0;
+  if (stopIndex < 0) return LANTERN_FULL_HEIGHT_PX;
+
+  const { heightAtStop15Px, doublingAnchorStopIndex } = LANTERN_CAROUSEL_SCALE_TAIL;
+  const tailHeightPx = heightAtStop15Px * 2 ** (doublingAnchorStopIndex - stopIndex);
+  return Math.min(LANTERN_FULL_HEIGHT_PX, tailHeightPx);
+}
+
 export function scaleAtStopIndex(stopIndex: number): number {
   if (stopIndex < 0) return 1;
   if (stopIndex >= LANTERN_CAROUSEL_STOP_IDS.length) return 0;
-  if (LANTERN_CAROUSEL_STOP_IDS.length <= 1) return 1;
-  return lerp(1, 0, stopIndex / (LANTERN_CAROUSEL_STOP_IDS.length - 1));
+  const heightPx = targetHeightPxAtStopIndex(stopIndex);
+  if (heightPx <= 0) return 0;
+  return heightPx / LANTERN_FULL_HEIGHT_PX;
 }
 
 export function scaleAtJourneyS(journeyS: number): number {

@@ -55,10 +55,17 @@ describe("lanternFlightPath", () => {
   });
 
   describe("scaleAtStopIndex", () => {
-    it("scales down to zero at stop-16", () => {
+    const fullHeightPx = 17.5 * 16 * (505 / 330);
+
+    it("is full scale at stop-1 and collapses at stop-16", () => {
       expect(scaleAtStopIndex(0)).toBeCloseTo(1, 5);
       expect(scaleAtStopIndex(15)).toBeCloseTo(0, 5);
       expect(scaleAtStopIndex(16)).toBe(0);
+    });
+
+    it("shrinks exponentially in the tail (stop-14 ≈ 24px, stop-15 ≈ 12px)", () => {
+      expect(scaleAtStopIndex(13) * fullHeightPx).toBeCloseTo(24, 0);
+      expect(scaleAtStopIndex(14) * fullHeightPx).toBeCloseTo(12, 0);
     });
   });
 
