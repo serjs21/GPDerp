@@ -187,7 +187,7 @@ function buildArcLengthTable(segments: CubicSegment[]): ArcLengthEntry[] {
 
 function normalizePoint(point: SvgPoint): SvgPoint {
   return {
-    x: point.x / LANTERN_FLIGHT_PATH_VIEWBOX.width,
+    x: 1 - point.x / LANTERN_FLIGHT_PATH_VIEWBOX.width,
     y: point.y / LANTERN_FLIGHT_PATH_VIEWBOX.height,
   };
 }

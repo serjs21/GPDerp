@@ -32,7 +32,7 @@ function buildRouteStop(id: number, cx: number, cy: number): RouteStop {
     id,
     cx,
     cy,
-    x: cx / LANTERN_FLIGHT_PATH_VIEWBOX.width,
+    x: 1 - cx / LANTERN_FLIGHT_PATH_VIEWBOX.width,
     y: cy / LANTERN_FLIGHT_PATH_VIEWBOX.height,
   };
 

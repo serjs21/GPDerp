@@ -74,8 +74,15 @@ describe("lanternRouteStops", () => {
     expect(stop).toBeDefined();
     if (!stop) return;
 
-    expect(stop.x).toBeCloseTo(stop.cx / 1920, 5);
+    expect(stop.x).toBeCloseTo(1 - stop.cx / 1920, 5);
     expect(stop.y).toBeCloseTo(stop.cy / 1080, 5);
+  });
+
+  it("mirrors stop x coordinates horizontally in normalized space", () => {
+    const stop1 = routeStopById(1);
+    expect(stop1).toBeDefined();
+    if (!stop1) return;
+    expect(stop1.x).toBeCloseTo(1 - 1325.15 / 1920, 2);
   });
 
   it("samples segment-1 for the midpoint between stop-1 and stop-2", () => {
