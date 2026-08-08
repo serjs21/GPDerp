@@ -11,6 +11,7 @@ import {
   getLanternFlightOpacity,
   getLanternFlightTransform,
   getLanternJourneyTransform,
+  getLanternQueueRestJourneyS,
   getLanternQueuePathProgress,
   getLanternQueueRestPathS,
   getVisibleLanternCount,
@@ -199,6 +200,13 @@ describe("lanternFlightPath", () => {
     it("keeps followers on carousel stops at scroll 0", () => {
       expect(getLanternQueuePathProgress(0, 1, 3)).toBeCloseTo(LANTERN_FLIGHT_PATH_STOPS[1] ?? 0, 3);
       expect(getLanternQueuePathProgress(0, 0, 3)).toBeCloseTo(LANTERN_FLIGHT_PATH_STOPS[2] ?? 0, 3);
+    });
+
+    it("advances followers one stop while the newest fades to exit", () => {
+      const rest = getLanternQueueRestJourneyS(1, 3);
+      const advanced = getLanternQueuePathProgress(1, 1, 3);
+      expect(advanced).toBeLessThan(rest);
+      expect(advanced).toBeCloseTo(LANTERN_FLIGHT_PATH_STOPS[0] ?? 0, 3);
     });
   });
 

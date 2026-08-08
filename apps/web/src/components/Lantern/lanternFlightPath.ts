@@ -32,6 +32,7 @@ import {
   pointAtFlightArcLength,
   tangentAtFlightArcLength,
 } from "./lanternFlightPathSvg";
+import type { LanternTransform } from "./lanternTransform";
 
 export { LANTERN_FLIGHT_PATH_INITIAL, LANTERN_FLIGHT_PATH_FADE } from "./lanternFlightPath.config";
 export {
@@ -206,12 +207,16 @@ export function getLanternQueueFadePathS(
 ): number | undefined {
   if (index !== newestIndex) return undefined;
   const scroll = clamp01(scrollProgress);
+  if (scroll <= LANTERN_FLIGHT_PATH_REST_EPSILON) {
+    return undefined;
+  }
   return lerp(lanternInitialPathS(), lanternExitPathS(), scroll);
 }
 
 export type LanternQueueSlot = {
   journeyS?: number;
   pathS?: number;
+  transform?: Partial<LanternTransform>;
 };
 
 function isQueueSlotAtInitial(slot: LanternQueueSlot): boolean {
@@ -219,6 +224,30 @@ function isQueueSlotAtInitial(slot: LanternQueueSlot): boolean {
     return slot.pathS <= lanternInitialPathS() + LANTERN_FLIGHT_PATH_REST_EPSILON;
   }
   return (slot.journeyS ?? 0) <= lanternInitialJourneyS() + LANTERN_FLIGHT_PATH_REST_EPSILON;
+}
+
+export function getLanternQueueFollowerJourneyS(
+  scrollProgress: number,
+  index: number,
+  lanternCount: number,
+  newestIndex: number,
+): number | undefined {
+  if (index >= newestIndex) return undefined;
+
+  const scroll = clamp01(scrollProgress);
+  if (scroll <= LANTERN_FLIGHT_PATH_REST_EPSILON) {
+    return undefined;
+  }
+
+  const fromStopIndex = getLanternQueueRestStopIndex(index, lanternCount);
+  const toStopIndex = fromStopIndex - 1;
+  if (toStopIndex < 0) {
+    return undefined;
+  }
+
+  const fromJourneyS = journeySForCarouselStep(fromStopIndex);
+  const toJourneyS = journeySForCarouselStep(toStopIndex);
+  return lerp(fromJourneyS, toJourneyS, scroll);
 }
 
 export function getLanternQueueHandoffFadePathS(
@@ -260,6 +289,16 @@ export function resolveLanternQueueSlot(
 ): LanternQueueSlot {
   const visibleCount = options.visibleLanternCount ?? lanternCount;
   const newestIndex = Math.max(0, visibleCount - 1);
+
+  const followerJourneyS = getLanternQueueFollowerJourneyS(
+    scrollProgress,
+    index,
+    lanternCount,
+    newestIndex,
+  );
+  if (followerJourneyS !== undefined) {
+    return { journeyS: followerJourneyS };
+  }
 
   const handoffPathS = getLanternQueueHandoffFadePathS(
     scrollProgress,

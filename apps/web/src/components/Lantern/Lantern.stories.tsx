@@ -1,7 +1,7 @@
 "use client";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type MutableRefObject, type ReactNode } from "react";
 import type { CelestialPresetName } from "@/theme/celestialPresets";
 import {
   composeDecorators,
@@ -12,25 +12,31 @@ import {
 } from "@/storybook";
 import { Lantern } from "./Lantern";
 import {
-  applyCarouselScrollDelta,
   getLanternJourneyTransform,
-  isLanternFlightPathVisible,
   isLanternJourneyVisible,
   LANTERN_CAROUSEL_STOP_IDS,
   LANTERN_FLIGHT_PATH_EXIT_STOP_ID,
   LANTERN_FLIGHT_PATH_INITIAL_STOP_ID,
   lanternInitialJourneyS,
   lanternInitialPathS,
-  resolveCarouselQueueSlots,
   routeStopById,
 } from "./lanternFlightPath";
+import {
+  createLanternQueueScrollState,
+  isLanternQueueSlotVisible,
+  requestLanternQueueScrollStep,
+  resolveAnimatedQueueSlots,
+  tickLanternQueueAnimation,
+  type AnimatedLanternQueueSlot,
+  type LanternQueueScrollState,
+} from "./lanternQueueExitAnimation";
+import { resolveLanternTransform } from "./lanternTransform";
 import {
   buildCarouselLanternJourneyS,
   clampCarouselStepIndex,
   getCarouselStepBounds,
   isCarouselLanternVisibleAtStep,
 } from "./lanternCarouselSteps";
-import { easeInOutCubic } from "./lanternTransform";
 import styles from "./Lantern.stories.module.css";
 
 const meta: Meta<typeof Lantern> = {
@@ -84,10 +90,6 @@ softens the night.`,
   },
 ] as const;
 
-const CAROUSEL_TRANSITION_MS = 500;
-
-const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
-
 type FlightPathArgs = {
   lanternCount: number;
 };
@@ -108,10 +110,79 @@ function FlightPathGuideBox({
   );
 }
 
+function renderLanternExitSlot(
+  slot: AnimatedLanternQueueSlot,
+  className: string,
+  haiku: { id: string; title: string; body: string },
+  key: string,
+) {
+  return (
+    <Lantern
+      key={key}
+      className={className}
+      journeyS={slot.transform ? undefined : slot.journeyS}
+      progress={slot.pathS !== undefined ? slot.pathS : undefined}
+      transform={slot.transform}
+      haiku={makeMockHaiku({
+        id: haiku.id,
+        title: haiku.title,
+        body: haiku.body,
+      })}
+    />
+  );
+}
+
+function useLanternQueueAnimationLoop(
+  state: LanternQueueScrollState,
+  setState: (next: LanternQueueScrollState) => void,
+  stateRef: MutableRefObject<LanternQueueScrollState>,
+  options: {
+    onPhaseIdle?: (completed: LanternQueueScrollState) => LanternQueueScrollState;
+    onSample?: (next: LanternQueueScrollState) => void;
+  } = {},
+) {
+  const onPhaseIdleRef = useRef(options.onPhaseIdle);
+  const onSampleRef = useRef(options.onSample);
+  onPhaseIdleRef.current = options.onPhaseIdle;
+  onSampleRef.current = options.onSample;
+
+  useEffect(() => {
+    if (state.phase === "idle" || state.animStartTime === null) {
+      return;
+    }
+
+    let raf = 0;
+    const tick = (now: number) => {
+      const prev = stateRef.current;
+      let next = tickLanternQueueAnimation(prev, now);
+
+      if (next.phase === "idle" && prev.phase !== "idle") {
+        next = onPhaseIdleRef.current?.(next) ?? next;
+      }
+
+      stateRef.current = next;
+      setState(next);
+      onSampleRef.current?.(next);
+
+      if (next.phase !== "idle") {
+        raf = requestAnimationFrame(tick);
+      }
+    };
+
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [setState, state.animStartTime, state.phase, stateRef]);
+}
+
 function FlightPathDemo({ lanternCount }: FlightPathArgs) {
   const stageRef = useRef<HTMLDivElement>(null);
-  const [scrollState, setScrollState] = useState({ scrollProgress: 0, pushedOutCount: 0 });
-  const { scrollProgress, pushedOutCount } = scrollState;
+  const [scrollState, setScrollState] = useState<LanternQueueScrollState>(() =>
+    createLanternQueueScrollState(),
+  );
+  const scrollStateRef = useRef(scrollState);
+  const lastSampledMilestoneRef = useRef(-1);
+  scrollStateRef.current = scrollState;
+  const { fadeProgress, pushedOutCount, phase } = scrollState;
 
   const lanterns = Array.from({ length: lanternCount }, (_, index) => {
     const haiku = WRITTEN_HAIKUS[index % WRITTEN_HAIKUS.length];
@@ -122,22 +193,106 @@ function FlightPathDemo({ lanternCount }: FlightPathArgs) {
     };
   });
 
+  useLanternQueueAnimationLoop(scrollState, setScrollState, scrollStateRef, {
+    onSample: (next) => {
+      if (next.phase === "idle") {
+        lastSampledMilestoneRef.current = -1;
+        return;
+      }
+
+      const milestone = Math.floor(next.phaseT * 4);
+      if (milestone === lastSampledMilestoneRef.current) return;
+      lastSampledMilestoneRef.current = milestone;
+
+      const slots = resolveAnimatedQueueSlots(next, lanternCount);
+      const newest = slots.at(-1);
+      const resolved = newest
+        ? resolveLanternTransform({
+            progress: newest.slot.transform ? undefined : newest.slot.pathS,
+            journeyS: newest.slot.journeyS,
+            transform: newest.slot.transform,
+          })
+        : null;
+
+      // #region agent log
+      fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a4f3b7" },
+        body: JSON.stringify({
+          sessionId: "a4f3b7",
+          runId: "segment0-fix",
+          hypothesisId: "H6",
+          location: "Lantern.stories.tsx:FlightPathDemo",
+          message: "queue animation sample",
+          data: {
+            phase: next.phase,
+            phaseT: next.phaseT,
+            pathS: newest?.slot.pathS,
+            journeyS: newest?.slot.journeyS,
+            x: resolved?.x,
+            y: resolved?.y,
+            opacity: resolved?.opacity,
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+      // #endregion
+    },
+  });
+
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
 
     const onWheel = (event: WheelEvent) => {
       event.preventDefault();
-      setScrollState((state) =>
-        applyCarouselScrollDelta(state, lanternCount, event.deltaY * 0.0008),
+      const direction = Math.sign(event.deltaY);
+      if (direction === 0) return;
+
+      const next = requestLanternQueueScrollStep(
+        scrollStateRef.current,
+        direction,
+        lanternCount,
+        performance.now(),
       );
+
+      // #region agent log
+      fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a4f3b7" },
+        body: JSON.stringify({
+          sessionId: "a4f3b7",
+          runId: "segment0-fix",
+          hypothesisId: "H1",
+          location: "Lantern.stories.tsx:onWheel",
+          message: "queue scroll step requested",
+          data: {
+            direction,
+            fromPhase: scrollStateRef.current.phase,
+            toPhase: next.phase,
+            fadeProgress: next.fadeProgress,
+            pushedOutCount: next.pushedOutCount,
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+      // #endregion
+
+      if (next.phase === scrollStateRef.current.phase && next.phase === "idle") {
+        return;
+      }
+
+      scrollStateRef.current = next;
+      setScrollState(next);
     };
 
     stage.addEventListener("wheel", onWheel, { passive: false });
-    return () => stage.removeEventListener("wheel", onWheel);
+    return () => {
+      stage.removeEventListener("wheel", onWheel);
+    };
   }, [lanternCount]);
 
-  const queueSlots = resolveCarouselQueueSlots(scrollProgress, lanternCount, pushedOutCount);
+  const queueSlots = resolveAnimatedQueueSlots(scrollState, lanternCount);
 
   const activeIndex = queueSlots.findIndex(({ slot }) => {
     if (slot.journeyS !== undefined) {
@@ -152,7 +307,7 @@ function FlightPathDemo({ lanternCount }: FlightPathArgs) {
   return (
     <div ref={stageRef} className={styles.flightPathViewport}>
       <p className={styles.flightPathHud}>
-        scroll {(scrollProgress * 100).toFixed(0)}%
+        {phase !== "idle" ? `${phase} ${(scrollState.phaseT * 100).toFixed(0)}%` : `fade ${(fadeProgress * 100).toFixed(0)}%`}
         {pushedOutCount > 0 ? ` · pushed ${pushedOutCount}` : ""}
         {activeIndex >= 0 ? ` · active #${queueSlots[activeIndex]?.index ?? activeIndex + 1}` : ""}
       </p>
@@ -166,10 +321,7 @@ function FlightPathDemo({ lanternCount }: FlightPathArgs) {
             }))
             .filter(
               ({ item, slot }) =>
-                item !== undefined &&
-                (slot.journeyS !== undefined
-                  ? isLanternJourneyVisible(slot.journeyS)
-                  : isLanternFlightPathVisible(slot.pathS ?? lanternInitialPathS())),
+                item !== undefined && isLanternQueueSlotVisible(slot, phase),
             )
             .sort((a, b) => {
               const aValue = a.slot.pathS ?? a.slot.journeyS ?? 0;
@@ -183,9 +335,10 @@ function FlightPathDemo({ lanternCount }: FlightPathArgs) {
               return (
                 <Lantern
                   key={item.id}
-                  className={styles.flightPathLantern}
-                  journeyS={slot.journeyS}
-                  progress={slot.pathS}
+                  className={`${styles.flightPathLantern} ${styles.flightPathStopLantern}`}
+                  journeyS={slot.transform ? undefined : slot.journeyS}
+                  progress={slot.pathS !== undefined ? slot.pathS : undefined}
+                  transform={slot.transform}
                   nextLanternPathProgress={nextSlot?.pathS ?? nextSlot?.journeyS}
                   haiku={makeMockHaiku({
                     id: item.id,
@@ -207,12 +360,24 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
   const [lanternJourneyS, setLanternJourneyS] = useState(() =>
     buildCarouselLanternJourneyS(maxStepIndex, lanternCount),
   );
+  const [queueState, setQueueState] = useState<LanternQueueScrollState>(() =>
+    createLanternQueueScrollState(),
+  );
+  const [exitingOffset, setExitingOffset] = useState<number | null>(null);
+  const [enteringOffset, setEnteringOffset] = useState<number | null>(null);
+  const exitingOffsetRef = useRef<number | null>(null);
+  const enteringOffsetRef = useRef<number | null>(null);
+  const queueVisibleCountRef = useRef(0);
   const animationRef = useRef<number | null>(null);
   const journeySRef = useRef(lanternJourneyS);
   const stepIndexRef = useRef(stepIndex);
+  const queueStateRef = useRef(queueState);
   const goToStepRef = useRef<(nextIndex: number) => void>(() => {});
   journeySRef.current = lanternJourneyS;
   stepIndexRef.current = stepIndex;
+  queueStateRef.current = queueState;
+  exitingOffsetRef.current = exitingOffset;
+  enteringOffsetRef.current = enteringOffset;
   const stopIds = LANTERN_CAROUSEL_STOP_IDS;
   const activeStepIndex = Math.min(stepIndex, maxStepIndex);
   const activeStopId = stopIds[activeStepIndex] ?? LANTERN_FLIGHT_PATH_INITIAL_STOP_ID;
@@ -220,41 +385,114 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
   const lanternTransform = getLanternJourneyTransform(leadJourneyS ?? 0);
   const exitStop = routeStopById(LANTERN_FLIGHT_PATH_EXIT_STOP_ID);
   const initialStop = routeStopById(LANTERN_FLIGHT_PATH_INITIAL_STOP_ID);
+  const lanternClassName = `${styles.flightPathLantern} ${styles.flightPathStopLantern}`;
+  const queueAnimating = exitingOffset !== null || enteringOffset !== null;
+  const queueVisibleCount = queueAnimating ? queueVisibleCountRef.current : stepIndex + 1;
+
+  const getCarouselQueueSlot = (offset: number): AnimatedLanternQueueSlot | null => {
+    if (!queueAnimating) return null;
+    const slots = resolveAnimatedQueueSlots(queueState, queueVisibleCount);
+    return slots.find((entry) => entry.index === offset)?.slot ?? null;
+  };
+
+  useLanternQueueAnimationLoop(queueState, setQueueState, queueStateRef, {
+    onPhaseIdle: (completed) => {
+      if (exitingOffsetRef.current !== null) {
+        const visibleCount = queueVisibleCountRef.current;
+        if (completed.fadeProgress >= 1 - 0.02 && completed.pushedOutCount === 0) {
+          return requestLanternQueueScrollStep(completed, 1, visibleCount, performance.now());
+        }
+
+        if (completed.pushedOutCount > 0) {
+          const nextStep = Math.max(minStepIndex, stepIndexRef.current - 1);
+          const nextJourney = buildCarouselLanternJourneyS(nextStep, lanternCount);
+          setStepIndex(nextStep);
+          setLanternJourneyS(nextJourney);
+          journeySRef.current = nextJourney;
+          stepIndexRef.current = nextStep;
+          setExitingOffset(null);
+          exitingOffsetRef.current = null;
+          return createLanternQueueScrollState();
+        }
+
+        return completed;
+      }
+
+      if (enteringOffsetRef.current !== null) {
+        const visibleCount = queueVisibleCountRef.current;
+        if (completed.fadeProgress >= 1 - 0.02) {
+          return requestLanternQueueScrollStep(completed, -1, visibleCount, performance.now());
+        }
+
+        if (completed.fadeProgress <= 0.02) {
+          const nextStep = Math.min(maxStepIndex, stepIndexRef.current + 1);
+          const nextJourney = buildCarouselLanternJourneyS(nextStep, lanternCount);
+          setStepIndex(nextStep);
+          setLanternJourneyS(nextJourney);
+          journeySRef.current = nextJourney;
+          stepIndexRef.current = nextStep;
+          setEnteringOffset(null);
+          enteringOffsetRef.current = null;
+          return createLanternQueueScrollState();
+        }
+
+        return completed;
+      }
+
+      return completed;
+    },
+  });
+
+  const startQueueExit = (departingOffset: number, visibleCount: number) => {
+    queueVisibleCountRef.current = visibleCount;
+    setExitingOffset(departingOffset);
+    exitingOffsetRef.current = departingOffset;
+    const nextQueue = requestLanternQueueScrollStep(
+      createLanternQueueScrollState(),
+      1,
+      visibleCount,
+      performance.now(),
+    );
+    queueStateRef.current = nextQueue;
+    setQueueState(nextQueue);
+  };
+
+  const startQueueEnter = (offset: number, visibleCount: number) => {
+    queueVisibleCountRef.current = visibleCount;
+    setEnteringOffset(offset);
+    enteringOffsetRef.current = offset;
+    const nextQueue = requestLanternQueueScrollStep(
+      { ...createLanternQueueScrollState(), pushedOutCount: 1 },
+      -1,
+      visibleCount,
+      performance.now(),
+    );
+    queueStateRef.current = nextQueue;
+    setQueueState(nextQueue);
+  };
 
   const goToStep = (nextIndex: number) => {
     const clamped = clampCarouselStepIndex(nextIndex, lanternCount);
-    const atRest = animationRef.current === null;
-    if (clamped === stepIndexRef.current && atRest) return;
+    if (queueStateRef.current.phase !== "idle") {
+      return;
+    }
+    if (clamped === stepIndexRef.current) {
+      return;
+    }
 
     if (animationRef.current !== null) {
       cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
     }
 
-    const fromValues = [...journeySRef.current];
-    const toValues = buildCarouselLanternJourneyS(clamped, lanternCount);
-    setStepIndex(clamped);
+    if (clamped < stepIndexRef.current) {
+      const visibleCount = stepIndexRef.current + 1;
+      startQueueExit(stepIndexRef.current, visibleCount);
+      return;
+    }
 
-    const start = performance.now();
-    const tick = (now: number) => {
-      const linearT = clamp01((now - start) / CAROUSEL_TRANSITION_MS);
-      const easedT = easeInOutCubic(linearT);
-      const nextValues = fromValues.map((from, offset) => {
-        const to = toValues[offset] ?? from;
-        return from + (to - from) * easedT;
-      });
-      journeySRef.current = nextValues;
-      setLanternJourneyS(nextValues);
-      if (linearT < 1) {
-        animationRef.current = requestAnimationFrame(tick);
-      } else {
-        animationRef.current = null;
-        journeySRef.current = toValues;
-        setLanternJourneyS(toValues);
-      }
-    };
-
-    animationRef.current = requestAnimationFrame(tick);
+    const visibleCount = stepIndexRef.current + 2;
+    startQueueEnter(stepIndexRef.current + 1, visibleCount);
   };
 
   goToStepRef.current = goToStep;
@@ -314,22 +552,41 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
             </span>
           ) : null}
           {Array.from({ length: lanternCount }, (_, offset) => {
-              if (!isCarouselLanternVisibleAtStep(stepIndex, offset)) return null;
+              const isExiting = exitingOffset === offset;
+              const isEntering = enteringOffset === offset;
+              const visibleAtStep = isCarouselLanternVisibleAtStep(stepIndex, offset);
+              if (!visibleAtStep && !isExiting && !isEntering) return null;
+
+              const haiku = WRITTEN_HAIKUS[offset % WRITTEN_HAIKUS.length];
+              const haikuProps = {
+                id: `flight-path-stop-lantern-${offset}`,
+                title: haiku.title,
+                body: haiku.body,
+              };
+
+              if (isExiting || isEntering || (queueAnimating && visibleAtStep)) {
+                const animSlot = getCarouselQueueSlot(offset);
+                if (!animSlot || !isLanternQueueSlotVisible(animSlot, queueState.phase)) {
+                  return null;
+                }
+
+                return renderLanternExitSlot(
+                  animSlot,
+                  lanternClassName,
+                  haikuProps,
+                  `carousel-lantern-${offset}`,
+                );
+              }
 
               const slotJourneyS = lanternJourneyS[offset];
               if (slotJourneyS === undefined || !isLanternJourneyVisible(slotJourneyS)) return null;
 
-              const haiku = WRITTEN_HAIKUS[offset % WRITTEN_HAIKUS.length];
               return (
                 <Lantern
                   key={`carousel-lantern-${offset}`}
-                  className={`${styles.flightPathLantern} ${styles.flightPathStopLantern}`}
+                  className={lanternClassName}
                   journeyS={slotJourneyS}
-                  haiku={makeMockHaiku({
-                    id: `flight-path-stop-lantern-${offset}`,
-                    title: haiku.title,
-                    body: haiku.body,
-                  })}
+                  haiku={makeMockHaiku(haikuProps)}
                 />
               );
             })}
@@ -348,7 +605,7 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
           type="button"
           className={styles.flightPathControlButton}
           aria-label="Previous stop"
-          disabled={activeStepIndex <= minStepIndex}
+          disabled={activeStepIndex <= minStepIndex || queueState.phase !== "idle"}
           onClick={() => goToStep(stepIndex - 1)}
         >
           ←
@@ -360,7 +617,7 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
           type="button"
           className={styles.flightPathControlButton}
           aria-label="Next stop"
-          disabled={activeStepIndex >= maxStepIndex}
+          disabled={activeStepIndex >= maxStepIndex || queueState.phase !== "idle"}
           onClick={() => goToStep(stepIndex + 1)}
         >
           →

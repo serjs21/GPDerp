@@ -101,14 +101,34 @@ export function resolveLanternTransform(props: LanternTransformInput): LanternTr
   }
 
   if (props.transform) {
-    const base =
-      props.step !== undefined
-        ? getLanternTransformAtStep(props.step, props.maxSteps)
-        : props.progress !== undefined
-          ? getLanternTransformAtProgress(props.progress, {
-              nextLanternPathProgress: props.nextLanternPathProgress,
-            })
-          : getLanternTransformAtStep(0, props.maxSteps);
+    if (props.journeyS !== undefined) {
+      return {
+        ...getLanternJourneyTransform(props.journeyS),
+        ...props.transform,
+        positionMode: props.transform.positionMode ?? "percent",
+      };
+    }
+
+    if (props.progress !== undefined) {
+      return {
+        ...getLanternFlightTransform(props.progress),
+        ...props.transform,
+        positionMode: props.transform.positionMode ?? "percent",
+      };
+    }
+
+    if (props.transform.positionMode === "percent") {
+      return {
+        scale: 1,
+        rotate: 0,
+        opacity: 1,
+        x: 0,
+        y: 0,
+        ...props.transform,
+      } as LanternTransform;
+    }
+
+    const base = getLanternTransformAtStep(0, props.maxSteps);
     return {
       x: props.transform.x ?? base.x,
       y: props.transform.y ?? base.y,

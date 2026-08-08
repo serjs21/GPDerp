@@ -34,6 +34,16 @@ export {
 } from "./lanternCarouselSteps";
 export type { CarouselStepBounds } from "./lanternCarouselSteps";
 export {
+  createLanternQueueScrollState,
+  getLanternPushOutTransform,
+  isLanternQueueSlotVisible,
+  LANTERN_QUEUE_TRANSITION_MS,
+  requestLanternQueueScrollStep,
+  resolveAnimatedQueueSlots,
+  tickLanternQueueAnimation,
+} from "./lanternQueueExitAnimation";
+export type { LanternQueueScrollState } from "./lanternQueueExitAnimation";
+export {
   applyCarouselScrollDelta,
   equalArcLengthSamples,
   getLanternFlightOpacity,

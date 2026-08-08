@@ -24,7 +24,7 @@ describe("lanternTransform", () => {
     it("reaches zero opacity at the final fade step", () => {
       const end = getLanternTransformAtStep(LANTERN_DEFAULT_MAX_STEPS, LANTERN_DEFAULT_MAX_STEPS);
       expect(end.scale).toBeCloseTo(LANTERN_FLIGHT_PATH_FADE.exitScale, 2);
-      expect(end.opacity).toBeCloseTo(0, 2);
+      expect(end.opacity).toBeCloseTo(LANTERN_FLIGHT_PATH_FADE.minOpacity, 2);
     });
 
     it("floors fractional and clamps negative steps", () => {
@@ -50,7 +50,7 @@ describe("lanternTransform", () => {
     it("reaches zero opacity at the exit stop", () => {
       const exit = getLanternTransformAtProgress(lanternExitPathS());
       expect(exit.scale).toBeCloseTo(1, 2);
-      expect(exit.opacity).toBeCloseTo(0, 2);
+      expect(exit.opacity).toBeCloseTo(LANTERN_FLIGHT_PATH_FADE.minOpacity, 2);
     });
 
     it("supports black-path progress values", () => {

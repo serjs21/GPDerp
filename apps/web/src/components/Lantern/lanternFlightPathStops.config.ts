@@ -66,7 +66,6 @@ export function opacityAtPathS(pathS: number): number {
 
   if (pathS > fadeEnd + 0.02) return 0;
   if (pathS <= fadeStart) return 1;
-  if (pathS >= fadeEnd - 0.02) return LANTERN_EXIT_STOP_OPACITY;
 
   const span = fadeEnd - fadeStart || 1;
   const t = (pathS - fadeStart) / span;
