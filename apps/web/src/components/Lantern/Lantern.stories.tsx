@@ -37,6 +37,8 @@ import {
   getCarouselStepBounds,
   isCarouselLanternVisibleAtStep,
 } from "./lanternCarouselSteps";
+import { resolveCarouselPushOutSlots } from "./lanternCarouselPushOut";
+import { journeySForCarouselStep } from "./lanternRouteStops";
 import styles from "./Lantern.stories.module.css";
 
 const meta: Meta<typeof Lantern> = {
@@ -368,6 +370,7 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
   const exitingOffsetRef = useRef<number | null>(null);
   const enteringOffsetRef = useRef<number | null>(null);
   const queueVisibleCountRef = useRef(0);
+  const pushFromJourneysRef = useRef<number[]>([]);
   const animationRef = useRef<number | null>(null);
   const journeySRef = useRef(lanternJourneyS);
   const stepIndexRef = useRef(stepIndex);
@@ -393,6 +396,19 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
   const queueVisibleCount = queueAnimating ? queueVisibleCountRef.current : stepIndex + 1;
 
   const getCarouselQueueSlot = (offset: number): AnimatedLanternQueueSlot | null => {
+    if (
+      queueState.phase === "pushOut" &&
+      exitingOffsetRef.current !== null
+    ) {
+      const slots = resolveCarouselPushOutSlots(
+        queueState.phaseT,
+        stepIndex,
+        exitingOffsetRef.current,
+        pushFromJourneysRef.current,
+      );
+      return slots.find((entry) => entry.index === offset)?.slot ?? null;
+    }
+
     const useQueueSlots = queueAnimating || restingAtExit;
     if (!useQueueSlots) return null;
     const visibleCount = queueAnimating ? queueVisibleCountRef.current : stepIndex + 1;
@@ -406,6 +422,9 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
         if (completed.pushedOutCount > 0) {
           const nextStep = Math.max(minStepIndex, stepIndexRef.current - 1);
           const nextJourney = buildCarouselLanternJourneyS(nextStep, lanternCount);
+          for (let offset = 0; offset < nextStep; offset += 1) {
+            nextJourney[offset] = journeySForCarouselStep(offset);
+          }
           setStepIndex(nextStep);
           setLanternJourneyS(nextJourney);
           journeySRef.current = nextJourney;
@@ -418,16 +437,16 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
             headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a4f3b7" },
             body: JSON.stringify({
               sessionId: "a4f3b7",
-              runId: "two-phase-exit",
-              hypothesisId: "H1",
+              runId: "push-shift",
+              hypothesisId: "H4",
               location: "Lantern.stories.tsx:onPhaseIdle",
-              message: "pushOut complete — step decremented",
-              data: { nextStep, fadeProgress: 0 },
+              message: "pushOut complete — next rearmost at stop-0 rest",
+              data: { nextStep, fadeProgress: 1 },
               timestamp: Date.now(),
             }),
           }).catch(() => {});
           // #endregion
-          return createLanternQueueScrollState();
+          return { ...createLanternQueueScrollState(), fadeProgress: 1 };
         }
 
         if (completed.fadeProgress >= 1 - LANTERN_FLIGHT_PATH_REST_EPSILON) {
@@ -512,6 +531,16 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
       visibleCount,
       performance.now(),
     );
+    if (nextQueue.phase === "pushOut") {
+      const rested = resolveAnimatedQueueSlots(queueStateRef.current, visibleCount);
+      const fromJourneys = [...journeySRef.current];
+      for (const { index, slot } of rested) {
+        if (slot.journeyS !== undefined) {
+          fromJourneys[index] = slot.journeyS;
+        }
+      }
+      pushFromJourneysRef.current = fromJourneys;
+    }
     // #region agent log
     fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
       method: "POST",
@@ -685,7 +714,8 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
                 isExiting ||
                 isEntering ||
                 (queueAnimating && visibleAtStep) ||
-                (restingAtExit && visibleAtStep);
+                (restingAtExit && visibleAtStep) ||
+                (queueState.phase === "pushOut" && visibleAtStep);
 
               if (useQueueSlot) {
                 const animSlot = getCarouselQueueSlot(offset);
