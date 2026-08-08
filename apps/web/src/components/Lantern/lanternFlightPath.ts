@@ -202,9 +202,9 @@ export function getLanternQueueRestPathS(index: number, lanternCount: number): n
 export function getLanternQueueFadePathS(
   scrollProgress: number,
   index: number,
-  lanternCount: number,
+  newestIndex: number,
 ): number | undefined {
-  if (index !== lanternCount - 1) return undefined;
+  if (index !== newestIndex) return undefined;
   const scroll = clamp01(scrollProgress);
   return lerp(lanternInitialPathS(), lanternExitPathS(), scroll);
 }
@@ -224,9 +224,9 @@ function isQueueSlotAtInitial(slot: LanternQueueSlot): boolean {
 export function getLanternQueueHandoffFadePathS(
   scrollProgress: number,
   index: number,
+  newestIndex: number,
   lanternCount: number,
 ): number | undefined {
-  const newestIndex = lanternCount - 1;
   if (index >= newestIndex) return undefined;
 
   const restJourneyS = getLanternQueueRestJourneyS(index, lanternCount);
@@ -234,33 +234,115 @@ export function getLanternQueueHandoffFadePathS(
     return undefined;
   }
 
-  const nextSlot = resolveLanternQueueSlot(scrollProgress, index + 1, lanternCount);
-  if (
-    scrollProgress > 0 &&
-    isQueueSlotAtInitial(nextSlot)
-  ) {
+  const nextSlot = resolveLanternQueueSlot(scrollProgress, index + 1, lanternCount, {
+    visibleLanternCount: newestIndex + 1,
+  });
+  if (scrollProgress > 0 && isQueueSlotAtInitial(nextSlot)) {
     return lanternExitPathS();
   }
 
   return undefined;
 }
 
+export function getVisibleLanternCount(lanternCount: number, pushedOutCount: number): number {
+  return Math.max(0, lanternCount - pushedOutCount);
+}
+
+export type ResolveLanternQueueSlotOptions = {
+  visibleLanternCount?: number;
+};
+
 export function resolveLanternQueueSlot(
   scrollProgress: number,
   index: number,
   lanternCount: number,
+  options: ResolveLanternQueueSlotOptions = {},
 ): LanternQueueSlot {
-  const handoffPathS = getLanternQueueHandoffFadePathS(scrollProgress, index, lanternCount);
+  const visibleCount = options.visibleLanternCount ?? lanternCount;
+  const newestIndex = Math.max(0, visibleCount - 1);
+
+  const handoffPathS = getLanternQueueHandoffFadePathS(
+    scrollProgress,
+    index,
+    newestIndex,
+    lanternCount,
+  );
   if (handoffPathS !== undefined) {
     return { pathS: handoffPathS };
   }
 
-  const fadePathS = getLanternQueueFadePathS(scrollProgress, index, lanternCount);
+  const fadePathS = getLanternQueueFadePathS(scrollProgress, index, newestIndex);
   if (fadePathS !== undefined) {
     return { pathS: fadePathS };
   }
 
   return { journeyS: getLanternQueueRestJourneyS(index, lanternCount) };
+}
+
+export type CarouselQueueLanternSlot = {
+  index: number;
+  slot: LanternQueueSlot;
+};
+
+export function resolveCarouselQueueSlots(
+  scrollProgress: number,
+  lanternCount: number,
+  pushedOutCount: number,
+): CarouselQueueLanternSlot[] {
+  const visibleCount = getVisibleLanternCount(lanternCount, pushedOutCount);
+  const slots: CarouselQueueLanternSlot[] = [];
+
+  for (let index = 0; index < visibleCount; index += 1) {
+    const slot = resolveLanternQueueSlot(scrollProgress, index, lanternCount, {
+      visibleLanternCount: visibleCount,
+    });
+    slots.push({ index, slot });
+  }
+
+  return slots;
+}
+
+export type CarouselScrollState = {
+  scrollProgress: number;
+  pushedOutCount: number;
+};
+
+export function applyCarouselScrollDelta(
+  state: CarouselScrollState,
+  lanternCount: number,
+  delta: number,
+): CarouselScrollState {
+  if (lanternCount <= 0 || delta === 0) {
+    return state;
+  }
+
+  const maxPushedOut = Math.max(0, lanternCount - 1);
+
+  if (delta > 0) {
+    if (state.scrollProgress >= 1 - LANTERN_FLIGHT_PATH_REST_EPSILON) {
+      if (state.pushedOutCount < maxPushedOut) {
+        return { scrollProgress: 0, pushedOutCount: state.pushedOutCount + 1 };
+      }
+      return { scrollProgress: 1, pushedOutCount: state.pushedOutCount };
+    }
+
+    return {
+      scrollProgress: clamp01(state.scrollProgress + delta),
+      pushedOutCount: state.pushedOutCount,
+    };
+  }
+
+  if (state.pushedOutCount > 0 && state.scrollProgress <= LANTERN_FLIGHT_PATH_REST_EPSILON) {
+    return {
+      scrollProgress: 1,
+      pushedOutCount: state.pushedOutCount - 1,
+    };
+  }
+
+  return {
+    scrollProgress: clamp01(state.scrollProgress + delta),
+    pushedOutCount: state.pushedOutCount,
+  };
 }
 
 /**

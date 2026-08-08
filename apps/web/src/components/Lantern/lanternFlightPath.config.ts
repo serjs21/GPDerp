@@ -13,6 +13,9 @@ export const LANTERN_FLIGHT_QUEUE_SPACING = 0.14;
 /** Carousel scale at stop-16 (fully collapsed). */
 export const LANTERN_CAROUSEL_MIN_SCALE = 0;
 
+/** Opacity when a lantern rests on stop-0 (exit). */
+export const LANTERN_EXIT_STOP_OPACITY = 0.5;
+
 /** Ease-out depth scale tail for carousel stops (stop-1 = 1, stop-15 ≈ minTailScale). */
 export const LANTERN_CAROUSEL_DEPTH_SCALE = {
   minTailScale: 0.01,
@@ -27,7 +30,7 @@ export function easeOutCubic(t: number): number {
 export const LANTERN_FLIGHT_PATH_FADE = {
   initialPathS: 0,
   exitPathS: 1,
-  minOpacity: 0,
-  /** Scale stays 1 on segment-0; opacity fades to 0. */
+  minOpacity: LANTERN_EXIT_STOP_OPACITY,
+  /** Scale stays 1 on segment-0; opacity fades to exit stop opacity. */
   exitScale: 1,
 } as const;

@@ -1,4 +1,4 @@
-import { LANTERN_CAROUSEL_DEPTH_SCALE, LANTERN_FLIGHT_PATH_FADE, easeOutCubic } from "./lanternFlightPath.config";
+import { LANTERN_CAROUSEL_DEPTH_SCALE, LANTERN_EXIT_STOP_OPACITY, LANTERN_FLIGHT_PATH_FADE, easeOutCubic } from "./lanternFlightPath.config";
 import {
   LANTERN_CAROUSEL_STOP_IDS,
   lanternExitPathS,
@@ -66,10 +66,11 @@ export function opacityAtPathS(pathS: number): number {
 
   if (pathS > fadeEnd + 0.02) return 0;
   if (pathS <= fadeStart) return 1;
+  if (pathS >= fadeEnd - 0.02) return LANTERN_EXIT_STOP_OPACITY;
 
   const span = fadeEnd - fadeStart || 1;
   const t = (pathS - fadeStart) / span;
-  return lerp(1, LANTERN_FLIGHT_PATH_FADE.minOpacity, clamp01(t));
+  return lerp(1, LANTERN_EXIT_STOP_OPACITY, clamp01(t));
 }
 
 /** Scale stays 1 on segment-0 fade; carousel uses scaleAtJourneyS. */

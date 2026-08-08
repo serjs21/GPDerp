@@ -1,21 +1,26 @@
 import {
   LANTERN_CAROUSEL_MIN_SCALE,
+  LANTERN_EXIT_STOP_OPACITY,
   LANTERN_FLIGHT_PATH_FADE,
   LANTERN_FLIGHT_PATH_INITIAL,
   LANTERN_FLIGHT_PATH_REST_EPSILON,
 } from "./lanternFlightPath.config";
 import {
+  applyCarouselScrollDelta,
   equalArcLengthSamples,
   getLanternFlightOpacity,
   getLanternFlightTransform,
   getLanternJourneyTransform,
   getLanternQueuePathProgress,
   getLanternQueueRestPathS,
+  getVisibleLanternCount,
   isLanternFlightPathVisible,
   isLanternJourneyVisible,
   lanternExitPathS,
   lanternInitialPathS,
   LANTERN_FLIGHT_PATH_STOPS,
+  resolveCarouselQueueSlots,
+  resolveLanternQueueSlot,
   sampleLanternFlightPath,
   sampleLanternJourney,
   scaleAtJourneyS,
@@ -86,10 +91,13 @@ describe("lanternFlightPath", () => {
       expect(rest.y).toBeCloseTo(LANTERN_FADE_SEGMENT_SAMPLER.pathEnd.y, 3);
     });
 
-    it("fades opacity to zero at exit while keeping scale at 1", () => {
+    it("fades opacity to exit stop opacity while keeping scale at 1", () => {
       const exit = sampleLanternFlightPath(lanternExitPathS());
       expect(exit.scale).toBeCloseTo(1, 5);
-      expect(getLanternFlightOpacity({ pathT: lanternExitPathS() })).toBeCloseTo(0, 2);
+      expect(getLanternFlightOpacity({ pathT: lanternExitPathS() })).toBeCloseTo(
+        LANTERN_EXIT_STOP_OPACITY,
+        2,
+      );
       expect(exit.x).toBeCloseTo(LANTERN_FADE_SEGMENT_SAMPLER.pathStart.x, 3);
       expect(exit.y).toBeCloseTo(LANTERN_FADE_SEGMENT_SAMPLER.pathStart.y, 3);
     });
@@ -106,6 +114,10 @@ describe("lanternFlightPath", () => {
       const rest = sampleLanternFlightPath(lanternInitialPathS());
       const exit = sampleLanternFlightPath(lanternExitPathS());
       expect(exit.y).toBeLessThan(rest.y);
+    });
+
+    it("keeps stop-0 visible at exit opacity", () => {
+      expect(isLanternFlightPathVisible(lanternExitPathS())).toBe(true);
     });
 
     it("hides samples past the exit via opacity", () => {
@@ -195,6 +207,44 @@ describe("lanternFlightPath", () => {
       const transform = getLanternFlightTransform(lanternExitPathS());
       expect(transform.positionMode).toBe("percent");
       expect(transform.opacity).toBeCloseTo(LANTERN_FLIGHT_PATH_FADE.minOpacity, 2);
+    });
+  });
+
+  describe("resolveCarouselQueueSlots", () => {
+    it("omits pushed-out newest lanterns from the visible list", () => {
+      const slots = resolveCarouselQueueSlots(0, 3, 1);
+      expect(slots).toHaveLength(2);
+      expect(slots.map((entry) => entry.index)).toEqual([0, 1]);
+    });
+
+    it("restores fade to the next newest visible lantern after push-out", () => {
+      const fading = resolveCarouselQueueSlots(1, 3, 1);
+      const newest = fading.at(-1);
+      expect(newest?.index).toBe(1);
+      expect(newest?.slot.pathS).toBeCloseTo(lanternExitPathS(), 2);
+    });
+  });
+
+  describe("applyCarouselScrollDelta", () => {
+    it("pushes out the newest lantern after reaching stop-0", () => {
+      const next = applyCarouselScrollDelta({ scrollProgress: 1, pushedOutCount: 0 }, 3, 0.01);
+      expect(next).toEqual({ scrollProgress: 0, pushedOutCount: 1 });
+    });
+
+    it("restores a pushed-out lantern when scrolling back from rest", () => {
+      const next = applyCarouselScrollDelta({ scrollProgress: 0, pushedOutCount: 1 }, 3, -0.01);
+      expect(next).toEqual({ scrollProgress: 1, pushedOutCount: 0 });
+    });
+
+    it("caps push-out at lanternCount - 1", () => {
+      const next = applyCarouselScrollDelta({ scrollProgress: 1, pushedOutCount: 2 }, 3, 0.01);
+      expect(next.pushedOutCount).toBe(2);
+    });
+  });
+
+  describe("getVisibleLanternCount", () => {
+    it("subtracts pushed-out lanterns from the visible count", () => {
+      expect(getVisibleLanternCount(3, 1)).toBe(2);
     });
   });
 

@@ -24,16 +24,29 @@ export {
   resolveLanternTransform,
 } from "./lanternTransform";
 export {
+  buildCarouselLanternJourneyS,
+  clampCarouselStepIndex,
+  getCarouselLanternStopIndex,
+  getCarouselStepBounds,
+  hasLanternOnStop1,
+  isCarouselLanternVisibleAtStep,
+  isCarouselStepAllowed,
+} from "./lanternCarouselSteps";
+export type { CarouselStepBounds } from "./lanternCarouselSteps";
+export {
+  applyCarouselScrollDelta,
   equalArcLengthSamples,
   getLanternFlightOpacity,
   getLanternFlightTransform,
   getLanternJourneyTransform,
   getLanternQueuePathProgress,
+  getVisibleLanternCount,
   isLanternJourneyVisible,
   journeySBetweenCarouselSteps,
   journeySForCarouselStep,
   LANTERN_FLIGHT_PATH_INITIAL,
   LANTERN_FLIGHT_QUEUE_SPACING,
+  resolveCarouselQueueSlots,
   resolveLanternQueueSlot,
   sampleLanternFlightPath,
   sampleLanternJourney,
