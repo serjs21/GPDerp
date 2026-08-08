@@ -27,7 +27,8 @@
 .flightPathGuideBox {
   position: relative;
   aspect-ratio: 1920 / 1080;
-  width: min(100%, calc((68vh - 5rem) * 1920 / 1080));
+  min-width: 60rem;
+  width: 100vw;
   max-height: min(68vh, 36rem);
 }
 
