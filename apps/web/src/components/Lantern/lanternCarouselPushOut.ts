@@ -5,6 +5,7 @@ import {
 import {
   getCarouselLanternStopIndex,
 } from "./lanternCarouselSteps";
+import { shouldUseStop0SegmentForPushOut } from "./lanternCarouselOpacity";
 import { journeySForCarouselStep } from "./lanternRouteStops";
 import {
   getLanternPushOutTransform,
@@ -40,7 +41,7 @@ export function resolveCarouselPushOutSlots(
       continue;
     }
 
-    if (offset === departingOffset - 1) {
+    if (shouldUseStop0SegmentForPushOut(offset, departingOffset)) {
       const pathS = lerp(lanternInitialPathS(), lanternExitPathS(), phaseT);
       slots.push({ index: offset, slot: { pathS } });
       continue;

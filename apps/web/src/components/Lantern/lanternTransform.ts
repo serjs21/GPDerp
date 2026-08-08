@@ -97,7 +97,15 @@ export type LanternTransformInput = {
 
 export function resolveLanternTransform(props: LanternTransformInput): LanternTransform {
   if (props.journeyS !== undefined) {
-    return getLanternJourneyTransform(props.journeyS);
+    const base = getLanternJourneyTransform(props.journeyS);
+    if (props.transform) {
+      return {
+        ...base,
+        ...props.transform,
+        positionMode: props.transform.positionMode ?? base.positionMode,
+      };
+    }
+    return base;
   }
 
   if (props.transform) {

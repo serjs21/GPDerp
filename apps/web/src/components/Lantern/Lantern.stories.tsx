@@ -18,6 +18,7 @@ import {
   LANTERN_FLIGHT_PATH_EXIT_STOP_ID,
   LANTERN_FLIGHT_PATH_INITIAL_STOP_ID,
   LANTERN_FLIGHT_PATH_REST_EPSILON,
+  lanternExitPathS,
   lanternInitialJourneyS,
   lanternInitialPathS,
   routeStopById,
@@ -37,8 +38,21 @@ import {
   getCarouselStepBounds,
   isCarouselLanternVisibleAtStep,
 } from "./lanternCarouselSteps";
+import {
+  applyCarouselSlotToJourney,
+  carouselOpacityForOffset,
+  getCarouselDepartingOffset,
+  getCarouselVisibleCount,
+  opacityForCarouselStopAssignment,
+  resolveCarouselSlotOpacity,
+  type CarouselOpacityContext,
+} from "./lanternCarouselOpacity";
+import {
+  buildCarouselCompressedJourneyS,
+  resolveCarouselEnterFadeSlots,
+  resolveCarouselPullInSlots,
+} from "./lanternCarouselEnter";
 import { resolveCarouselPushOutSlots } from "./lanternCarouselPushOut";
-import { journeySForCarouselStep } from "./lanternRouteStops";
 import styles from "./Lantern.stories.module.css";
 
 const meta: Meta<typeof Lantern> = {
@@ -117,19 +131,50 @@ function renderLanternExitSlot(
   className: string,
   haiku: { id: string; title: string; body: string },
   key: string,
+  opacityContext?: CarouselOpacityContext,
 ) {
+  const haikuNode = makeMockHaiku({
+    id: haiku.id,
+    title: haiku.title,
+    body: haiku.body,
+  });
+
+  if (slot.transform) {
+    return (
+      <Lantern
+        key={key}
+        className={className}
+        transform={slot.transform}
+        haiku={haikuNode}
+      />
+    );
+  }
+
+  if (slot.pathS !== undefined) {
+    const opacity = opacityContext
+      ? resolveCarouselSlotOpacity(slot, opacityContext)
+      : opacityForCarouselStopAssignment(slot);
+    return (
+      <Lantern
+        key={key}
+        className={className}
+        progress={slot.pathS}
+        transform={
+          opacity !== undefined
+            ? { opacity, positionMode: "percent" as const }
+            : undefined
+        }
+        haiku={haikuNode}
+      />
+    );
+  }
+
   return (
     <Lantern
       key={key}
       className={className}
-      journeyS={slot.transform ? undefined : slot.journeyS}
-      progress={slot.pathS !== undefined ? slot.pathS : undefined}
-      transform={slot.transform}
-      haiku={makeMockHaiku({
-        id: haiku.id,
-        title: haiku.title,
-        body: haiku.body,
-      })}
+      journeyS={slot.journeyS}
+      haiku={haikuNode}
     />
   );
 }
@@ -367,8 +412,10 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
   );
   const [exitingOffset, setExitingOffset] = useState<number | null>(null);
   const [enteringOffset, setEnteringOffset] = useState<number | null>(null);
+  const [restingAtExitOffset, setRestingAtExitOffset] = useState<number | null>(null);
   const exitingOffsetRef = useRef<number | null>(null);
   const enteringOffsetRef = useRef<number | null>(null);
+  const restingAtExitOffsetRef = useRef<number | null>(null);
   const queueVisibleCountRef = useRef(0);
   const pushFromJourneysRef = useRef<number[]>([]);
   const animationRef = useRef<number | null>(null);
@@ -381,6 +428,7 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
   queueStateRef.current = queueState;
   exitingOffsetRef.current = exitingOffset;
   enteringOffsetRef.current = enteringOffset;
+  restingAtExitOffsetRef.current = restingAtExitOffset;
   const stopIds = LANTERN_CAROUSEL_STOP_IDS;
   const activeStepIndex = Math.min(stepIndex, maxStepIndex);
   const activeStopId = stopIds[activeStepIndex] ?? LANTERN_FLIGHT_PATH_INITIAL_STOP_ID;
@@ -409,7 +457,31 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
       return slots.find((entry) => entry.index === offset)?.slot ?? null;
     }
 
-    const useQueueSlots = queueAnimating || restingAtExit;
+    if (queueState.phase === "pullIn" && enteringOffsetRef.current !== null) {
+      const slots = resolveCarouselPullInSlots(
+        queueState.phaseT,
+        stepIndex,
+        enteringOffsetRef.current,
+        pushFromJourneysRef.current,
+      );
+      return slots.find((entry) => entry.index === offset)?.slot ?? null;
+    }
+
+    if (queueState.phase === "fadeFromExit" && enteringOffsetRef.current !== null) {
+      const slots = resolveCarouselEnterFadeSlots(
+        queueState.phaseT,
+        stepIndex,
+        enteringOffsetRef.current,
+        pushFromJourneysRef.current,
+      );
+      return slots.find((entry) => entry.index === offset)?.slot ?? null;
+    }
+
+    if (restingAtExit && restingAtExitOffset === offset) {
+      return { pathS: lanternExitPathS() };
+    }
+
+    const useQueueSlots = queueAnimating;
     if (!useQueueSlots) return null;
     const visibleCount = queueAnimating ? queueVisibleCountRef.current : stepIndex + 1;
     const slots = resolveAnimatedQueueSlots(queueState, visibleCount);
@@ -417,20 +489,55 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
   };
 
   useLanternQueueAnimationLoop(queueState, setQueueState, queueStateRef, {
+    onSample: (next) => {
+      if (next.phase !== "pullIn" || enteringOffsetRef.current !== 1) {
+        return;
+      }
+      const slots = resolveCarouselPullInSlots(
+        next.phaseT,
+        stepIndexRef.current,
+        1,
+        pushFromJourneysRef.current,
+      );
+      const lead = slots.find((entry) => entry.index === 0)?.slot;
+      if (!lead) return;
+      const opacity = resolveCarouselSlotOpacity(lead, {
+        phase: "pullIn",
+        offset: 0,
+        restingAtExitOffset: restingAtExitOffsetRef.current,
+        enteringOffset: 1,
+        exitingOffset: null,
+      });
+      // #region agent log
+      if (Math.floor(next.phaseT * 4) === 2) {
+        fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a4f3b7" },
+          body: JSON.stringify({
+            sessionId: "a4f3b7",
+            runId: "post-fix-v2",
+            hypothesisId: "H7",
+            location: "Lantern.stories.tsx:onSample",
+            message: "pullIn lead opacity sample",
+            data: { phaseT: next.phaseT, pathS: lead.pathS, opacity },
+            timestamp: Date.now(),
+          }),
+        }).catch(() => {});
+      }
+      // #endregion
+    },
     onPhaseIdle: (completed) => {
       if (exitingOffsetRef.current !== null) {
         if (completed.pushedOutCount > 0) {
           const nextStep = Math.max(minStepIndex, stepIndexRef.current - 1);
-          const nextJourney = buildCarouselLanternJourneyS(nextStep, lanternCount);
-          for (let offset = 0; offset < nextStep; offset += 1) {
-            nextJourney[offset] = journeySForCarouselStep(offset);
-          }
+          const nextJourney = buildCarouselCompressedJourneyS(nextStep, lanternCount);
           setStepIndex(nextStep);
           setLanternJourneyS(nextJourney);
           journeySRef.current = nextJourney;
           stepIndexRef.current = nextStep;
           setExitingOffset(null);
           exitingOffsetRef.current = null;
+          setRestingAtExitOffset(nextStep);
           // #region agent log
           fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
             method: "POST",
@@ -441,7 +548,7 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
               hypothesisId: "H4",
               location: "Lantern.stories.tsx:onPhaseIdle",
               message: "pushOut complete — next rearmost at stop-0 rest",
-              data: { nextStep, fadeProgress: 1 },
+              data: { nextStep, fadeProgress: 1, restingAtExitOffset: nextStep },
               timestamp: Date.now(),
             }),
           }).catch(() => {});
@@ -456,12 +563,11 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
           const slots = resolveAnimatedQueueSlots(completed, visibleCount);
           const nextJourney = [...journeySRef.current];
           for (const { index, slot } of slots) {
-            if (slot.journeyS !== undefined) {
-              nextJourney[index] = slot.journeyS;
-            }
+            applyCarouselSlotToJourney(nextJourney, index, slot, stepIndexRef.current);
           }
           setLanternJourneyS(nextJourney);
           journeySRef.current = nextJourney;
+          setRestingAtExitOffset(stepIndexRef.current);
           // #region agent log
           fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
             method: "POST",
@@ -487,6 +593,7 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
         if (completed.fadeProgress <= LANTERN_FLIGHT_PATH_REST_EPSILON) {
           setExitingOffset(null);
           exitingOffsetRef.current = null;
+          setRestingAtExitOffset(null);
           const restored = buildCarouselLanternJourneyS(stepIndexRef.current, lanternCount);
           setLanternJourneyS(restored);
           journeySRef.current = restored;
@@ -497,12 +604,48 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
       }
 
       if (enteringOffsetRef.current !== null) {
-        const visibleCount = queueVisibleCountRef.current;
-        if (completed.fadeProgress >= 1 - 0.02) {
-          return requestLanternQueueScrollStep(completed, -1, visibleCount, performance.now());
+        const entering = enteringOffsetRef.current;
+        const step = stepIndexRef.current;
+
+        if (completed.fadeProgress >= 1 - LANTERN_FLIGHT_PATH_REST_EPSILON) {
+          const endSlots = resolveCarouselPullInSlots(
+            1,
+            step,
+            entering,
+            pushFromJourneysRef.current,
+          );
+          const nextJourney = [...journeySRef.current];
+          for (const { index, slot } of endSlots) {
+            applyCarouselSlotToJourney(nextJourney, index, slot, step);
+          }
+          setLanternJourneyS(nextJourney);
+          journeySRef.current = nextJourney;
+          setEnteringOffset(null);
+          enteringOffsetRef.current = null;
+          setRestingAtExitOffset(entering);
+          // #region agent log
+          fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a4f3b7" },
+            body: JSON.stringify({
+              sessionId: "a4f3b7",
+              runId: "opacity-fix",
+              hypothesisId: "H6",
+              location: "Lantern.stories.tsx:onPhaseIdle",
+              message: "pullIn complete — only entering offset at stop-0",
+              data: {
+                stepIndex: step,
+                restingAtExitOffset: entering,
+                leadJourney: nextJourney[0],
+              },
+              timestamp: Date.now(),
+            }),
+          }).catch(() => {});
+          // #endregion
+          return { ...createLanternQueueScrollState(), fadeProgress: 1 };
         }
 
-        if (completed.fadeProgress <= 0.02) {
+        if (completed.fadeProgress <= LANTERN_FLIGHT_PATH_REST_EPSILON) {
           const nextStep = Math.min(maxStepIndex, stepIndexRef.current + 1);
           const nextJourney = buildCarouselLanternJourneyS(nextStep, lanternCount);
           setStepIndex(nextStep);
@@ -511,6 +654,7 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
           stepIndexRef.current = nextStep;
           setEnteringOffset(null);
           enteringOffsetRef.current = null;
+          setRestingAtExitOffset(null);
           return createLanternQueueScrollState();
         }
 
@@ -579,16 +723,45 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
     setQueueState(nextQueue);
   };
 
-  const startQueueEnter = (offset: number, visibleCount: number) => {
-    queueVisibleCountRef.current = visibleCount;
-    setEnteringOffset(offset);
-    enteringOffsetRef.current = offset;
-    const nextQueue = requestLanternQueueScrollStep(
-      { ...createLanternQueueScrollState(), pushedOutCount: 1 },
-      -1,
-      visibleCount,
-      performance.now(),
-    );
+  const startQueuePullIn = (enteringOffset: number) => {
+    const step = stepIndexRef.current;
+    queueVisibleCountRef.current = step + 2;
+    pushFromJourneysRef.current = [...journeySRef.current];
+    setEnteringOffset(enteringOffset);
+    enteringOffsetRef.current = enteringOffset;
+    const now = performance.now();
+    const nextQueue: LanternQueueScrollState = {
+      ...queueStateRef.current,
+      phase: "pullIn",
+      phaseT: 0,
+      animFromFade: 1,
+      animToFade: 1,
+      animStartTime: now,
+    };
+    queueStateRef.current = nextQueue;
+    setQueueState(nextQueue);
+  };
+
+  const startQueueEnterFade = (enteringOffset: number) => {
+    const step = stepIndexRef.current;
+    queueVisibleCountRef.current = step + 2;
+    const fromJourneys = [...journeySRef.current];
+    const pullEnd = resolveCarouselPullInSlots(1, step, enteringOffset, fromJourneys);
+    for (const { index, slot } of pullEnd) {
+      applyCarouselSlotToJourney(fromJourneys, index, slot, step);
+    }
+    pushFromJourneysRef.current = fromJourneys;
+    setEnteringOffset(enteringOffset);
+    enteringOffsetRef.current = enteringOffset;
+    const now = performance.now();
+    const nextQueue: LanternQueueScrollState = {
+      ...queueStateRef.current,
+      phase: "fadeFromExit",
+      phaseT: 0,
+      animFromFade: 1,
+      animToFade: 0,
+      animStartTime: now,
+    };
     queueStateRef.current = nextQueue;
     setQueueState(nextQueue);
   };
@@ -609,7 +782,16 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
       animationRef.current = null;
     }
 
-    startQueueExit(currentStep, currentStep + 1);
+    const departOffset = getCarouselDepartingOffset(
+      currentStep,
+      restingAtExitOffsetRef.current,
+      state.fadeProgress,
+    );
+    const visibleCount = getCarouselVisibleCount(
+      currentStep,
+      restingAtExitOffsetRef.current,
+    );
+    startQueueExit(departOffset, visibleCount);
   };
 
   const stepForward = () => {
@@ -619,7 +801,29 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
 
     const state = queueStateRef.current;
     if (state.fadeProgress >= 1 - LANTERN_FLIGHT_PATH_REST_EPSILON) {
-      startQueueRetreatFromExit(stepIndexRef.current, stepIndexRef.current + 1);
+      const restOffset = restingAtExitOffsetRef.current ?? stepIndexRef.current;
+
+      if (restOffset > stepIndexRef.current) {
+        if (animationRef.current !== null) {
+          cancelAnimationFrame(animationRef.current);
+          animationRef.current = null;
+        }
+        startQueueEnterFade(restOffset);
+        return;
+      }
+
+      if (stepIndexRef.current < maxStepIndex) {
+        if (animationRef.current !== null) {
+          cancelAnimationFrame(animationRef.current);
+          animationRef.current = null;
+        }
+        startQueuePullIn(stepIndexRef.current + 1);
+        return;
+      }
+
+      if (restOffset === stepIndexRef.current) {
+        startQueueRetreatFromExit(stepIndexRef.current, stepIndexRef.current + 1);
+      }
       return;
     }
 
@@ -632,7 +836,7 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
       animationRef.current = null;
     }
 
-    startQueueEnter(stepIndexRef.current + 1, stepIndexRef.current + 2);
+    startQueuePullIn(stepIndexRef.current + 1);
   };
 
   goToStepRef.current = (direction: number) => {
@@ -700,8 +904,11 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
           {Array.from({ length: lanternCount }, (_, offset) => {
               const isExiting = exitingOffset === offset;
               const isEntering = enteringOffset === offset;
+              const isStop0Resting =
+                restingAtExit && restingAtExitOffset === offset;
+              const isEnterResting = isStop0Resting && offset > stepIndex;
               const visibleAtStep = isCarouselLanternVisibleAtStep(stepIndex, offset);
-              if (!visibleAtStep && !isExiting && !isEntering) return null;
+              if (!visibleAtStep && !isExiting && !isEntering && !isEnterResting) return null;
 
               const haiku = WRITTEN_HAIKUS[offset % WRITTEN_HAIKUS.length];
               const haikuProps = {
@@ -713,9 +920,13 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
               const useQueueSlot =
                 isExiting ||
                 isEntering ||
+                isStop0Resting ||
                 (queueAnimating && visibleAtStep) ||
-                (restingAtExit && visibleAtStep) ||
-                (queueState.phase === "pushOut" && visibleAtStep);
+                (queueState.phase === "pushOut" && visibleAtStep) ||
+                (queueState.phase === "pullIn" && (visibleAtStep || isEntering)) ||
+                (queueState.phase === "fadeFromExit" &&
+                  enteringOffset !== null &&
+                  (visibleAtStep || isEntering));
 
               if (useQueueSlot) {
                 const animSlot = getCarouselQueueSlot(offset);
@@ -728,6 +939,13 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
                   lanternClassName,
                   haikuProps,
                   `carousel-lantern-${offset}`,
+                  {
+                    phase: queueState.phase,
+                    offset,
+                    restingAtExitOffset,
+                    enteringOffset,
+                    exitingOffset,
+                  },
                 );
               }
 
@@ -739,6 +957,10 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
                   key={`carousel-lantern-${offset}`}
                   className={lanternClassName}
                   journeyS={slotJourneyS}
+                  transform={{
+                    opacity: carouselOpacityForOffset(offset, restingAtExitOffset),
+                    positionMode: "percent",
+                  }}
                   haiku={makeMockHaiku(haikuProps)}
                 />
               );
