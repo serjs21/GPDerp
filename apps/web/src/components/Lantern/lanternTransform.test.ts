@@ -1,4 +1,4 @@
-import { LANTERN_DEFAULT_MAX_STEPS } from "./constants";
+import { LANTERN_DEFAULT_MAX_STEPS, LANTERN_FLAME_ANCHOR_Y } from "./constants";
 import { LANTERN_FLIGHT_PATH_FADE } from "./lanternFlightPath.config";
 import {
   lanternExitPathS,
@@ -89,10 +89,14 @@ describe("lanternTransform", () => {
         positionMode: "percent",
       }) as Record<string, string>;
       expect(vars["--lantern-left"]).toBe("42%");
-      expect(vars["--lantern-top"]).toBe("68%");
+      expect(vars["--lantern-bottom"]).toBe("32%");
       expect(vars["--lantern-scale"]).toBe("0.8");
       expect(vars["--lantern-rotate"]).toBe("-6deg");
       expect(vars["--lantern-opacity"]).toBe("0.5");
+    });
+
+    it("anchors path stops at the flame center height", () => {
+      expect(LANTERN_FLAME_ANCHOR_Y).toBeCloseTo(0.125, 5);
     });
 
     it("maps translate transform to CSS vars", () => {

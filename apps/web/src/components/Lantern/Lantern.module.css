@@ -4,11 +4,14 @@
   --lantern-x: 0px;
   --lantern-y: 0px;
   --lantern-left: 50%;
-  --lantern-top: 50%;
+  --lantern-bottom: 50%;
   --lantern-scale: 1;
   --lantern-rotate: 0deg;
   --lantern-opacity: 1;
   --lantern-width: 11.5rem;
+  --lantern-flame-bottom: 0.075;
+  --lantern-flame-height: 0.1;
+  --lantern-flame-anchor-y: 0.125;
 
   position: relative;
   display: inline-block;
@@ -25,8 +28,9 @@
 .pathPositioned {
   position: absolute;
   left: var(--lantern-left);
-  top: var(--lantern-top);
-  transform: translate(-50%, -100%) scale(var(--lantern-scale)) rotate(var(--lantern-rotate));
+  bottom: var(--lantern-bottom);
+  transform: translate(-50%, calc(var(--lantern-flame-anchor-y) * -100%))
+    scale(var(--lantern-scale)) rotate(var(--lantern-rotate));
   transform-origin: center bottom;
 }
 
@@ -50,9 +54,9 @@
 .flame {
   position: absolute;
   left: 50%;
-  bottom: 7.5%;
+  bottom: calc(var(--lantern-flame-bottom) * 100%);
   width: 18%;
-  height: 10%;
+  height: calc(var(--lantern-flame-height) * 100%);
   transform: translateX(-50%);
   border-radius: 50%;
   background: radial-gradient(

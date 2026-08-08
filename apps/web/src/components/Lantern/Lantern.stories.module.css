@@ -88,10 +88,9 @@
   --lantern-width: clamp(4.5rem, 9vw, 8.5rem);
 }
 
+/* RAF drives left/top and transform each frame — no CSS transition on transform. */
 .flightPathStopLantern {
-  transition:
-    transform 320ms ease,
-    opacity 320ms ease;
+  animation: none;
 }
 
 .flightPathHud {

@@ -61,7 +61,7 @@ export function lanternTransformToCssVars(transform: LanternTransform): CSSPrope
   if (transform.positionMode === "percent") {
     return {
       "--lantern-left": `${transform.x * 100}%`,
-      "--lantern-top": `${transform.y * 100}%`,
+      "--lantern-bottom": `${Number(((1 - transform.y) * 100).toFixed(4))}%`,
       "--lantern-scale": String(transform.scale),
       "--lantern-rotate": `${transform.rotate}deg`,
       "--lantern-opacity": String(opacity),

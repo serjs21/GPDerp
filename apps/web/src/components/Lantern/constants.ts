@@ -22,6 +22,12 @@ export const LANTERN_TEXT_INSET = {
   left: 0.15,
 } as const;
 
+/** `.flame` glow placement as fractions of the lantern box (see Lantern.module.css). */
+export const LANTERN_FLAME_BOTTOM = 0.075;
+export const LANTERN_FLAME_HEIGHT = 0.1;
+/** Vertical center of the flame glow from the lantern box bottom — path anchor point. */
+export const LANTERN_FLAME_ANCHOR_Y = LANTERN_FLAME_BOTTOM + LANTERN_FLAME_HEIGHT / 2;
+
 /** Scale multiplier per discrete flight step (~15–25% down). */
 export const LANTERN_SCALE_PER_STEP = 0.825;
 

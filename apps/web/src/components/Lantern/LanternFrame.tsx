@@ -3,6 +3,9 @@
 import type { CSSProperties, ReactNode } from "react";
 import {
   LANTERN_ASSET_SRC,
+  LANTERN_FLAME_ANCHOR_Y,
+  LANTERN_FLAME_BOTTOM,
+  LANTERN_FLAME_HEIGHT,
   LANTERN_IMAGE_HEIGHT,
   LANTERN_IMAGE_WIDTH,
   LANTERN_WIDTH_REM,
@@ -50,6 +53,9 @@ export function LanternFrame({
   const rootStyle = {
     ...lanternTransformToCssVars(resolved),
     "--lantern-width": `${widthRem}rem`,
+    "--lantern-flame-bottom": String(LANTERN_FLAME_BOTTOM),
+    "--lantern-flame-height": String(LANTERN_FLAME_HEIGHT),
+    "--lantern-flame-anchor-y": String(LANTERN_FLAME_ANCHOR_Y),
   } as CSSProperties;
 
   const rootClass = [
