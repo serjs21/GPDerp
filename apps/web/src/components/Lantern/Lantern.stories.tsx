@@ -17,6 +17,7 @@ import {
   LANTERN_CAROUSEL_STOP_IDS,
   LANTERN_FLIGHT_PATH_EXIT_STOP_ID,
   LANTERN_FLIGHT_PATH_INITIAL_STOP_ID,
+  LANTERN_FLIGHT_PATH_REST_EPSILON,
   lanternInitialJourneyS,
   lanternInitialPathS,
   routeStopById,
@@ -33,7 +34,6 @@ import {
 import { resolveLanternTransform } from "./lanternTransform";
 import {
   buildCarouselLanternJourneyS,
-  clampCarouselStepIndex,
   getCarouselStepBounds,
   isCarouselLanternVisibleAtStep,
 } from "./lanternCarouselSteps";
@@ -387,22 +387,22 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
   const initialStop = routeStopById(LANTERN_FLIGHT_PATH_INITIAL_STOP_ID);
   const lanternClassName = `${styles.flightPathLantern} ${styles.flightPathStopLantern}`;
   const queueAnimating = exitingOffset !== null || enteringOffset !== null;
+  const restingAtExit =
+    queueState.phase === "idle" &&
+    queueState.fadeProgress >= 1 - LANTERN_FLIGHT_PATH_REST_EPSILON;
   const queueVisibleCount = queueAnimating ? queueVisibleCountRef.current : stepIndex + 1;
 
   const getCarouselQueueSlot = (offset: number): AnimatedLanternQueueSlot | null => {
-    if (!queueAnimating) return null;
-    const slots = resolveAnimatedQueueSlots(queueState, queueVisibleCount);
+    const useQueueSlots = queueAnimating || restingAtExit;
+    if (!useQueueSlots) return null;
+    const visibleCount = queueAnimating ? queueVisibleCountRef.current : stepIndex + 1;
+    const slots = resolveAnimatedQueueSlots(queueState, visibleCount);
     return slots.find((entry) => entry.index === offset)?.slot ?? null;
   };
 
   useLanternQueueAnimationLoop(queueState, setQueueState, queueStateRef, {
     onPhaseIdle: (completed) => {
       if (exitingOffsetRef.current !== null) {
-        const visibleCount = queueVisibleCountRef.current;
-        if (completed.fadeProgress >= 1 - 0.02 && completed.pushedOutCount === 0) {
-          return requestLanternQueueScrollStep(completed, 1, visibleCount, performance.now());
-        }
-
         if (completed.pushedOutCount > 0) {
           const nextStep = Math.max(minStepIndex, stepIndexRef.current - 1);
           const nextJourney = buildCarouselLanternJourneyS(nextStep, lanternCount);
@@ -412,7 +412,66 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
           stepIndexRef.current = nextStep;
           setExitingOffset(null);
           exitingOffsetRef.current = null;
+          // #region agent log
+          fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a4f3b7" },
+            body: JSON.stringify({
+              sessionId: "a4f3b7",
+              runId: "two-phase-exit",
+              hypothesisId: "H1",
+              location: "Lantern.stories.tsx:onPhaseIdle",
+              message: "pushOut complete — step decremented",
+              data: { nextStep, fadeProgress: 0 },
+              timestamp: Date.now(),
+            }),
+          }).catch(() => {});
+          // #endregion
           return createLanternQueueScrollState();
+        }
+
+        if (completed.fadeProgress >= 1 - LANTERN_FLIGHT_PATH_REST_EPSILON) {
+          setExitingOffset(null);
+          exitingOffsetRef.current = null;
+          const visibleCount = stepIndexRef.current + 1;
+          const slots = resolveAnimatedQueueSlots(completed, visibleCount);
+          const nextJourney = [...journeySRef.current];
+          for (const { index, slot } of slots) {
+            if (slot.journeyS !== undefined) {
+              nextJourney[index] = slot.journeyS;
+            }
+          }
+          setLanternJourneyS(nextJourney);
+          journeySRef.current = nextJourney;
+          // #region agent log
+          fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a4f3b7" },
+            body: JSON.stringify({
+              sessionId: "a4f3b7",
+              runId: "order-fix",
+              hypothesisId: "H3",
+              location: "Lantern.stories.tsx:onPhaseIdle",
+              message: "fadeToExit complete — synced follower journeys",
+              data: {
+                stepIndex: stepIndexRef.current,
+                journeys: nextJourney.slice(0, visibleCount),
+                newestPathS: slots.at(-1)?.slot.pathS,
+              },
+              timestamp: Date.now(),
+            }),
+          }).catch(() => {});
+          // #endregion
+          return completed;
+        }
+
+        if (completed.fadeProgress <= LANTERN_FLIGHT_PATH_REST_EPSILON) {
+          setExitingOffset(null);
+          exitingOffsetRef.current = null;
+          const restored = buildCarouselLanternJourneyS(stepIndexRef.current, lanternCount);
+          setLanternJourneyS(restored);
+          journeySRef.current = restored;
+          return completed;
         }
 
         return completed;
@@ -448,8 +507,42 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
     setExitingOffset(departingOffset);
     exitingOffsetRef.current = departingOffset;
     const nextQueue = requestLanternQueueScrollStep(
-      createLanternQueueScrollState(),
+      queueStateRef.current,
       1,
+      visibleCount,
+      performance.now(),
+    );
+    // #region agent log
+    fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a4f3b7" },
+      body: JSON.stringify({
+        sessionId: "a4f3b7",
+        runId: "two-phase-exit",
+        hypothesisId: "H2",
+        location: "Lantern.stories.tsx:startQueueExit",
+        message: "queue exit requested",
+        data: {
+          phase: nextQueue.phase,
+          priorFadeProgress: queueStateRef.current.fadeProgress,
+          nextFadeProgress: nextQueue.fadeProgress,
+          departingOffset,
+        },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
+    queueStateRef.current = nextQueue;
+    setQueueState(nextQueue);
+  };
+
+  const startQueueRetreatFromExit = (departingOffset: number, visibleCount: number) => {
+    queueVisibleCountRef.current = visibleCount;
+    setExitingOffset(departingOffset);
+    exitingOffsetRef.current = departingOffset;
+    const nextQueue = requestLanternQueueScrollStep(
+      queueStateRef.current,
+      -1,
       visibleCount,
       performance.now(),
     );
@@ -471,12 +564,14 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
     setQueueState(nextQueue);
   };
 
-  const goToStep = (nextIndex: number) => {
-    const clamped = clampCarouselStepIndex(nextIndex, lanternCount);
+  const stepBack = () => {
     if (queueStateRef.current.phase !== "idle") {
       return;
     }
-    if (clamped === stepIndexRef.current) {
+
+    const currentStep = stepIndexRef.current;
+    const state = queueStateRef.current;
+    if (state.fadeProgress <= LANTERN_FLIGHT_PATH_REST_EPSILON && currentStep <= minStepIndex) {
       return;
     }
 
@@ -485,25 +580,47 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
       animationRef.current = null;
     }
 
-    if (clamped < stepIndexRef.current) {
-      const visibleCount = stepIndexRef.current + 1;
-      startQueueExit(stepIndexRef.current, visibleCount);
+    startQueueExit(currentStep, currentStep + 1);
+  };
+
+  const stepForward = () => {
+    if (queueStateRef.current.phase !== "idle") {
       return;
     }
 
-    const visibleCount = stepIndexRef.current + 2;
-    startQueueEnter(stepIndexRef.current + 1, visibleCount);
+    const state = queueStateRef.current;
+    if (state.fadeProgress >= 1 - LANTERN_FLIGHT_PATH_REST_EPSILON) {
+      startQueueRetreatFromExit(stepIndexRef.current, stepIndexRef.current + 1);
+      return;
+    }
+
+    if (stepIndexRef.current >= maxStepIndex) {
+      return;
+    }
+
+    if (animationRef.current !== null) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+
+    startQueueEnter(stepIndexRef.current + 1, stepIndexRef.current + 2);
   };
 
-  goToStepRef.current = goToStep;
+  goToStepRef.current = (direction: number) => {
+    if (direction < 0) {
+      stepBack();
+    } else if (direction > 0) {
+      stepForward();
+    }
+  };
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowLeft") {
-        goToStepRef.current(stepIndexRef.current - 1);
+        goToStepRef.current(-1);
       }
       if (event.key === "ArrowRight") {
-        goToStepRef.current(stepIndexRef.current + 1);
+        goToStepRef.current(1);
       }
     };
 
@@ -564,7 +681,13 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
                 body: haiku.body,
               };
 
-              if (isExiting || isEntering || (queueAnimating && visibleAtStep)) {
+              const useQueueSlot =
+                isExiting ||
+                isEntering ||
+                (queueAnimating && visibleAtStep) ||
+                (restingAtExit && visibleAtStep);
+
+              if (useQueueSlot) {
                 const animSlot = getCarouselQueueSlot(offset);
                 if (!animSlot || !isLanternQueueSlotVisible(animSlot, queueState.phase)) {
                   return null;
@@ -605,8 +728,12 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
           type="button"
           className={styles.flightPathControlButton}
           aria-label="Previous stop"
-          disabled={activeStepIndex <= minStepIndex || queueState.phase !== "idle"}
-          onClick={() => goToStep(stepIndex - 1)}
+          disabled={
+            queueState.phase !== "idle" ||
+            (activeStepIndex <= minStepIndex &&
+              queueState.fadeProgress <= LANTERN_FLIGHT_PATH_REST_EPSILON)
+          }
+          onClick={stepBack}
         >
           ←
         </button>
@@ -617,8 +744,12 @@ function FlightPathStopCarouselDemo({ lanternCount }: FlightPathArgs) {
           type="button"
           className={styles.flightPathControlButton}
           aria-label="Next stop"
-          disabled={activeStepIndex >= maxStepIndex || queueState.phase !== "idle"}
-          onClick={() => goToStep(stepIndex + 1)}
+          disabled={
+            queueState.phase !== "idle" ||
+            (activeStepIndex >= maxStepIndex &&
+              queueState.fadeProgress < 1 - LANTERN_FLIGHT_PATH_REST_EPSILON)
+          }
+          onClick={stepForward}
         >
           →
         </button>
