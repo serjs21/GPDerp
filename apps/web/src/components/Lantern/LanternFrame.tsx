@@ -38,7 +38,6 @@ export function LanternFrame({
   progress,
   journeyS,
   maxSteps,
-  nextLanternPathProgress,
   transform,
 }: LanternFrameProps) {
   const resolved = resolveLanternTransform({
@@ -46,7 +45,6 @@ export function LanternFrame({
     progress,
     journeyS,
     maxSteps,
-    nextLanternPathProgress,
     transform,
   });
 

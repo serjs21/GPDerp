@@ -1,80 +1,58 @@
 "use client";
 
-import type { HaikuDto } from "@/api/haikus";
-import { Label } from "@/components/Label/Label";
-import { HaikuActions } from "@/components/HaikuContainer/HaikuActions";
 import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
-import { formatCreatedAt } from "@/utils/date";
-import { formatHaikuTitle } from "@/utils/strings";
 import { LANTERN_CARD_WIDTH_REM } from "./constants";
+import { Lantern } from "./Lantern";
 import { LanternFrame } from "./LanternFrame";
 import cardStyles from "./LanternCard.module.css";
 
 export type LanternCardProps = HaikuContainerProps & {
   className?: string;
   onDelete?: () => Promise<void>;
+  onDeleted?: () => void;
+  onChanged?: () => void;
 };
 
-export function LanternCard(props: LanternCardProps) {
-  if ("generatingDraft" in props && props.generatingDraft) {
-    const { subject, content, createdAtLabel } = props.generatingDraft;
+export function LanternCard({
+  className,
+  onDelete,
+  onDeleted,
+  onChanged,
+  ...contentProps
+}: LanternCardProps) {
+  const generating = "generatingDraft" in contentProps && Boolean(contentProps.generatingDraft);
 
+  if (generating && "generatingDraft" in contentProps && contentProps.generatingDraft) {
     return (
       <LanternFrame
-        className={`${cardStyles.root}${props.className ? ` ${props.className}` : ""}`}
+        className={`${cardStyles.root}${className ? ` ${className}` : ""}`}
         contentClassName={cardStyles.content}
-        ariaLabel={`Generating haiku: ${subject}`}
+        ariaLabel={`Generating haiku: ${contentProps.generatingDraft.subject}`}
         widthRem={LANTERN_CARD_WIDTH_REM}
         generating
       >
-        <div className={cardStyles.actions}>
-          <HaikuActions variant="generating" />
-        </div>
-        <p className={cardStyles.title}>{subject}</p>
-        <p className={cardStyles.meta}>{createdAtLabel}</p>
-        <p className={cardStyles.body}>{content}</p>
+        <Lantern generatingDraft={contentProps.generatingDraft} />
       </LanternFrame>
     );
   }
 
-  const { haiku, onDeleted, onChanged, onDelete, className } = props as {
-    haiku: HaikuDto;
-    onDeleted?: () => void;
-    onChanged?: () => void;
-    onDelete?: () => Promise<void>;
-    className?: string;
-  };
-
-  const title = formatHaikuTitle(haiku);
+  if (!("haiku" in contentProps) || !contentProps.haiku) {
+    return null;
+  }
 
   return (
     <LanternFrame
       className={`${cardStyles.root}${className ? ` ${className}` : ""}`}
       contentClassName={cardStyles.content}
-      ariaLabel={`Haiku lantern: ${title}`}
+      ariaLabel={`Haiku lantern: ${contentProps.haiku.title}`}
       widthRem={LANTERN_CARD_WIDTH_REM}
     >
-      <div className={cardStyles.actions}>
-        <HaikuActions
-          variant="saved"
-          haiku={haiku}
-          onDeleted={onDeleted}
-          onChanged={onChanged}
-          onDelete={onDelete}
-        />
-      </div>
-      <p className={cardStyles.title}>{title}</p>
-      <p className={cardStyles.meta}>{formatCreatedAt(haiku.createdAt)}</p>
-      <p className={cardStyles.body}>{haiku.body}</p>
-      {haiku.labels.length > 0 ? (
-        <div className={cardStyles.footer}>
-          <div className={cardStyles.labels}>
-            {haiku.labels.map((label) => (
-              <Label key={label.id} name={label.name} color={label.color || "default"} />
-            ))}
-          </div>
-        </div>
-      ) : null}
+      <Lantern
+        haiku={contentProps.haiku}
+        onDelete={onDelete}
+        onDeleted={onDeleted}
+        onChanged={onChanged}
+      />
     </LanternFrame>
   );
 }

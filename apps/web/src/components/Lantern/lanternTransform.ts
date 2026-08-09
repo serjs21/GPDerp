@@ -4,7 +4,7 @@ import {
   getLanternFlightTransform,
   getLanternJourneyTransform,
   lanternFlightPathAtStep,
-} from "./lanternFlightPath";
+} from "./path";
 
 export type LanternPositionMode = "translate" | "percent";
 
@@ -29,29 +29,21 @@ export function easeInOutCubic(t: number): number {
 }
 
 /** Fast-at-start easing for depth scale along carousel stops. */
-export { easeOutCubic } from "./lanternFlightPath.config";
+export { easeOutCubic } from "./path";
 
-/**
- * Discrete flight step mapped to evenly spaced path samples.
- * Step 0 is the path start; maxSteps lands near the path exit.
- */
-export function getLanternTransformAtStep(step: number, maxSteps: number = LANTERN_DEFAULT_MAX_STEPS): LanternTransform {
+export function getLanternTransformAtStep(
+  step: number,
+  maxSteps: number = LANTERN_DEFAULT_MAX_STEPS,
+): LanternTransform {
   const flooredStep = Math.max(0, Math.floor(step));
   const pathT = lanternFlightPathAtStep(flooredStep, maxSteps);
   return getLanternFlightTransform(pathT);
 }
 
-/**
- * Continuous progress `t ∈ [0, 1]` along the flight path.
- * `LANERN_FLIGHT_PATH_INITIAL` (~0.78) is the primary rest pose at the right dip.
- */
 export function getLanternTransformAtProgress(
   progress: number,
-  options: { nextLanternPathProgress?: number } = {},
 ): LanternTransform {
-  return getLanternFlightTransform(progress, {
-    nextLanternPathT: options.nextLanternPathProgress,
-  });
+  return getLanternFlightTransform(progress);
 }
 
 export function lanternTransformToCssVars(transform: LanternTransform): CSSProperties {
@@ -91,11 +83,22 @@ export type LanternTransformInput = {
   progress?: number;
   journeyS?: number;
   maxSteps?: number;
-  nextLanternPathProgress?: number;
   transform?: Partial<LanternTransform>;
 };
 
 export function resolveLanternTransform(props: LanternTransformInput): LanternTransform {
+  if (props.transform?.positionMode === "percent" && props.transform.x !== undefined) {
+    return {
+      scale: 1,
+      rotate: 0,
+      opacity: 1,
+      x: 0,
+      y: 0,
+      ...props.transform,
+      positionMode: "percent",
+    } as LanternTransform;
+  }
+
   if (props.journeyS !== undefined) {
     const base = getLanternJourneyTransform(props.journeyS);
     if (props.transform) {
@@ -109,31 +112,12 @@ export function resolveLanternTransform(props: LanternTransformInput): LanternTr
   }
 
   if (props.transform) {
-    if (props.journeyS !== undefined) {
-      return {
-        ...getLanternJourneyTransform(props.journeyS),
-        ...props.transform,
-        positionMode: props.transform.positionMode ?? "percent",
-      };
-    }
-
     if (props.progress !== undefined) {
       return {
         ...getLanternFlightTransform(props.progress),
         ...props.transform,
         positionMode: props.transform.positionMode ?? "percent",
       };
-    }
-
-    if (props.transform.positionMode === "percent") {
-      return {
-        scale: 1,
-        rotate: 0,
-        opacity: 1,
-        x: 0,
-        y: 0,
-        ...props.transform,
-      } as LanternTransform;
     }
 
     const base = getLanternTransformAtStep(0, props.maxSteps);
@@ -153,9 +137,7 @@ export function resolveLanternTransform(props: LanternTransformInput): LanternTr
   }
 
   if (props.progress !== undefined) {
-    return getLanternTransformAtProgress(props.progress, {
-      nextLanternPathProgress: props.nextLanternPathProgress,
-    });
+    return getLanternTransformAtProgress(props.progress);
   }
 
   return getLanternTransformAtStep(0, props.maxSteps);

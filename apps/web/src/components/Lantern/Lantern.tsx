@@ -1,57 +1,37 @@
 "use client";
 
+import { Label } from "@/components/Label/Label";
+import { HaikuActions } from "@/components/HaikuContainer/HaikuActions";
 import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { formatCreatedAt } from "@/utils/date";
 import { formatHaikuTitle } from "@/utils/strings";
-import { LANTERN_WIDTH_REM } from "./constants";
-import { LanternFrame } from "./LanternFrame";
-import type { LanternTransform } from "./lanternTransform";
 import styles from "./Lantern.module.css";
 
 export type LanternProps = HaikuContainerProps & {
   className?: string;
-  /** Discrete flight step from the concept sheet (overrides progress). */
-  step?: number;
-  /** Continuous flight-path progress 0–1 (used when step is omitted). */
-  progress?: number;
-  /** Carousel journey position 0–1 (stop-1 … stop-16); overrides progress when set. */
-  journeyS?: number;
-  /** Next lantern path progress for queue handoff opacity. */
-  nextLanternPathProgress?: number;
-  /** Max discrete steps when mapping progress. */
-  maxSteps?: number;
-  /** Explicit transform; wins over step/progress when provided. */
-  transform?: Partial<LanternTransform>;
   /** Show only the haiku body (handwritten-on-paper presentation). */
   bodyOnly?: boolean;
+  onDelete?: () => Promise<void>;
+  onDeleted?: () => void;
+  onChanged?: () => void;
 };
 
-function resolveContent(props: HaikuContainerProps): {
-  title: string;
-  body: string;
-  meta?: string;
-  ariaLabel: string;
-  generating: boolean;
-} {
-  if ("generatingDraft" in props && props.generatingDraft) {
-    const draft: GeneratingDraft = props.generatingDraft;
-    return {
-      title: draft.subject,
-      body: draft.content,
-      meta: draft.createdAtLabel,
-      ariaLabel: `Generating haiku: ${draft.subject}`,
-      generating: true,
-    };
-  }
+function resolveGeneratingContent(draft: GeneratingDraft) {
+  return {
+    title: draft.subject,
+    body: draft.content,
+    meta: draft.createdAtLabel,
+    generating: true,
+  };
+}
 
-  const { haiku } = props;
+function resolveSavedContent(haiku: NonNullable<HaikuContainerProps["haiku"]>) {
   const title = formatHaikuTitle(haiku);
   return {
     title,
     body: haiku.body,
     meta: formatCreatedAt(haiku.createdAt),
-    ariaLabel: `Haiku lantern: ${title}`,
     generating: false,
   };
 }
@@ -59,35 +39,65 @@ function resolveContent(props: HaikuContainerProps): {
 export function Lantern(props: LanternProps) {
   const {
     className,
-    step,
-    progress,
-    journeyS,
-    maxSteps,
-    nextLanternPathProgress,
-    transform,
     bodyOnly = false,
+    onDelete,
+    onDeleted,
+    onChanged,
     ...noteProps
   } = props;
-  const { title, body, meta, ariaLabel, generating } = resolveContent(noteProps);
+
+  const contentClass = [styles.content, className].filter(Boolean).join(" ");
+
+  if ("generatingDraft" in noteProps && noteProps.generatingDraft) {
+    const { title, body, meta } = resolveGeneratingContent(noteProps.generatingDraft);
+    return (
+      <div className={contentClass}>
+        {bodyOnly ? null : (
+          <div className={styles.actions}>
+            <HaikuActions variant="generating" />
+          </div>
+        )}
+        {bodyOnly ? null : <p className={styles.title}>{title}</p>}
+        <p className={styles.body}>{body}</p>
+        {bodyOnly || !meta ? null : <p className={styles.meta}>{meta}</p>}
+      </div>
+    );
+  }
+
+  if (!("haiku" in noteProps) || !noteProps.haiku) {
+    return null;
+  }
+
+  const { haiku } = noteProps;
+  const { title, body, meta } = resolveSavedContent(haiku);
 
   return (
-    <LanternFrame
-      className={className}
-      ariaLabel={ariaLabel}
-      widthRem={LANTERN_WIDTH_REM}
-      generating={generating}
-      step={step}
-      progress={progress}
-      journeyS={journeyS}
-      maxSteps={maxSteps}
-      nextLanternPathProgress={nextLanternPathProgress}
-      transform={transform}
-    >
+    <div className={contentClass}>
+      {bodyOnly ? null : (
+        <div className={styles.actions}>
+          <HaikuActions
+            variant="saved"
+            haiku={haiku}
+            onDeleted={onDeleted}
+            onChanged={onChanged}
+            onDelete={onDelete}
+          />
+        </div>
+      )}
       {bodyOnly ? null : <p className={styles.title}>{title}</p>}
       <p className={styles.body}>{body}</p>
       {bodyOnly || !meta ? null : <p className={styles.meta}>{meta}</p>}
-    </LanternFrame>
+      {bodyOnly || haiku.labels.length === 0 ? null : (
+        <div className={styles.footer}>
+          <div className={styles.labels}>
+            {haiku.labels.map((label) => (
+              <Label key={label.id} name={label.name} color={label.color || "default"} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
-export type { LanternTransform };
+export type { LanternTransform } from "./lanternTransform";

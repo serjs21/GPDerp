@@ -2,6 +2,12 @@ export { Lantern, type LanternProps, type LanternTransform } from "./Lantern";
 export { LanternCard, type LanternCardProps } from "./LanternCard";
 export { LanternFrame, type LanternFrameProps } from "./LanternFrame";
 export {
+  LanternPath,
+  type LanternPathProps,
+  LANTERN_PATH_STEP_MS,
+  LANTERN_PATH_STOP_COUNT,
+} from "./LanternPath";
+export {
   LANTERN_ASSET_SRC,
   LANTERN_CARD_WIDTH_REM,
   LANTERN_DEFAULT_MAX_STEPS,
@@ -23,46 +29,4 @@ export {
   lerp,
   resolveLanternTransform,
 } from "./lanternTransform";
-export {
-  buildCarouselLanternJourneyS,
-  clampCarouselStepIndex,
-  getCarouselLanternStopIndex,
-  getCarouselStepBounds,
-  hasLanternOnStop1,
-  isCarouselLanternVisibleAtStep,
-  isCarouselStepAllowed,
-} from "./lanternCarouselSteps";
-export type { CarouselStepBounds } from "./lanternCarouselSteps";
-export {
-  createLanternQueueScrollState,
-  getLanternPushOutTransform,
-  isLanternQueueSlotVisible,
-  LANTERN_QUEUE_TRANSITION_MS,
-  requestLanternQueueScrollStep,
-  resolveAnimatedQueueSlots,
-  tickLanternQueueAnimation,
-} from "./lanternQueueExitAnimation";
-export type { LanternQueueScrollState } from "./lanternQueueExitAnimation";
-export {
-  applyCarouselScrollDelta,
-  equalArcLengthSamples,
-  getLanternFlightOpacity,
-  getLanternFlightTransform,
-  getLanternJourneyTransform,
-  getLanternQueuePathProgress,
-  getVisibleLanternCount,
-  isLanternJourneyVisible,
-  journeySBetweenCarouselSteps,
-  journeySForCarouselStep,
-  LANTERN_FLIGHT_PATH_INITIAL,
-  LANTERN_FLIGHT_QUEUE_SPACING,
-  resolveCarouselQueueSlots,
-  resolveLanternQueueSlot,
-  sampleLanternFlightPath,
-  sampleLanternJourney,
-} from "./lanternFlightPath";
-export {
-  LANTERN_FLIGHT_PATH_D,
-  LANTERN_FLIGHT_PATH_VIEWBOX,
-  pointAtArcLength,
-} from "./lanternFlightPathSvg";
+export * from "./path";

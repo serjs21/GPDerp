@@ -1,4 +1,4 @@
-import routeSvgImport from "../../assets/route-split-segments-exact.svg.txt?raw";
+import routeSvgImport from "../../../assets/route-split-segments-exact.svg.txt?raw";
 import { parseRouteSvg, resolveRouteStopsSvgMarkup } from "./routeStopsSvg.parse";
 
 const routeSvgMarkup = resolveRouteStopsSvgMarkup(routeSvgImport);

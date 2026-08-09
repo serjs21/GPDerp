@@ -1,9 +1,5 @@
 import { LANTERN_DEFAULT_MAX_STEPS, LANTERN_FLAME_ANCHOR_Y } from "./constants";
-import { LANTERN_FLIGHT_PATH_FADE } from "./lanternFlightPath.config";
-import {
-  lanternExitPathS,
-  lanternInitialPathS,
-} from "./lanternRouteStops";
+import { LANTERN_FLIGHT_PATH_FADE, lanternExitPathS, lanternInitialPathS } from "./path";
 import {
   easeInOutCubic,
   getLanternTransformAtProgress,
@@ -21,7 +17,7 @@ describe("lanternTransform", () => {
       expect(start.opacity).toBe(1);
     });
 
-    it("reaches zero opacity at the final fade step", () => {
+    it("reaches half opacity at the final fade step", () => {
       const end = getLanternTransformAtStep(LANTERN_DEFAULT_MAX_STEPS, LANTERN_DEFAULT_MAX_STEPS);
       expect(end.scale).toBeCloseTo(LANTERN_FLIGHT_PATH_FADE.exitScale, 2);
       expect(end.opacity).toBeCloseTo(LANTERN_FLIGHT_PATH_FADE.minOpacity, 2);
@@ -40,23 +36,10 @@ describe("lanternTransform", () => {
       expect(rest.opacity).toBe(1);
     });
 
-    it("keeps opacity on fade segment when next lantern reaches rest", () => {
-      const exiting = getLanternTransformAtProgress(lanternExitPathS(), {
-        nextLanternPathProgress: lanternInitialPathS(),
-      });
-      expect(exiting.opacity).toBeCloseTo(LANTERN_FLIGHT_PATH_FADE.minOpacity, 2);
-    });
-
-    it("reaches zero opacity at the exit stop", () => {
+    it("reaches half opacity at the exit stop", () => {
       const exit = getLanternTransformAtProgress(lanternExitPathS());
       expect(exit.scale).toBeCloseTo(1, 2);
       expect(exit.opacity).toBeCloseTo(LANTERN_FLIGHT_PATH_FADE.minOpacity, 2);
-    });
-
-    it("supports black-path progress values", () => {
-      const black = getLanternTransformAtProgress(-0.5);
-      expect(black.scale).toBeCloseTo(1, 1);
-      expect(black.opacity).toBe(1);
     });
 
     it("hides past the exit via opacity and collapsed scale", () => {

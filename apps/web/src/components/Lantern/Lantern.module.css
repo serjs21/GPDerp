@@ -22,6 +22,7 @@
   transform-origin: center bottom;
   opacity: var(--lantern-opacity);
   will-change: transform, opacity;
+  /* TODO: optional --lantern-sway for future gentle idle motion */
   animation: lanternReveal 280ms ease both;
 }
 
@@ -88,6 +89,32 @@
   font-family: var(--font-lantern-script, "Zen Kurenaido", cursive);
   /* Insets match constants.LANTERN_TEXT_INSET */
   inset: 20% 15% 22%;
+}
+
+.actions {
+  position: absolute;
+  top: 0.15rem;
+  right: 0.15rem;
+  opacity: 0;
+  pointer-events: auto;
+  transition: opacity 0.15s ease;
+}
+
+.content:hover .actions,
+.content:focus-within .actions {
+  opacity: 1;
+}
+
+.footer {
+  margin-top: 0.15rem;
+  width: 100%;
+}
+
+.labels {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem;
 }
 
 .title {
