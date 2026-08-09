@@ -75,6 +75,16 @@ export const HaikuActions = (props: HaikuActionsProps) => {
 
   return (
     <>
+      <Tooltip title="Delete">
+        <Button
+          type="text"
+          size="small"
+          // danger
+          icon={<DeleteOutlined />}
+          aria-label="Delete haiku"
+          onClick={openDeleteConfirm}
+        />
+      </Tooltip>
     <Tooltip title="Copy to clipboard">
       <Button
         type="text"
@@ -101,16 +111,6 @@ export const HaikuActions = (props: HaikuActionsProps) => {
           icon={<ShareAltOutlined />}
           aria-label="Share haiku"
           onClick={() => setShareOpen(true)}
-        />
-      </Tooltip>
-      <Tooltip title="Delete">
-        <Button
-          type="text"
-          size="small"
-          danger
-          icon={<DeleteOutlined />}
-          aria-label="Delete haiku"
-          onClick={openDeleteConfirm}
         />
       </Tooltip>
       <ShareModal haikuId={haiku.id} open={shareOpen} onClose={() => setShareOpen(false)} />
