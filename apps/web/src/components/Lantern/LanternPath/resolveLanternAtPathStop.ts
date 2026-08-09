@@ -12,6 +12,7 @@ import { lerp } from "../lanternTransform";
 import {
   LANTERN_PATH_EXIT_STOP,
   LANTERN_PATH_FOCUS_STOP,
+  LANTERN_PATH_MAX_VISIBLE_STOP,
   LANTERN_PATH_PUSH_OUT_X,
   LANTERN_PATH_PUSH_OUT_Y,
   LANTERN_PATH_VIRTUAL_STOP,
@@ -97,6 +98,16 @@ function opacityBetweenStops(fromStop: number, toStop: number, t: number): numbe
   return lerp(from.opacity ?? 1, to.opacity ?? 1, t);
 }
 
+/** Higher stack order for stop-1 (focus); lower for deeper stops. */
+export function stackOrderForPathStop(pathStop: number): number {
+  if (pathStop >= LANTERN_PATH_FOCUS_STOP) {
+    return Math.round(
+      (LANTERN_PATH_MAX_VISIBLE_STOP + LANTERN_PATH_FOCUS_STOP - pathStop) * 10,
+    );
+  }
+  return Math.round(pathStop * 10);
+}
+
 /** Resolve fractional path stop to a lantern transform (rotate fixed at 0). */
 export function resolveLanternAtPathStop(pathStop: number): LanternTransform {
   const floorStop = Math.floor(pathStop);
@@ -105,7 +116,7 @@ export function resolveLanternAtPathStop(pathStop: number): LanternTransform {
 
   if (t <= 1e-6) {
     const pose = poseAtIntegerStop(floorStop);
-    return { ...pose, positionMode: "percent", stackOrder: Math.round(pathStop * 10) };
+    return { ...pose, positionMode: "percent", stackOrder: stackOrderForPathStop(pathStop) };
   }
 
   const from = poseAtIntegerStop(floorStop);
@@ -118,7 +129,7 @@ export function resolveLanternAtPathStop(pathStop: number): LanternTransform {
     opacity: opacityBetweenStops(floorStop, ceilStop, t),
     rotate: 0,
     positionMode: "percent",
-    stackOrder: Math.round(pathStop * 10),
+    stackOrder: stackOrderForPathStop(pathStop),
   };
 }
 

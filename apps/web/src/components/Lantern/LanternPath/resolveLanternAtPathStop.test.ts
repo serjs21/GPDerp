@@ -37,4 +37,18 @@ describe("resolveLanternAtPathStop", () => {
     const transform = resolveLanternAtPathStop(16);
     expect(transform.scale).toBe(0);
   });
+
+  it("stacks stop-1 above deeper stops", () => {
+    const atFocus = resolveLanternAtPathStop(1);
+    const atSecond = resolveLanternAtPathStop(2);
+    const atThird = resolveLanternAtPathStop(3);
+    expect(atFocus.stackOrder).toBeGreaterThan(atSecond.stackOrder ?? 0);
+    expect(atSecond.stackOrder).toBeGreaterThan(atThird.stackOrder ?? 0);
+  });
+
+  it("stacks exit stop below focus", () => {
+    const atFocus = resolveLanternAtPathStop(1);
+    const atExit = resolveLanternAtPathStop(0);
+    expect(atFocus.stackOrder).toBeGreaterThan(atExit.stackOrder ?? 0);
+  });
 });

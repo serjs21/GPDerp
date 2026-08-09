@@ -51,6 +51,7 @@ export function useLanternPathScroll(
       animatingRef.current = true;
       setIsAnimating(true);
       setFromFocusIndex(current);
+      setFocusIndex(next);
       setTweenProgress(0);
 
       animationRef.current = animate(0, 1, {
@@ -59,7 +60,6 @@ export function useLanternPathScroll(
         onUpdate: (value) => setTweenProgress(value),
         onComplete: () => {
           focusRef.current = next;
-          setFocusIndex(next);
           setFromFocusIndex(next);
           setTweenProgress(1);
           setIsAnimating(false);
