@@ -20,7 +20,6 @@ import styles from "./Lantern.module.css";
 
 export type LanternFrameProps = LanternTransformInput & {
   className?: string;
-  contentClassName?: string;
   ariaLabel: string;
   widthRem?: number;
   generating?: boolean;
@@ -29,7 +28,6 @@ export type LanternFrameProps = LanternTransformInput & {
 
 export function LanternFrame({
   className,
-  contentClassName,
   ariaLabel,
   widthRem = LANTERN_WIDTH_REM,
   generating = false,
@@ -64,8 +62,6 @@ export function LanternFrame({
     .filter(Boolean)
     .join(" ");
 
-  const contentClass = [styles.content, contentClassName].filter(Boolean).join(" ");
-
   return (
     <article
       className={rootClass}
@@ -87,7 +83,7 @@ export function LanternFrame({
         <span className={styles.flame} />
       </div>
 
-      <div className={contentClass}>{children}</div>
+      <div className={styles.content}>{children}</div>
     </article>
   );
 }

@@ -8,9 +8,6 @@ export const LANTERN_ASSET_SRC = "/lantern_base.png";
 /** Default display width in rem (keeps aspect via CSS). */
 export const LANTERN_WIDTH_REM = 17.5;
 
-/** Slightly wider interactive card so action icons fit in the paper inset. */
-export const LANTERN_CARD_WIDTH_REM = 19.5;
-
 /**
  * Text panel inset as fractions of the lantern box.
  * Clears side frames and the dark wooden base with flame.
@@ -27,16 +24,6 @@ export const LANTERN_FLAME_BOTTOM = 0.075;
 export const LANTERN_FLAME_HEIGHT = 0.1;
 /** Vertical center of the flame glow from the lantern box bottom — path anchor point. */
 export const LANTERN_FLAME_ANCHOR_Y = LANTERN_FLAME_BOTTOM + LANTERN_FLAME_HEIGHT / 2;
-
-/** Scale multiplier per discrete flight step (~15–25% down). */
-export const LANTERN_SCALE_PER_STEP = 0.825;
-
-/** Zig-zag rotation amplitude in degrees. */
-export const LANTERN_ROTATE_DEG = 6;
-
-/** Diagonal up-right offset per step (px). */
-export const LANTERN_STEP_X_PX = 52;
-export const LANTERN_STEP_Y_PX = -64;
 
 /** Default path length for continuous progress mapping. */
 export const LANTERN_DEFAULT_MAX_STEPS = 5;

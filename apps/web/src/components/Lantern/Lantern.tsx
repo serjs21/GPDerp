@@ -95,12 +95,12 @@ export function Lantern(props: LanternProps) {
     ...noteProps
   } = props;
 
-  const contentClass = [styles.content, className].filter(Boolean).join(" ");
+  const stackClass = [styles.haikuStack, className].filter(Boolean).join(" ");
 
   if ("generatingDraft" in noteProps && noteProps.generatingDraft) {
     const { title, body, meta } = resolveGeneratingContent(noteProps.generatingDraft);
     return (
-      <div className={contentClass}>
+      <div className={stackClass}>
         <LanternContent
           title={title}
           body={body}
@@ -126,7 +126,7 @@ export function Lantern(props: LanternProps) {
   const { title, body, meta } = resolveSavedContent(haiku);
 
   return (
-    <div className={contentClass}>
+    <div className={stackClass}>
       <LanternContent
         title={title}
         body={body}
