@@ -1,22 +1,6 @@
 import type { CSSProperties } from "react";
+import { parseHaikuBody } from "@/utils/parseHaikuBody";
 import styles from "./HaikuNote.module.css";
-
-const HAIKU_LINE_LIMIT = 3;
-
-const parseHaikuBody = (body: string): { lines: string[]; author?: string } => {
-  const parts = body
-    .trim()
-    .split(/\n+/)
-    .map((line) => line.trim())
-    .filter(Boolean);
-
-  const last = parts[parts.length - 1];
-  if (last?.startsWith("-")) {
-    return { lines: parts.slice(0, -1), author: last.slice(1).trim() };
-  }
-
-  return { lines: parts };
-};
 
 export type HaikuNoteProps = {
   body: string;
@@ -34,7 +18,7 @@ export const HaikuNote = ({
   className,
 }: HaikuNoteProps) => {
   const parsed = parseHaikuBody(body);
-  const lines = parsed.lines.slice(0, HAIKU_LINE_LIMIT);
+  const lines = parsed.lines.filter(Boolean);
   const author = authorProp ?? parsed.author;
   const stripLabel = meta ?? author;
 

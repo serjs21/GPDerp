@@ -6,6 +6,7 @@ import {
   composeDecorators,
   EXAMPLE_HAIKU_BODY,
   makeMockHaiku,
+  STORY_CREATED_AT,
   withQueryClient,
   withThemedStoryStage,
 } from "@/storybook";
@@ -85,7 +86,10 @@ export const Default: Story = {
     haiku: makeMockHaiku({
       id: "lantern-default",
       title: "Night questions",
+      titleSuffix: 0,
       body: EXAMPLE_HAIKU_BODY,
+      createdAt: STORY_CREATED_AT,
+      labels: [],
     }),
   },
 };

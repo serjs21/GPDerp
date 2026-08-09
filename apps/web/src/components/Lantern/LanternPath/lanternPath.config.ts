@@ -1,6 +1,9 @@
 /** Linear step animation duration (ms). */
 export const LANTERN_PATH_STEP_MS = 300;
 
+/** Idle gap after last wheel tick before another scroll step is allowed. */
+export const LANTERN_PATH_WHEEL_GESTURE_IDLE_MS = 200;
+
 /** Carousel depth stops on the path (stop-1 … stop-16). */
 export const LANTERN_PATH_STOP_COUNT = 16;
 

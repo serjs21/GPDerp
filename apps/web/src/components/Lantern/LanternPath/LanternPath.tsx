@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { HaikuDto } from "@/api/haikus";
 import { computeVisibleLanterns } from "./computeVisibleLanterns";
-import { LANTERN_PATH_FOCUS_STOP } from "./lanternPath.config";
+import { LANTERN_PATH_FOCUS_STOP, LANTERN_PATH_WHEEL_GESTURE_IDLE_MS } from "./lanternPath.config";
 import { LanternPathLantern } from "./LanternPathLantern";
 import { LanternPathStage } from "./LanternPathStage";
 import { useLanternPathScroll } from "./useLanternPathScroll";
@@ -23,6 +23,8 @@ export function LanternPath({
   className,
 }: LanternPathProps) {
   const stageRef = useRef<HTMLDivElement>(null);
+  const wheelGestureLockedRef = useRef(false);
+  const wheelIdleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const {
     focusIndex,
     fromFocusIndex,
@@ -49,15 +51,36 @@ export function LanternPath({
     const stage = stageRef.current;
     if (!stage) return;
 
+    const scheduleWheelGestureUnlock = () => {
+      if (wheelIdleTimerRef.current) {
+        clearTimeout(wheelIdleTimerRef.current);
+      }
+      wheelIdleTimerRef.current = setTimeout(() => {
+        wheelGestureLockedRef.current = false;
+        wheelIdleTimerRef.current = null;
+      }, LANTERN_PATH_WHEEL_GESTURE_IDLE_MS);
+    };
+
     const onWheel = (event: WheelEvent) => {
       event.preventDefault();
+      scheduleWheelGestureUnlock();
+
       const direction = Math.sign(event.deltaY);
-      if (direction > 0) stepForward();
-      if (direction < 0) stepBack();
+      if (direction === 0 || wheelGestureLockedRef.current) return;
+
+      const stepped = direction > 0 ? stepForward() : stepBack();
+      if (stepped) {
+        wheelGestureLockedRef.current = true;
+      }
     };
 
     stage.addEventListener("wheel", onWheel, { passive: false });
-    return () => stage.removeEventListener("wheel", onWheel);
+    return () => {
+      stage.removeEventListener("wheel", onWheel);
+      if (wheelIdleTimerRef.current) {
+        clearTimeout(wheelIdleTimerRef.current);
+      }
+    };
   }, [stepBack, stepForward]);
 
   useEffect(() => {

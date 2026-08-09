@@ -1,10 +1,12 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { Label } from "@/components/Label/Label";
 import { HaikuActions } from "@/components/HaikuContainer/HaikuActions";
 import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { formatCreatedAt } from "@/utils/date";
+import { parseHaikuBody } from "@/utils/parseHaikuBody";
 import { formatHaikuTitle } from "@/utils/strings";
 import styles from "./Lantern.module.css";
 
@@ -36,6 +38,53 @@ function resolveSavedContent(haiku: NonNullable<HaikuContainerProps["haiku"]>) {
   };
 }
 
+function LanternBodyLines({ body }: { body: string }) {
+  const { lines } = parseHaikuBody(body);
+
+  return (
+    <div className={styles.bodyLines} aria-label="Haiku">
+      {lines.map((line, index) => (
+        <p key={index} className={styles.bodyLine}>
+          {line || "\u00A0"}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+function LanternContent({
+  title,
+  body,
+  meta,
+  bodyOnly,
+  actions,
+  footer,
+}: {
+  title?: string;
+  body: string;
+  meta?: string;
+  bodyOnly: boolean;
+  actions?: ReactNode;
+  footer?: ReactNode;
+}) {
+  const { author } = parseHaikuBody(body);
+
+  if (bodyOnly) {
+    return <LanternBodyLines body={body} />;
+  }
+
+  return (
+    <>
+      {title ? <p className={styles.title}>{title}</p> : null}
+      <LanternBodyLines body={body} />
+      {author ? <p className={styles.author}>—{author}</p> : null}
+      {meta ? <p className={styles.meta}>{meta}</p> : null}
+      {footer}
+      {actions}
+    </>
+  );
+}
+
 export function Lantern(props: LanternProps) {
   const {
     className,
@@ -52,14 +101,19 @@ export function Lantern(props: LanternProps) {
     const { title, body, meta } = resolveGeneratingContent(noteProps.generatingDraft);
     return (
       <div className={contentClass}>
-        {bodyOnly ? null : (
-          <div className={styles.actions}>
-            <HaikuActions variant="generating" />
-          </div>
-        )}
-        {bodyOnly ? null : <p className={styles.title}>{title}</p>}
-        <p className={styles.body}>{body}</p>
-        {bodyOnly || !meta ? null : <p className={styles.meta}>{meta}</p>}
+        <LanternContent
+          title={title}
+          body={body}
+          meta={meta}
+          bodyOnly={bodyOnly}
+          actions={
+            bodyOnly ? undefined : (
+              <div className={styles.actions}>
+                <HaikuActions variant="generating" />
+              </div>
+            )
+          }
+        />
       </div>
     );
   }
@@ -73,29 +127,36 @@ export function Lantern(props: LanternProps) {
 
   return (
     <div className={contentClass}>
-      {bodyOnly ? null : (
-        <div className={styles.actions}>
-          <HaikuActions
-            variant="saved"
-            haiku={haiku}
-            onDeleted={onDeleted}
-            onChanged={onChanged}
-            onDelete={onDelete}
-          />
-        </div>
-      )}
-      {bodyOnly ? null : <p className={styles.title}>{title}</p>}
-      <p className={styles.body}>{body}</p>
-      {bodyOnly || !meta ? null : <p className={styles.meta}>{meta}</p>}
-      {bodyOnly || haiku.labels.length === 0 ? null : (
-        <div className={styles.footer}>
-          <div className={styles.labels}>
-            {haiku.labels.map((label) => (
-              <Label key={label.id} name={label.name} color={label.color || "default"} />
-            ))}
-          </div>
-        </div>
-      )}
+      <LanternContent
+        title={title}
+        body={body}
+        meta={meta}
+        bodyOnly={bodyOnly}
+        footer={
+          bodyOnly || haiku.labels.length === 0 ? undefined : (
+            <div className={styles.footer}>
+              <div className={styles.labels}>
+                {haiku.labels.map((label) => (
+                  <Label key={label.id} name={label.name} color={label.color || "default"} />
+                ))}
+              </div>
+            </div>
+          )
+        }
+        actions={
+          bodyOnly ? undefined : (
+            <div className={styles.actions}>
+              <HaikuActions
+                variant="saved"
+                haiku={haiku}
+                onDeleted={onDeleted}
+                onChanged={onChanged}
+                onDelete={onDelete}
+              />
+            </div>
+          )
+        }
+      />
     </div>
   );
 }
