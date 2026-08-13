@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+  <g id="segments" fill="none" stroke-width="3" stroke-linecap="butt" stroke-linejoin="round">
+    <path id="segment-00" data-start="stop-00" data-end="stop-01" d="M80.18,0 c2.49 8.48 7.34 19.58 17.65 25.59" stroke="#E03131" />
+    <path id="segment-01" data-start="stop-01" data-end="stop-02" d="M97.83,25.59 c18.27 10.64 35.44 -5.37 67.65 -5.88" stroke="#28B852" />
+    <path id="segment-02" data-start="stop-02" data-end="stop-03" d="M165.48,19.71 c17.12 -0.27 20.78 4.11 72.06 22.06" stroke="#9831E0" />
+    <path id="segment-03" data-start="stop-03" data-end="stop-04" d="M237.54,41.77 c41.99 14.7 62.99 22.04 73.53 23.53" stroke="#B8A628" />
+    <path id="segment-04" data-start="stop-04" data-end="stop-05" d="M311.07,65.3 c57.5 8.11 71 -26.24 120.59 -20.59" stroke="#31C3E0" />
+    <path id="segment-05" data-start="stop-05" data-end="stop-06" d="M431.66,44.71 c23.33 2.66 27.1 11.03 101.47 60.29" stroke="#B82876" />
+    <path id="segment-06" data-start="stop-06" data-end="stop-07" d="M533.13,105 c64.3 42.59 96.44 63.88 113.24 66.18" stroke="#5DE031" />
+    <path id="segment-07" data-start="stop-07" data-end="stop-08" d="M646.37,171.18 c60.81 8.31 75.74 -42.54 163.24 -57.35" stroke="#2E28B8" />
+    <path id="segment-08" data-start="stop-08" data-end="stop-09" d="M809.61,113.83 c16.05 -2.72 85.32 -13.56 150.41 19.12" stroke="#E06C31" />
+    <path id="segment-09" data-start="stop-09" data-end="stop-10" d="M960.02,132.95 c76.97 38.64 65.63 96.73 131.94 132.35" stroke="#28B882" />
+    <path id="segment-10" data-start="stop-10" data-end="stop-11" d="M1091.96,265.3 c69.95 37.58 107.1 -13.89 219.12 0" stroke="#D231E0" />
+    <path id="segment-11" data-start="stop-11" data-end="stop-12" d="M1311.08,265.3 c92.6 11.48 96.2 50.25 250 117.65" stroke="#9AB828" />
+    <path id="segment-12" data-start="stop-12" data-end="stop-13" d="M1561.08,382.95 c158.28 69.36 245.97 68.39 245.59 94.12" stroke="#3189E0" />
+    <path id="segment-13" data-start="stop-13" data-end="stop-14" d="M1806.67,477.07 c-0.47 31.96 -136.42 77.47 -276.47 62.94" stroke="#B82846" />
+    <path id="segment-14" data-start="stop-14" data-end="stop-15" d="M1530.2,540.01 c-156.47 -16.23 -182.72 -93.36 -329.41 -111.47" stroke="#31E040" />
+    <path id="segment-15" data-start="stop-15" data-end="stop-16" d="M1200.79,428.54 c-100.01 -12.35 -107.71 21.05 -322.06 61.76" stroke="#5E28B8" />
+    <path id="segment-16" data-start="stop-16" data-end="stop-17" d="M878.73,490.3 c-210.1 39.91 -233.79 13.82 -436.76 52.49" stroke="#E0A631" />
+    <path id="segment-17" data-start="stop-17" data-end="stop-18" d="M441.97,542.79 c-197.61 37.65 -349.84 66.66 -361.76 135.75" stroke="#28B8B2" />
+    <path id="segment-18" data-start="stop-18" data-end="stop-19" d="M80.21,678.54 c-19.27 111.66 340.38 256.07 380.88 272.06" stroke="#E031B4" />
+    <path id="segment-19" data-start="stop-19" data-end="stop-20" d="M461.09,950.6 c244.91 96.68 454.73 99.8 498.94 100" stroke="#6AB828" />
+    <path id="segment-20" data-start="stop-20" data-end="stop-21" d="M960.03,1050.6 c159.39 0.73 589.79 2.72 846.65 -307.35" stroke="#314EE0" />
+    <path id="segment-21" data-start="stop-21" data-end="stop-22" d="M1806.68,743.25 c95.13 -114.84 136.39 -236.19 155.88 -314.71" stroke="#B83B28" />
+  </g>
+  <g id="stops" stroke="#fff" stroke-width="2">
+    <circle id="stop-00" cx="80.18" cy="0" r="8" fill="#E03131" />
+    <circle id="stop-01" cx="97.83" cy="25.59" r="8" fill="#28B852" />
+    <circle id="stop-02" cx="165.48" cy="19.71" r="8" fill="#9831E0" />
+    <circle id="stop-03" cx="237.54" cy="41.77" r="8" fill="#B8A628" />
+    <circle id="stop-04" cx="311.07" cy="65.3" r="8" fill="#31C3E0" />
+    <circle id="stop-05" cx="431.66" cy="44.71" r="8" fill="#B82876" />
+    <circle id="stop-06" cx="533.13" cy="105" r="8" fill="#5DE031" />
+    <circle id="stop-07" cx="646.37" cy="171.18" r="8" fill="#2E28B8" />
+    <circle id="stop-08" cx="809.61" cy="113.83" r="8" fill="#E06C31" />
+    <circle id="stop-09" cx="960.02" cy="132.95" r="8" fill="#28B882" />
+    <circle id="stop-10" cx="1091.96" cy="265.3" r="8" fill="#D231E0" />
+    <circle id="stop-11" cx="1311.08" cy="265.3" r="8" fill="#9AB828" />
+    <circle id="stop-12" cx="1561.08" cy="382.95" r="8" fill="#3189E0" />
+    <circle id="stop-13" cx="1806.67" cy="477.07" r="8" fill="#B82846" />
+    <circle id="stop-14" cx="1530.2" cy="540.01" r="8" fill="#31E040" />
+    <circle id="stop-15" cx="1200.79" cy="428.54" r="8" fill="#5E28B8" />
+    <circle id="stop-16" cx="878.73" cy="490.3" r="8" fill="#E0A631" />
+    <circle id="stop-17" cx="441.97" cy="542.79" r="8" fill="#28B8B2" />
+    <circle id="stop-18" cx="80.21" cy="678.54" r="8" fill="#E031B4" />
+    <circle id="stop-19" cx="461.09" cy="950.6" r="8" fill="#6AB828" />
+    <circle id="stop-20" cx="960.03" cy="1050.6" r="8" fill="#314EE0" />
+    <circle id="stop-21" cx="1806.68" cy="743.25" r="8" fill="#B83B28" />
+    <circle id="stop-22" cx="1962.56" cy="428.54" r="8" fill="#31E07B" />
+  </g>
+</svg>

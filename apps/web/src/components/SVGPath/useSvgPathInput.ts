@@ -1,0 +1,60 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
+const SVG_PATH_WHEEL_GESTURE_IDLE_MS = 200;
+
+export function useSvgPathInput(
+  stageRef: React.RefObject<HTMLDivElement | null>,
+  stepForward: () => boolean,
+  stepBack: () => boolean,
+) {
+  const wheelGestureLockedRef = useRef(false);
+  const wheelIdleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    const scheduleWheelGestureUnlock = () => {
+      if (wheelIdleTimerRef.current) {
+        clearTimeout(wheelIdleTimerRef.current);
+      }
+      wheelIdleTimerRef.current = setTimeout(() => {
+        wheelGestureLockedRef.current = false;
+        wheelIdleTimerRef.current = null;
+      }, SVG_PATH_WHEEL_GESTURE_IDLE_MS);
+    };
+
+    const onWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      scheduleWheelGestureUnlock();
+
+      const direction = Math.sign(event.deltaY);
+      if (direction === 0 || wheelGestureLockedRef.current) return;
+
+      const stepped = direction > 0 ? stepForward() : stepBack();
+      if (stepped) {
+        wheelGestureLockedRef.current = true;
+      }
+    };
+
+    stage.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      stage.removeEventListener("wheel", onWheel);
+      if (wheelIdleTimerRef.current) {
+        clearTimeout(wheelIdleTimerRef.current);
+      }
+    };
+  }, [stageRef, stepBack, stepForward]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowRight") stepForward();
+      if (event.key === "ArrowLeft") stepBack();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [stepBack, stepForward]);
+}
