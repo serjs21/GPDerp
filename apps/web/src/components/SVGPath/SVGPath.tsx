@@ -114,7 +114,6 @@ export function SVGPath({
         {
           haiku,
           haikuIndex,
-          pathStop: fromStop + (toStop - fromStop) * tweenProgress,
           transform,
         },
       ];
@@ -137,11 +136,10 @@ export function SVGPath({
             // eslint-disable-next-line @next/next/no-img-element
             <img className={styles.guide} src={SVG_PATH_SRC} alt="" draggable={false} decoding="async" />
           ) : null}
-          {visibleLanterns.map(({ haiku, haikuIndex, pathStop, transform }) => (
+          {visibleLanterns.map(({ haiku, haikuIndex, transform }) => (
             <SVGPathLantern
               key={haiku.id ?? `svg-path-${haikuIndex}`}
               haiku={haiku}
-              pathStop={pathStop}
               transform={transform}
               onDeleted={onHaikuDeleted}
               onChanged={onHaikuChanged}
