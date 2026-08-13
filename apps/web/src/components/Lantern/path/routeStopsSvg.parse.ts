@@ -32,7 +32,7 @@ export function resolveRouteStopsSvgMarkup(imported: unknown): string {
   }
 
   throw new Error(
-    "route SVG must resolve to markup string; got Next/static image metadata instead. Import from src/assets/route-split-segments-exact.svg.txt?raw.",
+    "route SVG must resolve to markup string; import from src/assets/routeSplitSegmentsExact.ts.",
   );
 }
 

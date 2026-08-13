@@ -1,30 +1,39 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import type { HaikuDto } from "@/api/haikus";
+import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { computeVisibleLanterns } from "./computeVisibleLanterns";
-import { LANTERN_PATH_FOCUS_STOP, LANTERN_PATH_WHEEL_GESTURE_IDLE_MS } from "./lanternPath.config";
+import { LANTERN_PATH_FOCUS_STOP } from "./lanternPath.config";
 import { LanternPathLantern } from "./LanternPathLantern";
 import { LanternPathStage } from "./LanternPathStage";
+import { useLanternPathInput } from "./useLanternPathInput";
 import { useLanternPathScroll } from "./useLanternPathScroll";
-import styles from "../Lantern.stories.module.css";
+import styles from "./LanternPath.module.css";
 
 export type LanternPathProps = {
   haikus: HaikuDto[];
+  generatingDraft?: GeneratingDraft | null;
   initialFocusIndex?: number;
   onFocusChange?: (focusIndex: number) => void;
+  onHaikuDeleted?: () => void;
+  onHaikuChanged?: () => void;
   className?: string;
+  /** Storybook/debug: show SVG path guide and stop labels. */
+  showGuides?: boolean;
 };
 
 export function LanternPath({
   haikus,
+  generatingDraft = null,
   initialFocusIndex,
   onFocusChange,
+  onHaikuDeleted,
+  onHaikuChanged,
   className,
+  showGuides = false,
 }: LanternPathProps) {
   const stageRef = useRef<HTMLDivElement>(null);
-  const wheelGestureLockedRef = useRef(false);
-  const wheelIdleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const {
     focusIndex,
     fromFocusIndex,
@@ -35,6 +44,8 @@ export function LanternPath({
     canStepBack,
   } = useLanternPathScroll(haikus, { initialFocusIndex, onFocusChange });
 
+  useLanternPathInput(stageRef, stepForward, stepBack);
+
   const visibleLanterns = computeVisibleLanterns(
     haikus,
     focusIndex,
@@ -43,60 +54,17 @@ export function LanternPath({
   );
 
   const focusHaiku = haikus[focusIndex];
-  const hudLabel = focusHaiku
-    ? `${focusHaiku.title || "Haiku"} · ${focusIndex + 1} / ${haikus.length}`
-    : "No haikus";
-
-  useEffect(() => {
-    const stage = stageRef.current;
-    if (!stage) return;
-
-    const scheduleWheelGestureUnlock = () => {
-      if (wheelIdleTimerRef.current) {
-        clearTimeout(wheelIdleTimerRef.current);
-      }
-      wheelIdleTimerRef.current = setTimeout(() => {
-        wheelGestureLockedRef.current = false;
-        wheelIdleTimerRef.current = null;
-      }, LANTERN_PATH_WHEEL_GESTURE_IDLE_MS);
-    };
-
-    const onWheel = (event: WheelEvent) => {
-      event.preventDefault();
-      scheduleWheelGestureUnlock();
-
-      const direction = Math.sign(event.deltaY);
-      if (direction === 0 || wheelGestureLockedRef.current) return;
-
-      const stepped = direction > 0 ? stepForward() : stepBack();
-      if (stepped) {
-        wheelGestureLockedRef.current = true;
-      }
-    };
-
-    stage.addEventListener("wheel", onWheel, { passive: false });
-    return () => {
-      stage.removeEventListener("wheel", onWheel);
-      if (wheelIdleTimerRef.current) {
-        clearTimeout(wheelIdleTimerRef.current);
-      }
-    };
-  }, [stepBack, stepForward]);
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "ArrowRight") stepForward();
-      if (event.key === "ArrowLeft") stepBack();
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [stepBack, stepForward]);
+  const hudLabel = generatingDraft
+    ? `Generating: ${generatingDraft.subject}`
+    : focusHaiku
+      ? `${focusHaiku.title || "Haiku"} · ${focusIndex + 1} / ${haikus.length}`
+      : "No haikus";
 
   return (
     <LanternPathStage
       ref={stageRef}
       className={className}
+      showGuides={showGuides}
       hud={<p className={styles.flightPathHud}>{hudLabel}</p>}
       controls={
         <div className={styles.flightPathControls}>
@@ -129,8 +97,17 @@ export function LanternPath({
           key={haiku.id ?? `lantern-${haikuIndex}`}
           haiku={haiku}
           pathStop={pathStop}
+          onDeleted={onHaikuDeleted}
+          onChanged={onHaikuChanged}
         />
       ))}
+      {generatingDraft ? (
+        <LanternPathLantern
+          key={`generating-${generatingDraft.requestId}`}
+          generatingDraft={generatingDraft}
+          pathStop={LANTERN_PATH_FOCUS_STOP}
+        />
+      ) : null}
     </LanternPathStage>
   );
 }

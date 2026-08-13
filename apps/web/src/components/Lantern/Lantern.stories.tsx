@@ -106,7 +106,7 @@ export const FlightPath: StoryObj<LanternPathStoryArgs> = {
   },
   args: { haikuCount: 5 },
   render: ({ haikuCount }) => (
-    <LanternPath haikus={fixtureHaikus.slice(0, haikuCount)} />
+    <LanternPath haikus={fixtureHaikus.slice(0, haikuCount)} showGuides />
   ),
 };
 
@@ -121,6 +121,7 @@ export const FlightPathStops: StoryObj<LanternPathStoryArgs> = {
     <LanternPath
       key={haikuCount}
       haikus={fixtureHaikus.concat(fixtureHaikus).slice(0, haikuCount)}
+      showGuides
     />
   ),
 };

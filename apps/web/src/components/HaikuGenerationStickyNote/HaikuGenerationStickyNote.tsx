@@ -1,18 +1,16 @@
 "use client";
 
 import { useLayoutEffect, useRef } from "react";
+import { SavedHaikusLanternPath } from "@/components/SavedHaikusLanternPath/SavedHaikusLanternPath";
 import { useHaikuGenerationFlow } from "./hooks/useHaikuGenerationFlow";
-import { useHaikuGridColumnCount } from "./hooks/useHaikuGridColumnCount";
 import { useSavedHaikuCount } from "./hooks/useSavedHaikuCount";
 import { useStickyInputPlacement } from "./hooks/useStickyInputPlacement";
 import { InitialHaikuGate } from "./InitialHaikuGate";
 import {
   HAIKU_CARD_WIDTH_REM,
-  HAIKU_GRID_COLUMN_GAP_REM,
   STICKY_INPUT_MIN_HEIGHT_REM,
 } from "./constants";
 import { HaikuGenerationStickyNoteInput } from "./HaikuGenerationStickyNoteInput/HaikuGenerationStickyNoteInput";
-import { HaikuGenerationStickyNoteList } from "./HaikuGenerationStickyNoteList/HaikuGenerationStickyNoteList";
 import styles from "./HaikuGenerationStickyNote.module.css";
 
 export type StickyNoteInputAlignment = "bottom-center" | "bottom-start" | "bottom-end";
@@ -45,11 +43,9 @@ export function HaikuGenerationStickyNote({
   } = useHaikuGenerationFlow();
 
   const { count, isListReady, isLoggedIn } = useSavedHaikuCount();
-  const { columns } = useHaikuGridColumnCount(cardWidthRem);
   const { mode } = useStickyInputPlacement(stickyInputMinHeightRem);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const displayAreaRef = useRef<HTMLDivElement>(null);
   const inputSectionRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
@@ -83,18 +79,12 @@ export function HaikuGenerationStickyNote({
 
   const layoutStyle = {
     "--haiku-card-width": `${cardWidthRem}rem`,
-    "--haiku-grid-gap": `${HAIKU_GRID_COLUMN_GAP_REM}rem`,
   } as React.CSSProperties;
 
   return (
     <div ref={wrapperRef} className={styles.wrapper} style={layoutStyle}>
-      <div ref={displayAreaRef} className={styles.displayArea}>
-        <HaikuGenerationStickyNoteList
-          generatingDraft={generatingDraft}
-          columns={columns}
-          cardWidthRem={cardWidthRem}
-          scrollRootRef={displayAreaRef}
-        />
+      <div className={styles.displayArea}>
+        <SavedHaikusLanternPath generatingDraft={generatingDraft} />
         <InitialHaikuGate
           key={isLoggedIn ? "logged-in" : "logged-out"}
           count={count}

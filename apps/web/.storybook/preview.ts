@@ -39,6 +39,9 @@ const preview: Preview = {
     },
   ],
   parameters: {
+    nextjs: {
+      appDirectory: true,
+    },
     backgrounds: {
       default: 'theme-bg',
       values: [

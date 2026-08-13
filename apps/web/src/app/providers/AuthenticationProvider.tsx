@@ -16,6 +16,21 @@ export const AuthenticationProvider = ({ children }: { children: ReactNode }) =>
   );
 };
 
+/** Storybook/tests: inject a fixed auth result without hitting `/auth/me`. */
+export function MockAuthenticationProvider({
+  value,
+  children,
+}: {
+  value: AuthenticationResult;
+  children: ReactNode;
+}) {
+  return (
+    <AuthenticationContext.Provider value={value}>
+      {children}
+    </AuthenticationContext.Provider>
+  );
+}
+
 export const useAuthenticationState = (): AuthenticationResult => {
   const authState = useContext(AuthenticationContext);
   if (!authState) {

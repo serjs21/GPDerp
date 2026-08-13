@@ -6,7 +6,7 @@ import {
   LANTERN_FLIGHT_PATH_INITIAL_STOP_ID,
   routeStopById,
 } from "../path";
-import styles from "../Lantern.stories.module.css";
+import styles from "./LanternPath.module.css";
 
 const ROUTE_GUIDE_SRC = "/route-split-segments-exact.svg";
 
@@ -15,10 +15,12 @@ export type LanternPathStageProps = {
   hud?: ReactNode;
   controls?: ReactNode;
   className?: string;
+  /** Storybook/debug: show SVG path guide and stop labels. */
+  showGuides?: boolean;
 };
 
 export const LanternPathStage = forwardRef<HTMLDivElement, LanternPathStageProps>(
-  function LanternPathStage({ children, hud, controls, className }, ref) {
+  function LanternPathStage({ children, hud, controls, className, showGuides = false }, ref) {
     const exitStop = routeStopById(LANTERN_FLIGHT_PATH_EXIT_STOP_ID);
     const initialStop = routeStopById(LANTERN_FLIGHT_PATH_INITIAL_STOP_ID);
 
@@ -29,9 +31,11 @@ export const LanternPathStage = forwardRef<HTMLDivElement, LanternPathStageProps
         {hud}
         <div className={styles.flightPathStage} aria-label="Lantern flight path">
           <div className={styles.flightPathGuideBox}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={ROUTE_GUIDE_SRC} alt="" draggable={false} decoding="async" />
-            {exitStop ? (
+            {showGuides ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={ROUTE_GUIDE_SRC} alt="" draggable={false} decoding="async" />
+            ) : null}
+            {showGuides && exitStop ? (
               <span
                 className={`${styles.flightPathStopLabel} ${styles.flightPathStopLabelExit}`}
                 style={{ left: `${exitStop.x * 100}%`, top: `${exitStop.y * 100}%` }}
@@ -40,7 +44,7 @@ export const LanternPathStage = forwardRef<HTMLDivElement, LanternPathStageProps
                 0
               </span>
             ) : null}
-            {initialStop ? (
+            {showGuides && initialStop ? (
               <span
                 className={`${styles.flightPathStopLabel} ${styles.flightPathStopLabelInitial}`}
                 style={{ left: `${initialStop.x * 100}%`, top: `${initialStop.y * 100}%` }}

@@ -35,7 +35,6 @@
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 1200px;
   flex: 1;
   min-height: 0;
   align-self: stretch;

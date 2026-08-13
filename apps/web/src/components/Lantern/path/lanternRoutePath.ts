@@ -1,7 +1,5 @@
-import routeSvgImport from "../../../assets/route-split-segments-exact.svg.txt?raw";
-import { parseRouteSvg, resolveRouteStopsSvgMarkup } from "./routeStopsSvg.parse";
-
-const routeSvgMarkup = resolveRouteStopsSvgMarkup(routeSvgImport);
+import routeSvgMarkup from "../../../assets/routeSplitSegmentsExact";
+import { parseRouteSvg } from "./routeStopsSvg.parse";
 const parsedRoute = parseRouteSvg(routeSvgMarkup);
 
 /** Authored sub-path `d` for `segment-N` (stop-N → stop-(N+1)). */

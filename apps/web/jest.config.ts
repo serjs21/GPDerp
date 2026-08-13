@@ -6,7 +6,7 @@ const config: Config = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",
-    "^.+\\/assets\\/route-split-segments-exact\\.svg\\.txt\\?raw$":
+    "^.+\\/assets\\/routeSplitSegmentsExact$":
       "<rootDir>/tests/mocks/routeStopsSvgString.ts",
   },
   transform: {
