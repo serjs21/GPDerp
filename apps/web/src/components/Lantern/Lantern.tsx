@@ -14,6 +14,8 @@ export type LanternProps = HaikuContainerProps & {
   className?: string;
   /** Show only the haiku body (handwritten-on-paper presentation). */
   bodyOnly?: boolean;
+  /** Hover actions; omit during path tween so content stays cheap. */
+  showActions?: boolean;
   onDelete?: () => Promise<void>;
   onDeleted?: () => void;
   onChanged?: () => void;
@@ -89,6 +91,7 @@ export function Lantern(props: LanternProps) {
   const {
     className,
     bodyOnly = false,
+    showActions = true,
     onDelete,
     onDeleted,
     onChanged,
@@ -96,6 +99,7 @@ export function Lantern(props: LanternProps) {
   } = props;
 
   const stackClass = [styles.haikuStack, className].filter(Boolean).join(" ");
+  const includeActions = !bodyOnly && showActions;
 
   if ("generatingDraft" in noteProps && noteProps.generatingDraft) {
     const { title, body, meta } = resolveGeneratingContent(noteProps.generatingDraft);
@@ -107,11 +111,11 @@ export function Lantern(props: LanternProps) {
           meta={meta}
           bodyOnly={bodyOnly}
           actions={
-            bodyOnly ? undefined : (
+            includeActions ? (
               <div className={styles.actions}>
                 <HaikuActions variant="generating" />
               </div>
-            )
+            ) : undefined
           }
         />
       </div>
@@ -144,7 +148,7 @@ export function Lantern(props: LanternProps) {
           )
         }
         actions={
-          bodyOnly ? undefined : (
+          includeActions ? (
             <div className={styles.actions}>
               <HaikuActions
                 variant="saved"
@@ -154,7 +158,7 @@ export function Lantern(props: LanternProps) {
                 onDelete={onDelete}
               />
             </div>
-          )
+          ) : undefined
         }
       />
     </div>

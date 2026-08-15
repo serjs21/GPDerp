@@ -45,6 +45,10 @@
   animation: none;
 }
 
+.lanternAnimating {
+  pointer-events: none;
+}
+
 .hud {
   position: absolute;
   top: 0.5rem;

@@ -90,6 +90,7 @@ export function SVGPath({
     focusIndex,
     fromFocusIndex,
     tweenProgress,
+    isAnimating,
     stepForward,
     stepBack,
   } = useSvgPathScroll(haikus.length, SVG_PATH_STEP_MS, {
@@ -141,6 +142,7 @@ export function SVGPath({
               key={haiku.id ?? `svg-path-${haikuIndex}`}
               haiku={haiku}
               transform={transform}
+              isAnimating={isAnimating}
               onDeleted={onHaikuDeleted}
               onChanged={onHaikuChanged}
             />
