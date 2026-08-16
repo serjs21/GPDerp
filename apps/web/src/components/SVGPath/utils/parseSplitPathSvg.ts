@@ -80,6 +80,17 @@ export function parseSplitPathSvg(svgMarkup: string): ParsedSplitPathSvg {
   return { viewBox, stopsById, segmentsById };
 }
 
+/** Inner markup of the authored SVG (groups), for inline rendering in the same viewBox. */
+export function splitPathSvgInnerMarkup(svgMarkup: string): string {
+  const start = svgMarkup.search(/<svg[\s>]/i);
+  const openEnd = start >= 0 ? svgMarkup.indexOf(">", start) : -1;
+  const close = svgMarkup.lastIndexOf("</svg>");
+  if (openEnd < 0 || close < 0 || close <= openEnd) {
+    throw new Error("split path SVG is missing a complete <svg>…</svg> wrapper");
+  }
+  return svgMarkup.slice(openEnd + 1, close).trim();
+}
+
 export function padStopId(id: number): string {
   return String(id).padStart(2, "0");
 }

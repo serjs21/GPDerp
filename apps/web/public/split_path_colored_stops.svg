@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
   <g id="segments" fill="none" stroke-width="3" stroke-linecap="butt" stroke-linejoin="round">
     <path id="segment-00" data-start="stop-00" data-end="stop-01" d="M80.18,0 c2.49 8.48 7.34 19.58 17.65 25.59" stroke="#E03131" />
     <path id="segment-01" data-start="stop-01" data-end="stop-02" d="M97.83,25.59 c18.27 10.64 35.44 -5.37 67.65 -5.88" stroke="#28B852" />

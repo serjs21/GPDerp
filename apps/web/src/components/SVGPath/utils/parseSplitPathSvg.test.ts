@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
 import { join } from "path";
-import { parseSplitPathSvg } from "./parseSplitPathSvg";
+import { parseSplitPathSvg, splitPathSvgInnerMarkup } from "./parseSplitPathSvg";
 
 const svgMarkup = readFileSync(
   join(process.cwd(), "public/split_path_colored_stops.svg"),
@@ -28,5 +28,12 @@ describe("parseSplitPathSvg", () => {
     expect(parsed.segmentsById[20]?.endStopId).toBe(21);
     expect(parsed.segmentsById[21]?.startStopId).toBe(21);
     expect(parsed.segmentsById[21]?.endStopId).toBe(22);
+  });
+
+  it("extracts inner svg groups for inline rendering", () => {
+    const inner = splitPathSvgInnerMarkup(svgMarkup);
+    expect(inner).toContain('id="segments"');
+    expect(inner).toContain('id="stops"');
+    expect(inner).not.toContain("<svg");
   });
 });

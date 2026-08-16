@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { animate } from "motion/react";
-import { canStepBack, canStepForward, clampFocusIndex } from "./svgPathPose";
+import { canStepBack, canStepForward, clampFocusIndex } from "./utils";
 
 export function useSvgPathScroll(
   haikuCount: number,

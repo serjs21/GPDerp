@@ -2,20 +2,20 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { HaikuDto } from "@/api/haikus";
-import type { LanternTransform } from "@/components/Lantern/lanternTransform";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { useScrollBlocking } from "@/hooks/useScrollBlocking";
-import { parseSplitPathSvg, type ParsedSplitPathSvg } from "./parseSplitPathSvg";
 import { SVGPathLantern } from "./SVGPathLantern";
-import { pointBetweenStops } from "./svgPathPoint";
-import {
-  isStopOnPath,
-  lerpPose,
-  stopForHaikuIndex,
-  SVG_PATH_FOCUS_STOP,
-} from "./svgPathPose";
 import { useSvgPathInput } from "./useSvgPathInput";
 import { useSvgPathScroll } from "./useSvgPathScroll";
+import {
+  isStopOnPath,
+  lanternTransformAtStops,
+  parseSplitPathSvg,
+  splitPathSvgInnerMarkup,
+  stopForHaikuIndex,
+  SVG_PATH_FOCUS_STOP,
+  type ParsedSplitPathSvg,
+} from "./utils";
 import styles from "./SVGPath.module.css";
 
 const SVG_PATH_SRC = "/split_path_colored_stops.svg";
@@ -33,7 +33,10 @@ export type SVGPathProps = {
 };
 
 function useSplitPathSvg() {
-  const [parsed, setParsed] = useState<ParsedSplitPathSvg | null>(null);
+  const [splitPath, setSplitPath] = useState<{
+    parsed: ParsedSplitPathSvg;
+    guideInner: string;
+  } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -45,37 +48,19 @@ function useSplitPathSvg() {
         return response.text();
       })
       .then((markup) => {
-        if (!cancelled) setParsed(parseSplitPathSvg(markup));
+        if (!cancelled) {
+          setSplitPath({
+            parsed: parseSplitPathSvg(markup),
+            guideInner: splitPathSvgInnerMarkup(markup),
+          });
+        }
       });
     return () => {
       cancelled = true;
     };
   }, []);
 
-  return parsed;
-}
-
-function lanternTransform(
-  parsed: ParsedSplitPathSvg,
-  fromStop: number,
-  toStop: number,
-  t: number,
-): LanternTransform | null {
-  const point = pointBetweenStops(parsed, fromStop, toStop, t);
-  if (!point) return null;
-
-  const pose = lerpPose(fromStop, toStop, t);
-  const pathStop = fromStop + (toStop - fromStop) * t;
-
-  return {
-    x: point.x,
-    y: point.y,
-    scale: pose.scale,
-    opacity: pose.opacity,
-    rotate: 0,
-    positionMode: "percent",
-    stackOrder: Math.round(pathStop * 10),
-  };
+  return splitPath;
 }
 
 export function SVGPath({
@@ -88,7 +73,8 @@ export function SVGPath({
   className,
   showGuides = false,
 }: SVGPathProps) {
-  const parsed = useSplitPathSvg();
+  const splitPath = useSplitPathSvg();
+  const parsed = splitPath?.parsed ?? null;
   const stageRef = useRef<HTMLDivElement>(null);
   const svgAreaRef = useRef<HTMLDivElement>(null);
   const {
@@ -114,7 +100,7 @@ export function SVGPath({
       const toStop = stopForHaikuIndex(haikuIndex, focusIndex);
       if (!isStopOnPath(fromStop) && !isStopOnPath(toStop)) return [];
 
-      const transform = lanternTransform(parsed, fromStop, toStop, tweenProgress);
+      const transform = lanternTransformAtStops(parsed, fromStop, toStop, tweenProgress);
       if (!transform) return [];
 
       return [
@@ -128,7 +114,7 @@ export function SVGPath({
   }, [focusIndex, fromFocusIndex, haikus, parsed, tweenProgress]);
 
   const generatingTransform = parsed
-    ? lanternTransform(parsed, SVG_PATH_FOCUS_STOP, SVG_PATH_FOCUS_STOP, 1)
+    ? lanternTransformAtStops(parsed, SVG_PATH_FOCUS_STOP, SVG_PATH_FOCUS_STOP, 1)
     : null;
 
   const viewportClass = [styles.viewport, className].filter(Boolean).join(" ");
@@ -137,9 +123,14 @@ export function SVGPath({
     <div ref={stageRef} className={viewportClass}>
       <div className={styles.stage} aria-label="Lantern SVG path">
         <div ref={svgAreaRef} className={styles.guideBox}>
-          {showGuides ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img className={styles.guide} src={SVG_PATH_SRC} alt="" draggable={false} decoding="async" />
+          {showGuides && splitPath ? (
+            <svg
+              className={styles.guide}
+              viewBox={`0 0 ${splitPath.parsed.viewBox.width} ${splitPath.parsed.viewBox.height}`}
+              preserveAspectRatio="none"
+              aria-hidden
+              dangerouslySetInnerHTML={{ __html: splitPath.guideInner }}
+            />
           ) : null}
           {visibleLanterns.map(({ haiku, haikuIndex, transform }) => (
             <SVGPathLantern
