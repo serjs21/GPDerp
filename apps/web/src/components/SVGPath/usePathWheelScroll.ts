@@ -42,25 +42,6 @@ export function usePathWheelScroll(
     const onWheel = (event: WheelEvent) => {
       event.preventDefault();
       event.stopPropagation();
-      // #region agent log
-      fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a4f3b7" },
-        body: JSON.stringify({
-          sessionId: "a4f3b7",
-          runId: "post-fix",
-          hypothesisId: "C-D",
-          location: "usePathWheelScroll.ts:onWheel",
-          message: "human wheel after lethargy",
-          data: {
-            ignoring: ignoringRef.current,
-            deltaX: event.deltaX,
-            deltaY: event.deltaY,
-          },
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-      // #endregion
       if (!ignoringRef.current) void closuredHandler(event);
     };
 
