@@ -40,8 +40,6 @@ export function usePathWheelScroll(
     };
 
     const onWheel = (event: WheelEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
       if (!ignoringRef.current) void closuredHandler(event);
     };
 

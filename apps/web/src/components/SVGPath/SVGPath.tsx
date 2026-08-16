@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { HaikuDto } from "@/api/haikus";
 import type { LanternTransform } from "@/components/Lantern/lanternTransform";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
+import { useScrollBlocking } from "@/hooks/useScrollBlocking";
 import { parseSplitPathSvg, type ParsedSplitPathSvg } from "./parseSplitPathSvg";
 import { SVGPathLantern } from "./SVGPathLantern";
 import { pointBetweenStops } from "./svgPathPoint";
@@ -89,6 +90,7 @@ export function SVGPath({
 }: SVGPathProps) {
   const parsed = useSplitPathSvg();
   const stageRef = useRef<HTMLDivElement>(null);
+  const svgAreaRef = useRef<HTMLDivElement>(null);
   const {
     focusIndex,
     fromFocusIndex,
@@ -101,23 +103,8 @@ export function SVGPath({
     onFocusChange,
   });
 
-  // #region agent log
-  fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a4f3b7" },
-    body: JSON.stringify({
-      sessionId: "a4f3b7",
-      runId: "pre-fix",
-      hypothesisId: "A-B",
-      location: "SVGPath.tsx:render",
-      message: "svgpath render",
-      data: { haikuCount: haikus.length, focusIndex, isAnimating },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
-
   useSvgPathInput(stageRef, stepForward, stepBack);
+  useScrollBlocking(svgAreaRef);
 
   const visibleLanterns = useMemo(() => {
     if (!parsed) return [];
@@ -149,7 +136,7 @@ export function SVGPath({
   return (
     <div ref={stageRef} className={viewportClass}>
       <div className={styles.stage} aria-label="Lantern SVG path">
-        <div className={styles.guideBox}>
+        <div ref={svgAreaRef} className={styles.guideBox}>
           {showGuides ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img className={styles.guide} src={SVG_PATH_SRC} alt="" draggable={false} decoding="async" />
