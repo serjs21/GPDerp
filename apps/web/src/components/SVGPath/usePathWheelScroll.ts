@@ -7,6 +7,11 @@ export const PATH_WHEEL_DEBOUNCE_MS = 400;
 
 type Step = () => boolean;
 
+const isNextStepDirection = (event: WheelEvent) => {
+  if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) return event.deltaX > 0;
+  return event.deltaY < 0;
+}
+
 export function usePathWheelScroll(
   stageRef: React.RefObject<HTMLElement | null>,
   stepForward: Step,
@@ -18,7 +23,7 @@ export function usePathWheelScroll(
   const closuredHandler = (event: WheelEvent) => {
     ignoringRef.current = true;
     setTimeout(() => ignoringRef.current = false , debounceMs);
-    const shouldStepForward = event.deltaX > 0 || event.deltaY < 0;
+    const shouldStepForward = isNextStepDirection(event);
     void (shouldStepForward ? stepForward() : stepBack());
   }
 
