@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { filterInertia } from "@/utils/wheelEvents";
 
 export const PATH_WHEEL_DEBOUNCE_MS = 400;
 
@@ -16,7 +17,6 @@ export function usePathWheelScroll(
 
   const closuredHandler = (event: WheelEvent) => {
     ignoringRef.current = true;
-    console.log("trace_scroll", event.deltaX, event.deltaY);
     setTimeout(() => ignoringRef.current = false , debounceMs);
     const shouldStepForward = event.deltaX > 0 || event.deltaY < 0;
     void (shouldStepForward ? stepForward() : stepBack());
@@ -24,14 +24,15 @@ export function usePathWheelScroll(
 
   const onWheel = (event: WheelEvent) => {
     event.preventDefault();
-    if (!ignoringRef.current) setTimeout(() => void closuredHandler(event), 0);
+    if (!ignoringRef.current) void closuredHandler(event);
   };
 
   useEffect(() => {
     if (!stageRef.current) return;
-    stageRef.current.addEventListener("wheel", (event) => void onWheel(event), { passive: false });
+    const handler = filterInertia(onWheel);
+    stageRef.current.addEventListener("wheel", handler, { passive: false });
     return () => {
-      stageRef.current?.removeEventListener("wheel", onWheel);
+      stageRef.current?.removeEventListener("wheel", handler);
     };
   }, []);
 }

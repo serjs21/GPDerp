@@ -44,6 +44,9 @@ importers:
       js-cookie:
         specifier: ^3.0.5
         version: 3.0.5
+      lethargy-ts:
+        specifier: ^0.1.0
+        version: 0.1.0
       lodash-es:
         specifier: ^4.18.1
         version: 4.18.1
@@ -4189,6 +4192,9 @@ packages:
   language-tags@1.0.9:
     resolution: {integrity: sha512-MbjN408fEndfiQXbFQ1vnd+1NoLDsnQW41410oQBXiyXDMYH5z505juWa4KUE1LqxRC7DgOgZDbKLxHIwm27hA==}
     engines: {node: '>=0.10'}
+
+  lethargy-ts@0.1.0:
+    resolution: {integrity: sha512-ZNwMby5hVdtKsLCmQAw6ZwZV/YMnZglu6f7tCuoFq1nEGkBAqdzoGdtaObNa/tDQaA8yuyMNNfLpRaeIo8jXeA==}
 
   leven@3.1.0:
     resolution: {integrity: sha512-qsda+H8jTaUaN/x5vzW2rzc+8Rw4TAQ/4KjB46IwK5VH+IlVeeeje/EoZRpiXvIqjFgK84QffqPztGI3VBLG1A==}
@@ -10400,6 +10406,8 @@ snapshots:
   language-tags@1.0.9:
     dependencies:
       language-subtag-registry: 0.3.23
+
+  lethargy-ts@0.1.0: {}
 
   leven@3.1.0: {}
 
