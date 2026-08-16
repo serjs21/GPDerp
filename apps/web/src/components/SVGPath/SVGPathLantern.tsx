@@ -5,10 +5,12 @@ import type { HaikuDto } from "@/api/haikus";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import type { LanternTransform } from "@/components/Lantern/lanternTransform";
+import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import styles from "./SVGPath.module.css";
 
 export type SVGPathLanternProps = {
-  haiku: HaikuDto;
+  haiku?: HaikuDto;
+  generatingDraft?: GeneratingDraft | null;
   transform: LanternTransform;
   isAnimating?: boolean;
   onDeleted?: () => void;
@@ -17,15 +19,21 @@ export type SVGPathLanternProps = {
 
 const SVGPathLanternBody = memo(function SVGPathLanternBody({
   haiku,
+  generatingDraft,
   showActions,
   onDeleted,
   onChanged,
 }: {
-  haiku: HaikuDto;
+  haiku?: HaikuDto;
+  generatingDraft?: GeneratingDraft | null;
   showActions: boolean;
   onDeleted?: () => void;
   onChanged?: () => void;
 }) {
+  if (generatingDraft) {
+    return <Lantern generatingDraft={generatingDraft} showActions={showActions} />;
+  }
+  if (!haiku) return null;
   return (
     <Lantern
       haiku={haiku}
@@ -38,6 +46,7 @@ const SVGPathLanternBody = memo(function SVGPathLanternBody({
 
 export function SVGPathLantern({
   haiku,
+  generatingDraft,
   transform,
   isAnimating = false,
   onDeleted,
@@ -50,16 +59,21 @@ export function SVGPathLantern({
   const lanternClass = [styles.lantern, isAnimating ? styles.lanternAnimating : ""]
     .filter(Boolean)
     .join(" ");
+  const ariaLabel = generatingDraft
+    ? `Generating haiku: ${generatingDraft.subject}`
+    : `Haiku lantern: ${haiku?.title ?? ""}`;
 
   return (
     <LanternFrame
       className={lanternClass}
       transform={transform}
       widthRem={19}
-      ariaLabel={`Haiku lantern: ${haiku.title}`}
+      ariaLabel={ariaLabel}
+      generating={Boolean(generatingDraft)}
     >
       <SVGPathLanternBody
         haiku={haiku}
+        generatingDraft={generatingDraft}
         showActions={!isAnimating}
         onDeleted={onDeleted}
         onChanged={onChanged}

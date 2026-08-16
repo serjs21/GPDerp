@@ -1,63 +1,36 @@
 "use client";
 
-import { useRef, useMemo } from "react";
-import { motion } from "motion/react";
-import { StreamText } from "../StreamText";
-import styles from "./styles.module.css";
+import { SavedHaikusLanternPath } from "@/components/SavedHaikusLanternPath/SavedHaikusLanternPath";
+import { HaikuGenerationStickyNoteInput } from "@/components/HaikuGenerationStickyNote/HaikuGenerationStickyNoteInput/HaikuGenerationStickyNoteInput";
+import { useHaikuGenerationFlow } from "@/components/HaikuGenerationStickyNote/hooks/useHaikuGenerationFlow";
+import styles from "./HaikuDisplay.module.css";
 
-export type ChatLog = {
-  content: string;
-  createdAt: string;
-  subject: string;
-};
-
-export interface HaikuDisplayProps {
-  chatLogs: Record<string, ChatLog>;
-  /** When set, this element is the scroll parent for motion/useScroll; inner list does not scroll. */
-  scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
-}
-
-const EntryCard = ({
-  log,
-}: {
-  log: ChatLog;
-}) => {
-  const ref = useRef<HTMLDivElement>(null);
+export function HaikuDisplay() {
+  const {
+    subject,
+    setSubject,
+    isLoading,
+    generatingDraft,
+    inputRef,
+    onSubmit,
+    contextHolder,
+  } = useHaikuGenerationFlow();
 
   return (
-    <motion.div
-      ref={ref}
-      className={styles.entry}
-      // style={{ scale, opacity }}
-      initial={{ opacity: 0, x: -100, y: -20, minHeight: 0, height: 0 }}
-      animate={{ opacity: 1, x: 0, y: 0, minHeight: "185px", height: "fit-content" }}
-      transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }}
-    >
-      <div className={styles.cloud}>
-      <StreamText text={`${log.createdAt}: ${log.subject} \n\n`} />
-      <div className={styles.content}>{log.content}</div>
+    <div className={styles.wrapper}>
+      <div className={styles.displayArea}>
+        <SavedHaikusLanternPath generatingDraft={generatingDraft} />
       </div>
-    </motion.div>
-  );
-};
-
-export const HaikuDisplay = ({ chatLogs, scrollContainerRef }: HaikuDisplayProps) => {
-  const fallbackRef = useRef<HTMLDivElement>(null);
-
-  const sortedEntries = useMemo(
-    () => Object.entries(chatLogs).reverse(),
-    [chatLogs]
-  );
-
-  const rootClassName = scrollContainerRef
-    ? `${styles.haikuDisplay} ${styles.haikuDisplayStream}`
-    : styles.haikuDisplay;
-
-  return (
-    <div ref={scrollContainerRef ? undefined : fallbackRef} className={rootClassName}>
-      {sortedEntries.map(([id, log]) => (
-        <EntryCard key={id} log={log} />
-      ))}
+      <div className={`${styles.inputSection} ${styles.inputSectionBottom}`}>
+        <HaikuGenerationStickyNoteInput
+          subject={subject}
+          onSubjectChange={setSubject}
+          onSubmit={onSubmit}
+          isLoading={isLoading}
+          inputRef={inputRef}
+        />
+      </div>
+      {contextHolder}
     </div>
   );
-};
+}

@@ -5,7 +5,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { HomePageContent } from "@/app/HomePageContent";
 import pageStyles from "@/app/page.module.css";
 import { HaikuGenerationStickyNoteInput } from "@/components/HaikuGenerationStickyNote/HaikuGenerationStickyNoteInput/HaikuGenerationStickyNoteInput";
-import stickyStyles from "@/components/HaikuGenerationStickyNote/HaikuGenerationStickyNote.module.css";
+import displayStyles from "@/components/HaikuDisplay/HaikuDisplay.module.css";
 import { SVGPath } from "@/components/SVGPath";
 import type { CelestialPresetName } from "@/theme/celestialPresets";
 import {
@@ -41,13 +41,11 @@ function AppViewSplitPathContent() {
     <div className={pageStyles.page}>
       <div className={pageStyles.paperPlaneFlyLayer} data-paper-plane-background aria-hidden />
       <main className={pageStyles.main}>
-        <div className={stickyStyles.wrapper}>
-          <div className={stickyStyles.displayArea}>
+        <div className={displayStyles.wrapper}>
+          <div className={displayStyles.displayArea}>
             <SVGPath haikus={STORY_APP_VIEW_HAIKUS} showGuides />
           </div>
-          <div
-            className={`${stickyStyles.inputSection} ${stickyStyles.inputSectionStickyBottom} ${stickyStyles.inputAlignCenter}`}
-          >
+          <div className={`${displayStyles.inputSection} ${displayStyles.inputSectionBottom}`}>
             <HaikuGenerationStickyNoteInput
               subject={subject}
               onSubjectChange={setSubject}

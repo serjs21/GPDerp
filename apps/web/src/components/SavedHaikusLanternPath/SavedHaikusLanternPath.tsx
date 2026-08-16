@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 import { Button } from "@/components/StyledComponents";
-import { LanternPath } from "@/components/Lantern/LanternPath";
+import { SVGPath } from "@/components/SVGPath";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { useInfiniteHaikusQuery } from "@/hooks/useInfiniteHaikusQuery";
@@ -68,12 +68,13 @@ export function SavedHaikusLanternPath({
   }
 
   return (
-    <LanternPath
+    <SVGPath
       haikus={haikus}
       generatingDraft={generatingDraft}
       onFocusChange={handleFocusChange}
       onHaikuDeleted={handleHaikuChanged}
       onHaikuChanged={handleHaikuChanged}
+      showGuides
     />
   );
 }

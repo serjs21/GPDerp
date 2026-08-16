@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { HaikuDto } from "@/api/haikus";
 import type { LanternTransform } from "@/components/Lantern/lanternTransform";
+import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { parseSplitPathSvg, type ParsedSplitPathSvg } from "./parseSplitPathSvg";
 import { SVGPathLantern } from "./SVGPathLantern";
 import { pointBetweenStops } from "./svgPathPoint";
@@ -21,6 +22,7 @@ const SVG_PATH_STEP_MS = 300;
 
 export type SVGPathProps = {
   haikus: HaikuDto[];
+  generatingDraft?: GeneratingDraft | null;
   initialFocusIndex?: number;
   onFocusChange?: (focusIndex: number) => void;
   onHaikuDeleted?: () => void;
@@ -77,6 +79,7 @@ function lanternTransform(
 
 export function SVGPath({
   haikus,
+  generatingDraft = null,
   initialFocusIndex,
   onFocusChange,
   onHaikuDeleted,
@@ -121,16 +124,14 @@ export function SVGPath({
     });
   }, [focusIndex, fromFocusIndex, haikus, parsed, tweenProgress]);
 
-  const focusHaiku = haikus[focusIndex];
-  const hudLabel = focusHaiku
-    ? `${focusHaiku.title || "Haiku"} · stop-${SVG_PATH_FOCUS_STOP} · ${focusIndex + 1} / ${haikus.length}`
-    : "No haikus";
+  const generatingTransform = parsed
+    ? lanternTransform(parsed, SVG_PATH_FOCUS_STOP, SVG_PATH_FOCUS_STOP, 1)
+    : null;
 
   const viewportClass = [styles.viewport, className].filter(Boolean).join(" ");
 
   return (
     <div ref={stageRef} className={viewportClass}>
-      <p className={styles.hud}>{hudLabel}</p>
       <div className={styles.stage} aria-label="Lantern SVG path">
         <div className={styles.guideBox}>
           {showGuides ? (
@@ -147,6 +148,13 @@ export function SVGPath({
               onChanged={onHaikuChanged}
             />
           ))}
+          {generatingDraft && generatingTransform ? (
+            <SVGPathLantern
+              key={`generating-${generatingDraft.requestId}`}
+              generatingDraft={generatingDraft}
+              transform={generatingTransform}
+            />
+          ) : null}
         </div>
       </div>
     </div>
