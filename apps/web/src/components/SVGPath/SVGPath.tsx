@@ -101,6 +101,22 @@ export function SVGPath({
     onFocusChange,
   });
 
+  // #region agent log
+  fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a4f3b7" },
+    body: JSON.stringify({
+      sessionId: "a4f3b7",
+      runId: "pre-fix",
+      hypothesisId: "A-B",
+      location: "SVGPath.tsx:render",
+      message: "svgpath render",
+      data: { haikuCount: haikus.length, focusIndex, isAnimating },
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
+
   useSvgPathInput(stageRef, stepForward, stepBack);
 
   const visibleLanterns = useMemo(() => {

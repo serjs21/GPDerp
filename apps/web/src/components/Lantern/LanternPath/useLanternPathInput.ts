@@ -38,7 +38,7 @@ export function useLanternPathInput(
       }
     };
 
-    stage.addEventListener("wheel", onWheel, { passive: false });
+    stage.addEventListener("wheel", onWheel, { passive: false, capture: true });
     return () => {
       stage.removeEventListener("wheel", onWheel);
       if (wheelIdleTimerRef.current) {

@@ -79,6 +79,30 @@ export function useSvgPathScroll(
       const current = focusRef.current;
       const queuedCurrent = current + (pendingDirectionRef.current ?? 0);
       const next = clampFocusIndex(queuedCurrent + direction, haikuCount);
+      // #region agent log
+      fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a4f3b7" },
+        body: JSON.stringify({
+          sessionId: "a4f3b7",
+          runId: "post-fix",
+          hypothesisId: "A-E",
+          location: "useSvgPathScroll.ts:step",
+          message: "step attempt",
+          data: {
+            direction,
+            haikuCount,
+            current,
+            queuedCurrent,
+            next,
+            blockedAtBound: next === queuedCurrent,
+            animating: animatingRef.current,
+            pending: pendingDirectionRef.current,
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+      // #endregion
       if (next === queuedCurrent) return false;
 
       if (animatingRef.current) {
