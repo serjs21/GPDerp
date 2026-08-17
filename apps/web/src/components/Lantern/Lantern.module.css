@@ -16,7 +16,7 @@
   position: relative;
   display: inline-block;
   width: var(--lantern-width);
-  aspect-ratio: 330 / 505;
+  aspect-ratio: 368 / 391;
   transform: translate(var(--lantern-x), var(--lantern-y))
     scale(var(--lantern-scale)) rotate(var(--lantern-rotate));
   transform-origin: center bottom;
@@ -83,8 +83,8 @@
   overflow: hidden;
   color: var(--lantern-ink);
   font-family: var(--font-lantern-script, "Zen Kurenaido", cursive);
-  /* Insets match constants.LANTERN_TEXT_INSET */
-  inset: 21% 10% 30%;
+  /* Insets match constants.LANTERN_TEXT_INSET (fractions of the painted lantern). */
+  inset: 8% 10% 21%;
 }
 
 .haikuStack {
