@@ -5,12 +5,14 @@ import type { HaikuDto } from "@/api/haikus";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import type { LanternTransform } from "@/components/Lantern/lanternTransform";
+import { SakuraPetalLoader } from "@/components/Loaders";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import styles from "./SVGPath.module.css";
 
 export type SVGPathLanternProps = {
   haiku?: HaikuDto;
   generatingDraft?: GeneratingDraft | null;
+  loading?: boolean;
   transform: LanternTransform;
   isAnimating?: boolean;
   onDeleted?: () => void;
@@ -20,16 +22,25 @@ export type SVGPathLanternProps = {
 const SVGPathLanternBody = memo(function SVGPathLanternBody({
   haiku,
   generatingDraft,
+  loading,
   showActions,
   onDeleted,
   onChanged,
 }: {
   haiku?: HaikuDto;
   generatingDraft?: GeneratingDraft | null;
+  loading?: boolean;
   showActions: boolean;
   onDeleted?: () => void;
   onChanged?: () => void;
 }) {
+  if (loading) {
+    return (
+      <div className={styles.lanternLoader}>
+        <SakuraPetalLoader compact />
+      </div>
+    );
+  }
   if (generatingDraft) {
     return <Lantern generatingDraft={generatingDraft} showActions={showActions} />;
   }
@@ -47,6 +58,7 @@ const SVGPathLanternBody = memo(function SVGPathLanternBody({
 export function SVGPathLantern({
   haiku,
   generatingDraft,
+  loading = false,
   transform,
   isAnimating = false,
   onDeleted,
@@ -59,9 +71,11 @@ export function SVGPathLantern({
   const lanternClass = [styles.lantern, isAnimating ? styles.lanternAnimating : ""]
     .filter(Boolean)
     .join(" ");
-  const ariaLabel = generatingDraft
-    ? `Generating haiku: ${generatingDraft.subject}`
-    : `Haiku lantern: ${haiku?.title ?? ""}`;
+  const ariaLabel = loading
+    ? "Loading more haikus"
+    : generatingDraft
+      ? `Generating haiku: ${generatingDraft.subject}`
+      : `Haiku lantern: ${haiku?.title ?? ""}`;
 
   return (
     <LanternFrame
@@ -74,7 +88,8 @@ export function SVGPathLantern({
       <SVGPathLanternBody
         haiku={haiku}
         generatingDraft={generatingDraft}
-        showActions={!isAnimating}
+        loading={loading}
+        showActions={!isAnimating && !loading}
         onDeleted={onDeleted}
         onChanged={onChanged}
       />

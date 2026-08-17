@@ -17,8 +17,8 @@ import {
  */
 export const SVG_PATH_QUEUE_SCALE_RATIO = 0.75;
 
-export const SVG_PATH_EXIT_SCALE = 1.2;
-export const SVG_PATH_GONE_SCALE = 1.4;
+export const SVG_PATH_EXIT_SCALE = 1.1;
+export const SVG_PATH_GONE_SCALE = 1.2;
 export const SVG_PATH_EXIT_OPACITY = 0.5;
 export const SVG_PATH_GONE_OPACITY = 0;
 
@@ -28,10 +28,11 @@ export type SvgPathPose = {
 };
 
 export function scaleAtStop(stopId: number): number {
-  if (stopId === SVG_PATH_EXIT_STOP) return SVG_PATH_EXIT_SCALE;
-  if (stopId === SVG_PATH_GONE_STOP) return SVG_PATH_GONE_SCALE;
-  if (stopId < SPLIT_PATH_MIN_STOP || stopId > SVG_PATH_FOCUS_STOP) return 0;
-  return SVG_PATH_QUEUE_SCALE_RATIO ** (SVG_PATH_FOCUS_STOP - stopId);
+    if (stopId === SVG_PATH_FOCUS_STOP) return 1;
+    if (stopId === SVG_PATH_EXIT_STOP) return SVG_PATH_EXIT_SCALE;
+    if (stopId === SVG_PATH_GONE_STOP) return SVG_PATH_GONE_SCALE;
+    if (stopId < SPLIT_PATH_MIN_STOP || stopId > SVG_PATH_FOCUS_STOP) return 0;
+        return 1 / (SVG_PATH_FOCUS_STOP - stopId + 1);
 }
 
 export function opacityAtStop(stopId: number): number {

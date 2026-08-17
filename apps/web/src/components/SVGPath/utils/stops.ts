@@ -17,6 +17,32 @@ export function stopForHaikuIndex(haikuIndex: number, focusIndex: number): numbe
   return SVG_PATH_FOCUS_STOP + focusIndex - haikuIndex;
 }
 
+/** Stop for the virtual lantern that would occupy the next queue slot after `haikuCount` items. */
+export function queueLoaderStop(haikuCount: number, focusIndex: number): number {
+  return stopForHaikuIndex(haikuCount, focusIndex);
+}
+
+/** Opaque queue slots are stops 0–20 (`opacityAtStop === 1`). */
+export function isOpaqueQueueStop(stopId: number): boolean {
+  return stopId >= SPLIT_PATH_MIN_STOP && stopId <= SVG_PATH_FOCUS_STOP;
+}
+
+export function shouldFetchNextQueuePage(haikuCount: number, focusIndex: number): boolean {
+  return isOpaqueQueueStop(queueLoaderStop(haikuCount, focusIndex));
+}
+
+/** Pack new haikus at the loader/join stop, then fan out to natural slots as `catchUpT` goes 0→1. */
+export function catchUpStopForHaiku(
+  haikuIndex: number,
+  catchUpStartIndex: number,
+  focusIndex: number,
+  catchUpT: number,
+): number {
+  const packed = stopForHaikuIndex(catchUpStartIndex, focusIndex);
+  const natural = stopForHaikuIndex(haikuIndex, focusIndex);
+  return packed + (natural - packed) * catchUpT;
+}
+
 export function canStepBack(focusIndex: number): boolean {
   return focusIndex > 0;
 }

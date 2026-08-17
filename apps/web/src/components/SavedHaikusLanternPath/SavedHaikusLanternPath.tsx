@@ -8,8 +8,6 @@ import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { useInfiniteHaikusQuery } from "@/hooks/useInfiniteHaikusQuery";
 import styles from "@/components/Lantern/LanternPath/LanternPath.module.css";
 
-const PREFETCH_THRESHOLD = 3;
-
 export type SavedHaikusLanternPathProps = {
   generatingDraft?: GeneratingDraft | null;
 };
@@ -30,15 +28,9 @@ export function SavedHaikusLanternPath({
     refetch,
   } = useInfiniteHaikusQuery();
 
-  const handleFocusChange = useCallback(
-    (focusIndex: number) => {
-      if (!hasNextPage || isFetchingNextPage) return;
-      if (focusIndex >= haikus.length - PREFETCH_THRESHOLD) {
-        void fetchNextPage();
-      }
-    },
-    [fetchNextPage, haikus.length, hasNextPage, isFetchingNextPage],
-  );
+  const handleVacantQueueSlot = useCallback(() => {
+    fetchNextPage();
+  }, [fetchNextPage]);
 
   const handleHaikuChanged = useCallback(() => {
     invalidate();
@@ -71,7 +63,9 @@ export function SavedHaikusLanternPath({
     <SVGPath
       haikus={haikus}
       generatingDraft={generatingDraft}
-      onFocusChange={handleFocusChange}
+      hasNextPage={hasNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      onVacantQueueSlot={handleVacantQueueSlot}
       onHaikuDeleted={handleHaikuChanged}
       onHaikuChanged={handleHaikuChanged}
       showGuides
