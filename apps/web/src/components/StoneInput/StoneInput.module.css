@@ -1,0 +1,95 @@
+.root {
+  --stone-input-width: 28rem;
+  --stone-ink: #2c2924;
+  --stone-ink-soft: color-mix(in srgb, var(--stone-ink) 55%, transparent);
+
+  position: relative;
+  display: inline-block;
+  width: var(--stone-input-width);
+  max-width: 100%;
+  aspect-ratio: 1439 / 920;
+}
+
+.shell {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.form {
+  position: absolute;
+  /* Insets match constants.STONE_INPUT_FORM_INSET */
+  inset: 32% 18% 28%;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid color-mix(in srgb, var(--stone-ink) 32%, transparent);
+  padding: 0.4rem 0.2rem;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--stone-ink);
+  outline: none;
+  transition: border-color 0.2s ease;
+  letter-spacing: 0.02em;
+}
+
+.input::placeholder {
+  color: var(--stone-ink-soft);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.input:focus {
+  border-bottom-color: color-mix(in srgb, var(--stone-ink) 70%, transparent);
+}
+
+.input:disabled {
+  opacity: 0.55;
+}
+
+.submit {
+  align-self: flex-end;
+  background: transparent;
+  border: 2px solid color-mix(in srgb, var(--stone-ink) 32%, transparent);
+  color: var(--stone-ink);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  padding: 0.45rem 1.25rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}
+
+.submit:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--stone-ink) 65%, transparent);
+  background: color-mix(in srgb, var(--stone-ink) 6%, transparent);
+}
+
+.submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.submitLoader {
+  min-width: 3rem;
+  min-height: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
