@@ -1,10 +1,17 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
+import type { CelestialPresetName } from "@/theme/celestialPresets";
+import { composeDecorators, withThemedStoryStage } from "@/storybook";
 import { StoneInput } from "./StoneInput";
 
 const meta: Meta<typeof StoneInput> = {
   title: "Haiku/StoneInput",
   component: StoneInput,
+  parameters: {
+    layout: "fullscreen",
+    initialCelestialPreset: "goldenHour" satisfies CelestialPresetName,
+  },
+  decorators: [composeDecorators(withThemedStoryStage)],
   args: {
     subject: "",
     isLoading: false,
@@ -38,5 +45,13 @@ export const Loading: Story = {
 
 export const Disabled: Story = {
   args: { subject: "", isLoading: true },
+  render: (args) => <Controlled {...args} />,
+};
+
+export const BlueNight: Story = {
+  parameters: {
+    initialCelestialPreset: "blueNight" satisfies CelestialPresetName,
+  },
+  args: { subject: "Night questions" },
   render: (args) => <Controlled {...args} />,
 };
