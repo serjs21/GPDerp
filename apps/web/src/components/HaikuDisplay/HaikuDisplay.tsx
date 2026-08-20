@@ -1,7 +1,7 @@
 "use client";
 
 import { SavedHaikusLanternPath } from "@/components/SavedHaikusLanternPath/SavedHaikusLanternPath";
-import { HaikuGenerationStickyNoteInput } from "@/components/HaikuGenerationStickyNote/HaikuGenerationStickyNoteInput/HaikuGenerationStickyNoteInput";
+import { StoneInput } from "@/components/StoneInput";
 import { useHaikuGenerationFlow } from "@/components/HaikuGenerationStickyNote/hooks/useHaikuGenerationFlow";
 import styles from "./HaikuDisplay.module.css";
 
@@ -22,7 +22,7 @@ export function HaikuDisplay() {
         <SavedHaikusLanternPath generatingDraft={generatingDraft} />
       </div>
       <div className={`${styles.inputSection} ${styles.inputSectionBottom}`}>
-        <HaikuGenerationStickyNoteInput
+        <StoneInput
           subject={subject}
           onSubjectChange={setSubject}
           onSubmit={onSubmit}

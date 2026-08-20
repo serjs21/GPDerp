@@ -31,12 +31,7 @@
   bottom: 0;
   z-index: 2;
   padding-bottom: env(safe-area-inset-bottom, 0);
-  background: linear-gradient(
-    to top,
-    color-mix(in srgb, var(--background-color) 92%, transparent) 0%,
-    color-mix(in srgb, var(--background-color) 72%, transparent) 55%,
-    transparent 100%
-  );
+  background: none;
 }
 
 @media (max-width: 768px) {
