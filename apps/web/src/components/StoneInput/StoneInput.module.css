@@ -33,17 +33,16 @@
 
 .form {
   position: absolute;
-  /* Insets match constants.STONE_INPUT_FORM_INSET */
-  inset: 63% 28% 28%;
+  inset: 0;
   z-index: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.75rem;
 }
 
 .input {
-  width: 100%;
+  position: absolute;
+  /* Insets match constants.STONE_INPUT_FORM_INSET */
+  inset: 55% 28% 35%;
+  width: 50%;
+  height: auto;
   background: transparent;
   border: none;
   border-bottom: 2px solid color-mix(in srgb, var(--stone-ink) 32%, transparent);
@@ -71,32 +70,11 @@
 }
 
 .submit {
-  align-self: flex-end;
-  background: transparent;
-  border: 2px solid color-mix(in srgb, var(--stone-ink) 32%, transparent);
-  color: var(--stone-ink);
-  font-size: 0.8rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  padding: 0.45rem 1.25rem;
-  cursor: pointer;
-  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
-}
-
-.submit:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--stone-ink) 65%, transparent);
-  background: color-mix(in srgb, var(--stone-ink) 6%, transparent);
-}
-
-.submit:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.submitLoader {
-  min-width: 3rem;
-  min-height: 1.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  /* Insets match constants.STONE_INPUT_SUBMIT_INSET — adjust manually */
+  position: absolute;
+  inset: 40% 13% 24% 78%;
+  width: auto;
+  height: auto;
+  --lantern-submit-size: auto;
+  --lantern-submit-ink: var(--stone-ink);
 }

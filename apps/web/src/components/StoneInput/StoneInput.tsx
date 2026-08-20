@@ -1,7 +1,6 @@
 "use client";
 
 import { useId, type CSSProperties } from "react";
-import { WritingLoader } from "@/components/Loaders";
 import {
   colorBalanceToMatrix,
   useBackgroundSceneThemeBalance,
@@ -12,6 +11,7 @@ import {
   STONE_INPUT_IMAGE_WIDTH,
   STONE_INPUT_WIDTH_REM,
 } from "./constants";
+import { LanternSubmit } from "./LanternSubmit";
 import styles from "./StoneInput.module.css";
 
 export type StoneInputProps = {
@@ -38,6 +38,7 @@ export function StoneInput({
   const filterId = useId().replace(/:/g, "");
   const { global } = useBackgroundSceneThemeBalance();
   const colorMatrix = colorBalanceToMatrix(global);
+  const canSubmit = Boolean(subject.trim()) && !isLoading;
 
   const rootStyle = {
     "--stone-input-width": `${widthRem}rem`,
@@ -79,19 +80,12 @@ export function StoneInput({
           placeholder={placeholder}
           aria-label="Haiku subject"
         />
-        <button
-          type="submit"
+        <LanternSubmit
           className={styles.submit}
-          disabled={isLoading || !subject.trim().length}
-        >
-          {isLoading ? (
-            <span className={styles.submitLoader}>
-              <WritingLoader variant="pen" />
-            </span>
-          ) : (
-            submitLabel
-          )}
-        </button>
+          disabled={!canSubmit}
+          active={canSubmit}
+          aria-label={submitLabel}
+        />
       </form>
     </article>
   );

@@ -10,12 +10,22 @@ export const STONE_INPUT_ASSET_SRC = "/input_stone_base.png";
 export const STONE_INPUT_WIDTH_REM = 28;
 
 /**
- * Form panel inset as fractions of the stone box.
- * Clears transparent margins above/below the carved face.
+ * Subject field inset as fractions of the stone box.
+ * Matches `.input` inset in StoneInput.module.css.
  */
 export const STONE_INPUT_FORM_INSET = {
-  top: 0.32,
-  right: 0.18,
+  top: 0.63,
+  right: 0.28,
   bottom: 0.28,
-  left: 0.18,
+  left: 0.28,
+} as const;
+
+/**
+ * Submit button inset placeholder — tune in StoneInput.module.css `.submit`.
+ */
+export const STONE_INPUT_SUBMIT_INSET = {
+  top: 0.55,
+  right: 0.12,
+  bottom: 0.22,
+  left: 0.72,
 } as const;
