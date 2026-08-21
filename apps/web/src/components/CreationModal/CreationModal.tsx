@@ -37,6 +37,13 @@ export function CreationModal({
       destroyOnHidden
       centered
       className={styles.modal}
+      rootClassName={styles.modalRoot}
+      styles={{
+        content: { overflow: "visible", background: "transparent", boxShadow: "none" },
+        body: { overflow: "visible" },
+        header: { background: "transparent", borderBottom: "none" },
+        footer: { background: "transparent", borderTop: "none" },
+      }}
       footer={
         <div className={styles.footer}>
           <Button onClick={onKeepScrolling}>Keep scrolling</Button>
