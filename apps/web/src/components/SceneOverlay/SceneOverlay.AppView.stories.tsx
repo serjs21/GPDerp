@@ -72,9 +72,48 @@ export const VignetteOnAppView: Story = {
           <div className={styles.actions}>
             <Button onClick={() => setOpen(false)}>Keep scrolling</Button>
             <Button type="primary" onClick={() => setOpen(false)}>
-              Go to haiku
+              Go back to the beginning
             </Button>
           </div>
+        </SceneOverlay>
+      </>
+    );
+  },
+};
+
+/**
+ * Yin–yang S-curve overlay: left (dark) Keep scrolling, right (light) Go back to the beginning.
+ * Centered lantern; halves are the CTAs (no footer buttons).
+ */
+export const YinYangOnAppView: Story = {
+  name: "YinYang on App view",
+  args: {
+    open: false,
+    appearance: "yinYang",
+    closeOnScrimClick: false,
+    onClose: () => undefined,
+  },
+  render: function YinYangOnAppViewStory() {
+    const [open, setOpen] = useState(false);
+
+    return (
+      <>
+        <HomePageContent />
+        <div className={styles.appViewToggle}>
+          <Button type="primary" onClick={() => setOpen(true)}>
+            Open overlay
+          </Button>
+        </div>
+        <SceneOverlay
+          open={open}
+          appearance="yinYang"
+          onKeepScrolling={() => setOpen(false)}
+          onGoToBeginning={() => setOpen(false)}
+          onClose={() => setOpen(false)}
+        >
+          <LanternFrame ariaLabel={`Haiku lantern: ${MOCK_HAIKU.title}`} widthRem={14}>
+            <Lantern haiku={MOCK_HAIKU} showActions={false} />
+          </LanternFrame>
         </SceneOverlay>
       </>
     );

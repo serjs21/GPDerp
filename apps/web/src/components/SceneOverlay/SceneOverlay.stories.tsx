@@ -91,9 +91,9 @@ export const WithLantern: Story = {
         </LanternFrame>
         <div className={styles.actions}>
           <Button onClick={args.onClose}>Keep scrolling</Button>
-          <Button type="primary" onClick={args.onClose}>
-            Go to haiku
-          </Button>
+            <Button type="primary" onClick={args.onClose}>
+              Go back to the beginning
+            </Button>
         </div>
       </SceneOverlay>
     );
