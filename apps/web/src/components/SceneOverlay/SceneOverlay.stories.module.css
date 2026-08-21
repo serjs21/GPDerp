@@ -19,3 +19,11 @@
   justify-content: center;
   padding: 2rem;
 }
+
+.appViewToggle {
+  position: fixed;
+  top: 5.5rem;
+  left: 50%;
+  z-index: 20;
+  transform: translateX(-50%);
+}
