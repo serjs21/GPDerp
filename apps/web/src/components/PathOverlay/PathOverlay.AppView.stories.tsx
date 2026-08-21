@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { HomePageContent } from "@/app/HomePageContent";
 import { Button } from "@/components/StyledComponents";
@@ -9,7 +9,11 @@ import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import type { CelestialPresetName } from "@/theme/celestialPresets";
 import { EXAMPLE_HAIKU_BODY, makeMockHaiku } from "@/storybook";
 import { withLoggedInAppLayout } from "@/storybook/decorators/withLoggedInAppLayout";
-import { PathOverlay } from "./PathOverlay";
+import {
+  PathOverlay,
+  type PathOverlayFillOrigin,
+  type PathOverlaySeam,
+} from "./PathOverlay";
 import styles from "./PathOverlay.stories.module.css";
 
 const MOCK_HAIKU = makeMockHaiku({
@@ -37,38 +41,77 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+function AppViewDemo({
+  fillOrigin,
+  seam = "sCurve",
+}: {
+  fillOrigin: PathOverlayFillOrigin;
+  seam?: PathOverlaySeam;
+}): ReactNode {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <HomePageContent />
+      <div className={styles.appViewToggle}>
+        <Button type="primary" onClick={() => setOpen(true)}>
+          Open overlay
+        </Button>
+      </div>
+      <PathOverlay
+        open={open}
+        fillOrigin={fillOrigin}
+        seam={seam}
+        onKeepScrolling={() => setOpen(false)}
+        onGoToBeginning={() => setOpen(false)}
+        onClose={() => setOpen(false)}
+      >
+        <LanternFrame ariaLabel={`Haiku lantern: ${MOCK_HAIKU.title}`} widthRem={14}>
+          <Lantern haiku={MOCK_HAIKU} showActions={false} />
+        </LanternFrame>
+      </PathOverlay>
+    </>
+  );
+}
+
 /**
- * Yin–yang S-curve overlay: left (dark) Keep scrolling, right (light) Go back to the beginning.
- * Centered lantern; halves are the CTAs.
+ * Fill blooms from viewport center into the S-seam lobes.
  */
-export const OnAppView: Story = {
-  name: "On App view",
+export const CenterOnAppView: Story = {
+  name: "Center fill on App view",
   args: {
     open: false,
+    fillOrigin: "center",
+    seam: "sCurve",
     onClose: () => undefined,
   },
-  render: function PathOverlayOnAppViewStory() {
-    const [open, setOpen] = useState(false);
+  render: () => <AppViewDemo fillOrigin="center" />,
+};
 
-    return (
-      <>
-        <HomePageContent />
-        <div className={styles.appViewToggle}>
-          <Button type="primary" onClick={() => setOpen(true)}>
-            Open overlay
-          </Button>
-        </div>
-        <PathOverlay
-          open={open}
-          onKeepScrolling={() => setOpen(false)}
-          onGoToBeginning={() => setOpen(false)}
-          onClose={() => setOpen(false)}
-        >
-          <LanternFrame ariaLabel={`Haiku lantern: ${MOCK_HAIKU.title}`} widthRem={14}>
-            <Lantern haiku={MOCK_HAIKU} showActions={false} />
-          </LanternFrame>
-        </PathOverlay>
-      </>
-    );
+/**
+ * Dark fills from top-left, light from bottom-right (corner origin).
+ */
+export const CornersOnAppView: Story = {
+  name: "Corners fill on App view",
+  args: {
+    open: false,
+    fillOrigin: "corners",
+    seam: "sCurve",
+    onClose: () => undefined,
   },
+  render: () => <AppViewDemo fillOrigin="corners" />,
+};
+
+/**
+ * Straight vertical midline; dark from top-left, light from bottom-right.
+ */
+export const StraightCornersOnAppView: Story = {
+  name: "Straight split corners on App view",
+  args: {
+    open: false,
+    fillOrigin: "corners",
+    seam: "straight",
+    onClose: () => undefined,
+  },
+  render: () => <AppViewDemo fillOrigin="corners" seam="straight" />,
 };

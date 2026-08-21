@@ -1,2 +1,6 @@
 export { PathOverlay } from "./PathOverlay";
-export type { PathOverlayProps } from "./PathOverlay";
+export type {
+  PathOverlayFillOrigin,
+  PathOverlayProps,
+  PathOverlaySeam,
+} from "./PathOverlay";

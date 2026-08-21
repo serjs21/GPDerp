@@ -13,11 +13,12 @@ import { animate } from "animejs";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import styles from "./PathOverlay.module.css";
 import {
+  darkMaskForSeam,
+  darkPathUnitForSeam,
   isDarkSide,
-  yinYangDarkMaskImage,
-  yinYangDarkPathUnit,
-  yinYangLightMaskImage,
-  yinYangLightPathUnit,
+  lightMaskForSeam,
+  lightPathUnitForSeam,
+  type PathSeam,
 } from "./pathGeometry";
 
 /** Stagger-grid cell size in CSS pixels (true squares). */
@@ -31,10 +32,8 @@ const LABEL_DURATION_MS = 400;
 const DARK_FILL = "rgba(0, 0, 0, 0.55)";
 const LIGHT_FILL = "rgba(255, 255, 255, 0.55)";
 
-const DARK_MASK = yinYangDarkMaskImage();
-const LIGHT_MASK = yinYangLightMaskImage();
-const DARK_PATH_UNIT = yinYangDarkPathUnit();
-const LIGHT_PATH_UNIT = yinYangLightPathUnit();
+export type PathOverlayFillOrigin = "center" | "corners";
+export type PathOverlaySeam = PathSeam;
 
 export type PathOverlayProps = {
   open: boolean;
@@ -43,6 +42,18 @@ export type PathOverlayProps = {
   onKeepScrolling?: () => void;
   /** Right (light) half. */
   onGoToBeginning?: () => void;
+  /**
+   * Where the stagger fill begins.
+   * - `center` — bloom from viewport center
+   * - `corners` — dark from top-left, light from bottom-right
+   */
+  fillOrigin?: PathOverlayFillOrigin;
+  /**
+   * Split geometry.
+   * - `sCurve` — expressed S-seam
+   * - `straight` — vertical midline
+   */
+  seam?: PathOverlaySeam;
   children?: ReactNode;
   className?: string;
   contentClassName?: string;
@@ -62,8 +73,44 @@ function easeOut3(t: number) {
   return 1 - (1 - t) ** 3;
 }
 
+function cellDelayMs(
+  fillOrigin: PathOverlayFillOrigin,
+  col: number,
+  row: number,
+  cols: number,
+  rows: number,
+  staggerStepMs: number,
+  dark: boolean,
+): number {
+  if (fillOrigin === "corners") {
+    // Dark expands from top-left; light from bottom-right.
+    const ring = dark
+      ? Math.max(col, row)
+      : Math.max(cols - 1 - col, rows - 1 - row);
+    return ring * staggerStepMs;
+  }
+
+  const centerCol = (cols - 1) / 2;
+  const centerRow = (rows - 1) / 2;
+  const ring = Math.max(Math.abs(col - centerCol), Math.abs(row - centerRow));
+  return ring * staggerStepMs;
+}
+
+function maxRingForOrigin(
+  fillOrigin: PathOverlayFillOrigin,
+  cols: number,
+  rows: number,
+): number {
+  if (fillOrigin === "corners") {
+    return Math.max(cols - 1, rows - 1);
+  }
+  return Math.max((cols - 1) / 2, (rows - 1) / 2);
+}
+
 type PathScrimProps = {
   reduceMotion: boolean | null;
+  fillOrigin: PathOverlayFillOrigin;
+  seam: PathOverlaySeam;
   darkClipId: string;
   lightClipId: string;
   onKeepScrolling?: () => void;
@@ -72,6 +119,8 @@ type PathScrimProps = {
 
 function PathScrim({
   reduceMotion,
+  fillOrigin,
+  seam,
   darkClipId,
   lightClipId,
   onKeepScrolling,
@@ -79,6 +128,11 @@ function PathScrim({
 }: PathScrimProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const labelsRef = useRef<HTMLDivElement>(null);
+
+  const darkMask = darkMaskForSeam(seam);
+  const lightMask = lightMaskForSeam(seam);
+  const darkPathUnit = darkPathUnitForSeam(seam);
+  const lightPathUnit = lightPathUnitForSeam(seam);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -99,9 +153,7 @@ function PathScrim({
     canvas.style.height = `${gridH}px`;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    const centerCol = (cols - 1) / 2;
-    const centerRow = (rows - 1) / 2;
-    const maxRing = Math.max(centerCol, centerRow);
+    const maxRing = maxRingForOrigin(fillOrigin, cols, rows);
     const staggerStepMs =
       maxRing > 0 ? (TOTAL_OPEN_MS - CELL_DURATION_MS) / maxRing : 0;
 
@@ -109,15 +161,12 @@ function PathScrim({
     const cells: Cell[] = [];
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
-        const ring = Math.max(
-          Math.abs(col - centerCol),
-          Math.abs(row - centerRow),
-        );
+        const dark = isDarkSide((col + 0.5) / cols, (row + 0.5) / rows, seam);
         cells.push({
           x: col * CELL_PX,
           y: row * CELL_PX,
-          delay: ring * staggerStepMs,
-          dark: isDarkSide((col + 0.5) / cols, (row + 0.5) / rows),
+          delay: cellDelayMs(fillOrigin, col, row, cols, rows, staggerStepMs, dark),
+          dark,
         });
       }
     }
@@ -167,18 +216,18 @@ function PathScrim({
       cellAnim.cancel();
       labelAnim?.cancel();
     };
-  }, [reduceMotion]);
+  }, [reduceMotion, fillOrigin, seam]);
 
   const darkLobeStyle = {
-    WebkitMaskImage: DARK_MASK,
-    maskImage: DARK_MASK,
+    WebkitMaskImage: darkMask,
+    maskImage: darkMask,
     clipPath: `url(#${darkClipId})`,
     WebkitClipPath: `url(#${darkClipId})`,
   } as CSSProperties;
 
   const lightLobeStyle = {
-    WebkitMaskImage: LIGHT_MASK,
-    maskImage: LIGHT_MASK,
+    WebkitMaskImage: lightMask,
+    maskImage: lightMask,
     clipPath: `url(#${lightClipId})`,
     WebkitClipPath: `url(#${lightClipId})`,
   } as CSSProperties;
@@ -188,10 +237,10 @@ function PathScrim({
       <svg className={styles.clipDefs} width={0} height={0} aria-hidden>
         <defs>
           <clipPath id={darkClipId} clipPathUnits="objectBoundingBox">
-            <path d={DARK_PATH_UNIT} />
+            <path d={darkPathUnit} />
           </clipPath>
           <clipPath id={lightClipId} clipPathUnits="objectBoundingBox">
-            <path d={LIGHT_PATH_UNIT} />
+            <path d={lightPathUnit} />
           </clipPath>
         </defs>
       </svg>
@@ -229,6 +278,8 @@ export function PathOverlay({
   onClose,
   onKeepScrolling,
   onGoToBeginning,
+  fillOrigin = "center",
+  seam = "sCurve",
   children,
   className,
   contentClassName,
@@ -282,6 +333,8 @@ export function PathOverlay({
 
           <PathScrim
             reduceMotion={reduceMotion}
+            fillOrigin={fillOrigin}
+            seam={seam}
             darkClipId={darkClipId}
             lightClipId={lightClipId}
             onKeepScrolling={onKeepScrolling}

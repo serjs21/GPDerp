@@ -1,34 +1,40 @@
 /**
- * Fullscreen yin–yang S-seam (viewBox 0 0 100 100), same construction as
- * AuthDualityToggle `yingPath` / reverse complement — shared boundary, no gap.
- * Amp bows left in the upper half and right in the lower half → white larger on top,
- * dark larger on bottom.
+ * Fullscreen split seam (viewBox 0 0 100 100).
+ * - sCurve: AuthDualityToggle-style S (amp bows left upper / right lower)
+ * - straight: vertical midline, no bow
  */
 const SPLIT_X = 50;
-const SEAM_AMP = 18;
+/** Horizontal bow of the S — higher = rounder, more expressed duality seam. */
+const SEAM_AMP = 30;
+
+export type PathSeam = "sCurve" | "straight";
+
+function seamAmp(seam: PathSeam): number {
+  return seam === "straight" ? 0 : SEAM_AMP;
+}
 
 function seamControls(splitX: number, amp: number) {
   return {
     c1x: splitX - amp,
-    c1y: 27,
+    c1y: 22,
     c2x: splitX + amp,
-    c2y: 73,
+    c2y: 78,
   };
 }
 
-/** Dark (left) fill — ends on the S-curve. */
+/** Dark (left) fill — ends on the seam. */
 export function yinYangDarkPath(splitX = SPLIT_X, amp = SEAM_AMP): string {
   const { c1x, c1y, c2x, c2y } = seamControls(splitX, amp);
   return `M 0 0 H ${splitX} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${splitX} 100 H 0 Z`;
 }
 
-/** Light (right) fill — starts on the same S-curve (reversed). */
+/** Light (right) fill — starts on the same seam (reversed). */
 export function yinYangLightPath(splitX = SPLIT_X, amp = SEAM_AMP): string {
   const { c1x, c1y, c2x, c2y } = seamControls(splitX, amp);
   return `M ${splitX} 0 H 100 V 100 H ${splitX} C ${c2x} ${c2y}, ${c1x} ${c1y}, ${splitX} 0 Z`;
 }
 
-/** Open S-curve only (for seam sampling / stroke). */
+/** Open seam path only (for sampling / stroke). */
 export function yinYangSeamPath(splitX = SPLIT_X, amp = SEAM_AMP): string {
   const { c1x, c1y, c2x, c2y } = seamControls(splitX, amp);
   return `M ${splitX} 0 C ${c1x} ${c1y}, ${c2x} ${c2y}, ${splitX} 100`;
@@ -49,14 +55,16 @@ export function yinYangLightPathUnit(splitX = SPLIT_X, amp = SEAM_AMP): string {
 }
 
 /**
- * Cubic seam x at unit y ∈ [0,1] (viewBox path M s 0 C … s 1).
- * Dark lobe is x ≤ seamX (left of the S-curve).
+ * Seam x at unit y ∈ [0,1].
+ * Dark half is x ≤ seamX.
  */
 export function yinYangSeamXAtY(
   yUnit: number,
   splitX = SPLIT_X,
   amp = SEAM_AMP,
 ): number {
+  if (amp === 0) return splitX / 100;
+
   const { c1x, c1y, c2x, c2y } = seamControls(splitX, amp);
   const s = splitX / 100;
   const p1x = c1x / 100;
@@ -85,14 +93,14 @@ export function yinYangSeamXAtY(
   );
 }
 
-/** True when unit point falls in the dark (left) lobe. */
+/** True when unit point falls in the dark (left) half for the given seam. */
 export function isDarkSide(
   xUnit: number,
   yUnit: number,
+  seam: PathSeam = "sCurve",
   splitX = SPLIT_X,
-  amp = SEAM_AMP,
 ): boolean {
-  return xUnit <= yinYangSeamXAtY(yUnit, splitX, amp);
+  return xUnit <= yinYangSeamXAtY(yUnit, splitX, seamAmp(seam));
 }
 
 function pathToMaskDataUri(pathD: string): string {
@@ -106,4 +114,20 @@ export function yinYangDarkMaskImage(splitX = SPLIT_X, amp = SEAM_AMP): string {
 
 export function yinYangLightMaskImage(splitX = SPLIT_X, amp = SEAM_AMP): string {
   return pathToMaskDataUri(yinYangLightPath(splitX, amp));
+}
+
+export function darkPathUnitForSeam(seam: PathSeam): string {
+  return yinYangDarkPathUnit(SPLIT_X, seamAmp(seam));
+}
+
+export function lightPathUnitForSeam(seam: PathSeam): string {
+  return yinYangLightPathUnit(SPLIT_X, seamAmp(seam));
+}
+
+export function darkMaskForSeam(seam: PathSeam): string {
+  return yinYangDarkMaskImage(SPLIT_X, seamAmp(seam));
+}
+
+export function lightMaskForSeam(seam: PathSeam): string {
+  return yinYangLightMaskImage(SPLIT_X, seamAmp(seam));
 }
