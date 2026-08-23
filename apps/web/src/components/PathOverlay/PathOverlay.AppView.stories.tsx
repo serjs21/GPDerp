@@ -103,15 +103,30 @@ export const CornersOnAppView: Story = {
 };
 
 /**
- * Straight vertical midline; dark from top-left, light from bottom-right.
+ * Straight vertical midline; dark from both left corners, light from both right corners.
  */
 export const StraightCornersOnAppView: Story = {
-  name: "Straight split corners on App view",
+  name: "Straight split side-corners on App view",
   args: {
     open: false,
-    fillOrigin: "corners",
+    fillOrigin: "sideCorners",
     seam: "straight",
     onClose: () => undefined,
   },
-  render: () => <AppViewDemo fillOrigin="corners" seam="straight" />,
+  render: () => <AppViewDemo fillOrigin="sideCorners" seam="straight" />,
+};
+
+/**
+ * Straight midline; dark/bright sweep top↔bottom from sun altitude.
+ * Dark = skyMid, bright = highlight. Day: dark from top; night: dark from bottom.
+ */
+export const StraightVerticalOnAppView: Story = {
+  name: "Straight vertical sun-aware on App view",
+  args: {
+    open: false,
+    fillOrigin: "vertical",
+    seam: "straight",
+    onClose: () => undefined,
+  },
+  render: () => <AppViewDemo fillOrigin="vertical" seam="straight" />,
 };

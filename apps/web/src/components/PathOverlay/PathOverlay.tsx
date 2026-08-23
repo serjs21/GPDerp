@@ -11,6 +11,7 @@ import {
 import { createPortal } from "react-dom";
 import { animate } from "animejs";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useOptionalCelestialTheme } from "@/app/providers/CelestialThemeProvider";
 import styles from "./PathOverlay.module.css";
 import {
   darkMaskForSeam,
@@ -24,15 +25,19 @@ import {
 /** Stagger-grid cell size in CSS pixels (true squares). */
 const CELL_PX = 10;
 
-const CELL_DURATION_MS = 500;
-const TOTAL_OPEN_MS = 2000;
+const CELL_DURATION_MS = 300;
+const TOTAL_OPEN_MS = 800;
 const LABEL_DELAY_MS = 1300;
 const LABEL_DURATION_MS = 400;
 
-const DARK_FILL = "rgba(0, 0, 0, 0.55)";
-const LIGHT_FILL = "rgba(255, 255, 255, 0.55)";
+const DARK_FILL_FALLBACK = "rgba(0, 0, 0, 0.55)";
+const LIGHT_FILL_FALLBACK = "rgba(255, 255, 255, 0.55)";
 
-export type PathOverlayFillOrigin = "center" | "corners";
+export type PathOverlayFillOrigin =
+  | "center"
+  | "corners"
+  | "sideCorners"
+  | "vertical";
 export type PathOverlaySeam = PathSeam;
 
 export type PathOverlayProps = {
@@ -46,6 +51,8 @@ export type PathOverlayProps = {
    * Where the stagger fill begins.
    * - `center` — bloom from viewport center
    * - `corners` — dark from top-left, light from bottom-right
+   * - `sideCorners` — dark from both left corners, light from both right corners
+   * - `vertical` — dark/bright from top vs bottom (sun-aware); skyMid / highlight paints
    */
   fillOrigin?: PathOverlayFillOrigin;
   /**
@@ -73,6 +80,47 @@ function easeOut3(t: number) {
   return 1 - (1 - t) ** 3;
 }
 
+function cellRing(
+  fillOrigin: PathOverlayFillOrigin,
+  col: number,
+  row: number,
+  cols: number,
+  rows: number,
+  dark: boolean,
+  darkFromTop: boolean,
+): number {
+  if (fillOrigin === "vertical") {
+    // Dark from top (sun up) or bottom (sun down); bright from the opposite edge.
+    if (dark) {
+      return darkFromTop ? row : rows - 1 - row;
+    }
+    return darkFromTop ? rows - 1 - row : row;
+  }
+
+  if (fillOrigin === "sideCorners") {
+    // Dark from both left corners; light from both right corners.
+    if (dark) {
+      const fromTopLeft = Math.max(col, row);
+      const fromBottomLeft = Math.max(col, rows - 1 - row);
+      return Math.min(fromTopLeft, fromBottomLeft);
+    }
+    const fromTopRight = Math.max(cols - 1 - col, row);
+    const fromBottomRight = Math.max(cols - 1 - col, rows - 1 - row);
+    return Math.min(fromTopRight, fromBottomRight);
+  }
+
+  if (fillOrigin === "corners") {
+    // Dark from top-left; light from bottom-right.
+    return dark
+      ? Math.max(col, row)
+      : Math.max(cols - 1 - col, rows - 1 - row);
+  }
+
+  const centerCol = (cols - 1) / 2;
+  const centerRow = (rows - 1) / 2;
+  return Math.max(Math.abs(col - centerCol), Math.abs(row - centerRow));
+}
+
 function cellDelayMs(
   fillOrigin: PathOverlayFillOrigin,
   col: number,
@@ -81,19 +129,11 @@ function cellDelayMs(
   rows: number,
   staggerStepMs: number,
   dark: boolean,
+  darkFromTop: boolean,
 ): number {
-  if (fillOrigin === "corners") {
-    // Dark expands from top-left; light from bottom-right.
-    const ring = dark
-      ? Math.max(col, row)
-      : Math.max(cols - 1 - col, rows - 1 - row);
-    return ring * staggerStepMs;
-  }
-
-  const centerCol = (cols - 1) / 2;
-  const centerRow = (rows - 1) / 2;
-  const ring = Math.max(Math.abs(col - centerCol), Math.abs(row - centerRow));
-  return ring * staggerStepMs;
+  return (
+    cellRing(fillOrigin, col, row, cols, rows, dark, darkFromTop) * staggerStepMs
+  );
 }
 
 function maxRingForOrigin(
@@ -101,6 +141,13 @@ function maxRingForOrigin(
   cols: number,
   rows: number,
 ): number {
+  if (fillOrigin === "vertical") {
+    return rows - 1;
+  }
+  if (fillOrigin === "sideCorners") {
+    // Farthest cell is mid-height near the opposite side of each half.
+    return Math.max(cols - 1, Math.ceil((rows - 1) / 2));
+  }
   if (fillOrigin === "corners") {
     return Math.max(cols - 1, rows - 1);
   }
@@ -128,11 +175,23 @@ function PathScrim({
 }: PathScrimProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const labelsRef = useRef<HTMLDivElement>(null);
+  const celestial = useOptionalCelestialTheme();
 
   const darkMask = darkMaskForSeam(seam);
   const lightMask = lightMaskForSeam(seam);
   const darkPathUnit = darkPathUnitForSeam(seam);
   const lightPathUnit = lightPathUnitForSeam(seam);
+
+  const sunAboveHorizon = celestial?.scene.layout.sun.isAboveHorizon ?? true;
+  const darkFromTop = fillOrigin === "vertical" ? sunAboveHorizon : true;
+
+  const useThemePaints = fillOrigin === "vertical" && celestial != null;
+  const darkFill = useThemePaints
+    ? celestial.scene.theme.skyMid
+    : DARK_FILL_FALLBACK;
+  const lightFill = useThemePaints
+    ? celestial.scene.theme.highlightOnPaper
+    : LIGHT_FILL_FALLBACK;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -165,7 +224,16 @@ function PathScrim({
         cells.push({
           x: col * CELL_PX,
           y: row * CELL_PX,
-          delay: cellDelayMs(fillOrigin, col, row, cols, rows, staggerStepMs, dark),
+          delay: cellDelayMs(
+            fillOrigin,
+            col,
+            row,
+            cols,
+            rows,
+            staggerStepMs,
+            dark,
+            darkFromTop,
+          ),
           dark,
         });
       }
@@ -180,7 +248,7 @@ function PathScrim({
         const size = CELL_PX * t;
         const inset = (CELL_PX - size) / 2;
         ctx.globalAlpha = t;
-        ctx.fillStyle = cell.dark ? DARK_FILL : LIGHT_FILL;
+        ctx.fillStyle = cell.dark ? darkFill : lightFill;
         ctx.fillRect(cell.x + inset, cell.y + inset, size, size);
       }
       ctx.globalAlpha = 1;
@@ -216,7 +284,14 @@ function PathScrim({
       cellAnim.cancel();
       labelAnim?.cancel();
     };
-  }, [reduceMotion, fillOrigin, seam]);
+  }, [
+    reduceMotion,
+    fillOrigin,
+    seam,
+    darkFromTop,
+    darkFill,
+    lightFill,
+  ]);
 
   const darkLobeStyle = {
     WebkitMaskImage: darkMask,

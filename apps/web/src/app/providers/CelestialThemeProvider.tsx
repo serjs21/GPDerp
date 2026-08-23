@@ -130,3 +130,8 @@ export function useCelestialTheme() {
   }
   return context;
 }
+
+/** Same as useCelestialTheme, or null outside the provider. */
+export function useOptionalCelestialTheme() {
+  return useContext(CelestialThemeContext);
+}
