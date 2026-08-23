@@ -27,8 +27,9 @@ const CELL_PX = 10;
 
 const CELL_DURATION_MS = 300;
 const TOTAL_OPEN_MS = 800;
-const LABEL_DELAY_MS = 1300;
+const LABEL_DELAY_MS = 800;
 const LABEL_DURATION_MS = 400;
+const OVERLAY_OPACITY = 0.9;
 
 const DARK_FILL_FALLBACK = "rgba(0, 0, 0, 0.55)";
 const LIGHT_FILL_FALLBACK = "rgba(255, 255, 255, 0.55)";
@@ -201,43 +202,55 @@ function PathScrim({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const { cols, rows } = gridDimsForViewport(window.innerWidth, window.innerHeight);
-    const gridW = cols * CELL_PX;
-    const gridH = rows * CELL_PX;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-    canvas.width = Math.round(gridW * dpr);
-    canvas.height = Math.round(gridH * dpr);
-    canvas.style.width = `${gridW}px`;
-    canvas.style.height = `${gridH}px`;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    const maxRing = maxRingForOrigin(fillOrigin, cols, rows);
-    const staggerStepMs =
-      maxRing > 0 ? (TOTAL_OPEN_MS - CELL_DURATION_MS) / maxRing : 0;
-
     type Cell = { x: number; y: number; delay: number; dark: boolean };
-    const cells: Cell[] = [];
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        const dark = isDarkSide((col + 0.5) / cols, (row + 0.5) / rows, seam);
-        cells.push({
-          x: col * CELL_PX,
-          y: row * CELL_PX,
-          delay: cellDelayMs(
-            fillOrigin,
-            col,
-            row,
-            cols,
-            rows,
-            staggerStepMs,
+    let gridW = 0;
+    let gridH = 0;
+    let cells: Cell[] = [];
+    let animationDone = reduceMotion === true;
+
+    const buildGrid = () => {
+      const { cols, rows } = gridDimsForViewport(
+        window.innerWidth,
+        window.innerHeight,
+      );
+      gridW = cols * CELL_PX;
+      gridH = rows * CELL_PX;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      canvas.width = Math.round(gridW * dpr);
+      canvas.height = Math.round(gridH * dpr);
+      canvas.style.width = `${gridW}px`;
+      canvas.style.height = `${gridH}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const maxRing = maxRingForOrigin(fillOrigin, cols, rows);
+      const staggerStepMs =
+        maxRing > 0 ? (TOTAL_OPEN_MS - CELL_DURATION_MS) / maxRing : 0;
+
+      cells = [];
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const dark = isDarkSide((col + 0.5) / cols, (row + 0.5) / rows, seam);
+          cells.push({
+            x: col * CELL_PX,
+            y: row * CELL_PX,
+            delay: cellDelayMs(
+              fillOrigin,
+              col,
+              row,
+              cols,
+              rows,
+              staggerStepMs,
+              dark,
+              darkFromTop,
+            ),
             dark,
-            darkFromTop,
-          ),
-          dark,
-        });
+          });
+        }
       }
-    }
+
+      return;
+    };
 
     const paint = (timeMs: number) => {
       ctx.clearRect(0, 0, gridW, gridH);
@@ -247,17 +260,36 @@ function PathScrim({
         const t = local >= 1 ? 1 : easeOut3(local);
         const size = CELL_PX * t;
         const inset = (CELL_PX - size) / 2;
-        ctx.globalAlpha = t;
+        ctx.globalAlpha = t * OVERLAY_OPACITY;
         ctx.fillStyle = cell.dark ? darkFill : lightFill;
         ctx.fillRect(cell.x + inset, cell.y + inset, size, size);
       }
       ctx.globalAlpha = 1;
     };
 
-    if (reduceMotion) {
+    const paintFinal = () => {
       paint(TOTAL_OPEN_MS);
+    };
+
+    const syncAfterAnimation = () => {
+      buildGrid();
+      paintFinal();
+    };
+
+    buildGrid();
+
+    const onResize = () => {
+      if (!animationDone) return;
+      syncAfterAnimation();
+    };
+    window.addEventListener("resize", onResize);
+
+    if (reduceMotion) {
+      paintFinal();
       if (labels) labels.style.opacity = "1";
-      return;
+      return () => {
+        window.removeEventListener("resize", onResize);
+      };
     }
 
     if (labels) labels.style.opacity = "0";
@@ -269,6 +301,11 @@ function PathScrim({
       duration: TOTAL_OPEN_MS,
       ease: "linear",
       onUpdate: () => paint(clock.t),
+      onComplete: () => {
+        animationDone = true;
+        // Cover any resize that happened during the open animation.
+        syncAfterAnimation();
+      },
     });
 
     const labelAnim = labels
@@ -283,6 +320,7 @@ function PathScrim({
     return () => {
       cellAnim.cancel();
       labelAnim?.cancel();
+      window.removeEventListener("resize", onResize);
     };
   }, [
     reduceMotion,

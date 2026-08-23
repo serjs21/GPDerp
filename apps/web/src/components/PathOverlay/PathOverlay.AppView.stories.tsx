@@ -66,7 +66,7 @@ function AppViewDemo({
         onGoToBeginning={() => setOpen(false)}
         onClose={() => setOpen(false)}
       >
-        <LanternFrame ariaLabel={`Haiku lantern: ${MOCK_HAIKU.title}`} widthRem={14}>
+        <LanternFrame ariaLabel={`Haiku lantern: ${MOCK_HAIKU.title}`} widthRem={19}>
           <Lantern haiku={MOCK_HAIKU} showActions={false} />
         </LanternFrame>
       </PathOverlay>
