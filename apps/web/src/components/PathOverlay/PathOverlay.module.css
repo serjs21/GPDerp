@@ -48,6 +48,7 @@
   mask-repeat: no-repeat;
   -webkit-mask-position: center;
   mask-position: center;
+  will-change: background-color, box-shadow;
 }
 
 .lobe:focus-visible {
@@ -69,12 +70,14 @@
 
 .label {
   max-width: 11rem;
+  font-family: var(--font-lantern-script);
   font-size: clamp(0.85rem, 2.2vw, 1.05rem);
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: 0.04em;
   line-height: 1.35;
   text-align: center;
   pointer-events: none;
+  will-change: filter, text-shadow;
 }
 
 .labelLeft {

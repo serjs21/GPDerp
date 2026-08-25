@@ -4,6 +4,7 @@ import {
   useEffect,
   useId,
   useRef,
+  useState,
   type CSSProperties,
   type KeyboardEvent,
   type ReactNode,
@@ -33,6 +34,42 @@ const OVERLAY_OPACITY = 0.9;
 
 const DARK_FILL_FALLBACK = "rgba(0, 0, 0, 0.55)";
 const LIGHT_FILL_FALLBACK = "rgba(255, 255, 255, 0.55)";
+
+/** Hover glow (motion) — same filter/textShadow approach as Auth TextToIcon. */
+const GLOW_EASE = [0.38, 0, 0.9, 1] as const;
+const LOBE_GLOW_REST = {
+  backgroundColor: "rgba(0, 0, 0, 0)",
+  boxShadow: "inset 0 0 0 0 transparent",
+} as const;
+const DARK_LOBE_GLOW_SOFT =
+  "inset 0 0 4rem 1.5rem rgba(245, 235, 224, 0.22), inset 0 0 1.5rem 0.4rem rgba(255, 255, 255, 0.1)";
+const DARK_LOBE_GLOW_STRONG =
+  "inset 0 0 5.5rem 2.25rem rgba(245, 235, 224, 0.38), inset 0 0 2rem 0.6rem rgba(255, 255, 255, 0.18)";
+const LIGHT_LOBE_GLOW_SOFT =
+  "inset 0 0 4rem 1.5rem rgba(255, 230, 160, 0.28), inset 0 0 1.5rem 0.4rem rgba(255, 255, 255, 0.14)";
+const LIGHT_LOBE_GLOW_STRONG =
+  "inset 0 0 5.5rem 2.25rem rgba(255, 230, 160, 0.45), inset 0 0 2rem 0.6rem rgba(255, 255, 255, 0.22)";
+const LABEL_GLOW_SOFT =
+  "0 0 0.55em color-mix(in srgb, #ffffff 48%, transparent), 0 0 1.1em color-mix(in srgb, #ffffff 28%, transparent)";
+const LABEL_GLOW_STRONG =
+  "0 0 0.7em color-mix(in srgb, #ffffff 68%, transparent), 0 0 1.4em color-mix(in srgb, #ffffff 40%, transparent)";
+const LABEL_FILTER_SOFT =
+  "brightness(1.05) drop-shadow(0 0 0.35em color-mix(in srgb, #ffffff 28%, transparent))";
+const LABEL_FILTER_STRONG =
+  "brightness(1.1) drop-shadow(0 0 0.5em color-mix(in srgb, #ffffff 42%, transparent))";
+/** Right label sits on the light half (dark ink) — warm parchment halo. */
+const LABEL_RIGHT_GLOW_SOFT =
+  "0 0 0.45em color-mix(in srgb, #ffe9a8 55%, transparent), 0 0 1em color-mix(in srgb, #fff4d0 35%, transparent)";
+const LABEL_RIGHT_GLOW_STRONG =
+  "0 0 0.65em color-mix(in srgb, #ffe9a8 72%, transparent), 0 0 1.3em color-mix(in srgb, #fff4d0 48%, transparent)";
+const LABEL_RIGHT_FILTER_SOFT =
+  "brightness(1.04) drop-shadow(0 0 0.3em color-mix(in srgb, #ffe9a8 40%, transparent))";
+const LABEL_RIGHT_FILTER_STRONG =
+  "brightness(1.08) drop-shadow(0 0 0.45em color-mix(in srgb, #ffe9a8 55%, transparent))";
+const LABEL_GLOW_REST = {
+  textShadow: "none",
+  filter: "brightness(1)",
+} as const;
 
 export type PathOverlayFillOrigin =
   | "center"
@@ -177,6 +214,7 @@ function PathScrim({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const labelsRef = useRef<HTMLDivElement>(null);
   const celestial = useOptionalCelestialTheme();
+  const [hoveredSide, setHoveredSide] = useState<"dark" | "light" | null>(null);
 
   const darkMask = darkMaskForSeam(seam);
   const lightMask = lightMaskForSeam(seam);
@@ -345,6 +383,20 @@ function PathScrim({
     WebkitClipPath: `url(#${lightClipId})`,
   } as CSSProperties;
 
+  const glowPulse = !reduceMotion && hoveredSide != null;
+  const lobeGlowTransition = glowPulse
+    ? { duration: 1.15, repeat: Infinity, ease: "easeInOut" as const }
+    : { duration: 0.28, ease: GLOW_EASE };
+  const labelGlowTransition = glowPulse
+    ? {
+        duration: 1.15,
+        repeat: Infinity,
+        ease: "easeInOut" as const,
+        textShadow: { duration: 1.15, repeat: Infinity, ease: "easeInOut" as const },
+        filter: { duration: 1.15, repeat: Infinity, ease: "easeInOut" as const },
+      }
+    : { duration: 0.28, ease: GLOW_EASE };
+
   return (
     <div className={styles.scrim}>
       <svg className={styles.clipDefs} width={0} height={0} aria-hidden>
@@ -360,27 +412,97 @@ function PathScrim({
 
       <canvas ref={canvasRef} className={styles.grid} aria-hidden />
 
-      <button
+      <motion.button
         type="button"
         className={styles.lobe}
         style={darkLobeStyle}
-        aria-label="Keep scrolling"
+        aria-label="Continue the journey"
         onClick={() => onKeepScrolling?.()}
+        onHoverStart={() => setHoveredSide("dark")}
+        onHoverEnd={() => setHoveredSide((side) => (side === "dark" ? null : side))}
+        initial={false}
+        animate={
+          !reduceMotion && hoveredSide === "dark"
+            ? {
+                backgroundColor: [
+                  "rgba(245, 240, 232, 0.06)",
+                  "rgba(245, 240, 232, 0.16)",
+                  "rgba(245, 240, 232, 0.06)",
+                ],
+                boxShadow: [DARK_LOBE_GLOW_SOFT, DARK_LOBE_GLOW_STRONG, DARK_LOBE_GLOW_SOFT],
+              }
+            : LOBE_GLOW_REST
+        }
+        transition={hoveredSide === "dark" ? lobeGlowTransition : { duration: 0.28, ease: GLOW_EASE }}
       />
 
-      <button
+      <motion.button
         type="button"
         className={styles.lobe}
         style={lightLobeStyle}
-        aria-label="Go back to the beginning"
+        aria-label="Go back to the start"
         onClick={() => onGoToBeginning?.()}
+        onHoverStart={() => setHoveredSide("light")}
+        onHoverEnd={() => setHoveredSide((side) => (side === "light" ? null : side))}
+        initial={false}
+        animate={
+          !reduceMotion && hoveredSide === "light"
+            ? {
+                backgroundColor: [
+                  "rgba(255, 248, 220, 0.08)",
+                  "rgba(255, 248, 220, 0.2)",
+                  "rgba(255, 248, 220, 0.08)",
+                ],
+                boxShadow: [LIGHT_LOBE_GLOW_SOFT, LIGHT_LOBE_GLOW_STRONG, LIGHT_LOBE_GLOW_SOFT],
+              }
+            : LOBE_GLOW_REST
+        }
+        transition={hoveredSide === "light" ? lobeGlowTransition : { duration: 0.28, ease: GLOW_EASE }}
       />
 
       <div ref={labelsRef} className={styles.labels} aria-hidden>
-        <span className={`${styles.label} ${styles.labelLeft}`}>Keep scrolling</span>
-        <span className={`${styles.label} ${styles.labelRight}`}>
-          Go back to the beginning
-        </span>
+        <motion.span
+          className={`${styles.label} ${styles.labelLeft}`}
+          initial={false}
+          animate={
+            !reduceMotion && hoveredSide === "dark"
+              ? {
+                  textShadow: [LABEL_GLOW_SOFT, LABEL_GLOW_STRONG, LABEL_GLOW_SOFT],
+                  filter: [LABEL_FILTER_SOFT, LABEL_FILTER_STRONG, LABEL_FILTER_SOFT],
+                }
+              : LABEL_GLOW_REST
+          }
+          transition={
+            hoveredSide === "dark" ? labelGlowTransition : { duration: 0.28, ease: GLOW_EASE }
+          }
+        >
+          Continue the journey
+        </motion.span>
+        <motion.span
+          className={`${styles.label} ${styles.labelRight}`}
+          initial={false}
+          animate={
+            !reduceMotion && hoveredSide === "light"
+              ? {
+                  textShadow: [
+                    LABEL_RIGHT_GLOW_SOFT,
+                    LABEL_RIGHT_GLOW_STRONG,
+                    LABEL_RIGHT_GLOW_SOFT,
+                  ],
+                  filter: [
+                    LABEL_RIGHT_FILTER_SOFT,
+                    LABEL_RIGHT_FILTER_STRONG,
+                    LABEL_RIGHT_FILTER_SOFT,
+                  ],
+                }
+              : LABEL_GLOW_REST
+          }
+          transition={
+            hoveredSide === "light" ? labelGlowTransition : { duration: 0.28, ease: GLOW_EASE }
+          }
+        >
+          Go back to the start
+        </motion.span>
       </div>
     </div>
   );
