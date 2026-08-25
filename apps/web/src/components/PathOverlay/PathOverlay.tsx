@@ -13,6 +13,8 @@ import { createPortal } from "react-dom";
 import { animate } from "animejs";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useOptionalCelestialTheme } from "@/app/providers/CelestialThemeProvider";
+import { OverlayNextLabel } from "./OverlayNextLabel/OverlayNextLabel";
+import { OverlayPrevLabel } from "./OverlayPrevLabel/OverlayPrevLabel";
 import styles from "./PathOverlay.module.css";
 import {
   darkMaskForSeam,
@@ -461,8 +463,8 @@ function PathScrim({
       />
 
       <div ref={labelsRef} className={styles.labels} aria-hidden>
-        <motion.span
-          className={`${styles.label} ${styles.labelLeft}`}
+        <motion.div
+          className={styles.labelLeft}
           initial={false}
           animate={
             !reduceMotion && hoveredSide === "dark"
@@ -476,10 +478,10 @@ function PathScrim({
             hoveredSide === "dark" ? labelGlowTransition : { duration: 0.28, ease: GLOW_EASE }
           }
         >
-          Continue the journey
-        </motion.span>
-        <motion.span
-          className={`${styles.label} ${styles.labelRight}`}
+          <OverlayNextLabel />
+        </motion.div>
+        <motion.div
+          className={styles.labelRight}
           initial={false}
           animate={
             !reduceMotion && hoveredSide === "light"
@@ -501,8 +503,8 @@ function PathScrim({
             hoveredSide === "light" ? labelGlowTransition : { duration: 0.28, ease: GLOW_EASE }
           }
         >
-          Go back to the start
-        </motion.span>
+          <OverlayPrevLabel />
+        </motion.div>
       </div>
     </div>
   );
