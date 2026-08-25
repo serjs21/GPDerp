@@ -79,10 +79,16 @@
 
 .labelLeft {
   color: color-mix(in srgb, #f5f0e8 92%, transparent);
+  position: absolute;
+  left: 15%;
+  bottom: 25%;
 }
 
 .labelRight {
   color: color-mix(in srgb, #1a1814 88%, transparent);
+  position: absolute;
+  right: 15%;
+  top: 25%;
 }
 
 .content {

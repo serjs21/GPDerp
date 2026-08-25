@@ -1,11 +1,23 @@
 "use client";
 
 import type { HaikuDto } from "@/api/haikus";
-import { Button, Modal } from "@/components/StyledComponents";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
+import type { LanternTransform } from "@/components/Lantern/lanternTransform";
+import { PathOverlay } from "@/components/PathOverlay";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import styles from "./CreationModal.module.css";
+
+/** Resting pose from PathOverlay App view (devtools) — centered, mid-low. */
+const CREATION_LANTERN_WIDTH_REM = 20;
+const CREATION_LANTERN_TRANSFORM: LanternTransform = {
+  positionMode: "percent",
+  x: 0.5,
+  y: 0.70635, // --lantern-bottom: 29.365%
+  scale: 1,
+  rotate: 0,
+  opacity: 1,
+};
 
 export type CreationModalProps = {
   open: boolean;
@@ -30,34 +42,23 @@ export function CreationModal({
       : "Haiku creation";
 
   return (
-    <Modal
+    <PathOverlay
       open={open}
-      title="Creating haiku"
-      onCancel={onKeepScrolling}
-      destroyOnHidden
-      centered
-      className={styles.modal}
-      rootClassName={styles.modalRoot}
-      styles={{
-        content: { overflow: "visible", background: "transparent", boxShadow: "none" },
-        body: { overflow: "visible" },
-        header: { background: "transparent", borderBottom: "none" },
-        footer: { background: "transparent", borderTop: "none" },
-      }}
-      footer={
-        <div className={styles.footer}>
-          <Button onClick={onKeepScrolling}>Keep scrolling</Button>
-          <Button type="primary" onClick={onGoToHaiku}>
-            Go to haiku
-          </Button>
-        </div>
-      }
+      fillOrigin="vertical"
+      seam="straight"
+      onKeepScrolling={onKeepScrolling}
+      onGoToBeginning={onGoToHaiku}
+      onClose={onKeepScrolling}
     >
       <div className={styles.stage}>
-        <div className={styles.flyIn} key={generatingDraft?.requestId ?? haiku?.id ?? "lantern"}>
+        <div
+          className={styles.flyIn}
+          key={generatingDraft?.requestId ?? haiku?.id ?? "lantern"}
+        >
           <LanternFrame
             ariaLabel={ariaLabel}
-            widthRem={14}
+            widthRem={CREATION_LANTERN_WIDTH_REM}
+            transform={CREATION_LANTERN_TRANSFORM}
             generating={Boolean(generatingDraft)}
           >
             {generatingDraft ? (
@@ -68,6 +69,6 @@ export function CreationModal({
           </LanternFrame>
         </div>
       </div>
-    </Modal>
+    </PathOverlay>
   );
 }

@@ -1,12 +1,17 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
+import { HomePageContent } from "@/app/HomePageContent";
+import { Button } from "@/components/StyledComponents";
+import type { CelestialPresetName } from "@/theme/celestialPresets";
 import {
   EXAMPLE_HAIKU_BODY,
   makeMockHaiku,
   STORY_CREATED_AT,
 } from "@/storybook";
+import { withLoggedInAppLayout } from "@/storybook/decorators/withLoggedInAppLayout";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { CreationModal } from "./CreationModal";
+import styles from "./CreationModal.stories.module.css";
 
 const MOCK_DRAFT_PARTIAL: GeneratingDraft = {
   requestId: "story-req-generating",
@@ -35,8 +40,16 @@ const meta = {
   title: "Haiku/CreationModal",
   component: CreationModal,
   parameters: {
-    layout: "centered",
+    layout: "fullscreen",
+    initialCelestialPreset: "blueNight" satisfies CelestialPresetName,
+    nextjs: {
+      appDirectory: true,
+      navigation: {
+        pathname: "/",
+      },
+    },
   },
+  decorators: [withLoggedInAppLayout],
   args: {
     open: true,
     onKeepScrolling: () => undefined,
@@ -49,12 +62,25 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Generating: Story = {};
+export const Generating: Story = {
+  render: (args) => (
+    <>
+      <HomePageContent />
+      <CreationModal {...args} />
+    </>
+  ),
+};
 
 export const Streaming: Story = {
   args: {
     generatingDraft: MOCK_DRAFT_STREAMING,
   },
+  render: (args) => (
+    <>
+      <HomePageContent />
+      <CreationModal {...args} />
+    </>
+  ),
 };
 
 export const Saved: Story = {
@@ -62,31 +88,44 @@ export const Saved: Story = {
     generatingDraft: null,
     haiku: MOCK_SAVED,
   },
+  render: (args) => (
+    <>
+      <HomePageContent />
+      <CreationModal {...args} />
+    </>
+  ),
 };
 
 export const Closed: Story = {
   args: {
     open: false,
   },
+  render: (args) => (
+    <>
+      <HomePageContent />
+      <CreationModal {...args} />
+    </>
+  ),
 };
 
 export const Interactive: Story = {
   render: function InteractiveStory(args) {
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
     return (
-      <div>
-        {!open ? (
-          <button type="button" onClick={() => setOpen(true)}>
+      <>
+        <HomePageContent />
+        <div className={styles.appViewToggle}>
+          <Button type="primary" onClick={() => setOpen(true)}>
             Open CreationModal
-          </button>
-        ) : null}
+          </Button>
+        </div>
         <CreationModal
           {...args}
           open={open}
           onKeepScrolling={() => setOpen(false)}
           onGoToHaiku={() => setOpen(false)}
         />
-      </div>
+      </>
     );
   },
 };
