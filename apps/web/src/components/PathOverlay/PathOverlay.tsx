@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useId,
   useRef,
@@ -195,6 +196,7 @@ function maxRingForOrigin(
 }
 
 type PathScrimProps = {
+  open: boolean;
   reduceMotion: boolean | null;
   fillOrigin: PathOverlayFillOrigin;
   seam: PathOverlaySeam;
@@ -202,9 +204,11 @@ type PathScrimProps = {
   lightClipId: string;
   onKeepScrolling?: () => void;
   onGoToBeginning?: () => void;
+  onCloseComplete?: () => void;
 };
 
 function PathScrim({
+  open,
   reduceMotion,
   fillOrigin,
   seam,
@@ -212,6 +216,7 @@ function PathScrim({
   lightClipId,
   onKeepScrolling,
   onGoToBeginning,
+  onCloseComplete,
 }: PathScrimProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const labelsRef = useRef<HTMLDivElement>(null);
@@ -246,6 +251,7 @@ function PathScrim({
     let gridW = 0;
     let gridH = 0;
     let cells: Cell[] = [];
+    let maxCellDelay = 0;
     let animationDone = reduceMotion === true;
 
     const buildGrid = () => {
@@ -268,22 +274,25 @@ function PathScrim({
         maxRing > 0 ? (TOTAL_OPEN_MS - CELL_DURATION_MS) / maxRing : 0;
 
       cells = [];
+      maxCellDelay = 0;
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
           const dark = isDarkSide((col + 0.5) / cols, (row + 0.5) / rows, seam);
+          const delay = cellDelayMs(
+            fillOrigin,
+            col,
+            row,
+            cols,
+            rows,
+            staggerStepMs,
+            dark,
+            darkFromTop,
+          );
+          maxCellDelay = Math.max(maxCellDelay, delay);
           cells.push({
             x: col * CELL_PX,
             y: row * CELL_PX,
-            delay: cellDelayMs(
-              fillOrigin,
-              col,
-              row,
-              cols,
-              rows,
-              staggerStepMs,
-              dark,
-              darkFromTop,
-            ),
+            delay,
             dark,
           });
         }
@@ -292,23 +301,43 @@ function PathScrim({
       return;
     };
 
-    const paint = (timeMs: number) => {
+    const paintCell = (cell: Cell, progress: number) => {
+      if (progress <= 0) return;
+      const t = progress >= 1 ? 1 : easeOut3(progress);
+      const size = CELL_PX * t;
+      const inset = (CELL_PX - size) / 2;
+      ctx.globalAlpha = t * OVERLAY_OPACITY;
+      ctx.fillStyle = cell.dark ? darkFill : lightFill;
+      ctx.fillRect(cell.x + inset, cell.y + inset, size, size);
+    };
+
+    const paintOpen = (timeMs: number) => {
       ctx.clearRect(0, 0, gridW, gridH);
       for (const cell of cells) {
         const local = (timeMs - cell.delay) / CELL_DURATION_MS;
         if (local <= 0) continue;
-        const t = local >= 1 ? 1 : easeOut3(local);
-        const size = CELL_PX * t;
-        const inset = (CELL_PX - size) / 2;
-        ctx.globalAlpha = t * OVERLAY_OPACITY;
-        ctx.fillStyle = cell.dark ? darkFill : lightFill;
-        ctx.fillRect(cell.x + inset, cell.y + inset, size, size);
+        paintCell(cell, local >= 1 ? 1 : local);
+      }
+      ctx.globalAlpha = 1;
+    };
+
+    const paintClose = (closeTimeMs: number) => {
+      ctx.clearRect(0, 0, gridW, gridH);
+      for (const cell of cells) {
+        const closeDelay = maxCellDelay - cell.delay;
+        const local = (closeTimeMs - closeDelay) / CELL_DURATION_MS;
+        if (local <= 0) {
+          paintCell(cell, 1);
+          continue;
+        }
+        if (local >= 1) continue;
+        paintCell(cell, 1 - easeOut3(local));
       }
       ctx.globalAlpha = 1;
     };
 
     const paintFinal = () => {
-      paint(TOTAL_OPEN_MS);
+      paintOpen(TOTAL_OPEN_MS);
     };
 
     const syncAfterAnimation = () => {
@@ -324,51 +353,93 @@ function PathScrim({
     };
     window.addEventListener("resize", onResize);
 
-    if (reduceMotion) {
+    let cellAnim: { cancel: () => void } | null = null;
+    let labelAnim: { cancel: () => void } | null = null;
+    let cancelled = false;
+
+    const runGridClose = () => {
       paintFinal();
-      if (labels) labels.style.opacity = "1";
+      const clock = { t: 0 };
+      cellAnim = animate(clock, {
+        t: TOTAL_OPEN_MS,
+        duration: TOTAL_OPEN_MS,
+        ease: "linear",
+        onUpdate: () => {
+          if (!cancelled) paintClose(clock.t);
+        },
+        onComplete: () => {
+          if (cancelled) return;
+          animationDone = false;
+          paintClose(TOTAL_OPEN_MS);
+          onCloseComplete?.();
+        },
+      });
+    };
+
+    if (reduceMotion) {
+      if (open) {
+        paintFinal();
+        if (labels) labels.style.opacity = "1";
+      } else {
+        paintClose(TOTAL_OPEN_MS);
+        if (labels) labels.style.opacity = "0";
+        onCloseComplete?.();
+      }
       return () => {
         window.removeEventListener("resize", onResize);
       };
     }
 
-    if (labels) labels.style.opacity = "0";
-    paint(0);
+    if (open) {
+      animationDone = false;
+      if (labels) labels.style.opacity = "0";
+      paintOpen(0);
 
-    const clock = { t: 0 };
-    const cellAnim = animate(clock, {
-      t: TOTAL_OPEN_MS,
-      duration: TOTAL_OPEN_MS,
-      ease: "linear",
-      onUpdate: () => paint(clock.t),
-      onComplete: () => {
-        animationDone = true;
-        // Cover any resize that happened during the open animation.
-        syncAfterAnimation();
-      },
-    });
+      const clock = { t: 0 };
+      cellAnim = animate(clock, {
+        t: TOTAL_OPEN_MS,
+        duration: TOTAL_OPEN_MS,
+        ease: "linear",
+        onUpdate: () => {
+          if (!cancelled) paintOpen(clock.t);
+        },
+        onComplete: () => {
+          if (cancelled) return;
+          animationDone = true;
+          syncAfterAnimation();
+        },
+      });
 
-    const labelAnim = labels
-      ? animate(labels, {
-          opacity: [0, 1],
-          delay: LABEL_DELAY_MS,
-          duration: LABEL_DURATION_MS,
-          ease: "out(2)",
-        })
-      : null;
+      labelAnim = labels
+        ? animate(labels, {
+            opacity: [0, 1],
+            delay: LABEL_DELAY_MS,
+            duration: LABEL_DURATION_MS,
+            ease: "out(2)",
+          })
+        : null;
+    } else {
+      animationDone = false;
+      if (labels) labels.style.opacity = "0";
+      paintFinal();
+      runGridClose();
+    }
 
     return () => {
-      cellAnim.cancel();
+      cancelled = true;
+      cellAnim?.cancel();
       labelAnim?.cancel();
       window.removeEventListener("resize", onResize);
     };
   }, [
+    open,
     reduceMotion,
     fillOrigin,
     seam,
     darkFromTop,
     darkFill,
     lightFill,
+    onCloseComplete,
   ]);
 
   const darkLobeStyle = {
@@ -414,55 +485,68 @@ function PathScrim({
 
       <canvas ref={canvasRef} className={styles.grid} aria-hidden />
 
-      <motion.button
-        type="button"
-        className={styles.lobe}
-        style={darkLobeStyle}
-        aria-label="Continue the journey"
-        onClick={() => onKeepScrolling?.()}
-        onHoverStart={() => setHoveredSide("dark")}
-        onHoverEnd={() => setHoveredSide((side) => (side === "dark" ? null : side))}
-        initial={false}
-        animate={
-          !reduceMotion && hoveredSide === "dark"
-            ? {
-                backgroundColor: [
-                  "rgba(245, 240, 232, 0.06)",
-                  "rgba(245, 240, 232, 0.16)",
-                  "rgba(245, 240, 232, 0.06)",
-                ],
-                boxShadow: [DARK_LOBE_GLOW_SOFT, DARK_LOBE_GLOW_STRONG, DARK_LOBE_GLOW_SOFT],
-              }
-            : LOBE_GLOW_REST
-        }
-        transition={hoveredSide === "dark" ? lobeGlowTransition : { duration: 0.28, ease: GLOW_EASE }}
-      />
+      {open ? (
+        <>
+          <motion.button
+            type="button"
+            className={styles.lobe}
+            style={darkLobeStyle}
+            aria-label="Continue the journey"
+            onClick={() => onKeepScrolling?.()}
+            onHoverStart={() => setHoveredSide("dark")}
+            onHoverEnd={() => setHoveredSide((side) => (side === "dark" ? null : side))}
+            initial={false}
+            animate={
+              !reduceMotion && hoveredSide === "dark"
+                ? {
+                    backgroundColor: [
+                      "rgba(245, 240, 232, 0.06)",
+                      "rgba(245, 240, 232, 0.16)",
+                      "rgba(245, 240, 232, 0.06)",
+                    ],
+                    boxShadow: [DARK_LOBE_GLOW_SOFT, DARK_LOBE_GLOW_STRONG, DARK_LOBE_GLOW_SOFT],
+                  }
+                : LOBE_GLOW_REST
+            }
+            transition={
+              hoveredSide === "dark" ? lobeGlowTransition : { duration: 0.28, ease: GLOW_EASE }
+            }
+          />
 
-      <motion.button
-        type="button"
-        className={styles.lobe}
-        style={lightLobeStyle}
-        aria-label="Go back to the start"
-        onClick={() => onGoToBeginning?.()}
-        onHoverStart={() => setHoveredSide("light")}
-        onHoverEnd={() => setHoveredSide((side) => (side === "light" ? null : side))}
-        initial={false}
-        animate={
-          !reduceMotion && hoveredSide === "light"
-            ? {
-                backgroundColor: [
-                  "rgba(255, 248, 220, 0.08)",
-                  "rgba(255, 248, 220, 0.2)",
-                  "rgba(255, 248, 220, 0.08)",
-                ],
-                boxShadow: [LIGHT_LOBE_GLOW_SOFT, LIGHT_LOBE_GLOW_STRONG, LIGHT_LOBE_GLOW_SOFT],
-              }
-            : LOBE_GLOW_REST
-        }
-        transition={hoveredSide === "light" ? lobeGlowTransition : { duration: 0.28, ease: GLOW_EASE }}
-      />
+          <motion.button
+            type="button"
+            className={styles.lobe}
+            style={lightLobeStyle}
+            aria-label="Go back to the start"
+            onClick={() => onGoToBeginning?.()}
+            onHoverStart={() => setHoveredSide("light")}
+            onHoverEnd={() => setHoveredSide((side) => (side === "light" ? null : side))}
+            initial={false}
+            animate={
+              !reduceMotion && hoveredSide === "light"
+                ? {
+                    backgroundColor: [
+                      "rgba(255, 248, 220, 0.08)",
+                      "rgba(255, 248, 220, 0.2)",
+                      "rgba(255, 248, 220, 0.08)",
+                    ],
+                    boxShadow: [LIGHT_LOBE_GLOW_SOFT, LIGHT_LOBE_GLOW_STRONG, LIGHT_LOBE_GLOW_SOFT],
+                  }
+                : LOBE_GLOW_REST
+            }
+            transition={
+              hoveredSide === "light" ? lobeGlowTransition : { duration: 0.28, ease: GLOW_EASE }
+            }
+          />
+        </>
+      ) : null}
 
-      <div ref={labelsRef} className={styles.labels} aria-hidden>
+      <div
+        ref={labelsRef}
+        className={styles.labels}
+        aria-hidden
+        style={open ? undefined : ({ opacity: 0, pointerEvents: "none" } as CSSProperties)}
+      >
         <motion.div
           className={styles.labelLeft}
           initial={false}
@@ -526,6 +610,15 @@ export function PathOverlay({
   const darkClipId = `path-dark-${clipUid}`;
   const lightClipId = `path-light-${clipUid}`;
   const reduceMotion = useReducedMotion();
+  const [mounted, setMounted] = useState(open);
+
+  useEffect(() => {
+    if (open) setMounted(true);
+  }, [open]);
+
+  const handleCloseComplete = useCallback(() => {
+    setMounted(false);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -550,7 +643,7 @@ export function PathOverlay({
 
   return createPortal(
     <AnimatePresence>
-      {open ? (
+      {mounted ? (
         <motion.div
           key="path-overlay"
           className={rootClass}
@@ -561,14 +654,14 @@ export function PathOverlay({
           onKeyDown={handleRootKeyDown}
           initial={{ opacity: 1 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={reduceMotion ? { duration: 0 } : { duration: 0.2 }}
+          exit={{ opacity: 1 }}
         >
           <span id={titleId} className={styles.visuallyHidden}>
             Overlay
           </span>
 
           <PathScrim
+            open={open}
             reduceMotion={reduceMotion}
             fillOrigin={fillOrigin}
             seam={seam}
@@ -576,11 +669,22 @@ export function PathOverlay({
             lightClipId={lightClipId}
             onKeepScrolling={onKeepScrolling}
             onGoToBeginning={onGoToBeginning}
+            onCloseComplete={handleCloseComplete}
           />
 
-          <div className={contentClass} style={{ overflow: "visible" } as CSSProperties}>
-            {children}
-          </div>
+          <motion.div
+            className={contentClass}
+            style={{ overflow: "visible" } as CSSProperties}
+            initial={false}
+            animate={{ opacity: open ? 1 : 0 }}
+            transition={
+              reduceMotion
+                ? { duration: 0 }
+                : { duration: 0.32, ease: [0.38, 0, 0.9, 1] }
+            }
+          >
+            <div className={styles.contentHitTarget}>{children}</div>
+          </motion.div>
         </motion.div>
       ) : null}
     </AnimatePresence>,

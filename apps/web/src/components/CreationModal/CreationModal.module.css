@@ -13,10 +13,7 @@
   transform-origin: center bottom;
   will-change: transform, opacity;
   pointer-events: none;
-}
-
-.flyIn > * {
-  pointer-events: auto;
+  overflow: visible;
 }
 
 @keyframes creationLanternFlyIn {

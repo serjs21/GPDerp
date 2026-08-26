@@ -26,6 +26,8 @@ export type CreationModalProps = {
   generatingDraft?: GeneratingDraft | null;
   /** Optional saved haiku once complete (stories can pass a mock). */
   haiku?: HaikuDto | null;
+  /** Show hover actions on a saved lantern (e.g. Storybook clickability checks). */
+  showLanternActions?: boolean;
 };
 
 export function CreationModal({
@@ -34,6 +36,7 @@ export function CreationModal({
   onGoToHaiku,
   generatingDraft = null,
   haiku = null,
+  showLanternActions = false,
 }: CreationModalProps) {
   const ariaLabel = generatingDraft
     ? `Generating haiku: ${generatingDraft.subject}`
@@ -64,7 +67,7 @@ export function CreationModal({
             {generatingDraft ? (
               <Lantern generatingDraft={generatingDraft} showActions={false} />
             ) : haiku ? (
-              <Lantern haiku={haiku} showActions={false} />
+              <Lantern haiku={haiku} showActions={showLanternActions} />
             ) : null}
           </LanternFrame>
         </div>

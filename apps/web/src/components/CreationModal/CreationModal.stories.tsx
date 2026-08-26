@@ -109,6 +109,11 @@ export const Closed: Story = {
 };
 
 export const Interactive: Story = {
+  args: {
+    generatingDraft: null,
+    haiku: MOCK_SAVED,
+    showLanternActions: true,
+  },
   render: function InteractiveStory(args) {
     const [open, setOpen] = useState(false);
     return (

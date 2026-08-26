@@ -64,26 +64,42 @@
   opacity: 0;
 }
 
+/* Left half — next / continue; center of label on half center × 75% down (25% from bottom) */
 .labelLeft {
   position: absolute;
-  left: 15%;
-  bottom: 25%;
+  left: 0;
+  top: 75%;
+  width: 50%;
+  display: flex;
+  justify-content: center;
   color: color-mix(in srgb, #f5f0e8 92%, transparent);
   will-change: filter, text-shadow;
 }
 
+.labelLeft > * {
+  transform: translateY(-50%);
+}
+
+/* Right half — prev / return; center of label on half center × 25% down */
 .labelRight {
   position: absolute;
-  right: 15%;
+  left: 50%;
   top: 25%;
+  width: 50%;
+  display: flex;
+  justify-content: center;
   color: color-mix(in srgb, #1a1814 88%, transparent);
   will-change: filter, text-shadow;
+}
+
+.labelRight > * {
+  transform: translateY(-50%);
 }
 
 .content {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 4;
   display: grid;
   place-items: center;
   max-width: none;
@@ -94,8 +110,28 @@
   gap: 0;
   box-sizing: border-box;
   overflow: visible;
-  pointer-events: auto;
+  pointer-events: none;
   background: transparent;
+}
+
+.contentHitTarget {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* Lantern shell + 2rem slop sit above overlay lobes and stay clickable. */
+.contentHitTarget article {
+  pointer-events: auto;
+}
+
+.contentHitTarget article::before {
+  content: "";
+  position: absolute;
+  inset: -2rem;
+  pointer-events: auto;
+  z-index: -1;
 }
 
 .visuallyHidden {
