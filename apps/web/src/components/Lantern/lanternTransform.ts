@@ -140,5 +140,14 @@ export function resolveLanternTransform(props: LanternTransformInput): LanternTr
     return getLanternTransformAtProgress(props.progress);
   }
 
-  return getLanternTransformAtStep(0, props.maxSteps);
+  // No path/step/progress — stay in flow so overlay grids can center the lantern.
+  // Flight-path step 0 is percent-positioned and would pin the article off-center.
+  return {
+    x: 0,
+    y: 0,
+    scale: 1,
+    rotate: 0,
+    opacity: 1,
+    positionMode: "translate",
+  };
 }

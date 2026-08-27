@@ -70,10 +70,11 @@ export function lanternTransformAtStops(
   const b = Math.ceil(pathStop);
   const localT = pathStop - a;
 
+  // Position walks intermediate path segments; scale/opacity lerp endpoints (stable ratio).
   const point = pointBetweenStops(parsed, a, b, a === b ? 1 : localT);
   if (!point) return null;
 
-  const pose = a === b ? poseAtStop(a) : lerpPose(a, b, localT);
+  const pose = lerpPose(fromStop, toStop, t);
 
   return {
     x: point.x,

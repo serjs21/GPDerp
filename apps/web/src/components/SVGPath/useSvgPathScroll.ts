@@ -7,7 +7,6 @@ import {
   isScrollToTopNear,
   SCROLL_TO_TOP_HANDOFF_INDEX,
   scrollToTopNearDurationMs,
-  scrollToTopQuickDurationMs,
 } from "./scrollToTop.config";
 
 type JumpEase = "linear" | "easeInOut" | "easeOut";
@@ -162,13 +161,12 @@ export function useSvgPathScroll(
       return finishNear(current);
     }
 
-    return runJump(handoff, {
-      durationMs: scrollToTopQuickDurationMs(current - handoff),
-      ease: "easeInOut",
-      onSettled: (settled) => {
-        finishNear(settled);
-      },
-    });
+    // Far: snap to handoff immediately, then run the near scroll from there.
+    focusRef.current = handoff;
+    setFromFocusIndex(handoff);
+    setFocusIndex(handoff);
+    setTweenProgress(1);
+    return finishNear(handoff);
   }, [durationMs, haikuCount, onFocusChange, runJump]);
 
   const getFocusIndex = useCallback(() => focusRef.current, []);

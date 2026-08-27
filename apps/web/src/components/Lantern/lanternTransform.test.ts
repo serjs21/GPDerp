@@ -6,9 +6,23 @@ import {
   getLanternTransformAtStep,
   lanternTransformToCssVars,
   lerp,
+  resolveLanternTransform,
 } from "./lanternTransform";
 
 describe("lanternTransform", () => {
+  describe("resolveLanternTransform", () => {
+    it("defaults to centered translate when no path inputs", () => {
+      expect(resolveLanternTransform({})).toEqual({
+        x: 0,
+        y: 0,
+        scale: 1,
+        rotate: 0,
+        opacity: 1,
+        positionMode: "translate",
+      });
+    });
+  });
+
   describe("getLanternTransformAtStep", () => {
     it("keeps step 0 at rest with percent positioning", () => {
       const start = getLanternTransformAtStep(0);
