@@ -1,6 +1,8 @@
 import {
   opacityAtStop,
   scaleAtStop,
+  SVG_PATH_EXIT_SCALE,
+  SVG_PATH_GONE_SCALE,
   SVG_PATH_QUEUE_SCALE_RATIO,
 } from "./lanternDisplay";
 
@@ -16,9 +18,9 @@ describe("lanternDisplay", () => {
   });
 
   it("overrides exit and gone stops", () => {
-    expect(scaleAtStop(21)).toBeCloseTo(1.2);
+    expect(scaleAtStop(21)).toBeCloseTo(SVG_PATH_EXIT_SCALE);
     expect(opacityAtStop(21)).toBeCloseTo(0.5);
-    expect(scaleAtStop(22)).toBeCloseTo(1.4);
+    expect(scaleAtStop(22)).toBeCloseTo(SVG_PATH_GONE_SCALE);
     expect(opacityAtStop(22)).toBe(0);
   });
 });

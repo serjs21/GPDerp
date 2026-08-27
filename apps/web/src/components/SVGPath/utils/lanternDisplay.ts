@@ -28,11 +28,11 @@ export type SvgPathPose = {
 };
 
 export function scaleAtStop(stopId: number): number {
-    if (stopId === SVG_PATH_FOCUS_STOP) return 1;
-    if (stopId === SVG_PATH_EXIT_STOP) return SVG_PATH_EXIT_SCALE;
-    if (stopId === SVG_PATH_GONE_STOP) return SVG_PATH_GONE_SCALE;
-    if (stopId < SPLIT_PATH_MIN_STOP || stopId > SVG_PATH_FOCUS_STOP) return 0;
-        return 1 / (SVG_PATH_FOCUS_STOP - stopId + 1);
+  if (stopId === SVG_PATH_EXIT_STOP) return SVG_PATH_EXIT_SCALE;
+  if (stopId === SVG_PATH_GONE_STOP) return SVG_PATH_GONE_SCALE;
+  if (stopId < SPLIT_PATH_MIN_STOP || stopId > SVG_PATH_FOCUS_STOP) return 0;
+  // Constant per-step ratio so adjacent stops change evenly (not harmonic 1→½→⅓…).
+  return SVG_PATH_QUEUE_SCALE_RATIO ** (SVG_PATH_FOCUS_STOP - stopId);
 }
 
 export function opacityAtStop(stopId: number): number {
@@ -70,11 +70,11 @@ export function lanternTransformAtStops(
   const b = Math.ceil(pathStop);
   const localT = pathStop - a;
 
-  // Position walks intermediate path segments; scale/opacity lerp endpoints (stable ratio).
+  // Position and scale both walk adjacent segments so ratio changes linearly per step.
   const point = pointBetweenStops(parsed, a, b, a === b ? 1 : localT);
   if (!point) return null;
 
-  const pose = lerpPose(fromStop, toStop, t);
+  const pose = a === b ? poseAtStop(a) : lerpPose(a, b, localT);
 
   return {
     x: point.x,
