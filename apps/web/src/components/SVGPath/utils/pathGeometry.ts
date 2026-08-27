@@ -65,7 +65,8 @@ function normalizeSample(
 }
 
 /**
- * Point along the authored segment between two adjacent stops.
+ * Point along the authored path between two stops (adjacent or multi-stop).
+ * Multi-stop ranges walk intermediate stops so lanterns follow the path.
  * `t` is 0 at `fromStop` and 1 at `toStop`.
  */
 export function pointBetweenStops(
@@ -80,6 +81,16 @@ export function pointBetweenStops(
   }
   if (t <= 1e-6) {
     return stopPoint(parsed, Math.round(fromStop));
+  }
+
+  const span = toStop - fromStop;
+  if (Math.abs(span) > 1 + 1e-6) {
+    const continuous = fromStop + span * t;
+    const a = Math.floor(continuous);
+    const b = Math.ceil(continuous);
+    const localT = continuous - a;
+    if (a === b) return stopPoint(parsed, a);
+    return pointBetweenStops(parsed, a, b, localT);
   }
 
   const segment = parsed.segmentsById[Math.min(fromStop, toStop)];

@@ -65,11 +65,15 @@ export function lanternTransformAtStops(
   toStop: number,
   t: number,
 ): LanternTransform | null {
-  const point = pointBetweenStops(parsed, fromStop, toStop, t);
+  const pathStop = fromStop + (toStop - fromStop) * t;
+  const a = Math.floor(pathStop);
+  const b = Math.ceil(pathStop);
+  const localT = pathStop - a;
+
+  const point = pointBetweenStops(parsed, a, b, a === b ? 1 : localT);
   if (!point) return null;
 
-  const pose = lerpPose(fromStop, toStop, t);
-  const pathStop = fromStop + (toStop - fromStop) * t;
+  const pose = a === b ? poseAtStop(a) : lerpPose(a, b, localT);
 
   return {
     x: point.x,

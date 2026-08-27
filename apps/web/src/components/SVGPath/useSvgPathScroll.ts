@@ -3,6 +3,20 @@
 import { useCallback, useRef, useState } from "react";
 import { animate } from "motion/react";
 import { canStepBack, canStepForward, clampFocusIndex } from "./utils";
+import {
+  isScrollToTopNear,
+  SCROLL_TO_TOP_HANDOFF_INDEX,
+  scrollToTopNearDurationMs,
+  scrollToTopQuickDurationMs,
+} from "./scrollToTop.config";
+
+type JumpEase = "linear" | "easeInOut" | "easeOut";
+
+type JumpOptions = {
+  durationMs: number;
+  ease?: JumpEase;
+  onSettled?: (focusIndex: number) => void;
+};
 
 export function useSvgPathScroll(
   haikuCount: number,
@@ -25,11 +39,12 @@ export function useSvgPathScroll(
   const animationRef = useRef<ReturnType<typeof animate> | null>(null);
   const pendingDirectionRef = useRef<1 | -1 | null>(null);
   const animationGenRef = useRef(0);
+  const runStepRef = useRef<(direction: 1 | -1) => boolean>(() => false);
 
-  const runStep = useCallback(
-    (direction: 1 | -1) => {
+  const runJump = useCallback(
+    (toIndex: number, jump: JumpOptions) => {
       const current = focusRef.current;
-      const next = clampFocusIndex(current + direction, haikuCount);
+      const next = clampFocusIndex(toIndex, haikuCount);
       if (next === current) return false;
 
       animationGenRef.current += 1;
@@ -43,8 +58,8 @@ export function useSvgPathScroll(
       setTweenProgress(0);
 
       animationRef.current = animate(0, 1, {
-        duration: durationMs / 1000,
-        ease: "linear",
+        duration: jump.durationMs / 1000,
+        ease: jump.ease ?? "linear",
         onUpdate: (value) => {
           if (animationGenRef.current !== gen) return;
           setTweenProgress(value);
@@ -55,22 +70,46 @@ export function useSvgPathScroll(
           setFromFocusIndex(next);
           setTweenProgress(1);
           animationRef.current = null;
-          const pending = pendingDirectionRef.current;
-          pendingDirectionRef.current = null;
-          if (pending) {
-            runStep(pending);
-            return;
-          }
-          setIsAnimating(false);
-          animatingRef.current = false;
-          onFocusChange?.(next);
+          jump.onSettled?.(next);
         },
       });
 
       return true;
     },
-    [durationMs, haikuCount, onFocusChange],
+    [haikuCount],
   );
+
+  const settleAfterStep = useCallback(
+    (settled: number) => {
+      const pending = pendingDirectionRef.current;
+      pendingDirectionRef.current = null;
+      if (pending) {
+        runStepRef.current(pending);
+        return;
+      }
+      setIsAnimating(false);
+      animatingRef.current = false;
+      onFocusChange?.(settled);
+    },
+    [onFocusChange],
+  );
+
+  const runStep = useCallback(
+    (direction: 1 | -1) => {
+      const current = focusRef.current;
+      const next = clampFocusIndex(current + direction, haikuCount);
+      if (next === current) return false;
+
+      return runJump(next, {
+        durationMs,
+        ease: "linear",
+        onSettled: settleAfterStep,
+      });
+    },
+    [durationMs, haikuCount, runJump, settleAfterStep],
+  );
+
+  runStepRef.current = runStep;
 
   const step = useCallback(
     (direction: 1 | -1) => {
@@ -94,6 +133,46 @@ export function useSvgPathScroll(
   const stepForward = useCallback(() => step(1), [step]);
   const stepBack = useCallback(() => step(-1), [step]);
 
+  const scrollToTop = useCallback(() => {
+    if (haikuCount === 0) return false;
+
+    const current = focusRef.current;
+    if (current === 0) return false;
+
+    pendingDirectionRef.current = null;
+    animationRef.current?.stop();
+
+    const finishNear = (fromIndex: number) =>
+      runJump(0, {
+        durationMs: scrollToTopNearDurationMs(fromIndex, durationMs),
+        ease: "easeOut",
+        onSettled: (settled) => {
+          setIsAnimating(false);
+          animatingRef.current = false;
+          onFocusChange?.(settled);
+        },
+      });
+
+    if (isScrollToTopNear(current)) {
+      return finishNear(current);
+    }
+
+    const handoff = clampFocusIndex(SCROLL_TO_TOP_HANDOFF_INDEX, haikuCount);
+    if (handoff >= current) {
+      return finishNear(current);
+    }
+
+    return runJump(handoff, {
+      durationMs: scrollToTopQuickDurationMs(current - handoff),
+      ease: "easeInOut",
+      onSettled: (settled) => {
+        finishNear(settled);
+      },
+    });
+  }, [durationMs, haikuCount, onFocusChange, runJump]);
+
+  const getFocusIndex = useCallback(() => focusRef.current, []);
+
   return {
     focusIndex,
     fromFocusIndex,
@@ -101,6 +180,8 @@ export function useSvgPathScroll(
     isAnimating,
     stepForward,
     stepBack,
+    scrollToTop,
+    getFocusIndex,
     canStepForward: !isAnimating && canStepForward(focusIndex, haikuCount),
     canStepBack: !isAnimating && canStepBack(focusIndex),
   };

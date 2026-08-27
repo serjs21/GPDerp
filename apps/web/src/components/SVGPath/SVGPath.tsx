@@ -1,6 +1,14 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { animate } from "motion/react";
 import type { HaikuDto } from "@/api/haikus";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
@@ -24,6 +32,11 @@ import styles from "./SVGPath.module.css";
 const SVG_PATH_SRC = "/split_path_colored_stops.svg";
 const SVG_PATH_STEP_MS = 300;
 const SVG_PATH_CATCH_UP_MS = 450;
+
+export type SVGPathHandle = {
+  scrollToTop: () => boolean;
+  getFocusIndex: () => number;
+};
 
 export type SVGPathProps = {
   haikus: HaikuDto[];
@@ -70,19 +83,22 @@ function useSplitPathSvg() {
   return splitPath;
 }
 
-export function SVGPath({
-  haikus,
-  generatingDraft = null,
-  initialFocusIndex,
-  hasNextPage = false,
-  isFetchingNextPage = false,
-  onVacantQueueSlot,
-  onFocusChange,
-  onHaikuDeleted,
-  onHaikuChanged,
-  className,
-  showGuides = false,
-}: SVGPathProps) {
+export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
+  {
+    haikus,
+    generatingDraft = null,
+    initialFocusIndex,
+    hasNextPage = false,
+    isFetchingNextPage = false,
+    onVacantQueueSlot,
+    onFocusChange,
+    onHaikuDeleted,
+    onHaikuChanged,
+    className,
+    showGuides = false,
+  },
+  ref,
+) {
   const splitPath = useSplitPathSvg();
   const parsed = splitPath?.parsed ?? null;
   const stageRef = useRef<HTMLDivElement>(null);
@@ -100,10 +116,21 @@ export function SVGPath({
     isAnimating,
     stepForward,
     stepBack,
+    scrollToTop,
+    getFocusIndex,
   } = useSvgPathScroll(scrollCount, SVG_PATH_STEP_MS, {
     initialFocusIndex,
     onFocusChange,
   });
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      scrollToTop,
+      getFocusIndex,
+    }),
+    [getFocusIndex, scrollToTop],
+  );
 
   const loaderShown = morePages && shouldFetchNextQueuePage(haikus.length, focusIndex);
 
@@ -262,4 +289,4 @@ export function SVGPath({
       </div>
     </div>
   );
-}
+});
