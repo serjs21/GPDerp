@@ -2,10 +2,10 @@
 export const SCROLL_TO_TOP_NEAR_THRESHOLD = 10;
 
 /** Far mode snaps here immediately, then finishes with the near animation. */
-export const SCROLL_TO_TOP_HANDOFF_INDEX = 3;
+export const SCROLL_TO_TOP_HANDOFF_INDEX = 2;
 
 /** Fixed duration for the near / final scroll-to-top leg. */
-export const SCROLL_TO_TOP_NEAR_MS = 1000;
+export const SCROLL_TO_TOP_NEAR_MS = 600;
 
 export function scrollToTopNearDurationMs(_distance?: number, _stepMs?: number): number {
   return SCROLL_TO_TOP_NEAR_MS * 1.5;

@@ -18,13 +18,14 @@ import { useSvgPathInput } from "./useSvgPathInput";
 import { useSvgPathScroll } from "./useSvgPathScroll";
 import {
   catchUpStopForHaiku,
+  creationFlyProgress,
+  generatingLanternTransformAtFlyT,
   isStopOnPath,
   lanternTransformAtStops,
   parseSplitPathSvg,
   shouldFetchNextQueuePage,
   splitPathSvgInnerMarkup,
   stopForHaikuIndex,
-  SVG_PATH_FOCUS_STOP,
   type ParsedSplitPathSvg,
 } from "./utils";
 import styles from "./SVGPath.module.css";
@@ -255,9 +256,14 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
     tweenProgress,
   ]);
 
-  const generatingTransform = parsed
-    ? lanternTransformAtStops(parsed, SVG_PATH_FOCUS_STOP, SVG_PATH_FOCUS_STOP, 1)
+  const generatingFlyT = generatingDraft
+    ? creationFlyProgress(focusIndex, fromFocusIndex, tweenProgress, isAnimating)
     : null;
+
+  const generatingTransform =
+    parsed && generatingFlyT !== null
+      ? generatingLanternTransformAtFlyT(parsed, generatingFlyT)
+      : null;
 
   const viewportClass = [styles.viewport, className].filter(Boolean).join(" ");
 
@@ -290,7 +296,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
               key={`generating-${generatingDraft.requestId}`}
               generatingDraft={generatingDraft}
               transform={generatingTransform}
-              flyIn
+              isAnimating={isAnimating}
             />
           ) : null}
         </div>

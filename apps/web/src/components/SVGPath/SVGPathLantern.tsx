@@ -15,7 +15,6 @@ export type SVGPathLanternProps = {
   loading?: boolean;
   transform: LanternTransform;
   isAnimating?: boolean;
-  flyIn?: boolean;
   onDeleted?: () => void;
   onChanged?: () => void;
 };
@@ -62,7 +61,6 @@ export function SVGPathLantern({
   loading = false,
   transform,
   isAnimating = false,
-  flyIn = false,
   onDeleted,
   onChanged,
 }: SVGPathLanternProps) {
@@ -86,7 +84,6 @@ export function SVGPathLantern({
       widthRem={19}
       ariaLabel={ariaLabel}
       generating={Boolean(generatingDraft)}
-      flyIn={flyIn}
     >
       <SVGPathLanternBody
         haiku={haiku}

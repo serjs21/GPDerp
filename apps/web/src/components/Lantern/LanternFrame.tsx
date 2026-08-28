@@ -24,8 +24,6 @@ export type LanternFrameProps = LanternTransformInput & {
   ariaLabel: string;
   widthRem?: number;
   generating?: boolean;
-  /** Modal-style fly-in on shell + content (path creation). */
-  flyIn?: boolean;
   children: ReactNode;
 };
 
@@ -35,7 +33,6 @@ export function LanternFrame({
   ariaLabel,
   widthRem = LANTERN_WIDTH_REM,
   generating = false,
-  flyIn = false,
   children,
   step,
   progress,
@@ -63,14 +60,18 @@ export function LanternFrame({
   const rootClass = [
     styles.root,
     resolved.positionMode === "percent" ? styles.pathPositioned : "",
-    flyIn ? styles.creationFlyInRoot : "",
     className,
   ]
     .filter(Boolean)
     .join(" ");
 
-  const lanternBody = (
-    <>
+  return (
+    <article
+      className={rootClass}
+      style={rootStyle}
+      aria-label={ariaLabel}
+      {...(generating ? { "data-haiku-generating": true } : {})}
+    >
       <div className={styles.shell} aria-hidden>
         {/* eslint-disable-next-line @next/next/no-img-element -- decorative lantern art from /public */}
         <img
@@ -86,17 +87,6 @@ export function LanternFrame({
       </div>
 
       <div className={styles.content}>{children}</div>
-    </>
-  );
-
-  return (
-    <article
-      className={rootClass}
-      style={rootStyle}
-      aria-label={ariaLabel}
-      {...(generating ? { "data-haiku-generating": true } : {})}
-    >
-      {flyIn ? <div className={styles.creationFlyIn}>{lanternBody}</div> : lanternBody}
     </article>
   );
 }

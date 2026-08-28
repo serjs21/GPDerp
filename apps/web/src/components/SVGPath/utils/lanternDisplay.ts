@@ -9,6 +9,7 @@ import {
   SVG_PATH_EXIT_STOP,
   SVG_PATH_FOCUS_STOP,
   SVG_PATH_GONE_STOP,
+  CREATION_FOCUS_INDEX,
 } from "./stops";
 
 /**
@@ -84,5 +85,57 @@ export function lanternTransformAtStops(
     rotate: 0,
     positionMode: "percent",
     stackOrder: Math.round(pathStop * 10),
+  };
+}
+
+/** Scroll-synced fly-in progress for the generating lantern (0 = exit stop, 1 = focus stop). */
+export function creationFlyProgress(
+  focusIndex: number,
+  fromFocusIndex: number,
+  tweenProgress: number,
+  isAnimating: boolean,
+): number {
+  if (focusIndex === CREATION_FOCUS_INDEX) {
+    if (isAnimating && fromFocusIndex !== CREATION_FOCUS_INDEX) {
+      return tweenProgress;
+    }
+    return 1;
+  }
+  return 0;
+}
+
+/** Generating lantern pose along exit→focus segment; bottom from -exit to +focus. */
+export function generatingLanternTransformAtFlyT(
+  parsed: ParsedSplitPathSvg,
+  flyT: number,
+): LanternTransform | null {
+  const segmentTransform = lanternTransformAtStops(
+    parsed,
+    SVG_PATH_EXIT_STOP,
+    SVG_PATH_FOCUS_STOP,
+    flyT,
+  );
+  const exitTransform = lanternTransformAtStops(
+    parsed,
+    SVG_PATH_EXIT_STOP,
+    SVG_PATH_EXIT_STOP,
+    1,
+  );
+  const destTransform = lanternTransformAtStops(
+    parsed,
+    SVG_PATH_FOCUS_STOP,
+    SVG_PATH_FOCUS_STOP,
+    1,
+  );
+  if (!segmentTransform || !exitTransform || !destTransform) return segmentTransform;
+
+  const exitBottomPct = (1 - exitTransform.y) * 100;
+  const destBottomPct = (1 - destTransform.y) * 100;
+  const bottomPct = lerp(-exitBottomPct, destBottomPct, flyT);
+
+  return {
+    ...segmentTransform,
+    y: 1 - bottomPct / 100,
+    positionMode: "percent",
   };
 }

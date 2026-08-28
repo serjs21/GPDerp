@@ -43,5 +43,7 @@ export {
   poseAtStop,
   lerpPose,
   lanternTransformAtStops,
+  creationFlyProgress,
+  generatingLanternTransformAtFlyT,
   type SvgPathPose,
 } from "./lanternDisplay";
