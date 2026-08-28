@@ -34,6 +34,7 @@ export function HaikuDisplay() {
     modalGeneratingDraft,
     onKeepScrolling,
     onGoToHaiku,
+    onCreationHaikuDeleted,
     bindHaikuSaved,
   } = useCreationPathGate(generatingDraft, pathRef);
 
@@ -65,7 +66,10 @@ export function HaikuDisplay() {
         isGenerating={Boolean(generatingDraft)}
         lanternSessionKey={creationSessionKey}
         showLanternActions={Boolean(creationHaiku)}
-        onHaikuDeleted={invalidate}
+        onHaikuDeleted={() => {
+          onCreationHaikuDeleted();
+          invalidate();
+        }}
         onHaikuChanged={invalidate}
         onKeepScrolling={onKeepScrolling}
         onGoToHaiku={onGoToHaiku}

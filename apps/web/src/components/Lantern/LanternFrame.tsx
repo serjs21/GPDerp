@@ -24,6 +24,7 @@ export type LanternFrameProps = LanternTransformInput & {
   ariaLabel: string;
   widthRem?: number;
   generating?: boolean;
+  flightExiting?: boolean;
   children: ReactNode;
 };
 
@@ -33,6 +34,7 @@ export function LanternFrame({
   ariaLabel,
   widthRem = LANTERN_WIDTH_REM,
   generating = false,
+  flightExiting = false,
   children,
   step,
   progress,
@@ -60,6 +62,7 @@ export function LanternFrame({
   const rootClass = [
     styles.root,
     resolved.positionMode === "percent" ? styles.pathPositioned : "",
+    flightExiting ? styles.flightExiting : "",
     className,
   ]
     .filter(Boolean)

@@ -59,6 +59,7 @@ export function HaikuGenerationStickyNote({
     modalGeneratingDraft,
     onKeepScrolling,
     onGoToHaiku,
+    onCreationHaikuDeleted,
     bindHaikuSaved,
   } = useCreationPathGate(generatingDraft, pathRef);
 
@@ -136,7 +137,10 @@ export function HaikuGenerationStickyNote({
         isGenerating={Boolean(generatingDraft)}
         lanternSessionKey={creationSessionKey}
         showLanternActions={Boolean(creationHaiku)}
-        onHaikuDeleted={invalidate}
+        onHaikuDeleted={() => {
+          onCreationHaikuDeleted();
+          invalidate();
+        }}
         onHaikuChanged={invalidate}
         onKeepScrolling={onKeepScrolling}
         onGoToHaiku={onGoToHaiku}

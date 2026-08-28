@@ -12,6 +12,8 @@
   --lantern-flame-bottom: 0.075;
   --lantern-flame-height: 0.1;
   --lantern-flame-anchor-y: 0.125;
+  --lantern-flight-x: 0px;
+  --lantern-flight-y: 0px;
 
   position: relative;
   display: inline-block;
@@ -30,9 +32,15 @@
   position: absolute;
   left: var(--lantern-left);
   bottom: var(--lantern-bottom);
-  transform: translate(-50%, calc(var(--lantern-flame-anchor-y) * -100%))
+  transform: translate(calc(-50% + var(--lantern-flight-x)), calc(var(--lantern-flame-anchor-y) * -100% + var(--lantern-flight-y)))
     scale(var(--lantern-scale)) rotate(var(--lantern-rotate));
   transform-origin: center bottom;
+}
+
+.flightExiting {
+  transition:
+    transform 2s ease-out,
+    opacity 2s ease-out;
 }
 
 .shell {
@@ -226,5 +234,9 @@
   .flame {
     animation: none;
     opacity: 0.85;
+  }
+
+  .flightExiting {
+    transition: none;
   }
 }

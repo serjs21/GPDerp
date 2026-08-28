@@ -67,6 +67,13 @@ export function useCreationPathGate(
     staleDraftRef.current = null;
   }, []);
 
+  const onCreationHaikuDeleted = useCallback(() => {
+    setCreationOpen(false);
+    setCreationHaiku(null);
+    setCreationSessionKey(null);
+    staleDraftRef.current = null;
+  }, []);
+
   const onGoToHaiku = useCallback(() => {
     pathRef.current?.scrollToTop();
     setCreationOpen(false);
@@ -87,6 +94,7 @@ export function useCreationPathGate(
     modalGeneratingDraft,
     onKeepScrolling,
     onGoToHaiku,
+    onCreationHaikuDeleted,
     bindHaikuSaved,
   };
 }

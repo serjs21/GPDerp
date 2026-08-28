@@ -2,6 +2,7 @@
 
 import type { HaikuDto } from "@/api/haikus";
 import { Lantern } from "@/components/Lantern/Lantern";
+import { LanternDeleteExit } from "@/components/Lantern/LanternDeleteExit";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import type { LanternTransform } from "@/components/Lantern/lanternTransform";
 import { PathOverlay } from "@/components/PathOverlay";
@@ -68,23 +69,40 @@ export function CreationModal({
     >
       <div className={styles.stage}>
         <div className={styles.flyIn} key={flyInKey}>
-          <LanternFrame
-            ariaLabel={ariaLabel}
-            widthRem={CREATION_LANTERN_WIDTH_REM}
-            transform={CREATION_LANTERN_TRANSFORM}
-            generating={isGenerating}
-          >
-            {generatingDraft ? (
+          {generatingDraft ? (
+            <LanternFrame
+              ariaLabel={ariaLabel}
+              widthRem={CREATION_LANTERN_WIDTH_REM}
+              transform={CREATION_LANTERN_TRANSFORM}
+              generating={isGenerating}
+            >
               <Lantern generatingDraft={generatingDraft} showActions={false} />
-            ) : haiku ? (
-              <Lantern
-                haiku={haiku}
-                showActions={showLanternActions}
-                onDeleted={onHaikuDeleted}
-                onChanged={onHaikuChanged}
-              />
-            ) : null}
-          </LanternFrame>
+            </LanternFrame>
+          ) : haiku ? (
+            <LanternDeleteExit
+              haiku={haiku}
+              transform={CREATION_LANTERN_TRANSFORM}
+              onDeleted={onHaikuDeleted}
+              onChanged={onHaikuChanged}
+            >
+              {({ onDelete, flightStyle, flightExiting }) => (
+                <LanternFrame
+                  ariaLabel={ariaLabel}
+                  widthRem={CREATION_LANTERN_WIDTH_REM}
+                  transform={CREATION_LANTERN_TRANSFORM}
+                  style={flightStyle}
+                  flightExiting={flightExiting}
+                >
+                  <Lantern
+                    haiku={haiku}
+                    showActions={showLanternActions}
+                    onDelete={onDelete}
+                    onChanged={onHaikuChanged}
+                  />
+                </LanternFrame>
+              )}
+            </LanternDeleteExit>
+          ) : null}
         </div>
       </div>
     </PathOverlay>
