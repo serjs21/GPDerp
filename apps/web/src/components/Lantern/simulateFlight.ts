@@ -1,11 +1,13 @@
 import type { CSSProperties } from "react";
 import type { LanternTransform } from "./lanternTransform";
 
-export const LANTERN_FLIGHT_EXIT_MS = 3000;
-export const LANTERN_FLIGHT_STEP_MS = 300;
+export const LANTERN_FLIGHT_EXIT_MS = 4000;
+export const LANTERN_FLIGHT_STEP_MS = 500;
 
-const FLIGHT_DISTANCE_MIN_PX = 120;
-const FLIGHT_DISTANCE_MAX_PX = 280;
+const FLIGHT_DISTANCE_X_MIN_PX = 120;
+const FLIGHT_DISTANCE_X_MAX_PX = 280;
+const FLIGHT_DISTANCE_Y_MIN_PX = 220;
+const FLIGHT_DISTANCE_Y_MAX_PX = 380;
 
 export type LanternFlightStyleInput = {
   positionMode?: LanternTransform["positionMode"];
@@ -22,13 +24,19 @@ export type SimulateFlightOptions = {
 };
 
 function flightOffset(random: () => number, callIndex: number): { x: number; y: number } {
-  const minPx = FLIGHT_DISTANCE_MIN_PX / callIndex;
-  const maxPx = FLIGHT_DISTANCE_MAX_PX / callIndex;
-  const angle = -Math.PI + random() * Math.PI;
-  const distance = minPx + random() * (maxPx - minPx);
+  const minX = FLIGHT_DISTANCE_X_MIN_PX / callIndex;
+  const maxX = FLIGHT_DISTANCE_X_MAX_PX / callIndex;
+  const minY = FLIGHT_DISTANCE_Y_MIN_PX / callIndex;
+  const maxY = FLIGHT_DISTANCE_Y_MAX_PX / callIndex;
+
+  const xMagnitude = minX + random() * (maxX - minX);
+  const xSign = random() < 0.5 ? -1 : 1;
+
+  const yMagnitude = Math.abs(minY + random() * (maxY - minY));
+
   return {
-    x: Math.cos(angle) * distance,
-    y: -Math.abs(Math.sin(angle) * distance),
+    x: xSign * xMagnitude,
+    y: -yMagnitude,
   };
 }
 

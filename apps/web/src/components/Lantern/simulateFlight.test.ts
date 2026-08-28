@@ -7,15 +7,15 @@ import {
 } from "./simulateFlight";
 
 describe("simulateFlight", () => {
-  it("exports 2s duration constant", () => {
-    expect(LANTERN_FLIGHT_EXIT_MS).toBe(2000);
+  it("exports exit duration constant", () => {
+    expect(LANTERN_FLIGHT_EXIT_MS).toBe(4000);
   });
 
   it("exports step constant matching LANTERN_FLIGHT_STEP_MS", () => {
-    expect(LANTERN_FLIGHT_STEP_MS).toBe(300);
+    expect(LANTERN_FLIGHT_STEP_MS).toBe(500);
   });
 
-  it("scales distance down by callIndex", () => {
+  it("scales x and y distance down by callIndex", () => {
     const random = () => 0;
     const first = simulateFlight({ positionMode: "percent" }, { random, callIndex: 1 }) as Record<
       string,
@@ -27,9 +27,14 @@ describe("simulateFlight", () => {
     >;
     const firstX = Math.abs(Number.parseFloat(first["--lantern-flight-x"]));
     const secondX = Math.abs(Number.parseFloat(second["--lantern-flight-x"]));
+    const firstY = Math.abs(Number.parseFloat(first["--lantern-flight-y"]));
+    const secondY = Math.abs(Number.parseFloat(second["--lantern-flight-y"]));
     expect(firstX).toBeGreaterThan(0);
     expect(secondX).toBeGreaterThan(0);
+    expect(firstY).toBeGreaterThan(0);
+    expect(secondY).toBeGreaterThan(0);
     expect(secondX).toBeCloseTo(firstX / 2, 0);
+    expect(secondY).toBeCloseTo(firstY / 2, 0);
   });
 
   it("never flies downward for path-positioned lanterns", () => {
