@@ -13,6 +13,11 @@ describe("stops", () => {
     expect(stopForHaikuIndex(1, 0)).toBe(19);
   });
 
+  it("leaves stop-20 empty at creation focus -1", () => {
+    expect(stopForHaikuIndex(0, -1)).toBe(19);
+    expect(stopForHaikuIndex(1, -1)).toBe(18);
+  });
+
   it("moves the newest haiku to stop-21 when focus is 1", () => {
     expect(stopForHaikuIndex(0, 1)).toBe(21);
     expect(stopForHaikuIndex(1, 1)).toBe(20);

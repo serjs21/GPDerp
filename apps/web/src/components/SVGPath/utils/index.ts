@@ -29,6 +29,8 @@ export {
   canStepBack,
   canStepForward,
   clampFocusIndex,
+  clampScrollFocusIndex,
+  CREATION_FOCUS_INDEX,
 } from "./stops";
 export {
   SVG_PATH_QUEUE_SCALE_RATIO,

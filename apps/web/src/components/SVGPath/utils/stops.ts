@@ -12,6 +12,9 @@ export function isStopOnPath(stopId: number): boolean {
   return stopId >= SPLIT_PATH_MIN_STOP && stopId <= SPLIT_PATH_MAX_STOP;
 }
 
+/** Focus index that leaves stop-20 empty for the generating lantern. */
+export const CREATION_FOCUS_INDEX = -1;
+
 /** Which authored stop a haiku occupies when `focusIndex` sits on stop-20. */
 export function stopForHaikuIndex(haikuIndex: number, focusIndex: number): number {
   return SVG_PATH_FOCUS_STOP + focusIndex - haikuIndex;
@@ -50,6 +53,12 @@ export function canStepBack(focusIndex: number): boolean {
 export function canStepForward(focusIndex: number, haikuCount: number): boolean {
   if (haikuCount <= 0) return false;
   return focusIndex < haikuCount - 1;
+}
+
+/** Scroll target clamp; allows creation slot (-1) when list is non-empty. */
+export function clampScrollFocusIndex(focusIndex: number, haikuCount: number): number {
+  if (haikuCount <= 0) return 0;
+  return Math.max(CREATION_FOCUS_INDEX, Math.min(haikuCount - 1, focusIndex));
 }
 
 export function clampFocusIndex(focusIndex: number, haikuCount: number): number {

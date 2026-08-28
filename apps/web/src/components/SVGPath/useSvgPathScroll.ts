@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { animate } from "motion/react";
-import { canStepBack, canStepForward, clampFocusIndex } from "./utils";
+import { canStepBack, canStepForward, clampFocusIndex, clampScrollFocusIndex, CREATION_FOCUS_INDEX } from "./utils";
 import {
   isScrollToTopNear,
   SCROLL_TO_TOP_HANDOFF_INDEX,
@@ -41,9 +41,9 @@ export function useSvgPathScroll(
   const runStepRef = useRef<(direction: 1 | -1) => boolean>(() => false);
 
   const runJump = useCallback(
-    (toIndex: number, jump: JumpOptions) => {
+    (toIndex: number, jump: JumpOptions, clamp: typeof clampFocusIndex = clampFocusIndex) => {
       const current = focusRef.current;
-      const next = clampFocusIndex(toIndex, haikuCount);
+      const next = clamp(toIndex, haikuCount);
       if (next === current) return false;
 
       animationGenRef.current += 1;
@@ -132,6 +132,31 @@ export function useSvgPathScroll(
   const stepForward = useCallback(() => step(1), [step]);
   const stepBack = useCallback(() => step(-1), [step]);
 
+  const snapFocusIndex = useCallback(
+    (toIndex: number, clamp: typeof clampFocusIndex = clampFocusIndex) => {
+      if (haikuCount === 0) return false;
+
+      const next = clamp(toIndex, haikuCount);
+      if (focusRef.current === next) return false;
+
+      pendingDirectionRef.current = null;
+      animationRef.current?.stop();
+      animationGenRef.current += 1;
+
+      focusRef.current = next;
+      setFocusIndex(next);
+      setFromFocusIndex(next);
+      setTweenProgress(1);
+      setIsAnimating(false);
+      animatingRef.current = false;
+      onFocusChange?.(next);
+      return true;
+    },
+    [haikuCount, onFocusChange],
+  );
+
+  const snapToTop = useCallback(() => snapFocusIndex(0), [snapFocusIndex]);
+
   const scrollToTop = useCallback(() => {
     if (haikuCount === 0) return false;
 
@@ -169,6 +194,30 @@ export function useSvgPathScroll(
     return finishNear(handoff);
   }, [durationMs, haikuCount, onFocusChange, runJump]);
 
+  const scrollToCreationSlot = useCallback(() => {
+    if (haikuCount === 0) return false;
+
+    const current = focusRef.current;
+    if (current === CREATION_FOCUS_INDEX) return false;
+
+    pendingDirectionRef.current = null;
+    animationRef.current?.stop();
+
+    return runJump(
+      CREATION_FOCUS_INDEX,
+      {
+        durationMs: scrollToTopNearDurationMs(current, durationMs),
+        ease: "easeOut",
+        onSettled: (settled) => {
+          setIsAnimating(false);
+          animatingRef.current = false;
+          onFocusChange?.(settled);
+        },
+      },
+      clampScrollFocusIndex,
+    );
+  }, [durationMs, haikuCount, onFocusChange, runJump]);
+
   const getFocusIndex = useCallback(() => focusRef.current, []);
 
   return {
@@ -179,6 +228,8 @@ export function useSvgPathScroll(
     stepForward,
     stepBack,
     scrollToTop,
+    scrollToCreationSlot,
+    snapToTop,
     getFocusIndex,
     canStepForward: !isAnimating && canStepForward(focusIndex, haikuCount),
     canStepBack: !isAnimating && canStepBack(focusIndex),

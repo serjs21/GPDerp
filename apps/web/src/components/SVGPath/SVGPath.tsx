@@ -35,6 +35,9 @@ const SVG_PATH_CATCH_UP_MS = 450;
 
 export type SVGPathHandle = {
   scrollToTop: () => boolean;
+  scrollToCreationSlot: () => boolean;
+  /** Instantly set focus to 0 (no scroll animation). */
+  snapToTop: () => boolean;
   getFocusIndex: () => number;
 };
 
@@ -117,6 +120,8 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
     stepForward,
     stepBack,
     scrollToTop,
+    scrollToCreationSlot,
+    snapToTop,
     getFocusIndex,
   } = useSvgPathScroll(scrollCount, SVG_PATH_STEP_MS, {
     initialFocusIndex,
@@ -127,9 +132,11 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
     ref,
     () => ({
       scrollToTop,
+      scrollToCreationSlot,
+      snapToTop,
       getFocusIndex,
     }),
-    [getFocusIndex, scrollToTop],
+    [getFocusIndex, scrollToCreationSlot, scrollToTop, snapToTop],
   );
 
   const loaderShown = morePages && shouldFetchNextQueuePage(haikus.length, focusIndex);
@@ -283,6 +290,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
               key={`generating-${generatingDraft.requestId}`}
               generatingDraft={generatingDraft}
               transform={generatingTransform}
+              flyIn
             />
           ) : null}
         </div>

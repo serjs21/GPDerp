@@ -32,7 +32,7 @@ export function useCreationPathGate(
       return;
     }
 
-    pathRef.current?.scrollToTop();
+    pathRef.current?.scrollToCreationSlot();
   }, [generatingDraft, pathRef]);
 
   useEffect(() => {
@@ -51,9 +51,13 @@ export function useCreationPathGate(
       if (creationOpen) {
         setCreationHaiku(haiku);
         staleDraftRef.current = null;
+        return;
       }
+
+      // Near path: snap focus to 0 so saved haiku replaces generating lantern at stop-20.
+      pathRef.current?.snapToTop();
     },
-    [creationOpen],
+    [creationOpen, pathRef],
   );
 
   const onKeepScrolling = useCallback(() => {
