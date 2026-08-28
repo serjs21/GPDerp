@@ -26,8 +26,14 @@ export type CreationModalProps = {
   generatingDraft?: GeneratingDraft | null;
   /** Optional saved haiku once complete (stories can pass a mock). */
   haiku?: HaikuDto | null;
+  /** When true, lantern shows generating shimmer (draft may be stale after stream ends). */
+  isGenerating?: boolean;
+  /** Stable fly-in key for the whole create session (requestId); avoids remount on save. */
+  lanternSessionKey?: string | null;
   /** Show hover actions on a saved lantern (e.g. Storybook clickability checks). */
   showLanternActions?: boolean;
+  onHaikuDeleted?: () => void;
+  onHaikuChanged?: () => void;
 };
 
 export function CreationModal({
@@ -36,13 +42,20 @@ export function CreationModal({
   onGoToHaiku,
   generatingDraft = null,
   haiku = null,
+  isGenerating = false,
+  lanternSessionKey = null,
   showLanternActions = false,
+  onHaikuDeleted,
+  onHaikuChanged,
 }: CreationModalProps) {
   const ariaLabel = generatingDraft
     ? `Generating haiku: ${generatingDraft.subject}`
     : haiku
       ? `Haiku lantern: ${haiku.title ?? ""}`
       : "Haiku creation";
+
+  const flyInKey =
+    lanternSessionKey ?? generatingDraft?.requestId ?? haiku?.id ?? "lantern";
 
   return (
     <PathOverlay
@@ -54,20 +67,22 @@ export function CreationModal({
       onClose={onKeepScrolling}
     >
       <div className={styles.stage}>
-        <div
-          className={styles.flyIn}
-          key={generatingDraft?.requestId ?? haiku?.id ?? "lantern"}
-        >
+        <div className={styles.flyIn} key={flyInKey}>
           <LanternFrame
             ariaLabel={ariaLabel}
             widthRem={CREATION_LANTERN_WIDTH_REM}
             transform={CREATION_LANTERN_TRANSFORM}
-            generating={Boolean(generatingDraft)}
+            generating={isGenerating}
           >
             {generatingDraft ? (
               <Lantern generatingDraft={generatingDraft} showActions={false} />
             ) : haiku ? (
-              <Lantern haiku={haiku} showActions={showLanternActions} />
+              <Lantern
+                haiku={haiku}
+                showActions={showLanternActions}
+                onDeleted={onHaikuDeleted}
+                onChanged={onHaikuChanged}
+              />
             ) : null}
           </LanternFrame>
         </div>

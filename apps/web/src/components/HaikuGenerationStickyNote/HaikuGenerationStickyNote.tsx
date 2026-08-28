@@ -1,9 +1,10 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useEffect, useRef } from "react";
 import { CreationModal } from "@/components/CreationModal";
 import { SavedHaikusLanternPath } from "@/components/SavedHaikusLanternPath/SavedHaikusLanternPath";
 import type { SVGPathHandle } from "@/components/SVGPath";
+import { useInfiniteHaikusQuery } from "@/hooks/useInfiniteHaikusQuery";
 import { useCreationPathGate } from "./hooks/useCreationPathGate";
 import { useHaikuGenerationFlow } from "./hooks/useHaikuGenerationFlow";
 import { useSavedHaikuCount } from "./hooks/useSavedHaikuCount";
@@ -35,6 +36,10 @@ export function HaikuGenerationStickyNote({
   cardWidthRem = HAIKU_CARD_WIDTH_REM,
   stickyInputMinHeightRem = STICKY_INPUT_MIN_HEIGHT_REM,
 }: HaikuGenerationStickyNoteProps = {}) {
+  const pathRef = useRef<SVGPathHandle>(null);
+  const bindHaikuSavedRef = useRef<(haiku: import("@/api/haikus").HaikuDto) => void>(() => {});
+  const { invalidate } = useInfiniteHaikusQuery();
+
   const {
     subject,
     setSubject,
@@ -43,13 +48,23 @@ export function HaikuGenerationStickyNote({
     inputRef,
     onSubmit,
     contextHolder,
-  } = useHaikuGenerationFlow();
+  } = useHaikuGenerationFlow({
+    onHaikuSaved: (haiku) => bindHaikuSavedRef.current(haiku),
+  });
 
-  const pathRef = useRef<SVGPathHandle>(null);
-  const { creationOpen, onKeepScrolling, onGoToHaiku } = useCreationPathGate(
-    generatingDraft,
-    pathRef,
-  );
+  const {
+    creationOpen,
+    creationHaiku,
+    creationSessionKey,
+    modalGeneratingDraft,
+    onKeepScrolling,
+    onGoToHaiku,
+    bindHaikuSaved,
+  } = useCreationPathGate(generatingDraft, pathRef);
+
+  useEffect(() => {
+    bindHaikuSavedRef.current = bindHaikuSaved;
+  }, [bindHaikuSaved]);
 
   const { count, isListReady, isLoggedIn } = useSavedHaikuCount();
   const { mode } = useStickyInputPlacement(stickyInputMinHeightRem);
@@ -116,7 +131,13 @@ export function HaikuGenerationStickyNote({
 
       <CreationModal
         open={creationOpen}
-        generatingDraft={generatingDraft}
+        generatingDraft={modalGeneratingDraft}
+        haiku={creationHaiku}
+        isGenerating={Boolean(generatingDraft)}
+        lanternSessionKey={creationSessionKey}
+        showLanternActions={Boolean(creationHaiku)}
+        onHaikuDeleted={invalidate}
+        onHaikuChanged={invalidate}
         onKeepScrolling={onKeepScrolling}
         onGoToHaiku={onGoToHaiku}
       />

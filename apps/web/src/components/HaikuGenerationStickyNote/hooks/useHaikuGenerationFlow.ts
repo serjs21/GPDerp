@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { notification } from "@/components/StyledComponents";
+import type { HaikuDto } from "@/api/haikus";
 import {
   HAIKU_LIST_PAGE_SIZE,
   prependHaikuToInfiniteCache,
@@ -11,7 +12,12 @@ import { useHaikuSocket } from "@/hooks/useHaikuSocket";
 import { useAuthenticationVerification } from "@/app/providers/AuthenticationVerificationProvider";
 import { usePendingHaikuSubmit } from "./usePendingHaikuSubmit";
 
-export function useHaikuGenerationFlow() {
+export type UseHaikuGenerationFlowOptions = {
+  onHaikuSaved?: (haiku: HaikuDto) => void;
+};
+
+export function useHaikuGenerationFlow(options?: UseHaikuGenerationFlowOptions) {
+  const { onHaikuSaved: onHaikuSavedExtra } = options ?? {};
   const queryClient = useQueryClient();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,6 +28,7 @@ export function useHaikuGenerationFlow() {
   const { generatingDraft } = useHaikuSocket({
     onHaikuSaved: (haiku) => {
       prependHaikuToInfiniteCache(queryClient, HAIKU_LIST_PAGE_SIZE, haiku);
+      onHaikuSavedExtra?.(haiku);
     },
   });
 
