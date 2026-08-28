@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback } from "react";
+import { forwardRef, useCallback } from "react";
 import { Button } from "@/components/StyledComponents";
-import { SVGPath } from "@/components/SVGPath";
+import { SVGPath, type SVGPathHandle } from "@/components/SVGPath";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { useInfiniteHaikusQuery } from "@/hooks/useInfiniteHaikusQuery";
@@ -12,9 +12,10 @@ export type SavedHaikusLanternPathProps = {
   generatingDraft?: GeneratingDraft | null;
 };
 
-export function SavedHaikusLanternPath({
-  generatingDraft = null,
-}: SavedHaikusLanternPathProps) {
+export const SavedHaikusLanternPath = forwardRef<
+  SVGPathHandle,
+  SavedHaikusLanternPathProps
+>(function SavedHaikusLanternPath({ generatingDraft = null }, ref) {
   const {
     haikus,
     hasNextPage,
@@ -61,6 +62,7 @@ export function SavedHaikusLanternPath({
 
   return (
     <SVGPath
+      ref={ref}
       haikus={haikus}
       generatingDraft={generatingDraft}
       hasNextPage={hasNextPage}
@@ -71,4 +73,4 @@ export function SavedHaikusLanternPath({
       showGuides
     />
   );
-}
+});

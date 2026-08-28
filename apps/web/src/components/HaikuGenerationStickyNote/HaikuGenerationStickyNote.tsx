@@ -1,7 +1,10 @@
 "use client";
 
 import { useLayoutEffect, useRef } from "react";
+import { CreationModal } from "@/components/CreationModal";
 import { SavedHaikusLanternPath } from "@/components/SavedHaikusLanternPath/SavedHaikusLanternPath";
+import type { SVGPathHandle } from "@/components/SVGPath";
+import { useCreationPathGate } from "./hooks/useCreationPathGate";
 import { useHaikuGenerationFlow } from "./hooks/useHaikuGenerationFlow";
 import { useSavedHaikuCount } from "./hooks/useSavedHaikuCount";
 import { useStickyInputPlacement } from "./hooks/useStickyInputPlacement";
@@ -41,6 +44,12 @@ export function HaikuGenerationStickyNote({
     onSubmit,
     contextHolder,
   } = useHaikuGenerationFlow();
+
+  const pathRef = useRef<SVGPathHandle>(null);
+  const { creationOpen, onKeepScrolling, onGoToHaiku } = useCreationPathGate(
+    generatingDraft,
+    pathRef,
+  );
 
   const { count, isListReady, isLoggedIn } = useSavedHaikuCount();
   const { mode } = useStickyInputPlacement(stickyInputMinHeightRem);
@@ -84,7 +93,10 @@ export function HaikuGenerationStickyNote({
   return (
     <div ref={wrapperRef} className={styles.wrapper} style={layoutStyle}>
       <div className={styles.displayArea}>
-        <SavedHaikusLanternPath generatingDraft={generatingDraft} />
+        <SavedHaikusLanternPath
+          ref={pathRef}
+          generatingDraft={creationOpen ? null : generatingDraft}
+        />
         <InitialHaikuGate
           key={isLoggedIn ? "logged-in" : "logged-out"}
           count={count}
@@ -101,6 +113,13 @@ export function HaikuGenerationStickyNote({
           inputRef={inputRef}
         />
       </div>
+
+      <CreationModal
+        open={creationOpen}
+        generatingDraft={generatingDraft}
+        onKeepScrolling={onKeepScrolling}
+        onGoToHaiku={onGoToHaiku}
+      />
 
       {contextHolder}
     </div>
