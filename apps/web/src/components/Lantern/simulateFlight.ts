@@ -6,7 +6,7 @@ import type { LanternTransform } from "./lanternTransform";
 import { easeOutCubic } from "./lanternTransform";
 
 export const LANTERN_FLIGHT_EXIT_MS = 3000;
-export const LANTERN_FLIGHT_STEP_MS = 500;
+export const LANTERN_FLIGHT_STEP_MS = 600;
 
 const FLIGHT_DISTANCE_X_MIN_PX = 80;
 const FLIGHT_DISTANCE_X_MAX_PX = 120;

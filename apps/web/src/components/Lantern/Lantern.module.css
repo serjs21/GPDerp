@@ -39,8 +39,8 @@
 
 .flightExiting {
   transition:
-    transform 500ms ease-out,
-    opacity 500ms ease-out;
+    transform 600ms linear,
+    opacity 400ms ease-in;
 }
 
 .shell {
