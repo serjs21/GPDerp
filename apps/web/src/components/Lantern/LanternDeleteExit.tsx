@@ -8,10 +8,9 @@ import { message } from "@/components/StyledComponents";
 import type { LanternTransform } from "./lanternTransform";
 import {
   initialFlightCssVars,
-  LANTERN_FLIGHT_EXIT_MS,
   lanternTransformToFlightInput,
   prefersReducedMotion,
-  simulateFlight,
+  runSteppedLanternFlight,
 } from "./simulateFlight";
 
 export type LanternDeleteExitProps = {
@@ -26,12 +25,6 @@ export type LanternDeleteExitProps = {
   }) => ReactNode;
 };
 
-function waitForFlightExit(): Promise<void> {
-  return new Promise((resolve) => {
-    window.setTimeout(resolve, LANTERN_FLIGHT_EXIT_MS);
-  });
-}
-
 export function LanternDeleteExit({
   haiku,
   transform,
@@ -44,6 +37,7 @@ export function LanternDeleteExit({
     initialFlightCssVars(transform.positionMode),
   );
   const animatingRef = useRef(false);
+  const flightCancelRef = useRef<(() => void) | null>(null);
 
   const handleDelete = useCallback(async () => {
     if (animatingRef.current) return;
@@ -65,19 +59,19 @@ export function LanternDeleteExit({
 
       await new Promise<void>((resolve) => {
         requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            setFlightStyle(simulateFlight(flightInput));
-            resolve();
-          });
+          requestAnimationFrame(resolve);
         });
       });
 
-      await waitForFlightExit();
+      const { promise, cancel } = runSteppedLanternFlight(flightInput, setFlightStyle);
+      flightCancelRef.current = cancel;
+      await promise;
 
       await deleteHaiku(haiku.id);
       message.success("Haiku deleted");
       onDeleted?.();
     } catch (e) {
+      flightCancelRef.current?.();
       setFlightExiting(false);
       setFlightStyle(resetStyle);
       if (axios.isAxiosError(e) && e.response?.status === 403) {
@@ -87,6 +81,7 @@ export function LanternDeleteExit({
       }
       throw e;
     } finally {
+      flightCancelRef.current = null;
       animatingRef.current = false;
     }
   }, [haiku.id, onDeleted, transform]);

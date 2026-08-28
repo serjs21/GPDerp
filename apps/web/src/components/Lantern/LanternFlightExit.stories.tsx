@@ -1,7 +1,7 @@
 "use client";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { useCallback, useEffect, useState, type CSSProperties } from "react";
+import { useCallback, useRef, useState, type CSSProperties } from "react";
 import type { CelestialPresetName } from "@/theme/celestialPresets";
 import { Button } from "@/components/StyledComponents";
 import {
@@ -15,11 +15,7 @@ import {
 import { Lantern } from "./Lantern";
 import { LanternFrame } from "./LanternFrame";
 import type { LanternTransform } from "./lanternTransform";
-import {
-  initialFlightCssVars,
-  LANTERN_FLIGHT_EXIT_MS,
-  simulateFlight,
-} from "./simulateFlight";
+import { initialFlightCssVars, runSteppedLanternFlight } from "./simulateFlight";
 import styles from "./Lantern.stories.module.css";
 import demoStyles from "./LanternFlightExit.stories.module.css";
 
@@ -45,8 +41,11 @@ function LanternFlightExitDemo() {
   );
   const [flightExiting, setFlightExiting] = useState(false);
   const [runKey, setRunKey] = useState(0);
+  const flightCancelRef = useRef<(() => void) | null>(null);
 
   const resetFlight = useCallback(() => {
+    flightCancelRef.current?.();
+    flightCancelRef.current = null;
     setFlightExiting(false);
     setFlightStyle(initialFlightCssVars("percent"));
   }, []);
@@ -58,16 +57,15 @@ function LanternFlightExitDemo() {
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         setFlightExiting(true);
-        setFlightStyle(simulateFlight({ positionMode: "percent" }));
+        const { promise, cancel } = runSteppedLanternFlight(
+          { positionMode: "percent" },
+          setFlightStyle,
+        );
+        flightCancelRef.current = cancel;
+        void promise.then(resetFlight);
       });
     });
   }, [resetFlight]);
-
-  useEffect(() => {
-    if (!flightExiting) return;
-    const timer = window.setTimeout(resetFlight, LANTERN_FLIGHT_EXIT_MS);
-    return () => window.clearTimeout(timer);
-  }, [flightExiting, runKey, resetFlight]);
 
   return (
     <div className={demoStyles.demo}>

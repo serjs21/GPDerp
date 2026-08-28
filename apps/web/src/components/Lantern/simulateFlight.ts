@@ -1,10 +1,11 @@
 import type { CSSProperties } from "react";
 import type { LanternTransform } from "./lanternTransform";
 
-export const LANTERN_FLIGHT_EXIT_MS = 2000;
+export const LANTERN_FLIGHT_EXIT_MS = 3000;
+export const LANTERN_FLIGHT_STEP_MS = 300;
 
-const FLIGHT_DISTANCE_MIN_PX = 380;
-const FLIGHT_DISTANCE_MAX_PX = 580;
+const FLIGHT_DISTANCE_MIN_PX = 120;
+const FLIGHT_DISTANCE_MAX_PX = 280;
 
 export type LanternFlightStyleInput = {
   positionMode?: LanternTransform["positionMode"];
@@ -16,11 +17,15 @@ export type LanternFlightStyleInput = {
 
 export type SimulateFlightOptions = {
   random?: () => number;
+  /** 1-based step index; min/max distance are divided by this value. */
+  callIndex?: number;
 };
 
-function flightOffset(random: () => number): { x: number; y: number } {
+function flightOffset(random: () => number, callIndex: number): { x: number; y: number } {
+  const minPx = FLIGHT_DISTANCE_MIN_PX / callIndex;
+  const maxPx = FLIGHT_DISTANCE_MAX_PX / callIndex;
   const angle = -Math.PI + random() * Math.PI;
-  const distance = FLIGHT_DISTANCE_MIN_PX + random() * (FLIGHT_DISTANCE_MAX_PX - FLIGHT_DISTANCE_MIN_PX);
+  const distance = minPx + random() * (maxPx - minPx);
   return {
     x: Math.cos(angle) * distance,
     y: -Math.abs(Math.sin(angle) * distance),
@@ -33,7 +38,8 @@ export function simulateFlight(
   options: SimulateFlightOptions = {},
 ): CSSProperties {
   const random = options.random ?? Math.random;
-  const { x, y } = flightOffset(random);
+  const callIndex = Math.max(1, options.callIndex ?? 1);
+  const { x, y } = flightOffset(random, callIndex);
   const baseX = styles.x ?? 0;
   const baseY = styles.y ?? 0;
   const baseRotate = styles.rotate ?? 0;
@@ -84,4 +90,44 @@ export function prefersReducedMotion(): boolean {
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
+}
+
+/** Calls simulateFlight at t=0, 600, 1200, 1800ms; resolves after LANTERN_FLIGHT_EXIT_MS. */
+export function runSteppedLanternFlight(
+  flightInput: LanternFlightStyleInput,
+  onStep: (style: CSSProperties) => void,
+): { promise: Promise<void>; cancel: () => void } {
+  const timers: ReturnType<typeof setTimeout>[] = [];
+  let cancelled = false;
+  let callIndex = 0;
+
+  const tick = () => {
+    if (cancelled) return;
+    callIndex += 1;
+    onStep(simulateFlight(flightInput, { callIndex }));
+  };
+
+  tick();
+  for (
+    let elapsed = LANTERN_FLIGHT_STEP_MS;
+    elapsed < LANTERN_FLIGHT_EXIT_MS;
+    elapsed += LANTERN_FLIGHT_STEP_MS
+  ) {
+    timers.push(setTimeout(tick, elapsed));
+  }
+
+  const promise = new Promise<void>((resolve) => {
+    timers.push(
+      setTimeout(() => {
+        if (!cancelled) resolve();
+      }, LANTERN_FLIGHT_EXIT_MS),
+    );
+  });
+
+  const cancel = () => {
+    cancelled = true;
+    for (const timer of timers) clearTimeout(timer);
+  };
+
+  return { promise, cancel };
 }
