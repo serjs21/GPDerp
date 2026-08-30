@@ -1,7 +1,6 @@
 "use client";
 
-import axios from "axios";
-import { useCallback, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { HaikuDto } from "@/api/haikus";
 import { deleteHaiku } from "@/api/haikus";
 import { message } from "@/components/StyledComponents";
@@ -16,7 +15,12 @@ import {
 export type LanternDeleteExitProps = {
   haiku: HaikuDto;
   transform: LanternTransform;
-  onDeleted?: () => void;
+  /** Called immediately for optimistic UI (close modal / remove from list). */
+  onDeleted?: (haiku: HaikuDto) => void;
+  /** Called when the delete API fails after optimistic removal. */
+  onDeleteFailed?: (haiku: HaikuDto) => void;
+  /** Called after flight finishes (or immediately when reduced-motion). */
+  onExitComplete?: (haiku: HaikuDto) => void;
   onChanged?: () => void;
   children: (args: {
     onDelete: () => Promise<void>;
@@ -29,7 +33,8 @@ export function LanternDeleteExit({
   haiku,
   transform,
   onDeleted,
-  onChanged,
+  onDeleteFailed,
+  onExitComplete,
   children,
 }: LanternDeleteExitProps) {
   const [flightExiting, setFlightExiting] = useState(false);
@@ -38,53 +43,82 @@ export function LanternDeleteExit({
   );
   const animatingRef = useRef(false);
   const flightCancelRef = useRef<(() => void) | null>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const handleDelete = useCallback(async () => {
     if (animatingRef.current) return;
     animatingRef.current = true;
 
+    const snapshot = haiku;
     const flightInput = lanternTransformToFlightInput(transform);
     const resetStyle = initialFlightCssVars(transform.positionMode);
 
-    try {
-      if (prefersReducedMotion()) {
-        await deleteHaiku(haiku.id);
-        message.success("Haiku deleted");
-        onDeleted?.();
-        return;
-      }
+    // Optimistic: close modal / update list before animation or API finish.
+    onDeleted?.(snapshot);
 
-      setFlightExiting(true);
-      setFlightStyle(resetStyle);
-
-      await new Promise<void>((resolve) => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(resolve);
-        });
-      });
-
-      const { promise, cancel } = runSteppedLanternFlight(flightInput, setFlightStyle);
-      flightCancelRef.current = cancel;
-      await promise;
-
-      await deleteHaiku(haiku.id);
-      message.success("Haiku deleted");
-      onDeleted?.();
-    } catch (e) {
-      flightCancelRef.current?.();
-      setFlightExiting(false);
-      setFlightStyle(resetStyle);
-      if (axios.isAxiosError(e) && e.response?.status === 403) {
-        message.error("You are not allowed to delete this haiku.");
-      } else {
-        message.error("Could not delete haiku.");
-      }
-      throw e;
-    } finally {
+    const finishExit = (notifyComplete: boolean) => {
+      if (notifyComplete) onExitComplete?.(snapshot);
       flightCancelRef.current = null;
       animatingRef.current = false;
+    };
+
+    const commitDelete = async (notifyComplete: boolean) => {
+      try {
+        await deleteHaiku(snapshot.id);
+        message.success("Haiku deleted");
+      } catch {
+        onDeleteFailed?.(snapshot);
+      } finally {
+        finishExit(notifyComplete);
+      }
+    };
+
+    if (prefersReducedMotion()) {
+      await commitDelete(true);
+      return;
     }
-  }, [haiku.id, onDeleted, transform]);
+
+    setFlightExiting(true);
+    setFlightStyle(resetStyle);
+
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          resolve();
+        });
+      });
+    });
+
+    // Path optimistic remove unmounts this instance; parent ExitingPathLantern owns the flyer.
+    if (!mountedRef.current) {
+      void commitDelete(false);
+      return;
+    }
+
+    const { promise, cancel } = runSteppedLanternFlight(flightInput, setFlightStyle);
+    flightCancelRef.current = cancel;
+
+    // API runs in parallel with flight; do not block confirm/modal on animation.
+    void (async () => {
+      try {
+        await deleteHaiku(snapshot.id);
+        message.success("Haiku deleted");
+        await promise;
+      } catch {
+        cancel();
+        onDeleteFailed?.(snapshot);
+      } finally {
+        finishExit(true);
+      }
+    })();
+  }, [haiku, onDeleteFailed, onDeleted, onExitComplete, transform]);
 
   return <>{children({ onDelete: handleDelete, flightStyle, flightExiting })}</>;
 }

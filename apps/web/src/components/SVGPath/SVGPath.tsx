@@ -2,6 +2,7 @@
 
 import {
   forwardRef,
+  useCallback,
   useEffect,
   useImperativeHandle,
   useLayoutEffect,
@@ -12,8 +13,10 @@ import {
 import { animate } from "motion/react";
 import type { HaikuDto } from "@/api/haikus";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
+import type { LanternTransform } from "@/components/Lantern/lanternTransform";
 import { useScrollBlocking } from "@/hooks/useScrollBlocking";
 import { SVGPathLantern } from "./SVGPathLantern";
+import { ExitingPathLantern } from "./ExitingPathLantern";
 import { useSvgPathInput } from "./useSvgPathInput";
 import { useSvgPathScroll } from "./useSvgPathScroll";
 import {
@@ -33,6 +36,18 @@ import styles from "./SVGPath.module.css";
 const SVG_PATH_SRC = "/split_path_colored_stops.svg";
 const SVG_PATH_STEP_MS = 300;
 const SVG_PATH_CATCH_UP_MS = 450;
+const SVG_PATH_DELETE_PACK_MS = 450;
+
+type ExitingLantern = {
+  haiku: HaikuDto;
+  transform: LanternTransform;
+};
+
+/** Snapshot used to tween lanterns from pre-delete indices to compacted indices. */
+type DeletePack = {
+  /** haikuId → index before deletion */
+  prevIndexById: Map<string, number>;
+};
 
 export type SVGPathHandle = {
   scrollToTop: () => boolean;
@@ -50,7 +65,8 @@ export type SVGPathProps = {
   isFetchingNextPage?: boolean;
   onVacantQueueSlot?: () => void;
   onFocusChange?: (focusIndex: number) => void;
-  onHaikuDeleted?: () => void;
+  onHaikuDeleted?: (haiku: HaikuDto) => void;
+  onHaikuDeleteFailed?: (haiku: HaikuDto) => void;
   onHaikuChanged?: () => void;
   className?: string;
   showGuides?: boolean;
@@ -97,6 +113,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
     onVacantQueueSlot,
     onFocusChange,
     onHaikuDeleted,
+    onHaikuDeleteFailed,
     onHaikuChanged,
     className,
     showGuides = false,
@@ -109,6 +126,48 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
   const svgAreaRef = useRef<HTMLDivElement>(null);
   const onVacantQueueSlotRef = useRef(onVacantQueueSlot);
   onVacantQueueSlotRef.current = onVacantQueueSlot;
+  const [exitingLanterns, setExitingLanterns] = useState<ExitingLantern[]>([]);
+  const [deletePack, setDeletePack] = useState<DeletePack | null>(null);
+  const [deletePackT, setDeletePackT] = useState(1);
+  const deletePackAnimationRef = useRef<ReturnType<typeof animate> | null>(null);
+  const haikusRef = useRef(haikus);
+  haikusRef.current = haikus;
+
+  const handleLanternDeleted = useCallback(
+    (haiku: HaikuDto, transform: LanternTransform) => {
+      const prevIndexById = new Map(haikusRef.current.map((h, index) => [h.id, index]));
+      setExitingLanterns((prev) =>
+        prev.some((entry) => entry.haiku.id === haiku.id)
+          ? prev
+          : [...prev, { haiku, transform }],
+      );
+      setDeletePack({ prevIndexById });
+      setDeletePackT(0);
+      deletePackAnimationRef.current?.stop();
+      deletePackAnimationRef.current = animate(0, 1, {
+        duration: SVG_PATH_DELETE_PACK_MS / 1000,
+        ease: "easeOut",
+        onUpdate: (value) => setDeletePackT(value),
+        onComplete: () => {
+          setDeletePack(null);
+          setDeletePackT(1);
+          deletePackAnimationRef.current = null;
+        },
+      });
+      onHaikuDeleted?.(haiku);
+    },
+    [onHaikuDeleted],
+  );
+
+  const handleLanternExitComplete = useCallback((haiku: HaikuDto) => {
+    setExitingLanterns((prev) => prev.filter((entry) => entry.haiku.id !== haiku.id));
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      deletePackAnimationRef.current?.stop();
+    };
+  }, []);
 
   const morePages = hasNextPage || isFetchingNextPage;
   const scrollCount = haikus.length + (morePages ? 1 : 0);
@@ -199,6 +258,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
 
     const catchUpStart = catchUpStartRef.current;
     const catchingUp = catchUpStart !== null && displayCatchUpT < 1;
+    const packing = deletePack != null && deletePackT < 1;
 
     const lanterns: {
       haiku?: HaikuDto;
@@ -208,15 +268,24 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
     }[] = haikus.flatMap((haiku, haikuIndex) => {
       let fromStop = stopForHaikuIndex(haikuIndex, fromFocusIndex);
       let toStop = stopForHaikuIndex(haikuIndex, focusIndex);
+      let localT = tweenProgress;
 
       if (catchingUp && haikuIndex >= catchUpStart) {
         fromStop = catchUpStopForHaiku(haikuIndex, catchUpStart, fromFocusIndex, displayCatchUpT);
         toStop = catchUpStopForHaiku(haikuIndex, catchUpStart, focusIndex, displayCatchUpT);
+      } else if (packing) {
+        const prevIndex = deletePack.prevIndexById.get(haiku.id);
+        if (prevIndex != null && prevIndex !== haikuIndex) {
+          // Tween along path from vacated older slot toward compacted slot.
+          fromStop = stopForHaikuIndex(prevIndex, focusIndex);
+          toStop = stopForHaikuIndex(haikuIndex, focusIndex);
+          localT = deletePackT;
+        }
       }
 
       if (!isStopOnPath(fromStop) && !isStopOnPath(toStop)) return [];
 
-      const transform = lanternTransformAtStops(parsed, fromStop, toStop, tweenProgress);
+      const transform = lanternTransformAtStops(parsed, fromStop, toStop, localT);
       if (!transform) return [];
 
       return [
@@ -247,6 +316,8 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
 
     return lanterns;
   }, [
+    deletePack,
+    deletePackT,
     displayCatchUpT,
     focusIndex,
     fromFocusIndex,
@@ -266,6 +337,10 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
       : null;
 
   const viewportClass = [styles.viewport, className].filter(Boolean).join(" ");
+  const exitingIds = useMemo(
+    () => new Set(exitingLanterns.map((entry) => entry.haiku.id)),
+    [exitingLanterns],
+  );
 
   return (
     <div ref={stageRef} className={viewportClass}>
@@ -280,15 +355,30 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
               dangerouslySetInnerHTML={{ __html: splitPath.guideInner }}
             />
           ) : null}
-          {visibleLanterns.map(({ haiku, haikuIndex, loading, transform }) => (
-            <SVGPathLantern
-              key={loading ? "pagination-loader" : (haiku?.id ?? `svg-path-${haikuIndex}`)}
+          {visibleLanterns
+            .filter(({ haiku }) => !haiku || !exitingIds.has(haiku.id))
+            .map(({ haiku, haikuIndex, loading, transform }) => (
+              <SVGPathLantern
+                key={loading ? "pagination-loader" : (haiku?.id ?? `svg-path-${haikuIndex}`)}
+                haiku={haiku}
+                loading={loading}
+                transform={transform}
+                isAnimating={isAnimating || (deletePack != null && deletePackT < 1)}
+                onDeleted={
+                  haiku
+                    ? (deleted) => handleLanternDeleted(deleted, transform)
+                    : undefined
+                }
+                onDeleteFailed={onHaikuDeleteFailed}
+                onChanged={onHaikuChanged}
+              />
+            ))}
+          {exitingLanterns.map(({ haiku, transform }) => (
+            <ExitingPathLantern
+              key={`exiting-${haiku.id}`}
               haiku={haiku}
-              loading={loading}
               transform={transform}
-              isAnimating={isAnimating}
-              onDeleted={onHaikuDeleted}
-              onChanged={onHaikuChanged}
+              onComplete={handleLanternExitComplete}
             />
           ))}
           {generatingDraft && generatingTransform ? (

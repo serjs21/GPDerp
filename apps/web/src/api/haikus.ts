@@ -126,3 +126,30 @@ export function prependHaikuToInfiniteCache(
     },
   );
 }
+
+/** Remove a haiku from the infinite list cache (optimistic delete). */
+export function removeHaikuFromInfiniteCache(
+  queryClient: QueryClient,
+  pageSize: number,
+  haikuId: string,
+): void {
+  queryClient.setQueryData<InfiniteData<HaikuListSuccess, number>>(
+    haikuQueryKeys.infiniteList(pageSize),
+    (old) => {
+      if (!old?.pages?.length) return old;
+      const removed = old.pages.some((page) => page.data.haikus.some((h) => h.id === haikuId));
+      if (!removed) return old;
+      return {
+        ...old,
+        pages: old.pages.map((page) => ({
+          ...page,
+          data: {
+            ...page.data,
+            haikus: page.data.haikus.filter((h) => h.id !== haikuId),
+            total: Math.max(0, page.data.total - 1),
+          },
+        })),
+      };
+    },
+  );
+}

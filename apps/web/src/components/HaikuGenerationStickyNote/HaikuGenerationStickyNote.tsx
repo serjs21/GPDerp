@@ -4,6 +4,7 @@ import { useLayoutEffect, useEffect, useRef } from "react";
 import { CreationModal } from "@/components/CreationModal";
 import { SavedHaikusLanternPath } from "@/components/SavedHaikusLanternPath/SavedHaikusLanternPath";
 import type { SVGPathHandle } from "@/components/SVGPath";
+import { useHaikuDeleteController } from "@/hooks/useHaikuDeleteController";
 import { useInfiniteHaikusQuery } from "@/hooks/useInfiniteHaikusQuery";
 import { useCreationPathGate } from "./hooks/useCreationPathGate";
 import { useHaikuGenerationFlow } from "./hooks/useHaikuGenerationFlow";
@@ -39,6 +40,7 @@ export function HaikuGenerationStickyNote({
   const pathRef = useRef<SVGPathHandle>(null);
   const bindHaikuSavedRef = useRef<(haiku: import("@/api/haikus").HaikuDto) => void>(() => {});
   const { invalidate } = useInfiniteHaikusQuery();
+  const { onHaikuDeleted, onHaikuDeleteFailed, deleteFailedModal } = useHaikuDeleteController();
 
   const {
     subject,
@@ -137,15 +139,17 @@ export function HaikuGenerationStickyNote({
         isGenerating={Boolean(generatingDraft)}
         lanternSessionKey={creationSessionKey}
         showLanternActions={Boolean(creationHaiku)}
-        onHaikuDeleted={() => {
+        onHaikuDeleted={(haiku) => {
+          onHaikuDeleted(haiku);
           onCreationHaikuDeleted();
-          invalidate();
         }}
+        onHaikuDeleteFailed={onHaikuDeleteFailed}
         onHaikuChanged={invalidate}
         onKeepScrolling={onKeepScrolling}
         onGoToHaiku={onGoToHaiku}
       />
 
+      {deleteFailedModal}
       {contextHolder}
     </div>
   );

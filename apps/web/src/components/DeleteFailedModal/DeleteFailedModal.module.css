@@ -1,0 +1,14 @@
+.modal :global(.ant-modal-body) {
+  padding-top: 0.25rem;
+}
+
+.body {
+  margin-bottom: 0;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  width: 100%;
+}

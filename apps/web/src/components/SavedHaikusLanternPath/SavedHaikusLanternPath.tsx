@@ -5,6 +5,7 @@ import { Button } from "@/components/StyledComponents";
 import { SVGPath, type SVGPathHandle } from "@/components/SVGPath";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
+import { useHaikuDeleteController } from "@/hooks/useHaikuDeleteController";
 import { useInfiniteHaikusQuery } from "@/hooks/useInfiniteHaikusQuery";
 import styles from "@/components/Lantern/LanternPath/LanternPath.module.css";
 
@@ -28,6 +29,8 @@ export const SavedHaikusLanternPath = forwardRef<
     isError,
     refetch,
   } = useInfiniteHaikusQuery();
+
+  const { onHaikuDeleted, onHaikuDeleteFailed, deleteFailedModal } = useHaikuDeleteController();
 
   const handleVacantQueueSlot = useCallback(() => {
     fetchNextPage();
@@ -61,16 +64,20 @@ export const SavedHaikusLanternPath = forwardRef<
   }
 
   return (
-    <SVGPath
-      ref={ref}
-      haikus={haikus}
-      generatingDraft={generatingDraft}
-      hasNextPage={hasNextPage}
-      isFetchingNextPage={isFetchingNextPage}
-      onVacantQueueSlot={handleVacantQueueSlot}
-      onHaikuDeleted={handleHaikuChanged}
-      onHaikuChanged={handleHaikuChanged}
-      showGuides
-    />
+    <>
+      <SVGPath
+        ref={ref}
+        haikus={haikus}
+        generatingDraft={generatingDraft}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        onVacantQueueSlot={handleVacantQueueSlot}
+        onHaikuDeleted={onHaikuDeleted}
+        onHaikuDeleteFailed={onHaikuDeleteFailed}
+        onHaikuChanged={handleHaikuChanged}
+        showGuides
+      />
+      {deleteFailedModal}
+    </>
   );
 });

@@ -16,7 +16,9 @@ export type SVGPathLanternProps = {
   loading?: boolean;
   transform: LanternTransform;
   isAnimating?: boolean;
-  onDeleted?: () => void;
+  onDeleted?: (haiku: HaikuDto) => void;
+  onDeleteFailed?: (haiku: HaikuDto) => void;
+  onExitComplete?: (haiku: HaikuDto) => void;
   onChanged?: () => void;
 };
 
@@ -63,6 +65,8 @@ export function SVGPathLantern({
   transform,
   isAnimating = false,
   onDeleted,
+  onDeleteFailed,
+  onExitComplete,
   onChanged,
 }: SVGPathLanternProps) {
   if ((transform.opacity ?? 1) <= 0.01 || transform.scale <= 0) {
@@ -84,6 +88,8 @@ export function SVGPathLantern({
         haiku={haiku}
         transform={transform}
         onDeleted={onDeleted}
+        onDeleteFailed={onDeleteFailed}
+        onExitComplete={onExitComplete}
         onChanged={onChanged}
       >
         {({ onDelete, flightStyle, flightExiting }) => (

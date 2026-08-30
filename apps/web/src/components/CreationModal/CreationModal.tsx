@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import type { HaikuDto } from "@/api/haikus";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternDeleteExit } from "@/components/Lantern/LanternDeleteExit";
@@ -33,7 +34,8 @@ export type CreationModalProps = {
   lanternSessionKey?: string | null;
   /** Show hover actions on a saved lantern (e.g. Storybook clickability checks). */
   showLanternActions?: boolean;
-  onHaikuDeleted?: () => void;
+  onHaikuDeleted?: (haiku: HaikuDto) => void;
+  onHaikuDeleteFailed?: (haiku: HaikuDto) => void;
   onHaikuChanged?: () => void;
 };
 
@@ -47,20 +49,30 @@ export function CreationModal({
   lanternSessionKey = null,
   showLanternActions = false,
   onHaikuDeleted,
+  onHaikuDeleteFailed,
   onHaikuChanged,
 }: CreationModalProps) {
+  // Keep the lantern mounted for flight after parent clears haiku / closes open.
+  const [exitingHaiku, setExitingHaiku] = useState<HaikuDto | null>(null);
+  const activeHaiku = haiku ?? exitingHaiku;
+  const overlayOpen = open || exitingHaiku != null;
+
+  useEffect(() => {
+    if (open && haiku) setExitingHaiku(null);
+  }, [open, haiku]);
+
   const ariaLabel = generatingDraft
     ? `Generating haiku: ${generatingDraft.subject}`
-    : haiku
-      ? `Haiku lantern: ${haiku.title ?? ""}`
+    : activeHaiku
+      ? `Haiku lantern: ${activeHaiku.title ?? ""}`
       : "Haiku creation";
 
   const flyInKey =
-    lanternSessionKey ?? generatingDraft?.requestId ?? haiku?.id ?? "lantern";
+    activeHaiku?.id ?? lanternSessionKey ?? generatingDraft?.requestId ?? "lantern";
 
   return (
     <PathOverlay
-      open={open}
+      open={overlayOpen}
       fillOrigin="vertical"
       seam="straight"
       onKeepScrolling={onKeepScrolling}
@@ -78,11 +90,16 @@ export function CreationModal({
             >
               <Lantern generatingDraft={generatingDraft} showActions={false} />
             </LanternFrame>
-          ) : haiku ? (
+          ) : activeHaiku ? (
             <LanternDeleteExit
-              haiku={haiku}
+              haiku={activeHaiku}
               transform={CREATION_LANTERN_TRANSFORM}
-              onDeleted={onHaikuDeleted}
+              onDeleted={(deleted) => {
+                setExitingHaiku(deleted);
+                onHaikuDeleted?.(deleted);
+              }}
+              onDeleteFailed={onHaikuDeleteFailed}
+              onExitComplete={() => setExitingHaiku(null)}
               onChanged={onHaikuChanged}
             >
               {({ onDelete, flightStyle, flightExiting }) => (
@@ -94,8 +111,8 @@ export function CreationModal({
                   flightExiting={flightExiting}
                 >
                   <Lantern
-                    haiku={haiku}
-                    showActions={showLanternActions}
+                    haiku={activeHaiku}
+                    showActions={showLanternActions && !flightExiting}
                     onDelete={onDelete}
                     onChanged={onHaikuChanged}
                   />
