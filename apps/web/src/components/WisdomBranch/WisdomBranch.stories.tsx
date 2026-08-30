@@ -12,7 +12,7 @@ import { WisdomBranch } from "./WisdomBranch";
 import styles from "./WisdomBranch.stories.module.css";
 
 const meta: Meta<typeof WisdomBranch> = {
-  title: "Haiku/WisdomBranch",
+  title: "Archive/Haiku/WisdomBranch",
   component: WisdomBranch,
   decorators: [composeDecorators(withQueryClient, withThemedStoryStage)],
   parameters: {

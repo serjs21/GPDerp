@@ -38,7 +38,7 @@ const storyDefaults = {
 };
 
 const meta = {
-  title: "Components/WisdomForest",
+  title: "Archive/Components/WisdomForest",
   component: WisdomForest,
   parameters: { layout: "fullscreen" },
   decorators: [composeDecorators(withQueryClient, withAuthProviders)],

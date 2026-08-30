@@ -3,7 +3,7 @@ import { EXAMPLE_HAIKU_BODY, makeMockHaiku, withQueryClient } from "@/storybook"
 import { HaikuGenerationStickyNoteCard } from "./HaikuGenerationStickyNoteCard";
 
 const meta: Meta<typeof HaikuGenerationStickyNoteCard> = {
-  title: "Haiku/HaikuGenerationStickyNoteCard",
+  title: "Archive/Haiku/HaikuGenerationStickyNoteCard",
   component: HaikuGenerationStickyNoteCard,
   decorators: [withQueryClient],
 };

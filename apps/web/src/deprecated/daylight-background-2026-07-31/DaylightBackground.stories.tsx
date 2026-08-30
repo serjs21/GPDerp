@@ -22,7 +22,7 @@ import { DaylightBackgroundView } from "./DaylightBackground";
 import styles from "./DaylightBackground.stories.module.css";
 
 const meta: Meta<typeof DaylightBackgroundView> = {
-  title: "Layout/DaylightBackground",
+  title: "Archive/Layout/DaylightBackground",
   component: DaylightBackgroundView,
   parameters: {
     layout: "fullscreen",

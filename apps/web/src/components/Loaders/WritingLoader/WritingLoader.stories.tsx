@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { WritingLoader } from "./WritingLoader";
 
 const meta = {
-  title: "Loaders/WritingLoader",
+  title: "Archive/Loaders/WritingLoader",
   component: WritingLoader,
   tags: ["autodocs"],
   parameters: {

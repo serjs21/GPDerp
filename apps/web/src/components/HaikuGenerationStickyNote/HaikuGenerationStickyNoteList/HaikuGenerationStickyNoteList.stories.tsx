@@ -32,7 +32,7 @@ const ListPreview = (
 };
 
 const meta: Meta<typeof ListPreview> = {
-  title: "Haiku/HaikuGenerationStickyNoteList",
+  title: "Archive/Haiku/HaikuGenerationStickyNoteList",
   component: ListPreview,
   decorators: [withQueryClient],
   args: {

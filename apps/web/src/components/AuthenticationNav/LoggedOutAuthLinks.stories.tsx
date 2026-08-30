@@ -27,7 +27,7 @@ const authProviders = (Story: () => ReactNode) => (
 );
 
 const meta = {
-  title: "Components/LoggedOutAuthLinks",
+  title: "Archive/Components/LoggedOutAuthLinks",
   component: LoggedOutAuthLinks,
   tags: ["autodocs"],
   parameters: {

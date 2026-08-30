@@ -6,7 +6,7 @@ import { ThemeSelector } from "@/components/ThemeSelector/ThemeSelector";
 import { AuthDualityToggleDemo } from "./AuthDualityToggleDemo";
 
 const meta = {
-  title: "Components/AuthenticationNav/AuthDualityToggleDemo",
+  title: "Archive/Components/AuthenticationNav/AuthDualityToggleDemo",
   component: AuthDualityToggleDemo,
   tags: ["autodocs"],
   parameters: { layout: "centered" },

@@ -19,7 +19,7 @@ const MOCK_HAIKU = makeMockHaiku({
 });
 
 const meta = {
-  title: "Haiku/SceneOverlay",
+  title: "Archive/Haiku/SceneOverlay",
   component: SceneOverlay,
   parameters: {
     layout: "fullscreen",

@@ -15,7 +15,7 @@ Silence gathers on the path,
 Winter waits ahead.`;
 
 const meta: Meta<typeof HaikuNote> = {
-  title: "Haiku/HaikuNote",
+  title: "Archive/Haiku/HaikuNote",
   component: HaikuNote,
   args: {
     body: exampleBody,

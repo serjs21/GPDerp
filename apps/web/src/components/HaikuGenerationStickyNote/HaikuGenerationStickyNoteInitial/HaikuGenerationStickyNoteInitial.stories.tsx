@@ -3,7 +3,7 @@ import { HaikuGenerationStickyNoteInitial } from "./HaikuGenerationStickyNoteIni
 import { INITIAL_HAIKU_TEXT } from "../constants";
 
 const meta: Meta<typeof HaikuGenerationStickyNoteInitial> = {
-  title: "Haiku/HaikuGenerationStickyNoteInitial",
+  title: "Archive/Haiku/HaikuGenerationStickyNoteInitial",
   component: HaikuGenerationStickyNoteInitial,
   args: {
     text: INITIAL_HAIKU_TEXT,

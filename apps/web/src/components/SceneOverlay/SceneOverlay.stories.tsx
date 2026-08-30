@@ -18,7 +18,7 @@ import {
 import styles from "./SceneOverlay.stories.module.css";
 
 const meta = {
-  title: "Haiku/SceneOverlay",
+  title: "Archive/Haiku/SceneOverlay",
   component: SceneOverlay,
   parameters: {
     layout: "fullscreen",

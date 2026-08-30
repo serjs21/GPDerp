@@ -5,7 +5,7 @@ import { makeMockHaiku, TEXT_STREAM_STYLE_HAIKUS, withQueryClient } from "@/stor
 import { SavedHaikusListView } from "./SavedHaikusList";
 
 const meta: Meta<typeof SavedHaikusListView> = {
-  title: "Haiku/SavedHaikusList",
+  title: "Archive/Haiku/SavedHaikusList",
   component: SavedHaikusListView,
   decorators: [withQueryClient],
   args: {

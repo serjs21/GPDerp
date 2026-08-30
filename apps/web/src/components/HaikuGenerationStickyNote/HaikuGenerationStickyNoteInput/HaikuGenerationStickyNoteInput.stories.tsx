@@ -3,7 +3,7 @@ import { useState } from "react";
 import { HaikuGenerationStickyNoteInput } from "./HaikuGenerationStickyNoteInput";
 
 const meta: Meta<typeof HaikuGenerationStickyNoteInput> = {
-  title: "Haiku/HaikuGenerationStickyNoteInput",
+  title: "Archive/Haiku/HaikuGenerationStickyNoteInput",
   component: HaikuGenerationStickyNoteInput,
   args: {
     subject: "",

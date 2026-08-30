@@ -14,7 +14,7 @@ import headerStyles from "@/app/providers/headerStyles.module.css";
 import layoutStyles from "@/app/providers/layoutProviders.module.css";
 
 const meta: Meta<typeof ThemeSelector> = {
-  title: "Auth/ThemeSelector",
+  title: "Archive/Auth/ThemeSelector",
   component: ThemeSelector,
   args: {
     ariaLabel: "Theme",

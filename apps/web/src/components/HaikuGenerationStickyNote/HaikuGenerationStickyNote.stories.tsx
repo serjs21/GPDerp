@@ -10,7 +10,7 @@ import { haikuGenerationStickyNoteListStyles } from "./HaikuGenerationStickyNote
 import styles from "./HaikuGenerationStickyNote.module.css";
 
 const meta: Meta<typeof HaikuGenerationStickyNote> = {
-  title: "Haiku/HaikuGenerationStickyNote",
+  title: "Archive/Haiku/HaikuGenerationStickyNote",
   component: HaikuGenerationStickyNote,
   decorators: [composeDecorators(withQueryClient, withFullscreenShell)],
   parameters: {

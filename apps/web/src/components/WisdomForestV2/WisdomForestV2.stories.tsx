@@ -32,7 +32,7 @@ const manyHaikus: HaikuDto[] = Array.from({ length: 12 }, (_, i) =>
 );
 
 const meta = {
-  title: "Components/WisdomForestV2",
+  title: "Archive/Components/WisdomForestV2",
   component: WisdomForestV2,
   parameters: {
     layout: "fullscreen",

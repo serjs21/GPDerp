@@ -3,7 +3,7 @@ import { HaikuGenerationStickyNoteShell } from "./HaikuGenerationStickyNoteShell
 import { ThemeStage } from "../storybook/themeStage";
 
 const meta: Meta<typeof HaikuGenerationStickyNoteShell> = {
-  title: "Haiku/HaikuGenerationStickyNoteShell",
+  title: "Archive/Haiku/HaikuGenerationStickyNoteShell",
   component: HaikuGenerationStickyNoteShell,
   args: {
     title: "Autumn wind",
