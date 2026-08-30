@@ -10,8 +10,8 @@ export const LANTERN_FLIGHT_STEP_MS = 600;
 
 const FLIGHT_DISTANCE_X_MIN_PX = 80;
 const FLIGHT_DISTANCE_X_MAX_PX = 120;
-const FLIGHT_DISTANCE_Y_MIN_PX = 290;
-const FLIGHT_DISTANCE_Y_MAX_PX = 360;
+const FLIGHT_DISTANCE_Y_MIN_PX = 240;
+const FLIGHT_DISTANCE_Y_MAX_PX = 330;
 
 export type LanternFlightStyleInput = {
   positionMode?: LanternTransform["positionMode"];
@@ -42,12 +42,11 @@ function flightOffset(random: () => number, callIndex: number): FlightAccumulate
   const maxY = FLIGHT_DISTANCE_Y_MAX_PX / callIndex;
 
   const xMagnitude = minX + random() * (maxX - minX);
-  const xSign = random() < 0.5 ? -1 : 1;
 
   const yMagnitude = Math.abs(minY + random() * (maxY - minY));
 
   return {
-    x: xSign * xMagnitude,
+    x: xMagnitude,
     y: -yMagnitude,
   };
 }
@@ -68,7 +67,7 @@ export function flightPoseAtCall(callIndex: number, totalCalls: number): { scale
   const t = easeOutCubic(linearT);
   const scalePose = lerpPose(SVG_PATH_FOCUS_STOP, SPLIT_PATH_MIN_STOP, t);
   const opacityPose = lerpPose(SVG_PATH_FOCUS_STOP, SVG_PATH_GONE_STOP, t);
-  return { scale: scalePose.scale, opacity: opacityPose.opacity };
+  return { scale: scalePose.scale, opacity: opacityPose.opacitygu };
 }
 
 export function lanternFlightStepCount(): number {
