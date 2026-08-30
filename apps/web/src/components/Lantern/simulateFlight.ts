@@ -10,8 +10,8 @@ export const LANTERN_FLIGHT_STEP_MS = 600;
 
 const FLIGHT_DISTANCE_X_MIN_PX = 80;
 const FLIGHT_DISTANCE_X_MAX_PX = 120;
-const FLIGHT_DISTANCE_Y_MIN_PX = 120;
-const FLIGHT_DISTANCE_Y_MAX_PX = 200;
+const FLIGHT_DISTANCE_Y_MIN_PX = 290;
+const FLIGHT_DISTANCE_Y_MAX_PX = 360;
 
 export type LanternFlightStyleInput = {
   positionMode?: LanternTransform["positionMode"];
