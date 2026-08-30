@@ -3,7 +3,7 @@ import axios from "axios";
 import uniqBy from "lodash-es/uniqBy";
 
 /** Page size for saved haiku list requests (must match product default). */
-export const HAIKU_LIST_PAGE_SIZE = 3;
+export const HAIKU_LIST_PAGE_SIZE = 20;
 
 export type HaikuDto = {
   id: string;
