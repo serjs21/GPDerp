@@ -67,7 +67,7 @@ export function flightPoseAtCall(callIndex: number, totalCalls: number): { scale
   const t = easeOutCubic(linearT);
   const scalePose = lerpPose(SVG_PATH_FOCUS_STOP, SPLIT_PATH_MIN_STOP, t);
   const opacityPose = lerpPose(SVG_PATH_FOCUS_STOP, SVG_PATH_GONE_STOP, t);
-  return { scale: scalePose.scale, opacity: opacityPose.opacitygu };
+  return { scale: scalePose.scale, opacity: opacityPose.opacity };
 }
 
 export function lanternFlightStepCount(): number {
