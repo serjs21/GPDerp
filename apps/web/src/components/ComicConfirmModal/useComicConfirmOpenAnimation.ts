@@ -48,11 +48,37 @@ function applySlideFrame(
   el: HTMLElement,
   t: number,
   opts: Omit<SlideEnterOptions, "durationMs">,
+  debugLabel?: string,
 ) {
   const x = lerp(opts.fromXRem ?? 0, opts.toXRem ?? 0, t);
   const y = lerp(opts.fromYRem ?? 0, opts.toYRem ?? 0, t);
   el.style.opacity = String(lerp(opts.fromOpacity, opts.toOpacity, t));
   el.style.transform = x === 0 && y === 0 ? "" : `translate(${x}rem, ${y}rem)`;
+
+  // #region agent log
+  if (debugLabel && Math.round(t * 100) % 50 === 0) {
+    const rect = el.getBoundingClientRect();
+    fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "53a752" },
+      body: JSON.stringify({
+        sessionId: "53a752",
+        runId: "post-fix",
+        hypothesisId: "C",
+        location: "useComicConfirmOpenAnimation.ts:applySlideFrame",
+        message: "part position during animation",
+        data: {
+          label: debugLabel,
+          t,
+          top: Math.round(rect.top),
+          height: Math.round(rect.height),
+          transform: el.style.transform,
+        },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+  }
+  // #endregion
 }
 
 function clearMotionStyles(el: HTMLElement) {
@@ -96,6 +122,7 @@ function slideEnter(
 function slideExit(
   el: HTMLElement | null,
   opts: SlideEnterOptions,
+  debugLabel?: string,
 ): Promise<void> {
   if (!el) return Promise.resolve();
 
@@ -110,7 +137,7 @@ function slideExit(
   };
   const model = { t: 0 };
 
-  applySlideFrame(el, 0, exitMotion);
+  applySlideFrame(el, 0, exitMotion, debugLabel);
 
   return new Promise((resolve) => {
     animate(model, {
@@ -118,7 +145,7 @@ function slideExit(
       duration: opts.durationMs,
       ease: COMIC_EASE,
       onUpdate: () => {
-        applySlideFrame(el, model.t, exitMotion);
+        applySlideFrame(el, model.t, exitMotion, debugLabel);
       },
       onComplete: () => resolve(),
     });
@@ -132,6 +159,7 @@ export function useComicConfirmOpenAnimation(options: {
   overlayRef: RefObject<HTMLDivElement | null>;
   panelRef: RefObject<HTMLDivElement | null>;
   contentRef: RefObject<HTMLDivElement | null>;
+  ctaRowRef: RefObject<HTMLDivElement | null>;
   getCtaElements: () => HTMLElement[];
   onPresentEnd: () => void;
   refreshBubblesRef: RefObject<(() => void) | null>;
@@ -143,12 +171,14 @@ export function useComicConfirmOpenAnimation(options: {
     overlayRef,
     panelRef,
     contentRef,
+    ctaRowRef,
     getCtaElements,
     onPresentEnd,
     refreshBubblesRef,
   } = options;
 
   const [ctasMounted, setCtasMounted] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
   const exitingRef = useRef(false);
   const openGenRef = useRef(0);
   const ctaFadePendingRef = useRef(false);
@@ -156,6 +186,7 @@ export function useComicConfirmOpenAnimation(options: {
   useEffect(() => {
     if (open) {
       exitingRef.current = false;
+      setIsExiting(false);
       openGenRef.current += 1;
     }
   }, [open]);
@@ -164,6 +195,7 @@ export function useComicConfirmOpenAnimation(options: {
   useEffect(() => {
     if (!present) {
       setCtasMounted(false);
+      setIsExiting(false);
       ctaFadePendingRef.current = false;
       return;
     }
@@ -252,11 +284,12 @@ export function useComicConfirmOpenAnimation(options: {
     };
   }, [ctasMounted, getCtaElements, open, present, reducedMotion, refreshBubblesRef]);
 
-  // Close: overlay fade + all parts slide/fade out together
+  // Close: overlay fade + content row + CTA row slide/fade out together
   useEffect(() => {
     if (!present || open) return;
     if (exitingRef.current) return;
     exitingRef.current = true;
+    setIsExiting(true);
 
     let cancelled = false;
     const runExit = async () => {
@@ -264,41 +297,47 @@ export function useComicConfirmOpenAnimation(options: {
         if (!cancelled) {
           onPresentEnd();
           exitingRef.current = false;
+          setIsExiting(false);
         }
         return;
       }
 
-      const ctas = getCtaElements();
-      refreshBubblesRef.current?.();
       await Promise.all([
         fadeElement(overlayRef.current, 0, COMIC_ANIM_MS),
-        slideExit(contentRef.current, {
-          fromOpacity: 0,
-          toOpacity: 1,
-          fromXRem: -2,
-          toXRem: 0,
-          durationMs: COMIC_ANIM_MS,
-        }),
-        ...ctas.map((el) =>
-          slideExit(el, {
+        slideExit(
+          contentRef.current,
+          {
+            fromOpacity: 0,
+            toOpacity: 1,
+            fromXRem: -2,
+            toXRem: 0,
+            durationMs: COMIC_ANIM_MS,
+          },
+          "content",
+        ),
+        slideExit(
+          ctaRowRef.current,
+          {
             fromOpacity: 0,
             toOpacity: COMIC_CTA_REST_OPACITY,
             fromYRem: 1,
             toYRem: 0,
             durationMs: COMIC_ANIM_MS,
-          }),
+          },
+          "ctaRow",
         ),
       ]);
       if (cancelled) return;
       onPresentEnd();
       exitingRef.current = false;
+      setIsExiting(false);
     };
     void runExit();
 
     return () => {
       cancelled = true;
     };
-  }, [contentRef, getCtaElements, onPresentEnd, open, overlayRef, panelRef, present, reducedMotion, refreshBubblesRef]);
+  }, [contentRef, ctaRowRef, onPresentEnd, open, overlayRef, panelRef, present, reducedMotion]);
 
-  return { ctasMounted };
+  return { ctasMounted, isExiting };
 }

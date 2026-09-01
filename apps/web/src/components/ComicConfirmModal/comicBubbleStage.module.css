@@ -6,11 +6,13 @@
 
 /* Canvas and SVG bubble art must not participate in layout flow. */
 .stage > :global(canvas.comical-generated),
-.stage > svg {
+.stage > :global(svg.comical-generated) {
   position: absolute;
   inset: 0;
   z-index: 0;
   width: 100% !important;
   height: 100% !important;
   pointer-events: none;
+  /* Override UA `svg:not(:root) { overflow: hidden }` — clips pointed-arc spikes. */
+  overflow: visible;
 }

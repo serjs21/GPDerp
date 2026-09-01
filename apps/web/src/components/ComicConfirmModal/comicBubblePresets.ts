@@ -27,6 +27,11 @@ export const COMIC_CONTENT_ENTER_MS = COMIC_ANIM_MS;
 export const COMIC_CTA_ENTER_MS = COMIC_ANIM_MS;
 export const COMIC_EASE = "inOutSine";
 export const COMIC_CTA_REST_OPACITY = 0.8;
+/** Space between question bubble and CTA row. */
+export const COMIC_CONTENT_CTA_GAP_REM = 2;
+/** Stage inset so canvas art (shadow + jagged edges) is not clipped. */
+export const COMIC_PART_STAGE_PADDING = "2.25rem 2rem";
+export const COMIC_CONTENT_STAGE_PADDING = "6rem 3.5rem 0.5rem";
 
 /** Styles that ship with a speech tail in comicaljs defaults. */
 export function styleUsesTail(style: ComicBubbleStyle): boolean {
