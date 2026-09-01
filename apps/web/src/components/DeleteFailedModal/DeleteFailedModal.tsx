@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, Modal, Typography } from "@/components/StyledComponents";
+import { Button } from "@/components/StyledComponents";
+import { PaperModal } from "@/components/PaperModal";
 import styles from "./DeleteFailedModal.module.css";
 
 export type DeleteFailedModalProps = {
@@ -17,10 +18,14 @@ export function DeleteFailedModal({
   onLeaveItBe,
 }: DeleteFailedModalProps) {
   return (
-    <Modal
+    <PaperModal
       open={open}
+      onOpenChange={(next) => {
+        if (!next && !retrying) onLeaveItBe();
+      }}
       title="Deletion failed"
-      onCancel={onLeaveItBe}
+      roughSeed={19}
+      size="sm"
       footer={
         <div className={styles.footer}>
           <Button onClick={onLeaveItBe} disabled={retrying}>
@@ -31,12 +36,10 @@ export function DeleteFailedModal({
           </Button>
         </div>
       }
-      destroyOnHidden
-      className={styles.modal}
     >
-      <Typography.Paragraph type="secondary" className={styles.body}>
+      <p className={styles.body}>
         We couldn&apos;t delete this haiku. You can try again, or leave it in your list.
-      </Typography.Paragraph>
-    </Modal>
+      </p>
+    </PaperModal>
   );
 }

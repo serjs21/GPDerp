@@ -1,0 +1,190 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(35, 28, 22, 0.42);
+  backdrop-filter: blur(1px);
+  opacity: 0;
+}
+
+.contentRoot {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 2rem);
+  pointer-events: none;
+}
+
+.panel {
+  position: relative;
+  width: min(100%, 36rem);
+  pointer-events: auto;
+  opacity: 0;
+  overflow: visible;
+}
+
+/* Comical parent — fixed footprint so absolute CTAs + shout bleed fit inside canvas. */
+.stage {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 14.5rem;
+  padding: 2.75rem 3.25rem 6.25rem;
+  overflow: visible;
+}
+
+.stageShout {
+  padding-inline: 3.75rem;
+}
+
+.stage :global(canvas.comical-generated) {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none;
+}
+
+.questionBubble {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  max-width: calc(100% - 1rem);
+  margin: 0 auto;
+  padding: 1.2rem 1.75rem;
+  border: none;
+  background: transparent;
+  color: var(--sumi-ink, #2d2d2d);
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* Shout jagged edges need extra inset so comical canvas does not clip them. */
+.questionShout {
+  padding: 1.55rem 2.65rem;
+}
+
+.ctaBubble {
+  position: absolute;
+  z-index: 1;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0.85rem 1.5rem;
+  border: none;
+  background: transparent;
+  color: var(--sumi-ink, #2d2d2d);
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 1.08rem;
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 0.88;
+  transition:
+    opacity 180ms ease,
+    padding 180ms ease;
+}
+
+.ctaSlotStart {
+  left: 2rem;
+  bottom: 1.85rem;
+}
+
+.ctaSlotEnd {
+  right: 2rem;
+  bottom: 1.85rem;
+}
+
+.ctaSlotCenter {
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: fit-content;
+  bottom: 1.85rem;
+}
+
+.ctaShout {
+  padding: 0.95rem 1.75rem;
+}
+
+.ctaBubble:hover:not(:disabled),
+.ctaBubble:focus-visible:not(:disabled) {
+  opacity: 1;
+  padding-block: 1rem;
+  padding-inline: 1.65rem;
+  outline: none;
+}
+
+.ctaShout:hover:not(:disabled),
+.ctaShout:focus-visible:not(:disabled) {
+  padding-block: 1.05rem;
+  padding-inline: 1.9rem;
+}
+
+.ctaBubble:focus-visible:not(:disabled) {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-red, #bc002d) 45%, transparent);
+  border-radius: 0.35rem;
+}
+
+.ctaBubble:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.previewStage {
+  min-height: 9rem;
+  padding: 2.75rem 3.25rem;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay {
+    backdrop-filter: none;
+    opacity: 1;
+  }
+
+  .panel {
+    opacity: 1;
+  }
+
+  .ctaBubble {
+    transition: opacity 120ms ease;
+  }
+
+  .ctaBubble:hover:not(:disabled),
+  .ctaBubble:focus-visible:not(:disabled) {
+    padding: 0.85rem 1.5rem;
+  }
+
+  .ctaShout:hover:not(:disabled),
+  .ctaShout:focus-visible:not(:disabled) {
+    padding: 0.95rem 1.75rem;
+  }
+}

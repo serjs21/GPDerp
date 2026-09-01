@@ -1,9 +1,6 @@
-.modal :global(.ant-modal-body) {
-  padding-top: 0.25rem;
-}
-
 .body {
-  margin-bottom: 0;
+  margin: 0;
+  color: var(--text-muted, #6b6863);
 }
 
 .footer {

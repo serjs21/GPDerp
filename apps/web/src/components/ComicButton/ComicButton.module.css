@@ -1,0 +1,105 @@
+.stage {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-block;
+  overflow: visible;
+}
+
+.stage :global(canvas.comical-generated) {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none;
+}
+
+.stageCompact {
+  padding: 1.75rem 2rem;
+}
+
+.stageTailBottom {
+  padding: 1.75rem 2rem 3.25rem;
+}
+
+.stageTailTop {
+  padding: 3.25rem 2rem 1.75rem;
+}
+
+.stageTailLeft {
+  padding: 1.75rem 2rem 1.75rem 3.25rem;
+}
+
+.stageTailRight {
+  padding: 1.75rem 3.25rem 1.75rem 2rem;
+}
+
+.bubble {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0.85rem 1.5rem;
+  border: none;
+  background: transparent;
+  color: var(--sumi-ink, #2d2d2d);
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 1.08rem;
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 0.92;
+  transition:
+    opacity 180ms ease,
+    padding 180ms ease;
+}
+
+.bubbleShout {
+  padding: 0.95rem 1.75rem;
+}
+
+.bubble:hover:not(:disabled),
+.bubble:focus-visible:not(:disabled) {
+  opacity: 1;
+  padding-block: 1rem;
+  padding-inline: 1.65rem;
+  outline: none;
+}
+
+.bubbleShout:hover:not(:disabled),
+.bubbleShout:focus-visible:not(:disabled) {
+  padding-block: 1.05rem;
+  padding-inline: 1.9rem;
+}
+
+.bubble:focus-visible:not(:disabled) {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-red, #bc002d) 45%, transparent);
+  border-radius: 0.35rem;
+}
+
+.bubble:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble {
+    transition: opacity 120ms ease;
+  }
+
+  .bubble:hover:not(:disabled),
+  .bubble:focus-visible:not(:disabled) {
+    padding: 0.85rem 1.5rem;
+  }
+
+  .bubbleShout:hover:not(:disabled),
+  .bubbleShout:focus-visible:not(:disabled) {
+    padding: 0.95rem 1.75rem;
+  }
+}

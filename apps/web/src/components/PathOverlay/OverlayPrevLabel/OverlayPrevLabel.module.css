@@ -23,7 +23,7 @@
 .arrow {
   display: block;
   z-index: 1;
-  height: 10rem;
+  height: 8rem;
   object-fit: contain;
   user-select: none;
   pointer-events: none;

@@ -1,0 +1,175 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(35, 28, 22, 0.38);
+  backdrop-filter: blur(1px);
+  opacity: 0;
+}
+
+.contentRoot {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 2rem);
+  pointer-events: none;
+}
+
+.shell {
+  --drawn-modal-max-width: 28rem;
+  position: relative;
+  width: min(100%, var(--drawn-modal-max-width));
+  max-height: min(85vh, 40rem);
+  pointer-events: auto;
+  background: rgba(252, 250, 242, 0.92);
+  opacity: 0;
+}
+
+.frame {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.frame :global(path),
+.closeMark :global(path) {
+  opacity: 0;
+}
+
+.closeWrap {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  z-index: 3;
+  width: 2rem;
+  height: 2rem;
+}
+
+.closeHit {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  color: transparent;
+}
+
+.closeHit:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent-red, #bc002d) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.closeMark {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: inherit;
+  padding: 1.35rem 1.4rem 1.25rem;
+  color: var(--sumi-ink, #2d2d2d);
+  font-family: var(--font-lantern-script, cursive);
+}
+
+.contentHidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.contentVisible {
+  opacity: 1;
+  transition: opacity 320ms ease;
+  pointer-events: auto;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-right: 1.75rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.description {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  opacity: 0.88;
+}
+
+.children {
+  overflow: auto;
+  min-height: 0;
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay {
+    backdrop-filter: none;
+    opacity: 1;
+  }
+
+  .shell {
+    opacity: 1;
+  }
+
+  .frame :global(path),
+  .closeMark :global(path) {
+    opacity: 1;
+  }
+
+  .contentHidden,
+  .contentVisible {
+    transition: none;
+  }
+}
