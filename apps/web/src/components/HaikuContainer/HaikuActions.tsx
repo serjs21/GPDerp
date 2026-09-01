@@ -1,16 +1,16 @@
 "use client";
 
-import { CopyOutlined, DeleteOutlined, ShareAltOutlined, TagOutlined, WarningOutlined } from "@ant-design/icons";
+import { CopyOutlined, DeleteOutlined, ShareAltOutlined, TagOutlined } from "@ant-design/icons";
 import { Button, message, Tooltip } from "@/components/StyledComponents";
 import axios from "axios";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import type { HaikuDto } from "@/api/haikus";
 import { deleteHaiku } from "@/api/haikus";
+import { DeleteConfirmModal } from "@/components/DeleteConfirmModal";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { ManageLabelsModal } from "@/components/ManageLabelsModal/ManageLabelsModal";
 import { ShareModal } from "@/components/ShareModal/ShareModal";
-import { useConfirm } from "@/hooks/useConfirm";
-import { useCopy } from "@/hooks/useCopy"; 
+import { useCopy } from "@/hooks/useCopy";
 import styles from "./HaikuActions.module.css";
 import { formatHaikuPlainToText } from "@/utils/strings";
 
@@ -28,50 +28,53 @@ export type HaikuActionsProps =
 export const HaikuActions = (props: HaikuActionsProps) => {
   const [shareOpen, setShareOpen] = useState(false);
   const [labelsOpen, setLabelsOpen] = useState(false);
-  const { openConfirm } = useConfirm();
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const { copy } = useCopy();
+
+  const haiku = props.variant === "saved" ? props.haiku : null;
+  const onDeleted = props.variant === "saved" ? props.onDeleted : undefined;
+  const onDelete = props.variant === "saved" ? props.onDelete : undefined;
+
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!haiku) return;
+    setDeleting(true);
+    try {
+      if (onDelete) {
+        await onDelete();
+        setDeleteOpen(false);
+        return;
+      }
+      await deleteHaiku(haiku.id);
+      message.success("Haiku deleted");
+      onDeleted?.();
+      setDeleteOpen(false);
+    } catch (e) {
+      if (onDelete) {
+        setDeleteOpen(false);
+        return;
+      }
+      if (axios.isAxiosError(e) && e.response?.status === 403) {
+        message.error("You are not allowed to delete this haiku.");
+      } else {
+        message.error("Could not delete haiku.");
+      }
+    } finally {
+      setDeleting(false);
+    }
+  }, [haiku, onDelete, onDeleted]);
 
   if (props.variant === "generating") {
     return (
-        <Tooltip title="Saving this haiku…">
-          <span className={styles.loaderWrap}>
-            <SakuraPetalLoader compact />
-          </span>
-        </Tooltip>
+      <Tooltip title="Saving this haiku…">
+        <span className={styles.loaderWrap}>
+          <SakuraPetalLoader compact />
+        </span>
+      </Tooltip>
     );
   }
 
-  const { haiku, onDeleted, onChanged, onDelete } = props;
-
-  const openDeleteConfirm = () => {
-    openConfirm({
-      title: "Delete this haiku?",
-      content: "This action cannot be undone.",
-      okText: "Delete",
-      danger: true,
-      cancelText: "Cancel",
-      icon: <WarningOutlined style={{ color: "var(--accent-red)" }} />,
-      onOk: async () => {
-        try {
-          if (onDelete) {
-            await onDelete();
-            return;
-          }
-          await deleteHaiku(haiku.id);
-          message.success("Haiku deleted");
-          onDeleted?.();
-        } catch (e) {
-          if (onDelete) throw e;
-          if (axios.isAxiosError(e) && e.response?.status === 403) {
-            message.error("You are not allowed to delete this haiku.");
-          } else {
-            message.error("Could not delete haiku.");
-          }
-          throw e;
-        }
-      },
-    });
-  };
+  const { haiku: savedHaiku, onChanged } = props;
 
   return (
     <>
@@ -79,10 +82,9 @@ export const HaikuActions = (props: HaikuActionsProps) => {
         <Button
           type="text"
           size="small"
-          // danger
           icon={<DeleteOutlined />}
           aria-label="Delete haiku"
-          onClick={openDeleteConfirm}
+          onClick={() => setDeleteOpen(true)}
         />
       </Tooltip>
     <Tooltip title="Copy to clipboard">
@@ -92,7 +94,7 @@ export const HaikuActions = (props: HaikuActionsProps) => {
         className={styles.copyButton}
         icon={<CopyOutlined />}
         aria-label="Copy to clipboard"
-        onClick={() => void copy(formatHaikuPlainToText(haiku))}
+        onClick={() => void copy(formatHaikuPlainToText(savedHaiku))}
       />
       </Tooltip>
       <Tooltip title="Add label">
@@ -113,12 +115,18 @@ export const HaikuActions = (props: HaikuActionsProps) => {
           onClick={() => setShareOpen(true)}
         />
       </Tooltip>
-      <ShareModal haikuId={haiku.id} open={shareOpen} onClose={() => setShareOpen(false)} />
+      <ShareModal haikuId={savedHaiku.id} open={shareOpen} onClose={() => setShareOpen(false)} />
       <ManageLabelsModal
         open={labelsOpen}
-        haiku={haiku}
+        haiku={savedHaiku}
         onClose={() => setLabelsOpen(false)}
         onSaved={onChanged}
+      />
+      <DeleteConfirmModal
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        onConfirm={handleDeleteConfirm}
+        confirming={deleting}
       />
     </>
   );
