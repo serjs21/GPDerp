@@ -103,7 +103,7 @@ export function ComicConfirmModal({
     setPresent(false);
   }, []);
 
-  const { ctasMounted, isExiting } = useComicConfirmOpenAnimation({
+  const { isExiting, ctaEnterStarted, ctaEnterComplete } = useComicConfirmOpenAnimation({
     open,
     present,
     reducedMotion: Boolean(reduceMotion),
@@ -117,7 +117,7 @@ export function ComicConfirmModal({
   });
 
   const showCtaRow = present;
-  const ctaPending = present && !ctasMounted && !isExiting;
+  const ctaPending = present && !ctaEnterStarted && !isExiting;
 
   useLayoutEffect(() => {
     if (!present) return;
@@ -153,52 +153,6 @@ export function ComicConfirmModal({
       setPresent(true);
     }
   }, [open]);
-
-  // #region agent log
-  useEffect(() => {
-    if (!present) return;
-
-    const id = requestAnimationFrame(() => {
-      const content = questionPartRef.current;
-      const stage = content?.firstElementChild as HTMLElement | null;
-      const canvas = stage?.querySelector("canvas.comical-generated");
-      const svg = stage?.querySelector("svg.comical-generated");
-      const inner = questionInnerRef.current;
-      const stageRect = stage?.getBoundingClientRect();
-      const canvasRect = canvas?.getBoundingClientRect();
-      const svgRect = svg?.getBoundingClientRect();
-
-      const innerRect = inner?.getBoundingClientRect();
-
-      fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "53a752" },
-        body: JSON.stringify({
-          sessionId: "53a752",
-          runId: "overflow-fix",
-          hypothesisId: "E",
-          location: "ComicConfirmModal.tsx:clipMetrics",
-          message: "comical svg/canvas overflow",
-          data: {
-            stageTop: stageRect ? Math.round(stageRect.top) : null,
-            canvasTop: canvasRect ? Math.round(canvasRect.top) : null,
-            innerTop: innerRect ? Math.round(innerRect.top) : null,
-            bleedTopPx:
-              stageRect && innerRect ? Math.round(innerRect.top - stageRect.top) : null,
-            stagePadTop: stage ? getComputedStyle(stage).paddingTop : null,
-            canvasOverflow: canvas ? getComputedStyle(canvas).overflow : null,
-            svgOverflow: svg ? getComputedStyle(svg).overflow : null,
-            svgFound: Boolean(svg),
-            canvasFound: Boolean(canvas),
-          },
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-    });
-
-    return () => cancelAnimationFrame(id);
-  }, [present]);
-  // #endregion
 
   if (!present) {
     return (
@@ -284,7 +238,11 @@ export function ComicConfirmModal({
                         ref={(node) => {
                           ctaPartRefs.current.set(option.id, node);
                         }}
-                        className={[styles.ctaPart, ctaPending && styles.ctaPartPending]
+                        className={[
+                          styles.ctaPart,
+                          ctaPending && styles.ctaPartPending,
+                          ctaEnterComplete && styles.ctaPartReady,
+                        ]
                           .filter(Boolean)
                           .join(" ")}
                         data-comic-role="cta"

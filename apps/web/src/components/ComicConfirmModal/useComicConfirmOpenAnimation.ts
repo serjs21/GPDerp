@@ -48,37 +48,11 @@ function applySlideFrame(
   el: HTMLElement,
   t: number,
   opts: Omit<SlideEnterOptions, "durationMs">,
-  debugLabel?: string,
 ) {
   const x = lerp(opts.fromXRem ?? 0, opts.toXRem ?? 0, t);
   const y = lerp(opts.fromYRem ?? 0, opts.toYRem ?? 0, t);
   el.style.opacity = String(lerp(opts.fromOpacity, opts.toOpacity, t));
   el.style.transform = x === 0 && y === 0 ? "" : `translate(${x}rem, ${y}rem)`;
-
-  // #region agent log
-  if (debugLabel && Math.round(t * 100) % 50 === 0) {
-    const rect = el.getBoundingClientRect();
-    fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "53a752" },
-      body: JSON.stringify({
-        sessionId: "53a752",
-        runId: "post-fix",
-        hypothesisId: "C",
-        location: "useComicConfirmOpenAnimation.ts:applySlideFrame",
-        message: "part position during animation",
-        data: {
-          label: debugLabel,
-          t,
-          top: Math.round(rect.top),
-          height: Math.round(rect.height),
-          transform: el.style.transform,
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-  }
-  // #endregion
 }
 
 function clearMotionStyles(el: HTMLElement) {
@@ -122,7 +96,6 @@ function slideEnter(
 function slideExit(
   el: HTMLElement | null,
   opts: SlideEnterOptions,
-  debugLabel?: string,
 ): Promise<void> {
   if (!el) return Promise.resolve();
 
@@ -137,7 +110,7 @@ function slideExit(
   };
   const model = { t: 0 };
 
-  applySlideFrame(el, 0, exitMotion, debugLabel);
+  applySlideFrame(el, 0, exitMotion);
 
   return new Promise((resolve) => {
     animate(model, {
@@ -145,7 +118,7 @@ function slideExit(
       duration: opts.durationMs,
       ease: COMIC_EASE,
       onUpdate: () => {
-        applySlideFrame(el, model.t, exitMotion, debugLabel);
+        applySlideFrame(el, model.t, exitMotion);
       },
       onComplete: () => resolve(),
     });
@@ -178,6 +151,8 @@ export function useComicConfirmOpenAnimation(options: {
   } = options;
 
   const [ctasMounted, setCtasMounted] = useState(false);
+  const [ctaEnterStarted, setCtaEnterStarted] = useState(false);
+  const [ctaEnterComplete, setCtaEnterComplete] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const exitingRef = useRef(false);
   const openGenRef = useRef(0);
@@ -195,6 +170,8 @@ export function useComicConfirmOpenAnimation(options: {
   useEffect(() => {
     if (!present) {
       setCtasMounted(false);
+      setCtaEnterStarted(false);
+      setCtaEnterComplete(false);
       setIsExiting(false);
       ctaFadePendingRef.current = false;
       return;
@@ -204,6 +181,8 @@ export function useComicConfirmOpenAnimation(options: {
 
     const gen = openGenRef.current;
     setCtasMounted(false);
+    setCtaEnterStarted(false);
+    setCtaEnterComplete(false);
     ctaFadePendingRef.current = false;
 
     const id = requestAnimationFrame(() => {
@@ -214,6 +193,8 @@ export function useComicConfirmOpenAnimation(options: {
         if (contentRef.current) clearMotionStyles(contentRef.current);
         setCtasMounted(true);
         ctaFadePendingRef.current = true;
+        setCtaEnterStarted(true);
+        setCtaEnterComplete(true);
         return;
       }
 
@@ -261,8 +242,16 @@ export function useComicConfirmOpenAnimation(options: {
         for (const el of ctas) {
           clearMotionStyles(el);
         }
+        setCtaEnterStarted(true);
+        setCtaEnterComplete(true);
         return;
       }
+
+      for (const el of ctas) {
+        el.style.opacity = "0";
+        el.style.transform = "translate(0rem, 1rem)";
+      }
+      setCtaEnterStarted(true);
 
       void Promise.all(
         ctas.map((el) =>
@@ -274,7 +263,11 @@ export function useComicConfirmOpenAnimation(options: {
             durationMs: COMIC_ANIM_MS,
           }),
         ),
-      );
+      ).then(() => {
+        if (!cancelled && gen === openGenRef.current) {
+          setCtaEnterComplete(true);
+        }
+      });
     };
 
     runCtaEnter();
@@ -304,28 +297,20 @@ export function useComicConfirmOpenAnimation(options: {
 
       await Promise.all([
         fadeElement(overlayRef.current, 0, COMIC_ANIM_MS),
-        slideExit(
-          contentRef.current,
-          {
-            fromOpacity: 0,
-            toOpacity: 1,
-            fromXRem: -2,
-            toXRem: 0,
-            durationMs: COMIC_ANIM_MS,
-          },
-          "content",
-        ),
-        slideExit(
-          ctaRowRef.current,
-          {
-            fromOpacity: 0,
-            toOpacity: COMIC_CTA_REST_OPACITY,
-            fromYRem: 1,
-            toYRem: 0,
-            durationMs: COMIC_ANIM_MS,
-          },
-          "ctaRow",
-        ),
+        slideExit(contentRef.current, {
+          fromOpacity: 0,
+          toOpacity: 1,
+          fromXRem: -2,
+          toXRem: 0,
+          durationMs: COMIC_ANIM_MS,
+        }),
+        slideExit(ctaRowRef.current, {
+          fromOpacity: 0,
+          toOpacity: COMIC_CTA_REST_OPACITY,
+          fromYRem: 1,
+          toYRem: 0,
+          durationMs: COMIC_ANIM_MS,
+        }),
       ]);
       if (cancelled) return;
       onPresentEnd();
@@ -339,5 +324,5 @@ export function useComicConfirmOpenAnimation(options: {
     };
   }, [contentRef, ctaRowRef, onPresentEnd, open, overlayRef, panelRef, present, reducedMotion]);
 
-  return { ctasMounted, isExiting };
+  return { isExiting, ctaEnterStarted, ctaEnterComplete };
 }

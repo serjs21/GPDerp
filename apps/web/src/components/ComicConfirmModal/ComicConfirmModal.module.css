@@ -71,7 +71,15 @@
   flex-shrink: 0;
 }
 
-.ctaPartPending {
+.ctaPart {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  opacity: 0.8;
+  overflow: visible;
+}
+
+.ctaPart.ctaPartPending {
   opacity: 0;
   pointer-events: none;
 }
@@ -86,13 +94,8 @@
   gap: 0.85rem;
 }
 
-.ctaPart {
-  position: relative;
-  z-index: 1;
-  flex-shrink: 0;
-  opacity: 0.8;
+.ctaPartReady {
   transition: opacity 180ms ease;
-  overflow: visible;
 }
 
 .ctaPart:hover:not(:has(button:disabled)),
