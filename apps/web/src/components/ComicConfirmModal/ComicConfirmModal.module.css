@@ -25,14 +25,67 @@
   overflow: visible;
 }
 
-/* Comical parent — fixed footprint so absolute CTAs fit inside canvas. */
-.stage {
+.dialogLayout {
   position: relative;
   box-sizing: border-box;
   width: 100%;
   min-height: 14.5rem;
   padding: 2.75rem 3.25rem 6.25rem;
   overflow: visible;
+}
+
+.contentPart {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.partStage {
+  position: relative;
+  display: inline-block;
+  width: fit-content;
+  max-width: 100%;
+  padding: 1.75rem 2rem;
+  overflow: visible;
+}
+
+.ctaPart {
+  position: absolute;
+  z-index: 1;
+  opacity: 0.8;
+  transition: opacity 180ms ease;
+}
+
+.ctaPart:hover:not(:has(button:disabled)),
+.ctaPart:focus-within:has(button:focus-visible:not(:disabled)) {
+  opacity: 1;
+}
+
+.ctaPart:has(button:disabled) {
+  opacity: 0.5;
+}
+
+.ctaPartStart {
+  left: 2rem;
+  bottom: 1.85rem;
+}
+
+.ctaPartEnd {
+  right: 2rem;
+  bottom: 1.85rem;
+}
+
+.ctaPartCenter {
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: fit-content;
+  bottom: 1.85rem;
+}
+
+.ctaPart:focus-within:has(button:focus-visible:not(:disabled)) .partStage {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-red, #bc002d) 45%, transparent);
+  border-radius: 0.35rem;
 }
 
 .visuallyHidden {

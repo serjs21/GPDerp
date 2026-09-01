@@ -20,8 +20,13 @@ export const COMIC_BUBBLE_STYLES: ComicBubbleStyle[] = [
 export const COMIC_INK = "#2d2d2d";
 export const COMIC_FILL = "#ffffff";
 export const COMIC_SHADOW_OFFSET = 4;
-export const COMIC_OVERLAY_MS = 260;
+/** Shared duration for overlay, content, and CTA motion (200ms). */
+export const COMIC_ANIM_MS = 200;
+export const COMIC_OVERLAY_MS = COMIC_ANIM_MS;
+export const COMIC_CONTENT_ENTER_MS = COMIC_ANIM_MS;
+export const COMIC_CTA_ENTER_MS = COMIC_ANIM_MS;
 export const COMIC_EASE = "inOutSine";
+export const COMIC_CTA_REST_OPACITY = 0.8;
 
 /** Styles that ship with a speech tail in comicaljs defaults. */
 export function styleUsesTail(style: ComicBubbleStyle): boolean {

@@ -3,6 +3,7 @@
   width: fit-content;
   max-width: 100%;
   transform-origin: center center;
+  opacity: 0.92;
   transition:
     transform 180ms ease,
     opacity 180ms ease;
@@ -50,12 +51,11 @@
   white-space: nowrap;
   cursor: pointer;
   pointer-events: auto;
-  opacity: 0.92;
   transition: opacity 180ms ease;
 }
 
 .bubbleEmbedded {
-  position: absolute;
+  position: relative;
   z-index: 1;
   box-sizing: border-box;
   display: inline-flex;
@@ -74,53 +74,27 @@
   white-space: nowrap;
   cursor: pointer;
   pointer-events: auto;
-  opacity: 0.9;
-  transition: opacity 180ms ease;
-}
-
-.ctaSlotStart {
-  left: 2rem;
-  bottom: 1.85rem;
-}
-
-.ctaSlotEnd {
-  right: 2rem;
-  bottom: 1.85rem;
-}
-
-.ctaSlotCenter {
-  left: 0;
-  right: 0;
-  margin-inline: auto;
-  width: fit-content;
-  bottom: 1.85rem;
 }
 
 .stageStandalone:hover:not(:has(.bubble:disabled)) {
+  opacity: 1;
   transform: scale(1.06);
 }
 
-.stageStandalone:hover:not(:has(.bubble:disabled)) .bubble {
+.stageStandalone:focus-within:has(.bubble:focus-visible:not(:disabled)) {
   opacity: 1;
-}
-
-.bubble:focus-visible:not(:disabled),
-.bubbleEmbedded:focus-visible:not(:disabled) {
-  opacity: 1;
-  outline: none;
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-red, #bc002d) 45%, transparent);
   border-radius: 0.35rem;
 }
 
-.bubbleEmbedded:hover:not(:disabled),
+.bubble:focus-visible:not(:disabled),
 .bubbleEmbedded:focus-visible:not(:disabled) {
-  opacity: 1;
+  outline: none;
 }
 
 .bubble:disabled,
 .bubbleEmbedded:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
 }
 
 @media (prefers-reduced-motion: reduce) {

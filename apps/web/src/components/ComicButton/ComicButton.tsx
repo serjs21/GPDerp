@@ -67,15 +67,12 @@ export const ComicButton = forwardRef<HTMLButtonElement, ComicButtonProps>(funct
 
   const labelKey = typeof children === "string" ? children : "node";
 
-  const slotClass =
-    slot === "start" ? styles.ctaSlotStart : slot === "end" ? styles.ctaSlotEnd : styles.ctaSlotCenter;
-
   if (mode === "embedded") {
     return (
       <button
         ref={setButtonRef}
         type={type}
-        className={[styles.bubbleEmbedded, slotClass, className].filter(Boolean).join(" ")}
+        className={[styles.bubbleEmbedded, className].filter(Boolean).join(" ")}
         style={style}
         disabled={disabled}
         data-comic-role="cta"

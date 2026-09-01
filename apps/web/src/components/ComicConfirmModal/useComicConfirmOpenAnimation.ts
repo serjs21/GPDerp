@@ -2,7 +2,11 @@
 
 import { animate } from "animejs";
 import { useEffect, useRef, useState, type RefObject } from "react";
-import { COMIC_EASE, COMIC_OVERLAY_MS } from "./comicBubblePresets";
+import {
+  COMIC_ANIM_MS,
+  COMIC_CTA_REST_OPACITY,
+  COMIC_EASE,
+} from "./comicBubblePresets";
 
 export function fadeElement(
   el: HTMLElement | null,
@@ -20,12 +24,114 @@ export function fadeElement(
   });
 }
 
+type SlideEnterOptions = {
+  fromOpacity: number;
+  toOpacity: number;
+  fromXRem?: number;
+  toXRem?: number;
+  fromYRem?: number;
+  toYRem?: number;
+  durationMs: number;
+};
+
+function lerp(from: number, to: number, t: number): number {
+  return from + (to - from) * t;
+}
+
+function restorePartMotion(el: HTMLElement) {
+  el.style.opacity = "";
+  el.style.transform = "";
+}
+
+/** Transform + opacity on part containers (canvas moves with the wrapper). */
+function applySlideFrame(
+  el: HTMLElement,
+  t: number,
+  opts: Omit<SlideEnterOptions, "durationMs">,
+) {
+  const x = lerp(opts.fromXRem ?? 0, opts.toXRem ?? 0, t);
+  const y = lerp(opts.fromYRem ?? 0, opts.toYRem ?? 0, t);
+  el.style.opacity = String(lerp(opts.fromOpacity, opts.toOpacity, t));
+  el.style.transform = x === 0 && y === 0 ? "" : `translate(${x}rem, ${y}rem)`;
+}
+
+function clearMotionStyles(el: HTMLElement) {
+  restorePartMotion(el);
+}
+
+function slideEnter(
+  el: HTMLElement | null,
+  opts: SlideEnterOptions,
+): Promise<void> {
+  if (!el) return Promise.resolve();
+
+  const motion = {
+    fromOpacity: opts.fromOpacity,
+    toOpacity: opts.toOpacity,
+    fromXRem: opts.fromXRem ?? 0,
+    toXRem: opts.toXRem ?? 0,
+    fromYRem: opts.fromYRem ?? 0,
+    toYRem: opts.toYRem ?? 0,
+  };
+
+  applySlideFrame(el, 0, motion);
+
+  const model = { t: 0 };
+  return new Promise((resolve) => {
+    animate(model, {
+      t: 1,
+      duration: opts.durationMs,
+      ease: COMIC_EASE,
+      onUpdate: () => {
+        applySlideFrame(el, model.t, motion);
+      },
+      onComplete: () => {
+        restorePartMotion(el);
+        resolve();
+      },
+    });
+  });
+}
+
+function slideExit(
+  el: HTMLElement | null,
+  opts: SlideEnterOptions,
+): Promise<void> {
+  if (!el) return Promise.resolve();
+
+  const startOpacity = parseFloat(getComputedStyle(el).opacity) || opts.toOpacity;
+  const exitMotion = {
+    fromOpacity: startOpacity,
+    toOpacity: opts.fromOpacity,
+    fromXRem: opts.toXRem ?? 0,
+    toXRem: opts.fromXRem ?? 0,
+    fromYRem: opts.toYRem ?? 0,
+    toYRem: opts.fromYRem ?? 0,
+  };
+  const model = { t: 0 };
+
+  applySlideFrame(el, 0, exitMotion);
+
+  return new Promise((resolve) => {
+    animate(model, {
+      t: 1,
+      duration: opts.durationMs,
+      ease: COMIC_EASE,
+      onUpdate: () => {
+        applySlideFrame(el, model.t, exitMotion);
+      },
+      onComplete: () => resolve(),
+    });
+  });
+}
+
 export function useComicConfirmOpenAnimation(options: {
   open: boolean;
   present: boolean;
   reducedMotion: boolean;
   overlayRef: RefObject<HTMLDivElement | null>;
   panelRef: RefObject<HTMLDivElement | null>;
+  contentRef: RefObject<HTMLDivElement | null>;
   getCtaElements: () => HTMLElement[];
   onPresentEnd: () => void;
   refreshBubblesRef: RefObject<(() => void) | null>;
@@ -36,6 +142,7 @@ export function useComicConfirmOpenAnimation(options: {
     reducedMotion,
     overlayRef,
     panelRef,
+    contentRef,
     getCtaElements,
     onPresentEnd,
     refreshBubblesRef,
@@ -53,7 +160,7 @@ export function useComicConfirmOpenAnimation(options: {
     }
   }, [open]);
 
-  // Phase 1: overlay + question panel
+  // Phase 1: overlay fade + question part slides in LTR
   useEffect(() => {
     if (!present) {
       setCtasMounted(false);
@@ -68,9 +175,11 @@ export function useComicConfirmOpenAnimation(options: {
     ctaFadePendingRef.current = false;
 
     const id = requestAnimationFrame(() => {
+      if (panelRef.current) panelRef.current.style.opacity = "1";
+
       if (reducedMotion) {
         if (overlayRef.current) overlayRef.current.style.opacity = "1";
-        if (panelRef.current) panelRef.current.style.opacity = "1";
+        if (contentRef.current) clearMotionStyles(contentRef.current);
         setCtasMounted(true);
         ctaFadePendingRef.current = true;
         return;
@@ -78,32 +187,39 @@ export function useComicConfirmOpenAnimation(options: {
 
       void (async () => {
         await Promise.all([
-          fadeElement(overlayRef.current, 1, COMIC_OVERLAY_MS),
-          fadeElement(panelRef.current, 1, COMIC_OVERLAY_MS),
+          fadeElement(overlayRef.current, 1, COMIC_ANIM_MS),
+          slideEnter(contentRef.current, {
+            fromOpacity: 0,
+            toOpacity: 1,
+            fromXRem: -2,
+            toXRem: 0,
+            durationMs: COMIC_ANIM_MS,
+          }),
         ]);
         if (gen !== openGenRef.current) return;
+
         setCtasMounted(true);
         ctaFadePendingRef.current = true;
       })();
     });
 
     return () => cancelAnimationFrame(id);
-  }, [open, overlayRef, panelRef, present, reducedMotion]);
+  }, [contentRef, open, overlayRef, panelRef, present, reducedMotion]);
 
-  // Phase 2: after CTAs mount in the DOM, refresh comical and fade them in
+  // Phase 2: CTA parts slide up into place
   useEffect(() => {
     if (!present || !open || !ctasMounted || !ctaFadePendingRef.current) return;
 
     const gen = openGenRef.current;
     let cancelled = false;
 
-    const runCtaFade = () => {
+    const runCtaEnter = () => {
       if (cancelled || gen !== openGenRef.current) return;
 
       refreshBubblesRef.current?.();
       const ctas = getCtaElements();
       if (ctas.length === 0) {
-        requestAnimationFrame(runCtaFade);
+        requestAnimationFrame(runCtaEnter);
         return;
       }
 
@@ -111,26 +227,32 @@ export function useComicConfirmOpenAnimation(options: {
 
       if (reducedMotion) {
         for (const el of ctas) {
-          el.style.opacity = "0.9";
+          clearMotionStyles(el);
         }
         return;
       }
 
-      for (const el of ctas) {
-        el.style.opacity = "0";
-      }
-
-      void Promise.all(ctas.map((el) => fadeElement(el, 0.9, COMIC_OVERLAY_MS)));
+      void Promise.all(
+        ctas.map((el) =>
+          slideEnter(el, {
+            fromOpacity: 0,
+            toOpacity: COMIC_CTA_REST_OPACITY,
+            fromYRem: 1,
+            toYRem: 0,
+            durationMs: COMIC_ANIM_MS,
+          }),
+        ),
+      );
     };
 
-    runCtaFade();
+    runCtaEnter();
 
     return () => {
       cancelled = true;
     };
   }, [ctasMounted, getCtaElements, open, present, reducedMotion, refreshBubblesRef]);
 
-  // Close: fade everything together
+  // Close: overlay fade + all parts slide/fade out together
   useEffect(() => {
     if (!present || open) return;
     if (exitingRef.current) return;
@@ -146,10 +268,26 @@ export function useComicConfirmOpenAnimation(options: {
         return;
       }
 
+      const ctas = getCtaElements();
+      refreshBubblesRef.current?.();
       await Promise.all([
-        fadeElement(overlayRef.current, 0, COMIC_OVERLAY_MS),
-        fadeElement(panelRef.current, 0, COMIC_OVERLAY_MS),
-        ...getCtaElements().map((el) => fadeElement(el, 0, COMIC_OVERLAY_MS)),
+        fadeElement(overlayRef.current, 0, COMIC_ANIM_MS),
+        slideExit(contentRef.current, {
+          fromOpacity: 0,
+          toOpacity: 1,
+          fromXRem: -2,
+          toXRem: 0,
+          durationMs: COMIC_ANIM_MS,
+        }),
+        ...ctas.map((el) =>
+          slideExit(el, {
+            fromOpacity: 0,
+            toOpacity: COMIC_CTA_REST_OPACITY,
+            fromYRem: 1,
+            toYRem: 0,
+            durationMs: COMIC_ANIM_MS,
+          }),
+        ),
       ]);
       if (cancelled) return;
       onPresentEnd();
@@ -160,7 +298,7 @@ export function useComicConfirmOpenAnimation(options: {
     return () => {
       cancelled = true;
     };
-  }, [getCtaElements, onPresentEnd, open, overlayRef, panelRef, present, reducedMotion]);
+  }, [contentRef, getCtaElements, onPresentEnd, open, overlayRef, panelRef, present, reducedMotion, refreshBubblesRef]);
 
   return { ctasMounted };
 }

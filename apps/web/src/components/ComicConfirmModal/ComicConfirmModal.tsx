@@ -5,7 +5,6 @@ import { useReducedMotion } from "motion/react";
 import {
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
   type ReactNode,
@@ -38,9 +37,13 @@ export type ComicConfirmModalProps = {
   className?: string;
 };
 
-function ctaSlotForIndex(index: number, count: number, layout: "row" | "column"): "start" | "end" | "center" {
-  if (layout === "column" || count !== 2) return "center";
-  return index === 0 ? "start" : "end";
+function ctaPartClassForIndex(
+  index: number,
+  count: number,
+  layout: "row" | "column",
+): string {
+  if (layout === "column" || count !== 2) return styles.ctaPartCenter;
+  return index === 0 ? styles.ctaPartStart : styles.ctaPartEnd;
 }
 
 export function ComicConfirmModal({
@@ -58,10 +61,27 @@ export function ComicConfirmModal({
   const [present, setPresent] = useState(open);
   const overlayRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
-  const questionRef = useRef<HTMLDivElement>(null);
-  const ctaRefs = useRef(new Map<string, HTMLButtonElement | null>());
-  const refreshBubblesRef = useRef<(() => void) | null>(null);
+  const questionPartRef = useRef<HTMLDivElement>(null);
+  const questionInnerRef = useRef<HTMLDivElement>(null);
+  const questionRefreshRef = useRef<(() => void) | null>(null);
+  const ctaPartRefs = useRef(new Map<string, HTMLDivElement | null>());
+  const ctaButtonRefs = useRef(new Map<string, HTMLButtonElement | null>());
+  const ctaRefreshRefs = useRef(new Map<string, { current: (() => void) | null }>());
+  const refreshBubblesRef = useRef<(() => void)>(() => {
+    questionRefreshRef.current?.();
+    for (const entry of ctaRefreshRefs.current.values()) {
+      entry.current?.();
+    }
+  });
+
+  const getCtaRefreshRef = useCallback((id: string) => {
+    let entry = ctaRefreshRefs.current.get(id);
+    if (!entry) {
+      entry = { current: null };
+      ctaRefreshRefs.current.set(id, entry);
+    }
+    return entry;
+  }, []);
 
   const layout = resolveOptionsLayout(optionsLayout, options.length);
 
@@ -70,11 +90,11 @@ export function ComicConfirmModal({
     [options.length],
   );
 
-  const getCtaElements = useCallback(
+  const getCtaPartElements = useCallback(
     () =>
       options
-        .map((opt) => ctaRefs.current.get(opt.id))
-        .filter((node): node is HTMLButtonElement => node != null),
+        .map((opt) => ctaPartRefs.current.get(opt.id))
+        .filter((node): node is HTMLDivElement => node != null),
     [options],
   );
 
@@ -88,34 +108,11 @@ export function ComicConfirmModal({
     reducedMotion: Boolean(reduceMotion),
     overlayRef,
     panelRef,
-    getCtaElements,
+    contentRef: questionPartRef,
+    getCtaElements: getCtaPartElements,
     onPresentEnd: handlePresentEnd,
     refreshBubblesRef,
   });
-
-  const getTargets = useCallback(
-    () => [
-      { element: questionRef.current, style: questionBubbleStyle, isQuestion: true },
-      ...(ctasMounted
-        ? options.map((opt) => ({
-            element: ctaRefs.current.get(opt.id) ?? null,
-            style: (opt.bubbleStyle ?? "speech") as ComicBubbleStyle,
-          }))
-        : []),
-    ],
-    [ctasMounted, options, questionBubbleStyle],
-  );
-
-  const targetsKey = useMemo(
-    () =>
-      [
-        questionBubbleStyle,
-        layout,
-        ctasMounted ? "with-ctas" : "question-only",
-        options.map((opt) => `${opt.id}:${opt.bubbleStyle ?? "speech"}:${opt.disabled ? 1 : 0}`).join("|"),
-      ].join(";"),
-    [ctasMounted, layout, options, questionBubbleStyle],
-  );
 
   const handleSelect = useCallback(
     (option: ComicConfirmOption) => {
@@ -168,44 +165,79 @@ export function ComicConfirmModal({
                 Choose an option below.
               </Dialog.Description>
 
-              <ComicBubbleStage
-                ref={stageRef}
-                active={present && open}
-                targetsKey={targetsKey}
-                getTargets={getTargets}
-                refreshRef={refreshBubblesRef}
-                className={styles.stage}
-              >
-                <ComicDialogContent
-                  ref={questionRef}
-                  mode="embedded"
-                  bubbleStyle={questionBubbleStyle}
+              <div className={styles.dialogLayout}>
+                <div
+                  ref={questionPartRef}
+                  className={styles.contentPart}
+                  data-comic-role="dialog-content"
                 >
-                  {question}
-                </ComicDialogContent>
+                  <ComicBubbleStage
+                    active={present}
+                    targetsKey={`question:${questionBubbleStyle}:${questionText ?? "node"}`}
+                    getTargets={() => [
+                      {
+                        element: questionInnerRef.current,
+                        style: questionBubbleStyle,
+                        isQuestion: true,
+                      },
+                    ]}
+                    refreshRef={questionRefreshRef}
+                    className={styles.partStage}
+                  >
+                    <ComicDialogContent
+                      ref={questionInnerRef}
+                      mode="embedded"
+                      bubbleStyle={questionBubbleStyle}
+                    >
+                      {question}
+                    </ComicDialogContent>
+                  </ComicBubbleStage>
+                </div>
 
                 {ctasMounted &&
                   options.map((option, index) => (
-                    <ComicButton
+                    <div
                       key={option.id}
                       ref={(node) => {
-                        ctaRefs.current.set(option.id, node);
+                        ctaPartRefs.current.set(option.id, node);
                       }}
-                      mode="embedded"
-                      slot={ctaSlotForIndex(index, options.length, layout)}
-                      bubbleStyle={option.bubbleStyle}
-                      disabled={option.disabled}
+                      className={[styles.ctaPart, ctaPartClassForIndex(index, options.length, layout)]
+                        .filter(Boolean)
+                        .join(" ")}
+                      data-comic-role="cta"
                       style={
                         layout === "column" || options.length !== 2
                           ? { bottom: columnBottom(index) }
                           : undefined
                       }
-                      onClick={() => handleSelect(option)}
                     >
-                      {option.label}
-                    </ComicButton>
+                      <ComicBubbleStage
+                        active={present}
+                        targetsKey={`cta:${option.id}:${option.bubbleStyle ?? "speech"}:${option.disabled ? 1 : 0}`}
+                        getTargets={() => [
+                          {
+                            element: ctaButtonRefs.current.get(option.id) ?? null,
+                            style: (option.bubbleStyle ?? "speech") as ComicBubbleStyle,
+                          },
+                        ]}
+                        refreshRef={getCtaRefreshRef(option.id)}
+                        className={styles.partStage}
+                      >
+                        <ComicButton
+                          ref={(node) => {
+                            ctaButtonRefs.current.set(option.id, node);
+                          }}
+                          mode="embedded"
+                          bubbleStyle={option.bubbleStyle}
+                          disabled={option.disabled}
+                          onClick={() => handleSelect(option)}
+                        >
+                          {option.label}
+                        </ComicButton>
+                      </ComicBubbleStage>
+                    </div>
                   ))}
-              </ComicBubbleStage>
+              </div>
             </div>
           </div>
         </Dialog.Content>
