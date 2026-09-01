@@ -39,7 +39,8 @@
   padding-inline: 3.75rem;
 }
 
-.stage :global(canvas.comical-generated) {
+.stage :global(canvas.comical-generated),
+.stage > svg {
   position: absolute;
   inset: 0;
   z-index: 0;

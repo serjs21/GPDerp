@@ -2,10 +2,18 @@
   position: relative;
   box-sizing: border-box;
   display: inline-block;
+  width: fit-content;
+  max-width: 100%;
   overflow: visible;
+  transform-origin: center center;
+  transition:
+    transform 180ms ease,
+    opacity 180ms ease;
 }
 
-.stage :global(canvas.comical-generated) {
+/* Canvas and SVG bubble art must not participate in layout flow. */
+.stage > :global(canvas.comical-generated),
+.stage > svg {
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -16,6 +24,11 @@
 
 .stageCompact {
   padding: 1.75rem 2rem;
+}
+
+.stageShout {
+  /* Shout spikes extend well beyond the content box — generous inset on every side. */
+  padding: 3.5rem 4rem 4.75rem;
 }
 
 .stageTailBottom {
@@ -34,14 +47,32 @@
   padding: 1.75rem 3.25rem 1.75rem 2rem;
 }
 
+.stageShout.stageTailBottom {
+  padding-bottom: 5.5rem;
+}
+
+.stageShout.stageTailTop {
+  padding-top: 5.5rem;
+}
+
+.stageShout.stageTailLeft {
+  padding-left: 5rem;
+}
+
+.stageShout.stageTailRight {
+  padding-right: 5rem;
+}
+
 .bubble {
   position: relative;
   z-index: 1;
   box-sizing: border-box;
-  display: inline-flex;
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
   align-items: center;
   justify-content: center;
-  margin: 0;
   padding: 0.85rem 1.5rem;
   border: none;
   background: transparent;
@@ -55,30 +86,26 @@
   cursor: pointer;
   pointer-events: auto;
   opacity: 0.92;
-  transition:
-    opacity 180ms ease,
-    padding 180ms ease;
+  transition: opacity 180ms ease;
 }
 
 .bubbleShout {
-  padding: 0.95rem 1.75rem;
+  padding: 1.15rem 2rem;
+  font-weight: 600;
+  font-size: 1.12rem;
 }
 
-.bubble:hover:not(:disabled),
+.stage:hover:not(:has(.bubble:disabled)) {
+  transform: scale(1.06);
+}
+
+.stage:hover:not(:has(.bubble:disabled)) .bubble {
+  opacity: 1;
+}
+
 .bubble:focus-visible:not(:disabled) {
   opacity: 1;
-  padding-block: 1rem;
-  padding-inline: 1.65rem;
   outline: none;
-}
-
-.bubbleShout:hover:not(:disabled),
-.bubbleShout:focus-visible:not(:disabled) {
-  padding-block: 1.05rem;
-  padding-inline: 1.9rem;
-}
-
-.bubble:focus-visible:not(:disabled) {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-red, #bc002d) 45%, transparent);
   border-radius: 0.35rem;
 }
@@ -89,17 +116,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bubble {
+  .stage {
     transition: opacity 120ms ease;
   }
 
-  .bubble:hover:not(:disabled),
-  .bubble:focus-visible:not(:disabled) {
-    padding: 0.85rem 1.5rem;
-  }
-
-  .bubbleShout:hover:not(:disabled),
-  .bubbleShout:focus-visible:not(:disabled) {
-    padding: 0.95rem 1.75rem;
+  .stage:hover:not(:has(.bubble:disabled)) {
+    transform: none;
   }
 }

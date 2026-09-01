@@ -44,6 +44,7 @@ export function ComicButton({
         element: buttonRef.current,
         style: bubbleStyle,
         sourceDirection,
+        isCompactButton: true,
       },
     ],
     [bubbleStyle, sourceDirection],
@@ -51,16 +52,12 @@ export function ComicButton({
 
   const labelKey = typeof children === "string" ? children : "node";
 
-  const { refreshBubbles } = useComicalBubbles({
+  useComicalBubbles({
     active: true,
     stageRef,
     targetsKey: `${bubbleStyle}:${sourceDirection}:${labelKey}`,
     getTargets,
   });
-
-  const handlePointer = useCallback(() => {
-    requestAnimationFrame(() => refreshBubbles());
-  }, [refreshBubbles]);
 
   const stagePaddingClass = stagePaddingClassForDirection(sourceDirection, {
     stageTailBottom: styles.stageTailBottom,
@@ -73,7 +70,14 @@ export function ComicButton({
   return (
     <div
       ref={stageRef}
-      className={[styles.stage, stagePaddingClass, className].filter(Boolean).join(" ")}
+      className={[
+        styles.stage,
+        stagePaddingClass,
+        bubbleStyle === "shout" ? styles.stageShout : "",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
       style={style}
     >
       <button
@@ -86,10 +90,6 @@ export function ComicButton({
         data-bubble-style={bubbleStyle}
         data-source-direction={sourceDirection}
         onClick={onClick}
-        onMouseEnter={handlePointer}
-        onMouseLeave={handlePointer}
-        onFocus={handlePointer}
-        onBlur={handlePointer}
       >
         {children}
       </button>
