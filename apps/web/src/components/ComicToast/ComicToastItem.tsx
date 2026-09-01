@@ -42,6 +42,8 @@ export function ComicToastItem({ toast, onDismiss, onRemove }: ComicToastItemPro
   }, [onRemove, toast.exiting, toast.id]);
 
   const motionClass = toast.exiting ? styles.itemExit : entered ? styles.itemEnter : "";
+  const contentText = typeof toast.content === "string" ? toast.content : "";
+  const wrapContent = contentText.length > 52;
 
   return (
     <div
@@ -53,9 +55,11 @@ export function ComicToastItem({ toast, onDismiss, onRemove }: ComicToastItemPro
         bubbleStyle={preset.bubbleStyle}
         backgroundColors={preset.backgroundColors}
         className={[dialogStyles.previewStage, styles.stage].join(" ")}
-        contentClassName={styles.content}
+        contentClassName={[styles.toastContent, wrapContent && styles.toastContentWrap]
+          .filter(Boolean)
+          .join(" ")}
       >
-        <span>{toast.content}</span>
+        {toast.content}
         {toast.description ? <div className={styles.description}>{toast.description}</div> : null}
       </ComicDialogContent>
     </div>

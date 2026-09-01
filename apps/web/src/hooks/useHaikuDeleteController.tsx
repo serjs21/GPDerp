@@ -10,7 +10,7 @@ import {
   type HaikuDto,
 } from "@/api/haikus";
 import { DeleteFailedModal } from "@/components/DeleteFailedModal";
-import { message } from "@/components/StyledComponents";
+import { comicToast } from "@/components/ComicToast";
 
 export function useHaikuDeleteController(): {
   onHaikuDeleted: (haiku: HaikuDto) => void;
@@ -37,10 +37,10 @@ export function useHaikuDeleteController(): {
     setRetrying(true);
     try {
       await deleteHaiku(failedHaiku.id);
-      message.success("Haiku deleted");
+      comicToast.success("Haiku deleted");
       setFailedHaiku(null);
     } catch {
-      message.error("Could not delete haiku.");
+      comicToast.error("Could not delete haiku.");
     } finally {
       setRetrying(false);
     }

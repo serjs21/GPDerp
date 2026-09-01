@@ -7,15 +7,16 @@
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
-  width: min(100%, 26rem);
+  width: max-content;
+  max-width: calc(100vw - 2rem);
   padding-inline: 1rem;
   pointer-events: none;
   transform: translateX(-50%);
 }
 
 .item {
-  width: fit-content;
-  max-width: 100%;
+  width: max-content;
+  max-width: calc(100vw - 2rem);
   pointer-events: auto;
   opacity: 0;
   transform: translateY(calc(-1 * var(--comic-toast-enter-offset, 0.75rem)));
@@ -35,22 +36,39 @@
 }
 
 .stage {
-  min-height: 5rem;
-  padding: 1.75rem 2.25rem;
+  min-height: auto;
+  padding: 1.5rem 2rem;
 }
 
-.content {
+.toastContent {
+  display: block;
+  flex: none;
+  width: max-content;
+  max-width: min(calc(100vw - 6rem), 44rem);
+  margin: 0 auto;
+  padding: 0.85rem 1.35rem;
+  font-family: var(--font-lantern-script, cursive);
   font-size: 1.12rem;
   font-weight: 600;
-  padding: 0.85rem 1.35rem;
+  line-height: 1.3;
+  text-align: center;
+  white-space: nowrap;
+  color: var(--sumi-ink, #2d2d2d);
+}
+
+.toastContentWrap {
+  white-space: normal;
 }
 
 .description {
   margin-top: 0.35rem;
+  max-width: min(calc(100vw - 6rem), 44rem);
   font-size: 0.95rem;
   font-weight: 500;
   line-height: 1.35;
   opacity: 0.92;
+  white-space: pre-line;
+  text-align: center;
 }
 
 @media (prefers-reduced-motion: reduce) {

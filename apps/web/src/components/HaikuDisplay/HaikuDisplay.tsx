@@ -24,7 +24,6 @@ export function HaikuDisplay() {
     generatingDraft,
     inputRef,
     onSubmit,
-    contextHolder,
   } = useHaikuGenerationFlow({
     onHaikuSaved: (haiku) => bindHaikuSavedRef.current(haiku),
   });
@@ -78,7 +77,6 @@ export function HaikuDisplay() {
         onGoToHaiku={onGoToHaiku}
       />
       {deleteFailedModal}
-      {contextHolder}
     </div>
   );
 }

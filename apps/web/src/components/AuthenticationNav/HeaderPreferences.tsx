@@ -1,6 +1,6 @@
 "use client";
 
-import { message } from "@/components/StyledComponents";
+import { comicToast } from "@/components/ComicToast";
 import { LocaleSelector } from "@/components/LocaleSelector";
 import { CelestialThemeSelector } from "@/components/CelestialThemeSelector";
 import { useRouter } from "next/navigation";
@@ -34,7 +34,7 @@ export const HeaderPreferences = () => {
         });
         router.refresh();
       } catch {
-        message.error(t("preferencesSaveError"));
+        comicToast.error(t("preferencesSaveError"));
       }
     },
     [isLoggedIn, locale, router, t],

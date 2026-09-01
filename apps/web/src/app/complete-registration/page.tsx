@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, Card, Form, Input, Typography, message } from "@/components/StyledComponents";
+import { Button, Card, Form, Input, Typography } from "@/components/StyledComponents";
+import { comicToast } from "@/components/ComicToast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -49,7 +50,7 @@ const CompleteRegistrationPage = () => {
     setSubmitting(true);
     try {
       await completeRegistrationUsername({ userName: values.userName.trim() });
-      message.success("You’re all set");
+      comicToast.success("You’re all set");
       checkAuthentication();
       router.replace("/");
       router.refresh();
@@ -57,13 +58,13 @@ const CompleteRegistrationPage = () => {
       if (axios.isAxiosError(e) && e.response?.data) {
         const data = e.response.data as { error?: string; code?: string };
         if (data.code === "USERNAME_TAKEN") {
-          message.error(data.error ?? "Username taken");
+          comicToast.error(data.error ?? "Username taken");
           return;
         }
-        message.error(data.error ?? "Could not save username");
+        comicToast.error(data.error ?? "Could not save username");
         return;
       }
-      message.error("Could not save username");
+      comicToast.error("Could not save username");
     } finally {
       setSubmitting(false);
     }

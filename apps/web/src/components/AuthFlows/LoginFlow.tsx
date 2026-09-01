@@ -1,6 +1,7 @@
 "use client";
 
-import { Form, GoogleLoginButton, Input, message } from "@/components/StyledComponents";
+import { Form, GoogleLoginButton, Input } from "@/components/StyledComponents";
+import { comicToast } from "@/components/ComicToast";
 import { UIButton } from "@/components/ui";
 import axios from "axios";
 import authStyles from "@/app/auth.shared.module.css";
@@ -49,15 +50,15 @@ const notifyPasswordLoginError = (error: unknown) => {
   if (axios.isAxiosError(error) && error.response?.data) {
     const data = error.response.data as { error?: string; code?: string };
     if (data.code === "USE_GOOGLE") {
-      message.warning(data.error ?? "This account uses Google sign-in.");
+      comicToast.warning(data.error ?? "This account uses Google sign-in.");
       return;
     }
     if (error.response.status === 429) {
-      message.error(data.error ?? "Too many attempts. Try again later.");
+      comicToast.error(data.error ?? "Too many attempts. Try again later.");
       return;
     }
   }
-  message.error("Invalid email or password");
+  comicToast.error("Invalid email or password");
 };
 
 const notifyGoogleLoginError = (
@@ -70,12 +71,12 @@ const notifyGoogleLoginError = (
       if (onGoogleSignupRequired) {
         onGoogleSignupRequired();
       } else {
-        message.info("Complete account setup on the registration page.");
+        comicToast.info("Complete account setup on the registration page.");
       }
       return;
     }
   }
-  message.error("Google sign-in failed");
+  comicToast.error("Google sign-in failed");
 };
 
 function LoginEmailPasswordForm({
@@ -184,7 +185,7 @@ export function LoginFlow({
           <div className={authStyles.googleRow}>
             <GoogleLoginButton
               onSuccess={(c) => void onGoogleCredential(c.credential)}
-              onError={() => message.error("Google sign-in failed")}
+              onError={() => comicToast.error("Google sign-in failed")}
               text="signin_with"
             />
           </div>

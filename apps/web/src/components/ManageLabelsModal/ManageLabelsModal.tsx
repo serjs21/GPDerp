@@ -1,8 +1,9 @@
 "use client";
 
-import { Modal, Select, Typography, message } from "@/components/StyledComponents";
+import { Modal, Select, Typography } from "@/components/StyledComponents";
 import { useState } from "react";
 import type { HaikuDto } from "@/api/haikus";
+import { comicToast } from "@/components/ComicToast";
 import { LabelCreateAction } from "@/components/LabelCreateAction/LabelCreateAction";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
@@ -23,7 +24,6 @@ export function ManageLabelsModal({
   onSaved,
   loadingOverride,
 }: ManageLabelsModalProps) {
-  const [api, contextHolder] = message.useMessage();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const { labels: availableLabels, isLoading, fetch, setHaikuLabels, isSettingLabels } = useAccountLabels({
@@ -48,21 +48,19 @@ export function ManageLabelsModal({
       haikuId: haiku.id,
       labelIds: selectedIds,
       onSuccess: async () => {
-        api.success("Labels saved");
+        comicToast.success("Labels saved");
         onSaved?.();
         onClose();
         await fetch(true);
       },
       onError: async () => {
-        api.error("Could not save labels");
+        comicToast.error("Could not save labels");
       },
     });
   };
 
   return (
-    <>
-      {contextHolder}
-      <Modal
+    <Modal
         title="Manage labels"
         open={open}
         onCancel={onClose}
@@ -109,6 +107,5 @@ export function ManageLabelsModal({
           </>
         )}
       </Modal>
-    </>
   );
 }

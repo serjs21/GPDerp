@@ -1,6 +1,7 @@
 'use client';
 
-import { Button, Card, Form, Input, Typography, message } from "@/components/StyledComponents";
+import { Button, Card, Form, Input, Typography } from "@/components/StyledComponents";
+import { comicToast } from "@/components/ComicToast";
 import axios from 'axios';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -37,10 +38,10 @@ function RequestReset() {
   const onFinish = async (values: { email: string }) => {
     try {
       await axios.post('/auth/reset/request', { email: values.email.trim().toLowerCase() });
-      message.success('If an account exists for that email, we sent reset instructions.');
+      comicToast.success('If an account exists for that email, we sent reset instructions.');
       form.resetFields();
     } catch {
-      message.error('Request failed. Try again.');
+      comicToast.error('Request failed. Try again.');
     }
   };
 
@@ -79,15 +80,15 @@ function ConfirmReset({ token }: { token: string }) {
   const onFinish = async (values: { password: string }) => {
     try {
       await axios.post('/auth/reset/confirm', { token, password: values.password });
-      message.success('Password updated. You can sign in now.');
+      comicToast.success('Password updated. You can sign in now.');
       router.push('/login');
     } catch (e: unknown) {
       if (axios.isAxiosError(e) && e.response?.data) {
         const data = e.response.data as { error?: string };
-        message.error(data.error ?? 'Reset failed');
+        comicToast.error(data.error ?? 'Reset failed');
         return;
       }
-      message.error('Reset failed');
+      comicToast.error('Reset failed');
     }
   };
 

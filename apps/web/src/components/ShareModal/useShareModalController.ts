@@ -2,7 +2,7 @@ import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
-import { message } from "@/components/StyledComponents";
+import { comicToast } from "@/components/ComicToast";
 import { createShareLink, shareHaikuByEmail } from "@/api/shareLinks";
 import type { LinkPolicy, ShareMethod } from "./types";
 
@@ -126,9 +126,9 @@ export function useShareModalController({
       const body = buildShareLinkPayload({ haikuId, linkPolicy, expiresAt, maxViews });
       const data = await createShareLink(body);
       setCreatedUrl(data.shareUrl);
-      message.success("Share link created");
+      comicToast.success("Share link created");
     } catch (e) {
-      message.error(getAxiosErrorMessage(e, "Could not create share link"));
+      comicToast.error(getAxiosErrorMessage(e, "Could not create share link"));
     } finally {
       setCreating(false);
     }
@@ -144,9 +144,9 @@ export function useShareModalController({
         message: emailMessage.trim(),
       });
       setEmailSent(true);
-      message.success(sentCount === 1 ? "Your haiku has been sent" : `Your haikus have been sent (${sentCount})`);
+      comicToast.success(sentCount === 1 ? "Your haiku has been sent" : `Your haikus have been sent (${sentCount})`);
     } catch (e) {
-      message.error(getAxiosErrorMessage(e, "Could not send email"));
+      comicToast.error(getAxiosErrorMessage(e, "Could not send email"));
     } finally {
       setSendingEmail(false);
     }

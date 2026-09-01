@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { message } from "@/components/StyledComponents";
+import { comicToast } from "@/components/ComicToast";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { AuthProvider } from "@/types";
 import { isValidEmail } from "@/utils/strings";
@@ -105,7 +105,7 @@ export default function ProfilePage() {
         }
       })
       .catch(() => {
-        message.error("Could not load profile");
+        comicToast.error("Could not load profile");
       })
       .finally(() => setLoading(false));
   }, [initialized, isLoggedIn, setLocale, setTheme]);
@@ -125,10 +125,10 @@ export default function ProfilePage() {
         lastName: values.lastName,
       });
       setProfile(updated);
-      message.success("Profile updated");
+      comicToast.success("Profile updated");
       checkAuthentication();
     } catch {
-      message.error("Could not update profile");
+      comicToast.error("Could not update profile");
     } finally {
       setSaving(false);
     }
@@ -151,9 +151,9 @@ export default function ProfilePage() {
           : prev,
       );
       setEmailConfirmOpen(false);
-      message.success("Email change verification sent");
+      comicToast.success("Email change verification sent");
     } catch {
-      message.error("Could not create email change request");
+      comicToast.error("Could not create email change request");
     } finally {
       setRequestingEmailChange(false);
     }
@@ -176,9 +176,9 @@ export default function ProfilePage() {
           : prev,
       );
       setResendOpen(false);
-      message.success("Verification email sent");
+      comicToast.success("Verification email sent");
     } catch {
-      message.error("Could not resend verification email");
+      comicToast.error("Could not resend verification email");
     } finally {
       setResendingEmailChange(false);
     }
@@ -209,10 +209,10 @@ export default function ProfilePage() {
           setSavingAvatar(true);
           const updated = await updateOwnAvatar(publicUrl);
           setProfile(updated);
-          message.success("Profile picture saved");
+          comicToast.success("Profile picture saved");
           checkAuthentication();
         } catch {
-          message.error("Could not save profile picture to your account");
+          comicToast.error("Could not save profile picture to your account");
         } finally {
           setSavingAvatar(false);
         }

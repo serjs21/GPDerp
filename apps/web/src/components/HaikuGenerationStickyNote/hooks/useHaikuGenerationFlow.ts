@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { notification } from "@/components/StyledComponents";
+import { comicToast } from "@/components/ComicToast";
 import type { HaikuDto } from "@/api/haikus";
 import {
   HAIKU_LIST_PAGE_SIZE,
@@ -23,7 +23,6 @@ export function useHaikuGenerationFlow(options?: UseHaikuGenerationFlowOptions) 
   const [isLoading, setIsLoading] = useState(false);
   const [subject, setSubject] = useState("");
   const { requestAuthentication } = useAuthenticationVerification();
-  const [api, contextHolder] = notification.useNotification({ maxCount: 1 });
 
   const { generatingDraft } = useHaikuSocket({
     onHaikuSaved: (haiku) => {
@@ -33,14 +32,12 @@ export function useHaikuGenerationFlow(options?: UseHaikuGenerationFlowOptions) 
   });
 
   const onError = useCallback(() => {
-    api.error({
-      message: "Don't panic, but something went wrong",
+    comicToast.error("Don't panic, but something went wrong", {
       description:
         "Our slaves are working hard on fixing this issue. We will dispatch someone to hit them harder soon.\nPlease try again later.",
-      placement: "top",
-      duration: 3,
+      duration: 3000,
     });
-  }, [api]);
+  }, []);
 
   const { savePendingSubject, clearPendingSubject, runAgent } = usePendingHaikuSubmit({
     setSubject,
@@ -77,6 +74,5 @@ export function useHaikuGenerationFlow(options?: UseHaikuGenerationFlowOptions) 
     generatingDraft,
     inputRef,
     onSubmit,
-    contextHolder,
   };
 }

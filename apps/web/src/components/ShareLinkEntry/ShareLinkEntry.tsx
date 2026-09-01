@@ -1,7 +1,8 @@
 "use client";
 
 import { CheckCircleTwoTone, CloseCircleTwoTone } from "@ant-design/icons";
-import { Button, Modal, Typography, message } from "@/components/StyledComponents";
+import { Button, Modal, Typography } from "@/components/StyledComponents";
+import { comicToast } from "@/components/ComicToast";
 import axios from "axios";
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
@@ -31,14 +32,14 @@ export function ShareLinkEntry({ link, onChanged }: ShareLinkEntryProps) {
     try {
       setIsDeleting(true);
       await deleteShareLink(link.id);
-      message.success("Share link deleted");
+      comicToast.success("Share link deleted");
       onChanged();
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         const msg = (error.response?.data as { error?: string } | undefined)?.error;
-        message.error(typeof msg === "string" ? msg : "Could not delete share link");
+        comicToast.error(typeof msg === "string" ? msg : "Could not delete share link");
       } else {
-        message.error("Could not delete share link");
+        comicToast.error("Could not delete share link");
       }
     } finally {
       setIsDeleting(false);
@@ -74,15 +75,15 @@ export function ShareLinkEntry({ link, onChanged }: ShareLinkEntryProps) {
             ? { expirationDate: expiresAt?.toISOString() ?? null, maxViews: null }
             : { expirationDate: null, maxViews: maxViews ?? null };
       await refreshShareLink(link.id, body);
-      message.success("Share link refreshed");
+      comicToast.success("Share link refreshed");
       setRefreshOpen(false);
       onChanged();
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         const msg = (error.response?.data as { error?: string } | undefined)?.error;
-        message.error(typeof msg === "string" ? msg : "Could not refresh share link");
+        comicToast.error(typeof msg === "string" ? msg : "Could not refresh share link");
       } else {
-        message.error("Could not refresh share link");
+        comicToast.error("Could not refresh share link");
       }
     } finally {
       setIsRefreshing(false);

@@ -1,4 +1,4 @@
-import { message } from "@/components/StyledComponents";
+import { comicToast } from "@/components/ComicToast";
 import axios from "axios";
 import { useState } from "react";
 import {
@@ -30,16 +30,16 @@ export function useRegistration({ onSuccess, afterAccountCreated }: UseRegistrat
         email: values.email.trim().toLowerCase(),
         password: values.password,
       });
-      message.success("If this email can be used for a new account, we sent a verification link. Check your inbox.");
+      comicToast.success("If this email can be used for a new account, we sent a verification link. Check your inbox.");
       afterAccountCreated?.();
       onSuccess();
     } catch (e: unknown) {
       if (axios.isAxiosError(e) && e.response?.data) {
         const data = e.response.data as { error?: string; code?: string };
-        message.error(data.error ?? "Registration failed");
+        comicToast.error(data.error ?? "Registration failed");
         return;
       }
-      message.error("Registration failed");
+      comicToast.error("Registration failed");
     } finally {
       setSubmitting(false);
     }
@@ -60,7 +60,7 @@ export function useRegistration({ onSuccess, afterAccountCreated }: UseRegistrat
       await loginWithGoogleCredential(credential);
       onSuccess();
     } catch {
-      message.error("Google sign-in failed");
+      comicToast.error("Google sign-in failed");
     }
   };
 

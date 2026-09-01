@@ -1,9 +1,10 @@
 "use client";
 
 import { DeleteOutlined, EditOutlined, WarningOutlined } from "@ant-design/icons";
-import { Button, message, Tooltip } from "@/components/StyledComponents";
+import { Button, Tooltip } from "@/components/StyledComponents";
 import { useState } from "react";
 import type { LabelDto } from "@/api/labels";
+import { comicToast } from "@/components/ComicToast";
 import { CreateLabelModal } from "@/components/CreateLabelModal/CreateLabelModal";
 import { Label } from "@/components/Label/Label";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
@@ -33,11 +34,11 @@ export function LabelContainer({ accountId, label, onChanged }: LabelContainerPr
         await deleteLabel({
           labelId: label.id,
           onSuccess: async () => {
-            message.success("Label deleted");
+            comicToast.success("Label deleted");
             onChanged?.();
           },
           onError: async () => {
-            message.error("Could not delete label");
+            comicToast.error("Could not delete label");
           },
         });
       },

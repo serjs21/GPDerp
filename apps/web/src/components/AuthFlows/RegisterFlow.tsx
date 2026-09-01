@@ -1,6 +1,7 @@
 "use client";
 
-import { Form, GoogleLoginButton, Input, message } from "@/components/StyledComponents";
+import { Form, GoogleLoginButton, Input } from "@/components/StyledComponents";
+import { comicToast } from "@/components/ComicToast";
 import { UIButton } from "@/components/ui";
 import authStyles from "@/app/auth.shared.module.css";
 import { useRegistration, type RegisterFormValues } from "@/hooks/useRegistration";
@@ -33,7 +34,7 @@ export function RegisterFlow({ onSuccess, showGoogle = false }: RegisterFlowProp
             <GoogleLoginButton
               onSuccess={(c) => void signUpWithGoogle(c.credential)}
               text="signup_with"
-              onError={() => message.error("Google sign-up failed")}
+              onError={() => comicToast.error("Google sign-up failed")}
             />
           </div>
           <div className={authStyles.divider}>or register with email</div>

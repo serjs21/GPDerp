@@ -1,6 +1,7 @@
 'use client';
 
-import { Card, Typography, message } from "@/components/StyledComponents";
+import { Card, Typography } from "@/components/StyledComponents";
+import { comicToast } from "@/components/ComicToast";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import authStyles from '../auth.shared.module.css';
@@ -23,7 +24,7 @@ const LoginPage = () => {
           onSuccess={onLoginSuccess}
           showGoogle
           onGoogleSignupRequired={() => {
-            message.info('Complete account setup on the registration page.');
+            comicToast.info('Complete account setup on the registration page.');
             router.push('/register');
           }}
         />

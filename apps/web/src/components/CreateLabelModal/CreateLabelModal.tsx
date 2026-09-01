@@ -1,9 +1,10 @@
 "use client";
 
-import { Button, Input, Modal, Tooltip, message } from "@/components/StyledComponents";
+import { Button, Input, Modal, Tooltip } from "@/components/StyledComponents";
 import { useState } from "react";
 import { HexColorPicker } from "react-colorful";
 import type { LabelDto } from "@/api/labels";
+import { comicToast } from "@/components/ComicToast";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
 import { Label } from "@/components/Label/Label";
 import { getRandomLabelColor } from "@/utils/colors";
@@ -27,7 +28,6 @@ export function CreateLabelModal({
   onUpdated,
 }: CreateLabelModalProps) {
   const [name, setName] = useState("");
-  const [api, contextHolder] = message.useMessage();
   const [color, setColor] = useState(getRandomLabelColor);
   const { labels, isLoading, createLabel, updateLabel, isCreating, isUpdating } = useAccountLabels({
     accountId,
@@ -59,12 +59,12 @@ export function CreateLabelModal({
         name: trimmedName,
         color,
         onSuccess: async (updated) => {
-          api.success("Label updated");
+          comicToast.success("Label updated");
           onUpdated?.(updated);
           onClose();
         },
         onError: async () => {
-          api.error("Could not update label");
+          comicToast.error("Could not update label");
         },
       });
       return;
@@ -73,22 +73,20 @@ export function CreateLabelModal({
       name: trimmedName,
       color,
       onSuccess: async (created) => {
-        api.success("Label created");
+        comicToast.success("Label created");
         onCreated?.(created);
         setName("");
         setColor(getRandomLabelColor());
         onClose();
       },
       onError: async () => {
-        api.error("Could not create label");
+        comicToast.error("Could not create label");
       },
     });
   };
 
   return (
-    <>
-      {contextHolder}
-      <Modal
+    <Modal
         title={label ? "Edit label" : "Create label"}
         open={open}
         onCancel={onClose}
@@ -137,6 +135,5 @@ export function CreateLabelModal({
           )}
         </div>
       </Modal>
-    </>
   );
 }

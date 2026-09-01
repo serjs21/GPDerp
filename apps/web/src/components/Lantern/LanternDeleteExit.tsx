@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { HaikuDto } from "@/api/haikus";
 import { deleteHaiku } from "@/api/haikus";
-import { message } from "@/components/StyledComponents";
+import { comicToast } from "@/components/ComicToast";
 import type { LanternTransform } from "./lanternTransform";
 import {
   initialFlightCssVars,
@@ -72,7 +72,7 @@ export function LanternDeleteExit({
     const commitDelete = async (notifyComplete: boolean) => {
       try {
         await deleteHaiku(snapshot.id);
-        message.success("Haiku deleted");
+        comicToast.success("Haiku deleted");
       } catch {
         onDeleteFailed?.(snapshot);
       } finally {
@@ -109,7 +109,7 @@ export function LanternDeleteExit({
     void (async () => {
       try {
         await deleteHaiku(snapshot.id);
-        message.success("Haiku deleted");
+        comicToast.success("Haiku deleted");
         await promise;
       } catch {
         cancel();

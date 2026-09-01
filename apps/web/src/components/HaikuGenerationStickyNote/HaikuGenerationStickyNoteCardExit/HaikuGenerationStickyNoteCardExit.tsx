@@ -5,7 +5,7 @@ import { useCallback, useRef, useState } from "react";
 import { deleteHaiku } from "@/api/haikus";
 import { PaperPlaneExit } from "@/components/animations/PaperPlaneExit/PaperPlaneExit";
 import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
-import { message } from "@/components/StyledComponents";
+import { comicToast } from "@/components/ComicToast";
 import { HaikuGenerationStickyNoteCard } from "../HaikuGenerationStickyNoteCard/HaikuGenerationStickyNoteCard";
 
 export function HaikuGenerationStickyNoteCardExit(props: HaikuContainerProps) {
@@ -32,14 +32,14 @@ export function HaikuGenerationStickyNoteCardExit(props: HaikuContainerProps) {
 
     try {
       await deleteHaiku(haiku.id);
-      message.success("Haiku deleted");
+      comicToast.success("Haiku deleted");
       onDeleted?.();
     } catch (e) {
       setExiting(false);
       if (axios.isAxiosError(e) && e.response?.status === 403) {
-        message.error("You are not allowed to delete this haiku.");
+        comicToast.error("You are not allowed to delete this haiku.");
       } else {
-        message.error("Could not delete haiku.");
+        comicToast.error("Could not delete haiku.");
       }
       throw e;
     }

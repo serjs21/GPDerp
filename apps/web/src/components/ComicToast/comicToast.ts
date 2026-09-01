@@ -26,7 +26,6 @@ function push(tone: ComicToastTone, content: ReactNode, options?: ComicToastOpti
 
 /**
  * Imperative comic-bubble toasts. Requires `ComicToastProvider` in the app shell.
- * Remaining antd `message.*` call sites can be migrated incrementally.
  */
 export const comicToast = {
   show(content: ReactNode, options?: ComicToastOptions & { tone?: ComicToastTone }): void {

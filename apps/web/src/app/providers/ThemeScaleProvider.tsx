@@ -11,7 +11,7 @@ import {
 } from "react";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { updateOwnConfiguration } from "@/api/user";
-import { message } from "@/components/StyledComponents";
+import { comicToast } from "@/components/ComicToast";
 import {
   PREFERENCE_THEME_SCALE_STORAGE_KEY,
   PREFERENCE_THEME_STORAGE_KEY,
@@ -78,7 +78,7 @@ export const ThemeScaleProvider = ({ children }: { children: ReactNode }) => {
         await updateOwnConfiguration({ theme: nextTheme });
         router.refresh();
       } catch {
-        message.error(t("preferencesSaveError"));
+        comicToast.error(t("preferencesSaveError"));
       }
     },
     [isLoggedIn, router, t],

@@ -49,7 +49,6 @@ export function HaikuGenerationStickyNote({
     generatingDraft,
     inputRef,
     onSubmit,
-    contextHolder,
   } = useHaikuGenerationFlow({
     onHaikuSaved: (haiku) => bindHaikuSavedRef.current(haiku),
   });
@@ -150,7 +149,6 @@ export function HaikuGenerationStickyNote({
       />
 
       {deleteFailedModal}
-      {contextHolder}
     </div>
   );
 }
