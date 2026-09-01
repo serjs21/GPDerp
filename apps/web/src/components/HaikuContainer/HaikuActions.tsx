@@ -1,11 +1,12 @@
 "use client";
 
 import { CopyOutlined, DeleteOutlined, ShareAltOutlined, TagOutlined } from "@ant-design/icons";
-import { Button, message, Tooltip } from "@/components/StyledComponents";
+import { Button, Tooltip } from "@/components/StyledComponents";
 import axios from "axios";
 import { useCallback, useState } from "react";
 import type { HaikuDto } from "@/api/haikus";
 import { deleteHaiku } from "@/api/haikus";
+import { comicToast } from "@/components/ComicToast";
 import { DeleteConfirmModal } from "@/components/DeleteConfirmModal";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { ManageLabelsModal } from "@/components/ManageLabelsModal/ManageLabelsModal";
@@ -46,7 +47,7 @@ export const HaikuActions = (props: HaikuActionsProps) => {
         return;
       }
       await deleteHaiku(haiku.id);
-      message.success("Haiku deleted");
+      comicToast.success("Haiku deleted");
       onDeleted?.();
       setDeleteOpen(false);
     } catch (e) {
@@ -55,9 +56,9 @@ export const HaikuActions = (props: HaikuActionsProps) => {
         return;
       }
       if (axios.isAxiosError(e) && e.response?.status === 403) {
-        message.error("You are not allowed to delete this haiku.");
+        comicToast.error("You are not allowed to delete this haiku.");
       } else {
-        message.error("Could not delete haiku.");
+        comicToast.error("Could not delete haiku.");
       }
     } finally {
       setDeleting(false);

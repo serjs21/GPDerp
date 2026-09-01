@@ -20,6 +20,7 @@ export type ComicDialogContentProps = {
   className?: string;
   contentClassName?: string;
   style?: CSSProperties;
+  backgroundColors?: string[];
 };
 
 const ComicDialogContentInner = forwardRef<HTMLDivElement, ComicDialogContentProps>(
@@ -54,6 +55,7 @@ export const ComicDialogContent = forwardRef<HTMLDivElement, ComicDialogContentP
       className,
       contentClassName,
       style,
+      backgroundColors,
     },
     ref,
   ) {
@@ -76,9 +78,10 @@ export const ComicDialogContent = forwardRef<HTMLDivElement, ComicDialogContentP
           style: bubbleStyle,
           sourceDirection,
           isQuestion: true,
+          backgroundColors,
         },
       ],
-      [bubbleStyle, sourceDirection],
+      [backgroundColors, bubbleStyle, sourceDirection],
     );
 
     const labelKey = typeof children === "string" ? children : "node";

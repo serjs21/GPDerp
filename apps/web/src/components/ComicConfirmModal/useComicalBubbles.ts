@@ -9,6 +9,7 @@ export type ComicalBubbleTarget = {
   style: ComicBubbleStyle;
   isQuestion?: boolean;
   sourceDirection?: ComicSourceDirection;
+  backgroundColors?: string[];
 };
 
 type ComicalModule = typeof import("comicaljs");
@@ -29,6 +30,7 @@ function applySpecs(comical: ComicalModule, targets: ComicalBubbleTarget[]) {
     const bubble = new Bubble(target.element);
     const spec = buildBubbleSpec(target.element, target.style, Bubble.getDefaultBubbleSpec, {
       isQuestion: target.isQuestion,
+      backgroundColors: target.backgroundColors,
     });
     bubble.setBubbleSpec(
       applySourceDirectionToSpec(target.element, spec, target.sourceDirection, target.style, {

@@ -42,13 +42,15 @@ export function buildBubbleSpec(
   element: HTMLElement,
   style: ComicBubbleStyle,
   getDefault: (el: HTMLElement, bubbleStyle: string) => BubbleSpec,
-  options?: { isQuestion?: boolean },
+  options?: { isQuestion?: boolean; backgroundColors?: string[] },
 ): BubbleSpec {
   const base = getDefault(element, style);
   const isQuestion = options?.isQuestion ?? false;
+  const defaultColors =
+    style === "caption" ? base.backgroundColors ?? [COMIC_FILL, "#f0e6d8"] : [COMIC_FILL];
   return {
     ...base,
-    backgroundColors: style === "caption" ? base.backgroundColors ?? [COMIC_FILL, "#f0e6d8"] : [COMIC_FILL],
+    backgroundColors: options?.backgroundColors ?? defaultColors,
     shadowOffset: style === "caption" ? (base.shadowOffset ?? COMIC_SHADOW_OFFSET) : COMIC_SHADOW_OFFSET,
     // Question bubbles sit above CTAs — drop tails so outlines don't spike into options.
     tails: isQuestion || !styleUsesTail(style) ? [] : base.tails,

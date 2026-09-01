@@ -11,6 +11,7 @@ import { CompleteRegistrationRedirect } from "@/components/AuthFlows/CompleteReg
 import { GoogleOAuthAvailabilityProvider } from "./GoogleOAuthAvailabilityProvider";
 import { AuthenticationVerificationProvider } from "./AuthenticationVerificationProvider";
 import { CelestialAppShell } from "./CelestialAppShell";
+import { ComicToastProvider } from "@/components/ComicToast";
 
 export interface LayoutProviderProps {
   children: React.ReactNode;
@@ -23,23 +24,25 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
 
   const withAuthVerification = (
     <AuthenticationVerificationProvider>
-      <>
-        <AxiosInit />
-        <CelestialAppShell className={layoutStyles.shell}>
-          <header className={styles.header}>
-            <div className={styles.headerBar}>
-              <AuthNavigation />
-            </div>
-          </header>
-          <main className={layoutStyles.contentMain}>
-            <CompleteRegistrationRedirect />
-            <div className={layoutStyles.contentStretch}>{children}</div>
-          </main>
-          <footer className={layoutStyles.footerSlot}>
-            <SiteFooter />
-          </footer>
-        </CelestialAppShell>
-      </>
+      <ComicToastProvider>
+        <>
+          <AxiosInit />
+          <CelestialAppShell className={layoutStyles.shell}>
+            <header className={styles.header}>
+              <div className={styles.headerBar}>
+                <AuthNavigation />
+              </div>
+            </header>
+            <main className={layoutStyles.contentMain}>
+              <CompleteRegistrationRedirect />
+              <div className={layoutStyles.contentStretch}>{children}</div>
+            </main>
+            <footer className={layoutStyles.footerSlot}>
+              <SiteFooter />
+            </footer>
+          </CelestialAppShell>
+        </>
+      </ComicToastProvider>
     </AuthenticationVerificationProvider>
   );
 
