@@ -14,7 +14,7 @@ const meta = {
     open: true,
     onOpenChange: () => undefined,
     question: "Delete this haiku?",
-    questionBubbleStyle: "shout",
+    questionBubbleStyle: "pointedArcs",
     optionsLayout: "auto",
     closeOnOverlayClick: false,
     closeOnSelect: true,
@@ -54,10 +54,10 @@ export const ThreeOptions: Story = {
 export const DeleteFailedLike: Story = {
   args: {
     question: "Deletion failed!",
-    questionBubbleStyle: "shout",
+    questionBubbleStyle: "pointedArcs",
     options: [
       { id: "leave", label: "Leave it be", onSelect: () => undefined },
-      { id: "retry", label: "Retry", onSelect: () => undefined, bubbleStyle: "shout" },
+      { id: "retry", label: "Retry", onSelect: () => undefined, bubbleStyle: "pointedArcs" },
     ],
   },
 };
@@ -99,7 +99,7 @@ function InteractiveComicConfirmDemo() {
             id: "go",
             label: "Let it fly",
             onSelect: () => setLastChoice("Let it fly"),
-            bubbleStyle: "shout",
+            bubbleStyle: "pointedArcs",
           },
         ]}
       />

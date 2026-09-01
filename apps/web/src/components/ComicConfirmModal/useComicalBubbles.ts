@@ -8,7 +8,6 @@ export type ComicalBubbleTarget = {
   element: HTMLElement | null;
   style: ComicBubbleStyle;
   isQuestion?: boolean;
-  isCompactButton?: boolean;
   sourceDirection?: ComicSourceDirection;
 };
 
@@ -30,7 +29,6 @@ function applySpecs(comical: ComicalModule, targets: ComicalBubbleTarget[]) {
     const bubble = new Bubble(target.element);
     const spec = buildBubbleSpec(target.element, target.style, Bubble.getDefaultBubbleSpec, {
       isQuestion: target.isQuestion,
-      isCompactButton: target.isCompactButton,
     });
     bubble.setBubbleSpec(
       applySourceDirectionToSpec(target.element, spec, target.sourceDirection, target.style, {

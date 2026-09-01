@@ -15,17 +15,11 @@ export type ComicQuestionBubbleProps = {
  * matches the canvas coordinate system.
  */
 export const ComicQuestionBubble = forwardRef<HTMLDivElement, ComicQuestionBubbleProps>(
-  function ComicQuestionBubble({ bubbleStyle = "shout", children, className }, ref) {
+  function ComicQuestionBubble({ bubbleStyle = "pointedArcs", children, className }, ref) {
     return (
       <div
         ref={ref}
-        className={[
-          styles.questionBubble,
-          bubbleStyle === "shout" ? styles.questionShout : "",
-          className,
-        ]
-          .filter(Boolean)
-          .join(" ")}
+        className={[styles.questionBubble, className].filter(Boolean).join(" ")}
         data-comic-role="question"
       >
         {children}

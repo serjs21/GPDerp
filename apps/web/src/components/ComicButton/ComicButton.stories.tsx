@@ -42,9 +42,9 @@ export const TopLeft: Story = {
   },
 };
 
-export const ShoutBottomRight: Story = {
+export const PointedArcsBottomRight: Story = {
   args: {
-    bubbleStyle: "shout",
+    bubbleStyle: "pointedArcs",
     sourceDirection: "bottom-right",
     children: "Delete!",
   },

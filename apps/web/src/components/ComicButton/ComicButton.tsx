@@ -44,7 +44,6 @@ export function ComicButton({
         element: buttonRef.current,
         style: bubbleStyle,
         sourceDirection,
-        isCompactButton: true,
       },
     ],
     [bubbleStyle, sourceDirection],
@@ -70,22 +69,13 @@ export function ComicButton({
   return (
     <div
       ref={stageRef}
-      className={[
-        styles.stage,
-        stagePaddingClass,
-        bubbleStyle === "shout" ? styles.stageShout : "",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      className={[styles.stage, stagePaddingClass, className].filter(Boolean).join(" ")}
       style={style}
     >
       <button
         ref={buttonRef}
         type={type}
-        className={[styles.bubble, bubbleStyle === "shout" ? styles.bubbleShout : ""]
-          .filter(Boolean)
-          .join(" ")}
+        className={styles.bubble}
         disabled={disabled}
         data-bubble-style={bubbleStyle}
         data-source-direction={sourceDirection}

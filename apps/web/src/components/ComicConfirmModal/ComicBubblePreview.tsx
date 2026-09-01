@@ -18,7 +18,7 @@ export function ComicBubblePreview({ label, bubbleStyle, className }: ComicBubbl
   const contentRef = useRef<HTMLDivElement>(null);
 
   const getTargets = useCallback(
-    () => [{ element: contentRef.current, style: bubbleStyle, isQuestion: bubbleStyle === "shout" }],
+    () => [{ element: contentRef.current, style: bubbleStyle, isQuestion: true }],
     [bubbleStyle],
   );
 

@@ -10,8 +10,8 @@ const meta = {
     layout: "centered",
   },
   args: {
-    label: "Delete this haiku?",
-    bubbleStyle: "shout",
+    label: "Look here!",
+    bubbleStyle: "pointedArcs",
   },
 } satisfies Meta<typeof ComicBubblePreview>;
 
@@ -20,10 +20,6 @@ type Story = StoryObj<typeof meta>;
 
 export const QuestionSpeech: Story = {
   args: { bubbleStyle: "speech", label: "Are you sure?" },
-};
-
-export const QuestionShout: Story = {
-  args: { bubbleStyle: "shout", label: "Deletion failed!" },
 };
 
 export const QuestionThought: Story = {
@@ -74,7 +70,7 @@ export const CtaStylesRow: Story = {
         width: "min(100%, 42rem)",
       }}
     >
-      {(["speech", "circle", "rectangle", "shout"] as const).map((style) => (
+      {(["speech", "circle", "rectangle", "pointedArcs"] as const).map((style) => (
         <ComicBubblePreview key={style} bubbleStyle={style} label={style} />
       ))}
     </div>

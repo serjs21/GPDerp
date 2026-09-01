@@ -2,7 +2,6 @@ import type { BubbleSpec } from "comicaljs";
 
 export type ComicBubbleStyle =
   | "speech"
-  | "shout"
   | "thought"
   | "pointedArcs"
   | "circle"
@@ -11,7 +10,6 @@ export type ComicBubbleStyle =
 
 export const COMIC_BUBBLE_STYLES: ComicBubbleStyle[] = [
   "speech",
-  "shout",
   "thought",
   "pointedArcs",
   "circle",
@@ -27,27 +25,21 @@ export const COMIC_EASE = "inOutSine";
 
 /** Styles that ship with a speech tail in comicaljs defaults. */
 export function styleUsesTail(style: ComicBubbleStyle): boolean {
-  return style === "speech" || style === "shout" || style === "thought";
+  return style === "speech" || style === "thought";
 }
 
 export function buildBubbleSpec(
   element: HTMLElement,
   style: ComicBubbleStyle,
   getDefault: (el: HTMLElement, bubbleStyle: string) => BubbleSpec,
-  options?: { isQuestion?: boolean; isCompactButton?: boolean },
+  options?: { isQuestion?: boolean },
 ): BubbleSpec {
   const base = getDefault(element, style);
   const isQuestion = options?.isQuestion ?? false;
-  const isCompactButton = options?.isCompactButton ?? false;
   return {
     ...base,
     backgroundColors: style === "caption" ? base.backgroundColors ?? [COMIC_FILL, "#f0e6d8"] : [COMIC_FILL],
-    shadowOffset:
-      style === "caption"
-        ? (base.shadowOffset ?? COMIC_SHADOW_OFFSET)
-        : style === "shout" && isCompactButton
-          ? 5
-          : COMIC_SHADOW_OFFSET,
+    shadowOffset: style === "caption" ? (base.shadowOffset ?? COMIC_SHADOW_OFFSET) : COMIC_SHADOW_OFFSET,
     // Question bubbles sit above CTAs — drop tails so outlines don't spike into options.
     tails: isQuestion || !styleUsesTail(style) ? [] : base.tails,
   };

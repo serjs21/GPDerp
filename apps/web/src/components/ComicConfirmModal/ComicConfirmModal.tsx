@@ -59,7 +59,7 @@ export function ComicConfirmModal({
   open,
   onOpenChange,
   question,
-  questionBubbleStyle = "shout",
+  questionBubbleStyle = "pointedArcs",
   options,
   optionsLayout = "auto",
   closeOnOverlayClick = false,
@@ -209,15 +209,7 @@ export function ComicConfirmModal({
                 Choose an option below.
               </Dialog.Description>
 
-              <div
-                ref={stageRef}
-                className={[
-                  styles.stage,
-                  questionBubbleStyle === "shout" ? styles.stageShout : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-              >
+              <div ref={stageRef} className={styles.stage}>
                 <ComicQuestionBubble ref={questionRef} bubbleStyle={questionBubbleStyle}>
                   {question}
                 </ComicQuestionBubble>

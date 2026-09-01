@@ -40,14 +40,7 @@ export const ComicCtaBubble = forwardRef<HTMLButtonElement, ComicCtaBubbleProps>
       <button
         ref={ref}
         type="button"
-        className={[
-          styles.ctaBubble,
-          bubbleStyle === "shout" ? styles.ctaShout : "",
-          slotClass,
-          className,
-        ]
-          .filter(Boolean)
-          .join(" ")}
+        className={[styles.ctaBubble, slotClass, className].filter(Boolean).join(" ")}
         style={style}
         disabled={disabled}
         data-comic-role="cta"

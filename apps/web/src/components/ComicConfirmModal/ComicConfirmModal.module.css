@@ -25,7 +25,7 @@
   overflow: visible;
 }
 
-/* Comical parent — fixed footprint so absolute CTAs + shout bleed fit inside canvas. */
+/* Comical parent — fixed footprint so absolute CTAs fit inside canvas. */
 .stage {
   position: relative;
   box-sizing: border-box;
@@ -33,10 +33,6 @@
   min-height: 14.5rem;
   padding: 2.75rem 3.25rem 6.25rem;
   overflow: visible;
-}
-
-.stageShout {
-  padding-inline: 3.75rem;
 }
 
 .stage :global(canvas.comical-generated),
@@ -69,11 +65,6 @@
   line-height: 1.3;
   text-align: center;
   pointer-events: none;
-}
-
-/* Shout jagged edges need extra inset so comical canvas does not clip them. */
-.questionShout {
-  padding: 1.55rem 2.65rem;
 }
 
 .ctaBubble {
@@ -120,22 +111,12 @@
   bottom: 1.85rem;
 }
 
-.ctaShout {
-  padding: 0.95rem 1.75rem;
-}
-
 .ctaBubble:hover:not(:disabled),
 .ctaBubble:focus-visible:not(:disabled) {
   opacity: 1;
   padding-block: 1rem;
   padding-inline: 1.65rem;
   outline: none;
-}
-
-.ctaShout:hover:not(:disabled),
-.ctaShout:focus-visible:not(:disabled) {
-  padding-block: 1.05rem;
-  padding-inline: 1.9rem;
 }
 
 .ctaBubble:focus-visible:not(:disabled) {
@@ -182,10 +163,5 @@
   .ctaBubble:hover:not(:disabled),
   .ctaBubble:focus-visible:not(:disabled) {
     padding: 0.85rem 1.5rem;
-  }
-
-  .ctaShout:hover:not(:disabled),
-  .ctaShout:focus-visible:not(:disabled) {
-    padding: 0.95rem 1.75rem;
   }
 }
