@@ -35,105 +35,6 @@
   overflow: visible;
 }
 
-.stage :global(canvas.comical-generated),
-.stage > svg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100% !important;
-  height: 100% !important;
-  pointer-events: none;
-}
-
-.questionBubble {
-  position: relative;
-  z-index: 1;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: fit-content;
-  max-width: calc(100% - 1rem);
-  margin: 0 auto;
-  padding: 1.2rem 1.75rem;
-  border: none;
-  background: transparent;
-  color: var(--sumi-ink, #2d2d2d);
-  font-family: var(--font-lantern-script, cursive);
-  font-size: 1.35rem;
-  font-weight: 600;
-  line-height: 1.3;
-  text-align: center;
-  pointer-events: none;
-}
-
-.ctaBubble {
-  position: absolute;
-  z-index: 1;
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
-  padding: 0.85rem 1.5rem;
-  border: none;
-  background: transparent;
-  color: var(--sumi-ink, #2d2d2d);
-  font-family: var(--font-lantern-script, cursive);
-  font-size: 1.08rem;
-  font-weight: 500;
-  line-height: 1.25;
-  text-align: center;
-  white-space: nowrap;
-  cursor: pointer;
-  pointer-events: auto;
-  opacity: 0.88;
-  transition:
-    opacity 180ms ease,
-    padding 180ms ease;
-}
-
-.ctaSlotStart {
-  left: 2rem;
-  bottom: 1.85rem;
-}
-
-.ctaSlotEnd {
-  right: 2rem;
-  bottom: 1.85rem;
-}
-
-.ctaSlotCenter {
-  left: 0;
-  right: 0;
-  margin-inline: auto;
-  width: fit-content;
-  bottom: 1.85rem;
-}
-
-.ctaBubble:hover:not(:disabled),
-.ctaBubble:focus-visible:not(:disabled) {
-  opacity: 1;
-  padding-block: 1rem;
-  padding-inline: 1.65rem;
-  outline: none;
-}
-
-.ctaBubble:focus-visible:not(:disabled) {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-red, #bc002d) 45%, transparent);
-  border-radius: 0.35rem;
-}
-
-.ctaBubble:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.previewStage {
-  min-height: 9rem;
-  padding: 2.75rem 3.25rem;
-}
-
 .visuallyHidden {
   position: absolute;
   width: 1px;
@@ -154,14 +55,5 @@
 
   .panel {
     opacity: 1;
-  }
-
-  .ctaBubble {
-    transition: opacity 120ms ease;
-  }
-
-  .ctaBubble:hover:not(:disabled),
-  .ctaBubble:focus-visible:not(:disabled) {
-    padding: 0.85rem 1.5rem;
   }
 }

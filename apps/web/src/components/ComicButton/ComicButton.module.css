@@ -1,25 +1,11 @@
-.stage {
-  position: relative;
-  box-sizing: border-box;
+.stageStandalone {
   display: inline-block;
   width: fit-content;
   max-width: 100%;
-  overflow: visible;
   transform-origin: center center;
   transition:
     transform 180ms ease,
     opacity 180ms ease;
-}
-
-/* Canvas and SVG bubble art must not participate in layout flow. */
-.stage > :global(canvas.comical-generated),
-.stage > svg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100% !important;
-  height: 100% !important;
-  pointer-events: none;
 }
 
 .stageCompact {
@@ -68,32 +54,81 @@
   transition: opacity 180ms ease;
 }
 
-.stage:hover:not(:has(.bubble:disabled)) {
+.bubbleEmbedded {
+  position: absolute;
+  z-index: 1;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0.85rem 1.5rem;
+  border: none;
+  background: transparent;
+  color: var(--sumi-ink, #2d2d2d);
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 1.08rem;
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 0.9;
+  transition: opacity 180ms ease;
+}
+
+.ctaSlotStart {
+  left: 2rem;
+  bottom: 1.85rem;
+}
+
+.ctaSlotEnd {
+  right: 2rem;
+  bottom: 1.85rem;
+}
+
+.ctaSlotCenter {
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: fit-content;
+  bottom: 1.85rem;
+}
+
+.stageStandalone:hover:not(:has(.bubble:disabled)) {
   transform: scale(1.06);
 }
 
-.stage:hover:not(:has(.bubble:disabled)) .bubble {
+.stageStandalone:hover:not(:has(.bubble:disabled)) .bubble {
   opacity: 1;
 }
 
-.bubble:focus-visible:not(:disabled) {
+.bubble:focus-visible:not(:disabled),
+.bubbleEmbedded:focus-visible:not(:disabled) {
   opacity: 1;
   outline: none;
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-red, #bc002d) 45%, transparent);
   border-radius: 0.35rem;
 }
 
-.bubble:disabled {
+.bubbleEmbedded:hover:not(:disabled),
+.bubbleEmbedded:focus-visible:not(:disabled) {
+  opacity: 1;
+}
+
+.bubble:disabled,
+.bubbleEmbedded:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .stage {
+  .stageStandalone {
     transition: opacity 120ms ease;
   }
 
-  .stage:hover:not(:has(.bubble:disabled)) {
+  .stageStandalone:hover:not(:has(.bubble:disabled)) {
     transform: none;
   }
 }
