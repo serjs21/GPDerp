@@ -13,6 +13,22 @@ export type ComicToastViewportProps = {
 };
 
 export function ComicToastViewport({ toasts, onDismiss, onRemove }: ComicToastViewportProps) {
+  const isServer = typeof document === "undefined";
+  // #region agent log
+  fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "baf7a7" },
+    body: JSON.stringify({
+      sessionId: "baf7a7",
+      runId: "pre-fix",
+      hypothesisId: "A",
+      location: "ComicToastViewport.tsx:render",
+      message: "toast viewport server/client branch",
+      data: { isServer, toastCount: toasts.length, willReturnNull: isServer, willPortal: !isServer },
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
   if (typeof document === "undefined") return null;
 
   const visible = toasts.slice(-COMIC_TOAST_MAX_VISIBLE);

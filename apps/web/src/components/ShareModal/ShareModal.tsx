@@ -152,7 +152,6 @@ export function ShareModal({
       onOpenChange={(nextOpen) => {
         if (!nextOpen) onClose();
       }}
-      title={dialogTitle}
     >
       {showMethodRow ? (
         <ComicPageRow className={styles.methodRow}>
@@ -162,6 +161,7 @@ export function ShareModal({
             onSelect={selectLink}
             background="sunburst"
             color="teal"
+            title="Link"
             flexWeight={method === "link" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
             ariaLabel="Share by link"
             className={styles.methodPanel}
@@ -176,6 +176,7 @@ export function ShareModal({
             color="orange"
             flexWeight={method === "email" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
             ariaLabel="Share via email"
+            title="Email"
             className={styles.methodPanel}
           >
             <img src="/share_modal/email.svg" alt="" className={styles.methodIcon} />

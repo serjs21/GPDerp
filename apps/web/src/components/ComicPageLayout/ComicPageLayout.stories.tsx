@@ -144,3 +144,23 @@ function SelectableRowDemo() {
 export const SelectableRow: Story = {
   render: () => <SelectableRowDemo />,
 };
+
+export const PanelWithTitle: Story = {
+  render: () => (
+    <div style={{ padding: "2rem", background: "#222", minHeight: "100vh" }}>
+      <ComicPageLayout title="Caption panel">
+        <ComicPageRow>
+          <ComicPagePanel
+            span="full"
+            color="yellow"
+            background="sunburst"
+            title="Put a caption here"
+            contentAlign="start"
+          >
+            Panel body content sits below the caption box.
+          </ComicPagePanel>
+        </ComicPageRow>
+      </ComicPageLayout>
+    </div>
+  ),
+};

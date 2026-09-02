@@ -10,6 +10,8 @@ import panelStyles from "./ComicPagePanel.module.css";
 
 export type ComicPagePanelProps = {
   children?: ReactNode;
+  /** Comic caption box in the panel top-left corner. */
+  title?: ReactNode;
   background?: ComicPanelBackground;
   color?: ComicPanelColor;
   selectable?: boolean;
@@ -32,6 +34,7 @@ function panelStyleVars(color: ComicPanelColor): CSSProperties {
 
 export function ComicPagePanel({
   children,
+  title,
   background = "solid",
   color = "white",
   selectable = false,
@@ -64,9 +67,12 @@ export function ComicPagePanel({
     panelStyles.content,
     contentAlign === "start" && panelStyles.contentStart,
     contentAlign === "start" && panelStyles.contentStretch,
+    title != null && title !== "" && contentAlign === "start" && panelStyles.contentWithTitle,
   ]
     .filter(Boolean)
     .join(" ");
+
+  const titleLabel = typeof title === "string" ? title : null;
 
   const style = {
     ...panelStyleVars(color),
@@ -76,6 +82,9 @@ export function ComicPagePanel({
   const inner = (
     <>
       <div className={[panelStyles.bgLayer, bgClass].join(" ")} aria-hidden />
+      {title != null && title !== "" ? (
+        <div className={panelStyles.panelTitle}>{titleLabel ?? title}</div>
+      ) : null}
       <div className={contentClass}>{children}</div>
     </>
   );

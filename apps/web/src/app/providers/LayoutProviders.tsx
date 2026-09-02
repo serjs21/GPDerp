@@ -13,6 +13,43 @@ import { AuthenticationVerificationProvider } from "./AuthenticationVerification
 import { CelestialAppShell } from "./CelestialAppShell";
 import { ComicToastProvider } from "@/components/ComicToast";
 
+// #region agent log
+if (typeof window !== "undefined") {
+  const g = window as Window & { __baf7a7HydrationHook?: boolean };
+  if (!g.__baf7a7HydrationHook) {
+    g.__baf7a7HydrationHook = true;
+    const originalError = console.error;
+    console.error = (...args: unknown[]) => {
+      const text = args.map((arg) => {
+        if (typeof arg === "string") return arg.slice(0, 2000);
+        if (arg instanceof Error) return `${arg.name}: ${arg.message}`.slice(0, 2000);
+        try {
+          return JSON.stringify(arg).slice(0, 500);
+        } catch {
+          return String(arg).slice(0, 300);
+        }
+      });
+      if (text.some((part) => /hydrat/i.test(part))) {
+        fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "baf7a7" },
+          body: JSON.stringify({
+            sessionId: "baf7a7",
+            runId: "pre-fix",
+            hypothesisId: "E",
+            location: "LayoutProviders.tsx:console.error",
+            message: "captured hydration console.error",
+            data: { text },
+            timestamp: Date.now(),
+          }),
+        }).catch(() => {});
+      }
+      originalError.apply(console, args as Parameters<typeof console.error>);
+    };
+  }
+}
+// #endregion
+
 export interface LayoutProviderProps {
   children: React.ReactNode;
   googleClientId?: string;
