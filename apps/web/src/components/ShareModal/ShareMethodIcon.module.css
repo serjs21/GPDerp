@@ -1,0 +1,43 @@
+.stage {
+  display: inline-block;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.stageCompact {
+  padding: 0.85rem 1rem;
+}
+
+.stageTailBottom {
+  padding: 0.85rem 1rem 2rem;
+}
+
+.stageTailTop {
+  padding: 2rem 1rem 0.85rem;
+}
+
+.stageTailLeft {
+  padding: 0.85rem 1rem 0.85rem 2rem;
+}
+
+.stageTailRight {
+  padding: 0.85rem 2rem 0.85rem 1rem;
+}
+
+.iconTarget {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.65rem;
+  pointer-events: none;
+}
+
+.icon {
+  display: block;
+  height: 2rem;
+  width: auto;
+  object-fit: contain;
+}

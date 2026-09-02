@@ -10,6 +10,7 @@ import {
 import { CopyText } from "../CopyText/CopyText";
 import { SendShareEmailContent } from "./SendShareEmailContent";
 import { ShareLinkContent } from "./ShareLinkContent";
+import { ShareMethodIcon } from "./ShareMethodIcon";
 import styles from "./ShareModal.module.css";
 import type { LinkPolicy, ShareMethod } from "./types";
 import { useShareModalController } from "./useShareModalController";
@@ -166,7 +167,7 @@ export function ShareModal({
             ariaLabel="Share by link"
             className={styles.methodPanel}
           >
-            <img src="/share_modal/link.svg" alt="" className={styles.methodIcon} />
+            <ShareMethodIcon src="/share_modal/link.svg" bubbleStyle="pointedArcs" sourceDirection="none"/>
           </ComicPagePanel>
           <ComicPagePanel
             selectable
@@ -179,7 +180,7 @@ export function ShareModal({
             title="Email"
             className={styles.methodPanel}
           >
-            <img src="/share_modal/email.svg" alt="" className={styles.methodIcon} />
+            <ShareMethodIcon src="/share_modal/email.svg" bubbleStyle="rectangle" sourceDirection="none" />
           </ComicPagePanel>
         </ComicPageRow>
       ) : null}
