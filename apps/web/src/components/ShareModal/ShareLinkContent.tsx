@@ -1,6 +1,6 @@
 "use client";
 
-import { DatePicker, InputNumber, Radio, Typography } from "@/components/StyledComponents";
+import { Button, DatePicker, InputNumber, Radio, Tooltip, Typography } from "@/components/StyledComponents";
 import type { RadioChangeEvent } from "antd/es/radio";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
@@ -14,6 +14,10 @@ export type ShareLinkContentProps = {
   onExpiresAtChange: (v: Dayjs | null) => void;
   maxViews: number | null;
   onMaxViewsChange: (v: number | null) => void;
+  canCreateLink?: boolean;
+  creating?: boolean;
+  linkCtaHint?: string;
+  onCreateLink?: () => void;
 };
 
 export const ShareLinkContent = ({
@@ -23,6 +27,10 @@ export const ShareLinkContent = ({
   onExpiresAtChange,
   maxViews,
   onMaxViewsChange,
+  canCreateLink = false,
+  creating = false,
+  linkCtaHint = "",
+  onCreateLink,
 }: ShareLinkContentProps) => (
   <div className={styles.section}>
     <Typography.Text type="secondary">Link settings</Typography.Text>
@@ -72,6 +80,23 @@ export const ShareLinkContent = ({
           onChange={onMaxViewsChange}
           autoFocus
         />
+      </div>
+    ) : null}
+
+    {onCreateLink ? (
+      <div className={styles.footer}>
+        <Tooltip title={linkCtaHint}>
+          <span>
+            <Button
+              type="primary"
+              loading={creating}
+              disabled={!canCreateLink}
+              onClick={onCreateLink}
+            >
+              Create link
+            </Button>
+          </span>
+        </Tooltip>
       </div>
     ) : null}
   </div>

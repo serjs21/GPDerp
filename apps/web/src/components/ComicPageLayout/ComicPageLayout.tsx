@@ -1,5 +1,6 @@
 "use client";
 
+import * as Dialog from "@radix-ui/react-dialog";
 import type { ReactNode } from "react";
 import {
   COMIC_PAGE_BORDER_PX,
@@ -12,9 +13,10 @@ export type ComicPageLayoutProps = {
   children: ReactNode;
   title?: ReactNode;
   className?: string;
+  showClose?: boolean;
 };
 
-export function ComicPageLayout({ children, title, className }: ComicPageLayoutProps) {
+export function ComicPageLayout({ children, title, className, showClose = false }: ComicPageLayoutProps) {
   return (
     <div
       className={[styles.page, className].filter(Boolean).join(" ")}
@@ -27,6 +29,13 @@ export function ComicPageLayout({ children, title, className }: ComicPageLayoutP
       }
     >
       <div className={styles.pageInner}>
+        {showClose ? (
+          <Dialog.Close asChild>
+            <button type="button" className={styles.closeButton} aria-label="Close">
+              ×
+            </button>
+          </Dialog.Close>
+        ) : null}
         {title ? <h2 className={styles.title}>{title}</h2> : null}
         {children}
       </div>

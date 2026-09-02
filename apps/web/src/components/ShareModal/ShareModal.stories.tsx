@@ -36,6 +36,13 @@ export const ShareViaEmail: Story = {
   },
 };
 
+export const EmailSendReady: Story = {
+  args: {
+    initialMethod: "email",
+    initialEmailRecipients: ["friend@example.com"],
+  },
+};
+
 export const LimitedViewsSelected: Story = {
   args: {
     initialLinkPolicy: "limited",

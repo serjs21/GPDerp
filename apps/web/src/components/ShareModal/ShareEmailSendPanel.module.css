@@ -1,0 +1,26 @@
+.sendRow {
+  width: 100%;
+}
+
+.tooltipWrap {
+  display: block;
+  width: 100%;
+}
+
+.sendPanel {
+  min-height: 5rem;
+}
+
+.iconWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon {
+  display: block;
+  width: 3.5rem;
+  height: 3.5rem;
+  object-fit: contain;
+  pointer-events: none;
+}

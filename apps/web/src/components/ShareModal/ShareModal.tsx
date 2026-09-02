@@ -1,7 +1,8 @@
 "use client";
 
-import { Button, Tooltip, Typography } from "@/components/StyledComponents";
+import { Button, Typography } from "@/components/StyledComponents";
 import type { RadioChangeEvent } from "antd/es/radio";
+import { useRef } from "react";
 import {
   ComicPageDialog,
   ComicPagePanel,
@@ -9,6 +10,7 @@ import {
 } from "@/components/ComicPageLayout";
 import { CopyText } from "../CopyText/CopyText";
 import { SendShareEmailContent } from "./SendShareEmailContent";
+import { ShareEmailSendPanel } from "./ShareEmailSendPanel";
 import { ShareLinkContent } from "./ShareLinkContent";
 import { ShareMethodIcon } from "./ShareMethodIcon";
 import styles from "./ShareModal.module.css";
@@ -27,66 +29,13 @@ export type ShareModalProps = {
   initialMethod?: ShareMethod;
   /** When the modal opens, pre-select link policy (for Storybook). */
   initialLinkPolicy?: LinkPolicy;
+  /** When the modal opens, pre-fill recipient emails (for Storybook). */
+  initialEmailRecipients?: string[];
 };
 
 const SELECTED_PANEL_WEIGHT = 1.25;
 const UNSELECTED_PANEL_WEIGHT = 0.75;
-
-type ShareModalFooterProps = {
-  createdUrl: string | null;
-  emailSent: boolean;
-  onClose: () => void;
-  method: ShareMethod;
-  linkCtaHint: string;
-  emailCtaHint: string;
-  creating: boolean;
-  sendingEmail: boolean;
-  canCreateLink: boolean;
-  canSendEmail: boolean;
-  onCreateLink: () => void;
-  onSendEmail: () => void;
-};
-
-function ShareModalFooter({
-  createdUrl,
-  emailSent,
-  onClose,
-  method,
-  linkCtaHint,
-  emailCtaHint,
-  creating,
-  sendingEmail,
-  canCreateLink,
-  canSendEmail,
-  onCreateLink,
-  onSendEmail,
-}: ShareModalFooterProps) {
-  if (createdUrl != null || emailSent) {
-    return (
-      <Button type="primary" onClick={onClose}>
-        Done
-      </Button>
-    );
-  }
-
-  return (
-    <div className={styles.footerBtns}>
-      <Button onClick={onClose}>Close</Button>
-      <Tooltip title={method === "link" ? linkCtaHint : emailCtaHint}>
-        <span>
-          <Button
-            type="primary"
-            loading={method === "link" ? creating : sendingEmail}
-            disabled={method === "link" ? !canCreateLink : !canSendEmail}
-            onClick={method === "link" ? onCreateLink : onSendEmail}
-          >
-            {method === "email" ? "Send" : "Create link"}
-          </Button>
-        </span>
-      </Tooltip>
-    </div>
-  );
-}
+const EMPTY_EMAIL_RECIPIENTS: string[] = [];
 
 export function ShareModal({
   open,
@@ -95,7 +44,31 @@ export function ShareModal({
   initialCreatedUrl = null,
   initialMethod = "link",
   initialLinkPolicy = "permanent",
+  initialEmailRecipients = EMPTY_EMAIL_RECIPIENTS,
 }: ShareModalProps) {
+  const renderCountRef = useRef(0);
+  renderCountRef.current += 1;
+  // #region agent log
+  if (renderCountRef.current <= 20) {
+    fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "53a752" },
+      body: JSON.stringify({
+        sessionId: "53a752",
+        runId: "pre-fix",
+        hypothesisId: "H1",
+        location: "ShareModal.tsx:render",
+        message: "ShareModal render",
+        data: {
+          renderCount: renderCountRef.current,
+          recipientsIsDefaultEmpty: initialEmailRecipients === EMPTY_EMAIL_RECIPIENTS,
+        },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+  }
+  // #endregion
+
   const {
     method,
     setMethod,
@@ -127,6 +100,7 @@ export function ShareModal({
     initialCreatedUrl,
     initialMethod,
     initialLinkPolicy,
+    initialEmailRecipients,
   });
 
   const onLinkPolicyChange = (e: RadioChangeEvent) => {
@@ -135,7 +109,6 @@ export function ShareModal({
   };
 
   const showMethodRow = createdUrl == null && !emailSent;
-  const dialogTitle = createdUrl ? "Your share link" : "Share haiku";
 
   const selectLink = () => {
     setMethod("link");
@@ -150,6 +123,7 @@ export function ShareModal({
   return (
     <ComicPageDialog
       open={open}
+      showClose
       onOpenChange={(nextOpen) => {
         if (!nextOpen) onClose();
       }}
@@ -188,11 +162,21 @@ export function ShareModal({
       <ComicPageRow>
         <ComicPagePanel span="full" color="white" contentAlign="start" className={styles.contentPanel}>
           {createdUrl != null ? (
-            <CopyText text={createdUrl} mode="link" />
+            <div className={styles.successBlock}>
+              <CopyText text={createdUrl} mode="link" />
+              <Button type="primary" onClick={onClose}>
+                Done
+              </Button>
+            </div>
           ) : emailSent ? (
-            <Typography.Paragraph className={styles.success}>
-              Your haikus have been sent.
-            </Typography.Paragraph>
+            <div className={styles.successBlock}>
+              <Typography.Paragraph className={styles.success}>
+                Your haikus have been sent.
+              </Typography.Paragraph>
+              <Button type="primary" onClick={onClose}>
+                Done
+              </Button>
+            </div>
           ) : method === "link" ? (
             <ShareLinkContent
               linkPolicy={linkPolicy}
@@ -201,6 +185,10 @@ export function ShareModal({
               onExpiresAtChange={setExpiresAt}
               maxViews={maxViews}
               onMaxViewsChange={(v) => setMaxViews(typeof v === "number" ? v : null)}
+              canCreateLink={canCreateLink}
+              creating={creating}
+              linkCtaHint={linkCtaHint}
+              onCreateLink={() => void onCreateLink()}
             />
           ) : (
             <SendShareEmailContent
@@ -215,24 +203,14 @@ export function ShareModal({
         </ComicPagePanel>
       </ComicPageRow>
 
-      <ComicPageRow>
-        <ComicPagePanel span="full" color="cream" contentAlign="start" className={styles.footerPanel}>
-          <ShareModalFooter
-            createdUrl={createdUrl}
-            emailSent={emailSent}
-            onClose={onClose}
-            method={method}
-            linkCtaHint={linkCtaHint}
-            emailCtaHint={emailCtaHint}
-            creating={creating}
-            sendingEmail={sendingEmail}
-            canCreateLink={canCreateLink}
-            canSendEmail={canSendEmail}
-            onCreateLink={() => void onCreateLink()}
-            onSendEmail={() => void onSendEmail()}
-          />
-        </ComicPagePanel>
-      </ComicPageRow>
+      {method === "email" && !emailSent && createdUrl == null ? (
+        <ShareEmailSendPanel
+          canSendEmail={canSendEmail}
+          sendingEmail={sendingEmail}
+          emailCtaHint={emailCtaHint}
+          onSendEmail={() => void onSendEmail()}
+        />
+      ) : null}
     </ComicPageDialog>
   );
 }

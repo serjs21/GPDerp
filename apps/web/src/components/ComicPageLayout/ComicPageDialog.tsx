@@ -11,6 +11,7 @@ export type ComicPageDialogProps = {
   title?: ReactNode;
   children: ReactNode;
   closeOnOverlayClick?: boolean;
+  showClose?: boolean;
   className?: string;
 };
 
@@ -20,6 +21,7 @@ export function ComicPageDialog({
   title,
   children,
   closeOnOverlayClick = false,
+  showClose = false,
   className,
 }: ComicPageDialogProps) {
   const [present, setPresent] = useState(open);
@@ -67,7 +69,7 @@ export function ComicPageDialog({
               {title ? (
                 <Dialog.Title className={styles.srOnly}>{title}</Dialog.Title>
               ) : null}
-              <ComicPageLayout title={title} className={className}>
+              <ComicPageLayout title={title} showClose={showClose} className={className}>
                 {children}
               </ComicPageLayout>
             </div>

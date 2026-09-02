@@ -19,3 +19,10 @@
 .formControl :global(.ant-input-number) {
   width: 100%;
 }
+
+.footer {
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}

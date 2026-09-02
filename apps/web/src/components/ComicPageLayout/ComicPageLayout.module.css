@@ -35,11 +35,45 @@
 }
 
 .pageInner {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--comic-page-gutter, 10px);
   padding: var(--comic-page-gutter, 10px);
   background: #fff;
+}
+
+.closeButton {
+  position: absolute;
+  top: 0.15rem;
+  right: 0.15rem;
+  z-index: 2;
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--sumi-ink, #2d2d2d);
+  cursor: pointer;
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 1.65rem;
+  font-weight: 700;
+  line-height: 1;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.closeButton:hover {
+  background: rgb(45 45 45 / 6%);
+  color: var(--sumi-ink, #2d2d2d);
+}
+
+.closeButton:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent-red, #bc002d) 55%, transparent);
+  outline-offset: 2px;
 }
 
 .title {
