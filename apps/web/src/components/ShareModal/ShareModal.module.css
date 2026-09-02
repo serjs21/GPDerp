@@ -13,7 +13,7 @@
 }
 
 .contentSlot {
-  --share-modal-content-height: 12rem;
+  --share-modal-content-height: 20rem;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;

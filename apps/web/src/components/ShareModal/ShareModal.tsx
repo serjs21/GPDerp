@@ -1,7 +1,6 @@
 "use client";
 
 import { Button, Typography } from "@/components/StyledComponents";
-import type { RadioChangeEvent } from "antd/es/radio";
 import {
   ComicPageDialog,
   ComicPagePanel,
@@ -11,10 +10,9 @@ import type { ShareLinkListItem } from "@/api/shareLinks";
 import { ShareLink } from "@/components/ShareLink/ShareLink";
 import { SendShareEmailContent } from "./SendShareEmailContent";
 import { ShareEmailSendPanel } from "./ShareEmailSendPanel";
-import { ShareLinkContent } from "./ShareLinkContent";
 import { ShareMethodIcon } from "./ShareMethodIcon";
 import styles from "./ShareModal.module.css";
-import type { LinkPolicy, ShareMethod } from "./types";
+import type { ShareMethod } from "./types";
 import { useShareModalController } from "./useShareModalController";
 
 export type { LinkPolicy, ShareMethod } from "./types";
@@ -23,16 +21,16 @@ export type ShareModalProps = {
   open: boolean;
   onClose: () => void;
   haikuId: string;
-  /** Display title for the created ShareLink row. */
+  /** Display title for the ShareLink row. */
   haikuSubject?: string;
-  /** When the modal opens, start in the “link created” view (for Storybook). */
+  /** When the modal opens, start with a created link (for Storybook). */
   initialCreatedUrl?: string | null;
   /** Prefer full link object when available (Storybook / resume). */
   initialCreatedLink?: ShareLinkListItem | null;
+  /** Skip fetch and show empty ShareLink (Storybook). */
+  initialEmptyLink?: boolean;
   /** When the modal opens, pre-select a share method (for Storybook). */
   initialMethod?: ShareMethod;
-  /** When the modal opens, pre-select link policy (for Storybook). */
-  initialLinkPolicy?: LinkPolicy;
   /** When the modal opens, pre-fill recipient emails (for Storybook). */
   initialEmailRecipients?: string[];
 };
@@ -48,22 +46,16 @@ export function ShareModal({
   haikuSubject = "Haiku",
   initialCreatedUrl = null,
   initialCreatedLink = null,
+  initialEmptyLink = false,
   initialMethod = "link",
-  initialLinkPolicy = "permanent",
   initialEmailRecipients = EMPTY_EMAIL_RECIPIENTS,
 }: ShareModalProps) {
   const {
     method,
     setMethod,
-    linkPolicy,
-    setLinkPolicy,
-    expiresAt,
-    setExpiresAt,
-    maxViews,
-    setMaxViews,
-    createdLink,
-    setCreatedLink,
-    creating,
+    shareLink,
+    setShareLink,
+    loadingLink,
     emailMessage,
     setEmailMessage,
     emailRecipients,
@@ -72,10 +64,7 @@ export function ShareModal({
     emailSent,
     invalidEmails,
     canSendEmail,
-    canCreateLink,
-    linkCtaHint,
     emailCtaHint,
-    onCreateLink,
     onSendEmail,
   } = useShareModalController({
     open,
@@ -83,26 +72,19 @@ export function ShareModal({
     haikuSubject,
     initialCreatedUrl,
     initialCreatedLink,
+    initialEmptyLink,
     initialMethod,
-    initialLinkPolicy,
     initialEmailRecipients,
   });
 
-  const onLinkPolicyChange = (e: RadioChangeEvent) => {
-    setLinkPolicy(e.target.value);
-    setCreatedLink(null);
-  };
-
-  const showMethodRow = createdLink == null && !emailSent;
+  const showMethodRow = !emailSent;
 
   const selectLink = () => {
     setMethod("link");
-    setCreatedLink(null);
   };
 
   const selectEmail = () => {
     setMethod("email");
-    setCreatedLink(null);
   };
 
   return (
@@ -147,9 +129,7 @@ export function ShareModal({
       )}
 
       <div className={styles.contentSlot}>
-        {createdLink != null ? (
-          <ShareLink link={createdLink} onChanged={() => undefined} onLinkUpdate={setCreatedLink} />
-        ) : emailSent ? (
+        {emailSent ? (
           <ComicPagePanel span="full" color="white" contentAlign="start" className={styles.contentPanel}>
             <div className={styles.successBlock}>
               <Typography.Paragraph className={styles.success}>
@@ -160,36 +140,37 @@ export function ShareModal({
               </Button>
             </div>
           </ComicPagePanel>
+        ) : method === "link" ? (
+          loadingLink ? (
+            <ComicPagePanel span="full" color="white" contentAlign="center" className={styles.contentPanel}>
+              <Typography.Paragraph type="secondary" style={{ margin: 0 }}>
+                Loading…
+              </Typography.Paragraph>
+            </ComicPagePanel>
+          ) : (
+            <ShareLink
+              link={shareLink}
+              haikuId={haikuId}
+              haikuSubject={haikuSubject}
+              onChanged={() => undefined}
+              onLinkUpdate={setShareLink}
+            />
+          )
         ) : (
           <ComicPagePanel span="full" color="white" contentAlign="start" className={styles.contentPanel}>
-            {method === "link" ? (
-              <ShareLinkContent
-                linkPolicy={linkPolicy}
-                onLinkPolicyChange={onLinkPolicyChange}
-                expiresAt={expiresAt}
-                onExpiresAtChange={setExpiresAt}
-                maxViews={maxViews}
-                onMaxViewsChange={(v) => setMaxViews(typeof v === "number" ? v : null)}
-                canCreateLink={canCreateLink}
-                creating={creating}
-                linkCtaHint={linkCtaHint}
-                onCreateLink={() => void onCreateLink()}
-              />
-            ) : (
-              <SendShareEmailContent
-                message={emailMessage}
-                emails={emailRecipients}
-                invalidEmails={invalidEmails}
-                onMessageChange={setEmailMessage}
-                onEmailsChange={setEmailRecipients}
-                disabled={sendingEmail}
-              />
-            )}
+            <SendShareEmailContent
+              message={emailMessage}
+              emails={emailRecipients}
+              invalidEmails={invalidEmails}
+              onMessageChange={setEmailMessage}
+              onEmailsChange={setEmailRecipients}
+              disabled={sendingEmail}
+            />
           </ComicPagePanel>
         )}
       </div>
 
-      {method === "email" && !emailSent && createdLink == null ? (
+      {method === "email" && !emailSent ? (
         <ShareEmailSendPanel
           canSendEmail={canSendEmail}
           sendingEmail={sendingEmail}

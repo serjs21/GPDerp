@@ -46,6 +46,40 @@ const shareLinkPluginImpl = async (app: FastifyInstance) => {
     },
   );
 
+  app.get(
+    "/share_link/haiku/:haiku_id",
+    { preHandler: [app.requireAuthenticated] },
+    async (req: FastifyRequest, res: FastifyReply) => {
+      const userId = req.user?.sub;
+      if (!userId) {
+        res.code(403).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+
+      const { haiku_id } = req.params as { haiku_id: string };
+      if (!isUuid(haiku_id)) {
+        res.code(400).send({ ok: false, error: "Invalid haiku id" });
+        return;
+      }
+
+      const result = await shareLinkService.getShareLinkForHaiku({
+        userId,
+        haikuId: haiku_id,
+      });
+
+      if (!result.ok) {
+        if (result.reason === "not_found") {
+          res.code(404).send({ ok: false, error: "Haiku not found" });
+          return;
+        }
+        res.code(403).send({ ok: false, error: "You cannot share this haiku" });
+        return;
+      }
+
+      res.send({ ok: true, data: result.shareLink });
+    },
+  );
+
   app.post(
     "/share_link",
     { preHandler: [app.requireAuthenticated] },
@@ -104,7 +138,7 @@ const shareLinkPluginImpl = async (app: FastifyInstance) => {
         return;
       }
 
-      res.code(201).send({ ok: true, data: result.shareLink });
+      res.code(result.created ? 201 : 200).send({ ok: true, data: result.shareLink });
     },
   );
 

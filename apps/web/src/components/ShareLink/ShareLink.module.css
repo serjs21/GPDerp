@@ -1,68 +1,18 @@
 .root {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: stretch;
-  gap: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
   width: 100%;
   height: 100%;
   min-height: inherit;
-}
-
-.actionColumn {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.actionHit {
-  display: inline-flex;
-}
-
-.iconButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  width: 2.5rem;
-  height: 2.5rem;
-  padding: 0.35rem;
-  border: 2px solid #111;
-  border-radius: 0.25rem;
-  background: #fff;
+  font-family: var(--font-lantern-script, cursive);
   color: var(--sumi-ink, #2d2d2d);
-  cursor: pointer;
-  transition:
-    background-color 0.15s ease,
-    opacity 0.15s ease,
-    transform 0.15s ease;
-}
-
-.iconButton:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--sumi-ink, #2d2d2d) 6%, #fff);
-  transform: scale(1.04);
-}
-
-.iconButton:focus-visible {
-  outline: 2px solid var(--sumi-ink, #2d2d2d);
-  outline-offset: 2px;
-}
-
-.iconButton:disabled {
-  cursor: not-allowed;
-  opacity: 0.38;
-}
-
-.actionIcon {
-  display: block;
-  width: 1.35rem;
-  height: 1.35rem;
-  object-fit: contain;
-  pointer-events: none;
 }
 
 .panelShell {
+  flex: 1 1 auto;
   min-width: 0;
-  height: 100%;
+  min-height: 7.5rem;
   transition: filter 0.3s cubic-bezier(0.45, 0.05, 0.55, 0.95);
 }
 
@@ -79,22 +29,24 @@
   height: 100%;
 }
 
-.content {
+.panelBody {
+  position: relative;
   display: flex;
-  align-items: stretch;
-  gap: 0.75rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
   width: 100%;
-  min-height: 4.5rem;
-  padding: 0.35rem 0.5rem;
+  height: 100%;
+  min-height: 6.5rem;
+  padding: 0.5rem 0.65rem 0.65rem;
 }
 
 .planeStage {
-  position: relative;
-  flex: 0 0 4.5rem;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
-  min-height: 4.5rem;
+  min-height: 3.5rem;
 }
 
 .plane {
@@ -106,25 +58,10 @@
   pointer-events: none;
 }
 
-.details {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.25rem;
-  min-width: 0;
-}
-
-.subject {
-  margin: 0 !important;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .meters {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.85rem;
   flex-wrap: wrap;
   min-height: 1.35rem;
@@ -147,25 +84,130 @@
 }
 
 .meterValue {
-  font-family: var(--font-pixel), ui-monospace, monospace;
-  font-size: 0.7rem;
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 0.95rem;
   line-height: 1;
   letter-spacing: 0.02em;
   color: var(--sumi-ink, #2d2d2d);
   white-space: nowrap;
 }
 
-.urlCopy {
+.copyWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+}
+
+.copyBubble {
+  transform: scale(0.78);
+  transform-origin: center center;
+}
+
+.limitsRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 1.1rem;
+  flex: 0 0 auto;
+  padding: 0.15rem 0.1rem;
+}
+
+.limitField {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  margin: 0;
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 0.95rem;
+}
+
+.limitLabel {
+  flex: 0 0 auto;
+  min-width: 3.4rem;
+  font-weight: 600;
+}
+
+.limitInput {
+  width: 4.5rem !important;
+}
+
+.limitDate {
+  min-width: 10.5rem;
+}
+
+.actionRow {
+  flex: 0 0 auto;
   width: 100%;
+}
+
+.actionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.6rem;
+  padding: 0.4rem 0.75rem;
+  border: 2px solid #111;
+  border-radius: 0.3rem;
+  background: #fff;
+  color: var(--sumi-ink, #2d2d2d);
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+
+.actionButton:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--sumi-ink, #2d2d2d) 6%, #fff);
+  transform: scale(1.01);
+}
+
+.actionButton:focus-visible {
+  outline: 2px solid var(--sumi-ink, #2d2d2d);
+  outline-offset: 2px;
+}
+
+.actionButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.actionIcon {
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.actionLabel {
+  display: inline-flex;
+  align-items: baseline;
+  min-width: 0;
+}
+
+.activatingDots {
+  display: inline-block;
+  min-width: 1.5em;
+  text-align: left;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .panelShell,
-  .iconButton {
+  .actionButton {
     transition: none;
   }
 
-  .iconButton:hover:not(:disabled) {
+  .actionButton:hover:not(:disabled) {
     transform: none;
   }
 }

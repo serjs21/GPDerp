@@ -68,7 +68,13 @@ export default function ManageShareLinksPage() {
             </Typography.Paragraph>
           ) : (
             items.map((link) => (
-              <ShareLink key={link.id} link={link} onChanged={() => void query.refetch()} />
+              <ShareLink
+                key={link.id}
+                link={link}
+                haikuId={link.sharedHaikuId ?? ""}
+                haikuSubject={link.haikuSubject}
+                onChanged={() => void query.refetch()}
+              />
             ))
           )}
 

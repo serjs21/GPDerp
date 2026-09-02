@@ -13,6 +13,7 @@ export type CreateShareLinkResponse = {
     shareHash: string;
     shareUrl: string;
     haikuSubject: string;
+    sharedHaikuId?: string;
     createdAt: string;
     expirationDate: string | null;
     maxViews: number | null;
@@ -28,6 +29,7 @@ export type ShareLinkListItem = {
   shareHash: string;
   shareUrl: string;
   haikuSubject: string;
+  sharedHaikuId?: string;
   createdAt: string;
   expirationDate: string | null;
   maxViews: number | null;
@@ -42,6 +44,18 @@ export const createShareLink = async (body: CreateShareLinkBody): Promise<Create
   }
   return data.data;
 };
+
+type FetchShareLinkForHaikuResponse =
+  | { ok: true; data: ShareLinkListItem | null }
+  | { ok: false; error: string };
+
+export async function fetchShareLinkForHaiku(haikuId: string): Promise<ShareLinkListItem | null> {
+  const { data } = await axios.get<FetchShareLinkForHaikuResponse>(
+    `/share_link/haiku/${encodeURIComponent(haikuId)}`,
+  );
+  if (!data.ok) throw new Error(data.error ?? "Failed to fetch share link");
+  return data.data;
+}
 
 export const deleteShareLink = async (shareLinkId: string): Promise<void> => {
   const { data } = await axios.delete<{ ok: boolean; error?: string }>(
@@ -82,23 +96,14 @@ type RefreshShareLinkBody = {
   maxViews?: number | null;
 };
 
-type RefreshShareLinkData = {
-  id: string;
-  shareHash: string;
-  shareUrl: string;
-  expirationDate: string | null;
-  maxViews: number | null;
-  viewCount: number;
-};
-
 type RefreshShareLinkResponse =
-  | { ok: true; data: RefreshShareLinkData }
+  | { ok: true; data: ShareLinkListItem }
   | { ok: false; error: string };
 
 export async function refreshShareLink(
   shareLinkId: string,
   body: RefreshShareLinkBody,
-): Promise<RefreshShareLinkData> {
+): Promise<ShareLinkListItem> {
   const { data } = await axios.patch<RefreshShareLinkResponse>(
     `/share_link/${encodeURIComponent(shareLinkId)}/refresh`,
     body,

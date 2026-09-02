@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto";
 import type { Prisma } from "../../generated/prisma";
 import { env } from "../../env";
 import { prismaClient } from "../../lib/prisma";
+import { isUniqueConstraintError } from "../../utils/prismaErrors";
 import { authRepository } from "../auth/repository";
 import { haikuRepository } from "../haiku/haiku.repository";
 import { shareLinkRepository } from "./shareLink.repository";
@@ -50,12 +51,14 @@ type ShareLinkListRow = {
   viewCount: number;
   disabled: boolean;
   haikuSubject: string;
+  sharedHaikuId: string;
 };
 
 const shareLinkItemFromRow = (row: ShareLinkListRow) => ({
   id: row.id,
   shareHash: row.shareHash,
   shareUrl: `${env.WEB_APP_URL.replace(/\/$/, "")}/share/${row.shareHash}`,
+  sharedHaikuId: row.sharedHaikuId,
   haikuSubject: row.haikuSubject,
   createdAt: row.createdAt.toISOString(),
   expirationDate: row.expirationDate ? row.expirationDate.toISOString() : null,
@@ -81,6 +84,25 @@ export const shareLinkService = {
     return Boolean(member);
   },
 
+  async getShareLinkForHaiku(params: {
+    userId: string;
+    haikuId: string;
+  }): Promise<
+    | { ok: true; shareLink: ReturnType<typeof shareLinkItemFromRow> | null }
+    | { ok: false; reason: "not_found" | "forbidden" }
+  > {
+    const haiku = await haikuRepository.findFullById(params.haikuId);
+    if (!haiku) return { ok: false, reason: "not_found" };
+
+    const allowed = await shareLinkService.userCanAccessHaiku(params.userId, params.haikuId);
+    if (!allowed) return { ok: false, reason: "forbidden" };
+
+    const row = await shareLinkRepository.findBySharedHaikuId(params.haikuId);
+    if (!row) return { ok: true, shareLink: null };
+
+    return { ok: true, shareLink: shareLinkItemFromRow(row) };
+  },
+
   async createShareLink(params: {
     userId: string;
     haikuId: string;
@@ -89,17 +111,8 @@ export const shareLinkService = {
   }): Promise<
     | {
         ok: true;
-        shareLink: {
-          id: string;
-          shareHash: string;
-          shareUrl: string;
-          haikuSubject: string;
-          createdAt: string;
-          expirationDate: string | null;
-          maxViews: number | null;
-          viewCount: number;
-          disabled: boolean;
-        };
+        created: boolean;
+        shareLink: ReturnType<typeof shareLinkItemFromRow>;
       }
     | { ok: false; reason: "not_found" | "forbidden" | "invalid_expiry" | "invalid_max_views" }
   > {
@@ -110,6 +123,11 @@ export const shareLinkService = {
 
     const allowed = await shareLinkService.userCanAccessHaiku(userId, haikuId);
     if (!allowed) return { ok: false, reason: "forbidden" };
+
+    const existing = await shareLinkRepository.findBySharedHaikuId(haikuId);
+    if (existing) {
+      return { ok: true, created: false, shareLink: shareLinkItemFromRow(existing) };
+    }
 
     if (expirationDate != null) {
       if (!(expirationDate instanceof Date) || Number.isNaN(expirationDate.getTime())) {
@@ -128,36 +146,32 @@ export const shareLinkService = {
 
     let shareHash = newShareHash();
     for (let i = 0; i < 8; i++) {
-      const existing = await shareLinkRepository.findByShareHash(shareHash);
-      if (!existing) break;
+      const hashRow = await shareLinkRepository.findByShareHash(shareHash);
+      if (!hashRow) break;
       shareHash = newShareHash();
     }
 
-    const row = await shareLinkRepository.create({
-      shareHash,
-      createdByUserId: userId,
-      sharedHaikuId: haikuId,
-      haikuSubject: haiku.title,
-      expirationDate,
-      maxViews,
-    });
+    try {
+      const row = await shareLinkRepository.create({
+        shareHash,
+        createdByUserId: userId,
+        sharedHaikuId: haikuId,
+        haikuSubject: haiku.title,
+        expirationDate,
+        maxViews,
+      });
 
-    const shareUrl = `${env.WEB_APP_URL.replace(/\/$/, "")}/share/${row.shareHash}`;
-
-    return {
-      ok: true,
-      shareLink: {
-        id: row.id,
-        shareHash: row.shareHash,
-        shareUrl,
-        haikuSubject: row.haikuSubject,
-        createdAt: row.createdAt.toISOString(),
-        expirationDate: row.expirationDate ? row.expirationDate.toISOString() : null,
-        maxViews: row.maxViews,
-        viewCount: row.viewCount,
-        disabled: row.disabled,
-      },
-    };
+      return {
+        ok: true,
+        created: true,
+        shareLink: shareLinkItemFromRow(row),
+      };
+    } catch (error) {
+      if (!isUniqueConstraintError(error)) throw error;
+      const raced = await shareLinkRepository.findBySharedHaikuId(haikuId);
+      if (!raced) throw error;
+      return { ok: true, created: false, shareLink: shareLinkItemFromRow(raced) };
+    }
   },
 
   async setShareLinkDisabled(params: {
@@ -278,18 +292,7 @@ export const shareLinkService = {
     expirationDate: Date | null;
     maxViews: number | null;
   }): Promise<
-    | {
-        ok: true;
-        shareLink: {
-          id: string;
-          shareHash: string;
-          shareUrl: string;
-          expirationDate: string | null;
-          maxViews: number | null;
-          viewCount: number;
-          disabled: boolean;
-        };
-      }
+    | { ok: true; shareLink: ReturnType<typeof shareLinkItemFromRow> }
     | { ok: false; reason: "not_found" | "forbidden" | "invalid_expiry" | "invalid_max_views" }
   > {
     const row = await shareLinkRepository.findById(params.shareLinkId);
@@ -317,15 +320,7 @@ export const shareLinkService = {
 
     return {
       ok: true,
-      shareLink: {
-        id: updated.id,
-        shareHash: updated.shareHash,
-        shareUrl: `${env.WEB_APP_URL.replace(/\/$/, "")}/share/${updated.shareHash}`,
-        expirationDate: updated.expirationDate ? updated.expirationDate.toISOString() : null,
-        maxViews: updated.maxViews,
-        viewCount: updated.viewCount,
-        disabled: updated.disabled,
-      },
+      shareLink: shareLinkItemFromRow(updated),
     };
   },
 

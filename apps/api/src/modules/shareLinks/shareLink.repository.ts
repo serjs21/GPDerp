@@ -39,6 +39,24 @@ export const shareLinkRepository = {
     });
   },
 
+  findBySharedHaikuId(sharedHaikuId: string) {
+    return prismaClient.shareLink.findUnique({
+      where: { sharedHaikuId },
+      select: {
+        id: true,
+        shareHash: true,
+        createdAt: true,
+        expirationDate: true,
+        maxViews: true,
+        viewCount: true,
+        disabled: true,
+        sharedHaikuId: true,
+        haikuSubject: true,
+        createdByUserId: true,
+      },
+    });
+  },
+
   findByShareHash(shareHash: string) {
     return prismaClient.shareLink.findUnique({
       where: { shareHash },
@@ -92,6 +110,7 @@ export const shareLinkRepository = {
         maxViews: true,
         viewCount: true,
         disabled: true,
+        sharedHaikuId: true,
         haikuSubject: true,
       },
     });
@@ -129,6 +148,7 @@ export const shareLinkRepository = {
         maxViews: true,
         viewCount: true,
         disabled: true,
+        sharedHaikuId: true,
         haikuSubject: true,
       },
     });
@@ -146,6 +166,7 @@ export const shareLinkRepository = {
         maxViews: true,
         viewCount: true,
         disabled: true,
+        sharedHaikuId: true,
         haikuSubject: true,
       },
     });

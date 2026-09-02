@@ -176,6 +176,7 @@ model ShareLink {
   createdBy User  @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
   haiku     Haiku @relation(fields: [sharedHaikuId], references: [id], onDelete: Cascade)
 
+  @@unique([sharedHaikuId])
   @@index([createdByUserId])
   @@index([createdAt])
   @@index([createdByUserId, createdAt(sort: Desc)])
