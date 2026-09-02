@@ -1,7 +1,7 @@
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import axios from "axios";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { comicToast } from "@/components/ComicToast";
 import { createShareLink, shareHaikuByEmail } from "@/api/shareLinks";
 import type { LinkPolicy, ShareMethod } from "./types";
@@ -76,9 +76,6 @@ export function useShareModalController({
   initialLinkPolicy = "permanent",
   initialEmailRecipients = EMPTY_EMAIL_RECIPIENTS,
 }: UseShareModalControllerParams) {
-  const resetEffectCountRef = useRef(0);
-  const prevRecipientsRef = useRef<string[] | null>(null);
-
   const [method, setMethod] = useState<ShareMethod>("link");
   const [linkPolicy, setLinkPolicy] = useState<LinkPolicy>("permanent");
   const [expiresAt, setExpiresAt] = useState<Dayjs | null>(null);
@@ -91,29 +88,6 @@ export function useShareModalController({
   const [emailSent, setEmailSent] = useState(false);
 
   useEffect(() => {
-    resetEffectCountRef.current += 1;
-    const sameRefAsPrev = prevRecipientsRef.current === initialEmailRecipients;
-    prevRecipientsRef.current = initialEmailRecipients;
-    // #region agent log
-    fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "53a752" },
-      body: JSON.stringify({
-        sessionId: "53a752",
-        runId: "pre-fix",
-        hypothesisId: "H1",
-        location: "useShareModalController.ts:resetEffect",
-        message: "reset effect fired",
-        data: {
-          open,
-          runCount: resetEffectCountRef.current,
-          recipientsLen: initialEmailRecipients.length,
-          sameRefAsPrev,
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
     if (!open) return;
     setMethod(initialMethod);
     setLinkPolicy(initialLinkPolicy);

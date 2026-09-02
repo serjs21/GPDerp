@@ -2,7 +2,6 @@
 
 import { Button, Typography } from "@/components/StyledComponents";
 import type { RadioChangeEvent } from "antd/es/radio";
-import { useRef } from "react";
 import {
   ComicPageDialog,
   ComicPagePanel,
@@ -46,29 +45,6 @@ export function ShareModal({
   initialLinkPolicy = "permanent",
   initialEmailRecipients = EMPTY_EMAIL_RECIPIENTS,
 }: ShareModalProps) {
-  const renderCountRef = useRef(0);
-  renderCountRef.current += 1;
-  // #region agent log
-  if (renderCountRef.current <= 20) {
-    fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "53a752" },
-      body: JSON.stringify({
-        sessionId: "53a752",
-        runId: "pre-fix",
-        hypothesisId: "H1",
-        location: "ShareModal.tsx:render",
-        message: "ShareModal render",
-        data: {
-          renderCount: renderCountRef.current,
-          recipientsIsDefaultEmpty: initialEmailRecipients === EMPTY_EMAIL_RECIPIENTS,
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-  }
-  // #endregion
-
   const {
     method,
     setMethod,
