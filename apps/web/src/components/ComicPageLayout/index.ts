@@ -9,3 +9,9 @@ export {
   type ComicPanelColor,
   type ComicPageRowColumns,
 } from "./comicPagePresets";
+export {
+  COMIC_PANEL_MOTION_BG_SIZE_X_PERCENT,
+  COMIC_PANEL_MOTION_CROSSFADE_MS,
+  COMIC_PANEL_MOTION_PAN_MS,
+  COMIC_PANEL_MOTION_STREAK_ANGLE_DEG,
+} from "./comicPanelMotionTokens";

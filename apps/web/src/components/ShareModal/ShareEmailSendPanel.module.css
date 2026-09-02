@@ -26,11 +26,9 @@
 }
 
 .iconWrapReady {
-  background: #fff;
   box-shadow:
-    0 0 0.3rem #fff,
-    0 0 0.75rem rgb(255 255 255 / 85%),
-    0 0 1.4rem rgb(206 147 216 / 50%);
+    0 0 0.75rem rgb(206 147 216 / 55%),
+    0 0 1.4rem rgb(206 147 216 / 40%);
 }
 
 .icon {

@@ -164,3 +164,58 @@ export const PanelWithTitle: Story = {
     </div>
   ),
 };
+
+const MOTION_SAMPLES: Array<{ color: ComicPanelColor; label: string }> = [
+  { color: "purple", label: "Purple motion" },
+  { color: "teal", label: "Teal motion" },
+  { color: "blue", label: "Blue motion" },
+];
+
+export const MotionBackground: Story = {
+  render: () => (
+    <div style={{ padding: "2rem", background: "#222", minHeight: "100vh" }}>
+      <ComicPageLayout title="Motion backgrounds">
+        <ComicPageRow columns="1fr-1fr">
+          {MOTION_SAMPLES.slice(0, 2).map((sample) => (
+            <ComicPagePanel key={sample.label} background="motion" color={sample.color}>
+              {sample.label}
+            </ComicPagePanel>
+          ))}
+        </ComicPageRow>
+        <ComicPageRow>
+          <ComicPagePanel span="full" background="motion" color={MOTION_SAMPLES[2].color}>
+            {MOTION_SAMPLES[2].label}
+          </ComicPagePanel>
+        </ComicPageRow>
+      </ComicPageLayout>
+    </div>
+  ),
+};
+
+function LoadingTransitionDemo() {
+  const [loading, setLoading] = useState(false);
+
+  return (
+    <div style={{ padding: "2rem", background: "#222", minHeight: "100vh" }}>
+      <ComicPageLayout title="Halftone → motion loading">
+        <ComicPageRow>
+          <ComicPagePanel
+            span="full"
+            background="halftone"
+            color="purple"
+            loading={loading}
+            contentAlign="center"
+          >
+            <button type="button" onClick={() => setLoading((v) => !v)}>
+              {loading ? "Stop loading" : "Start loading"}
+            </button>
+          </ComicPagePanel>
+        </ComicPageRow>
+      </ComicPageLayout>
+    </div>
+  );
+}
+
+export const LoadingTransition: Story = {
+  render: () => <LoadingTransitionDemo />,
+};

@@ -1,4 +1,4 @@
-export type ComicPanelBackground = "sunburst" | "halftone" | "solid";
+export type ComicPanelBackground = "sunburst" | "halftone" | "solid" | "motion";
 
 export type ComicPanelColor =
   | "magenta"

@@ -14,6 +14,8 @@ export type ComicPagePanelProps = {
   title?: ReactNode;
   background?: ComicPanelBackground;
   color?: ComicPanelColor;
+  /** Crossfade anime speed-line overlay on top of the static background. */
+  loading?: boolean;
   selectable?: boolean;
   selected?: boolean;
   onSelect?: () => void;
@@ -32,11 +34,18 @@ function panelStyleVars(color: ComicPanelColor): CSSProperties {
   } as CSSProperties;
 }
 
+function staticBgClass(background: ComicPanelBackground): string {
+  if (background === "sunburst") return panelStyles.bgSunburst;
+  if (background === "halftone") return panelStyles.bgHalftone;
+  return panelStyles.bgSolid;
+}
+
 export function ComicPagePanel({
   children,
   title,
   background = "solid",
   color = "white",
+  loading = false,
   selectable = false,
   selected = false,
   onSelect,
@@ -46,18 +55,16 @@ export function ComicPagePanel({
   className,
   ariaLabel,
 }: ComicPagePanelProps) {
-  const bgClass =
-    background === "sunburst"
-      ? panelStyles.bgSunburst
-      : background === "halftone"
-        ? panelStyles.bgHalftone
-        : panelStyles.bgSolid;
+  const isMotionBackground = background === "motion";
+  const showMotionOverlay = loading && !isMotionBackground;
+  const bgClass = staticBgClass(isMotionBackground ? "solid" : background);
 
   const panelClass = [
     panelStyles.panel,
     span === "full" ? panelStyles.panelFull : panelStyles.panelAuto,
     selectable && panelStyles.panelSelectable,
     selected && panelStyles.panelSelected,
+    loading && panelStyles.panelLoading,
     className,
   ]
     .filter(Boolean)
@@ -82,6 +89,12 @@ export function ComicPagePanel({
   const inner = (
     <>
       <div className={[panelStyles.bgLayer, bgClass].join(" ")} aria-hidden />
+      {isMotionBackground ? (
+        <div className={[panelStyles.bgLayer, panelStyles.bgMotion].join(" ")} aria-hidden />
+      ) : null}
+      {showMotionOverlay ? (
+        <div className={[panelStyles.bgLayer, panelStyles.bgMotionOverlay].join(" ")} aria-hidden />
+      ) : null}
       {title != null && title !== "" ? (
         <div className={panelStyles.panelTitle}>{titleLabel ?? title}</div>
       ) : null}
@@ -96,6 +109,7 @@ export function ComicPagePanel({
         className={panelClass}
         style={style}
         aria-pressed={selected}
+        aria-busy={loading}
         aria-label={ariaLabel}
         onClick={onSelect}
       >
@@ -105,7 +119,7 @@ export function ComicPagePanel({
   }
 
   return (
-    <div className={panelClass} style={style}>
+    <div className={panelClass} style={style} aria-busy={loading || undefined}>
       {inner}
     </div>
   );

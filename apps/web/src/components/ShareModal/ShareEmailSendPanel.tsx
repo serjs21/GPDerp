@@ -18,6 +18,7 @@ export function ShareEmailSendPanel({
   onSendEmail,
 }: ShareEmailSendPanelProps) {
   const ready = canSendEmail && !sendingEmail;
+  const active = canSendEmail || sendingEmail;
   const tooltipTitle = ready ? "" : emailCtaHint;
 
   const handleSelect = () => {
@@ -32,10 +33,11 @@ export function ShareEmailSendPanel({
           <ComicPagePanel
             span="full"
             selectable
-            selected={ready}
+            selected={active}
+            loading={sendingEmail}
             onSelect={handleSelect}
-            background={ready ? "halftone" : "solid"}
-            color={ready ? "purple" : "white"}
+            background={active ? "halftone" : "solid"}
+            color={active ? "purple" : "white"}
             ariaLabel="Send email"
             className={styles.sendPanel}
           >
