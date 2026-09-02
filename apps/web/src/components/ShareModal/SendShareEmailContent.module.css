@@ -34,8 +34,9 @@
   z-index: 1;
   display: flex;
   flex: 0 0 auto;
-  align-items: baseline;
+  align-items: flex-end;
   gap: 0.35rem;
+  box-sizing: border-box;
   min-height: var(--notebook-line-height);
   max-height: calc(var(--notebook-line-height) * 3);
   padding: 0 0 0 2rem;
@@ -46,10 +47,10 @@
   flex: 0 0 auto;
   color: var(--notebook-ink, rgba(45, 45, 45, 0.72));
   font-family: var(--font-lantern-script, "Zen Kurenaido", cursive);
-  font-size: 1.12rem;
+  font-size: var(--notebook-font-size, 1.12rem);
   font-weight: 700;
   letter-spacing: 0.06em;
-  line-height: var(--notebook-line-height);
+  line-height: 1;
   text-transform: uppercase;
 }
 
@@ -57,10 +58,10 @@
   flex: 1 1 auto;
   min-width: 0;
   font-family: var(--font-lantern-script, "Zen Kurenaido", cursive);
-  font-size: 1.12rem;
+  font-size: var(--notebook-font-size, 1.12rem);
   font-weight: 600;
   letter-spacing: 0.035em;
-  line-height: var(--notebook-line-height);
+  line-height: 1;
 }
 
 .toInput:global(.ant-select) {
@@ -68,7 +69,8 @@
 }
 
 .toInput :global(.ant-select-selector) {
-  min-height: var(--notebook-line-height) !important;
+  height: auto !important;
+  min-height: 0 !important;
   padding: 0 !important;
   border: none !important;
   background: transparent !important;
@@ -76,7 +78,7 @@
 }
 
 .toInput :global(.ant-select-selection-wrap) {
-  align-self: baseline;
+  align-self: flex-end;
 }
 
 .toInput :global(.ant-select-selection-overflow) {
@@ -84,7 +86,7 @@
 }
 
 .toInput :global(.ant-select-selection-overflow-item) {
-  line-height: var(--notebook-line-height);
+  line-height: 1;
 }
 
 .toInput :global(.ant-select-selection-item) {
@@ -97,21 +99,22 @@
   font-size: inherit !important;
   font-weight: inherit !important;
   letter-spacing: inherit !important;
-  line-height: var(--notebook-line-height) !important;
+  line-height: 1 !important;
 }
 
 .toInput :global(.ant-select-selection-search) {
   margin: 0 !important;
-  line-height: var(--notebook-line-height);
+  line-height: 1;
 }
 
 .toInput :global(.ant-select-selection-search-input) {
-  height: var(--notebook-line-height) !important;
+  height: auto !important;
+  min-height: 0 !important;
   font-family: inherit !important;
   font-size: inherit !important;
   font-weight: inherit !important;
   letter-spacing: inherit !important;
-  line-height: var(--notebook-line-height) !important;
+  line-height: 1 !important;
 }
 
 .toInput :global(.ant-select-selection-placeholder) {
@@ -121,7 +124,7 @@
   font-style: italic;
   font-weight: 500 !important;
   letter-spacing: inherit !important;
-  line-height: var(--notebook-line-height) !important;
+  line-height: 1 !important;
 }
 
 .message {
@@ -139,12 +142,16 @@
   background: transparent;
   color: var(--notebook-ink, rgba(45, 45, 45, 0.72));
   font-family: var(--font-lantern-script, "Zen Kurenaido", cursive);
-  font-size: 1.12rem;
+  font-size: var(--notebook-font-size, 1.12rem);
   font-weight: 600;
   letter-spacing: 0.035em;
   line-height: var(--notebook-line-height);
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
+  appearance: none;
   resize: none;
   outline: none;
+  overflow: auto;
 }
 
 .message::placeholder {

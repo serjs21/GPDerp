@@ -2,6 +2,10 @@ import type { CSSProperties } from "react";
 import { PAPER_COLORS, PAPER_ROUGH_DEFAULTS } from "@/components/PaperModal/paperTokens";
 
 export const NOTEBOOK_LINE_HEIGHT = "1.75rem";
+/** Nudge ruled lines down so Zen Kurenaido baselines sit on the rules. */
+export const NOTEBOOK_RULE_Y_OFFSET = "0.22rem";
+/** Font size as a fraction of line height — keeps half-leading stable on the grid. */
+export const NOTEBOOK_FONT_SIZE_RATIO = 0.64;
 export const NOTEBOOK_PAD_X = "1rem";
 export const NOTEBOOK_PAD_Y = "0.65rem";
 export const NOTEBOOK_MARGIN_X = "2.5rem";
@@ -21,6 +25,8 @@ export const NOTEBOOK_ROUGH = {
 export function notebookStyleVars(): CSSProperties {
   return {
     "--notebook-line-height": NOTEBOOK_LINE_HEIGHT,
+    "--notebook-rule-y-offset": NOTEBOOK_RULE_Y_OFFSET,
+    "--notebook-font-size": `calc(${NOTEBOOK_LINE_HEIGHT} * ${NOTEBOOK_FONT_SIZE_RATIO})`,
     "--notebook-pad-x": NOTEBOOK_PAD_X,
     "--notebook-pad-y": NOTEBOOK_PAD_Y,
     "--notebook-margin-x": NOTEBOOK_MARGIN_X,
@@ -32,18 +38,27 @@ export function notebookStyleVars(): CSSProperties {
 
 export function readNotebookMetrics(host: HTMLElement) {
   const style = getComputedStyle(host);
+  const rootFontSize =
+    typeof document !== "undefined"
+      ? Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16
+      : 16;
   const lineHeight = Number.parseFloat(style.getPropertyValue("--notebook-line-height")) || 1.75;
   const lineHeightUnit = style.getPropertyValue("--notebook-line-height").trim().endsWith("rem")
-    ? lineHeight * (Number.parseFloat(style.fontSize) || 16)
+    ? lineHeight * rootFontSize
     : lineHeight;
-  const padX = parseCssLength(style.getPropertyValue("--notebook-pad-x"), style.fontSize);
-  const padY = parseCssLength(style.getPropertyValue("--notebook-pad-y"), style.fontSize);
-  const marginX = parseCssLength(style.getPropertyValue("--notebook-margin-x"), style.fontSize);
+  const padX = parseCssLength(style.getPropertyValue("--notebook-pad-x"), `${rootFontSize}px`);
+  const padY = parseCssLength(style.getPropertyValue("--notebook-pad-y"), `${rootFontSize}px`);
+  const marginX = parseCssLength(style.getPropertyValue("--notebook-margin-x"), `${rootFontSize}px`);
+  const ruleYOffset = parseCssLength(
+    style.getPropertyValue("--notebook-rule-y-offset"),
+    `${rootFontSize}px`,
+  );
   return {
     lineHeightPx: lineHeightUnit,
     padX,
     padY,
     marginX,
+    ruleYOffset,
   };
 }
 

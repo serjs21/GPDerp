@@ -41,7 +41,7 @@ export function NotebookPageRough({ hostRef, className }: NotebookPageRoughProps
       svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
       while (svg.firstChild) svg.removeChild(svg.firstChild);
 
-      const { lineHeightPx, padX, padY, marginX } = readNotebookMetrics(host);
+      const { lineHeightPx, padX, padY, marginX, ruleYOffset } = readNotebookMetrics(host);
       const rough = resolveRough() as { svg: (el: SVGSVGElement, config?: { options?: { seed?: number } }) => RoughSvg };
       const rc = rough.svg(svg, { options: { seed: NOTEBOOK_ROUGH_SEED } });
       const inset = 4;
@@ -64,7 +64,7 @@ export function NotebookPageRough({ hostRef, className }: NotebookPageRoughProps
       const lineCount = Math.max(1, Math.floor((innerBottom - innerTop) / lineHeightPx));
 
       for (let i = 0; i < lineCount; i += 1) {
-        const y = innerTop + lineHeightPx * (i + 1);
+        const y = innerTop + lineHeightPx * (i + 1) + ruleYOffset;
         if (y > innerBottom) break;
         const rule = rc.line(left, y, right, y, {
           ...roughLineOptions(NOTEBOOK_ROUGH_SEED + i + 1),
