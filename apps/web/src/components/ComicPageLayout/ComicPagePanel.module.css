@@ -1,6 +1,8 @@
 .panel {
   position: relative;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   min-height: 4.5rem;
   overflow: hidden;
@@ -163,6 +165,12 @@
 
 .contentStretch {
   flex-direction: column;
+}
+
+.contentStart.contentStretch {
+  flex: 1 1 auto;
+  align-self: stretch;
+  min-height: inherit;
 }
 
 .panelTitle {

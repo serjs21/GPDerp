@@ -7,6 +7,8 @@ export const NOTEBOOK_PAD_Y = "0.65rem";
 export const NOTEBOOK_MARGIN_X = "2.5rem";
 export const NOTEBOOK_VISIBLE_MESSAGE_LINES = 4;
 export const NOTEBOOK_ROUGH_SEED = 84;
+/** Cool white-gray paper (not warm cream). */
+export const NOTEBOOK_PAPER = "#f2f4f7";
 
 export const NOTEBOOK_ROUGH = {
   roughness: PAPER_ROUGH_DEFAULTS.roughness,
@@ -22,7 +24,7 @@ export function notebookStyleVars(): CSSProperties {
     "--notebook-pad-x": NOTEBOOK_PAD_X,
     "--notebook-pad-y": NOTEBOOK_PAD_Y,
     "--notebook-margin-x": NOTEBOOK_MARGIN_X,
-    "--notebook-paper": PAPER_COLORS.base,
+    "--notebook-paper": NOTEBOOK_PAPER,
     "--notebook-ink": PAPER_COLORS.ink,
     "--notebook-ink-soft": PAPER_COLORS.inkSoft,
   } as CSSProperties;

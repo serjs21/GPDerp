@@ -40,7 +40,7 @@ export function ShareEmailSendPanel({
             loading={sendingEmail}
             onSelect={handleSelect}
             background={active ? "halftone" : "solid"}
-            color={active ? "purple" : "white"}
+            color={active ? "teal" : "white"}
             ariaLabel="Send email"
             className={styles.sendPanel}
           >

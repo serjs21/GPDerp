@@ -7,7 +7,8 @@
 }
 
 .contentPanel {
-  min-height: 12rem;
+  --share-email-content-height: 12rem;
+  min-height: var(--share-email-content-height);
 }
 
 .successBlock {

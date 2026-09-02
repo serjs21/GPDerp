@@ -4,7 +4,6 @@ import { useRef } from "react";
 import { Select, Typography } from "@/components/StyledComponents";
 import { NotebookPageRough } from "./NotebookPageRough";
 import {
-  NOTEBOOK_VISIBLE_MESSAGE_LINES,
   notebookStyleVars,
 } from "./notebookTokens";
 import styles from "./SendShareEmailContent.module.css";
@@ -59,7 +58,6 @@ export const SendShareEmailContent = ({
           placeholder="I wanted to share with you..."
           maxLength={250}
           disabled={disabled}
-          rows={NOTEBOOK_VISIBLE_MESSAGE_LINES}
           aria-label="Email message"
         />
       </div>

@@ -3,21 +3,25 @@
   flex-direction: column;
   gap: 0.5rem;
   width: 100%;
+  height: 100%;
+  min-height: var(--share-email-content-height, 12rem);
 }
 
 .notebook {
   position: relative;
   box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
   width: 100%;
-  min-height: calc(
-    var(--notebook-pad-y) * 2 + var(--notebook-line-height) * (1 + var(--notebook-message-lines))
-  );
+  min-height: 0;
+  height: 100%;
   padding:
     var(--notebook-pad-y)
     var(--notebook-pad-x)
     var(--notebook-pad-y)
     var(--notebook-pad-x);
-  background: var(--notebook-paper, #f7f1e6);
+  background: var(--notebook-paper, #f2f4f7);
   --notebook-message-lines: 4;
 }
 
@@ -26,22 +30,23 @@
 }
 
 .toRow {
-  padding: 0 0 0 2rem;
   position: relative;
   z-index: 1;
   display: flex;
+  flex: 0 0 auto;
   align-items: baseline;
   gap: 0.35rem;
   min-height: var(--notebook-line-height);
   max-height: calc(var(--notebook-line-height) * 3);
+  padding: 0 0 0 2rem;
   overflow: hidden;
 }
 
 .toPrefix {
   flex: 0 0 auto;
   color: var(--notebook-ink, rgba(45, 45, 45, 0.72));
-  font-family: var(--font-lantern-script, cursive);
-  font-size: 1.05rem;
+  font-family: var(--font-lantern-script, "Zen Kurenaido", cursive);
+  font-size: 1.12rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   line-height: var(--notebook-line-height);
@@ -51,8 +56,10 @@
 .toInput {
   flex: 1 1 auto;
   min-width: 0;
-  font-family: var(--font-lantern-script, cursive);
-  font-size: 1.05rem;
+  font-family: var(--font-lantern-script, "Zen Kurenaido", cursive);
+  font-size: 1.12rem;
+  font-weight: 600;
+  letter-spacing: 0.035em;
   line-height: var(--notebook-line-height);
 }
 
@@ -88,6 +95,8 @@
   color: var(--notebook-ink, rgba(45, 45, 45, 0.72)) !important;
   font-family: inherit !important;
   font-size: inherit !important;
+  font-weight: inherit !important;
+  letter-spacing: inherit !important;
   line-height: var(--notebook-line-height) !important;
 }
 
@@ -100,31 +109,39 @@
   height: var(--notebook-line-height) !important;
   font-family: inherit !important;
   font-size: inherit !important;
+  font-weight: inherit !important;
+  letter-spacing: inherit !important;
   line-height: var(--notebook-line-height) !important;
 }
 
 .toInput :global(.ant-select-selection-placeholder) {
   color: var(--notebook-ink-soft, rgba(45, 45, 45, 0.42)) !important;
   font-family: inherit !important;
+  font-size: inherit !important;
   font-style: italic;
+  font-weight: 500 !important;
+  letter-spacing: inherit !important;
   line-height: var(--notebook-line-height) !important;
 }
 
 .message {
-  padding: 0 0 0 2rem;
   position: relative;
   z-index: 1;
   box-sizing: border-box;
   display: block;
+  flex: 1 1 auto;
   width: 100%;
-  min-height: calc(var(--notebook-line-height) * var(--notebook-message-lines));
+  min-height: 0;
+  height: 100%;
   margin: 0;
+  padding: 0 0 0 2rem;
   border: none;
   background: transparent;
   color: var(--notebook-ink, rgba(45, 45, 45, 0.72));
-  font-family: var(--font-lantern-script, cursive);
-  font-size: 1.05rem;
-  font-weight: 500;
+  font-family: var(--font-lantern-script, "Zen Kurenaido", cursive);
+  font-size: 1.12rem;
+  font-weight: 600;
+  letter-spacing: 0.035em;
   line-height: var(--notebook-line-height);
   resize: none;
   outline: none;
@@ -133,7 +150,7 @@
 .message::placeholder {
   color: var(--notebook-ink-soft, rgba(45, 45, 45, 0.42));
   font-style: italic;
-  font-weight: 400;
+  font-weight: 500;
 }
 
 .message:disabled {
@@ -142,6 +159,7 @@
 
 .validation {
   display: block;
+  flex: 0 0 auto;
   margin: 0;
   font-size: 0.85rem;
 }
