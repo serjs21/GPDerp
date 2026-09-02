@@ -17,18 +17,7 @@
   align-items: center;
   justify-content: center;
   padding: 0.4rem 0.5rem;
-  border-radius: 0.9rem;
-  background: transparent;
-  box-shadow: 0 0 0 0 transparent;
-  transition:
-    background-color 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-.iconWrapReady {
-  box-shadow:
-    0 0 0.75rem rgb(206 147 216 / 55%),
-    0 0 1.4rem rgb(206 147 216 / 40%);
+  transform-origin: center center;
 }
 
 .icon {
@@ -40,8 +29,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sendPanel,
-  .iconWrap {
+  .sendPanel {
     transition: none;
   }
 }
