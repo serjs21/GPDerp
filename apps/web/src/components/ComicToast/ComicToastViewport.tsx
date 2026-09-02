@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { COMIC_TOAST_MAX_VISIBLE } from "./comicToastPresets";
 import { ComicToastItem } from "./ComicToastItem";
@@ -13,6 +14,11 @@ export type ComicToastViewportProps = {
 };
 
 export function ComicToastViewport({ toasts, onDismiss, onRemove }: ComicToastViewportProps) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const isServer = typeof document === "undefined";
   // #region agent log
   fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
@@ -20,16 +26,22 @@ export function ComicToastViewport({ toasts, onDismiss, onRemove }: ComicToastVi
     headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "baf7a7" },
     body: JSON.stringify({
       sessionId: "baf7a7",
-      runId: "pre-fix",
+      runId: "post-fix",
       hypothesisId: "A",
       location: "ComicToastViewport.tsx:render",
       message: "toast viewport server/client branch",
-      data: { isServer, toastCount: toasts.length, willReturnNull: isServer, willPortal: !isServer },
+      data: {
+        isServer,
+        mounted,
+        toastCount: toasts.length,
+        willReturnNull: !mounted,
+        willPortal: mounted,
+      },
       timestamp: Date.now(),
     }),
   }).catch(() => {});
   // #endregion
-  if (typeof document === "undefined") return null;
+  if (!mounted) return null;
 
   const visible = toasts.slice(-COMIC_TOAST_MAX_VISIBLE);
 
