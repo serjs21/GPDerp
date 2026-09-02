@@ -1,6 +1,6 @@
 .root {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: stretch;
   gap: 0.65rem;
   width: 100%;
@@ -10,8 +10,52 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 0.35rem;
-  min-width: 4.75rem;
+}
+
+.actionHit {
+  display: inline-flex;
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0.35rem;
+  border: 2px solid #111;
+  border-radius: 0.25rem;
+  background: #fff;
+  color: var(--sumi-ink, #2d2d2d);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+
+.iconButton:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--sumi-ink, #2d2d2d) 6%, #fff);
+  transform: scale(1.04);
+}
+
+.iconButton:focus-visible {
+  outline: 2px solid var(--sumi-ink, #2d2d2d);
+  outline-offset: 2px;
+}
+
+.iconButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
+.actionIcon {
+  display: block;
+  width: 1.35rem;
+  height: 1.35rem;
+  object-fit: contain;
+  pointer-events: none;
 }
 
 .panelShell {
@@ -74,21 +118,50 @@
   white-space: nowrap;
 }
 
-.statusLine {
-  font-size: 0.9rem;
+.meters {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  min-height: 1.35rem;
+}
+
+.meter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.meterIcon {
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
+  object-fit: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+.meterValue {
+  font-family: var(--font-pixel-display), ui-monospace, monospace;
+  font-size: 0.7rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--sumi-ink, #2d2d2d);
+  white-space: nowrap;
 }
 
 .urlCopy {
   width: 100%;
 }
 
-.deleteColumn {
-  display: flex;
-  align-items: center;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .panelShell {
+  .panelShell,
+  .iconButton {
     transition: none;
+  }
+
+  .iconButton:hover:not(:disabled) {
+    transform: none;
   }
 }

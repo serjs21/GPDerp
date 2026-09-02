@@ -25,7 +25,7 @@ export const COMIC_PANEL_COLORS: Record<ComicPanelColor, { base: string; accent?
   purple: { base: "#9c27b0", accent: "#ce93d8" },
   blue: { base: "#2196f3", accent: "#64b5f6" },
   red: { base: "#f44336", accent: "#ef5350" },
-  white: { base: "#ffffff" },
+  white: { base: "#ffffff", accent: "#c8c8c8" },
   cream: { base: "#faf6ee", accent: "#f0e6d8" },
 };
 

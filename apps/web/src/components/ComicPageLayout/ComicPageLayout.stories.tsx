@@ -171,6 +171,28 @@ const MOTION_SAMPLES: Array<{ color: ComicPanelColor; label: string }> = [
   { color: "blue", label: "Blue motion" },
 ];
 
+export const SunburstShine: Story = {
+  render: () => (
+    <div style={{ padding: "2rem", background: "#222", minHeight: "100vh" }}>
+      <ComicPageLayout title="Sunburst shine">
+        <ComicPageRow columns="1fr-1fr">
+          <ComicPagePanel background="sunburst" color="white">
+            Inactive B/W
+          </ComicPagePanel>
+          <ComicPagePanel background="sunburst" color="teal">
+            Active teal
+          </ComicPagePanel>
+        </ComicPageRow>
+        <ComicPageRow>
+          <ComicPagePanel span="full" background="sunburst" color="orange">
+            Orange shine reference
+          </ComicPagePanel>
+        </ComicPageRow>
+      </ComicPageLayout>
+    </div>
+  ),
+};
+
 export const MotionBackground: Story = {
   render: () => (
     <div style={{ padding: "2rem", background: "#222", minHeight: "100vh" }}>

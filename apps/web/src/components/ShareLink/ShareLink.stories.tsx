@@ -78,3 +78,47 @@ export const ViewLimitReached: Story = {
     />
   ),
 };
+
+export const RemainingViews: Story = {
+  render: () => (
+    <ShareLink
+      link={{
+        ...baseLink,
+        id: "55555555-5555-4555-8555-555555555555",
+        maxViews: 10,
+        viewCount: 3,
+      }}
+      onChanged={() => undefined}
+    />
+  ),
+};
+
+export const ExpiringSoon: Story = {
+  render: () => (
+    <ShareLink
+      link={{
+        ...baseLink,
+        id: "66666666-6666-4666-8666-666666666666",
+        expirationDate: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+      }}
+      onChanged={() => undefined}
+    />
+  ),
+};
+
+export const ExpiringLater: Story = {
+  render: () => (
+    <ShareLink
+      link={{
+        ...baseLink,
+        id: "77777777-7777-4777-8777-777777777777",
+        expirationDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
+      }}
+      onChanged={() => undefined}
+    />
+  ),
+};
+
+export const Permanent: Story = {
+  render: () => <ShareLink link={baseLink} onChanged={() => undefined} />,
+};

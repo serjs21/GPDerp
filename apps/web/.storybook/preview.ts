@@ -1,6 +1,7 @@
 import type { Preview } from '@storybook/nextjs-vite'
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { NextIntlClientProvider } from 'next-intl';
+import { Press_Start_2P } from 'next/font/google';
 import { createElement } from 'react';
 import enMessages from '../messages/en.json';
 import '@/theme/globals.css';
@@ -8,6 +9,13 @@ import '@/theme/themes/tokyo-dusk.css';
 import '@/theme/themes/sumie.css';
 import '@/theme/themes/night-sky.css';
 import '@/theme/antd-overrides.css';
+
+const pressStart2P = Press_Start_2P({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-pixel',
+  display: 'swap',
+});
 
 const preview: Preview = {
   decorators: [
@@ -22,6 +30,7 @@ const preview: Preview = {
           createElement(
             'div',
             {
+              className: pressStart2P.variable,
               style: {
                 minHeight: '100vh',
                 boxSizing: 'border-box',

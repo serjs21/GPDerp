@@ -60,6 +60,8 @@
   --themed-chrome-serif: var(--font-noto-serif), ui-serif, Georgia, "Hiragino Mincho ProN", serif;
   /* Brush script for lantern / handwritten haiku (Zen Kurenaido via next/font) */
   --font-lantern-script: var(--font-zen-kurenaido), "Zen Kurenaido", cursive;
+  /* Pixel display for share-link meters (Press Start 2P via next/font) */
+  --font-pixel-display: var(--font-pixel), ui-monospace, monospace;
 }
 
 *,

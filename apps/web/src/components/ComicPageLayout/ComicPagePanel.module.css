@@ -59,13 +59,60 @@
   background: var(--comic-panel-base, #fff);
 }
 
+/* Comic sunburst: radial rays + center glow + halftone; shine = slow ray rotation. */
 .bgSunburst {
+  --comic-sunburst-ray: var(
+    --comic-panel-accent,
+    color-mix(in srgb, var(--comic-panel-base, #fff) 68%, #111)
+  );
+  container-type: size;
+  background-color: var(--comic-panel-base, #fff);
+  overflow: hidden;
+}
+
+.bgSunburst::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  /* Square >= panel diagonal so rotation never uncovers corners (was 220%x220%). */
+  width: 150cqmax;
+  height: 150cqmax;
+  translate: -50% -50%;
   background:
     repeating-conic-gradient(
-      from 0deg at 50% 50%,
-      var(--comic-panel-base, #fff) 0deg 8deg,
-      var(--comic-panel-accent, var(--comic-panel-base, #fff)) 8deg 16deg
+      from 0deg,
+      var(--comic-panel-base, #fff) 0deg 5deg,
+      var(--comic-sunburst-ray) 5deg 7deg,
+      var(--comic-panel-base, #fff) 7deg 12deg,
+      color-mix(in srgb, var(--comic-sunburst-ray) 82%, #111) 12deg 14deg
     );
+  animation: comicSunburstShine 10s linear infinite;
+  will-change: transform;
+}
+
+.bgSunburst::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(
+      circle at 50% 50%,
+      color-mix(in srgb, var(--comic-panel-base, #fff) 96%, white) 0%,
+      color-mix(in srgb, var(--comic-panel-base, #fff) 40%, transparent) 26%,
+      transparent 48%
+    ),
+    radial-gradient(
+      circle at center,
+      rgb(0 0 0 / 20%) 0.07rem,
+      transparent 0.095rem
+    );
+  background-size: 100% 100%, 0.38rem 0.38rem;
+  background-position: center, center;
+  /* Halftone only darkens; center glow stays bright. */
+  background-blend-mode: normal, multiply;
+  opacity: 0.9;
 }
 
 .bgHalftone {
@@ -146,6 +193,12 @@
   }
 }
 
+@keyframes comicSunburstShine {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .content {
   position: relative;
   z-index: 1;
@@ -218,5 +271,9 @@
 
   .bgMotionOverlay {
     transition: none;
+  }
+
+  .bgSunburst::before {
+    animation: none;
   }
 }

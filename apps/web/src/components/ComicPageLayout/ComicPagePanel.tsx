@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
+import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import {
   COMIC_PANEL_COLORS,
   type ComicPanelBackground,
@@ -58,6 +58,63 @@ export function ComicPagePanel({
   const isMotionBackground = background === "motion";
   const showMotionOverlay = loading && !isMotionBackground;
   const bgClass = staticBgClass(isMotionBackground ? "solid" : background);
+  const panelRef = useRef<HTMLElement | null>(null);
+
+  // #region agent log
+  useEffect(() => {
+    if (background !== "sunburst") return;
+    const el = panelRef.current;
+    if (!el) return;
+
+    const measure = () => {
+      const bg = el.querySelector(`.${panelStyles.bgSunburst}`) as HTMLElement | null;
+      const host = bg ?? el;
+      const rect = host.getBoundingClientRect();
+      const before = getComputedStyle(host, "::before");
+      const beforeW = Number.parseFloat(before.width) || 0;
+      const beforeH = Number.parseFloat(before.height) || 0;
+      const diagonal = Math.hypot(rect.width, rect.height);
+      const minSide = Math.min(beforeW, beforeH);
+      const coversDiagonal = minSide >= diagonal - 0.5;
+      const aspect = rect.width / Math.max(rect.height, 1);
+      fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Debug-Session-Id": "53a752",
+        },
+        body: JSON.stringify({
+          sessionId: "53a752",
+          runId: "post-fix",
+          hypothesisId: "A",
+          location: "ComicPagePanel.tsx:sunburst-measure",
+          message: "sunburst coverage geometry",
+          data: {
+            panelW: Math.round(rect.width * 10) / 10,
+            panelH: Math.round(rect.height * 10) / 10,
+            aspect: Math.round(aspect * 100) / 100,
+            diagonal: Math.round(diagonal * 10) / 10,
+            beforeW: Math.round(beforeW * 10) / 10,
+            beforeH: Math.round(beforeH * 10) / 10,
+            minSide: Math.round(minSide * 10) / 10,
+            coversDiagonal,
+            shortfall: Math.round((diagonal - minSide) * 10) / 10,
+            beforeTransform: before.transform,
+            beforeTranslate: before.translate,
+            cssWidth: before.getPropertyValue("width"),
+            cssHeight: before.getPropertyValue("height"),
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+    };
+
+    measure();
+    const ro = new ResizeObserver(() => measure());
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [background, color, className]);
+  // #endregion
 
   const panelClass = [
     panelStyles.panel,
@@ -106,6 +163,7 @@ export function ComicPagePanel({
     return (
       <button
         type="button"
+        ref={panelRef as React.RefObject<HTMLButtonElement>}
         className={panelClass}
         style={style}
         aria-pressed={selected}
@@ -119,7 +177,12 @@ export function ComicPagePanel({
   }
 
   return (
-    <div className={panelClass} style={style} aria-busy={loading || undefined}>
+    <div
+      ref={panelRef as React.RefObject<HTMLDivElement>}
+      className={panelClass}
+      style={style}
+      aria-busy={loading || undefined}
+    >
       {inner}
     </div>
   );

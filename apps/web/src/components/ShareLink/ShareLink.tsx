@@ -2,22 +2,29 @@
 
 import axios from "axios";
 import { motion, useReducedMotion } from "motion/react";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ShareLinkListItem } from "@/api/shareLinks";
-import { deleteShareLink, setShareLinkDisabled } from "@/api/shareLinks";
+import { setShareLinkDisabled } from "@/api/shareLinks";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { CopyText } from "@/components/CopyText/CopyText";
 import { comicToast } from "@/components/ComicToast";
-import { Button, Tooltip, Typography } from "@/components/StyledComponents";
+import { Tooltip, Typography } from "@/components/StyledComponents";
+import { useLocale } from "@/hooks/useLocale";
 import {
-  canStartShareLink,
-  getShareLinkStatus,
-  isActiveShareLink,
-  isWithinShareLinkLimits,
-} from "@/utils/shareLinkStatus";
+  getHitsMeterDisplay,
+  getTimeMeterDisplay,
+  shouldTickShareLinkClock,
+} from "@/utils/shareLinkDisplay";
+import { canStartShareLink, isActiveShareLink } from "@/utils/shareLinkStatus";
 import styles from "./ShareLink.module.css";
 
 const PAPER_PLANE_SRC = "/share_modal/link/paper_plane.svg";
+const START_ICON_SRC = "/share_modal/link/start.svg";
+const PAUSE_ICON_SRC = "/share_modal/link/pause.svg";
+const HEART_FILLED_SRC = "/share_modal/link/heart_filled.svg";
+const HEART_SRC = "/share_modal/link/heart.svg";
+const CLOCK_SRC = "/share_modal/link/clock.svg";
+const INFINITY_SRC = "/share_modal/link/infinity.svg";
 
 export type ShareLinkProps = {
   link: ShareLinkListItem;
@@ -26,18 +33,26 @@ export type ShareLinkProps = {
 
 export function ShareLink({ link, onChanged }: ShareLinkProps) {
   const reduceMotion = useReducedMotion();
+  const { locale } = useLocale();
   const [isUpdating, setIsUpdating] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [now, setNow] = useState<Date | null>(null);
 
-  const status = useMemo(() => getShareLinkStatus(link), [link]);
-  const active = isActiveShareLink(link);
-  const showStop = active;
-  const showStart = link.disabled && isWithinShareLinkLimits(link);
-  const startDisabled = link.disabled && !canStartShareLink(link);
-  const startTooltip = startDisabled ? "Update link limits to restart" : "";
+  const active = isActiveShareLink(link, now ?? undefined);
+  const canStart = canStartShareLink(link, now ?? undefined);
   const isFlying = active && !reduceMotion;
+  const hits = getHitsMeterDisplay(link);
+  const time = getTimeMeterDisplay(link.expirationDate, now, locale);
+
+  useEffect(() => {
+    const tick = () => setNow(new Date());
+    tick();
+    if (!shouldTickShareLinkClock(link.expirationDate, new Date())) return;
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, [link.expirationDate]);
 
   const onStop = async () => {
+    if (!active || isUpdating) return;
     try {
       setIsUpdating(true);
       await setShareLinkDisabled(link.id, true);
@@ -56,7 +71,7 @@ export function ShareLink({ link, onChanged }: ShareLinkProps) {
   };
 
   const onStart = async () => {
-    if (startDisabled) return;
+    if (!canStart || isUpdating) return;
     try {
       setIsUpdating(true);
       await setShareLinkDisabled(link.id, false);
@@ -74,52 +89,58 @@ export function ShareLink({ link, onChanged }: ShareLinkProps) {
     }
   };
 
-  const onDelete = async () => {
-    try {
-      setIsDeleting(true);
-      await deleteShareLink(link.id);
-      comicToast.success("Share link deleted");
-      onChanged();
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        const msg = (error.response?.data as { error?: string } | undefined)?.error;
-        comicToast.error(typeof msg === "string" ? msg : "Could not delete share link");
-      } else {
-        comicToast.error("Could not delete share link");
-      }
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+  const startTooltip = !canStart ? "Update link limits to restart" : "Start link";
+  const hitsLabel =
+    hits.kind === "unlimited"
+      ? "Unlimited visits"
+      : hits.kind === "empty"
+        ? "No visits left"
+        : `${hits.count} visits left`;
+  const timeLabel =
+    time.kind === "unlimited"
+      ? "No expiration"
+      : time.kind === "relative"
+        ? `Expires ${time.text}`
+        : time.text
+          ? `Time left ${time.text}`
+          : "Time left";
 
   return (
     <article className={styles.root}>
       <div className={styles.actionColumn}>
-        {showStop ? (
-          <Button danger loading={isUpdating} onClick={() => void onStop()}>
-            Stop
-          </Button>
-        ) : null}
-        {showStart ? (
+        {active ? (
+          <Tooltip title="Stop link">
+            <button
+              type="button"
+              className={styles.iconButton}
+              aria-label="Stop link"
+              disabled={isUpdating}
+              onClick={() => void onStop()}
+            >
+              <img src={PAUSE_ICON_SRC} alt="" className={styles.actionIcon} aria-hidden />
+            </button>
+          </Tooltip>
+        ) : (
           <Tooltip title={startTooltip}>
-            <span>
-              <Button
-                type="primary"
-                loading={isUpdating}
-                disabled={startDisabled}
+            <span className={styles.actionHit}>
+              <button
+                type="button"
+                className={styles.iconButton}
+                aria-label="Start link"
+                disabled={!canStart || isUpdating}
                 onClick={() => void onStart()}
               >
-                Start
-              </Button>
+                <img src={START_ICON_SRC} alt="" className={styles.actionIcon} aria-hidden />
+              </button>
             </span>
           </Tooltip>
-        ) : null}
+        )}
       </div>
 
       <div className={[styles.panelShell, active ? styles.panelShellActive : styles.panelShellInactive].join(" ")}>
         <ComicPagePanel
           span="full"
-          background={active ? "motion" : "solid"}
+          background="sunburst"
           color={active ? "teal" : "white"}
           contentAlign="start"
           className={styles.panel}
@@ -156,20 +177,33 @@ export function ShareLink({ link, onChanged }: ShareLinkProps) {
               <Typography.Title level={5} className={styles.subject}>
                 {link.haikuSubject}
               </Typography.Title>
-              <Typography.Text className={styles.statusLine}>
-                {status.label}
-                {status.detail ? `: ${status.detail}` : ""}
-              </Typography.Text>
+              <div className={styles.meters}>
+                <span className={styles.meter} aria-label={hitsLabel}>
+                  <img
+                    src={hits.kind === "empty" ? HEART_SRC : HEART_FILLED_SRC}
+                    alt=""
+                    className={styles.meterIcon}
+                    aria-hidden
+                  />
+                  {hits.kind === "unlimited" ? (
+                    <img src={INFINITY_SRC} alt="" className={styles.meterIcon} aria-hidden />
+                  ) : (
+                    <span className={styles.meterValue}>{hits.count}</span>
+                  )}
+                </span>
+                <span className={styles.meter} aria-label={timeLabel}>
+                  <img src={CLOCK_SRC} alt="" className={styles.meterIcon} aria-hidden />
+                  {time.kind === "unlimited" ? (
+                    <img src={INFINITY_SRC} alt="" className={styles.meterIcon} aria-hidden />
+                  ) : (
+                    <span className={styles.meterValue}>{time.text}</span>
+                  )}
+                </span>
+              </div>
               <CopyText text={link.shareUrl} mode="link" className={styles.urlCopy} />
             </div>
           </div>
         </ComicPagePanel>
-      </div>
-
-      <div className={styles.deleteColumn}>
-        <Button danger type="text" loading={isDeleting} onClick={() => void onDelete()}>
-          Delete
-        </Button>
       </div>
     </article>
   );

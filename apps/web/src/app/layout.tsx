@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Noto_Serif_JP, Zen_Kurenaido } from "next/font/google";
+import { Geist, Geist_Mono, Noto_Serif_JP, Press_Start_2P, Zen_Kurenaido } from "next/font/google";
 import "@/theme/globals.css";
 import "@/theme/themes/tokyo-dusk.css";
 import "@/theme/themes/sumie.css";
@@ -40,6 +40,13 @@ const zenKurenaido = Zen_Kurenaido({
   weight: "400",
 });
 
+const pressStart2P = Press_Start_2P({
+  variable: "--font-pixel",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "GPDerp",
   description: "AI, but useless",
@@ -69,7 +76,7 @@ export default async function RootLayout({
   
   return (
     <html lang={initialLocale} data-theme={initialTheme}>
-      <body className={`${notoSerifJP.variable} ${zenKurenaido.variable} ${geistSans.variable} ${geistMono.variable}`}>
+      <body className={`${notoSerifJP.variable} ${zenKurenaido.variable} ${geistSans.variable} ${geistMono.variable} ${pressStart2P.variable}`}>
         <AntdRegistry>
           <HtmlLoader />
           <NextIntlClientProvider locale={initialLocale} messages={messages}>
