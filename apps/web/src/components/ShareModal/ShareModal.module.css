@@ -1,16 +1,33 @@
-.modalBody {
-  padding-block: 0.25rem;
+.methodRow {
+  min-height: 6.5rem;
 }
 
-.modalFooter {
-  margin-top: 0;
+.methodPanel {
+  min-height: 6.5rem;
+}
+
+.methodIcon {
+  display: block;
+  width: 3.5rem;
+  height: 3.5rem;
+  object-fit: contain;
+}
+
+.contentPanel {
+  min-height: 12rem;
+}
+
+.footerPanel {
+  min-height: auto;
 }
 
 .footerBtns {
-  display: inline-flex;
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
   gap: 0.5rem;
 }
 
 .success {
-  margin: 0.5rem 0;
+  margin: 0;
 }

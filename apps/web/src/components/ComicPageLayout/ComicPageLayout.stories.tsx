@@ -1,0 +1,146 @@
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { useState } from "react";
+import {
+  COMIC_PAGE_BLANK_TEMPLATE_ROWS,
+  ComicPageLayout,
+  ComicPagePanel,
+  ComicPageRow,
+  type ComicPanelBackground,
+  type ComicPanelColor,
+} from "./index";
+
+function ComicPageLayoutStoryShell() {
+  return null;
+}
+
+const meta = {
+  title: "Haiku/ComicPageLayout",
+  component: ComicPageLayoutStoryShell,
+  tags: ["autodocs"],
+  parameters: {
+    layout: "fullscreen",
+  },
+} satisfies Meta<typeof ComicPageLayoutStoryShell>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+const BACKGROUND_SAMPLES: Array<{
+  background: ComicPanelBackground;
+  color: ComicPanelColor;
+  label: string;
+}> = [
+  { background: "sunburst", color: "magenta", label: "Sunburst" },
+  { background: "halftone", color: "teal", label: "Halftone" },
+  { background: "solid", color: "yellow", label: "Solid" },
+  { background: "sunburst", color: "orange", label: "Sunburst" },
+  { background: "halftone", color: "purple", label: "Halftone" },
+  { background: "solid", color: "blue", label: "Solid" },
+];
+
+export const BlankTemplate: Story = {
+  render: () => (
+    <div style={{ padding: "2rem", background: "#222", minHeight: "100vh" }}>
+      <ComicPageLayout title="Blank comic template">
+        {COMIC_PAGE_BLANK_TEMPLATE_ROWS.map((columns, rowIndex) => (
+          <ComicPageRow key={columns} columns={columns}>
+            <ComicPagePanel
+              background={rowIndex % 2 === 0 ? "sunburst" : "halftone"}
+              color={rowIndex === 0 ? "magenta" : rowIndex === 1 ? "teal" : "yellow"}
+              span="auto"
+            />
+            <ComicPagePanel background="solid" color="white" span="auto" />
+          </ComicPageRow>
+        ))}
+      </ComicPageLayout>
+    </div>
+  ),
+};
+
+export const BackgroundGallery: Story = {
+  render: () => (
+    <div style={{ padding: "2rem", background: "#222", minHeight: "100vh" }}>
+      <ComicPageLayout title="Panel backgrounds">
+        <ComicPageRow columns="1fr-1fr">
+          {BACKGROUND_SAMPLES.slice(0, 2).map((sample) => (
+            <ComicPagePanel
+              key={sample.label}
+              background={sample.background}
+              color={sample.color}
+            >
+              {sample.label}
+            </ComicPagePanel>
+          ))}
+        </ComicPageRow>
+        <ComicPageRow columns="1fr-1fr">
+          {BACKGROUND_SAMPLES.slice(2, 4).map((sample) => (
+            <ComicPagePanel
+              key={sample.label}
+              background={sample.background}
+              color={sample.color}
+            >
+              {sample.label}
+            </ComicPagePanel>
+          ))}
+        </ComicPageRow>
+        <ComicPageRow columns="1fr-1fr">
+          {BACKGROUND_SAMPLES.slice(4, 6).map((sample) => (
+            <ComicPagePanel
+              key={sample.label}
+              background={sample.background}
+              color={sample.color}
+            >
+              {sample.label}
+            </ComicPagePanel>
+          ))}
+        </ComicPageRow>
+      </ComicPageLayout>
+    </div>
+  ),
+};
+
+function SelectableRowDemo() {
+  const [selected, setSelected] = useState<"link" | "email">("link");
+  const selectedWeight = 1.25;
+  const unselectedWeight = 0.75;
+
+  return (
+    <div style={{ padding: "2rem", background: "#222", minHeight: "100vh" }}>
+      <ComicPageLayout title="Selectable row">
+        <ComicPageRow>
+          <ComicPagePanel
+            selectable
+            selected={selected === "link"}
+            onSelect={() => setSelected("link")}
+            background="sunburst"
+            color="teal"
+            flexWeight={selected === "link" ? selectedWeight : unselectedWeight}
+            ariaLabel="Link"
+          >
+            <img src="/share_modal/link.svg" alt="" width={56} height={56} />
+          </ComicPagePanel>
+          <ComicPagePanel
+            selectable
+            selected={selected === "email"}
+            onSelect={() => setSelected("email")}
+            background="halftone"
+            color="orange"
+            flexWeight={selected === "email" ? selectedWeight : unselectedWeight}
+            ariaLabel="Email"
+          >
+            <img src="/share_modal/email.svg" alt="" width={56} height={56} />
+          </ComicPagePanel>
+        </ComicPageRow>
+        <ComicPageRow>
+          <ComicPagePanel span="full" color="white" contentAlign="start">
+            Content for: {selected}
+          </ComicPagePanel>
+        </ComicPageRow>
+      </ComicPageLayout>
+    </div>
+  );
+}
+
+export const SelectableRow: Story = {
+  render: () => <SelectableRowDemo />,
+};

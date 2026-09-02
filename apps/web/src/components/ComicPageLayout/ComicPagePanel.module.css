@@ -1,0 +1,116 @@
+.panel {
+  position: relative;
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 4.5rem;
+  overflow: hidden;
+  border: var(--comic-page-border, 4px) solid #111;
+  outline: var(--comic-page-inset, 3px) solid #fff;
+  outline-offset: calc(-1 * var(--comic-page-inset, 3px));
+  background: var(--comic-panel-base, #fff);
+  transition:
+    flex-grow 200ms cubic-bezier(0.45, 0.05, 0.55, 0.95),
+    transform 200ms cubic-bezier(0.45, 0.05, 0.55, 0.95),
+    box-shadow 200ms cubic-bezier(0.45, 0.05, 0.55, 0.95);
+}
+
+.panelFull {
+  width: 100%;
+  flex: 1 1 100%;
+}
+
+.panelAuto {
+  flex: 1 1 0;
+  flex-grow: var(--comic-panel-flex, 1);
+}
+
+.panelSelectable {
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  text-align: inherit;
+  appearance: none;
+}
+
+.panelSelectable:focus-visible {
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 4px var(--sumi-ink, #2d2d2d);
+}
+
+.panelSelected {
+  transform: scale(1.02);
+  box-shadow: 0 0.35rem 0 rgb(0 0 0 / 22%);
+  z-index: 1;
+}
+
+.bgLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bgSolid {
+  background: var(--comic-panel-base, #fff);
+}
+
+.bgSunburst {
+  background:
+    repeating-conic-gradient(
+      from 0deg at 50% 50%,
+      var(--comic-panel-base, #fff) 0deg 8deg,
+      var(--comic-panel-accent, var(--comic-panel-base, #fff)) 8deg 16deg
+    );
+}
+
+.bgHalftone {
+  background-color: var(--comic-panel-base, #fff);
+  background-image: radial-gradient(
+    circle at center,
+    rgb(0 0 0 / 18%) 0.09rem,
+    transparent 0.1rem
+  );
+  background-size: 0.42rem 0.42rem;
+}
+
+.bgHalftone::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 70% 30%,
+    transparent 30%,
+    rgb(0 0 0 / 8%) 100%
+  );
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: inherit;
+  padding: 0.85rem 1rem;
+}
+
+.contentStart {
+  align-items: flex-start;
+  justify-content: stretch;
+}
+
+.contentStretch {
+  flex-direction: column;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    transition: none;
+  }
+
+  .panelSelected {
+    transform: none;
+  }
+}

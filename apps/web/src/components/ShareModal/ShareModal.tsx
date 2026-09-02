@@ -1,7 +1,12 @@
 "use client";
 
-import { Button, Modal, Radio, Tooltip, Typography } from "@/components/StyledComponents";
+import { Button, Tooltip, Typography } from "@/components/StyledComponents";
 import type { RadioChangeEvent } from "antd/es/radio";
+import {
+  ComicPageDialog,
+  ComicPagePanel,
+  ComicPageRow,
+} from "@/components/ComicPageLayout";
 import { CopyText } from "../CopyText/CopyText";
 import { SendShareEmailContent } from "./SendShareEmailContent";
 import { ShareLinkContent } from "./ShareLinkContent";
@@ -22,6 +27,9 @@ export type ShareModalProps = {
   /** When the modal opens, pre-select link policy (for Storybook). */
   initialLinkPolicy?: LinkPolicy;
 };
+
+const SELECTED_PANEL_WEIGHT = 1.25;
+const UNSELECTED_PANEL_WEIGHT = 0.75;
 
 type ShareModalFooterProps = {
   createdUrl: string | null;
@@ -120,61 +128,70 @@ export function ShareModal({
     initialLinkPolicy,
   });
 
-  const onMethodChange = (e: RadioChangeEvent) => {
-    setMethod(e.target.value);
-    setCreatedUrl(null);
-  };
-
   const onLinkPolicyChange = (e: RadioChangeEvent) => {
     setLinkPolicy(e.target.value);
     setCreatedUrl(null);
   };
 
-  return (
-    <Modal
-      title={createdUrl ? "Your share link" : "Share haiku"}
-      open={open}
-      onCancel={onClose}
-      footer={
-        <ShareModalFooter
-          createdUrl={createdUrl}
-          emailSent={emailSent}
-          onClose={onClose}
-          method={method}
-          linkCtaHint={linkCtaHint}
-          emailCtaHint={emailCtaHint}
-          creating={creating}
-          sendingEmail={sendingEmail}
-          canCreateLink={canCreateLink}
-          canSendEmail={canSendEmail}
-          onCreateLink={() => void onCreateLink()}
-          onSendEmail={() => void onSendEmail()}
-        />
-      }
-      closable={false}
-      maskClosable={false}
-      keyboard={false}
-      destroyOnHidden
-      classNames={{ body: styles.modalBody, footer: styles.modalFooter }}
-    >
-      {createdUrl != null ? (
-        <CopyText text={createdUrl} mode="link" />
-      ) : emailSent ? (
-        <Typography.Paragraph className={styles.success}>
-          Your haikus have been sent.
-        </Typography.Paragraph>
-      ) : (
-        <>
-          <Radio.Group
-            value={method}
-            onChange={onMethodChange}
-            options={[
-              { value: "link" as const, label: "Share by link" },
-              { value: "email" as const, label: "Share via mail" },
-            ]}
-          />
+  const showMethodRow = createdUrl == null && !emailSent;
+  const dialogTitle = createdUrl ? "Your share link" : "Share haiku";
 
-          {method === "link" ? (
+  const selectLink = () => {
+    setMethod("link");
+    setCreatedUrl(null);
+  };
+
+  const selectEmail = () => {
+    setMethod("email");
+    setCreatedUrl(null);
+  };
+
+  return (
+    <ComicPageDialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) onClose();
+      }}
+      title={dialogTitle}
+    >
+      {showMethodRow ? (
+        <ComicPageRow className={styles.methodRow}>
+          <ComicPagePanel
+            selectable
+            selected={method === "link"}
+            onSelect={selectLink}
+            background="sunburst"
+            color="teal"
+            flexWeight={method === "link" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
+            ariaLabel="Share by link"
+            className={styles.methodPanel}
+          >
+            <img src="/share_modal/link.svg" alt="" className={styles.methodIcon} />
+          </ComicPagePanel>
+          <ComicPagePanel
+            selectable
+            selected={method === "email"}
+            onSelect={selectEmail}
+            background="halftone"
+            color="orange"
+            flexWeight={method === "email" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
+            ariaLabel="Share via email"
+            className={styles.methodPanel}
+          >
+            <img src="/share_modal/email.svg" alt="" className={styles.methodIcon} />
+          </ComicPagePanel>
+        </ComicPageRow>
+      ) : null}
+
+      <ComicPageRow>
+        <ComicPagePanel span="full" color="white" contentAlign="start" className={styles.contentPanel}>
+          {createdUrl != null ? (
+            <CopyText text={createdUrl} mode="link" />
+          ) : emailSent ? (
+            <Typography.Paragraph className={styles.success}>
+              Your haikus have been sent.
+            </Typography.Paragraph>
+          ) : method === "link" ? (
             <ShareLinkContent
               linkPolicy={linkPolicy}
               onLinkPolicyChange={onLinkPolicyChange}
@@ -193,8 +210,27 @@ export function ShareModal({
               disabled={sendingEmail}
             />
           )}
-        </>
-      )}
-    </Modal>
+        </ComicPagePanel>
+      </ComicPageRow>
+
+      <ComicPageRow>
+        <ComicPagePanel span="full" color="cream" contentAlign="start" className={styles.footerPanel}>
+          <ShareModalFooter
+            createdUrl={createdUrl}
+            emailSent={emailSent}
+            onClose={onClose}
+            method={method}
+            linkCtaHint={linkCtaHint}
+            emailCtaHint={emailCtaHint}
+            creating={creating}
+            sendingEmail={sendingEmail}
+            canCreateLink={canCreateLink}
+            canSendEmail={canSendEmail}
+            onCreateLink={() => void onCreateLink()}
+            onSendEmail={() => void onSendEmail()}
+          />
+        </ComicPagePanel>
+      </ComicPageRow>
+    </ComicPageDialog>
   );
 }

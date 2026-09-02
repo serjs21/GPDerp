@@ -1,0 +1,77 @@
+.dialogOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgb(255 255 255 / 42%);
+  backdrop-filter: blur(1px);
+}
+
+.dialogRoot {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vw, 2rem);
+  pointer-events: none;
+  overflow: auto;
+}
+
+.dialogContent {
+  pointer-events: auto;
+  width: min(100%, 36rem);
+  max-height: min(92vh, 44rem);
+  overflow: auto;
+  outline: none;
+}
+
+.page {
+  box-sizing: border-box;
+  padding: var(--comic-page-gutter, 10px);
+  background: #111;
+  border: var(--comic-page-border, 4px) solid #111;
+  box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 35%);
+}
+
+.pageInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--comic-page-gutter, 10px);
+  padding: var(--comic-page-gutter, 10px);
+  background: #fff;
+}
+
+.title {
+  margin: 0;
+  padding: 0.35rem 0.5rem 0;
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 1.65rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--sumi-ink, #2d2d2d);
+  text-align: center;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.row {
+  display: flex;
+  gap: var(--comic-page-gutter, 10px);
+  min-height: 0;
+}
+
+.rowColumns {
+  display: grid;
+  grid-template-columns: var(--comic-row-left, 1fr) var(--comic-row-right, 1fr);
+}

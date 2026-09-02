@@ -7,7 +7,7 @@ const meta = {
   component: ShareModal,
   tags: ["autodocs"],
   parameters: {
-    layout: "centered",
+    layout: "fullscreen",
   },
   args: {
     open: true,
