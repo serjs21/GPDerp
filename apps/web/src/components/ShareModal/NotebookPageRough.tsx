@@ -2,7 +2,12 @@
 
 import { useEffect, useRef, type RefObject } from "react";
 import { resolveRough, roughLineOptions } from "@/components/DrawnModal/roughUtils";
-import { NOTEBOOK_ROUGH, NOTEBOOK_ROUGH_SEED, readNotebookMetrics } from "./notebookTokens";
+import {
+  collectNotebookRuleYs,
+  NOTEBOOK_ROUGH,
+  NOTEBOOK_ROUGH_SEED,
+  readNotebookMetrics,
+} from "./notebookTokens";
 import styles from "./NotebookPageRough.module.css";
 
 type RoughSvg = {
@@ -41,7 +46,7 @@ export function NotebookPageRough({ hostRef, className }: NotebookPageRoughProps
       svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
       while (svg.firstChild) svg.removeChild(svg.firstChild);
 
-      const { lineHeightPx, padX, padY, marginX, ruleYOffset } = readNotebookMetrics(host);
+      const { lineHeightPx, padX, padY, marginX } = readNotebookMetrics(host);
       const rough = resolveRough() as { svg: (el: SVGSVGElement, config?: { options?: { seed?: number } }) => RoughSvg };
       const rc = rough.svg(svg, { options: { seed: NOTEBOOK_ROUGH_SEED } });
       const inset = 4;
@@ -61,18 +66,17 @@ export function NotebookPageRough({ hostRef, className }: NotebookPageRoughProps
       const right = Math.max(left + 1, width - padX);
       const innerTop = padY;
       const innerBottom = Math.max(innerTop + 1, height - padY);
-      const lineCount = Math.max(1, Math.floor((innerBottom - innerTop) / lineHeightPx));
+      const ruleYs = collectNotebookRuleYs(host, lineHeightPx, padY);
 
-      for (let i = 0; i < lineCount; i += 1) {
-        const y = innerTop + lineHeightPx * (i + 1) + ruleYOffset;
-        if (y > innerBottom) break;
+      ruleYs.forEach((y, index) => {
+        if (y <= innerTop || y > innerBottom) return;
         const rule = rc.line(left, y, right, y, {
-          ...roughLineOptions(NOTEBOOK_ROUGH_SEED + i + 1),
+          ...roughLineOptions(NOTEBOOK_ROUGH_SEED + index + 1),
           strokeWidth: 0.95,
           stroke: NOTEBOOK_ROUGH.stroke,
         });
         svg.appendChild(rule);
-      }
+      });
 
       const marginLine = rc.line(marginX, innerTop, marginX, innerBottom, {
         ...roughLineOptions(NOTEBOOK_ROUGH_SEED + 100),
@@ -82,10 +86,15 @@ export function NotebookPageRough({ hostRef, className }: NotebookPageRoughProps
       svg.appendChild(marginLine);
     };
 
-    draw();
-    const observer = new ResizeObserver(() => draw());
+    const scheduleDraw = () => {
+      requestAnimationFrame(draw);
+    };
+
+    scheduleDraw();
+    const observer = new ResizeObserver(scheduleDraw);
     observer.observe(svg);
     observer.observe(host);
+    host.querySelectorAll("[data-notebook-row]").forEach((row) => observer.observe(row));
     return () => observer.disconnect();
   }, [hostRef]);
 

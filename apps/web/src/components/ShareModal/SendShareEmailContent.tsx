@@ -35,7 +35,7 @@ export const SendShareEmailContent = ({
         style={notebookStyleVars()}
       >
         <NotebookPageRough hostRef={notebookRef} className={styles.paperArt} />
-        <div className={styles.toRow}>
+        <div className={styles.toRow} data-notebook-row="to">
           <span className={styles.toPrefix} aria-hidden>
             TO:
           </span>
@@ -51,8 +51,10 @@ export const SendShareEmailContent = ({
             autoFocus
           />
         </div>
+        <div className={styles.lineSpacer} data-notebook-row="spacer" aria-hidden />
         <textarea
           className={styles.message}
+          data-notebook-row="message"
           value={message}
           onChange={(e) => onMessageChange(e.target.value)}
           placeholder="I wanted to share with you..."
