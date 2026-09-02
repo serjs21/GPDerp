@@ -26,6 +26,7 @@ export const shareLinkRepository = {
         expirationDate: true,
         maxViews: true,
         viewCount: true,
+        disabled: true,
         sharedHaikuId: true,
         haikuSubject: true,
       },
@@ -49,6 +50,7 @@ export const shareLinkRepository = {
         expirationDate: true,
         maxViews: true,
         viewCount: true,
+        disabled: true,
         createdAt: true,
         createdBy: {
           select: {
@@ -89,6 +91,7 @@ export const shareLinkRepository = {
         expirationDate: true,
         maxViews: true,
         viewCount: true,
+        disabled: true,
         haikuSubject: true,
       },
     });
@@ -125,6 +128,24 @@ export const shareLinkRepository = {
         expirationDate: true,
         maxViews: true,
         viewCount: true,
+        disabled: true,
+        haikuSubject: true,
+      },
+    });
+  },
+
+  updateDisabledById(params: { id: string; disabled: boolean }) {
+    return prismaClient.shareLink.update({
+      where: { id: params.id },
+      data: { disabled: params.disabled },
+      select: {
+        id: true,
+        shareHash: true,
+        createdAt: true,
+        expirationDate: true,
+        maxViews: true,
+        viewCount: true,
+        disabled: true,
         haikuSubject: true,
       },
     });

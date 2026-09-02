@@ -41,6 +41,38 @@ const resolveDisplayName = (createdBy: {
   return emailPrefix || "Unknown author";
 };
 
+type ShareLinkListRow = {
+  id: string;
+  shareHash: string;
+  createdAt: Date;
+  expirationDate: Date | null;
+  maxViews: number | null;
+  viewCount: number;
+  disabled: boolean;
+  haikuSubject: string;
+};
+
+const shareLinkItemFromRow = (row: ShareLinkListRow) => ({
+  id: row.id,
+  shareHash: row.shareHash,
+  shareUrl: `${env.WEB_APP_URL.replace(/\/$/, "")}/share/${row.shareHash}`,
+  haikuSubject: row.haikuSubject,
+  createdAt: row.createdAt.toISOString(),
+  expirationDate: row.expirationDate ? row.expirationDate.toISOString() : null,
+  maxViews: row.maxViews,
+  viewCount: row.viewCount,
+  disabled: row.disabled,
+});
+
+const isShareLinkExpired = (row: { expirationDate: Date | null }, now = new Date()) =>
+  row.expirationDate != null && row.expirationDate <= now;
+
+const isShareLinkViewLimitReached = (row: { maxViews: number | null; viewCount: number }) =>
+  row.maxViews != null && row.viewCount >= row.maxViews;
+
+const withinShareLinkLimits = (row: { expirationDate: Date | null; maxViews: number | null; viewCount: number }, now = new Date()) =>
+  !isShareLinkExpired(row, now) && !isShareLinkViewLimitReached(row);
+
 export const shareLinkService = {
   async userCanAccessHaiku(userId: string, haikuId: string): Promise<boolean> {
     const haiku = await haikuRepository.findFullById(haikuId);
@@ -63,6 +95,7 @@ export const shareLinkService = {
           shareUrl: string;
           expirationDate: string | null;
           maxViews: number | null;
+          disabled: boolean;
         };
       }
     | { ok: false; reason: "not_found" | "forbidden" | "invalid_expiry" | "invalid_max_views" }
@@ -116,8 +149,33 @@ export const shareLinkService = {
         shareUrl,
         expirationDate: row.expirationDate ? row.expirationDate.toISOString() : null,
         maxViews: row.maxViews,
+        disabled: row.disabled,
       },
     };
+  },
+
+  async setShareLinkDisabled(params: {
+    userId: string;
+    shareLinkId: string;
+    disabled: boolean;
+  }): Promise<
+    | { ok: true; shareLink: ReturnType<typeof shareLinkItemFromRow> }
+    | { ok: false; reason: "not_found" | "forbidden" | "limits_reached" }
+  > {
+    const row = await shareLinkRepository.findById(params.shareLinkId);
+    if (!row) return { ok: false, reason: "not_found" };
+    if (row.createdByUserId !== params.userId) return { ok: false, reason: "forbidden" };
+
+    if (!params.disabled && !withinShareLinkLimits(row)) {
+      return { ok: false, reason: "limits_reached" };
+    }
+
+    const updated = await shareLinkRepository.updateDisabledById({
+      id: params.shareLinkId,
+      disabled: params.disabled,
+    });
+
+    return { ok: true, shareLink: shareLinkItemFromRow(updated) };
   },
 
   async deleteShareLink(params: {
@@ -148,6 +206,7 @@ export const shareLinkService = {
       expirationDate: string | null;
       maxViews: number | null;
       viewCount: number;
+      disabled: boolean;
     }>;
     total: number;
     pageSize: number;
@@ -167,11 +226,13 @@ export const shareLinkService = {
 
     if (params.filter === "active") {
       where.AND = [
+        { disabled: false },
         { OR: [{ expirationDate: null }, { expirationDate: { gt: now } }] },
         { OR: [{ maxViews: null }, { viewCount: { lt: prismaClient.shareLink.fields.maxViews } }] },
       ];
     } else if (params.filter === "inactive") {
       where.OR = [
+        { disabled: true },
         { expirationDate: { lte: now } },
         {
           AND: [{ maxViews: { not: null } }, { viewCount: { gte: prismaClient.shareLink.fields.maxViews } }],
@@ -198,16 +259,7 @@ export const shareLinkService = {
 
     return {
       ok: true,
-      items: rows.map((row) => ({
-        id: row.id,
-        shareHash: row.shareHash,
-        shareUrl: `${env.WEB_APP_URL.replace(/\/$/, "")}/share/${row.shareHash}`,
-        haikuSubject: row.haikuSubject,
-        createdAt: row.createdAt.toISOString(),
-        expirationDate: row.expirationDate ? row.expirationDate.toISOString() : null,
-        maxViews: row.maxViews,
-        viewCount: row.viewCount,
-      })),
+      items: rows.map((row) => shareLinkItemFromRow(row)),
       total,
       pageSize,
       offset,
@@ -229,6 +281,7 @@ export const shareLinkService = {
           expirationDate: string | null;
           maxViews: number | null;
           viewCount: number;
+          disabled: boolean;
         };
       }
     | { ok: false; reason: "not_found" | "forbidden" | "invalid_expiry" | "invalid_max_views" }
@@ -265,6 +318,7 @@ export const shareLinkService = {
         expirationDate: updated.expirationDate ? updated.expirationDate.toISOString() : null,
         maxViews: updated.maxViews,
         viewCount: updated.viewCount,
+        disabled: updated.disabled,
       },
     };
   },
@@ -282,6 +336,10 @@ export const shareLinkService = {
     const row = await shareLinkRepository.findByShareHash(shareToken);
     if (!row) return { ok: false, reason: "Share link not found" };
 
+    if (row.disabled) {
+      return { ok: false, reason: "This share link is disabled" };
+    }
+
     const now = new Date();
     if (row.expirationDate && row.expirationDate <= now) {
       return { ok: false, reason: "This share link has expired" };
@@ -294,6 +352,7 @@ export const shareLinkService = {
     const updated = await prismaClient.$transaction(async (tx) => {
       const current = await tx.shareLink.findUnique({ where: { id: row.id } });
       if (!current) return null;
+      if (current.disabled) return null;
       if (current.expirationDate && current.expirationDate <= new Date()) return null;
       if (current.maxViews != null && current.viewCount >= current.maxViews) return null;
 

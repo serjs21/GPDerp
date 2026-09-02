@@ -28,6 +28,7 @@ export type ShareLinkListItem = {
   expirationDate: string | null;
   maxViews: number | null;
   viewCount: number;
+  disabled: boolean;
 };
 
 export const createShareLink = async (body: CreateShareLinkBody): Promise<CreateShareLinkResponse["data"]> => {
@@ -99,6 +100,22 @@ export async function refreshShareLink(
     body,
   );
   if (!data.ok) throw new Error(data.error ?? "Failed to refresh share link");
+  return data.data;
+}
+
+type SetShareLinkStatusResponse =
+  | { ok: true; data: ShareLinkListItem }
+  | { ok: false; error: string };
+
+export async function setShareLinkDisabled(
+  shareLinkId: string,
+  disabled: boolean,
+): Promise<ShareLinkListItem> {
+  const { data } = await axios.patch<SetShareLinkStatusResponse>(
+    `/share_link/${encodeURIComponent(shareLinkId)}/status`,
+    { disabled },
+  );
+  if (!data.ok) throw new Error(data.error ?? "Failed to update share link status");
   return data.data;
 }
 

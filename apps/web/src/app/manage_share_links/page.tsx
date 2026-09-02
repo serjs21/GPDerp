@@ -3,7 +3,7 @@
 import { Input, Select, Space, Typography } from "@/components/StyledComponents";
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { ShareLinkEntry } from "@/components/ShareLinkEntry/ShareLinkEntry";
+import { ShareLink } from "@/components/ShareLink/ShareLink";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { useEndOfContentScroll } from "@/hooks/useEndOfContentScroll";
@@ -68,7 +68,7 @@ export default function ManageShareLinksPage() {
             </Typography.Paragraph>
           ) : (
             items.map((link) => (
-              <ShareLinkEntry key={link.id} link={link} onChanged={() => void query.refetch()} />
+              <ShareLink key={link.id} link={link} onChanged={() => void query.refetch()} />
             ))
           )}
 

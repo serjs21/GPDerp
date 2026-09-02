@@ -4,6 +4,7 @@ export type ShareLinkComputedStatus =
   | { kind: "active_indefinite"; label: string; detail: null; active: true }
   | { kind: "active_remaining_views"; label: string; detail: string; active: true }
   | { kind: "active_expires_in"; label: string; detail: string; active: true }
+  | { kind: "stopped"; label: string; detail: null; active: false }
   | { kind: "expired"; label: string; detail: null; active: false }
   | { kind: "view_limit_reached"; label: string; detail: null; active: false };
 
@@ -31,8 +32,16 @@ export function isViewLimitReached(link: ShareLinkListItem): boolean {
   return link.maxViews != null && link.viewCount >= link.maxViews;
 }
 
-export function isActiveShareLink(link: ShareLinkListItem, now = new Date()): boolean {
+export function isWithinShareLinkLimits(link: ShareLinkListItem, now = new Date()): boolean {
   return !isExpired(link, now) && !isViewLimitReached(link);
+}
+
+export function isActiveShareLink(link: ShareLinkListItem, now = new Date()): boolean {
+  return !link.disabled && isWithinShareLinkLimits(link, now);
+}
+
+export function canStartShareLink(link: ShareLinkListItem, now = new Date()): boolean {
+  return link.disabled && isWithinShareLinkLimits(link, now);
 }
 
 export function remainingViews(link: ShareLinkListItem): number | null {
@@ -46,6 +55,9 @@ export function getShareLinkStatus(link: ShareLinkListItem, now = new Date()): S
   }
   if (isViewLimitReached(link)) {
     return { kind: "view_limit_reached", label: "View limit reached", detail: null, active: false };
+  }
+  if (link.disabled) {
+    return { kind: "stopped", label: "Stopped", detail: null, active: false };
   }
   if (link.expirationDate) {
     const expiry = new Date(link.expirationDate);

@@ -41,7 +41,7 @@ const eslintConfig = defineConfig([
       "src/components/IconUploader/IconUploader.tsx",
       "src/components/LocaleSelector/LocaleSelector.tsx",
       "src/components/SavedHaikusList/SavedHaikusList.tsx",
-      "src/components/ShareLinkEntry/ShareLinkEntry.tsx",
+      "src/components/ShareLink/ShareLink.tsx",
       "src/components/ThemeSelector/ThemeSelector.tsx",
       "src/hooks/useAccountLabels.ts",
       "src/hooks/useAuthentication.ts",
