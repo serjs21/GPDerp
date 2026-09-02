@@ -56,7 +56,7 @@ export const SendShareEmailContent = ({
           className={styles.message}
           value={message}
           onChange={(e) => onMessageChange(e.target.value)}
-          placeholder="I want to tell you..."
+          placeholder="I wanted to share with you..."
           maxLength={250}
           disabled={disabled}
           rows={NOTEBOOK_VISIBLE_MESSAGE_LINES}
