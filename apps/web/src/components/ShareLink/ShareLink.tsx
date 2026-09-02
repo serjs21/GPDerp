@@ -29,9 +29,11 @@ const INFINITY_SRC = "/share_modal/link/infinity.svg";
 export type ShareLinkProps = {
   link: ShareLinkListItem;
   onChanged: () => void;
+  /** Optional local update after start/stop (e.g. ShareModal) before a list refetch. */
+  onLinkUpdate?: (link: ShareLinkListItem) => void;
 };
 
-export function ShareLink({ link, onChanged }: ShareLinkProps) {
+export function ShareLink({ link, onChanged, onLinkUpdate }: ShareLinkProps) {
   const reduceMotion = useReducedMotion();
   const { locale } = useLocale();
   const [isUpdating, setIsUpdating] = useState(false);
@@ -55,7 +57,8 @@ export function ShareLink({ link, onChanged }: ShareLinkProps) {
     if (!active || isUpdating) return;
     try {
       setIsUpdating(true);
-      await setShareLinkDisabled(link.id, true);
+      const updated = await setShareLinkDisabled(link.id, true);
+      onLinkUpdate?.(updated);
       comicToast.success("Share link stopped");
       onChanged();
     } catch (error: unknown) {
@@ -74,7 +77,8 @@ export function ShareLink({ link, onChanged }: ShareLinkProps) {
     if (!canStart || isUpdating) return;
     try {
       setIsUpdating(true);
-      await setShareLinkDisabled(link.id, false);
+      const updated = await setShareLinkDisabled(link.id, false);
+      onLinkUpdate?.(updated);
       comicToast.success("Share link started");
       onChanged();
     } catch (error: unknown) {
@@ -142,6 +146,7 @@ export function ShareLink({ link, onChanged }: ShareLinkProps) {
           span="full"
           background="sunburst"
           color={active ? "teal" : "white"}
+          shine={active}
           contentAlign="start"
           className={styles.panel}
           ariaLabel={`Share link for ${link.haikuSubject}`}

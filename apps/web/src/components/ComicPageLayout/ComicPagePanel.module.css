@@ -91,6 +91,11 @@
   will-change: transform;
 }
 
+.bgSunburstPaused::before {
+  animation: none;
+  will-change: auto;
+}
+
 .bgSunburst::after {
   content: "";
   position: absolute;

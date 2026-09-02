@@ -26,6 +26,7 @@ export const Default: Story = {};
 
 export const LinkReady: Story = {
   args: {
+    haikuSubject: "Morning mist on the mountain path",
     initialCreatedUrl: "https://example.com/share/demo-token-abc",
   },
 };

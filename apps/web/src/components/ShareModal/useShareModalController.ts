@@ -3,7 +3,11 @@ import dayjs from "dayjs";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { comicToast } from "@/components/ComicToast";
-import { createShareLink, shareHaikuByEmail } from "@/api/shareLinks";
+import {
+  createShareLink,
+  shareHaikuByEmail,
+  type ShareLinkListItem,
+} from "@/api/shareLinks";
 import type { LinkPolicy, ShareMethod } from "./types";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
@@ -59,10 +63,27 @@ const buildShareLinkPayload = ({
   return { haikuId, expirationDate: null, maxViews: maxViews! };
 };
 
+const stubCreatedLinkFromUrl = (
+  shareUrl: string,
+  haikuSubject: string,
+): ShareLinkListItem => ({
+  id: "00000000-0000-4000-8000-000000000001",
+  shareHash: "demo-hash",
+  shareUrl,
+  haikuSubject,
+  createdAt: new Date().toISOString(),
+  expirationDate: null,
+  maxViews: null,
+  viewCount: 0,
+  disabled: false,
+});
+
 type UseShareModalControllerParams = {
   open: boolean;
   haikuId: string;
+  haikuSubject?: string;
   initialCreatedUrl?: string | null;
+  initialCreatedLink?: ShareLinkListItem | null;
   initialMethod?: ShareMethod;
   initialLinkPolicy?: LinkPolicy;
   initialEmailRecipients?: string[];
@@ -71,7 +92,9 @@ type UseShareModalControllerParams = {
 export function useShareModalController({
   open,
   haikuId,
+  haikuSubject = "Haiku",
   initialCreatedUrl = null,
+  initialCreatedLink = null,
   initialMethod = "link",
   initialLinkPolicy = "permanent",
   initialEmailRecipients = EMPTY_EMAIL_RECIPIENTS,
@@ -80,7 +103,7 @@ export function useShareModalController({
   const [linkPolicy, setLinkPolicy] = useState<LinkPolicy>("permanent");
   const [expiresAt, setExpiresAt] = useState<Dayjs | null>(null);
   const [maxViews, setMaxViews] = useState<number | null>(DEFAULT_MAX_VIEWS);
-  const [createdUrl, setCreatedUrl] = useState<string | null>(null);
+  const [createdLink, setCreatedLink] = useState<ShareLinkListItem | null>(null);
   const [creating, setCreating] = useState(false);
   const [emailMessage, setEmailMessage] = useState("");
   const [emailRecipients, setEmailRecipients] = useState<string[]>([]);
@@ -93,12 +116,23 @@ export function useShareModalController({
     setLinkPolicy(initialLinkPolicy);
     setExpiresAt(null);
     setMaxViews(DEFAULT_MAX_VIEWS);
-    setCreatedUrl(initialCreatedUrl ?? null);
+    setCreatedLink(
+      initialCreatedLink ??
+        (initialCreatedUrl ? stubCreatedLinkFromUrl(initialCreatedUrl, haikuSubject) : null),
+    );
     setEmailMessage("");
     setEmailRecipients(initialEmailRecipients);
     setSendingEmail(false);
     setEmailSent(false);
-  }, [open, initialCreatedUrl, initialMethod, initialLinkPolicy, initialEmailRecipients]);
+  }, [
+    open,
+    initialCreatedUrl,
+    initialCreatedLink,
+    initialMethod,
+    initialLinkPolicy,
+    initialEmailRecipients,
+    haikuSubject,
+  ]);
 
   useEffect(() => {
     if (linkPolicy !== "limited") return;
@@ -128,7 +162,17 @@ export function useShareModalController({
     try {
       const body = buildShareLinkPayload({ haikuId, linkPolicy, expiresAt, maxViews });
       const data = await createShareLink(body);
-      setCreatedUrl(data.shareUrl);
+      setCreatedLink({
+        id: data.id,
+        shareHash: data.shareHash,
+        shareUrl: data.shareUrl,
+        haikuSubject: data.haikuSubject || haikuSubject,
+        createdAt: data.createdAt,
+        expirationDate: data.expirationDate,
+        maxViews: data.maxViews,
+        viewCount: data.viewCount,
+        disabled: data.disabled,
+      });
       comicToast.success("Share link created");
     } catch (e) {
       comicToast.error(getAxiosErrorMessage(e, "Could not create share link"));
@@ -164,8 +208,8 @@ export function useShareModalController({
     setExpiresAt,
     maxViews,
     setMaxViews,
-    createdUrl,
-    setCreatedUrl,
+    createdLink,
+    setCreatedLink,
     creating,
     emailMessage,
     setEmailMessage,

@@ -75,8 +75,8 @@ export default async function RootLayout({
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? process.env.GOOGLE_CLIENT_ID;
   
   return (
-    <html lang={initialLocale} data-theme={initialTheme}>
-      <body className={`${notoSerifJP.variable} ${zenKurenaido.variable} ${geistSans.variable} ${geistMono.variable} ${pressStart2P.variable}`}>
+    <html lang={initialLocale} data-theme={initialTheme} className={`${notoSerifJP.variable} ${zenKurenaido.variable} ${geistSans.variable} ${geistMono.variable} ${pressStart2P.variable}`}>
+      <body>
         <AntdRegistry>
           <HtmlLoader />
           <NextIntlClientProvider locale={initialLocale} messages={messages}>

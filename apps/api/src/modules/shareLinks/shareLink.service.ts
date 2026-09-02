@@ -93,8 +93,11 @@ export const shareLinkService = {
           id: string;
           shareHash: string;
           shareUrl: string;
+          haikuSubject: string;
+          createdAt: string;
           expirationDate: string | null;
           maxViews: number | null;
+          viewCount: number;
           disabled: boolean;
         };
       }
@@ -147,8 +150,11 @@ export const shareLinkService = {
         id: row.id,
         shareHash: row.shareHash,
         shareUrl,
+        haikuSubject: row.haikuSubject,
+        createdAt: row.createdAt.toISOString(),
         expirationDate: row.expirationDate ? row.expirationDate.toISOString() : null,
         maxViews: row.maxViews,
+        viewCount: row.viewCount,
         disabled: row.disabled,
       },
     };

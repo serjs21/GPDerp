@@ -12,8 +12,12 @@ export type CreateShareLinkResponse = {
     id: string;
     shareHash: string;
     shareUrl: string;
+    haikuSubject: string;
+    createdAt: string;
     expirationDate: string | null;
     maxViews: number | null;
+    viewCount: number;
+    disabled: boolean;
   };
 };
 

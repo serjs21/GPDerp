@@ -13,7 +13,7 @@ import { ManageLabelsModal } from "@/components/ManageLabelsModal/ManageLabelsMo
 import { ShareModal } from "@/components/ShareModal/ShareModal";
 import { useCopy } from "@/hooks/useCopy";
 import styles from "./HaikuActions.module.css";
-import { formatHaikuPlainToText } from "@/utils/strings";
+import { formatHaikuPlainToText, formatHaikuTitle } from "@/utils/strings";
 
 export type HaikuActionsProps =
   | { variant: "generating" }
@@ -116,7 +116,12 @@ export const HaikuActions = (props: HaikuActionsProps) => {
           onClick={() => setShareOpen(true)}
         />
       </Tooltip>
-      <ShareModal haikuId={savedHaiku.id} open={shareOpen} onClose={() => setShareOpen(false)} />
+      <ShareModal
+        haikuId={savedHaiku.id}
+        haikuSubject={formatHaikuTitle(savedHaiku)}
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+      />
       <ManageLabelsModal
         open={labelsOpen}
         haiku={savedHaiku}
