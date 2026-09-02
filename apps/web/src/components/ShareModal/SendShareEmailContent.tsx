@@ -1,6 +1,12 @@
 "use client";
 
-import { Input, Select, Typography } from "@/components/StyledComponents";
+import { useRef } from "react";
+import { Select, Typography } from "@/components/StyledComponents";
+import { NotebookPageRough } from "./NotebookPageRough";
+import {
+  NOTEBOOK_VISIBLE_MESSAGE_LINES,
+  notebookStyleVars,
+} from "./notebookTokens";
 import styles from "./SendShareEmailContent.module.css";
 
 type SendShareEmailContentProps = {
@@ -19,33 +25,49 @@ export const SendShareEmailContent = ({
   onMessageChange,
   onEmailsChange,
   disabled = false,
-}: SendShareEmailContentProps) => (
-  <div className={styles.root}>
-    <Typography.Paragraph type="secondary" className={styles.help}>
-      Add a personal note and one or more recipients.
-    </Typography.Paragraph>
-    <Select
-      mode="tags"
-      value={emails}
-      onChange={onEmailsChange}
-      tokenSeparators={[",", " "]}
-      placeholder="Recipient emails (press Enter after each)"
-      className={styles.emailSelect}
-      disabled={disabled}
-      autoFocus
-    />
-    {invalidEmails.length > 0 ? (
-      <Typography.Text type="danger" className={styles.validation}>
-        Invalid emails: {invalidEmails.join(", ")}
-      </Typography.Text>
-    ) : null}
-    <Input.TextArea
-      value={message}
-      onChange={(e) => onMessageChange(e.target.value)}
-      placeholder="A poem from your future self..."
-      rows={3}
-      maxLength={250}
-      disabled={disabled}
-    />
-  </div>
-);
+}: SendShareEmailContentProps) => {
+  const notebookRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <div className={styles.root}>
+      <div
+        ref={notebookRef}
+        className={styles.notebook}
+        style={notebookStyleVars()}
+      >
+        <NotebookPageRough hostRef={notebookRef} className={styles.paperArt} />
+        <div className={styles.toRow}>
+          <span className={styles.toPrefix} aria-hidden>
+            TO:
+          </span>
+          <Select
+            mode="tags"
+            variant="borderless"
+            value={emails}
+            onChange={onEmailsChange}
+            tokenSeparators={[",", " "]}
+            placeholder="Recipient emails (press Enter after each)"
+            className={styles.toInput}
+            disabled={disabled}
+            autoFocus
+          />
+        </div>
+        <textarea
+          className={styles.message}
+          value={message}
+          onChange={(e) => onMessageChange(e.target.value)}
+          placeholder="I want to tell you..."
+          maxLength={250}
+          disabled={disabled}
+          rows={NOTEBOOK_VISIBLE_MESSAGE_LINES}
+          aria-label="Email message"
+        />
+      </div>
+      {invalidEmails.length > 0 ? (
+        <Typography.Text type="danger" className={styles.validation}>
+          Invalid emails: {invalidEmails.join(", ")}
+        </Typography.Text>
+      ) : null}
+    </div>
+  );
+};

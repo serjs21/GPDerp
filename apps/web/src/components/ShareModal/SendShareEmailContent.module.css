@@ -1,20 +1,147 @@
 .root {
-  margin-top: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
   width: 100%;
 }
 
-.help {
+.notebook {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: calc(
+    var(--notebook-pad-y) * 2 + var(--notebook-line-height) * (1 + var(--notebook-message-lines))
+  );
+  padding:
+    var(--notebook-pad-y)
+    var(--notebook-pad-x)
+    var(--notebook-pad-y)
+    var(--notebook-pad-x);
+  background: var(--notebook-paper, #f7f1e6);
+  --notebook-message-lines: 4;
+}
+
+.paperArt {
+  border-radius: 0.15rem;
+}
+
+.toRow {
+  padding: 0 0 0 2rem;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  min-height: var(--notebook-line-height);
+  max-height: calc(var(--notebook-line-height) * 3);
+  overflow: hidden;
+}
+
+.toPrefix {
+  flex: 0 0 auto;
+  color: var(--notebook-ink, rgba(45, 45, 45, 0.72));
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: var(--notebook-line-height);
+  text-transform: uppercase;
+}
+
+.toInput {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 1.05rem;
+  line-height: var(--notebook-line-height);
+}
+
+.toInput:global(.ant-select) {
+  width: 100%;
+}
+
+.toInput :global(.ant-select-selector) {
+  min-height: var(--notebook-line-height) !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.toInput :global(.ant-select-selection-wrap) {
+  align-self: baseline;
+}
+
+.toInput :global(.ant-select-selection-overflow) {
+  gap: 0.2rem 0.35rem;
+}
+
+.toInput :global(.ant-select-selection-overflow-item) {
+  line-height: var(--notebook-line-height);
+}
+
+.toInput :global(.ant-select-selection-item) {
+  margin: 0 !important;
+  padding: 0 0.35rem !important;
+  border: none !important;
+  background: transparent !important;
+  color: var(--notebook-ink, rgba(45, 45, 45, 0.72)) !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: var(--notebook-line-height) !important;
+}
+
+.toInput :global(.ant-select-selection-search) {
+  margin: 0 !important;
+  line-height: var(--notebook-line-height);
+}
+
+.toInput :global(.ant-select-selection-search-input) {
+  height: var(--notebook-line-height) !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: var(--notebook-line-height) !important;
+}
+
+.toInput :global(.ant-select-selection-placeholder) {
+  color: var(--notebook-ink-soft, rgba(45, 45, 45, 0.42)) !important;
+  font-family: inherit !important;
+  font-style: italic;
+  line-height: var(--notebook-line-height) !important;
+}
+
+.message {
+  padding: 0 0 0 2rem;
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  min-height: calc(var(--notebook-line-height) * var(--notebook-message-lines));
   margin: 0;
+  border: none;
+  background: transparent;
+  color: var(--notebook-ink, rgba(45, 45, 45, 0.72));
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: var(--notebook-line-height);
+  resize: none;
+  outline: none;
 }
 
-.emailSelect {
-  width: 100%;
+.message::placeholder {
+  color: var(--notebook-ink-soft, rgba(45, 45, 45, 0.42));
+  font-style: italic;
+  font-weight: 400;
+}
+
+.message:disabled {
+  opacity: 0.55;
 }
 
 .validation {
   display: block;
-  margin-top: -0.35rem;
+  margin: 0;
+  font-size: 0.85rem;
 }
