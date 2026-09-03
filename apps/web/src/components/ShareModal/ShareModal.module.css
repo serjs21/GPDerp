@@ -1,5 +1,8 @@
 .methodRow {
+  position: relative;
+  z-index: 3;
   min-height: 6.5rem;
+  overflow: visible;
 }
 
 .methodPanel {
@@ -10,6 +13,13 @@
 .methodRowSpacer {
   min-height: 6.5rem;
   width: 100%;
+}
+
+/* Match ShareEmailSendPanel row (~88px measured) so Link/Email dialog height does not jump. */
+.sendRowSpacer {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 5.5rem;
 }
 
 .contentSlot {

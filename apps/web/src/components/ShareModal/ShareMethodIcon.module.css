@@ -5,7 +5,8 @@
 }
 
 .stageCompact {
-  padding: 0.85rem 1rem;
+  /* Extra room so pointed-arc spikes (esp. bottom) aren't flush to the stage edge. */
+  padding: 1.35rem 1.35rem 1.55rem;
 }
 
 .stageTailBottom {

@@ -104,6 +104,9 @@ export function ShareModal({
             background="sunburst"
             color="teal"
             title="Link"
+            isMotionBackground={false}
+            shine={false}
+            overflowVisible
             flexWeight={method === "link" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
             ariaLabel="Share by link"
             className={styles.methodPanel}
@@ -121,6 +124,7 @@ export function ShareModal({
             onSelect={selectEmail}
             background="halftone"
             color="orange"
+            overflowVisible
             flexWeight={method === "email" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
             ariaLabel="Share via email"
             title="Email"
@@ -180,13 +184,17 @@ export function ShareModal({
         )}
       </div>
 
-      {method === "email" && !emailSent ? (
-        <ShareEmailSendPanel
-          canSendEmail={canSendEmail}
-          sendingEmail={sendingEmail}
-          emailCtaHint={emailCtaHint}
-          onSendEmail={() => void onSendEmail()}
-        />
+      {!emailSent ? (
+        method === "email" ? (
+          <ShareEmailSendPanel
+            canSendEmail={canSendEmail}
+            sendingEmail={sendingEmail}
+            emailCtaHint={emailCtaHint}
+            onSendEmail={() => void onSendEmail()}
+          />
+        ) : (
+          <div className={styles.sendRowSpacer} aria-hidden />
+        )
       ) : null}
     </ComicPageDialog>
   );

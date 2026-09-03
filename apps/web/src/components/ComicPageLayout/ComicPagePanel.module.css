@@ -17,6 +17,32 @@
     filter 200ms cubic-bezier(0.45, 0.05, 0.55, 0.95);
 }
 
+.panelOverflowVisible {
+  overflow: visible;
+}
+
+/*
+ * `filter` / `transform` on the panel root force Blink/WebKit to clip overflow
+ * even when overflow is visible — bad for Comical pointed-arc spikes.
+ * Keep selection affordances without those properties on the clipping root.
+ */
+.panelSelectable.panelOverflowVisible {
+  filter: none;
+}
+
+.panelSelectable.panelOverflowVisible:not(.panelSelected) .bgLayer,
+.panelSelectable.panelOverflowVisible:not(.panelSelected) .content,
+.panelSelectable.panelOverflowVisible:not(.panelSelected) .panelTitle {
+  filter: grayscale(1);
+}
+
+.panelSelected.panelOverflowVisible {
+  transform: none;
+  filter: none;
+  /* Slight lift without scale-induced clipping */
+  box-shadow: 0 0.45rem 0 rgb(0 0 0 / 22%);
+}
+
 .panelFull {
   width: 100%;
   flex: 1 1 100%;

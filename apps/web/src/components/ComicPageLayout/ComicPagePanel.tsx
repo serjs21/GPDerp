@@ -20,6 +20,11 @@ export type ComicPagePanelProps = {
   footerColor?: ComicPanelColor;
   background?: ComicPanelBackground;
   color?: ComicPanelColor;
+  /**
+   * Show the anime speed-line motion background.
+   * Defaults to true when `background` is `"motion"`.
+   */
+  isMotionBackground?: boolean;
   /** Crossfade anime speed-line overlay on top of the static background. */
   loading?: boolean;
   /** When background is sunburst, rotate rays (shine). Default true. */
@@ -32,6 +37,8 @@ export type ComicPagePanelProps = {
   contentAlign?: "center" | "start";
   className?: string;
   ariaLabel?: string;
+  /** Allow bubble/canvas spikes to paint outside the panel border. */
+  overflowVisible?: boolean;
 };
 
 function panelStyleVars(color: ComicPanelColor): CSSProperties {
@@ -56,6 +63,7 @@ export function ComicPagePanel({
   footerColor = "white",
   background = "solid",
   color = "white",
+  isMotionBackground: isMotionBackgroundProp,
   loading = false,
   shine = true,
   selectable = false,
@@ -66,14 +74,17 @@ export function ComicPagePanel({
   contentAlign = "center",
   className,
   ariaLabel,
+  overflowVisible = false,
 }: ComicPagePanelProps) {
-  const isMotionBackground = background === "motion";
+  const isMotionBackground = isMotionBackgroundProp ?? background === "motion";
   const showMotionOverlay = loading && !isMotionBackground;
   const hasTitle = title != null && title !== "";
   const hasFooter = footer != null && footer !== "";
+  const staticBackground =
+    isMotionBackground || background === "motion" ? "solid" : background;
   const bgClass = [
-    staticBgClass(isMotionBackground ? "solid" : background),
-    background === "sunburst" && !shine && panelStyles.bgSunburstPaused,
+    staticBgClass(staticBackground),
+    staticBackground === "sunburst" && !shine && panelStyles.bgSunburstPaused,
   ]
     .filter(Boolean)
     .join(" ");
@@ -84,6 +95,7 @@ export function ComicPagePanel({
     selectable && panelStyles.panelSelectable,
     selected && panelStyles.panelSelected,
     loading && panelStyles.panelLoading,
+    overflowVisible && panelStyles.panelOverflowVisible,
     className,
   ]
     .filter(Boolean)
