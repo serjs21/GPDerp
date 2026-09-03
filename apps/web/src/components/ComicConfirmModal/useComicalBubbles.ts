@@ -21,16 +21,13 @@ let editingStageEl: HTMLElement | null = null;
 
 function claimEditingStage(stage: HTMLElement) {
   editingStageEl = stage;
-  stage.setAttribute("data-comical-editing", "1");
 }
 
 function releaseEditingStage(stage: HTMLElement | null) {
   if (stage) {
-    stage.removeAttribute("data-comical-editing");
     if (editingStageEl === stage) editingStageEl = null;
     return;
   }
-  editingStageEl?.removeAttribute("data-comical-editing");
   editingStageEl = null;
 }
 
@@ -164,28 +161,7 @@ export function useComicalBubbles(options: {
       const stage = stageRef.current;
       if (!stage) return;
 
-      const targets = getTargetsRef.current();
-      // #region agent log
-      fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "53a752" },
-        body: JSON.stringify({
-          sessionId: "53a752",
-          runId: "post-fix",
-          hypothesisId: "A",
-          location: "useComicalBubbles.ts:mount",
-          message: "startEditing about to run",
-          data: {
-            gen,
-            targetsKey,
-            editingStagesBefore: document.querySelectorAll("[data-comical-editing]").length,
-          },
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-      // #endregion
-
-      applySpecs(comical, targets);
+      applySpecs(comical, getTargetsRef.current());
 
       const prev = editingStageEl;
       stopComicalEditing(comical);
@@ -196,107 +172,20 @@ export function useComicalBubbles(options: {
       comical.Comical.hideHandles();
 
       requestAnimationFrame(() => {
-        if (cancelled || generationRef.current !== gen) {
-          // #region agent log
-          fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "53a752" },
-            body: JSON.stringify({
-              sessionId: "53a752",
-              runId: "post-fix",
-              hypothesisId: "B",
-              location: "useComicalBubbles.ts:rAF",
-              message: "rAF skipped due to cancel/gen",
-              data: { gen, targetsKey },
-              timestamp: Date.now(),
-            }),
-          }).catch(() => {});
-          // #endregion
-          return;
-        }
-        if (!isClaimedEditingStage(stage)) {
-          // #region agent log
-          fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "53a752" },
-            body: JSON.stringify({
-              sessionId: "53a752",
-              runId: "post-fix",
-              hypothesisId: "A",
-              location: "useComicalBubbles.ts:rAF",
-              message: "update skipped — not owner stage",
-              data: { gen, targetsKey },
-              timestamp: Date.now(),
-            }),
-          }).catch(() => {});
-          // #endregion
-          return;
-        }
+        if (cancelled || generationRef.current !== gen) return;
+        if (!isClaimedEditingStage(stage)) return;
         applySpecs(comical, getTargetsRef.current());
         try {
           if (!restartEditingIfCanvasStale(comical, stage, getTargetsRef.current())) {
             comical.Comical.update(stage);
             comical.Comical.hideHandles();
           }
-          // #region agent log
-          fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "53a752" },
-            body: JSON.stringify({
-              sessionId: "53a752",
-              runId: "post-fix",
-              hypothesisId: "A",
-              location: "useComicalBubbles.ts:rAF",
-              message: "update succeeded as owner",
-              data: {
-                gen,
-                targetsKey,
-                editingStages: document.querySelectorAll("[data-comical-editing]").length,
-              },
-              timestamp: Date.now(),
-            }),
-          }).catch(() => {});
-          // #endregion
-        } catch (error) {
-          const err = error instanceof Error ? error : new Error(String(error));
-          // #region agent log
-          fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "53a752" },
-            body: JSON.stringify({
-              sessionId: "53a752",
-              runId: "post-fix",
-              hypothesisId: "A",
-              location: "useComicalBubbles.ts:rAF",
-              message: "update threw",
-              data: { gen, targetsKey, errMessage: err.message },
-              timestamp: Date.now(),
-            }),
-          }).catch(() => {});
-          // #endregion
+        } catch {
+          // stage may no longer be the active Comical edit root
         }
       });
 
       resizeObserver = new ResizeObserver(() => {
-        // #region agent log
-        fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "53a752" },
-          body: JSON.stringify({
-            sessionId: "53a752",
-            runId: "post-fix",
-            hypothesisId: "D",
-            location: "useComicalBubbles.ts:resize",
-            message: "ResizeObserver refreshBubbles",
-            data: {
-              targetsKey,
-              isOwner: isClaimedEditingStage(stage),
-              editing: editingRef.current,
-            },
-            timestamp: Date.now(),
-          }),
-        }).catch(() => {});
-        // #endregion
         refreshBubbles();
       });
       resizeObserver.observe(stage);
@@ -317,24 +206,6 @@ export function useComicalBubbles(options: {
       resizeObserver?.disconnect();
       generationRef.current += 1;
       const stage = stageRef.current;
-      // #region agent log
-      fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "53a752" },
-        body: JSON.stringify({
-          sessionId: "53a752",
-          runId: "post-fix",
-          hypothesisId: "B",
-          location: "useComicalBubbles.ts:cleanup",
-          message: "effect cleanup stopEditing",
-          data: {
-            targetsKey,
-            wasOwner: Boolean(stage && isClaimedEditingStage(stage)),
-          },
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-      // #endregion
       if (stage && isClaimedEditingStage(stage)) {
         stopComicalEditing(comicalRef.current);
         releaseEditingStage(stage);

@@ -12,8 +12,12 @@ export type ComicPagePanelProps = {
   children?: ReactNode;
   /** Comic caption box in the panel top-left corner. */
   title?: ReactNode;
+  /** Background color for the title caption box. Defaults to white. */
+  titleColor?: ComicPanelColor;
   /** Comic caption box in the panel bottom-right corner. */
   footer?: ReactNode;
+  /** Background color for the footer caption box. Defaults to white. */
+  footerColor?: ComicPanelColor;
   background?: ComicPanelBackground;
   color?: ComicPanelColor;
   /** Crossfade anime speed-line overlay on top of the static background. */
@@ -47,7 +51,9 @@ function staticBgClass(background: ComicPanelBackground): string {
 export function ComicPagePanel({
   children,
   title,
+  titleColor = "white",
   footer,
+  footerColor = "white",
   background = "solid",
   color = "white",
   loading = false,
@@ -98,6 +104,8 @@ export function ComicPagePanel({
 
   const style = {
     ...panelStyleVars(color),
+    "--comic-title-bg": COMIC_PANEL_COLORS[titleColor].base,
+    "--comic-footer-bg": COMIC_PANEL_COLORS[footerColor].base,
     ...(span === "auto" ? { "--comic-panel-flex": flexWeight } : {}),
   } as CSSProperties;
 

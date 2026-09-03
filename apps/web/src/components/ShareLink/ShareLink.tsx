@@ -279,6 +279,67 @@ export function ShareLink({
           ? `Time left ${time.text}`
           : "Time left";
 
+  const panelBodyClass = [
+    styles.panelBody,
+    copyEnabled ? styles.panelBodyCopyable : null,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const panelBodyContent = (
+    <>
+      <div className={styles.meters} aria-hidden={false}>
+        <span className={styles.meter} aria-label={hitsLabel}>
+          <img
+            src={hits.kind === "empty" ? HEART_SRC : HEART_FILLED_SRC}
+            alt=""
+            className={styles.meterIcon}
+            aria-hidden
+          />
+          {hits.kind === "unlimited" ? (
+            <img src={INFINITY_SRC} alt="" className={styles.meterIcon} aria-hidden />
+          ) : (
+            <span className={styles.meterValue}>{hits.count}</span>
+          )}
+        </span>
+        <span className={styles.meter} aria-label={timeLabel}>
+          <img src={CLOCK_SRC} alt="" className={styles.meterIcon} aria-hidden />
+          {time.kind === "unlimited" ? (
+            <img src={INFINITY_SRC} alt="" className={styles.meterIcon} aria-hidden />
+          ) : (
+            <span className={styles.meterValue}>{time.text}</span>
+          )}
+        </span>
+      </div>
+      <div className={styles.planeStage}>
+        <motion.img
+          src={PAPER_PLANE_SRC}
+          alt=""
+          className={styles.plane}
+          aria-hidden
+          animate={
+            isFlying
+              ? {
+                  x: [0, 3, -2, 4, 1, 0],
+                  y: [0, -4, -7, -5, -2, 0],
+                  rotate: [0, -5, 4, -3, 2, 0],
+                }
+              : {
+                  x: 0,
+                  y: 10,
+                  rotate: 78,
+                }
+          }
+          transition={
+            isFlying
+              ? { duration: 1.4, repeat: Infinity, ease: "easeInOut" }
+              : { duration: 0.3, ease: "easeOut" }
+          }
+        />
+      </div>
+    </>
+  );
+
   return (
     <article className={styles.root}>
       <div
@@ -290,66 +351,27 @@ export function ShareLink({
         <ComicPagePanel
           span="full"
           background="sunburst"
-          color={active && !activating ? "teal" : "white"}
+          color={active && !activating ? "orange" : "white"}
           shine={shine}
           contentAlign="center"
           className={styles.panel}
           title={subject}
-          footer={active && !activating ? "Click to copy the link" : undefined}
+          footer={copyEnabled ? "Click to copy the link" : undefined}
+          footerColor="info"
           ariaLabel={`Share link for ${subject}`}
         >
-          <div className={styles.panelBody}>
-
-            <div className={styles.meters} aria-hidden={false}>
-              <span className={styles.meter} aria-label={hitsLabel}>
-                <img
-                  src={hits.kind === "empty" ? HEART_SRC : HEART_FILLED_SRC}
-                  alt=""
-                  className={styles.meterIcon}
-                  aria-hidden
-                />
-                {hits.kind === "unlimited" ? (
-                  <img src={INFINITY_SRC} alt="" className={styles.meterIcon} aria-hidden />
-                ) : (
-                  <span className={styles.meterValue}>{hits.count}</span>
-                )}
-              </span>
-              <span className={styles.meter} aria-label={timeLabel}>
-                <img src={CLOCK_SRC} alt="" className={styles.meterIcon} aria-hidden />
-                {time.kind === "unlimited" ? (
-                  <img src={INFINITY_SRC} alt="" className={styles.meterIcon} aria-hidden />
-                ) : (
-                  <span className={styles.meterValue}>{time.text}</span>
-                )}
-              </span>
-            </div>
-            <div className={styles.planeStage}>
-              <motion.img
-                src={PAPER_PLANE_SRC}
-                alt=""
-                className={styles.plane}
-                aria-hidden
-                animate={
-                  isFlying
-                    ? {
-                        x: [0, 3, -2, 4, 1, 0],
-                        y: [0, -4, -7, -5, -2, 0],
-                        rotate: [0, -5, 4, -3, 2, 0],
-                      }
-                    : {
-                        x: 0,
-                        y: 10,
-                        rotate: 78,
-                      }
-                }
-                transition={
-                  isFlying
-                    ? { duration: 1.4, repeat: Infinity, ease: "easeInOut" }
-                    : { duration: 0.3, ease: "easeOut" }
-                }
-              />
-            </div>
-          </div>
+          {copyEnabled ? (
+            <button
+              type="button"
+              className={panelBodyClass}
+              onClick={onCopy}
+              aria-label="Copy share link"
+            >
+              {panelBodyContent}
+            </button>
+          ) : (
+            <div className={panelBodyClass}>{panelBodyContent}</div>
+          )}
         </ComicPagePanel>
       </div>
 

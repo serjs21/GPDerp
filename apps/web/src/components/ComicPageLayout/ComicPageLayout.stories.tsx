@@ -155,7 +155,9 @@ export const PanelWithTitle: Story = {
             color="yellow"
             background="sunburst"
             title="Put a caption here"
+            titleColor="white"
             footer="And a footer here"
+            footerColor="info"
             contentAlign="start"
           >
             Panel body content sits between the title and footer captions.
