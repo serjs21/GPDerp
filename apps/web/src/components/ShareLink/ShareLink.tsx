@@ -299,6 +299,30 @@ export function ShareLink({
           ariaLabel={`Share link for ${subject}`}
         >
           <div className={styles.panelBody}>
+
+            <div className={styles.meters} aria-hidden={false}>
+              <span className={styles.meter} aria-label={hitsLabel}>
+                <img
+                  src={hits.kind === "empty" ? HEART_SRC : HEART_FILLED_SRC}
+                  alt=""
+                  className={styles.meterIcon}
+                  aria-hidden
+                />
+                {hits.kind === "unlimited" ? (
+                  <img src={INFINITY_SRC} alt="" className={styles.meterIcon} aria-hidden />
+                ) : (
+                  <span className={styles.meterValue}>{hits.count}</span>
+                )}
+              </span>
+              <span className={styles.meter} aria-label={timeLabel}>
+                <img src={CLOCK_SRC} alt="" className={styles.meterIcon} aria-hidden />
+                {time.kind === "unlimited" ? (
+                  <img src={INFINITY_SRC} alt="" className={styles.meterIcon} aria-hidden />
+                ) : (
+                  <span className={styles.meterValue}>{time.text}</span>
+                )}
+              </span>
+            </div>
             <div className={styles.planeStage}>
               <motion.img
                 src={PAPER_PLANE_SRC}
@@ -325,52 +349,6 @@ export function ShareLink({
                 }
               />
             </div>
-
-            <div className={styles.meters} aria-hidden={false}>
-              <span className={styles.meter} aria-label={hitsLabel}>
-                <img
-                  src={hits.kind === "empty" ? HEART_SRC : HEART_FILLED_SRC}
-                  alt=""
-                  className={styles.meterIcon}
-                  aria-hidden
-                />
-                {hits.kind === "unlimited" ? (
-                  <img src={INFINITY_SRC} alt="" className={styles.meterIcon} aria-hidden />
-                ) : (
-                  <span className={styles.meterValue}>{hits.count}</span>
-                )}
-              </span>
-              <span className={styles.meter} aria-label={timeLabel}>
-                <img src={CLOCK_SRC} alt="" className={styles.meterIcon} aria-hidden />
-                {time.kind === "unlimited" ? (
-                  <img src={INFINITY_SRC} alt="" className={styles.meterIcon} aria-hidden />
-                ) : (
-                  <span className={styles.meterValue}>{time.text}</span>
-                )}
-              </span>
-            </div>
-
-            <motion.div
-              className={styles.copyWrap}
-              animate={{ opacity: copyEnabled ? 1 : 0 }}
-              transition={
-                reduceMotion
-                  ? { duration: 0 }
-                  : { duration: 0.35, ease: "easeInOut" }
-              }
-              style={{ pointerEvents: copyEnabled ? "auto" : "none" }}
-              aria-hidden={!copyEnabled}
-            >
-              <ComicButton
-                bubbleStyle="speech"
-                sourceDirection="none"
-                disabled={!copyEnabled}
-                onClick={onCopy}
-                className={styles.copyBubble}
-              >
-                Copy share link
-              </ComicButton>
-            </motion.div>
           </div>
         </ComicPagePanel>
       </div>
