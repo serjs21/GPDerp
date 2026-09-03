@@ -1,19 +1,20 @@
-import {
-  useCallback,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-} from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { COMIC_SOURCE_DIRECTIONS } from "@/components/ComicConfirmModal";
-import { ComicBubbleStage } from "@/components/ComicConfirmModal/ComicBubbleStage";
-import { COMIC_LABEL_DEFAULT_BUBBLE_STYLE } from "./comicLabelBubblePresets";
-import { resolveComicLabelFill } from "./comicLabelColors";
-import { sourceDirectionFromOutwardAngle } from "@/components/Lantern/lanternLabelRingLayout";
-import type { ComicalBubbleTarget } from "@/components/ComicConfirmModal/useComicalBubbles";
+import { Lantern } from "@/components/Lantern/Lantern";
+import { LanternFrame } from "@/components/Lantern/LanternFrame";
+import type { CelestialPresetName } from "@/theme/celestialPresets";
+import {
+  composeDecorators,
+  EXAMPLE_HAIKU_BODY,
+  makeMockHaiku,
+  STORY_CREATED_AT,
+  withQueryClient,
+  withThemedStoryStage,
+} from "@/storybook";
 import { ComicLabel } from "./ComicLabel";
+import { ComicLabelCircleRing } from "./ComicLabelCircleRing";
+import { COMIC_LABEL_DEFAULT_BUBBLE_STYLE } from "./comicLabelBubblePresets";
+import type { ComicLabelCircleItem } from "./comicLabelCircleLayout";
 import styles from "./ComicLabel.stories.module.css";
 
 const meta = {
@@ -24,11 +25,14 @@ const meta = {
     layout: "centered",
   },
   decorators: [
-    (Story) => (
-      <div className={styles.canvas}>
+    (Story, { parameters }) =>
+      parameters.skipComicLabelCanvas ? (
         <Story />
-      </div>
-    ),
+      ) : (
+        <div className={styles.canvas}>
+          <Story />
+        </div>
+      ),
   ],
   args: {
     name: "POW!",
@@ -155,13 +159,7 @@ export const TextLengths: Story = {
   ),
 };
 
-type CircleLabel = {
-  id: string;
-  name: string;
-  color: string;
-};
-
-const CIRCLE_LABELS: CircleLabel[] = [
+const CIRCLE_LABELS: ComicLabelCircleItem[] = [
   { id: "top-left", name: "POW!", color: "#1677ff" },
   { id: "top", name: "WOW!", color: "#52c41a" },
   { id: "top-right", name: "ZAP!", color: "#faad14" },
@@ -169,128 +167,58 @@ const CIRCLE_LABELS: CircleLabel[] = [
   { id: "bottom-left", name: "OMG!", color: "#722ed1" },
 ];
 
-const CIRCLE_RING_RADIUS = 0.35;
-const CIRCLE_START_ANGLE = (-3 * Math.PI) / 4;
-
-function CircleAroundDotAnchorStage() {
-  const targetRefs = useRef(new Map<string, HTMLElement | null>());
-  const stageRef = useRef<HTMLDivElement | null>(null);
-  /** Pixel top-left so label center sits on ring point — no CSS transform (comical uses offset*). */
-  const [slotOrigins, setSlotOrigins] = useState<Record<string, { left: number; top: number }>>({});
-
-  const slots = useMemo(
-    () =>
-      CIRCLE_LABELS.map((label, index) => {
-        const angle = CIRCLE_START_ANGLE + (index * 2 * Math.PI) / CIRCLE_LABELS.length;
-        const sourceDirection = sourceDirectionFromOutwardAngle(angle);
-        const x = 50 + Math.cos(angle) * CIRCLE_RING_RADIUS * 100;
-        const y = 50 + Math.sin(angle) * CIRCLE_RING_RADIUS * 100;
-        return { label, sourceDirection, x, y };
-      }),
-    [],
-  );
-
-  useLayoutEffect(() => {
-    const stage = stageRef.current;
-    if (!stage) return;
-
-    const next: Record<string, { left: number; top: number }> = {};
-    for (const slot of slots) {
-      const el = targetRefs.current.get(slot.label.id);
-      if (!el) continue;
-      const centerX = (slot.x / 100) * stage.clientWidth;
-      const centerY = (slot.y / 100) * stage.clientHeight;
-      next[slot.label.id] = {
-        left: Math.round(centerX - el.offsetWidth / 2),
-        top: Math.round(centerY - el.offsetHeight / 2),
-      };
-    }
-
-    setSlotOrigins((prev) => {
-      const prevKey = Object.entries(prev)
-        .map(([id, origin]) => `${id}:${origin.left},${origin.top}`)
-        .join("|");
-      const nextKey = Object.entries(next)
-        .map(([id, origin]) => `${id}:${origin.left},${origin.top}`)
-        .join("|");
-      return prevKey === nextKey ? prev : next;
-    });
-  }, [slots]);
-
-  const originsKey = Object.entries(slotOrigins)
-    .map(([id, origin]) => `${id}:${origin.left},${origin.top}`)
-    .join("|");
-
-  const targetsKey = [
-    slots
-      .map(
-        (slot) =>
-          `${slot.label.id}:${slot.sourceDirection}:${resolveComicLabelFill(slot.label.color)}`,
-      )
-      .join("|"),
-    originsKey,
-  ].join("::");
-
-  const getTargets = useCallback(
-    (): ComicalBubbleTarget[] =>
-      slots.map((slot) => ({
-        element: targetRefs.current.get(slot.label.id) ?? null,
-        style: COMIC_LABEL_DEFAULT_BUBBLE_STYLE,
-        sourceDirection: "none",
-        backgroundColors: [resolveComicLabelFill(slot.label.color)],
-        variant: "label",
-      })),
-    [slots],
-  );
-
-  const setTargetRef = useCallback((id: string, node: HTMLElement | null) => {
-    if (node) {
-      targetRefs.current.set(id, node);
-    } else {
-      targetRefs.current.delete(id);
-    }
-  }, []);
-
-  return (
-    <div className={styles.circleStage}>
-      <ComicBubbleStage
-        ref={stageRef}
-        active
-        targetsKey={targetsKey}
-        getTargets={getTargets}
-        className={styles.circleBubbleStage}
-      >
-        <div className={styles.circleAnchor} aria-label="Circle anchor" />
-        {slots.map((slot) => {
-          const origin = slotOrigins[slot.label.id];
-          return (
-            <ComicLabel
-              key={slot.label.id}
-              ref={(node) => setTargetRef(slot.label.id, node)}
-              mode="embedded"
-              name={slot.label.name}
-              color={slot.label.color}
-              sourceDirection="none"
-              style={
-                {
-                  position: "absolute",
-                  left: origin ? `${origin.left}px` : `${slot.x}%`,
-                  top: origin ? `${origin.top}px` : `${slot.y}%`,
-                  transform: "none",
-                  margin: 0,
-                  width: "max-content",
-                  pointerEvents: "none",
-                } as CSSProperties
-              }
-            />
-          );
-        })}
-      </ComicBubbleStage>
-    </div>
-  );
-}
-
 export const CircleAroundDotAnchor: Story = {
   name: "Circle around dot anchor",
-  render: () => <CircleAroundDotAnchorStage />,
+  render: () => (
+    <ComicLabelCircleRing
+      labels={CIRCLE_LABELS}
+      className={styles.circleStage}
+      stageClassName={styles.circleBubbleStage}
+    >
+      <div className={styles.circleAnchor} aria-label="Circle anchor" />
+    </ComicLabelCircleRing>
+  ),
+};
+
+const LANTERN_CIRCLE_LABELS: ComicLabelCircleItem[] = [
+  { id: "top-left", name: "Zen", color: "#52c41a" },
+  { id: "top", name: "Mist", color: "#1677ff" },
+  { id: "top-right", name: "Autumn", color: "#faad14" },
+  { id: "bottom-right", name: "Moon", color: "#eb2f96" },
+  { id: "bottom-left", name: "Night", color: "#722ed1" },
+];
+
+export const CircleAroundLantern: Story = {
+  name: "Circle around lantern",
+  parameters: {
+    layout: "fullscreen",
+    skipComicLabelCanvas: true,
+    initialCelestialPreset: "blueNight" satisfies CelestialPresetName,
+  },
+  decorators: [composeDecorators(withQueryClient, withThemedStoryStage)],
+  render: () => (
+    <div className={styles.lanternCircleHost}>
+      <ComicLabelCircleRing
+        labels={LANTERN_CIRCLE_LABELS}
+        radius={0.4}
+        className={styles.lanternCircleStage}
+        stageClassName={styles.lanternCircleBubbleStage}
+      >
+        <div className={styles.lanternCircleAnchor}>
+          <LanternFrame ariaLabel="Haiku lantern with comic labels">
+            <Lantern
+              haiku={makeMockHaiku({
+                id: "comic-label-lantern-circle",
+                title: "Night questions",
+                titleSuffix: 0,
+                body: EXAMPLE_HAIKU_BODY,
+                createdAt: STORY_CREATED_AT,
+                labels: [],
+              })}
+            />
+          </LanternFrame>
+        </div>
+      </ComicLabelCircleRing>
+    </div>
+  ),
 };

@@ -31,3 +31,19 @@
   letter-spacing: 0.04em;
   opacity: 0.75;
 }
+
+.beltHost {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(28rem, 92vw);
+  margin: 0 auto;
+}
+
+.beltStage {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: min(80vh, 42rem);
+  padding: 4rem 1.5rem;
+}

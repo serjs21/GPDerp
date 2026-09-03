@@ -66,3 +66,36 @@
   background-color: #2d2d2d;
   z-index: 10;
 }
+
+.lanternCircleHost {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: min(80vh, 42rem);
+  padding: 1.5rem;
+}
+
+.lanternCircleStage {
+  position: relative;
+  width: min(40rem, 92vw);
+  height: min(40rem, 92vw);
+  margin: 0 auto;
+}
+
+.lanternCircleBubbleStage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 3rem;
+  box-sizing: border-box;
+}
+
+.lanternCircleAnchor {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}

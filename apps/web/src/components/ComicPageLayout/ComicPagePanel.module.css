@@ -13,7 +13,6 @@
   transition:
     flex-grow 200ms cubic-bezier(0.45, 0.05, 0.55, 0.95),
     transform 200ms cubic-bezier(0.45, 0.05, 0.55, 0.95),
-    box-shadow 200ms cubic-bezier(0.45, 0.05, 0.55, 0.95),
     filter 200ms cubic-bezier(0.45, 0.05, 0.55, 0.95);
 }
 
@@ -39,8 +38,6 @@
 .panelSelected.panelOverflowVisible {
   transform: none;
   filter: none;
-  /* Slight lift without scale-induced clipping */
-  box-shadow: 0 0.45rem 0 rgb(0 0 0 / 22%);
 }
 
 .panelFull {
@@ -62,15 +59,8 @@
   filter: grayscale(1);
 }
 
-.panelSelectable:focus-visible {
-  box-shadow:
-    0 0 0 2px #fff,
-    0 0 0 4px var(--sumi-ink, #2d2d2d);
-}
-
 .panelSelected {
   transform: scale(1.02);
-  box-shadow: 0 0.35rem 0 rgb(0 0 0 / 22%);
   filter: grayscale(0);
   z-index: 1;
 }

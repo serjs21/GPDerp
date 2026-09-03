@@ -10,6 +10,7 @@ import {
   withQueryClient,
   withThemedStoryStage,
 } from "@/storybook";
+import { type LabelBeltItem } from "./LabelBelt";
 import { Lantern } from "./Lantern";
 import { LanternFrame } from "./LanternFrame";
 import { LanternPath } from "./LanternPath";
@@ -134,6 +135,54 @@ export const LanternsLabels: Story = {
       ))}
     </div>
   ),
+};
+
+const BELT_LABELS_FIVE: LabelBeltItem[] = [
+  { id: "b1", name: "Zen", color: "#52c41a" },
+  { id: "b2", name: "Mist", color: "#1677ff" },
+  { id: "b3", name: "Autumn", color: "#faad14" },
+  { id: "b4", name: "Moon", color: "#eb2f96" },
+  { id: "b5", name: "Night", color: "#722ed1" },
+];
+
+const BELT_LABELS_TWELVE: LabelBeltItem[] = [
+  ...BELT_LABELS_FIVE,
+  { id: "b6", name: "Pond", color: "#13c2c2" },
+  { id: "b7", name: "Crow", color: "#fa541c" },
+  { id: "b8", name: "Snow", color: "#ffffff" },
+  { id: "b9", name: "Bell", color: "#2f54eb" },
+  { id: "b10", name: "Grass", color: "#a0d911" },
+  { id: "b11", name: "Wind", color: "#eb2f96" },
+  { id: "b12", name: "Ink", color: "#17131A" },
+];
+
+function LabelBeltLanternHost({ labels }: { labels: LabelBeltItem[] }) {
+  return (
+    <div className={styles.beltStage}>
+      <LanternFrame ariaLabel="Haiku lantern with label belt" labels={labels}>
+        <Lantern
+          haiku={makeMockHaiku({
+            id: "lantern-label-belt",
+            title: "Night questions",
+            titleSuffix: 0,
+            body: EXAMPLE_HAIKU_BODY,
+            createdAt: STORY_CREATED_AT,
+            labels: [],
+          })}
+        />
+      </LanternFrame>
+    </div>
+  );
+}
+
+export const LabelBeltStory: Story = {
+  name: "Label belt",
+  render: () => <LabelBeltLanternHost labels={BELT_LABELS_FIVE} />,
+};
+
+export const LabelBeltOverflow: Story = {
+  name: "Label belt overflow",
+  render: () => <LabelBeltLanternHost labels={BELT_LABELS_TWELVE} />,
 };
 
 type LanternPathStoryArgs = {

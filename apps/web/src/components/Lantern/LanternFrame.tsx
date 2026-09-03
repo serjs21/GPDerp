@@ -10,6 +10,7 @@ import {
   LANTERN_IMAGE_WIDTH,
   LANTERN_WIDTH_REM,
 } from "./constants";
+import { LabelBelt, type LabelBeltItem } from "./LabelBelt";
 import {
   lanternTransformToCssVars,
   resolveLanternTransform,
@@ -25,6 +26,8 @@ export type LanternFrameProps = LanternTransformInput & {
   widthRem?: number;
   generating?: boolean;
   flightExiting?: boolean;
+  /** Comic labels rendered in an upper-half arc around this frame. */
+  labels?: LabelBeltItem[];
   children: ReactNode;
 };
 
@@ -35,6 +38,7 @@ export function LanternFrame({
   widthRem = LANTERN_WIDTH_REM,
   generating = false,
   flightExiting = false,
+  labels,
   children,
   step,
   progress,
@@ -90,6 +94,7 @@ export function LanternFrame({
       </div>
 
       <div className={styles.content}>{children}</div>
+      {labels && labels.length > 0 ? <LabelBelt labels={labels} /> : null}
     </article>
   );
 }

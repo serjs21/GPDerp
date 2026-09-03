@@ -1,0 +1,78 @@
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.slot {
+  position: absolute;
+  z-index: 1;
+  width: max-content;
+  max-width: 9rem;
+  margin: 0;
+  pointer-events: none;
+}
+
+.navButton {
+  position: absolute;
+  z-index: 5;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  padding: 0.15rem;
+  border: none;
+  border-radius: 0.25rem;
+  background: transparent;
+  color: var(--sumi-ink, #2d2d2d);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.navButton:hover {
+  color: color-mix(in srgb, var(--accent-red, #bc002d) 70%, var(--sumi-ink, #2d2d2d));
+}
+
+.navButton:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent-red, #bc002d) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.navPrev {
+  left: 65%;
+  bottom: -15%;
+  transform: translate(calc(-100% - 0.35rem), -50%);
+}
+
+.navNext {
+  right: 65%;
+  bottom: -15%;
+  transform: translate(calc(100% + 0.35rem), -50%) scaleX(-1);
+}
+
+.navIcon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.navMeta {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  z-index: 5;
+  transform: translate(-50%, calc(100% + 0.35rem));
+  margin: 0;
+  color: var(--sumi-ink, #2d2d2d);
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  pointer-events: none;
+}
