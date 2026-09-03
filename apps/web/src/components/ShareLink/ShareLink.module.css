@@ -108,15 +108,24 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.65rem 1.1rem;
+  gap: 0.65rem 0.75rem;
   flex: 0 0 auto;
   padding: 0.15rem 0.1rem;
 }
 
+.limitFields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+
 .limitField {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 0.4rem;
+  width: 100%;
   min-width: 0;
   margin: 0;
   font-family: var(--font-lantern-script, cursive);
@@ -124,17 +133,61 @@
 }
 
 .limitLabel {
-  flex: 0 0 auto;
-  min-width: 3.4rem;
+  flex: 0 0 4.75rem;
+  min-width: 4.75rem;
   font-weight: 600;
 }
 
-.limitInput {
-  width: 4.5rem !important;
+.limitControl {
+  flex: 1 1 0;
+  min-width: 0;
 }
 
+.limitInput,
 .limitDate {
-  min-width: 10.5rem;
+  width: 17rem !important;
+  min-width: 0 !important;
+}
+
+.updateButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  align-self: center;
+  min-height: 2.6rem;
+  height: 100%;
+  padding: 0.4rem 0.85rem;
+  border: 2px solid #111;
+  border-radius: 0.3rem;
+  background: #fff;
+  color: var(--sumi-ink, #2d2d2d);
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+
+.updateButton:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--sumi-ink, #2d2d2d) 6%, #fff);
+  transform: scale(1.01);
+}
+
+.updateButton:focus-visible {
+  outline: 2px solid var(--sumi-ink, #2d2d2d);
+  outline-offset: 2px;
+}
+
+.updateButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .actionRow {
@@ -203,11 +256,13 @@
 
 @media (prefers-reduced-motion: reduce) {
   .panelShell,
-  .actionButton {
+  .actionButton,
+  .updateButton {
     transition: none;
   }
 
-  .actionButton:hover:not(:disabled) {
+  .actionButton:hover:not(:disabled),
+  .updateButton:hover:not(:disabled) {
     transform: none;
   }
 }

@@ -37,6 +37,16 @@ function ShareLinkStory({
       haikuSubject={SUBJECT}
       onChanged={() => undefined}
       onLinkUpdate={setCurrent}
+      refreshShareLinkFn={async (_id, body) => {
+        await new Promise((r) => setTimeout(r, 2200));
+        const base = current ?? baseLink;
+        return {
+          ...base,
+          maxViews: body.maxViews ?? null,
+          expirationDate: body.expirationDate ?? null,
+          viewCount: 0,
+        };
+      }}
     />
   );
 }

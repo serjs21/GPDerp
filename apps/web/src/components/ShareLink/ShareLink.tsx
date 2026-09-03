@@ -1,8 +1,6 @@
 "use client";
 
 import axios from "axios";
-import type { CheckboxChangeEvent } from "antd/es/checkbox";
-import { Checkbox } from "antd";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import { motion, useReducedMotion } from "motion/react";
@@ -26,6 +24,7 @@ import styles from "./ShareLink.module.css";
 const PAPER_PLANE_SRC = "/share_modal/link/paper_plane.svg";
 const START_ICON_SRC = "/share_modal/link/start.svg";
 const PAUSE_ICON_SRC = "/share_modal/link/pause.svg";
+const UPDATE_ICON_SRC = "/share_modal/link/update.svg";
 const HEART_FILLED_SRC = "/share_modal/link/heart_filled.svg";
 const HEART_SRC = "/share_modal/link/heart.svg";
 const CLOCK_SRC = "/share_modal/link/clock.svg";
@@ -34,28 +33,21 @@ const INFINITY_SRC = "/share_modal/link/infinity.svg";
 const ACTIVATING_DOT_MS = 500;
 const ACTIVATING_DOT_CYCLE = ["", ".", "..", "..."] as const;
 const ACTIVATING_MIN_MS = ACTIVATING_DOT_MS * ACTIVATING_DOT_CYCLE.length;
-const DEFAULT_HITS = 3;
 
 type LimitForm = {
-  hitsUnlimited: boolean;
   maxViews: number | null;
-  timeoutUnlimited: boolean;
   expiresAt: Dayjs | null;
 };
 
 const defaultLimitForm = (): LimitForm => ({
-  hitsUnlimited: true,
   maxViews: null,
-  timeoutUnlimited: true,
   expiresAt: null,
 });
 
 const formFromLink = (link: ShareLinkListItem | null): LimitForm => {
   if (!link) return defaultLimitForm();
   return {
-    hitsUnlimited: link.maxViews == null,
     maxViews: link.maxViews,
-    timeoutUnlimited: link.expirationDate == null,
     expiresAt: link.expirationDate ? dayjs(link.expirationDate) : null,
   };
 };
@@ -65,13 +57,9 @@ export const buildLimitPayload = (form: LimitForm): {
   expirationDate: string | null;
 } => {
   const maxViews =
-    form.hitsUnlimited || form.maxViews == null || form.maxViews < 1
-      ? null
-      : Math.floor(form.maxViews);
+    form.maxViews == null || form.maxViews < 1 ? null : Math.floor(form.maxViews);
   const expirationDate =
-    form.timeoutUnlimited || form.expiresAt == null || !form.expiresAt.isValid()
-      ? null
-      : form.expiresAt.toISOString();
+    form.expiresAt == null || !form.expiresAt.isValid() ? null : form.expiresAt.toISOString();
   return { maxViews, expirationDate };
 };
 
@@ -96,6 +84,7 @@ export type ShareLinkProps = {
   onChanged: () => void;
   onLinkUpdate?: (link: ShareLinkListItem) => void;
   createShareLinkFn?: typeof shareLinksApi.createShareLink;
+  refreshShareLinkFn?: typeof shareLinksApi.refreshShareLink;
 };
 
 const getAxiosErrorMessage = (error: unknown, fallback: string) => {
@@ -113,29 +102,34 @@ export function ShareLink({
   onChanged,
   onLinkUpdate,
   createShareLinkFn = shareLinksApi.createShareLink,
+  refreshShareLinkFn = shareLinksApi.refreshShareLink,
 }: ShareLinkProps) {
   const reduceMotion = useReducedMotion();
   const { locale } = useLocale();
   const { copy } = useCopy();
   const [isUpdating, setIsUpdating] = useState(false);
   const [activating, setActivating] = useState(false);
-  const [activatingDots, setActivatingDots] = useState<(typeof ACTIVATING_DOT_CYCLE)[number]>("");
+  const [updatingLimits, setUpdatingLimits] = useState(false);
+  const [busyDots, setBusyDots] = useState<(typeof ACTIVATING_DOT_CYCLE)[number]>("");
   const [now, setNow] = useState<Date | null>(null);
   const [form, setForm] = useState<LimitForm>(() => formFromLink(link));
 
   const subject = link?.haikuSubject || haikuSubject;
   const active = link != null && isActiveShareLink(link, now ?? undefined);
-  const limitsLocked = active || activating;
-  const copyEnabled = active && !activating;
+  const busy = activating || updatingLimits;
+  const limitsLocked = busy;
+  const copyEnabled = active && !busy;
   const isFlying = (active || activating) && !reduceMotion;
   const grayscale = !active;
   const shine = active || activating;
 
   const payload = buildLimitPayload(form);
   const formValid =
-    (form.hitsUnlimited || (form.maxViews != null && form.maxViews >= 1)) &&
-    (form.timeoutUnlimited ||
-      (form.expiresAt != null && form.expiresAt.isValid() && form.expiresAt.isAfter(dayjs())));
+    (form.maxViews == null || form.maxViews >= 1) &&
+    (form.expiresAt == null ||
+      (form.expiresAt.isValid() && form.expiresAt.isAfter(dayjs())));
+  const limitsDirty = link != null && payloadDiffersFromLink(link, payload);
+  const showUpdate = active && (limitsDirty || updatingLimits);
 
   const statusSource: Pick<ShareLinkListItem, "maxViews" | "viewCount" | "expirationDate"> =
     active && link
@@ -162,31 +156,30 @@ export function ShareLink({
   }, [active, link, payload.expirationDate]);
 
   useEffect(() => {
-    if (!activating) {
-      setActivatingDots("");
+    if (!busy) {
+      setBusyDots("");
       return;
     }
-    setActivatingDots("");
+    setBusyDots("");
     let step = 0;
     const id = window.setInterval(() => {
       step = (step + 1) % ACTIVATING_DOT_CYCLE.length;
-      setActivatingDots(ACTIVATING_DOT_CYCLE[step]!);
+      setBusyDots(ACTIVATING_DOT_CYCLE[step]!);
     }, ACTIVATING_DOT_MS);
     return () => window.clearInterval(id);
-  }, [activating]);
+  }, [busy]);
 
-  const finishActivating = async (startedAt: number) => {
+  const holdMinBusy = async (startedAt: number) => {
     const elapsed = Date.now() - startedAt;
     if (elapsed < ACTIVATING_MIN_MS) {
       await new Promise((resolve) => {
         window.setTimeout(resolve, ACTIVATING_MIN_MS - elapsed);
       });
     }
-    setActivating(false);
   };
 
   const onStop = async () => {
-    if (!link || !active || isUpdating || activating) return;
+    if (!link || !active || isUpdating || busy) return;
     try {
       setIsUpdating(true);
       const updated = await shareLinksApi.setShareLinkDisabled(link.id, true);
@@ -201,7 +194,7 @@ export function ShareLink({
   };
 
   const onStart = async () => {
-    if (active || isUpdating || activating || !formValid) return;
+    if (active || isUpdating || busy || !formValid) return;
     const startedAt = Date.now();
     setActivating(true);
     setIsUpdating(true);
@@ -231,7 +224,7 @@ export function ShareLink({
           payloadDiffersFromLink(link, limitPayload) || !canStartShareLink(link, now ?? undefined);
         let current = link;
         if (needsRefresh) {
-          current = await shareLinksApi.refreshShareLink(link.id, limitPayload);
+          current = await refreshShareLinkFn(link.id, limitPayload);
           onLinkUpdate?.(current);
         }
         const updated = await shareLinksApi.setShareLinkDisabled(current.id, false);
@@ -243,7 +236,27 @@ export function ShareLink({
       comicToast.error(getAxiosErrorMessage(error, "Could not start share link"));
     } finally {
       setIsUpdating(false);
-      await finishActivating(startedAt);
+      await holdMinBusy(startedAt);
+      setActivating(false);
+    }
+  };
+
+  const onUpdateLimits = async () => {
+    if (!link || !active || !limitsDirty || isUpdating || busy || !formValid) return;
+    const startedAt = Date.now();
+    setUpdatingLimits(true);
+    setIsUpdating(true);
+    try {
+      const updated = await refreshShareLinkFn(link.id, buildLimitPayload(form));
+      onLinkUpdate?.(updated);
+      comicToast.success("Share link updated");
+      onChanged();
+    } catch (error: unknown) {
+      comicToast.error(getAxiosErrorMessage(error, "Could not update share link"));
+    } finally {
+      setIsUpdating(false);
+      await holdMinBusy(startedAt);
+      setUpdatingLimits(false);
     }
   };
 
@@ -266,24 +279,6 @@ export function ShareLink({
         : time.text
           ? `Time left ${time.text}`
           : "Time left";
-
-  const onHitsUnlimitedChange = (e: CheckboxChangeEvent) => {
-    const checked = e.target.checked;
-    setForm((prev) => ({
-      ...prev,
-      hitsUnlimited: checked,
-      maxViews: checked ? null : (prev.maxViews != null && prev.maxViews >= 1 ? prev.maxViews : DEFAULT_HITS),
-    }));
-  };
-
-  const onTimeoutUnlimitedChange = (e: CheckboxChangeEvent) => {
-    const checked = e.target.checked;
-    setForm((prev) => ({
-      ...prev,
-      timeoutUnlimited: checked,
-      expiresAt: checked ? null : prev.expiresAt ?? dayjs().add(1, "day").endOf("day"),
-    }));
-  };
 
   return (
     <article className={styles.root}>
@@ -381,54 +376,72 @@ export function ShareLink({
       </div>
 
       <div className={styles.limitsRow}>
-        <label className={styles.limitField}>
-          <span className={styles.limitLabel}>Hits</span>
-          <InputNumber
-            min={1}
-            step={1}
-            precision={0}
-            value={form.hitsUnlimited ? null : form.maxViews}
-            disabled={limitsLocked || form.hitsUnlimited}
-            onChange={(v) =>
-              setForm((prev) => ({
-                ...prev,
-                maxViews: typeof v === "number" ? v : null,
-              }))
-            }
-            className={styles.limitInput}
-          />
-          <Checkbox
-            checked={form.hitsUnlimited}
-            disabled={limitsLocked}
-            onChange={onHitsUnlimitedChange}
-          >
-            unlimited
-          </Checkbox>
-        </label>
+        <div className={styles.limitFields}>
+          <label className={styles.limitField}>
+            <span className={styles.limitLabel}>Hits</span>
+            <span className={styles.limitControl}>
+              <InputNumber
+                min={1}
+                step={1}
+                precision={0}
+                placeholder="∞"
+                value={form.maxViews}
+                disabled={limitsLocked}
+                onChange={(v) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    maxViews: typeof v === "number" ? v : null,
+                  }))
+                }
+                className={styles.limitInput}
+              />
+            </span>
+          </label>
 
-        <label className={styles.limitField}>
-          <span className={styles.limitLabel}>Timeout</span>
-          <DatePicker
-            showTime
-            value={form.timeoutUnlimited ? null : form.expiresAt}
-            disabled={limitsLocked || form.timeoutUnlimited}
-            disabledDate={(d) => d != null && d.isBefore(dayjs(), "day")}
-            onChange={(v) =>
-              setForm((prev) => ({
-                ...prev,
-                expiresAt: v,
-              }))
-            }
-            className={styles.limitDate}
-          />
-          <Checkbox
-            checked={form.timeoutUnlimited}
-            disabled={limitsLocked}
-            onChange={onTimeoutUnlimitedChange}
+          <label className={styles.limitField}>
+            <span className={styles.limitLabel}>Timeout</span>
+            <span className={styles.limitControl}>
+              <DatePicker
+                showTime
+                allowClear
+                placeholder="∞"
+                value={form.expiresAt}
+                disabled={limitsLocked}
+                disabledDate={(d) => d != null && d.isBefore(dayjs(), "day")}
+                onChange={(v) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    expiresAt: v,
+                  }))
+                }
+                className={styles.limitDate}
+              />
+            </span>
+          </label>
+        </div>
+
+        {showUpdate ? (
+          <button
+            type="button"
+            className={styles.updateButton}
+            disabled={!formValid || isUpdating || busy}
+            onClick={() => void onUpdateLimits()}
+            aria-label="Update link"
+            aria-live="polite"
           >
-            unlimited
-          </Checkbox>
-        </label>
+            {updatingLimits ? (
+              <span className={styles.actionLabel}>
+                Updating
+                <span className={styles.activatingDots}>{busyDots}</span>
+              </span>
+            ) : (
+              <>
+                <img src={UPDATE_ICON_SRC} alt="" className={styles.actionIcon} aria-hidden />
+                <span className={styles.actionLabel}>Update</span>
+              </>
+            )}
+          </button>
+        ) : null}
       </div>
 
       <div className={styles.actionRow}>
@@ -436,14 +449,14 @@ export function ShareLink({
           <button type="button" className={styles.actionButton} disabled aria-live="polite">
             <span className={styles.actionLabel}>
               Activating
-              <span className={styles.activatingDots}>{activatingDots}</span>
+              <span className={styles.activatingDots}>{busyDots}</span>
             </span>
           </button>
         ) : active ? (
           <button
             type="button"
             className={styles.actionButton}
-            disabled={isUpdating}
+            disabled={isUpdating || busy}
             onClick={() => void onStop()}
             aria-label="Stop link"
           >
@@ -454,7 +467,7 @@ export function ShareLink({
           <button
             type="button"
             className={styles.actionButton}
-            disabled={!formValid || isUpdating}
+            disabled={!formValid || isUpdating || busy}
             onClick={() => void onStart()}
             aria-label="Start link"
           >
