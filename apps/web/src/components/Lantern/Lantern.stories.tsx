@@ -94,6 +94,48 @@ export const Default: Story = {
   },
 };
 
+const LANTERN_LABEL_FIXTURES = [
+  { id: "l-short", name: "Zen", color: "green" },
+  { id: "l-medium", name: "Morning mist", color: "blue" },
+  { id: "l-long", name: "Late autumn philosophy", color: "purple" },
+] as const;
+
+const LANTERN_LABEL_SIZES = [
+  { widthRem: 6, caption: "6rem · path mini" },
+  { widthRem: 9, caption: "9rem · path focused" },
+  { widthRem: 12, caption: "12rem · medium" },
+  { widthRem: 17.5, caption: "17.5rem · default" },
+] as const;
+
+export const LanternsLabels: Story = {
+  name: "Labels",
+  render: () => (
+    <div className={styles.labelsStage}>
+      {LANTERN_LABEL_SIZES.map(({ widthRem, caption }) => (
+        <div key={widthRem} className={styles.labelsSample}>
+          <LanternFrame
+            widthRem={widthRem}
+            ariaLabel={`Haiku lantern with labels at ${widthRem}rem`}
+          >
+            <Lantern
+              showActions={false}
+              haiku={makeMockHaiku({
+                id: `lantern-labels-${widthRem}`,
+                title: "Night questions",
+                titleSuffix: 0,
+                body: EXAMPLE_HAIKU_BODY,
+                createdAt: STORY_CREATED_AT,
+                labels: [...LANTERN_LABEL_FIXTURES],
+              })}
+            />
+          </LanternFrame>
+          <p className={styles.labelsCaption}>{caption}</p>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
 type LanternPathStoryArgs = {
   haikuCount: number;
 };

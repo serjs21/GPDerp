@@ -5,3 +5,29 @@
   min-height: min(70vh, 32rem);
   padding: 1rem;
 }
+
+.labelsStage {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2rem 2.5rem;
+  width: 100%;
+  min-height: min(70vh, 36rem);
+  padding: 1.5rem;
+}
+
+.labelsSample {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.labelsCaption {
+  margin: 0;
+  color: var(--sumi-ink, #2d2d2d);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  opacity: 0.75;
+}
