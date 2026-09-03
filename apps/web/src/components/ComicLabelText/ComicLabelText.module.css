@@ -1,0 +1,24 @@
+.text {
+  display: inline-block;
+  font-family: var(--font-comic-label, "Comic Sans MS", cursive);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  /* Webkit outline for clean, consistent stroke */
+  -webkit-text-stroke-color: currentColor;
+  -webkit-text-stroke-linejoin: round;
+  /* Paint order ensures stroke is behind fill for proper rendering */
+  paint-order: stroke fill;
+}
+
+.sizeSm {
+  font-size: 1.2rem;
+}
+
+.sizeMd {
+  font-size: 1.8rem;
+}
+
+.sizeLg {
+  font-size: 2.5rem;
+}
