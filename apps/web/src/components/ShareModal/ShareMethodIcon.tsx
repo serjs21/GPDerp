@@ -14,12 +14,15 @@ export type ShareMethodIconProps = {
   src: string;
   bubbleStyle: ComicBubbleStyle;
   sourceDirection?: ComicSourceDirection;
+  /** When false, Comical editing is stopped (avoids multi-stage races). */
+  active?: boolean;
 };
 
 export function ShareMethodIcon({
   src,
   bubbleStyle,
   sourceDirection = "bottom",
+  active = true,
 }: ShareMethodIconProps) {
   const targetRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
@@ -46,8 +49,8 @@ export function ShareMethodIcon({
   return (
     <ComicBubbleStage
       ref={stageRef}
-      active
-      targetsKey={`share-icon:${bubbleStyle}:${sourceDirection}:${src}`}
+      active={active}
+      targetsKey={`share-icon:${bubbleStyle}:${sourceDirection}:${src}:${active ? 1 : 0}`}
       getTargets={getTargets}
       className={[stageStyles.stage, styles.stage, stagePaddingClass].filter(Boolean).join(" ")}
     >

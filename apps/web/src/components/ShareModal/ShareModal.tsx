@@ -108,7 +108,12 @@ export function ShareModal({
             ariaLabel="Share by link"
             className={styles.methodPanel}
           >
-            <ShareMethodIcon src="/share_modal/link.svg" bubbleStyle="pointedArcs" sourceDirection="none" />
+            <ShareMethodIcon
+              src="/share_modal/link.svg"
+              bubbleStyle="pointedArcs"
+              sourceDirection="none"
+              active={method === "link"}
+            />
           </ComicPagePanel>
           <ComicPagePanel
             selectable
@@ -121,7 +126,12 @@ export function ShareModal({
             title="Email"
             className={styles.methodPanel}
           >
-            <ShareMethodIcon src="/share_modal/email.svg" bubbleStyle="rectangle" sourceDirection="none" />
+            <ShareMethodIcon
+              src="/share_modal/email.svg"
+              bubbleStyle="rectangle"
+              sourceDirection="none"
+              active={method === "email"}
+            />
           </ComicPagePanel>
         </ComicPageRow>
       ) : (

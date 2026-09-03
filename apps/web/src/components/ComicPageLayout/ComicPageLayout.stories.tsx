@@ -155,9 +155,10 @@ export const PanelWithTitle: Story = {
             color="yellow"
             background="sunburst"
             title="Put a caption here"
+            footer="And a footer here"
             contentAlign="start"
           >
-            Panel body content sits below the caption box.
+            Panel body content sits between the title and footer captions.
           </ComicPagePanel>
         </ComicPageRow>
       </ComicPageLayout>

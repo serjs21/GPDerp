@@ -7,7 +7,6 @@ import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 import type { ShareLinkListItem } from "@/api/shareLinks";
 import * as shareLinksApi from "@/api/shareLinks";
-import { ComicButton } from "@/components/ComicButton/ComicButton";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { comicToast } from "@/components/ComicToast";
 import { DatePicker, InputNumber } from "@/components/StyledComponents";
@@ -296,6 +295,7 @@ export function ShareLink({
           contentAlign="center"
           className={styles.panel}
           title={subject}
+          footer={active && !activating ? "Click to copy the link" : undefined}
           ariaLabel={`Share link for ${subject}`}
         >
           <div className={styles.panelBody}>

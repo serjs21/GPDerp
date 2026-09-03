@@ -12,6 +12,8 @@ export type ComicPagePanelProps = {
   children?: ReactNode;
   /** Comic caption box in the panel top-left corner. */
   title?: ReactNode;
+  /** Comic caption box in the panel bottom-right corner. */
+  footer?: ReactNode;
   background?: ComicPanelBackground;
   color?: ComicPanelColor;
   /** Crossfade anime speed-line overlay on top of the static background. */
@@ -45,6 +47,7 @@ function staticBgClass(background: ComicPanelBackground): string {
 export function ComicPagePanel({
   children,
   title,
+  footer,
   background = "solid",
   color = "white",
   loading = false,
@@ -60,6 +63,8 @@ export function ComicPagePanel({
 }: ComicPagePanelProps) {
   const isMotionBackground = background === "motion";
   const showMotionOverlay = loading && !isMotionBackground;
+  const hasTitle = title != null && title !== "";
+  const hasFooter = footer != null && footer !== "";
   const bgClass = [
     staticBgClass(isMotionBackground ? "solid" : background),
     background === "sunburst" && !shine && panelStyles.bgSunburstPaused,
@@ -82,12 +87,14 @@ export function ComicPagePanel({
     panelStyles.content,
     contentAlign === "start" && panelStyles.contentStart,
     contentAlign === "start" && panelStyles.contentStretch,
-    title != null && title !== "" && contentAlign === "start" && panelStyles.contentWithTitle,
+    hasTitle && contentAlign === "start" && panelStyles.contentWithTitle,
+    hasFooter && contentAlign === "start" && panelStyles.contentWithFooter,
   ]
     .filter(Boolean)
     .join(" ");
 
   const titleLabel = typeof title === "string" ? title : null;
+  const footerLabel = typeof footer === "string" ? footer : null;
 
   const style = {
     ...panelStyleVars(color),
@@ -103,10 +110,13 @@ export function ComicPagePanel({
       {showMotionOverlay ? (
         <div className={[panelStyles.bgLayer, panelStyles.bgMotionOverlay].join(" ")} aria-hidden />
       ) : null}
-      {title != null && title !== "" ? (
+      {hasTitle ? (
         <div className={panelStyles.panelTitle}>{titleLabel ?? title}</div>
       ) : null}
       <div className={contentClass}>{children}</div>
+      {hasFooter ? (
+        <div className={panelStyles.panelFooter}>{footerLabel ?? footer}</div>
+      ) : null}
     </>
   );
 
