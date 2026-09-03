@@ -52,7 +52,7 @@ export const ComicLabelText = forwardRef<HTMLSpanElement, ComicLabelTextProps>(
     const combinedStyle: CSSProperties = {
       color,
       WebkitTextStroke: `${outlineWidth}px ${outlineColor}`,
-      textShadow: generateTextShadow(outlineColor, outlineWidth),
+      textShadow: generateTextShadow(outlineColor),
       ...style,
     };
 

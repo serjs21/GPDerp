@@ -12,11 +12,14 @@ import {
 import { ComicBubbleStage } from "@/components/ComicConfirmModal/ComicBubbleStage";
 import stageStyles from "@/components/ComicConfirmModal/comicBubbleStage.module.css";
 import type { ComicBubbleStyle } from "@/components/ComicConfirmModal/comicBubblePresets";
+import type { ComicSourceDirection } from "@/components/ComicConfirmModal/comicSourceDirection";
+import { ComicLabelText } from "@/components/ComicLabelText/ComicLabelText";
+import { COMIC_LABEL_DEFAULT_BUBBLE_STYLE } from "./comicLabelBubblePresets";
+import { resolveComicLabelFill } from "./comicLabelColors";
 import {
-  stagePaddingClassForDirection,
-  type ComicSourceDirection,
-} from "@/components/ComicConfirmModal/comicSourceDirection";
-import { pickComicLabelInk, resolveComicLabelFill } from "./comicLabelColors";
+  contentClassForBubbleStyle,
+  stagePaddingClassForLabel,
+} from "./comicLabelLayout";
 import styles from "./ComicLabel.module.css";
 
 export type ComicLabelMode = "standalone" | "embedded";
@@ -35,21 +38,22 @@ export type ComicLabelProps = {
   children?: ReactNode;
 };
 
-const ComicLabelInner = forwardRef<HTMLDivElement | HTMLButtonElement, ComicLabelProps>(
+type ComicLabelInnerProps = ComicLabelProps & {
+  bubbleStyle: ComicBubbleStyle;
+};
+
+const ComicLabelInner = forwardRef<HTMLDivElement | HTMLButtonElement, ComicLabelInnerProps>(
   function ComicLabelInner(
-    { name, color, className, style, onClick, children },
+    { name, bubbleStyle, className, style, onClick, children },
     ref,
   ) {
-    const fill = resolveComicLabelFill(color);
-    const ink = pickComicLabelInk(fill);
-    const contentStyle = {
-      ...style,
-      "--comic-label-ink": ink,
-      color: ink,
-    } as CSSProperties;
+    const contentPaddingClass = contentClassForBubbleStyle(bubbleStyle, {
+      contentBurst: styles.contentBurst,
+      contentSpeech: styles.contentSpeech,
+    });
 
     const contentClass = [
-      styles.content,
+      contentPaddingClass,
       onClick ? styles.contentInteractive : "",
       onClick ? styles.contentButton : "",
       className,
@@ -57,17 +61,28 @@ const ComicLabelInner = forwardRef<HTMLDivElement | HTMLButtonElement, ComicLabe
       .filter(Boolean)
       .join(" ");
 
+    const labelContent =
+      children ?? (
+        <ComicLabelText
+          text={name}
+          size="sm"
+          color="#ffffff"
+          outlineColor="#000000"
+          outlineWidth={2}
+        />
+      );
+
     if (onClick) {
       return (
         <button
           ref={ref as Ref<HTMLButtonElement>}
           type="button"
           className={contentClass}
-          style={contentStyle}
+          style={style}
           data-comic-role="label"
           onClick={onClick}
         >
-          {children ?? name}
+          {labelContent}
         </button>
       );
     }
@@ -76,10 +91,10 @@ const ComicLabelInner = forwardRef<HTMLDivElement | HTMLButtonElement, ComicLabe
       <div
         ref={ref as Ref<HTMLDivElement>}
         className={contentClass}
-        style={contentStyle}
+        style={style}
         data-comic-role="label"
       >
-        {children ?? name}
+        {labelContent}
       </div>
     );
   },
@@ -95,7 +110,7 @@ export const ComicLabel = forwardRef<HTMLDivElement | HTMLButtonElement, ComicLa
       name,
       color,
       sourceDirection = "none",
-      bubbleStyle = "speech",
+      bubbleStyle = COMIC_LABEL_DEFAULT_BUBBLE_STYLE,
       mode = "standalone",
       className,
       style,
@@ -125,6 +140,7 @@ export const ComicLabel = forwardRef<HTMLDivElement | HTMLButtonElement, ComicLa
           style: bubbleStyle,
           sourceDirection,
           backgroundColors: [fill],
+          variant: "label" as const,
         },
       ],
       [bubbleStyle, fill, sourceDirection],
@@ -136,6 +152,7 @@ export const ComicLabel = forwardRef<HTMLDivElement | HTMLButtonElement, ComicLa
           ref={setRef}
           name={name}
           color={color}
+          bubbleStyle={bubbleStyle}
           className={className}
           style={style}
           onClick={onClick}
@@ -145,12 +162,16 @@ export const ComicLabel = forwardRef<HTMLDivElement | HTMLButtonElement, ComicLa
       );
     }
 
-    const stagePaddingClass = stagePaddingClassForDirection(sourceDirection, {
+    const stagePaddingClass = stagePaddingClassForLabel(bubbleStyle, sourceDirection, {
+      contentBurst: styles.contentBurst,
+      contentSpeech: styles.contentSpeech,
+      stageBurst: styles.stageBurst,
+      stageSpeech: styles.stageSpeech,
       stageTailBottom: styles.stageTailBottom,
       stageTailTop: styles.stageTailTop,
       stageTailLeft: styles.stageTailLeft,
       stageTailRight: styles.stageTailRight,
-      stageCompact: styles.stageCompact,
+      stageCompact: styles.stageSpeech,
     });
 
     return (
@@ -164,7 +185,13 @@ export const ComicLabel = forwardRef<HTMLDivElement | HTMLButtonElement, ComicLa
           .join(" ")}
         style={style}
       >
-        <ComicLabelInner ref={setRef} name={name} color={color} onClick={onClick}>
+        <ComicLabelInner
+          ref={setRef}
+          name={name}
+          color={color}
+          bubbleStyle={bubbleStyle}
+          onClick={onClick}
+        >
           {children}
         </ComicLabelInner>
       </ComicBubbleStage>

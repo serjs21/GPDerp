@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { ComicBubbleStage } from "@/components/ComicConfirmModal/ComicBubbleStage";
 import { ComicLabel } from "@/components/ComicLabel/ComicLabel";
 import { resolveComicLabelFill } from "@/components/ComicLabel/comicLabelColors";
@@ -80,69 +80,6 @@ export function LanternLabelsRing({
       targetRefs.current.delete(id);
     }
   }, []);
-
-  // #region agent log
-  useEffect(() => {
-    const id = window.setTimeout(() => {
-      const canvases = document.querySelectorAll("canvas.comical-generated");
-      const stages = document.querySelectorAll("[data-comic-bubble-stage]");
-      const labelsEls = Array.from(document.querySelectorAll('[data-comic-role="label"]'));
-      const stage = stages[0] as HTMLElement | undefined;
-      const stageRect = stage?.getBoundingClientRect();
-      fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Debug-Session-Id": "53a752",
-        },
-        body: JSON.stringify({
-          sessionId: "53a752",
-          runId: "post-fix",
-          hypothesisId: "B-portal",
-          location: "LanternLabelsRing.tsx:effect",
-          message: "ring mount DOM snapshot",
-          data: {
-            labelCount: labels.length,
-            visibleCount: visible.length,
-            comicalCanvasCount: canvases.length,
-            stageCount: stages.length,
-            portaledStages: Array.from(stages).filter(
-              (el) => (el as HTMLElement).dataset.renderInline === "false",
-            ).length,
-            labelElCount: labelsEls.length,
-            stageParentIsBody: stage?.parentElement === document.body,
-            targetOutside: labelsEls.slice(0, 6).map((el) => {
-              if (!stageRect) return null;
-              const r = el.getBoundingClientRect();
-              return {
-                outsideStage:
-                  r.right < stageRect.left ||
-                  r.left > stageRect.right ||
-                  r.bottom < stageRect.top ||
-                  r.top > stageRect.bottom,
-                offsetLeft: (el as HTMLElement).offsetLeft,
-                offsetTop: (el as HTMLElement).offsetTop,
-                w: Math.round(r.width),
-                h: Math.round(r.height),
-              };
-            }),
-            canvases: Array.from(canvases).slice(0, 2).map((c) => {
-              const canvas = c as HTMLCanvasElement;
-              const r = canvas.getBoundingClientRect();
-              return {
-                w: Math.round(r.width),
-                h: Math.round(r.height),
-                parentIsBody: canvas.parentElement?.parentElement === document.body,
-              };
-            }),
-          },
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-    }, 500);
-    return () => window.clearTimeout(id);
-  }, [labels.length, visible.length, targetsKey]);
-  // #endregion
 
   if (labels.length === 0) return null;
 
