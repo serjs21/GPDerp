@@ -1,6 +1,7 @@
 .methodRow {
   position: relative;
   z-index: 3;
+  flex: 0 0 auto;
   min-height: 6.5rem;
   overflow: visible;
 }
@@ -9,27 +10,38 @@
   min-height: 6.5rem;
 }
 
-/* Keep modal height stable when method row is replaced after create/send. */
-.methodRowSpacer {
-  min-height: 6.5rem;
-  width: 100%;
-}
-
-/* Match ShareEmailSendPanel row (~88px measured) so Link/Email dialog height does not jump. */
-.sendRowSpacer {
-  box-sizing: border-box;
-  width: 100%;
-  min-height: 5.5rem;
-}
-
-.contentSlot {
+/*
+ * Fixed shell height so Link / Email / sent states share one modal size
+ * without filler spacers. Sized for method row + content + email send row.
+ */
+.body {
+  --share-modal-method-height: 6.5rem;
   --share-modal-content-height: 20rem;
+  --share-modal-send-height: 5.5rem;
+  --share-modal-gap: var(--comic-page-gutter, 10px);
+
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  gap: var(--share-modal-gap);
   width: 100%;
-  min-height: var(--share-modal-content-height);
-  height: var(--share-modal-content-height);
+  height: calc(
+    var(--share-modal-method-height) + var(--share-modal-content-height) + var(--share-modal-send-height) +
+      (2 * var(--share-modal-gap))
+  );
+  min-height: calc(
+    var(--share-modal-method-height) + var(--share-modal-content-height) + var(--share-modal-send-height) +
+      (2 * var(--share-modal-gap))
+  );
+}
+
+.contentSlot {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
 }
 
 .contentSlot > * {
@@ -39,9 +51,15 @@
 }
 
 .contentPanel {
-  --share-email-content-height: var(--share-modal-content-height);
-  min-height: var(--share-modal-content-height);
+  --share-email-content-height: 100%;
+  min-height: 0;
   height: 100%;
+}
+
+.sendRow {
+  flex: 0 0 auto;
+  width: 100%;
+  min-height: var(--share-modal-send-height);
 }
 
 .successBlock {

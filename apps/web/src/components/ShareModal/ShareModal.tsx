@@ -95,107 +95,105 @@ export function ShareModal({
         if (!nextOpen) onClose();
       }}
     >
-      {showMethodRow ? (
-        <ComicPageRow className={styles.methodRow}>
-          <ComicPagePanel
-            selectable
-            selected={method === "link"}
-            onSelect={selectLink}
-            background="sunburst"
-            color="teal"
-            title="Link"
-            isMotionBackground={false}
-            shine={false}
-            overflowVisible
-            flexWeight={method === "link" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
-            ariaLabel="Share by link"
-            className={styles.methodPanel}
-          >
-            <ShareMethodIcon
-              src="/share_modal/link.svg"
-              bubbleStyle="pointedArcs"
-              sourceDirection="none"
-              active={method === "link"}
-            />
-          </ComicPagePanel>
-          <ComicPagePanel
-            selectable
-            selected={method === "email"}
-            onSelect={selectEmail}
-            background="halftone"
-            color="orange"
-            overflowVisible
-            flexWeight={method === "email" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
-            ariaLabel="Share via email"
-            title="Email"
-            className={styles.methodPanel}
-          >
-            <ShareMethodIcon
-              src="/share_modal/email.svg"
-              bubbleStyle="rectangle"
-              sourceDirection="none"
-              active={method === "email"}
-            />
-          </ComicPagePanel>
-        </ComicPageRow>
-      ) : (
-        <div className={styles.methodRowSpacer} aria-hidden />
-      )}
-
-      <div className={styles.contentSlot}>
-        {emailSent ? (
-          <ComicPagePanel span="full" color="white" contentAlign="start" className={styles.contentPanel}>
-            <div className={styles.successBlock}>
-              <Typography.Paragraph className={styles.success}>
-                Your haikus have been sent.
-              </Typography.Paragraph>
-              <Button type="primary" onClick={onClose}>
-                Done
-              </Button>
-            </div>
-          </ComicPagePanel>
-        ) : method === "link" ? (
-          loadingLink ? (
-            <ComicPagePanel span="full" color="white" contentAlign="center" className={styles.contentPanel}>
-              <Typography.Paragraph type="secondary" style={{ margin: 0 }}>
-                Loading…
-              </Typography.Paragraph>
+      <div className={styles.body}>
+        {showMethodRow ? (
+          <ComicPageRow className={styles.methodRow}>
+            <ComicPagePanel
+              selectable
+              selected={method === "link"}
+              onSelect={selectLink}
+              background="sunburst"
+              color="teal"
+              title="Link"
+              isMotionBackground={false}
+              shine={false}
+              overflowVisible
+              flexWeight={method === "link" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
+              ariaLabel="Share by link"
+              className={styles.methodPanel}
+            >
+              <ShareMethodIcon
+                src="/share_modal/link.svg"
+                bubbleStyle="pointedArcs"
+                sourceDirection="none"
+                active={method === "link"}
+              />
             </ComicPagePanel>
-          ) : (
-            <ShareLink
-              link={shareLink}
-              haikuId={haikuId}
-              haikuSubject={haikuSubject}
-              onChanged={() => undefined}
-              onLinkUpdate={setShareLink}
-            />
-          )
-        ) : (
-          <ComicPagePanel span="full" color="white" contentAlign="start" className={styles.contentPanel}>
-            <SendShareEmailContent
-              message={emailMessage}
-              emails={emailRecipients}
-              invalidEmails={invalidEmails}
-              onMessageChange={setEmailMessage}
-              onEmailsChange={setEmailRecipients}
-              disabled={sendingEmail}
-            />
-          </ComicPagePanel>
-        )}
-      </div>
+            <ComicPagePanel
+              selectable
+              selected={method === "email"}
+              onSelect={selectEmail}
+              background="halftone"
+              color="orange"
+              overflowVisible
+              flexWeight={method === "email" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
+              ariaLabel="Share via email"
+              title="Email"
+              className={styles.methodPanel}
+            >
+              <ShareMethodIcon
+                src="/share_modal/email.svg"
+                bubbleStyle="rectangle"
+                sourceDirection="none"
+                active={method === "email"}
+              />
+            </ComicPagePanel>
+          </ComicPageRow>
+        ) : null}
 
-      {!emailSent ? (
-        method === "email" ? (
-          <ShareEmailSendPanel
-            canSendEmail={canSendEmail}
-            sendingEmail={sendingEmail}
-            emailCtaHint={emailCtaHint}
-            onSendEmail={() => void onSendEmail()}
-          />
-        ) : (
-          <div className={styles.sendRowSpacer} aria-hidden />
-        )
-      ) : null}
+        <div className={styles.contentSlot}>
+          {emailSent ? (
+            <ComicPagePanel span="full" color="white" contentAlign="start" className={styles.contentPanel}>
+              <div className={styles.successBlock}>
+                <Typography.Paragraph className={styles.success}>
+                  Your haikus have been sent.
+                </Typography.Paragraph>
+                <Button type="primary" onClick={onClose}>
+                  Done
+                </Button>
+              </div>
+            </ComicPagePanel>
+          ) : method === "link" ? (
+            loadingLink ? (
+              <ComicPagePanel span="full" color="white" contentAlign="center" className={styles.contentPanel}>
+                <Typography.Paragraph type="secondary" style={{ margin: 0 }}>
+                  Loading…
+                </Typography.Paragraph>
+              </ComicPagePanel>
+            ) : (
+              <ShareLink
+                link={shareLink}
+                haikuId={haikuId}
+                haikuSubject={haikuSubject}
+                onChanged={() => undefined}
+                onLinkUpdate={setShareLink}
+              />
+            )
+          ) : (
+            <ComicPagePanel span="full" color="white" contentAlign="start" className={styles.contentPanel}>
+              <SendShareEmailContent
+                message={emailMessage}
+                emails={emailRecipients}
+                invalidEmails={invalidEmails}
+                onMessageChange={setEmailMessage}
+                onEmailsChange={setEmailRecipients}
+                disabled={sendingEmail}
+              />
+            </ComicPagePanel>
+          )}
+        </div>
+
+        {method === "email" && !emailSent ? (
+          <div className={styles.sendRow}>
+            <ShareEmailSendPanel
+              canSendEmail={canSendEmail}
+              sendingEmail={sendingEmail}
+              emailCtaHint={emailCtaHint}
+              onSendEmail={() => void onSendEmail()}
+            />
+          </div>
+        ) : null}
+      </div>
     </ComicPageDialog>
   );
 }
