@@ -404,6 +404,7 @@ export function ShareLink({
         <ComicPagePanel
           span="full"
           background="sunburst"
+          sunburstHalftone={false}
           color={active && !activating && !deactivating ? "orange" : "white"}
           shine={shine}
           contentAlign="center"

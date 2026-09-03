@@ -146,6 +146,17 @@
   opacity: 0.9;
 }
 
+.bgSunburstNoHalftone::after {
+  background-image: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in srgb, var(--comic-panel-base, #fff) 96%, white) 0%,
+    color-mix(in srgb, var(--comic-panel-base, #fff) 40%, transparent) 26%,
+    transparent 48%
+  );
+  background-size: 100% 100%;
+  background-blend-mode: normal;
+}
+
 .bgHalftone {
   background-color: var(--comic-panel-base, #fff);
   background-image: radial-gradient(

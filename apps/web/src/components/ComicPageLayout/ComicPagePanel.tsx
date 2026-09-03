@@ -29,6 +29,8 @@ export type ComicPagePanelProps = {
   loading?: boolean;
   /** When background is sunburst, rotate rays (shine). Default true. */
   shine?: boolean;
+  /** When background is sunburst, overlay the comic halftone dots. Default true. */
+  sunburstHalftone?: boolean;
   selectable?: boolean;
   selected?: boolean;
   onSelect?: () => void;
@@ -66,6 +68,7 @@ export function ComicPagePanel({
   isMotionBackground: isMotionBackgroundProp,
   loading = false,
   shine = true,
+  sunburstHalftone = true,
   selectable = false,
   selected = false,
   onSelect,
@@ -85,6 +88,7 @@ export function ComicPagePanel({
   const bgClass = [
     staticBgClass(staticBackground),
     staticBackground === "sunburst" && !shine && panelStyles.bgSunburstPaused,
+    staticBackground === "sunburst" && !sunburstHalftone && panelStyles.bgSunburstNoHalftone,
   ]
     .filter(Boolean)
     .join(" ");

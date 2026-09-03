@@ -107,6 +107,7 @@ export function ShareModal({
               title="Link"
               isMotionBackground={false}
               shine={false}
+              sunburstHalftone={false}
               overflowVisible
               flexWeight={method === "link" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
               ariaLabel="Share by link"
