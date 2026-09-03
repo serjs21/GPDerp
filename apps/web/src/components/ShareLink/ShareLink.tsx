@@ -35,7 +35,7 @@ const ACTIVATING_MIN_MS = ACTIVATING_DOT_MS * ACTIVATING_DOT_CYCLE.length;
 const PLANE_ALTITUDE_Y = -50;
 const PLANE_LIFT_MS = 0.4;
 
-type PlanePhase = "idle" | "takeoff" | "flying";
+type PlanePhase = "idle" | "takeoff" | "flying" | "landing";
 
 const planeVariants: Record<
   PlanePhase,
@@ -45,7 +45,7 @@ const planeVariants: Record<
     rotate: number | number[];
     transition: {
       duration: number;
-      ease: "easeOut" | "easeInOut";
+      ease?: "easeOut" | "easeInOut";
       repeat?: number;
     };
   }
@@ -54,7 +54,7 @@ const planeVariants: Record<
     x: 0,
     y: 0,
     rotate: 78,
-    transition: { duration: PLANE_LIFT_MS, ease: "easeOut" },
+    transition: { duration: 0 },
   },
   takeoff: {
     x: 0,
@@ -64,9 +64,22 @@ const planeVariants: Record<
   },
   flying: {
     x: [0, 3, -2, 4, 1, 0],
-    y: [-40, -44, -47, -45, -42, -40],
+    y: [
+      PLANE_ALTITUDE_Y,
+      PLANE_ALTITUDE_Y - 4,
+      PLANE_ALTITUDE_Y - 7,
+      PLANE_ALTITUDE_Y - 5,
+      PLANE_ALTITUDE_Y - 2,
+      PLANE_ALTITUDE_Y,
+    ],
     rotate: [0, -5, 4, -3, 2, 0],
     transition: { duration: 1.4, repeat: Infinity, ease: "easeInOut" },
+  },
+  landing: {
+    x: 0,
+    y: 0,
+    rotate: 78,
+    transition: { duration: PLANE_LIFT_MS, ease: "easeOut" },
   },
 };
 
@@ -145,6 +158,7 @@ export function ShareLink({
   const { copy } = useCopy();
   const [isUpdating, setIsUpdating] = useState(false);
   const [activating, setActivating] = useState(false);
+  const [deactivating, setDeactivating] = useState(false);
   const [updatingLimits, setUpdatingLimits] = useState(false);
   const [busyDots, setBusyDots] = useState<(typeof ACTIVATING_DOT_CYCLE)[number]>("");
   const [now, setNow] = useState<Date | null>(null);
@@ -152,13 +166,20 @@ export function ShareLink({
 
   const subject = link?.haikuSubject || haikuSubject;
   const active = link != null && isActiveShareLink(link, now ?? undefined);
-  const busy = activating || updatingLimits;
+  const busy = activating || deactivating || updatingLimits;
   const limitsLocked = busy;
   const copyEnabled = active && !busy;
-  const grayscale = !active;
-  const shine = active || activating;
-  const planePhase: PlanePhase =
-    activating && !reduceMotion ? "takeoff" : active && !reduceMotion ? "flying" : "idle";
+  const grayscale = !active && !deactivating;
+  const shine = active || activating || deactivating;
+  const planePhase: PlanePhase = reduceMotion
+    ? "idle"
+    : deactivating
+      ? "landing"
+      : activating
+        ? "takeoff"
+        : active
+          ? "flying"
+          : "idle";
   /** Static airborne pose so mount-as-active can enter the flying keyframe loop. */
   const planeInitial =
     active && !reduceMotion
@@ -211,19 +232,21 @@ export function ShareLink({
     return () => window.clearInterval(id);
   }, [busy]);
 
-  const holdMinBusy = async (startedAt: number) => {
+  const holdMinBusy = async (startedAt: number, minMs = ACTIVATING_MIN_MS) => {
     const elapsed = Date.now() - startedAt;
-    if (elapsed < ACTIVATING_MIN_MS) {
+    if (elapsed < minMs) {
       await new Promise((resolve) => {
-        window.setTimeout(resolve, ACTIVATING_MIN_MS - elapsed);
+        window.setTimeout(resolve, minMs - elapsed);
       });
     }
   };
 
   const onStop = async () => {
     if (!link || !active || isUpdating || busy) return;
+    const startedAt = Date.now();
+    setDeactivating(true);
+    setIsUpdating(true);
     try {
-      setIsUpdating(true);
       const updated = await shareLinksApi.setShareLinkDisabled(link.id, true);
       onLinkUpdate?.(updated);
       comicToast.success("Share link stopped");
@@ -232,6 +255,8 @@ export function ShareLink({
       comicToast.error(getAxiosErrorMessage(error, "Could not stop share link"));
     } finally {
       setIsUpdating(false);
+      await holdMinBusy(startedAt, Math.round(PLANE_LIFT_MS * 1000));
+      setDeactivating(false);
     }
   };
 
@@ -379,7 +404,7 @@ export function ShareLink({
         <ComicPagePanel
           span="full"
           background="sunburst"
-          color={active && !activating ? "orange" : "white"}
+          color={active && !activating && !deactivating ? "orange" : "white"}
           shine={shine}
           contentAlign="center"
           className={styles.panel}
@@ -477,6 +502,13 @@ export function ShareLink({
           <button type="button" className={styles.actionButton} disabled aria-live="polite">
             <span className={styles.actionLabel}>
               Activating
+              <span className={styles.activatingDots}>{busyDots}</span>
+            </span>
+          </button>
+        ) : deactivating ? (
+          <button type="button" className={styles.actionButton} disabled aria-live="polite">
+            <span className={styles.actionLabel}>
+              Stopping
               <span className={styles.activatingDots}>{busyDots}</span>
             </span>
           </button>
