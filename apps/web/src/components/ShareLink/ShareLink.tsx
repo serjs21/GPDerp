@@ -32,6 +32,43 @@ const INFINITY_SRC = "/share_modal/link/infinity.svg";
 const ACTIVATING_DOT_MS = 500;
 const ACTIVATING_DOT_CYCLE = ["", ".", "..", "..."] as const;
 const ACTIVATING_MIN_MS = ACTIVATING_DOT_MS * ACTIVATING_DOT_CYCLE.length;
+const PLANE_ALTITUDE_Y = -50;
+const PLANE_LIFT_MS = 0.4;
+
+type PlanePhase = "idle" | "takeoff" | "flying";
+
+const planeVariants: Record<
+  PlanePhase,
+  {
+    x: number | number[];
+    y: number | number[];
+    rotate: number | number[];
+    transition: {
+      duration: number;
+      ease: "easeOut" | "easeInOut";
+      repeat?: number;
+    };
+  }
+> = {
+  idle: {
+    x: 0,
+    y: 0,
+    rotate: 78,
+    transition: { duration: PLANE_LIFT_MS, ease: "easeOut" },
+  },
+  takeoff: {
+    x: 0,
+    y: PLANE_ALTITUDE_Y,
+    rotate: 0,
+    transition: { duration: PLANE_LIFT_MS, ease: "easeOut" },
+  },
+  flying: {
+    x: [0, 3, -2, 4, 1, 0],
+    y: [-40, -44, -47, -45, -42, -40],
+    rotate: [0, -5, 4, -3, 2, 0],
+    transition: { duration: 1.4, repeat: Infinity, ease: "easeInOut" },
+  },
+};
 
 type LimitForm = {
   maxViews: number | null;
@@ -118,9 +155,15 @@ export function ShareLink({
   const busy = activating || updatingLimits;
   const limitsLocked = busy;
   const copyEnabled = active && !busy;
-  const isFlying = (active || activating) && !reduceMotion;
   const grayscale = !active;
   const shine = active || activating;
+  const planePhase: PlanePhase =
+    activating && !reduceMotion ? "takeoff" : active && !reduceMotion ? "flying" : "idle";
+  /** Static airborne pose so mount-as-active can enter the flying keyframe loop. */
+  const planeInitial =
+    active && !reduceMotion
+      ? { x: 0, y: PLANE_ALTITUDE_Y, rotate: 0 }
+      : ("idle" as const);
 
   const payload = buildLimitPayload(form);
   const formValid =
@@ -317,24 +360,9 @@ export function ShareLink({
           alt=""
           className={styles.plane}
           aria-hidden
-          animate={
-            isFlying
-              ? {
-                  x: [0, 3, -2, 4, 1, 0],
-                  y: [0, -4, -7, -5, -2, 0],
-                  rotate: [0, -5, 4, -3, 2, 0],
-                }
-              : {
-                  x: 0,
-                  y: 10,
-                  rotate: 78,
-                }
-          }
-          transition={
-            isFlying
-              ? { duration: 1.4, repeat: Infinity, ease: "easeInOut" }
-              : { duration: 0.3, ease: "easeOut" }
-          }
+          variants={planeVariants}
+          initial={planeInitial}
+          animate={planePhase}
         />
       </div>
     </>
