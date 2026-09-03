@@ -8,6 +8,18 @@
   gap: 0.75rem;
 }
 
+.filtersSection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  justify-content: center;
+  z-index: 10;
+  padding-top: 1rem;
+}
+
 .displayArea {
   position: relative;
   flex: 1;

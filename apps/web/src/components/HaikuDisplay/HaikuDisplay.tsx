@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CreationModal } from "@/components/CreationModal";
 import { SavedHaikusLanternPath } from "@/components/SavedHaikusLanternPath/SavedHaikusLanternPath";
 import { StoneInput } from "@/components/StoneInput";
@@ -9,6 +9,8 @@ import { useHaikuDeleteController } from "@/hooks/useHaikuDeleteController";
 import { useInfiniteHaikusQuery } from "@/hooks/useInfiniteHaikusQuery";
 import { useCreationPathGate } from "@/components/HaikuGenerationStickyNote/hooks/useCreationPathGate";
 import { useHaikuGenerationFlow } from "@/components/HaikuGenerationStickyNote/hooks/useHaikuGenerationFlow";
+import { SearchInput } from "@/components/SearchInput";
+import { LabelFilter } from "@/components/LabelFilter";
 import styles from "./HaikuDisplay.module.css";
 
 export function HaikuDisplay() {
@@ -16,6 +18,9 @@ export function HaikuDisplay() {
   const bindHaikuSavedRef = useRef<(haiku: import("@/api/haikus").HaikuDto) => void>(() => {});
   const { invalidate } = useInfiniteHaikusQuery();
   const { onHaikuDeleted, onHaikuDeleteFailed, deleteFailedModal } = useHaikuDeleteController();
+
+  const [searchString, setSearchString] = useState("");
+  const [selectedLabelIds, setSelectedLabelIds] = useState<string[]>([]);
 
   const {
     subject,
@@ -45,10 +50,22 @@ export function HaikuDisplay() {
 
   return (
     <div className={styles.wrapper}>
+      <div className={styles.filtersSection}>
+        <SearchInput
+          value={searchString}
+          onChange={setSearchString}
+        />
+        <LabelFilter
+          selectedLabelIds={selectedLabelIds}
+          onChange={setSelectedLabelIds}
+        />
+      </div>
       <div className={styles.displayArea}>
         <SavedHaikusLanternPath
           ref={pathRef}
           generatingDraft={creationOpen ? null : generatingDraft}
+          searchString={searchString}
+          selectedLabelIds={selectedLabelIds}
         />
       </div>
       <div className={`${styles.inputSection} ${styles.inputSectionBottom}`}>

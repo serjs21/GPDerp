@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useCallback } from "react";
+import { forwardRef, useCallback, useMemo } from "react";
 import { Button } from "@/components/StyledComponents";
 import { SVGPath, type SVGPathHandle } from "@/components/SVGPath";
 import { SakuraPetalLoader } from "@/components/Loaders";
@@ -11,12 +11,14 @@ import styles from "@/components/Lantern/LanternPath/LanternPath.module.css";
 
 export type SavedHaikusLanternPathProps = {
   generatingDraft?: GeneratingDraft | null;
+  searchString?: string;
+  selectedLabelIds?: string[];
 };
 
 export const SavedHaikusLanternPath = forwardRef<
   SVGPathHandle,
   SavedHaikusLanternPathProps
->(function SavedHaikusLanternPath({ generatingDraft = null }, ref) {
+>(function SavedHaikusLanternPath({ generatingDraft = null, searchString = "", selectedLabelIds = [] }, ref) {
   const {
     haikus,
     hasNextPage,
@@ -29,6 +31,23 @@ export const SavedHaikusLanternPath = forwardRef<
     isError,
     refetch,
   } = useInfiniteHaikusQuery();
+
+  const filteredHaikus = useMemo(() => {
+    let result = haikus;
+    
+    if (searchString) {
+      const lowerSearch = searchString.toLowerCase();
+      result = result.filter((haiku) => haiku.title.toLowerCase().includes(lowerSearch));
+    }
+    
+    if (selectedLabelIds.length > 0) {
+      result = result.filter((haiku) =>
+        haiku.labels.some((label) => selectedLabelIds.includes(label.id)),
+      );
+    }
+    
+    return result;
+  }, [haikus, searchString, selectedLabelIds]);
 
   const { onHaikuDeleted, onHaikuDeleteFailed, deleteFailedModal } = useHaikuDeleteController();
 
@@ -67,7 +86,7 @@ export const SavedHaikusLanternPath = forwardRef<
     <>
       <SVGPath
         ref={ref}
-        haikus={haikus}
+        haikus={filteredHaikus}
         generatingDraft={generatingDraft}
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetchingNextPage}

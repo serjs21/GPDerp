@@ -1,0 +1,8 @@
+.searchInput {
+  min-width: 200px;
+  border-radius: 8px;
+}
+
+.icon {
+  color: var(--text-tertiary, #888);
+}

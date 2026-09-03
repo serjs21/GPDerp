@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Noto_Serif_JP, Press_Start_2P, Zen_Kurenaido } from "next/font/google";
+import { Bangers, Geist, Geist_Mono, Noto_Serif_JP, Press_Start_2P, Zen_Kurenaido } from "next/font/google";
 import "@/theme/globals.css";
 import "@/theme/themes/tokyo-dusk.css";
 import "@/theme/themes/sumie.css";
@@ -47,6 +47,14 @@ const pressStart2P = Press_Start_2P({
   display: "swap",
 });
 
+// Comic-style font for labels
+const bangers = Bangers({
+  variable: "--font-comic-label",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "GPDerp",
   description: "AI, but useless",
@@ -75,7 +83,7 @@ export default async function RootLayout({
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? process.env.GOOGLE_CLIENT_ID;
   
   return (
-    <html lang={initialLocale} data-theme={initialTheme} className={`${notoSerifJP.variable} ${zenKurenaido.variable} ${geistSans.variable} ${geistMono.variable} ${pressStart2P.variable}`}>
+    <html lang={initialLocale} data-theme={initialTheme} className={`${notoSerifJP.variable} ${zenKurenaido.variable} ${geistSans.variable} ${geistMono.variable} ${pressStart2P.variable} ${bangers.variable}`}>
       <body>
         <AntdRegistry>
           <HtmlLoader />
