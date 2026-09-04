@@ -21,6 +21,7 @@ import {
   stagePaddingClassForLabel,
 } from "./comicLabelLayout";
 import styles from "./ComicLabel.module.css";
+import { formatComicLabelText } from "./utils";
 
 export type ComicLabelMode = "standalone" | "embedded";
 
@@ -64,7 +65,7 @@ const ComicLabelInner = forwardRef<HTMLDivElement | HTMLButtonElement, ComicLabe
     const labelContent =
       children ?? (
         <ComicLabelText
-          text={name}
+          text={formatComicLabelText(name)}
           size="sm"
           color="#ffffff"
           outlineColor="#000000"
