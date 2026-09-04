@@ -1,12 +1,18 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties } from "react";
+import {
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import { ComicLabel } from "@/components/ComicLabel/ComicLabel";
 import { rotateLabelsWindow } from "./lanternLabelRingLayout";
 import {
   buildLabelBeltSlots,
-  LABEL_BELT_EDGE_GAP,
   LABEL_BELT_MAX_VISIBLE,
+  LABEL_BELT_SPIKE_GAP,
 } from "./labelBeltLayout";
 import styles from "./LabelBelt.module.css";
 
@@ -25,10 +31,22 @@ export type LabelBeltProps = {
 
 const ARROW_SRC = "/inkbrush-arrow.svg";
 
+type SlotPush = { x: number; y: number };
+
+function remToPx(rem: string): number {
+  const n = Number.parseFloat(rem);
+  if (!Number.isFinite(n)) return 12;
+  const probe = document.createElement("div");
+  probe.style.cssText = "position:absolute;width:1rem;visibility:hidden";
+  document.body.appendChild(probe);
+  const px = probe.offsetWidth || 16;
+  probe.remove();
+  return n * px;
+}
+
 /**
- * Upper-half arc of ComicLabels around a lantern frame (`position: relative` host).
- * Label centers sit `LABEL_BELT_EDGE_GAP` outside the host box edge.
- * Standalone ComicLabel per slot so each bubble can rotate toward center.
+ * Upper-half belt of upright ComicLabels on a rectangular outline.
+ * Clearance uses half the label content size + spike gap (not the padded stage AABB).
  */
 export function LabelBelt({
   labels,
@@ -36,6 +54,7 @@ export function LabelBelt({
   className,
 }: LabelBeltProps) {
   const [rotationOffset, setRotationOffset] = useState(0);
+  const [pushes, setPushes] = useState<SlotPush[]>([]);
 
   const overflow = labels.length > maxVisible;
   const visible = useMemo(
@@ -52,6 +71,32 @@ export function LabelBelt({
     [visible],
   );
 
+  const slotRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  // Measure content boxes and push centers just outside the lantern edge.
+  useLayoutEffect(() => {
+    const spikePx = remToPx(LABEL_BELT_SPIKE_GAP);
+    const next = slots.map((slot, index) => {
+      const el = slotRefs.current[index];
+      const content = el?.querySelector("[data-comic-role='label']") as HTMLElement | null;
+      const w = content?.offsetWidth ?? 48;
+      const h = content?.offsetHeight ?? 28;
+      return {
+        x: slot.rectX * (w / 2 + spikePx),
+        y: slot.rectY * (h / 2 + spikePx),
+      };
+    });
+    setPushes((prev) => {
+      if (
+        prev.length === next.length &&
+        prev.every((p, i) => Math.abs(p.x - next[i]!.x) < 0.5 && Math.abs(p.y - next[i]!.y) < 0.5)
+      ) {
+        return prev;
+      }
+      return next;
+    });
+  }, [slots]);
+
   if (labels.length === 0) return null;
 
   const windowStart = ((rotationOffset % labels.length) + labels.length) % labels.length;
@@ -61,22 +106,27 @@ export function LabelBelt({
       className={[styles.overlay, className].filter(Boolean).join(" ")}
       aria-label="Haiku label belt"
     >
-      {slots.map((slot) => (
-        <div
-          key={slot.label.id}
-          className={styles.slot}
-          style={
-            {
-              left: `calc(50% + (50% + ${LABEL_BELT_EDGE_GAP}) * ${slot.cos})`,
-              top: `calc(50% + (50% + ${LABEL_BELT_EDGE_GAP}) * ${slot.sin})`,
-              transform: `translate(-50%, -50%) rotate(${slot.rotateDeg}deg)`,
-              transformOrigin: "center center",
-            } as CSSProperties
-          }
-        >
-          <ComicLabel name={slot.label.name} color={slot.label.color} sourceDirection="none" />
-        </div>
-      ))}
+      {slots.map((slot, index) => {
+        const push = pushes[index] ?? { x: 0, y: 0 };
+        return (
+          <div
+            key={slot.label.id}
+            ref={(el) => {
+              slotRefs.current[index] = el;
+            }}
+            className={styles.slot}
+            style={
+              {
+                left: `calc(50% + 50% * ${slot.rectX})`,
+                top: `calc(50% + 50% * ${slot.rectY})`,
+                transform: `translate(calc(-50% + ${push.x}px), calc(-50% + ${push.y}px))`,
+              } as CSSProperties
+            }
+          >
+            <ComicLabel name={slot.label.name} color={slot.label.color} sourceDirection="none" />
+          </div>
+        );
+      })}
 
       {overflow ? (
         <>
