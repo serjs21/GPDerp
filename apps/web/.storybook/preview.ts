@@ -1,7 +1,7 @@
 import type { Preview } from '@storybook/nextjs-vite'
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { NextIntlClientProvider } from 'next-intl';
-import { Geist, Geist_Mono, Noto_Serif_JP, Press_Start_2P, Zen_Kurenaido } from 'next/font/google';
+import { Geist, Geist_Mono, Luckiest_Guy, Noto_Serif_JP, Press_Start_2P, Zen_Kurenaido } from 'next/font/google';
 import { createElement } from 'react';
 import enMessages from '../messages/en.json';
 import '@/theme/globals.css';
@@ -39,12 +39,20 @@ const pressStart2P = Press_Start_2P({
   display: 'swap',
 });
 
+const luckiestGuy = Luckiest_Guy({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-luckiest-guy',
+  display: 'swap',
+});
+
 const storybookFontVariableClass = [
   notoSerifJP.variable,
   zenKurenaido.variable,
   geistSans.variable,
   geistMono.variable,
   pressStart2P.variable,
+  luckiestGuy.variable,
 ].join(' ');
 
 const preview: Preview = {

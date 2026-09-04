@@ -123,7 +123,7 @@ export function LabelBelt({
               } as CSSProperties
             }
           >
-            <ComicLabel name={slot.label.name} color={slot.label.color} sourceDirection="none" />
+            <ComicLabel text={slot.label.name} shape="burst" color={slot.label.color} />
           </div>
         );
       })}
