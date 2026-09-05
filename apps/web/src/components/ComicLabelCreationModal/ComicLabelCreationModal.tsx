@@ -208,23 +208,17 @@ export function ComicLabelCreationModal({
 
           <div ref={colorShellRef} className={styles.colorShell}>
             <ComicPagePanel
-              title="Color"
+              title={pickerOpen ? undefined : "Color"}
               background="solid"
               color="white"
               contentAlign="center"
-              className={styles.colorPanel}
+              className={[styles.colorPanel, pickerOpen ? styles.colorPanelOpen : ""]
+                .filter(Boolean)
+                .join(" ")}
               ariaLabel="Label color"
               style={colorPanelStyle}
             >
-              {pickerOpen ? (
-                <div
-                  className={styles.pickerWrap}
-                  onClick={(e) => e.stopPropagation()}
-                  onPointerDown={(e) => e.stopPropagation()}
-                >
-                  <HexColorPicker color={color} onChange={setColor} />
-                </div>
-              ) : (
+              {pickerOpen ? null : (
                 <button
                   type="button"
                   className={styles.colorBody}
@@ -238,41 +232,56 @@ export function ComicLabelCreationModal({
                 </button>
               )}
             </ComicPagePanel>
+            {pickerOpen ? (
+              <div
+                className={styles.pickerWrap}
+                onClick={(e) => e.stopPropagation()}
+                onPointerDown={(e) => e.stopPropagation()}
+              >
+                <HexColorPicker color={color} onChange={setColor} />
+              </div>
+            ) : null}
           </div>
         </ComicPageRow>
 
-        <ComicPageRow className={styles.shapeRow}>
-          {COMIC_LABEL_SHAPE_PRESETS.map((preset) => {
-            const selected = shapeId === preset.id;
-            return (
-              <ComicPagePanel
-                key={preset.id}
-                selectable
-                selected={selected}
-                onSelect={() => setShapeId(preset.id)}
-                background="halftone"
-                color={selected ? "orange" : "white"}
-                overflowVisible
-                flexWeight={1}
-                className={styles.shapePanel}
-                ariaLabel={`${preset.label} shape`}
-              >
-                <div className={styles.shapePreview}>
-                  <ComicBurstLabel
-                    text={formatComicLabelText(preset.label.slice(0, 6))}
-                    fill={selected ? color : "#888888"}
-                    shapeKind={preset.kind}
-                    spikeCount={preset.spikeCount}
-                    randomness={preset.randomness}
-                    seed={preset.id}
-                    fontSize={16}
-                  />
-                  <p className={styles.shapeCaption}>{preset.label}</p>
-                </div>
-              </ComicPagePanel>
-            );
-          })}
-        </ComicPageRow>
+        <div className={styles.shapeRows}>
+          {[COMIC_LABEL_SHAPE_PRESETS.slice(0, 3), COMIC_LABEL_SHAPE_PRESETS.slice(3)].map(
+            (row, rowIndex) => (
+              <ComicPageRow key={rowIndex} className={styles.shapeRow}>
+                {row.map((preset) => {
+                  const selected = shapeId === preset.id;
+                  return (
+                    <ComicPagePanel
+                      key={preset.id}
+                      selectable
+                      selected={selected}
+                      onSelect={() => setShapeId(preset.id)}
+                      background="halftone"
+                      color={selected ? "orange" : "white"}
+                      overflowVisible
+                      flexWeight={1}
+                      className={styles.shapePanel}
+                      ariaLabel={`${preset.label} shape`}
+                    >
+                      <div className={styles.shapePreview}>
+                        <ComicBurstLabel
+                          text={formatComicLabelText(preset.label.slice(0, 6))}
+                          fill={selected ? color : "#888888"}
+                          shapeKind={preset.kind}
+                          spikeCount={preset.spikeCount}
+                          randomness={preset.randomness}
+                          seed={preset.id}
+                          fontSize={16}
+                        />
+                        <p className={styles.shapeCaption}>{preset.label}</p>
+                      </div>
+                    </ComicPagePanel>
+                  );
+                })}
+              </ComicPageRow>
+            ),
+          )}
+        </div>
 
         <ComicPageRow className={styles.footerRow}>
           <Tooltip title={disabledReason ?? ""}>

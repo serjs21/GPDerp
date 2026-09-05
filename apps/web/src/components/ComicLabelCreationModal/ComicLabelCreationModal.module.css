@@ -94,6 +94,10 @@
   cursor: pointer;
 }
 
+.colorPanelOpen {
+  cursor: default;
+}
+
 .colorBody {
   position: relative;
   display: flex;
@@ -119,9 +123,7 @@
   width: 5.25rem;
   height: 5.25rem;
   padding: 0.55rem;
-  background: #fff;
-  border: 2px solid #111;
-  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
+
 }
 
 .brush {
@@ -133,24 +135,51 @@
 }
 
 .pickerWrap {
-  position: relative;
-  z-index: 1;
+  position: absolute;
+  /* Sit inside the panel’s black border so the comic chrome stays visible. */
+  inset: var(--comic-page-border, 4px);
+  z-index: 4;
   box-sizing: border-box;
-  width: 100%;
-  max-width: 12rem;
-  padding: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  border: none;
   background: #fff;
-  border: 2px solid #111;
+  overflow: hidden;
 }
 
 .pickerWrap :global(.react-colorful) {
   width: 100% !important;
-  height: 8rem !important;
+  height: 100% !important;
+  min-height: 0;
+}
+
+.pickerWrap :global(.react-colorful__saturation) {
+  border-radius: 0;
+  border-bottom: none;
+}
+
+.pickerWrap :global(.react-colorful__hue) {
+  border-radius: 0;
+  height: 1.75rem;
+  margin-top: 0;
+}
+
+.shapeRows {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 0 0 auto;
 }
 
 .shapeRow {
   flex: 0 0 auto;
   gap: 0 !important;
+}
+
+.shapeRow + .shapeRow {
+  margin-top: calc(-1 * var(--comic-page-border, 4px));
 }
 
 .shapePanel {
