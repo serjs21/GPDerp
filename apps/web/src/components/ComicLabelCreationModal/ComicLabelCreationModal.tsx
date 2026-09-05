@@ -69,7 +69,7 @@ export function ComicLabelCreationModal({
   const trimmedName = name.trim();
   const shape = shapePreset(shapeId);
   const previewText =
-    trimmedName.length > 0 ? formatComicLabelText(trimmedName) : formatComicLabelText("abc");
+    trimmedName.length > 0 ? formatComicLabelText(trimmedName) : formatComicLabelText("__");
   const saveText = formatComicLabelText(label ? "Save" : "Create");
 
   const isShort = trimmedName.length > 0 && trimmedName.length < COMIC_LABEL_NAME_MIN;
