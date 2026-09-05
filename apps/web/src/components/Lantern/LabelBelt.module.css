@@ -51,8 +51,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.1rem;
-  height: 2.1rem;
+  height: 4rem;
   padding: 0.15rem;
   border: none;
   border-radius: 0.25rem;
@@ -77,14 +76,14 @@
 }
 
 .navPrev {
-  left: 65%;
-  bottom: -15%;
+  left: 80%;
+  bottom: -35%;
   transform: translate(calc(-100% - 0.35rem), -50%);
 }
 
 .navNext {
-  right: 65%;
-  bottom: -15%;
+  right: 80%;
+  bottom: -35%;
   transform: translate(calc(100% + 0.35rem), -50%) scaleX(-1);
 }
 

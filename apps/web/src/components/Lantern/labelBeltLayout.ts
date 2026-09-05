@@ -25,29 +25,33 @@ export type LabelBeltSlot = {
 };
 
 /**
- * Fill priority when fewer than 6 labels: corners first, then mid spots.
- * Order: bottom-left → top-left → bottom-right → top-right → middle-left → middle-right.
+ * Fill priority when fewer than 6 labels: clockwise from bottom-left.
+ * bl → br → mr → tr → tl → ml
  */
 export const LABEL_BELT_FILL_ORDER: readonly LabelBeltSlotId[] = [
   "bl",
-  "tl",
   "br",
-  "tr",
-  "ml",
   "mr",
+  "tr",
+  "tl",
+  "ml",
 ] as const;
 
 /**
- * Ring order for overflow window + portal neighbors:
- * bl → ml → tl → tr → mr → br → bl
+ * Ring order for overflow window + portal neighbors (clockwise from bl):
+ * bl → br → mr → tr → tl → ml → bl
+ *
+ * With this order, nav prev (delta −1) advances labels clockwise and
+ * nav next (delta +1) advances them counter-clockwise. Portal travel
+ * signs stay tied to delta (animation direction unchanged).
  */
 export const LABEL_BELT_RING_ORDER: readonly LabelBeltSlotId[] = [
   "bl",
-  "ml",
-  "tl",
-  "tr",
-  "mr",
   "br",
+  "mr",
+  "tr",
+  "tl",
+  "ml",
 ] as const;
 
 function slotFromId(id: LabelBeltSlotId, index: number): LabelBeltSlot {
@@ -63,7 +67,7 @@ function slotFromId(id: LabelBeltSlotId, index: number): LabelBeltSlot {
 
 /**
  * Build slots for `count` visible labels.
- * - `count < 6`: occupy fill-order slots (corners first).
+ * - `count < 6`: occupy fill-order slots (clockwise from bottom-left).
  * - `count === 6`: all slots in ring order (overflow window maps index → ring).
  */
 export function buildLabelBeltSlots(count: number): LabelBeltSlot[] {
@@ -98,9 +102,9 @@ export function labelBeltPortalAxisForMove(
 
 /**
  * Local-Y travel sign for a portal wipe into `to`.
- * Same-side slots share one direction per nav arrow:
- * - prev (delta −1): left rolls down (+1), right rolls up (−1)
- * - next (delta +1): left rolls up (−1), right rolls down (+1)
+ * Same-side slots share one direction per nav arrow (independent of ring order):
+ * - prev (delta −1 / clockwise): left rolls down (+1), right rolls up (−1)
+ * - next (delta +1 / counter-clockwise): left rolls up (−1), right rolls down (+1)
  */
 export function labelBeltPortalTravelSign(
   to: LabelBeltSlotId,

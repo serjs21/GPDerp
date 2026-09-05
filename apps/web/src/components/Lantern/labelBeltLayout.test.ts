@@ -17,25 +17,25 @@ describe("labelBeltLayout", () => {
     expect(buildLabelBeltSlots(9)).toHaveLength(6);
   });
 
-  it("fills corners before mid spots", () => {
+  it("fills clockwise from bottom-left", () => {
     expect(buildLabelBeltSlots(1).map((s) => s.id)).toEqual(["bl"]);
-    expect(buildLabelBeltSlots(2).map((s) => s.id)).toEqual(["bl", "tl"]);
-    expect(buildLabelBeltSlots(3).map((s) => s.id)).toEqual(["bl", "tl", "br"]);
-    expect(buildLabelBeltSlots(4).map((s) => s.id)).toEqual(["bl", "tl", "br", "tr"]);
+    expect(buildLabelBeltSlots(2).map((s) => s.id)).toEqual(["bl", "br"]);
+    expect(buildLabelBeltSlots(3).map((s) => s.id)).toEqual(["bl", "br", "mr"]);
+    expect(buildLabelBeltSlots(4).map((s) => s.id)).toEqual(["bl", "br", "mr", "tr"]);
     expect(buildLabelBeltSlots(5).map((s) => s.id)).toEqual([
       "bl",
-      "tl",
       "br",
+      "mr",
       "tr",
-      "ml",
+      "tl",
     ]);
-    expect(LABEL_BELT_FILL_ORDER).toEqual(["bl", "tl", "br", "tr", "ml", "mr"]);
+    expect(LABEL_BELT_FILL_ORDER).toEqual(["bl", "br", "mr", "tr", "tl", "ml"]);
   });
 
   it("uses ring order when all six slots are occupied", () => {
     const slots = buildLabelBeltSlots(LABEL_BELT_MAX_VISIBLE);
     expect(slots.map((s) => s.id)).toEqual([...LABEL_BELT_RING_ORDER]);
-    expect(LABEL_BELT_RING_ORDER).toEqual(["bl", "ml", "tl", "tr", "mr", "br"]);
+    expect(LABEL_BELT_RING_ORDER).toEqual(["bl", "br", "mr", "tr", "tl", "ml"]);
   });
 
   it("loads stop config for sides and tilts", () => {
@@ -57,23 +57,24 @@ describe("labelBeltLayout", () => {
   });
 
   it("walks ring neighbors for portal travel", () => {
-    expect(labelBeltRingNeighbor("bl", 1)).toBe("ml");
-    expect(labelBeltRingNeighbor("br", 1)).toBe("bl");
-    expect(labelBeltRingNeighbor("tl", -1)).toBe("ml");
-    expect(labelBeltPortalAxisForMove("bl", "ml")).toBe("y");
+    expect(labelBeltRingNeighbor("bl", 1)).toBe("br");
+    expect(labelBeltRingNeighbor("br", 1)).toBe("mr");
+    expect(labelBeltRingNeighbor("ml", 1)).toBe("bl");
+    expect(labelBeltRingNeighbor("tl", -1)).toBe("tr");
+    expect(labelBeltPortalAxisForMove("bl", "br")).toBe("y");
     expect(labelBeltPortalAxisForMove("tl", "tr")).toBe("y");
     expect(labelBeltPortalAxisForMove("br", "bl")).toBe("y");
   });
 
   it("rolls same-side slots together based on nav delta", () => {
-    // Left arrow (prev): left down, right up
+    // Left arrow (prev / clockwise): left down, right up — animation unchanged
     expect(labelBeltPortalTravelSign("bl", -1)).toBe(1);
     expect(labelBeltPortalTravelSign("ml", -1)).toBe(1);
     expect(labelBeltPortalTravelSign("tl", -1)).toBe(1);
     expect(labelBeltPortalTravelSign("tr", -1)).toBe(-1);
     expect(labelBeltPortalTravelSign("mr", -1)).toBe(-1);
     expect(labelBeltPortalTravelSign("br", -1)).toBe(-1);
-    // Right arrow (next): left up, right down
+    // Right arrow (next / counter-clockwise): left up, right down
     expect(labelBeltPortalTravelSign("bl", 1)).toBe(-1);
     expect(labelBeltPortalTravelSign("ml", 1)).toBe(-1);
     expect(labelBeltPortalTravelSign("tl", 1)).toBe(-1);
