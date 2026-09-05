@@ -55,11 +55,26 @@ describe("labelBeltLayout", () => {
     expect(labelBeltRingNeighbor("bl", 1)).toBe("ml");
     expect(labelBeltRingNeighbor("br", 1)).toBe("bl");
     expect(labelBeltRingNeighbor("tl", -1)).toBe("ml");
-    expect(labelBeltPortalTravelSign("bl", "ml")).toBe(-1);
-    expect(labelBeltPortalTravelSign("tl", "tr")).toBe(1);
     expect(labelBeltPortalAxisForMove("bl", "ml")).toBe("y");
     expect(labelBeltPortalAxisForMove("tl", "tr")).toBe("y");
     expect(labelBeltPortalAxisForMove("br", "bl")).toBe("y");
+  });
+
+  it("rolls same-side slots together based on nav delta", () => {
+    // Left arrow (prev): left down, right up
+    expect(labelBeltPortalTravelSign("bl", -1)).toBe(1);
+    expect(labelBeltPortalTravelSign("ml", -1)).toBe(1);
+    expect(labelBeltPortalTravelSign("tl", -1)).toBe(1);
+    expect(labelBeltPortalTravelSign("tr", -1)).toBe(-1);
+    expect(labelBeltPortalTravelSign("mr", -1)).toBe(-1);
+    expect(labelBeltPortalTravelSign("br", -1)).toBe(-1);
+    // Right arrow (next): left up, right down
+    expect(labelBeltPortalTravelSign("bl", 1)).toBe(-1);
+    expect(labelBeltPortalTravelSign("ml", 1)).toBe(-1);
+    expect(labelBeltPortalTravelSign("tl", 1)).toBe(-1);
+    expect(labelBeltPortalTravelSign("tr", 1)).toBe(1);
+    expect(labelBeltPortalTravelSign("mr", 1)).toBe(1);
+    expect(labelBeltPortalTravelSign("br", 1)).toBe(1);
   });
 
   it("windows more than six labels via rotateLabelsWindow", () => {

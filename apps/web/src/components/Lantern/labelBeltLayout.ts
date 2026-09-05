@@ -102,18 +102,16 @@ export function labelBeltPortalAxisForMove(
   return "y";
 }
 
+/**
+ * Local-Y travel sign for a portal wipe into `to`.
+ * Same-side slots share one direction per nav arrow:
+ * - prev (delta −1): left rolls down (+1), right rolls up (−1)
+ * - next (delta +1): left rolls up (−1), right rolls down (+1)
+ */
 export function labelBeltPortalTravelSign(
-  from: LabelBeltSlotId,
   to: LabelBeltSlotId,
+  delta: 1 | -1,
 ): 1 | -1 {
-  const fromDef = SLOT_DEFS[from];
-  const toDef = SLOT_DEFS[to];
-  if (Math.abs(toDef.rectY - fromDef.rectY) > 1e-6) {
-    return toDef.rectY >= fromDef.rectY ? 1 : -1;
-  }
-  // Same row (tl↔tr / br↔bl): keep a stable ring-forward sign for wipe direction.
-  const fromI = LABEL_BELT_RING_ORDER.indexOf(from);
-  const toI = LABEL_BELT_RING_ORDER.indexOf(to);
-  const forward = (toI - fromI + LABEL_BELT_RING_ORDER.length) % LABEL_BELT_RING_ORDER.length;
-  return forward <= LABEL_BELT_RING_ORDER.length / 2 ? 1 : -1;
+  const side = SLOT_DEFS[to].rectX;
+  return (side < 0 ? -delta : delta) as 1 | -1;
 }
