@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, type RefObject } from "react";
 import { buildBubbleSpec, type ComicBubbleStyle } from "./comicBubblePresets";
-import { buildComicLabelBubbleSpec } from "@/components/ComicLabel/comicLabelBubblePresets";
 import { applySourceDirectionToSpec, type ComicSourceDirection } from "./comicSourceDirection";
 
 export type ComicalBubbleTarget = {
@@ -11,8 +10,6 @@ export type ComicalBubbleTarget = {
   isQuestion?: boolean;
   sourceDirection?: ComicSourceDirection;
   backgroundColors?: string[];
-  /** Label burst preset: tighter two-tone fills from `backgroundColors[0]`. */
-  variant?: "label";
 };
 
 type ComicalModule = typeof import("comicaljs");
@@ -50,19 +47,10 @@ function applySpecs(comical: ComicalModule, targets: ComicalBubbleTarget[]) {
   for (const target of targets) {
     if (!target.element) continue;
     const bubble = new Bubble(target.element);
-    const fill = target.backgroundColors?.[0];
-    const spec =
-      target.variant === "label" && fill
-        ? buildComicLabelBubbleSpec(
-            target.element,
-            target.style,
-            Bubble.getDefaultBubbleSpec,
-            { fill },
-          )
-        : buildBubbleSpec(target.element, target.style, Bubble.getDefaultBubbleSpec, {
-            isQuestion: target.isQuestion,
-            backgroundColors: target.backgroundColors,
-          });
+    const spec = buildBubbleSpec(target.element, target.style, Bubble.getDefaultBubbleSpec, {
+      isQuestion: target.isQuestion,
+      backgroundColors: target.backgroundColors,
+    });
     bubble.setBubbleSpec(
       applySourceDirectionToSpec(target.element, spec, target.sourceDirection, target.style, {
         isQuestion: target.isQuestion,

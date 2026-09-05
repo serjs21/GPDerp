@@ -62,8 +62,6 @@
   --font-lantern-script: var(--font-zen-kurenaido), "Zen Kurenaido", cursive;
   /* Pixel display for share-link meters (Press Start 2P via next/font) */
   --font-pixel-display: var(--font-pixel, ui-monospace), ui-monospace, monospace;
-  /* Comic-style font for labels (Bangers via next/font) */
-  --font-comic-label: var(--font-comic-label, "Comic Sans MS", cursive);
 }
 
 *,

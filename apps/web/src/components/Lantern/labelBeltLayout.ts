@@ -22,8 +22,8 @@ export type LabelBeltSlot = {
   rectY: number;
   /**
    * CSS rotate degrees. Belt labels stay upright (0) so text matches the
-   * bubble the same way as standalone ComicLabel — radial spins made glyphs
-   * look detached from the burst.
+   * burst the same way as standalone ComicBurstLabel — radial spins made
+   * glyphs look detached from the silhouette.
    */
   rotateDeg: number;
 };

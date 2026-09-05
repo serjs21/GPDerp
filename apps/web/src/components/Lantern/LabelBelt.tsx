@@ -8,7 +8,7 @@ import {
   type CSSProperties,
 } from "react";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
-import { formatComicLabelText } from "@/components/ComicLabel/utils";
+import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { rotateLabelsWindow } from "./lanternLabelRingLayout";
 import {
   buildLabelBeltSlots,
