@@ -1,10 +1,13 @@
 import { createBurstRng } from "./comicBurstSeed";
 
+export type ComicBurstShapeKind = "burst" | "circle" | "square" | "thought";
+
 export type ComicBurstPathOptions = {
   width: number;
   height: number;
   spikeCount?: number;
   randomness?: number;
+  kind?: ComicBurstShapeKind;
   /** Stable seed key (usually text or explicit seed). */
   seedKey: string | number;
 };
@@ -33,6 +36,91 @@ function lerp(a: Point, b: Point, t: number): Point {
   };
 }
 
+function fmt(n: number): string {
+  return n.toFixed(2);
+}
+
+function buildEllipsePath(width: number, height: number): ComicBurstLayout {
+  const cx = width / 2;
+  const cy = height / 2;
+  const rx = width / 2 - 2;
+  const ry = height / 2 - 2;
+  const d = [
+    `M ${fmt(cx - rx)} ${fmt(cy)}`,
+    `A ${fmt(rx)} ${fmt(ry)} 0 1 0 ${fmt(cx + rx)} ${fmt(cy)}`,
+    `A ${fmt(rx)} ${fmt(ry)} 0 1 0 ${fmt(cx - rx)} ${fmt(cy)}`,
+    "Z",
+  ].join(" ");
+  return { width, height, cx, cy, d };
+}
+
+function buildSquarePath(width: number, height: number, cornerCount: number): ComicBurstLayout {
+  const cx = width / 2;
+  const cy = height / 2;
+  const inset = 3;
+  const maxR = Math.min(width, height) * 0.22;
+  // Longer labels → more rounded corners (higher effective radius steps).
+  const r = Math.min(maxR, 6 + cornerCount * 0.55);
+  const x0 = inset;
+  const y0 = inset;
+  const x1 = width - inset;
+  const y1 = height - inset;
+  const d = [
+    `M ${fmt(x0 + r)} ${fmt(y0)}`,
+    `L ${fmt(x1 - r)} ${fmt(y0)}`,
+    `Q ${fmt(x1)} ${fmt(y0)} ${fmt(x1)} ${fmt(y0 + r)}`,
+    `L ${fmt(x1)} ${fmt(y1 - r)}`,
+    `Q ${fmt(x1)} ${fmt(y1)} ${fmt(x1 - r)} ${fmt(y1)}`,
+    `L ${fmt(x0 + r)} ${fmt(y1)}`,
+    `Q ${fmt(x0)} ${fmt(y1)} ${fmt(x0)} ${fmt(y1 - r)}`,
+    `L ${fmt(x0)} ${fmt(y0 + r)}`,
+    `Q ${fmt(x0)} ${fmt(y0)} ${fmt(x0 + r)} ${fmt(y0)}`,
+    "Z",
+  ].join(" ");
+  return { width, height, cx, cy, d };
+}
+
+/**
+ * Thought-bubble scallops: lobe count grows with spikeCount for longer text.
+ */
+function buildThoughtPath(
+  width: number,
+  height: number,
+  lobeCount: number,
+  randomness: number,
+  seedKey: string | number,
+): ComicBurstLayout {
+  const cx = width / 2;
+  const cy = height / 2;
+  const rx = (width / 2) * 0.92;
+  const ry = (height / 2) * 0.88;
+  const rng = createBurstRng(seedKey);
+  const count = Math.max(8, Math.floor(lobeCount));
+  const points: Point[] = [];
+
+  for (let i = 0; i < count; i += 1) {
+    const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
+    const wobble = 0.88 + rng() * randomness * 0.35;
+    points.push(ellipsePoint(cx, cy, rx * wobble, ry * wobble, angle));
+  }
+
+  const parts: string[] = [];
+  const first = points[0]!;
+  parts.push(`M ${fmt(first.x)} ${fmt(first.y)}`);
+  for (let i = 0; i < count; i += 1) {
+    const a = points[i]!;
+    const b = points[(i + 1) % count]!;
+    const mid = lerp(a, b, 0.5);
+    const outward = {
+      x: cx + (mid.x - cx) * 1.18,
+      y: cy + (mid.y - cy) * 1.18,
+    };
+    parts.push(`Q ${fmt(outward.x)} ${fmt(outward.y)} ${fmt(b.x)} ${fmt(b.y)}`);
+  }
+  parts.push("Z");
+  return { width, height, cx, cy, d: parts.join(" ") };
+}
+
 /**
  * Build a comic impact-burst path: sharp outer spike tips, rounded concave valleys.
  * Deterministic for a given seedKey + geometry params.
@@ -43,8 +131,19 @@ export function buildComicBurstPath(options: ComicBurstPathOptions): ComicBurstL
     height,
     spikeCount = 12,
     randomness = 0.18,
+    kind = "burst",
     seedKey,
   } = options;
+
+  if (kind === "circle") {
+    return buildEllipsePath(width, height);
+  }
+  if (kind === "square") {
+    return buildSquarePath(width, height, spikeCount);
+  }
+  if (kind === "thought") {
+    return buildThoughtPath(width, height, spikeCount, randomness, seedKey);
+  }
 
   const cx = width / 2;
   const cy = height / 2;
@@ -82,11 +181,9 @@ export function buildComicBurstPath(options: ComicBurstPathOptions): ComicBurstL
     const nextTip = tips[(i + 1) % count]!;
 
     if (i > 0) {
-      // Sharp corner at tip
       parts.push(`L ${fmt(tip.x)} ${fmt(tip.y)}`);
     }
 
-    // Straight exit from tip, then quadratic through valley, then approach next tip
     const leave = lerp(tip, valley, 0.38);
     const approach = lerp(nextTip, valley, 0.38);
     parts.push(`L ${fmt(leave.x)} ${fmt(leave.y)}`);
@@ -98,8 +195,13 @@ export function buildComicBurstPath(options: ComicBurstPathOptions): ComicBurstL
   return { width, height, cx, cy, d: parts.join(" ") };
 }
 
-function fmt(n: number): string {
-  return n.toFixed(2);
+/** Extra silhouette detail for longer labels (spikes / lobes / corner roundness). */
+export function silhouetteDetailForTextLength(base: number, text: string): number {
+  const len = text.trim().length;
+  if (len <= 5) return base;
+  if (len <= 9) return base + 4;
+  if (len <= 12) return base + 8;
+  return base + 12;
 }
 
 export function layoutComicBurstLabel(params: {
@@ -110,15 +212,29 @@ export function layoutComicBurstLabel(params: {
   spikeCount: number;
   randomness: number;
   seedKey: string | number;
+  kind?: ComicBurstShapeKind;
+  text?: string;
 }): ComicBurstLayout {
-  const { textWidth, fontSize, paddingX, paddingY, spikeCount, randomness, seedKey } = params;
-  const width = Math.max(72, textWidth + paddingX * 2);
-  const height = Math.max(48, fontSize * 1.35 + paddingY * 2);
-  return buildComicBurstPath({
-    width,
-    height,
+  const {
+    textWidth,
+    fontSize,
+    paddingX,
+    paddingY,
     spikeCount,
     randomness,
     seedKey,
+    kind = "burst",
+    text = "",
+  } = params;
+  const width = Math.max(72, textWidth + paddingX * 2);
+  const height = Math.max(48, fontSize * 1.35 + paddingY * 2);
+  const detail = silhouetteDetailForTextLength(spikeCount, text || String(seedKey));
+  return buildComicBurstPath({
+    width,
+    height,
+    spikeCount: detail,
+    randomness,
+    seedKey,
+    kind,
   });
 }

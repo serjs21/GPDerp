@@ -61,6 +61,42 @@ export const Preview: Story = {
   ),
 };
 
+export const Shapes: Story = {
+  name: "Shape kinds",
+  render: () => (
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "1.25rem",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "2rem",
+        background: "#1a2744",
+        borderRadius: "0.5rem",
+      }}
+    >
+      {(
+        [
+          { text: "BURST!", kind: "burst" as const },
+          { text: "CIRCLE!", kind: "circle" as const },
+          { text: "SQUARE!", kind: "square" as const },
+          { text: "THOUGHT!", kind: "thought" as const },
+        ] as const
+      ).map((sample) => (
+        <ComicBurstLabel
+          key={sample.kind}
+          text={sample.text}
+          fill="#f4511e"
+          shapeKind={sample.kind}
+          spikeCount={12}
+          randomness={0.18}
+        />
+      ))}
+    </div>
+  ),
+};
+
 export const Controls: Story = {
   args: {
     text: "BANG!",
@@ -69,3 +105,4 @@ export const Controls: Story = {
     randomness: 0.22,
   },
 };
+

@@ -1,9 +1,12 @@
 "use client";
 
 import { useMemo, type CSSProperties } from "react";
-import { layoutComicBurstLabel } from "./comicBurstPath";
 import {
-  fitBurstFontSize,
+  layoutComicBurstLabel,
+  type ComicBurstShapeKind,
+} from "./comicBurstPath";
+import {
+  burstDisplayFontSize,
   measureComicBurstTextWidth,
 } from "./measureComicBurstText";
 import styles from "./ComicBurstLabel.module.css";
@@ -15,12 +18,14 @@ export type ComicBurstLabelProps = {
   textColor?: string;
   spikeCount?: number;
   randomness?: number;
+  /** Silhouette family: burst spikes, ellipse, rounded square, or thought cloud. */
+  shapeKind?: ComicBurstShapeKind;
   paddingX?: number;
   paddingY?: number;
   strokeWidth?: number;
   /** Optional override; defaults to `text` for deterministic silhouettes. */
   seed?: string | number;
-  /** Optional fixed size; when omitted, size auto-fits to the burst. */
+  /** Optional fixed size; when omitted, uses the default display size (no auto-shrink). */
   fontSize?: number;
   className?: string;
 };
@@ -32,6 +37,7 @@ const DEFAULT_TEXT_COLOR = "#ffffff";
 /**
  * Comic-book impact burst label: procedural SVG spikes + Bangers KA-BLAM lettering.
  * Shape is seeded from `seed ?? text` so the silhouette stays stable across renders.
+ * Longer text adds silhouette detail (spikes / lobes / corner roundness) instead of shrinking type.
  */
 export function ComicBurstLabel({
   text,
@@ -40,6 +46,7 @@ export function ComicBurstLabel({
   textColor = DEFAULT_TEXT_COLOR,
   spikeCount = 12,
   randomness = 0.18,
+  shapeKind = "burst",
   paddingX = 18,
   paddingY = 14,
   strokeWidth = 4,
@@ -50,7 +57,7 @@ export function ComicBurstLabel({
   const seedKey = seed ?? text;
 
   const { layout, fontSize, strokePx } = useMemo(() => {
-    const fontSize = fontSizeProp ?? fitBurstFontSize(text, paddingX);
+    const fontSize = fontSizeProp ?? burstDisplayFontSize(text);
     const textWidth = measureComicBurstTextWidth(text, fontSize);
     const layout = layoutComicBurstLabel({
       textWidth,
@@ -60,10 +67,12 @@ export function ComicBurstLabel({
       spikeCount,
       randomness,
       seedKey,
+      kind: shapeKind,
+      text,
     });
     const strokePx = Math.min(2.5, Math.max(1.5, fontSize * 0.08));
     return { layout, fontSize, strokePx };
-  }, [text, fontSizeProp, paddingX, paddingY, spikeCount, randomness, seedKey]);
+  }, [text, fontSizeProp, paddingX, paddingY, spikeCount, randomness, seedKey, shapeKind]);
 
   const rootStyle = {
     "--burst-font-size": `${fontSize}px`,

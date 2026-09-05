@@ -1,4 +1,8 @@
-import { buildComicBurstPath, layoutComicBurstLabel } from "./comicBurstPath";
+import {
+  buildComicBurstPath,
+  layoutComicBurstLabel,
+  silhouetteDetailForTextLength,
+} from "./comicBurstPath";
 import { hashSeed } from "./comicBurstSeed";
 
 describe("comicBurstSeed", () => {
@@ -38,6 +42,17 @@ describe("buildComicBurstPath", () => {
     expect(d.trim().endsWith("Z")).toBe(true);
   });
 
+  it("builds circle, square, and thought kinds", () => {
+    const circle = buildComicBurstPath({ ...base, kind: "circle" });
+    const square = buildComicBurstPath({ ...base, kind: "square" });
+    const thought = buildComicBurstPath({ ...base, kind: "thought" });
+    expect(circle.d).toContain("A ");
+    expect(square.d).toContain("Q ");
+    expect(thought.d).toContain("Q ");
+    expect(circle.d).not.toBe(square.d);
+    expect(square.d).not.toBe(thought.d);
+  });
+
   it("keeps layoutComicBurstLabel width at least text + padding", () => {
     const layout = layoutComicBurstLabel({
       textWidth: 100,
@@ -50,5 +65,11 @@ describe("buildComicBurstPath", () => {
     });
     expect(layout.width).toBe(136);
     expect(layout.height).toBeGreaterThanOrEqual(48);
+  });
+
+  it("adds silhouette detail for longer text", () => {
+    expect(silhouetteDetailForTextLength(12, "HI")).toBe(12);
+    expect(silhouetteDetailForTextLength(12, "LONGER!!")).toBe(16);
+    expect(silhouetteDetailForTextLength(12, "VERYLONGTEXT")).toBe(20);
   });
 });

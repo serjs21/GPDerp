@@ -7,7 +7,7 @@
   flex-direction: column;
   gap: var(--comic-label-modal-gap);
   width: 100%;
-  min-width: min(100%, 34rem);
+  min-width: min(100%, 42rem);
 }
 
 .topRow {
@@ -109,15 +109,27 @@
   appearance: none;
 }
 
-.brush {
+.brushPad {
   position: relative;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 5.25rem;
+  height: 5.25rem;
+  padding: 0.55rem;
+  background: #fff;
+  border: 2px solid #111;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
+}
+
+.brush {
   display: block;
-  width: 4.5rem;
-  height: 4.5rem;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   pointer-events: none;
-  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.35));
 }
 
 .pickerWrap {
@@ -142,7 +154,8 @@
 }
 
 .shapePanel {
-  min-height: 7.5rem;
+  min-height: 6.75rem;
+  min-width: 0;
   border-radius: 0;
 }
 

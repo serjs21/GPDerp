@@ -172,7 +172,7 @@ export function ComicLabelCreationModal({
             overflowVisible
             contentAlign="center"
             className={styles.previewPanel}
-            title="Preview"
+            title="Label Name"
             footer={
               trimmedName.length > 0 && trimmedName.length < COMIC_LABEL_NAME_MIN
                 ? `Min ${COMIC_LABEL_NAME_MIN} chars`
@@ -184,6 +184,7 @@ export function ComicLabelCreationModal({
                 <ComicBurstLabel
                   text={previewText}
                   fill={color}
+                  shapeKind={shape.kind}
                   spikeCount={shape.spikeCount}
                   randomness={shape.randomness}
                   seed={shape.id}
@@ -205,7 +206,7 @@ export function ComicLabelCreationModal({
             </div>
           </ComicPagePanel>
 
-          <div ref={colorShellRef} className={styles.colorShell} style={colorPanelStyle}>
+          <div ref={colorShellRef} className={styles.colorShell}>
             <ComicPagePanel
               title="Color"
               background="solid"
@@ -213,6 +214,7 @@ export function ComicLabelCreationModal({
               contentAlign="center"
               className={styles.colorPanel}
               ariaLabel="Label color"
+              style={colorPanelStyle}
             >
               {pickerOpen ? (
                 <div
@@ -229,9 +231,10 @@ export function ComicLabelCreationModal({
                   onClick={openPicker}
                   aria-label="Open color picker"
                 >
-                  <span className={styles.colorSwatch} style={{ backgroundColor: color }} />
-                  {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG asset */}
-                  <img className={styles.brush} src={BRUSH_SRC} alt="" draggable={false} />
+                  <span className={styles.brushPad}>
+                    {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG asset */}
+                    <img className={styles.brush} src={BRUSH_SRC} alt="" draggable={false} />
+                  </span>
                 </button>
               )}
             </ComicPagePanel>
@@ -258,10 +261,11 @@ export function ComicLabelCreationModal({
                   <ComicBurstLabel
                     text={formatComicLabelText(preset.label.slice(0, 6))}
                     fill={selected ? color : "#888888"}
+                    shapeKind={preset.kind}
                     spikeCount={preset.spikeCount}
                     randomness={preset.randomness}
                     seed={preset.id}
-                    fontSize={18}
+                    fontSize={16}
                   />
                   <p className={styles.shapeCaption}>{preset.label}</p>
                 </div>
