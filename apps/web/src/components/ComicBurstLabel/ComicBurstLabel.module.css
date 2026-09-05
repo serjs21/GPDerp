@@ -1,7 +1,9 @@
 .root {
+  position: relative;
   display: inline-block;
   line-height: 0;
   vertical-align: middle;
+  overflow: visible;
   filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.3));
 }
 
@@ -10,10 +12,40 @@
   overflow: visible;
 }
 
+/* HTML overlay — KA-BLAM lettering; transforms stay on this node only */
 .labelText {
-  font-family: var(--font-luckiest-guy), "Luckiest Guy", cursive;
-  font-style: italic;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  display: inline-block;
+  box-sizing: border-box;
+  max-width: 90%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: var(--burst-font-size, 28px);
+  font-style: normal;
   font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 0.85;
+  white-space: nowrap;
+  text-align: center;
+  -webkit-text-stroke: var(--burst-stroke, 2.5px) #050505;
+  paint-order: stroke fill;
+  text-shadow:
+    1px 1px 0 #050505,
+    2px 2px 0 #050505,
+    3px 3px 0 #050505,
+    4px 4px 0 #050505,
+    5px 5px 0 #050505,
+    7px 7px 0 rgba(0, 0, 0, 0.28);
+  /* Optical center: counter the down-right extrusion; skew/scale for energy */
+  transform: translate(calc(-50% - 2px), calc(-50% - 2px)) skewX(-4deg) scaleY(1.08);
+  transform-origin: center center;
   user-select: none;
   pointer-events: none;
 }
