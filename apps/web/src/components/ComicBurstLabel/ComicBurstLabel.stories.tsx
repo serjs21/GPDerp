@@ -79,6 +79,7 @@ export const Shapes: Story = {
       {(
         [
           { text: "BURST!", kind: "burst" as const },
+          { text: "RECT!", kind: "rect" as const },
           { text: "CIRCLE!", kind: "circle" as const },
           { text: "SQUARE!", kind: "square" as const },
           { text: "THOUGHT!", kind: "thought" as const },

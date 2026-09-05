@@ -13,6 +13,8 @@ export type ComicPageDialogProps = {
   closeOnOverlayClick?: boolean;
   showClose?: boolean;
   className?: string;
+  /** Applied to the dialog content shell (width / max-height). */
+  contentClassName?: string;
 };
 
 export function ComicPageDialog({
@@ -23,6 +25,7 @@ export function ComicPageDialog({
   closeOnOverlayClick = false,
   showClose = false,
   className,
+  contentClassName,
 }: ComicPageDialogProps) {
   const [present, setPresent] = useState(open);
 
@@ -65,7 +68,9 @@ export function ComicPageDialog({
               event.preventDefault();
             }}
           >
-            <div className={styles.dialogContent}>
+            <div
+              className={[styles.dialogContent, contentClassName].filter(Boolean).join(" ")}
+            >
               {title ? (
                 <Dialog.Title className={styles.srOnly}>{title}</Dialog.Title>
               ) : null}

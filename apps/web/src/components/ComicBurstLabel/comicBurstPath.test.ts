@@ -42,15 +42,19 @@ describe("buildComicBurstPath", () => {
     expect(d.trim().endsWith("Z")).toBe(true);
   });
 
-  it("builds circle, square, and thought kinds", () => {
+  it("builds circle, square, rect, and thought kinds", () => {
     const circle = buildComicBurstPath({ ...base, kind: "circle" });
     const square = buildComicBurstPath({ ...base, kind: "square" });
+    const rect = buildComicBurstPath({ ...base, kind: "rect" });
     const thought = buildComicBurstPath({ ...base, kind: "thought" });
     expect(circle.d).toContain("A ");
     expect(square.d).toContain("Q ");
+    expect(rect.d).not.toContain("Q ");
+    expect(rect.d).toContain("L ");
     expect(thought.d).toContain("Q ");
     expect(circle.d).not.toBe(square.d);
-    expect(square.d).not.toBe(thought.d);
+    expect(square.d).not.toBe(rect.d);
+    expect(rect.d).not.toBe(thought.d);
   });
 
   it("keeps layoutComicBurstLabel width at least text + padding", () => {

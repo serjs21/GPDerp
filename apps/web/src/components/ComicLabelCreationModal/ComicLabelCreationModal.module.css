@@ -1,23 +1,29 @@
 .body {
-  --comic-label-modal-gap: var(--comic-page-gutter, 10px);
-  --comic-label-preview-min: 18rem;
+  --comic-label-modal-gap: 0.55rem;
+  --comic-label-preview-min: 16rem;
 
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: var(--comic-label-modal-gap);
   width: 100%;
-  min-width: min(100%, 42rem);
+  min-width: min(100%, 40rem);
+}
+
+.dialogContent {
+  width: min(100%, 40rem);
+  max-height: min(94vh, 56rem);
+  overflow: hidden;
 }
 
 .topRow {
   flex: 0 0 auto;
-  min-height: 11rem;
+  min-height: 8.25rem;
 }
 
 .previewPanel {
   min-width: var(--comic-label-preview-min);
-  min-height: 11rem;
+  min-height: 8.25rem;
 }
 
 .previewStage {
@@ -26,8 +32,8 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 8.5rem;
-  padding: 0.75rem;
+  min-height: 6.25rem;
+  padding: 0.45rem;
 }
 
 .burstWrap {
@@ -68,13 +74,13 @@
 .previewHint {
   position: absolute;
   left: 50%;
-  bottom: 0.35rem;
+  bottom: 0.25rem;
   z-index: 3;
   margin: 0;
   transform: translateX(-50%);
   color: var(--sumi-ink, #2d2d2d);
   font-family: var(--font-lantern-script, cursive);
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   letter-spacing: 0.03em;
   white-space: nowrap;
   pointer-events: none;
@@ -85,12 +91,12 @@
   display: flex;
   flex: 1 1 0;
   min-width: 0;
-  min-height: 11rem;
+  min-height: 8.25rem;
 }
 
 .colorPanel {
   width: 100%;
-  min-height: 11rem;
+  min-height: 8.25rem;
   cursor: pointer;
 }
 
@@ -104,7 +110,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 8.5rem;
+  min-height: 6.25rem;
   margin: 0;
   padding: 0;
   border: none;
@@ -120,10 +126,9 @@
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  width: 5.25rem;
-  height: 5.25rem;
-  padding: 0.55rem;
-
+  width: 4.5rem;
+  height: 4.5rem;
+  padding: 0.45rem;
 }
 
 .brush {
@@ -162,7 +167,7 @@
 
 .pickerWrap :global(.react-colorful__hue) {
   border-radius: 0;
-  height: 1.75rem;
+  height: 1.5rem;
   margin-top: 0;
 }
 
@@ -183,7 +188,7 @@
 }
 
 .shapePanel {
-  min-height: 6.75rem;
+  min-height: 4.25rem;
   min-width: 0;
   border-radius: 0;
 }
@@ -194,20 +199,10 @@
 
 .shapePreview {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.35rem;
-  padding: 0.35rem;
-}
-
-.shapeCaption {
-  margin: 0;
-  color: var(--sumi-ink, #2d2d2d);
-  font-family: var(--font-lantern-script, cursive);
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  padding: 0.2rem;
+  line-height: 0;
 }
 
 .footerRow {
@@ -216,13 +211,13 @@
 }
 
 .savePanel {
-  min-height: 3.75rem;
+  min-height: 3rem;
 }
 
 .saveLabel {
   margin: 0;
   font-family: var(--font-lantern-script, cursive);
-  font-size: 1.35rem;
+  font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: 0.04em;
 }

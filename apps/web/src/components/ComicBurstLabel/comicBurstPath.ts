@@ -1,6 +1,6 @@
 import { createBurstRng } from "./comicBurstSeed";
 
-export type ComicBurstShapeKind = "burst" | "circle" | "square" | "thought";
+export type ComicBurstShapeKind = "burst" | "circle" | "square" | "rect" | "thought";
 
 export type ComicBurstPathOptions = {
   width: number;
@@ -54,17 +54,32 @@ function buildEllipsePath(width: number, height: number): ComicBurstLayout {
   return { width, height, cx, cy, d };
 }
 
-function buildSquarePath(width: number, height: number, cornerCount: number): ComicBurstLayout {
+function buildSquarePath(
+  width: number,
+  height: number,
+  cornerCount: number,
+  sharp = false,
+): ComicBurstLayout {
   const cx = width / 2;
   const cy = height / 2;
   const inset = 3;
   const maxR = Math.min(width, height) * 0.22;
-  // Longer labels → more rounded corners (higher effective radius steps).
-  const r = Math.min(maxR, 6 + cornerCount * 0.55);
+  // Longer labels → more rounded corners; sharp rects stay radius 0.
+  const r = sharp ? 0 : Math.min(maxR, 6 + cornerCount * 0.55);
   const x0 = inset;
   const y0 = inset;
   const x1 = width - inset;
   const y1 = height - inset;
+  if (r <= 0) {
+    const d = [
+      `M ${fmt(x0)} ${fmt(y0)}`,
+      `L ${fmt(x1)} ${fmt(y0)}`,
+      `L ${fmt(x1)} ${fmt(y1)}`,
+      `L ${fmt(x0)} ${fmt(y1)}`,
+      "Z",
+    ].join(" ");
+    return { width, height, cx, cy, d };
+  }
   const d = [
     `M ${fmt(x0 + r)} ${fmt(y0)}`,
     `L ${fmt(x1 - r)} ${fmt(y0)}`,
@@ -138,8 +153,11 @@ export function buildComicBurstPath(options: ComicBurstPathOptions): ComicBurstL
   if (kind === "circle") {
     return buildEllipsePath(width, height);
   }
+  if (kind === "rect") {
+    return buildSquarePath(width, height, spikeCount, true);
+  }
   if (kind === "square") {
-    return buildSquarePath(width, height, spikeCount);
+    return buildSquarePath(width, height, spikeCount, false);
   }
   if (kind === "thought") {
     return buildThoughtPath(width, height, spikeCount, randomness, seedKey);

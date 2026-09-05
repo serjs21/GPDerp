@@ -25,6 +25,7 @@ import {
   COMIC_LABEL_NAME_MAX,
   COMIC_LABEL_NAME_MIN,
   COMIC_LABEL_SHAPE_PRESETS,
+  COMIC_LABEL_SHAPE_PREVIEW_TEXT,
   type ComicLabelShapeId,
 } from "./comicLabelShapes";
 import styles from "./ComicLabelCreationModal.module.css";
@@ -160,6 +161,7 @@ export function ComicLabelCreationModal({
     <ComicPageDialog
       open={open}
       showClose
+      contentClassName={styles.dialogContent}
       onOpenChange={(nextOpen) => {
         if (!nextOpen) onClose();
       }}
@@ -265,15 +267,16 @@ export function ComicLabelCreationModal({
                     >
                       <div className={styles.shapePreview}>
                         <ComicBurstLabel
-                          text={formatComicLabelText(preset.label.slice(0, 6))}
+                          text={COMIC_LABEL_SHAPE_PREVIEW_TEXT}
                           fill={selected ? color : "#888888"}
                           shapeKind={preset.kind}
                           spikeCount={preset.spikeCount}
                           randomness={preset.randomness}
                           seed={preset.id}
-                          fontSize={16}
+                          fontSize={14}
+                          paddingX={22}
+                          paddingY={14}
                         />
-                        <p className={styles.shapeCaption}>{preset.label}</p>
                       </div>
                     </ComicPagePanel>
                   );
