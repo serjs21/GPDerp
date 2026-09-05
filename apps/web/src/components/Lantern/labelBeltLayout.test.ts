@@ -1,60 +1,74 @@
 import { rotateLabelsWindow } from "./lanternLabelRingLayout";
 import {
   buildLabelBeltSlots,
-  labelBeltAngleForIndex,
-  labelBeltRectOffset,
-  labelBeltRotateDeg,
+  labelBeltPortalAxisForMove,
+  labelBeltPortalTravelSign,
+  labelBeltRingNeighbor,
+  LABEL_BELT_FILL_ORDER,
   LABEL_BELT_MAX_VISIBLE,
+  LABEL_BELT_RING_ORDER,
 } from "./labelBeltLayout";
 
 describe("labelBeltLayout", () => {
-  it("places a single label at top center", () => {
-    expect(labelBeltAngleForIndex(0, 1)).toBeCloseTo(-Math.PI / 2, 8);
-    const [slot] = buildLabelBeltSlots(1);
-    expect(slot!.rectX).toBeCloseTo(0, 5);
-    expect(slot!.rectY).toBeCloseTo(-1, 5);
+  it("caps visible slots at six", () => {
+    expect(LABEL_BELT_MAX_VISIBLE).toBe(6);
+    expect(buildLabelBeltSlots(6)).toHaveLength(6);
+    expect(buildLabelBeltSlots(9)).toHaveLength(6);
   });
 
-  it("spreads endpoints to left and right on the upper arc", () => {
-    const count = 5;
-    expect(labelBeltAngleForIndex(0, count)).toBeCloseTo(-Math.PI, 8);
-    expect(labelBeltAngleForIndex(count - 1, count)).toBeCloseTo(0, 8);
-    expect(labelBeltAngleForIndex(2, count)).toBeCloseTo(-Math.PI / 2, 8);
+  it("fills corners before mid spots", () => {
+    expect(buildLabelBeltSlots(1).map((s) => s.id)).toEqual(["bl"]);
+    expect(buildLabelBeltSlots(2).map((s) => s.id)).toEqual(["bl", "tl"]);
+    expect(buildLabelBeltSlots(3).map((s) => s.id)).toEqual(["bl", "tl", "br"]);
+    expect(buildLabelBeltSlots(4).map((s) => s.id)).toEqual(["bl", "tl", "br", "tr"]);
+    expect(buildLabelBeltSlots(5).map((s) => s.id)).toEqual([
+      "bl",
+      "tl",
+      "br",
+      "tr",
+      "ml",
+    ]);
+    expect(LABEL_BELT_FILL_ORDER).toEqual(["bl", "tl", "br", "tr", "ml", "mr"]);
   });
 
-  it("builds nine evenly spaced slots for the max visible window", () => {
+  it("uses ring order when all six slots are occupied", () => {
     const slots = buildLabelBeltSlots(LABEL_BELT_MAX_VISIBLE);
-    expect(slots).toHaveLength(9);
-    expect(slots[0]!.angleRad).toBeCloseTo(-Math.PI, 8);
-    expect(slots[0]!.rectX).toBeCloseTo(-1, 5);
-    expect(slots[0]!.rectY).toBeCloseTo(0, 5);
-    expect(slots[8]!.angleRad).toBeCloseTo(0, 8);
-    expect(slots[8]!.rectX).toBeCloseTo(1, 5);
-    expect(slots[8]!.rectY).toBeCloseTo(0, 5);
+    expect(slots.map((s) => s.id)).toEqual([...LABEL_BELT_RING_ORDER]);
+    expect(LABEL_BELT_RING_ORDER).toEqual(["bl", "ml", "tl", "tr", "mr", "br"]);
   });
 
-  it("maps diagonal rays to rectangle corners so they clear the box", () => {
-    const { rectX, rectY } = labelBeltRectOffset((-3 * Math.PI) / 4);
-    expect(rectX).toBeCloseTo(-1, 5);
-    expect(rectY).toBeCloseTo(-1, 5);
+  it("places left and right columns with sketch tilts", () => {
+    const slots = buildLabelBeltSlots(6);
+    const byId = Object.fromEntries(slots.map((s) => [s.id, s]));
+    expect(byId.bl!.rectX).toBe(-1);
+    expect(byId.bl!.rectY).toBeCloseTo(0.85, 5);
+    expect(byId.bl!.rotateDeg).toBe(-22);
+    expect(byId.tl!.rotateDeg).toBe(22);
+    expect(byId.ml!.rotateDeg).toBe(0);
+    expect(byId.tr!.rectX).toBe(1);
+    expect(byId.tr!.rotateDeg).toBe(-22);
+    expect(byId.br!.rotateDeg).toBe(22);
+    expect(byId.mr!.rotateDeg).toBe(0);
   });
 
-  it("keeps belt label text upright so it stays aligned in the bubble", () => {
-    expect(labelBeltRotateDeg(-Math.PI / 2)).toBe(0);
-    expect(labelBeltRotateDeg(0)).toBe(0);
-    expect(labelBeltRotateDeg(-Math.PI)).toBe(0);
-    expect(labelBeltRotateDeg((-3 * Math.PI) / 4)).toBe(0);
-    const slots = buildLabelBeltSlots(5);
-    expect(slots.every((s) => s.rotateDeg === 0)).toBe(true);
+  it("walks ring neighbors for portal travel", () => {
+    expect(labelBeltRingNeighbor("bl", 1)).toBe("ml");
+    expect(labelBeltRingNeighbor("br", 1)).toBe("bl");
+    expect(labelBeltRingNeighbor("tl", -1)).toBe("ml");
+    expect(labelBeltPortalTravelSign("bl", "ml")).toBe(-1);
+    expect(labelBeltPortalTravelSign("tl", "tr")).toBe(1);
+    expect(labelBeltPortalAxisForMove("bl", "ml")).toBe("y");
+    expect(labelBeltPortalAxisForMove("tl", "tr")).toBe("x");
+    expect(labelBeltPortalAxisForMove("br", "bl")).toBe("x");
   });
 
-  it("windows more than nine labels via rotateLabelsWindow", () => {
+  it("windows more than six labels via rotateLabelsWindow", () => {
     const labels = Array.from({ length: 12 }, (_, i) => ({ id: `l-${i}` }));
     const first = rotateLabelsWindow(labels, 0, LABEL_BELT_MAX_VISIBLE);
     const next = rotateLabelsWindow(labels, 1, LABEL_BELT_MAX_VISIBLE);
-    expect(first).toHaveLength(9);
+    expect(first).toHaveLength(6);
     expect(first[0]!.id).toBe("l-0");
     expect(next[0]!.id).toBe("l-1");
-    expect(next[8]!.id).toBe("l-9");
+    expect(next[5]!.id).toBe("l-6");
   });
 });

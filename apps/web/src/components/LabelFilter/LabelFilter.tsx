@@ -35,7 +35,7 @@ export function LabelFilter({ selectedLabelIds, onChange, className }: LabelFilt
       options={selectOptions}
       value={selectedLabelIds}
       onChange={(next) => onChange(next)}
-      onDropdownVisibleChange={(visible) => setIsOpen(visible)}
+      onOpenChange={(visible) => setIsOpen(visible)}
       notFoundContent={
         isLoading ? (
           <div className={styles.loaderRow}>

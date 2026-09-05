@@ -1,5 +1,5 @@
-/** Max labels drawn on the upper-half belt at once; extras rotate via nav arrows. */
-export const LABEL_BELT_MAX_VISIBLE = 9;
+/** Max labels drawn at once; extras rotate via nav arrows. */
+export const LABEL_BELT_MAX_VISIBLE = 6;
 
 /**
  * Extra clearance beyond half the label *content* box (spike margin).
@@ -7,70 +7,115 @@ export const LABEL_BELT_MAX_VISIBLE = 9;
  */
 export const LABEL_BELT_SPIKE_GAP = "0.75rem";
 
+export type LabelBeltSlotId = "bl" | "ml" | "tl" | "tr" | "mr" | "br";
+
+export type LabelBeltPortalAxis = "x" | "y";
+
 export type LabelBeltSlot = {
+  id: LabelBeltSlotId;
   index: number;
-  /** Outward angle in radians (0 = east, π/2 = south). */
-  angleRad: number;
   /**
-   * Rectangular edge offset X in [-1, 1]: ray from center mapped onto the
-   * host box perimeter (axis-aligned), not a circle.
+   * Rectangular edge offset X in [-1, 1]: left (−1) or right (+1) column.
    */
   rectX: number;
   /**
-   * Rectangular edge offset Y in [-1, 1] (same mapping as `rectX`).
+   * Rectangular edge offset Y in [-1, 1]: top / mid / bottom along the column.
    */
   rectY: number;
-  /**
-   * CSS rotate degrees. Belt labels stay upright (0) so text matches the
-   * burst the same way as standalone ComicBurstLabel — radial spins made
-   * glyphs look detached from the silhouette.
-   */
+  /** CSS rotate degrees (sketch tilts away from lantern center). */
   rotateDeg: number;
+  /** Local portal wipe axis for anime.js scroll (column = y, top link = x). */
+  portalAxis: LabelBeltPortalAxis;
 };
 
 /**
- * Map a unit ray (cos, sin) onto an axis-aligned rectangle perimeter.
- * Corners land at (±1, ±1) so labels clear the box instead of a circle chord.
+ * Fill priority when fewer than 6 labels: corners first, then mid spots.
+ * Order: bottom-left → top-left → bottom-right → top-right → middle-left → middle-right.
  */
-export function labelBeltRectOffset(angleRad: number): { rectX: number; rectY: number } {
-  const cos = Math.cos(angleRad);
-  const sin = Math.sin(angleRad);
-  const m = Math.max(Math.abs(cos), Math.abs(sin));
-  if (m < Number.EPSILON) {
-    return { rectX: 0, rectY: -1 };
-  }
-  return { rectX: cos / m, rectY: sin / m };
+export const LABEL_BELT_FILL_ORDER: readonly LabelBeltSlotId[] = [
+  "bl",
+  "tl",
+  "br",
+  "tr",
+  "ml",
+  "mr",
+] as const;
+
+/**
+ * Ring order for overflow window + portal neighbors:
+ * bl → ml → tl → tr → mr → br → bl
+ */
+export const LABEL_BELT_RING_ORDER: readonly LabelBeltSlotId[] = [
+  "bl",
+  "ml",
+  "tl",
+  "tr",
+  "mr",
+  "br",
+] as const;
+
+const SLOT_DEFS: Record<LabelBeltSlotId, Omit<LabelBeltSlot, "index">> = {
+  bl: { id: "bl", rectX: -1, rectY: 0.85, rotateDeg: -22, portalAxis: "y" },
+  ml: { id: "ml", rectX: -1, rectY: 0, rotateDeg: 0, portalAxis: "y" },
+  tl: { id: "tl", rectX: -1, rectY: -0.85, rotateDeg: 22, portalAxis: "y" },
+  tr: { id: "tr", rectX: 1, rectY: -0.85, rotateDeg: -22, portalAxis: "x" },
+  mr: { id: "mr", rectX: 1, rectY: 0, rotateDeg: 0, portalAxis: "y" },
+  br: { id: "br", rectX: 1, rectY: 0.85, rotateDeg: 22, portalAxis: "y" },
+};
+
+function slotFromId(id: LabelBeltSlotId, index: number): LabelBeltSlot {
+  return { ...SLOT_DEFS[id], index };
 }
 
 /**
- * Upper-half arc angle for slot `index` of `count`.
- * Spreads evenly from left (−π) through top (−π/2) to right (0).
- * Single label → top center (−π/2).
+ * Build slots for `count` visible labels.
+ * - `count < 6`: occupy fill-order slots (corners first).
+ * - `count === 6`: all slots in ring order (overflow window maps index → ring).
  */
-export function labelBeltAngleForIndex(index: number, count: number): number {
-  if (count <= 0) return -Math.PI / 2;
-  if (count === 1) return -Math.PI / 2;
-  return -Math.PI + (index * Math.PI) / (count - 1);
-}
-
-/** Belt labels stay upright so text stays centered in the burst. */
-export function labelBeltRotateDeg(_angleRad: number): number {
-  return 0;
-}
-
 export function buildLabelBeltSlots(count: number): LabelBeltSlot[] {
   if (count <= 0) return [];
-  const slots: LabelBeltSlot[] = [];
-  for (let index = 0; index < count; index += 1) {
-    const angleRad = labelBeltAngleForIndex(index, count);
-    const { rectX, rectY } = labelBeltRectOffset(angleRad);
-    slots.push({
-      index,
-      angleRad,
-      rectX,
-      rectY,
-      rotateDeg: labelBeltRotateDeg(angleRad),
-    });
+  const n = Math.min(count, LABEL_BELT_MAX_VISIBLE);
+  if (n === LABEL_BELT_MAX_VISIBLE) {
+    return LABEL_BELT_RING_ORDER.map((id, index) => slotFromId(id, index));
   }
-  return slots;
+  return LABEL_BELT_FILL_ORDER.slice(0, n).map((id, index) => slotFromId(id, index));
+}
+
+/** Ring neighbor in the given direction (−1 = prev, +1 = next). */
+export function labelBeltRingNeighbor(
+  id: LabelBeltSlotId,
+  direction: 1 | -1,
+): LabelBeltSlotId {
+  const i = LABEL_BELT_RING_ORDER.indexOf(id);
+  const next = (i + direction + LABEL_BELT_RING_ORDER.length) % LABEL_BELT_RING_ORDER.length;
+  return LABEL_BELT_RING_ORDER[next]!;
+}
+
+/**
+ * Portal travel sign for a move from `from` → `to` along the local axis.
+ * Positive = content exits toward +x / +y (right / down).
+ */
+export function labelBeltPortalAxisForMove(
+  from: LabelBeltSlotId,
+  to: LabelBeltSlotId,
+): LabelBeltPortalAxis {
+  const fromLeft = ["bl", "ml", "tl"].includes(from);
+  const toLeft = ["bl", "ml", "tl"].includes(to);
+  const fromRight = ["tr", "mr", "br"].includes(from);
+  const toRight = ["tr", "mr", "br"].includes(to);
+  if ((fromLeft && toLeft) || (fromRight && toRight)) return "y";
+  return "x";
+}
+
+export function labelBeltPortalTravelSign(
+  from: LabelBeltSlotId,
+  to: LabelBeltSlotId,
+): 1 | -1 {
+  const axis = labelBeltPortalAxisForMove(from, to);
+  const fromDef = SLOT_DEFS[from];
+  const toDef = SLOT_DEFS[to];
+  if (axis === "x") {
+    return toDef.rectX >= fromDef.rectX ? 1 : -1;
+  }
+  return toDef.rectY >= fromDef.rectY ? 1 : -1;
 }

@@ -15,6 +15,29 @@
   pointer-events: none;
 }
 
+.portal {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  width: max-content;
+  max-width: 9rem;
+  line-height: 0;
+}
+
+.portalLayer {
+  display: block;
+  width: max-content;
+  max-width: 9rem;
+  line-height: 0;
+  will-change: transform;
+}
+
+.portalLayerIncoming {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
 .navButton {
   position: absolute;
   z-index: 5;
@@ -40,6 +63,11 @@
 .navButton:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--accent-red, #bc002d) 55%, transparent);
   outline-offset: 2px;
+}
+
+.navButton:disabled {
+  cursor: default;
+  opacity: 0.45;
 }
 
 .navPrev {

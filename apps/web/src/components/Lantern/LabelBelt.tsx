@@ -14,7 +14,10 @@ import {
   buildLabelBeltSlots,
   LABEL_BELT_MAX_VISIBLE,
   LABEL_BELT_SPIKE_GAP,
+  type LabelBeltSlot,
+  type LabelBeltSlotId,
 } from "./labelBeltLayout";
+import { useLabelBeltPortalTransition } from "./useLabelBeltPortalTransition";
 import styles from "./LabelBelt.module.css";
 
 export type LabelBeltItem = {
@@ -25,7 +28,7 @@ export type LabelBeltItem = {
 
 export type LabelBeltProps = {
   labels: LabelBeltItem[];
-  /** Override max visible slots on the arc (default 9). */
+  /** Override max visible slots (default 6). */
   maxVisible?: number;
   className?: string;
 };
@@ -33,6 +36,13 @@ export type LabelBeltProps = {
 const ARROW_SRC = "/inkbrush-arrow.svg";
 
 type SlotPush = { x: number; y: number };
+
+type PortalTransition = {
+  delta: 1 | -1;
+  nextOffset: number;
+  fromVisible: LabelBeltItem[];
+  toVisible: LabelBeltItem[];
+};
 
 function remToPx(rem: string): number {
   const n = Number.parseFloat(rem);
@@ -45,9 +55,15 @@ function remToPx(rem: string): number {
   return n * px;
 }
 
+function burstFor(label: LabelBeltItem) {
+  return (
+    <ComicBurstLabel text={formatComicLabelText(label.name)} fill={label.color} />
+  );
+}
+
 /**
- * Upper-half belt of upright ComicBurstLabels on a rectangular outline.
- * Clearance uses half the label content size + spike gap (not the padded stage AABB).
+ * Side-column ComicBurstLabels (corners first, then mids).
+ * Overflow rotates through a 6-slot ring with anime.js portal scroll.
  */
 export function LabelBelt({
   labels,
@@ -55,30 +71,36 @@ export function LabelBelt({
   className,
 }: LabelBeltProps) {
   const [rotationOffset, setRotationOffset] = useState(0);
+  const [transition, setTransition] = useState<PortalTransition | null>(null);
   const [pushes, setPushes] = useState<SlotPush[]>([]);
+  const { busy, setLayerRef, runPortal } = useLabelBeltPortalTransition();
 
   const overflow = labels.length > maxVisible;
-  const visible = useMemo(
+  const committedVisible = useMemo(
     () => rotateLabelsWindow(labels, rotationOffset, maxVisible),
     [labels, maxVisible, rotationOffset],
   );
 
-  const slots = useMemo(
-    () =>
-      buildLabelBeltSlots(visible.length).map((slot, index) => ({
-        ...slot,
-        label: visible[index]!,
-      })),
-    [visible],
-  );
+  const displayOutgoing = transition?.fromVisible ?? committedVisible;
+  const displayIncoming = transition?.toVisible ?? null;
 
-  const slotRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const slots = useMemo((): Array<LabelBeltSlot & { out: LabelBeltItem; inn: LabelBeltItem | null }> => {
+    const base = buildLabelBeltSlots(displayOutgoing.length);
+    return base.map((slot, index) => ({
+      ...slot,
+      out: displayOutgoing[index]!,
+      inn: displayIncoming?.[index] ?? null,
+    }));
+  }, [displayOutgoing, displayIncoming]);
+
+  const slotRefs = useRef<Map<LabelBeltSlotId, HTMLDivElement | null>>(new Map());
+  const portalStartedFor = useRef<PortalTransition | null>(null);
 
   // Measure content boxes and push centers just outside the lantern edge.
   useLayoutEffect(() => {
     const spikePx = remToPx(LABEL_BELT_SPIKE_GAP);
-    const next = slots.map((slot, index) => {
-      const el = slotRefs.current[index];
+    const next = slots.map((slot) => {
+      const el = slotRefs.current.get(slot.id);
       const content = el?.querySelector("[data-comic-role='label']") as HTMLElement | null;
       const w = content?.offsetWidth ?? 48;
       const h = content?.offsetHeight ?? 28;
@@ -98,9 +120,31 @@ export function LabelBelt({
     });
   }, [slots]);
 
+  // Start portal once dual layers are mounted for a pending transition.
+  useLayoutEffect(() => {
+    if (!transition) {
+      portalStartedFor.current = null;
+      return;
+    }
+    if (portalStartedFor.current === transition) return;
+    portalStartedFor.current = transition;
+    runPortal(transition.delta, () => {
+      setRotationOffset(transition.nextOffset);
+      setTransition(null);
+    });
+  }, [transition, runPortal]);
+
   if (labels.length === 0) return null;
 
   const windowStart = ((rotationOffset % labels.length) + labels.length) % labels.length;
+
+  const step = (delta: 1 | -1) => {
+    if (!overflow || busy || transition) return;
+    const nextOffset = rotationOffset + delta;
+    const fromVisible = committedVisible;
+    const toVisible = rotateLabelsWindow(labels, nextOffset, maxVisible);
+    setTransition({ delta, nextOffset, fromVisible, toVisible });
+  };
 
   return (
     <div
@@ -109,22 +153,38 @@ export function LabelBelt({
     >
       {slots.map((slot, index) => {
         const push = pushes[index] ?? { x: 0, y: 0 };
+        const rotating = Boolean(slot.inn);
         return (
           <div
-            key={slot.label.id}
+            key={slot.id}
             ref={(el) => {
-              slotRefs.current[index] = el;
+              slotRefs.current.set(slot.id, el);
             }}
             className={styles.slot}
             style={
               {
                 left: `calc(50% + 50% * ${slot.rectX})`,
                 top: `calc(50% + 50% * ${slot.rectY})`,
-                transform: `translate(calc(-50% + ${push.x}px), calc(-50% + ${push.y}px))`,
+                transform: `translate(calc(-50% + ${push.x}px), calc(-50% + ${push.y}px)) rotate(${slot.rotateDeg}deg)`,
               } as CSSProperties
             }
           >
-            <ComicBurstLabel text={formatComicLabelText(slot.label.name)} fill={slot.label.color} />
+            <div className={styles.portal}>
+              <div
+                className={styles.portalLayer}
+                ref={(el) => setLayerRef(slot.id, "out", el)}
+              >
+                {burstFor(slot.out)}
+              </div>
+              {rotating ? (
+                <div
+                  className={[styles.portalLayer, styles.portalLayerIncoming].join(" ")}
+                  ref={(el) => setLayerRef(slot.id, "inn", el)}
+                >
+                  {burstFor(slot.inn!)}
+                </div>
+              ) : null}
+            </div>
           </div>
         );
       })}
@@ -135,7 +195,8 @@ export function LabelBelt({
             type="button"
             className={[styles.navButton, styles.navPrev].join(" ")}
             aria-label="Previous labels"
-            onClick={() => setRotationOffset((prev) => prev - 1)}
+            disabled={busy || Boolean(transition)}
+            onClick={() => step(-1)}
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG asset */}
             <img className={styles.navIcon} src={ARROW_SRC} alt="" draggable={false} />
@@ -144,7 +205,8 @@ export function LabelBelt({
             type="button"
             className={[styles.navButton, styles.navNext].join(" ")}
             aria-label="Next labels"
-            onClick={() => setRotationOffset((prev) => prev + 1)}
+            disabled={busy || Boolean(transition)}
+            onClick={() => step(1)}
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG asset */}
             <img className={styles.navIcon} src={ARROW_SRC} alt="" draggable={false} />

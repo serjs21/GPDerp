@@ -76,6 +76,7 @@ export function ComicBurstLabel({
       style={rootStyle}
       role="img"
       aria-label={text}
+      data-comic-role="label"
     >
       <svg
         className={styles.svg}
