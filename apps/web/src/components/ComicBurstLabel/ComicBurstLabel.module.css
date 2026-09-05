@@ -1,0 +1,19 @@
+.root {
+  display: inline-block;
+  line-height: 0;
+  vertical-align: middle;
+  filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.3));
+}
+
+.svg {
+  display: block;
+  overflow: visible;
+}
+
+.labelText {
+  font-family: var(--font-luckiest-guy), "Luckiest Guy", cursive;
+  font-style: italic;
+  font-weight: 400;
+  user-select: none;
+  pointer-events: none;
+}

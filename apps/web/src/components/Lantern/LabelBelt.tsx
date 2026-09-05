@@ -7,7 +7,8 @@ import {
   useState,
   type CSSProperties,
 } from "react";
-import { ComicLabel } from "@/components/ComicLabel/ComicLabel";
+import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
+import { formatComicLabelText } from "@/components/ComicLabel/utils";
 import { rotateLabelsWindow } from "./lanternLabelRingLayout";
 import {
   buildLabelBeltSlots,
@@ -45,7 +46,7 @@ function remToPx(rem: string): number {
 }
 
 /**
- * Upper-half belt of upright ComicLabels on a rectangular outline.
+ * Upper-half belt of upright ComicBurstLabels on a rectangular outline.
  * Clearance uses half the label content size + spike gap (not the padded stage AABB).
  */
 export function LabelBelt({
@@ -123,7 +124,7 @@ export function LabelBelt({
               } as CSSProperties
             }
           >
-            <ComicLabel text={slot.label.name} shape="burst" color={slot.label.color} />
+            <ComicBurstLabel text={formatComicLabelText(slot.label.name)} fill={slot.label.color} />
           </div>
         );
       })}
