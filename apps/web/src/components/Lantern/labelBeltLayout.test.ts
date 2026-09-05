@@ -58,8 +58,8 @@ describe("labelBeltLayout", () => {
     expect(labelBeltPortalTravelSign("bl", "ml")).toBe(-1);
     expect(labelBeltPortalTravelSign("tl", "tr")).toBe(1);
     expect(labelBeltPortalAxisForMove("bl", "ml")).toBe("y");
-    expect(labelBeltPortalAxisForMove("tl", "tr")).toBe("x");
-    expect(labelBeltPortalAxisForMove("br", "bl")).toBe("x");
+    expect(labelBeltPortalAxisForMove("tl", "tr")).toBe("y");
+    expect(labelBeltPortalAxisForMove("br", "bl")).toBe("y");
   });
 
   it("windows more than six labels via rotateLabelsWindow", () => {

@@ -10,24 +10,28 @@
   position: absolute;
   z-index: 1;
   width: max-content;
-  max-width: 9rem;
+  max-width: 11rem;
   margin: 0;
   pointer-events: none;
 }
 
+/* Clip only the portal wipe; pad so burst stroke / shadow / spikes are not shaved. */
 .portal {
   position: relative;
   display: block;
   overflow: hidden;
+  box-sizing: content-box;
   width: max-content;
-  max-width: 9rem;
+  max-width: 11rem;
+  padding: 0.55rem;
+  margin: -0.55rem;
   line-height: 0;
 }
 
 .portalLayer {
   display: block;
   width: max-content;
-  max-width: 9rem;
+  max-width: 11rem;
   line-height: 0;
   will-change: transform;
 }

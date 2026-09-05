@@ -70,6 +70,24 @@ export function LabelBelt({
   maxVisible = LABEL_BELT_MAX_VISIBLE,
   className,
 }: LabelBeltProps) {
+  // #region agent log
+  fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Debug-Session-Id": "320659",
+    },
+    body: JSON.stringify({
+      sessionId: "320659",
+      runId: "parse-check",
+      hypothesisId: "H1-stale-or-unsaved",
+      location: "LabelBelt.tsx:mount",
+      message: "LabelBelt module evaluated and component rendered",
+      data: { labelCount: labels.length, maxVisible },
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
   const [rotationOffset, setRotationOffset] = useState(0);
   const [transition, setTransition] = useState<PortalTransition | null>(null);
   const [pushes, setPushes] = useState<SlotPush[]>([]);
@@ -102,8 +120,45 @@ export function LabelBelt({
     const next = slots.map((slot) => {
       const el = slotRefs.current.get(slot.id);
       const content = el?.querySelector("[data-comic-role='label']") as HTMLElement | null;
+      const portal = el?.querySelector("[data-belt-portal]") as HTMLElement | null;
       const w = content?.offsetWidth ?? 48;
       const h = content?.offsetHeight ?? 28;
+      // #region agent log
+      if (content && portal) {
+        const cr = content.getBoundingClientRect();
+        const pr = portal.getBoundingClientRect();
+        fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Debug-Session-Id": "8e01e4",
+          },
+          body: JSON.stringify({
+            sessionId: "8e01e4",
+            runId: "post-fix",
+            hypothesisId: "H3-H4-H5",
+            location: "LabelBelt.tsx:measure",
+            message: "idle portal vs burst size",
+            data: {
+              slotId: slot.id,
+              rotateDeg: slot.rotateDeg,
+              contentOffsetW: w,
+              contentOffsetH: h,
+              burstRectW: Math.round(cr.width),
+              burstRectH: Math.round(cr.height),
+              portalRectW: Math.round(pr.width),
+              portalRectH: Math.round(pr.height),
+              widthDelta: Math.round(cr.width - pr.width),
+              heightDelta: Math.round(cr.height - pr.height),
+              portalOverflow: getComputedStyle(portal).overflow,
+              portalMaxWidth: getComputedStyle(portal).maxWidth,
+              portalPadTop: getComputedStyle(portal).paddingTop,
+            },
+            timestamp: Date.now(),
+          }),
+        }).catch(() => {});
+      }
+      // #endregion
       return {
         x: slot.rectX * (w / 2 + spikePx),
         y: slot.rectY * (h / 2 + spikePx),
@@ -161,6 +216,8 @@ export function LabelBelt({
               slotRefs.current.set(slot.id, el);
             }}
             className={styles.slot}
+            data-belt-slot={slot.id}
+            data-rotate-deg={slot.rotateDeg}
             style={
               {
                 left: `calc(50% + 50% * ${slot.rectX})`,
@@ -169,7 +226,7 @@ export function LabelBelt({
               } as CSSProperties
             }
           >
-            <div className={styles.portal}>
+            <div className={styles.portal} data-belt-portal={slot.id}>
               <div
                 className={styles.portalLayer}
                 ref={(el) => setLayerRef(slot.id, "out", el)}

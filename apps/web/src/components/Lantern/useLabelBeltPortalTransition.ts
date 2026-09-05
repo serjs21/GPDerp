@@ -102,11 +102,78 @@ export function useLabelBeltPortalTransition() {
         const fromId = LABEL_BELT_RING_ORDER[fromIndex]!;
         const refs = layerRefs.current.get(slotId);
         if (!refs?.out || !refs.inn) continue;
+        const axis = labelBeltPortalAxisForMove(fromId, slotId);
+        const sign = labelBeltPortalTravelSign(fromId, slotId);
+        // #region agent log
+        {
+          const slotEl = refs.out.closest("[data-belt-slot]") as HTMLElement | null;
+          const portalEl = refs.out.parentElement;
+          const burst = refs.out.querySelector("[data-comic-role='label']") as HTMLElement | null;
+          const rotateDeg = slotEl ? Number.parseFloat(slotEl.dataset.rotateDeg || "0") : NaN;
+          fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Debug-Session-Id": "8e01e4",
+            },
+            body: JSON.stringify({
+              sessionId: "8e01e4",
+              runId: "post-fix",
+              hypothesisId: "H1-H2",
+              location: "useLabelBeltPortalTransition.ts:runPortal",
+              message: "portal motion axis vs slot tilt",
+              data: {
+                slotId,
+                fromId,
+                axis,
+                sign,
+                rotateDeg,
+                textAlignedAxis: Math.abs(rotateDeg) > 5 && axis === "x" ? "likely-along-text" : "ok-or-mid",
+                expectPerpToText: axis === "y",
+              },
+              timestamp: Date.now(),
+            }),
+          }).catch(() => {});
+          if (portalEl && burst) {
+            const p = portalEl.getBoundingClientRect();
+            const b = burst.getBoundingClientRect();
+            const cs = getComputedStyle(portalEl);
+            fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-Debug-Session-Id": "8e01e4",
+              },
+              body: JSON.stringify({
+                sessionId: "8e01e4",
+                runId: "post-fix",
+                hypothesisId: "H3-H4-H5",
+                location: "useLabelBeltPortalTransition.ts:runPortal",
+                message: "portal vs burst rects",
+                data: {
+                  slotId,
+                  portalW: Math.round(p.width),
+                  portalH: Math.round(p.height),
+                  burstW: Math.round(b.width),
+                  burstH: Math.round(b.height),
+                  widthDelta: Math.round(b.width - p.width),
+                  heightDelta: Math.round(b.height - p.height),
+                  portalOverflow: cs.overflow,
+                  portalMaxWidth: cs.maxWidth,
+                  portalPadTop: cs.paddingTop,
+                  portalPadLeft: cs.paddingLeft,
+                },
+                timestamp: Date.now(),
+              }),
+            }).catch(() => {});
+          }
+        }
+        // #endregion
         motions.push({
           out: refs.out,
           inn: refs.inn,
-          axis: labelBeltPortalAxisForMove(fromId, slotId),
-          sign: labelBeltPortalTravelSign(fromId, slotId),
+          axis,
+          sign,
         });
       }
 

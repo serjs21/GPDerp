@@ -58,7 +58,7 @@ const SLOT_DEFS: Record<LabelBeltSlotId, Omit<LabelBeltSlot, "index">> = {
   bl: { id: "bl", rectX: -1, rectY: 0.85, rotateDeg: -22, portalAxis: "y" },
   ml: { id: "ml", rectX: -1, rectY: 0, rotateDeg: 0, portalAxis: "y" },
   tl: { id: "tl", rectX: -1, rectY: -0.85, rotateDeg: 22, portalAxis: "y" },
-  tr: { id: "tr", rectX: 1, rectY: -0.85, rotateDeg: -22, portalAxis: "x" },
+  tr: { id: "tr", rectX: 1, rectY: -0.85, rotateDeg: -22, portalAxis: "y" },
   mr: { id: "mr", rectX: 1, rectY: 0, rotateDeg: 0, portalAxis: "y" },
   br: { id: "br", rectX: 1, rectY: 0.85, rotateDeg: 22, portalAxis: "y" },
 };
@@ -92,30 +92,28 @@ export function labelBeltRingNeighbor(
 }
 
 /**
- * Portal travel sign for a move from `from` → `to` along the local axis.
- * Positive = content exits toward +x / +y (right / down).
+ * Portal wipe axis in the slot’s local (rotated) frame.
+ * Always `y` so the scroll is perpendicular to the text baseline (local `x`).
  */
 export function labelBeltPortalAxisForMove(
-  from: LabelBeltSlotId,
-  to: LabelBeltSlotId,
+  _from: LabelBeltSlotId,
+  _to: LabelBeltSlotId,
 ): LabelBeltPortalAxis {
-  const fromLeft = ["bl", "ml", "tl"].includes(from);
-  const toLeft = ["bl", "ml", "tl"].includes(to);
-  const fromRight = ["tr", "mr", "br"].includes(from);
-  const toRight = ["tr", "mr", "br"].includes(to);
-  if ((fromLeft && toLeft) || (fromRight && toRight)) return "y";
-  return "x";
+  return "y";
 }
 
 export function labelBeltPortalTravelSign(
   from: LabelBeltSlotId,
   to: LabelBeltSlotId,
 ): 1 | -1 {
-  const axis = labelBeltPortalAxisForMove(from, to);
   const fromDef = SLOT_DEFS[from];
   const toDef = SLOT_DEFS[to];
-  if (axis === "x") {
-    return toDef.rectX >= fromDef.rectX ? 1 : -1;
+  if (Math.abs(toDef.rectY - fromDef.rectY) > 1e-6) {
+    return toDef.rectY >= fromDef.rectY ? 1 : -1;
   }
-  return toDef.rectY >= fromDef.rectY ? 1 : -1;
+  // Same row (tl↔tr / br↔bl): keep a stable ring-forward sign for wipe direction.
+  const fromI = LABEL_BELT_RING_ORDER.indexOf(from);
+  const toI = LABEL_BELT_RING_ORDER.indexOf(to);
+  const forward = (toI - fromI + LABEL_BELT_RING_ORDER.length) % LABEL_BELT_RING_ORDER.length;
+  return forward <= LABEL_BELT_RING_ORDER.length / 2 ? 1 : -1;
 }
