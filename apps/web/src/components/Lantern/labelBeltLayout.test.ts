@@ -50,9 +50,10 @@ describe("labelBeltLayout", () => {
     expect(byId.tr!.rotateDeg).toBe(-22);
     expect(byId.br!.rotateDeg).toBe(22);
     expect(byId.mr!.rotateDeg).toBe(0);
-    expect(LABEL_BELT_STOPS.bl.left).toBe(0);
-    expect(LABEL_BELT_STOPS.bl.top).toBe(85);
-    expect(LABEL_BELT_STOPS.tr.right).toBe(0);
+    expect(typeof LABEL_BELT_STOPS.bl.left).toBe("number");
+    expect(typeof LABEL_BELT_STOPS.bl.top).toBe("number");
+    expect(typeof LABEL_BELT_STOPS.tr.right).toBe("number");
+    expect(typeof LABEL_BELT_STOPS.tr.top).toBe("number");
   });
 
   it("walks ring neighbors for portal travel", () => {

@@ -16,6 +16,7 @@ import {
 import { rotateLabelsWindow } from "./lanternLabelRingLayout";
 import {
   buildLabelBeltSlots,
+  labelBeltPortalTravelSign,
   LABEL_BELT_MAX_VISIBLE,
   type LabelBeltSlot,
 } from "./labelBeltLayout";
@@ -51,12 +52,9 @@ function burstFor(label: LabelBeltItem) {
 }
 
 /**
- * Side-column ComicBurstLabels (corners first, then mids).
- * Overflow rotates through a 6-slot ring with anime.js portal scroll.
- *
- * During transition the entering label owns portal size from t=0 (final layout).
- * The exiting label is offset by that footprint so the two never share a layout
- * box — avoiding the commit snap when the enterer is rendered alone.
+ * Side-column ComicBurstLabels at LABEL_BELT_STOPS.
+ * Overflow rotates with a stacked-block portal wipe: both labels are normal
+ * flow blocks with 1rem gap; the portal clips; the entering block ends where idle sits.
  */
 export function LabelBelt({
   labels,
@@ -65,7 +63,8 @@ export function LabelBelt({
 }: LabelBeltProps) {
   const [rotationOffset, setRotationOffset] = useState(0);
   const [transition, setTransition] = useState<PortalTransition | null>(null);
-  const { busy, setLayerRef, runPortal } = useLabelBeltPortalTransition();
+  const { busy, setLayerRef, runPortal, clearInlineStyles } =
+    useLabelBeltPortalTransition();
 
   const overflow = labels.length > maxVisible;
   const committedVisible = useMemo(
@@ -92,6 +91,8 @@ export function LabelBelt({
   useLayoutEffect(() => {
     if (!transition) {
       portalStartedFor.current = null;
+      // Idle commit: drop wipe transforms/sizes before paint (no end blink).
+      clearInlineStyles();
       return;
     }
     if (portalStartedFor.current === transition) return;
@@ -103,7 +104,7 @@ export function LabelBelt({
         setTransition(null);
       },
     });
-  }, [transition, runPortal]);
+  }, [transition, runPortal, clearInlineStyles]);
 
   if (labels.length === 0) return null;
 
@@ -125,6 +126,34 @@ export function LabelBelt({
       {slots.map((slot) => {
         const rotating = Boolean(slot.inn);
         const inset = labelBeltStopInsetStyle(slot.stop);
+        /** +1 → inn above out (enter from top). −1 → out above inn (enter from bottom). */
+        const sign = transition
+          ? labelBeltPortalTravelSign(slot.id, transition.delta)
+          : (1 as const);
+        const innFirst = rotating && sign > 0;
+
+        // Key by label id so the entering node can reconcile into idle without remount.
+        const outBlock = (
+          <div
+            key={slot.out.id}
+            className={styles.portalBlock}
+            data-belt-layer="out"
+            ref={(el) => setLayerRef(slot.id, "out", el)}
+          >
+            {burstFor(slot.out)}
+          </div>
+        );
+        const innBlock = slot.inn ? (
+          <div
+            key={slot.inn.id}
+            className={styles.portalBlock}
+            data-belt-layer="inn"
+            ref={(el) => setLayerRef(slot.id, "inn", el)}
+          >
+            {burstFor(slot.inn)}
+          </div>
+        ) : null;
+
         return (
           <div
             key={slot.id}
@@ -137,27 +166,27 @@ export function LabelBelt({
               } as CSSProperties
             }
           >
-            <div
-              className={[styles.portal, rotating ? styles.portalRotating : ""]
-                .filter(Boolean)
-                .join(" ")}
-            >
+            <div className={styles.portal}>
               <div
-                className={styles.portalLayer}
-                data-belt-layer="out"
-                ref={(el) => setLayerRef(slot.id, "out", el)}
+                className={styles.portalStack}
+                ref={(el) => setLayerRef(slot.id, "stack", el)}
               >
-                {burstFor(slot.out)}
+                {rotating ? (
+                  innFirst ? (
+                    <>
+                      {innBlock}
+                      {outBlock}
+                    </>
+                  ) : (
+                    <>
+                      {outBlock}
+                      {innBlock}
+                    </>
+                  )
+                ) : (
+                  outBlock
+                )}
               </div>
-              {rotating ? (
-                <div
-                  className={[styles.portalLayer, styles.portalLayerIncoming].join(" ")}
-                  data-belt-layer="inn"
-                  ref={(el) => setLayerRef(slot.id, "inn", el)}
-                >
-                  {burstFor(slot.inn!)}
-                </div>
-              ) : null}
             </div>
           </div>
         );

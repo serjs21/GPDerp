@@ -5,12 +5,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import {
   LABEL_BELT_RING_ORDER,
-  labelBeltPortalAxisForMove,
   labelBeltPortalTravelSign,
   type LabelBeltSlotId,
 } from "./labelBeltLayout";
 
 export const LABEL_BELT_PORTAL_MS = 420;
+/** Must match `.portalStack { gap }` in LabelBelt.module.css */
+export const LABEL_BELT_STACK_GAP_REM = 1;
 
 type AnimLike = {
   pause?: () => void;
@@ -29,70 +30,67 @@ function stopAnim(anim: AnimLike | null) {
   }
 }
 
-export type LabelBeltPortalLayerRefs = {
+type LabelBeltPortalLayerRefs = {
   out: HTMLElement | null;
   inn: HTMLElement | null;
+  stack: HTMLElement | null;
 };
 
 type SlotMotion = {
-  out: HTMLElement;
-  inn: HTMLElement;
+  stack: HTMLElement;
   portal: HTMLElement;
-  axis: "x" | "y";
+  /** +1: inn above out, scroll from -(innH+gap) → 0. −1: out above inn, scroll from 0 → -(outH+gap). */
   sign: 1 | -1;
-  /** Entering label axis size — portal already matches final layout. */
-  innSize: number;
-  /** Exiting label axis size — extra travel after clearing inn. */
-  outSize: number;
-  innW: number;
+  outH: number;
   innH: number;
-  slotId: LabelBeltSlotId;
+  innW: number;
+  gap: number;
 };
 
-function measureBurstSize(el: HTMLElement): { w: number; h: number } {
-  const burst = el.querySelector("[data-comic-role='label']") as HTMLElement | null;
-  const target = burst ?? el;
+function measureBlock(el: HTMLElement): { w: number; h: number } {
   return {
-    w: target.offsetWidth || 48,
-    h: target.offsetHeight || 28,
+    w: el.offsetWidth || 48,
+    h: el.offsetHeight || 28,
   };
 }
 
+function remToPx(rem: number): number {
+  const probe = document.createElement("div");
+  probe.style.cssText = "position:absolute;width:1rem;visibility:hidden";
+  document.body.appendChild(probe);
+  const px = probe.offsetWidth || 16;
+  probe.remove();
+  return rem * px;
+}
+
+function stackTravel(sign: 1 | -1, outH: number, innH: number, gap: number) {
+  const y0 = sign > 0 ? -(innH + gap) : 0;
+  const y1 = sign > 0 ? 0 : -(outH + gap);
+  return { y0, y1 };
+}
+
 /**
- * Incoming stays at 0 (final pose). Outgoing starts already pushed past the
- * incoming footprint, then travels further by its own size.
+ * Stacked-block wipe: both labels are normal flow blocks; the portal clips.
+ * At t=1 the entering block sits at the top of the clip — same pose as static.
  */
-function applyPortalFrame(motion: SlotMotion, t: number) {
-  const { out, inn, portal, axis, sign, innSize, outSize, innW, innH } = motion;
-  inn.style.transform = "";
-  const outOff = sign * (innSize + t * outSize);
-  if (axis === "x") {
-    out.style.transform = `translate(${outOff}px, 0)`;
-  } else {
-    out.style.transform = `translate(0, ${outOff}px)`;
-  }
+function applyStackFrame(motion: SlotMotion, t: number) {
+  const { stack, portal, sign, outH, innH, innW, gap } = motion;
+  const { y0, y1 } = stackTravel(sign, outH, innH, gap);
+  const y = y0 + (y1 - y0) * t;
+  stack.style.transform = `translate(0, ${y}px)`;
+  // Clip window = entering label box (final static size).
   portal.style.width = `${innW}px`;
   portal.style.height = `${innH}px`;
 }
 
-function clippedLayerOverlap(out: HTMLElement, inn: HTMLElement, portal: HTMLElement): boolean {
-  const clip = portal.getBoundingClientRect();
-  const a = out.getBoundingClientRect();
-  const b = inn.getBoundingClientRect();
-  const left = Math.max(clip.left, a.left, b.left);
-  const right = Math.min(clip.right, a.right, b.right);
-  const top = Math.max(clip.top, a.top, b.top);
-  const bottom = Math.min(clip.bottom, a.bottom, b.bottom);
-  return right > left + 1 && bottom > top + 1;
-}
-
-function clearPortalFrame(refs: LabelBeltPortalLayerRefs) {
-  if (refs.out) refs.out.style.transform = "";
-  if (refs.inn) refs.inn.style.transform = "";
-  const portal = refs.out?.parentElement ?? refs.inn?.parentElement;
-  if (portal) {
-    portal.style.width = "";
-    portal.style.height = "";
+function clearPortalInlineStyles(layerRefs: Map<LabelBeltSlotId, LabelBeltPortalLayerRefs>) {
+  for (const refs of layerRefs.values()) {
+    if (refs.stack) refs.stack.style.transform = "";
+    const portal = refs.stack?.parentElement;
+    if (portal) {
+      portal.style.width = "";
+      portal.style.height = "";
+    }
   }
 }
 
@@ -103,8 +101,10 @@ export type RunPortalOptions = {
 };
 
 /**
- * Portal wipe where the entering label owns slot geometry from t=0.
- * Exiting label is offset by the entering footprint (no shared layout box → no snap).
+ * Dual-label stacked scroll inside a clip sized to the entering label.
+ * Entering block ends at the top of the portal — identical to idle layout.
+ * Does not clear transforms on complete (avoids end blink); LabelBelt clears
+ * after the idle commit in useLayoutEffect.
  */
 export function useLabelBeltPortalTransition() {
   const reduceMotion = useReducedMotion();
@@ -118,15 +118,16 @@ export function useLabelBeltPortalTransition() {
   }, []);
 
   const setLayerRef = useCallback(
-    (slotId: LabelBeltSlotId, layer: "out" | "inn", el: HTMLElement | null) => {
-      const prev = layerRefs.current.get(slotId) ?? { out: null, inn: null };
-      layerRefs.current.set(slotId, {
-        ...prev,
-        [layer === "out" ? "out" : "inn"]: el,
-      });
+    (slotId: LabelBeltSlotId, layer: "out" | "inn" | "stack", el: HTMLElement | null) => {
+      const prev = layerRefs.current.get(slotId) ?? { out: null, inn: null, stack: null };
+      layerRefs.current.set(slotId, { ...prev, [layer]: el });
     },
     [],
   );
+
+  const clearInlineStyles = useCallback(() => {
+    clearPortalInlineStyles(layerRefs.current);
+  }, []);
 
   const runPortal = useCallback(
     (options: RunPortalOptions) => {
@@ -138,33 +139,24 @@ export function useLabelBeltPortalTransition() {
         return true;
       }
 
+      const gap = remToPx(LABEL_BELT_STACK_GAP_REM);
       const motions: SlotMotion[] = [];
-      for (let i = 0; i < LABEL_BELT_RING_ORDER.length; i += 1) {
-        const slotId = LABEL_BELT_RING_ORDER[i]!;
-        const fromIndex =
-          (i + delta + LABEL_BELT_RING_ORDER.length) % LABEL_BELT_RING_ORDER.length;
-        const fromId = LABEL_BELT_RING_ORDER[fromIndex]!;
+      for (const slotId of LABEL_BELT_RING_ORDER) {
         const refs = layerRefs.current.get(slotId);
-        if (!refs?.out || !refs.inn) continue;
-        const portal = refs.out.parentElement;
+        if (!refs?.out || !refs.inn || !refs.stack) continue;
+        const portal = refs.stack.parentElement;
         if (!portal) continue;
-        const axis = labelBeltPortalAxisForMove(fromId, slotId);
         const sign = labelBeltPortalTravelSign(slotId, delta);
-        const outM = measureBurstSize(refs.out);
-        const innM = measureBurstSize(refs.inn);
-        const outSize = (axis === "y" ? outM.h : outM.w) + 8;
-        const innSize = (axis === "y" ? innM.h : innM.w) + 8;
+        const outM = measureBlock(refs.out);
+        const innM = measureBlock(refs.inn);
         motions.push({
-          out: refs.out,
-          inn: refs.inn,
+          stack: refs.stack,
           portal,
-          axis,
           sign,
-          innSize,
-          outSize,
-          innW: innM.w,
+          outH: outM.h,
           innH: innM.h,
-          slotId,
+          innW: innM.w,
+          gap,
         });
       }
 
@@ -178,131 +170,27 @@ export function useLabelBeltPortalTransition() {
       stopAnim(animRef.current);
 
       for (const motion of motions) {
-        applyPortalFrame(motion, 0);
+        applyStackFrame(motion, 0);
       }
       onProgress?.(0);
 
-      // #region agent log
-      fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Debug-Session-Id": "320659",
-        },
-        body: JSON.stringify({
-          sessionId: "320659",
-          runId: "post-fix4",
-          hypothesisId: "H8-enter-owns-layout",
-          location: "useLabelBeltPortalTransition.ts:t0",
-          message: "inn owns portal; out pre-pushed by innSize",
-          data: {
-            delta,
-            samples: motions.map((m) => ({
-              slotId: m.slotId,
-              sign: m.sign,
-              innSize: m.innSize,
-              outSize: m.outSize,
-              outOff0: m.sign * m.innSize,
-              portalW: m.innW,
-              portalH: m.innH,
-              clippedOverlap: clippedLayerOverlap(m.out, m.inn, m.portal),
-            })),
-          },
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-      // #endregion
-
       const model = { t: 0 };
-      let loggedMid = false;
       animRef.current = animate(model, {
         t: 1,
         duration: LABEL_BELT_PORTAL_MS,
         ease: "inOutQuad",
         onUpdate: () => {
           for (const motion of motions) {
-            applyPortalFrame(motion, model.t);
+            applyStackFrame(motion, model.t);
           }
           onProgress?.(model.t);
-          // #region agent log
-          if (!loggedMid && model.t >= 0.45 && model.t <= 0.6) {
-            loggedMid = true;
-            const overlaps = motions.map((m) => ({
-              slotId: m.slotId,
-              clippedOverlap: clippedLayerOverlap(m.out, m.inn, m.portal),
-              portalH: Math.round(m.portal.getBoundingClientRect().height),
-              innH: m.innH,
-              outOff: Math.round(m.sign * (m.innSize + model.t * m.outSize)),
-            }));
-            fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "X-Debug-Session-Id": "320659",
-              },
-              body: JSON.stringify({
-                sessionId: "320659",
-                runId: "post-fix4",
-                hypothesisId: "H8-enter-owns-layout",
-                location: "useLabelBeltPortalTransition.ts:mid",
-                message: "mid-wipe clipped overlap check",
-                data: {
-                  t: model.t,
-                  anyOverlap: overlaps.some((o) => o.clippedOverlap),
-                  overlaps,
-                },
-                timestamp: Date.now(),
-              }),
-            }).catch(() => {});
-          }
-          // #endregion
         },
         onComplete: () => {
-          // #region agent log
-          {
-            const samples = motions.map((m) => {
-              const portalRect = m.portal.getBoundingClientRect();
-              const innRect = m.inn.getBoundingClientRect();
-              return {
-                slotId: m.slotId,
-                styleMatch:
-                  m.portal.style.width === `${m.innW}px` &&
-                  m.portal.style.height === `${m.innH}px`,
-                portalContentH: Math.round(portalRect.height),
-                innContentH: Math.round(innRect.height),
-                heightDelta: Math.round(portalRect.height - innRect.height),
-                clippedOverlap: clippedLayerOverlap(m.out, m.inn, m.portal),
-              };
-            });
-            fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "X-Debug-Session-Id": "320659",
-              },
-              body: JSON.stringify({
-                sessionId: "320659",
-                runId: "post-fix4",
-                hypothesisId: "H8-enter-owns-layout",
-                location: "useLabelBeltPortalTransition.ts:t1",
-                message: "before commit — portal still inn-sized",
-                data: {
-                  delta,
-                  anyOverlap: samples.some((s) => s.clippedOverlap),
-                  maxHeightDelta: Math.max(...samples.map((s) => Math.abs(s.heightDelta))),
-                  samples,
-                },
-                timestamp: Date.now(),
-              }),
-            }).catch(() => {});
-          }
-          // #endregion
+          // Keep final stack pose until React idle commit; clearing here caused
+          // sign=-1 to flash the outgoing label (transform snap back to 0).
           animRef.current = null;
           busyRef.current = false;
           setBusy(false);
-          for (const refs of layerRefs.current.values()) {
-            clearPortalFrame(refs);
-          }
           onComplete();
         },
       });
@@ -312,5 +200,5 @@ export function useLabelBeltPortalTransition() {
     [reduceMotion],
   );
 
-  return { busy, setLayerRef, runPortal };
+  return { busy, setLayerRef, runPortal, clearInlineStyles };
 }

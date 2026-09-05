@@ -15,7 +15,7 @@
   pointer-events: none;
 }
 
-/* Clip only the portal wipe; pad so burst stroke / shadow / spikes are not shaved. */
+/* Clip window for stacked wipe; pad so burst stroke / spikes are not shaved. */
 .portal {
   position: relative;
   display: block;
@@ -28,26 +28,20 @@
   line-height: 0;
 }
 
-.portalLayer {
+.portalStack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: max-content;
+  max-width: 11rem;
+  will-change: transform;
+}
+
+.portalBlock {
   display: block;
   width: max-content;
   max-width: 11rem;
   line-height: 0;
-  will-change: transform;
-}
-
-/* Both layers absolute so portal size is controlled by the entering label only. */
-.portalRotating .portalLayer {
-  position: absolute;
-  left: 0;
-  top: 0;
-}
-
-.portalLayerIncoming {
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 1;
 }
 
 .navButton {
