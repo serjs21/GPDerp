@@ -1,6 +1,7 @@
 .body {
   --comic-label-modal-gap: 0.55rem;
   --comic-label-preview-min: 16rem;
+  --comic-label-caret-size: 28px;
 
   box-sizing: border-box;
   display: flex;
@@ -12,18 +13,18 @@
 
 .dialogContent {
   width: min(100%, 40rem);
-  max-height: min(94vh, 56rem);
+  max-height: min(94vh, 58rem);
   overflow: hidden;
 }
 
 .topRow {
   flex: 0 0 auto;
-  min-height: 8.25rem;
+  min-height: 9.5rem;
 }
 
 .previewPanel {
   min-width: var(--comic-label-preview-min);
-  min-height: 8.25rem;
+  min-height: 9.5rem;
 }
 
 .previewStage {
@@ -32,8 +33,8 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 6.25rem;
-  padding: 0.45rem;
+  min-height: 8.25rem;
+  padding: 0.5rem;
 }
 
 .burstWrap {
@@ -55,19 +56,20 @@
   border: none;
   background: transparent;
   color: transparent;
-  caret-color: #111;
+  /* Caret height/thickness follows Bangers metrics when family + size match the label. */
+  caret-color: #fff;
   font-family: var(--font-comic-label), "Bangers", sans-serif;
-  font-size: 1.35rem;
+  font-size: var(--comic-label-caret-size);
   font-weight: 400;
   letter-spacing: 0.01em;
-  line-height: 1;
+  line-height: 0.85;
   text-align: center;
   text-transform: uppercase;
   outline: none;
 }
 
 .previewInput::selection {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.28);
   color: transparent;
 }
 
@@ -91,12 +93,12 @@
   display: flex;
   flex: 1 1 0;
   min-width: 0;
-  min-height: 8.25rem;
+  min-height: 9.5rem;
 }
 
 .colorPanel {
   width: 100%;
-  min-height: 8.25rem;
+  min-height: 9.5rem;
   cursor: pointer;
 }
 
@@ -110,7 +112,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 6.25rem;
+  min-height: 7.25rem;
   margin: 0;
   padding: 0;
   border: none;
@@ -188,7 +190,7 @@
 }
 
 .shapePanel {
-  min-height: 4.25rem;
+  min-height: 5rem;
   min-width: 0;
   border-radius: 0;
 }
@@ -201,28 +203,47 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.2rem;
+  padding: 0.25rem;
   line-height: 0;
 }
 
 .footerRow {
   flex: 0 0 auto;
   width: 100%;
-}
-
-.savePanel {
-  min-height: 3rem;
-}
-
-.saveLabel {
-  margin: 0;
-  font-family: var(--font-lantern-script, cursive);
-  font-size: 1.2rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  padding-top: 0.15rem;
 }
 
 .tooltipWrap {
   display: block;
   width: 100%;
+}
+
+.saveButton {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.15rem 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+}
+
+.saveButton:disabled {
+  cursor: not-allowed;
+}
+
+.saveButton[aria-busy="true"] {
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.saveBurst {
+  display: block;
+  width: 100%;
+}
+
+.saveBurst svg {
+  width: 100%;
+  height: 3.35rem;
 }

@@ -31,6 +31,7 @@ import {
 import styles from "./ComicLabelCreationModal.module.css";
 
 const BRUSH_SRC = "/brush-paint-repair.svg";
+const SAVE_DISABLED_FILL = "#9e9e9e";
 
 export type ComicLabelCreationModalProps = {
   open: boolean;
@@ -58,6 +59,7 @@ export function ComicLabelCreationModal({
   const [shapeId, setShapeId] = useState<ComicLabelShapeId>("classic");
   const [pickerOpen, setPickerOpen] = useState(false);
   const colorShellRef = useRef<HTMLDivElement | null>(null);
+  const nameInputRef = useRef<HTMLInputElement | null>(null);
 
   const { labels, isLoading, createLabel, updateLabel, isCreating, isUpdating } = useAccountLabels({
     accountId,
@@ -68,6 +70,7 @@ export function ComicLabelCreationModal({
   const shape = shapePreset(shapeId);
   const previewText =
     trimmedName.length > 0 ? formatComicLabelText(trimmedName) : formatComicLabelText("abc");
+  const saveText = formatComicLabelText(label ? "Save" : "Create");
 
   const isShort = trimmedName.length > 0 && trimmedName.length < COMIC_LABEL_NAME_MIN;
   const exists = labels.some(
@@ -85,6 +88,7 @@ export function ComicLabelCreationModal({
           ? "Label already exists in this account"
           : null;
   const canSave = !disabledReason && !isCreating && !isUpdating;
+  const busy = isCreating || isUpdating;
 
   useEffect(() => {
     if (!open) {
@@ -95,6 +99,16 @@ export function ComicLabelCreationModal({
     setColor(label?.color ?? getRandomLabelColor());
     setShapeId("classic");
     setPickerOpen(false);
+
+    // Focus after dialog portal mounts; caret uses Bangers metrics via matched font styles.
+    const timer = window.setTimeout(() => {
+      const el = nameInputRef.current;
+      if (!el) return;
+      el.focus();
+      const len = el.value.length;
+      el.setSelectionRange(len, len);
+    }, 40);
+    return () => window.clearTimeout(timer);
   }, [open, label]);
 
   useEffect(() => {
@@ -174,7 +188,7 @@ export function ComicLabelCreationModal({
             overflowVisible
             contentAlign="center"
             className={styles.previewPanel}
-            title="Label Name"
+            title="Name"
             footer={
               trimmedName.length > 0 && trimmedName.length < COMIC_LABEL_NAME_MIN
                 ? `Min ${COMIC_LABEL_NAME_MIN} chars`
@@ -192,6 +206,7 @@ export function ComicLabelCreationModal({
                   seed={shape.id}
                 />
                 <input
+                  ref={nameInputRef}
                   className={styles.previewInput}
                   value={name}
                   maxLength={COMIC_LABEL_NAME_MAX}
@@ -258,17 +273,23 @@ export function ComicLabelCreationModal({
                       selectable
                       selected={selected}
                       onSelect={() => setShapeId(preset.id)}
-                      background="halftone"
-                      color={selected ? "orange" : "white"}
+                      background={selected ? "solid" : "halftone"}
+                      color="white"
                       overflowVisible
                       flexWeight={1}
                       className={styles.shapePanel}
                       ariaLabel={`${preset.label} shape`}
+                      style={
+                        selected
+                          ? ({ "--comic-panel-base": color } as CSSProperties)
+                          : undefined
+                      }
                     >
                       <div className={styles.shapePreview}>
                         <ComicBurstLabel
                           text={COMIC_LABEL_SHAPE_PREVIEW_TEXT}
-                          fill={selected ? color : "#888888"}
+                          fill="#ffffff"
+                          stroke={selected ? "#111111" : "#555555"}
                           shapeKind={preset.kind}
                           spikeCount={preset.spikeCount}
                           randomness={preset.randomness}
@@ -286,28 +307,35 @@ export function ComicLabelCreationModal({
           )}
         </div>
 
-        <ComicPageRow className={styles.footerRow}>
+        <div className={styles.footerRow}>
           <Tooltip title={disabledReason ?? ""}>
             <span className={styles.tooltipWrap}>
-              <ComicPagePanel
-                span="full"
-                selectable
-                selected={canSave}
-                onSelect={() => {
+              <button
+                type="button"
+                className={styles.saveButton}
+                disabled={!canSave}
+                aria-busy={busy || undefined}
+                aria-label={label ? "Save label" : "Create label"}
+                onClick={() => {
                   if (!canSave) return;
                   submit();
                 }}
-                background={canSave ? "halftone" : "solid"}
-                color={canSave ? "teal" : "white"}
-                loading={isCreating || isUpdating}
-                ariaLabel={label ? "Save label" : "Create label"}
-                className={styles.savePanel}
               >
-                <p className={styles.saveLabel}>{label ? "Save" : "Create"}</p>
-              </ComicPagePanel>
+                <ComicBurstLabel
+                  className={styles.saveBurst}
+                  text={saveText}
+                  fill={canSave ? color : SAVE_DISABLED_FILL}
+                  shapeKind="rect"
+                  seed="save-rect"
+                  fontSize={22}
+                  paddingX={48}
+                  paddingY={10}
+                  strokeWidth={3}
+                />
+              </button>
             </span>
           </Tooltip>
-        </ComicPageRow>
+        </div>
       </div>
     </ComicPageDialog>
   );
