@@ -41,6 +41,8 @@ export type ComicPagePanelProps = {
   ariaLabel?: string;
   /** Allow bubble/canvas spikes to paint outside the panel border. */
   overflowVisible?: boolean;
+  /** Merged after panel color CSS variables (e.g. override `--comic-panel-base`). */
+  style?: CSSProperties;
 };
 
 function panelStyleVars(color: ComicPanelColor): CSSProperties {
@@ -78,6 +80,7 @@ export function ComicPagePanel({
   className,
   ariaLabel,
   overflowVisible = false,
+  style: styleProp,
 }: ComicPagePanelProps) {
   const isMotionBackground = isMotionBackgroundProp ?? background === "motion";
   const showMotionOverlay = loading && !isMotionBackground;
@@ -123,6 +126,7 @@ export function ComicPagePanel({
     "--comic-title-bg": COMIC_PANEL_COLORS[titleColor].base,
     "--comic-footer-bg": COMIC_PANEL_COLORS[footerColor].base,
     ...(span === "auto" ? { "--comic-panel-flex": flexWeight } : {}),
+    ...styleProp,
   } as CSSProperties;
 
   const inner = (
