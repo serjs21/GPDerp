@@ -1,31 +1,27 @@
+import {
+  LABEL_BELT_STOPS,
+  type LabelBeltStop,
+  type LabelBeltStopId,
+  type LabelBeltStopSide,
+} from "./config";
+
+export type { LabelBeltStop, LabelBeltStopId, LabelBeltStopSide };
+
 /** Max labels drawn at once; extras rotate via nav arrows. */
 export const LABEL_BELT_MAX_VISIBLE = 6;
 
-/**
- * Extra clearance beyond half the label *content* box (spike margin).
- * Centers sit on the host edge + contentHalf + this gap along the rect normal.
- */
-export const LABEL_BELT_SPIKE_GAP = "0.75rem";
-
-export type LabelBeltSlotId = "bl" | "ml" | "tl" | "tr" | "mr" | "br";
+export type LabelBeltSlotId = LabelBeltStopId;
 
 export type LabelBeltPortalAxis = "x" | "y";
 
 export type LabelBeltSlot = {
   id: LabelBeltSlotId;
   index: number;
-  /**
-   * Rectangular edge offset X in [-1, 1]: left (−1) or right (+1) column.
-   */
-  rectX: number;
-  /**
-   * Rectangular edge offset Y in [-1, 1]: top / mid / bottom along the column.
-   */
-  rectY: number;
-  /** CSS rotate degrees (sketch tilts away from lantern center). */
+  side: LabelBeltStopSide;
+  /** CSS rotate degrees from the stop config. */
   rotateDeg: number;
-  /** Local portal wipe axis for anime.js scroll (column = y, top link = x). */
-  portalAxis: LabelBeltPortalAxis;
+  /** Full stop record (lantern-relative % insets). */
+  stop: LabelBeltStop;
 };
 
 /**
@@ -54,17 +50,15 @@ export const LABEL_BELT_RING_ORDER: readonly LabelBeltSlotId[] = [
   "br",
 ] as const;
 
-const SLOT_DEFS: Record<LabelBeltSlotId, Omit<LabelBeltSlot, "index">> = {
-  bl: { id: "bl", rectX: -1, rectY: 0.85, rotateDeg: -22, portalAxis: "y" },
-  ml: { id: "ml", rectX: -1, rectY: 0, rotateDeg: 0, portalAxis: "y" },
-  tl: { id: "tl", rectX: -1, rectY: -0.85, rotateDeg: 22, portalAxis: "y" },
-  tr: { id: "tr", rectX: 1, rectY: -0.85, rotateDeg: -22, portalAxis: "y" },
-  mr: { id: "mr", rectX: 1, rectY: 0, rotateDeg: 0, portalAxis: "y" },
-  br: { id: "br", rectX: 1, rectY: 0.85, rotateDeg: 22, portalAxis: "y" },
-};
-
 function slotFromId(id: LabelBeltSlotId, index: number): LabelBeltSlot {
-  return { ...SLOT_DEFS[id], index };
+  const stop = LABEL_BELT_STOPS[id];
+  return {
+    id,
+    index,
+    side: stop.side,
+    rotateDeg: stop.rotateDeg,
+    stop,
+  };
 }
 
 /**
@@ -112,6 +106,6 @@ export function labelBeltPortalTravelSign(
   to: LabelBeltSlotId,
   delta: 1 | -1,
 ): 1 | -1 {
-  const side = SLOT_DEFS[to].rectX;
-  return (side < 0 ? -delta : delta) as 1 | -1;
+  const side = LABEL_BELT_STOPS[to].side;
+  return (side === "left" ? -delta : delta) as 1 | -1;
 }

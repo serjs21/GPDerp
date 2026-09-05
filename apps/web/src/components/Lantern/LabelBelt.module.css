@@ -36,10 +36,18 @@
   will-change: transform;
 }
 
+/* Both layers absolute so portal size is controlled by the entering label only. */
+.portalRotating .portalLayer {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
 .portalLayerIncoming {
   position: absolute;
   left: 0;
   top: 0;
+  z-index: 1;
 }
 
 .navButton {

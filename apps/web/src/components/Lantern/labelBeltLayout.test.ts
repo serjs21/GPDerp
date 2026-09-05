@@ -1,4 +1,5 @@
 import { rotateLabelsWindow } from "./lanternLabelRingLayout";
+import { LABEL_BELT_STOPS } from "./config";
 import {
   buildLabelBeltSlots,
   labelBeltPortalAxisForMove,
@@ -37,18 +38,21 @@ describe("labelBeltLayout", () => {
     expect(LABEL_BELT_RING_ORDER).toEqual(["bl", "ml", "tl", "tr", "mr", "br"]);
   });
 
-  it("places left and right columns with sketch tilts", () => {
+  it("loads stop config for sides and tilts", () => {
     const slots = buildLabelBeltSlots(6);
     const byId = Object.fromEntries(slots.map((s) => [s.id, s]));
-    expect(byId.bl!.rectX).toBe(-1);
-    expect(byId.bl!.rectY).toBeCloseTo(0.85, 5);
+    expect(byId.bl!.side).toBe("left");
+    expect(byId.bl!.stop).toEqual(LABEL_BELT_STOPS.bl);
     expect(byId.bl!.rotateDeg).toBe(-22);
     expect(byId.tl!.rotateDeg).toBe(22);
     expect(byId.ml!.rotateDeg).toBe(0);
-    expect(byId.tr!.rectX).toBe(1);
+    expect(byId.tr!.side).toBe("right");
     expect(byId.tr!.rotateDeg).toBe(-22);
     expect(byId.br!.rotateDeg).toBe(22);
     expect(byId.mr!.rotateDeg).toBe(0);
+    expect(LABEL_BELT_STOPS.bl.left).toBe(0);
+    expect(LABEL_BELT_STOPS.bl.top).toBe(85);
+    expect(LABEL_BELT_STOPS.tr.right).toBe(0);
   });
 
   it("walks ring neighbors for portal travel", () => {

@@ -9,13 +9,15 @@ import {
 } from "react";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
+import {
+  labelBeltStopInsetStyle,
+  labelBeltStopTransformOrigin,
+} from "./config";
 import { rotateLabelsWindow } from "./lanternLabelRingLayout";
 import {
   buildLabelBeltSlots,
   LABEL_BELT_MAX_VISIBLE,
-  LABEL_BELT_SPIKE_GAP,
   type LabelBeltSlot,
-  type LabelBeltSlotId,
 } from "./labelBeltLayout";
 import { useLabelBeltPortalTransition } from "./useLabelBeltPortalTransition";
 import styles from "./LabelBelt.module.css";
@@ -35,25 +37,12 @@ export type LabelBeltProps = {
 
 const ARROW_SRC = "/inkbrush-arrow.svg";
 
-type SlotPush = { x: number; y: number };
-
 type PortalTransition = {
   delta: 1 | -1;
   nextOffset: number;
   fromVisible: LabelBeltItem[];
   toVisible: LabelBeltItem[];
 };
-
-function remToPx(rem: string): number {
-  const n = Number.parseFloat(rem);
-  if (!Number.isFinite(n)) return 12;
-  const probe = document.createElement("div");
-  probe.style.cssText = "position:absolute;width:1rem;visibility:hidden";
-  document.body.appendChild(probe);
-  const px = probe.offsetWidth || 16;
-  probe.remove();
-  return n * px;
-}
 
 function burstFor(label: LabelBeltItem) {
   return (
@@ -64,6 +53,10 @@ function burstFor(label: LabelBeltItem) {
 /**
  * Side-column ComicBurstLabels (corners first, then mids).
  * Overflow rotates through a 6-slot ring with anime.js portal scroll.
+ *
+ * During transition the entering label owns portal size from t=0 (final layout).
+ * The exiting label is offset by that footprint so the two never share a layout
+ * box — avoiding the commit snap when the enterer is rendered alone.
  */
 export function LabelBelt({
   labels,
@@ -72,7 +65,6 @@ export function LabelBelt({
 }: LabelBeltProps) {
   const [rotationOffset, setRotationOffset] = useState(0);
   const [transition, setTransition] = useState<PortalTransition | null>(null);
-  const [pushes, setPushes] = useState<SlotPush[]>([]);
   const { busy, setLayerRef, runPortal } = useLabelBeltPortalTransition();
 
   const overflow = labels.length > maxVisible;
@@ -84,7 +76,9 @@ export function LabelBelt({
   const displayOutgoing = transition?.fromVisible ?? committedVisible;
   const displayIncoming = transition?.toVisible ?? null;
 
-  const slots = useMemo((): Array<LabelBeltSlot & { out: LabelBeltItem; inn: LabelBeltItem | null }> => {
+  const slots = useMemo((): Array<
+    LabelBeltSlot & { out: LabelBeltItem; inn: LabelBeltItem | null }
+  > => {
     const base = buildLabelBeltSlots(displayOutgoing.length);
     return base.map((slot, index) => ({
       ...slot,
@@ -93,34 +87,8 @@ export function LabelBelt({
     }));
   }, [displayOutgoing, displayIncoming]);
 
-  const slotRefs = useRef<Map<LabelBeltSlotId, HTMLDivElement | null>>(new Map());
   const portalStartedFor = useRef<PortalTransition | null>(null);
 
-  // Measure content boxes and push centers just outside the lantern edge.
-  useLayoutEffect(() => {
-    const spikePx = remToPx(LABEL_BELT_SPIKE_GAP);
-    const next = slots.map((slot) => {
-      const el = slotRefs.current.get(slot.id);
-      const content = el?.querySelector("[data-comic-role='label']") as HTMLElement | null;
-      const w = content?.offsetWidth ?? 48;
-      const h = content?.offsetHeight ?? 28;
-      return {
-        x: slot.rectX * (w / 2 + spikePx),
-        y: slot.rectY * (h / 2 + spikePx),
-      };
-    });
-    setPushes((prev) => {
-      if (
-        prev.length === next.length &&
-        prev.every((p, i) => Math.abs(p.x - next[i]!.x) < 0.5 && Math.abs(p.y - next[i]!.y) < 0.5)
-      ) {
-        return prev;
-      }
-      return next;
-    });
-  }, [slots]);
-
-  // Start portal once dual layers are mounted for a pending transition.
   useLayoutEffect(() => {
     if (!transition) {
       portalStartedFor.current = null;
@@ -128,9 +96,12 @@ export function LabelBelt({
     }
     if (portalStartedFor.current === transition) return;
     portalStartedFor.current = transition;
-    runPortal(transition.delta, () => {
-      setRotationOffset(transition.nextOffset);
-      setTransition(null);
+    runPortal({
+      delta: transition.delta,
+      onComplete: () => {
+        setRotationOffset(transition.nextOffset);
+        setTransition(null);
+      },
     });
   }, [transition, runPortal]);
 
@@ -151,27 +122,29 @@ export function LabelBelt({
       className={[styles.overlay, className].filter(Boolean).join(" ")}
       aria-label="Haiku label belt"
     >
-      {slots.map((slot, index) => {
-        const push = pushes[index] ?? { x: 0, y: 0 };
+      {slots.map((slot) => {
         const rotating = Boolean(slot.inn);
+        const inset = labelBeltStopInsetStyle(slot.stop);
         return (
           <div
             key={slot.id}
-            ref={(el) => {
-              slotRefs.current.set(slot.id, el);
-            }}
             className={styles.slot}
             style={
               {
-                left: `calc(50% + 50% * ${slot.rectX})`,
-                top: `calc(50% + 50% * ${slot.rectY})`,
-                transform: `translate(calc(-50% + ${push.x}px), calc(-50% + ${push.y}px)) rotate(${slot.rotateDeg}deg)`,
+                ...inset,
+                transform: `rotate(${slot.rotateDeg}deg)`,
+                transformOrigin: labelBeltStopTransformOrigin(slot.side),
               } as CSSProperties
             }
           >
-            <div className={styles.portal}>
+            <div
+              className={[styles.portal, rotating ? styles.portalRotating : ""]
+                .filter(Boolean)
+                .join(" ")}
+            >
               <div
                 className={styles.portalLayer}
+                data-belt-layer="out"
                 ref={(el) => setLayerRef(slot.id, "out", el)}
               >
                 {burstFor(slot.out)}
@@ -179,6 +152,7 @@ export function LabelBelt({
               {rotating ? (
                 <div
                   className={[styles.portalLayer, styles.portalLayerIncoming].join(" ")}
+                  data-belt-layer="inn"
                   ref={(el) => setLayerRef(slot.id, "inn", el)}
                 >
                   {burstFor(slot.inn!)}
