@@ -16,9 +16,9 @@ export const AuthNavigation = () => {
       <div className={styles.headerNavSlot}>
         {isLoggedIn ? (
           <div className={toolStyles.toolsSlot}>
-            <HeaderHaikuSearch />
-            <HeaderHaikuLabelFilter />
             <LoggedInUserNav user={user} onLogout={logout} />
+            <HeaderHaikuLabelFilter />
+            <HeaderHaikuSearch />
           </div>
         ) : null}
       </div>
