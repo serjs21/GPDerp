@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
-import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { useHaikuFilters } from "@/app/providers/HaikuFiltersProvider";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
@@ -13,7 +12,6 @@ import styles from "./HeaderHaikuTools.module.css";
 
 export function HeaderHaikuLabelFilter() {
   const pathname = usePathname();
-  const { initialized, isLoggedIn } = useAuthenticationState();
   const { selectedLabelIds, setSelectedLabelIds, removeLabelId } = useHaikuFilters();
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -29,8 +27,7 @@ export function HeaderHaikuLabelFilter() {
     return map;
   }, [labels]);
 
-  const visible = initialized && isLoggedIn && pathname === "/";
-  if (!visible) return null;
+  if (pathname !== "/") return null;
 
   const chips = selectedLabelIds
     .map((id) => labelById.get(id))

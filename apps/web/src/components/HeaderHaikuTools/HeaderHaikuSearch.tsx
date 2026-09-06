@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { useHaikuFilters } from "@/app/providers/HaikuFiltersProvider";
 import styles from "./HeaderHaikuTools.module.css";
 
@@ -10,14 +9,11 @@ const FADE_MS = 100;
 
 export function HeaderHaikuSearch() {
   const pathname = usePathname();
-  const { initialized, isLoggedIn } = useAuthenticationState();
   const { searchString, setSearchString } = useHaikuFilters();
   const [expanded, setExpanded] = useState(false);
   const [fadingOut, setFadingOut] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const fadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const visible = initialized && isLoggedIn && pathname === "/";
 
   useEffect(() => {
     if (searchString.trim()) setExpanded(true);
@@ -35,7 +31,7 @@ export function HeaderHaikuSearch() {
     }
   }, [expanded, fadingOut]);
 
-  if (!visible) return null;
+  if (pathname !== "/") return null;
 
   const openSearch = () => {
     if (fadeTimerRef.current) {

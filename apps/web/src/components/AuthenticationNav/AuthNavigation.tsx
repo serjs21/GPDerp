@@ -14,11 +14,13 @@ export const AuthNavigation = () => {
   return (
     <div className={styles.authCluster}>
       <div className={styles.headerNavSlot}>
-        <div className={toolStyles.toolsSlot}>
-          <HeaderHaikuSearch />
-          <HeaderHaikuLabelFilter />
-        </div>
-        {isLoggedIn ? <LoggedInUserNav user={user} onLogout={logout} /> : null}
+        {isLoggedIn ? (
+          <div className={toolStyles.toolsSlot}>
+            <HeaderHaikuSearch />
+            <HeaderHaikuLabelFilter />
+            <LoggedInUserNav user={user} onLogout={logout} />
+          </div>
+        ) : null}
       </div>
       <HeaderPreferences />
     </div>
