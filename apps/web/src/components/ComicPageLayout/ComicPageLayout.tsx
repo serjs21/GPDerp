@@ -1,6 +1,6 @@
 "use client";
 
-import * as Dialog from "@radix-ui/react-dialog";
+import { Dialog } from "@base-ui/react/dialog";
 import type { ReactNode } from "react";
 import {
   COMIC_PAGE_BORDER_PX,
@@ -31,10 +31,8 @@ export function ComicPageLayout({ children, title, className, showClose = false 
       }
     >
       {showClose ? (
-        <Dialog.Close asChild>
-          <button type="button" className={styles.closeButton} aria-label="Close">
-            ×
-          </button>
+        <Dialog.Close className={styles.closeButton} aria-label="Close">
+          ×
         </Dialog.Close>
       ) : null}
       <div className={styles.pageInner}>

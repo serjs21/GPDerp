@@ -1,7 +1,7 @@
 "use client";
 
-import * as Dialog from "@radix-ui/react-dialog";
-import { useEffect, useState, type ReactNode } from "react";
+import { Dialog } from "@base-ui/react/dialog";
+import type { ReactNode } from "react";
 import { ComicPageLayout } from "./ComicPageLayout";
 import styles from "./ComicPageLayout.module.css";
 
@@ -31,59 +31,36 @@ export function ComicPageDialog({
   className,
   contentClassName,
 }: ComicPageDialogProps) {
-  const [present, setPresent] = useState(open);
-
-  useEffect(() => {
-    setPresent(open);
-  }, [open]);
-
-  if (!present && !open) {
-    return (
-      <Dialog.Root open={false} onOpenChange={onOpenChange}>
-        {null}
-      </Dialog.Root>
-    );
-  }
-
   return (
     <Dialog.Root
       open={open}
-      onOpenChange={(next) => {
-        onOpenChange(next);
-        if (!next) setPresent(false);
+      disablePointerDismissal={!closeOnOverlayClick}
+      onOpenChange={(nextOpen, details) => {
+        if (!nextOpen && !closeOnEscape && details.reason === "escape-key") {
+          details.cancel();
+          return;
+        }
+        onOpenChange(nextOpen);
       }}
     >
-      <Dialog.Portal forceMount>
-        <Dialog.Overlay asChild forceMount>
-          <div className={styles.dialogOverlay} />
-        </Dialog.Overlay>
-
-        <div className={styles.dialogRoot}>
-          <Dialog.Content
-            asChild
-            forceMount
-            onPointerDownOutside={(event) => {
-              if (!closeOnOverlayClick) event.preventDefault();
-            }}
-            onInteractOutside={(event) => {
-              if (!closeOnOverlayClick) event.preventDefault();
-            }}
-            onEscapeKeyDown={(event) => {
-              if (!closeOnEscape) event.preventDefault();
-            }}
+      <Dialog.Portal>
+        <Dialog.Backdrop className={styles.dialogBackdrop} />
+        <Dialog.Viewport className={styles.dialogViewport}>
+          <Dialog.Popup
+            className={[styles.dialogPopup, contentClassName].filter(Boolean).join(" ")}
           >
-            <div
-              className={[styles.dialogContent, contentClassName].filter(Boolean).join(" ")}
-            >
+            <div className={styles.comicPageShell}>
               {title ? (
                 <Dialog.Title className={styles.srOnly}>{title}</Dialog.Title>
-              ) : null}
+              ) : (
+                <Dialog.Title className={styles.srOnly}>Dialog</Dialog.Title>
+              )}
               <ComicPageLayout title={title} showClose={showClose} className={className}>
                 {children}
               </ComicPageLayout>
             </div>
-          </Dialog.Content>
-        </div>
+          </Dialog.Popup>
+        </Dialog.Viewport>
       </Dialog.Portal>
     </Dialog.Root>
   );

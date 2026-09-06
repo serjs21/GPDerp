@@ -1,60 +1,122 @@
-.dialogOverlay {
+.dialogBackdrop {
   position: fixed;
   inset: 0;
   z-index: 1000;
+  min-height: 100dvh;
   background: rgb(255 255 255 / 42%);
   backdrop-filter: blur(1px);
-  animation: comicDialogOverlayIn 180ms ease-out both;
+  opacity: 1;
+  transition: opacity 180ms ease-out;
 }
 
-.dialogRoot {
+.dialogBackdrop[data-starting-style],
+.dialogBackdrop[data-ending-style] {
+  opacity: 0;
+}
+
+.dialogViewport {
   position: fixed;
   inset: 0;
   z-index: 1001;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: clamp(1rem, 4vw, 2rem);
-  pointer-events: none;
   overflow: auto;
+  /* Let the popup handle interaction; viewport shouldn't steal clicks from stacked pages. */
+  pointer-events: none;
 }
 
-.dialogContent {
+.dialogPopup {
+  --comic-stack-step: -8px;
+  --comic-stack-rot: -0.45deg;
+  --comic-stack-scale-step: 0.015;
+  --comic-page-motion: 260ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  position: relative;
+  box-sizing: border-box;
   pointer-events: auto;
   width: min(100%, 36rem);
   max-height: min(92vh, 44rem);
   overflow: auto;
   outline: none;
   transform-origin: center center;
-  animation: comicDialogContentIn 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  opacity: 1;
+  will-change: transform, opacity;
+  transition:
+    transform var(--comic-page-motion),
+    opacity var(--comic-page-motion),
+    box-shadow var(--comic-page-motion);
 }
 
-@keyframes comicDialogOverlayIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+.comicPageShell {
+  position: relative;
+  width: 100%;
+  min-height: 0;
 }
 
-@keyframes comicDialogContentIn {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
+/* Opening / closing: fly a comic sheet onto / off the stack */
+.dialogPopup[data-starting-style] {
+  opacity: 0;
+  transform: translate3d(30px, 10px, 0) rotate(1deg) scale(0.985);
+}
+
+.dialogPopup[data-ending-style] {
+  opacity: 0;
+  transform: translate3d(35px, 8px, 0) rotate(1deg) scale(0.985);
+}
+
+/*
+ * Parent pages while a nested dialog is open.
+ * --nested-dialogs is provided by Base UI (child backdrops are not rendered).
+ */
+.dialogPopup[data-nested-dialog-open] {
+  pointer-events: none;
+  transform: translate3d(
+      calc(var(--nested-dialogs, 0) * var(--comic-stack-step)),
+      calc(var(--nested-dialogs, 0) * var(--comic-stack-step)),
+      0
+    )
+    rotate(calc(var(--nested-dialogs, 0) * var(--comic-stack-rot)))
+    scale(calc(1 - (var(--nested-dialogs, 0) * var(--comic-stack-scale-step))));
+  box-shadow:
+    6px 6px 0 rgb(0 0 0 / 18%),
+    0 0.75rem 2rem rgb(0 0 0 / 28%);
+}
+
+@media (max-width: 640px) {
+  .dialogPopup {
+    --comic-stack-step: -5px;
+    --comic-stack-rot: -0.3deg;
+    --comic-stack-scale-step: 0.012;
   }
 
-  to {
-    opacity: 1;
-    transform: scale(1);
+  .dialogPopup[data-starting-style] {
+    transform: translate3d(18px, 8px, 0) rotate(0.7deg) scale(0.99);
+  }
+
+  .dialogPopup[data-ending-style] {
+    transform: translate3d(20px, 6px, 0) rotate(0.7deg) scale(0.99);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dialogOverlay,
-  .dialogContent {
-    animation: none;
+  .dialogBackdrop,
+  .dialogPopup {
+    transition: none;
+  }
+
+  .dialogPopup[data-starting-style],
+  .dialogPopup[data-ending-style] {
+    transform: none;
+    opacity: 0;
+  }
+
+  /* Keep stacked positioning without fly motion */
+  .dialogPopup[data-nested-dialog-open] {
+    transition: none;
   }
 }
 
