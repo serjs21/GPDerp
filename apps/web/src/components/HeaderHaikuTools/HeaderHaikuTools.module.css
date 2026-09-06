@@ -1,0 +1,155 @@
+.searchRoot,
+.filterRoot {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.iconButton {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: 0;
+  padding: 0.25rem;
+  border: none;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--profile-surface-bg, #fff) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-color, #222) 14%, transparent);
+  cursor: pointer;
+  color: inherit;
+}
+
+.iconButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.iconButton:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent-red, #c44) 70%, var(--text-color) 30%);
+  outline-offset: 2px;
+}
+
+.iconImg {
+  display: block;
+  width: 1.5rem;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.searchInput {
+  position: absolute;
+  left: calc(100% + 0.4rem);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  box-sizing: border-box;
+  width: min(42vw, 16rem);
+  margin: 0;
+  padding: 0.35rem 0.65rem;
+  border: 3px solid #111;
+  background: #fff;
+  color: var(--sumi-ink, #2d2d2d);
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 1.2rem;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+  outline: none;
+  box-shadow: 0.15rem 0.15rem 0 #111;
+  opacity: 1;
+  transition: opacity 0.1s ease;
+}
+
+.searchInputFadeOut {
+  opacity: 0;
+}
+
+.searchInput::placeholder {
+  color: color-mix(in srgb, var(--sumi-ink, #2d2d2d) 45%, transparent);
+}
+
+.filterChips {
+  position: fixed;
+  top: calc(5rem + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 480;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  max-width: min(92vw, 40rem);
+  padding: 0.35rem 0.5rem;
+  pointer-events: none;
+}
+
+.filterChip {
+  position: relative;
+  pointer-events: auto;
+  line-height: 0;
+  filter: drop-shadow(0 0.1rem 0.15rem rgb(0 0 0 / 25%));
+}
+
+.filterChipBurst {
+  display: block;
+  max-width: 9rem;
+}
+
+.filterChipBurst svg {
+  width: 100%;
+  height: 2.1rem;
+}
+
+.filterChipRemove {
+  appearance: none;
+  position: absolute;
+  top: -0.35rem;
+  right: -0.35rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0;
+  padding: 0;
+  border: 2px solid #111;
+  border-radius: 999px;
+  background: #fff;
+  color: #111;
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.filterChipRemove:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent-red, #c44) 70%, #111 30%);
+  outline-offset: 1px;
+}
+
+.toolsSlot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: 0 0 auto;
+  min-width: 0;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .searchInput {
+    width: min(58vw, 12.5rem);
+    font-size: 1.05rem;
+  }
+
+  .filterChips {
+    top: calc(4.5rem + env(safe-area-inset-top, 0px));
+  }
+}

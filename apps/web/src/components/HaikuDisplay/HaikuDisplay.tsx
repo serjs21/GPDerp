@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { CreationModal } from "@/components/CreationModal";
 import { SavedHaikusLanternPath } from "@/components/SavedHaikusLanternPath/SavedHaikusLanternPath";
 import { StoneInput } from "@/components/StoneInput";
@@ -9,8 +9,7 @@ import { useHaikuDeleteController } from "@/hooks/useHaikuDeleteController";
 import { useInfiniteHaikusQuery } from "@/hooks/useInfiniteHaikusQuery";
 import { useCreationPathGate } from "@/components/HaikuGenerationStickyNote/hooks/useCreationPathGate";
 import { useHaikuGenerationFlow } from "@/components/HaikuGenerationStickyNote/hooks/useHaikuGenerationFlow";
-import { SearchInput } from "@/components/SearchInput";
-import { LabelFilter } from "@/components/LabelFilter";
+import { useHaikuFilters } from "@/app/providers/HaikuFiltersProvider";
 import styles from "./HaikuDisplay.module.css";
 
 export function HaikuDisplay() {
@@ -18,9 +17,7 @@ export function HaikuDisplay() {
   const bindHaikuSavedRef = useRef<(haiku: import("@/api/haikus").HaikuDto) => void>(() => {});
   const { invalidate } = useInfiniteHaikusQuery();
   const { onHaikuDeleted, onHaikuDeleteFailed, deleteFailedModal } = useHaikuDeleteController();
-
-  const [searchString, setSearchString] = useState("");
-  const [selectedLabelIds, setSelectedLabelIds] = useState<string[]>([]);
+  const { searchString, selectedLabelIds } = useHaikuFilters();
 
   const {
     subject,
@@ -50,16 +47,6 @@ export function HaikuDisplay() {
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.filtersSection}>
-        <SearchInput
-          value={searchString}
-          onChange={setSearchString}
-        />
-        <LabelFilter
-          selectedLabelIds={selectedLabelIds}
-          onChange={setSelectedLabelIds}
-        />
-      </div>
       <div className={styles.displayArea}>
         <SavedHaikusLanternPath
           ref={pathRef}
@@ -79,19 +66,17 @@ export function HaikuDisplay() {
       </div>
       <CreationModal
         open={creationOpen}
-        generatingDraft={modalGeneratingDraft}
         haiku={creationHaiku}
-        isGenerating={Boolean(generatingDraft)}
-        lanternSessionKey={creationSessionKey}
-        showLanternActions={Boolean(creationHaiku)}
-        onHaikuDeleted={(haiku) => {
-          onHaikuDeleted(haiku);
-          onCreationHaikuDeleted();
-        }}
-        onHaikuDeleteFailed={onHaikuDeleteFailed}
-        onHaikuChanged={invalidate}
+        generatingDraft={modalGeneratingDraft}
+        sessionKey={creationSessionKey}
         onKeepScrolling={onKeepScrolling}
         onGoToHaiku={onGoToHaiku}
+        onHaikuDeleted={(haiku) => {
+          onCreationHaikuDeleted();
+          onHaikuDeleted(haiku);
+        }}
+        onHaikuDeleteFailed={onHaikuDeleteFailed}
+        onHaikuChanged={() => invalidate()}
       />
       {deleteFailedModal}
     </div>

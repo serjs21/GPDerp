@@ -17,6 +17,7 @@ export type SVGPathLanternProps = {
   loading?: boolean;
   transform: LanternTransform;
   isAnimating?: boolean;
+  excludeLabelIds?: string[];
   onDeleted?: (haiku: HaikuDto) => void;
   onDeleteFailed?: (haiku: HaikuDto) => void;
   onExitComplete?: (haiku: HaikuDto) => void;
@@ -65,6 +66,7 @@ export function SVGPathLantern({
   loading = false,
   transform,
   isAnimating = false,
+  excludeLabelIds,
   onDeleted,
   onDeleteFailed,
   onExitComplete,
@@ -101,7 +103,7 @@ export function SVGPathLantern({
             flightExiting={flightExiting}
             widthRem={19}
             ariaLabel={ariaLabel}
-            labels={toLabelBeltItems(haiku.labels)}
+            labels={toLabelBeltItems(haiku.labels, excludeLabelIds)}
           >
             <SVGPathLanternBody
               haiku={haiku}

@@ -12,6 +12,7 @@ import { GoogleOAuthAvailabilityProvider } from "./GoogleOAuthAvailabilityProvid
 import { AuthenticationVerificationProvider } from "./AuthenticationVerificationProvider";
 import { CelestialAppShell } from "./CelestialAppShell";
 import { ComicToastProvider } from "@/components/ComicToast";
+import { HaikuFiltersProvider } from "./HaikuFiltersProvider";
 
 export interface LayoutProviderProps {
   children: React.ReactNode;
@@ -25,23 +26,25 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
   const withAuthVerification = (
     <AuthenticationVerificationProvider>
       <ComicToastProvider>
-        <>
-          <AxiosInit />
-          <CelestialAppShell className={layoutStyles.shell}>
-            <header className={styles.header}>
-              <div className={styles.headerBar}>
-                <AuthNavigation />
-              </div>
-            </header>
-            <main className={layoutStyles.contentMain}>
-              <CompleteRegistrationRedirect />
-              <div className={layoutStyles.contentStretch}>{children}</div>
-            </main>
-            <footer className={layoutStyles.footerSlot}>
-              <SiteFooter />
-            </footer>
-          </CelestialAppShell>
-        </>
+        <HaikuFiltersProvider>
+          <>
+            <AxiosInit />
+            <CelestialAppShell className={layoutStyles.shell}>
+              <header className={styles.header}>
+                <div className={styles.headerBar}>
+                  <AuthNavigation />
+                </div>
+              </header>
+              <main className={layoutStyles.contentMain}>
+                <CompleteRegistrationRedirect />
+                <div className={layoutStyles.contentStretch}>{children}</div>
+              </main>
+              <footer className={layoutStyles.footerSlot}>
+                <SiteFooter />
+              </footer>
+            </CelestialAppShell>
+          </>
+        </HaikuFiltersProvider>
       </ComicToastProvider>
     </AuthenticationVerificationProvider>
   );

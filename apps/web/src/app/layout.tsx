@@ -91,9 +91,11 @@ export default async function RootLayout({
             <ThemeProvider initialTheme={initialTheme}>
               <AuthenticationProvider>
                 <CelestialThemeProvider initialSlot={initialCelestialSlot}>
-                  <LayoutProvider googleClientId={googleClientId}>
-                    <QueryProvider>{children}</QueryProvider>
-                  </LayoutProvider>
+                  <QueryProvider>
+                    <LayoutProvider googleClientId={googleClientId}>
+                      {children}
+                    </LayoutProvider>
+                  </QueryProvider>
                 </CelestialThemeProvider>
               </AuthenticationProvider>
             </ThemeProvider>

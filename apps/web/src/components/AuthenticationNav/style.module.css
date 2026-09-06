@@ -44,6 +44,7 @@
 .headerNavSlot {
   display: flex;
   align-items: center;
+  gap: 0.65rem;
   min-width: 0;
   flex: 1;
 }

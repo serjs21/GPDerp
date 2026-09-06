@@ -27,19 +27,39 @@ const SAVE_DISABLED_FILL = "#9e9e9e";
 const PAGE_SIZE = 12;
 const SEARCH_DEBOUNCE_MS = 200;
 
-export type ComicLabelSelectionModalProps = {
-  open: boolean;
-  haiku: HaikuDto;
-  onClose: () => void;
-  onSaved?: () => void;
-};
-
 type SelectableLabel = {
   id: string;
   name: string;
   color: string;
   shape: string;
 };
+
+type ComicLabelSelectionModalBase = {
+  open: boolean;
+  onClose: () => void;
+};
+
+export type ComicLabelSelectionAssignProps = ComicLabelSelectionModalBase & {
+  mode?: "assign";
+  haiku: HaikuDto;
+  onSaved?: () => void;
+  accountId?: never;
+  selectedIds?: never;
+  onApply?: never;
+};
+
+export type ComicLabelSelectionFilterProps = ComicLabelSelectionModalBase & {
+  mode: "filter";
+  accountId: string;
+  selectedIds: string[];
+  onApply: (ids: string[]) => void;
+  haiku?: never;
+  onSaved?: never;
+};
+
+export type ComicLabelSelectionModalProps =
+  | ComicLabelSelectionAssignProps
+  | ComicLabelSelectionFilterProps;
 
 function chunkRows<T>(items: T[], size: number): T[][] {
   if (items.length === 0) return [];
@@ -62,12 +82,18 @@ function selectedPanelStyle(color: string): CSSProperties {
   } as CSSProperties;
 }
 
-export function ComicLabelSelectionModal({
-  open,
-  haiku,
-  onClose,
-  onSaved,
-}: ComicLabelSelectionModalProps) {
+export function ComicLabelSelectionModal(props: ComicLabelSelectionModalProps) {
+  const { open, onClose } = props;
+  const isFilter = props.mode === "filter";
+  const accountId = isFilter ? props.accountId : props.haiku.accountId;
+  const assignHaikuLabels = isFilter ? null : props.haiku.labels;
+  const filterSelectedIds = isFilter ? props.selectedIds : null;
+  const seedLabelSource = useMemo(() => {
+    if (isFilter) return filterSelectedIds ?? [];
+    return [...(assignHaikuLabels ?? [])].map((l) => l.id).reverse();
+  }, [isFilter, filterSelectedIds, assignHaikuLabels]);
+  const haikuLabels = assignHaikuLabels ?? [];
+
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchInput, setSearchInput] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
@@ -95,12 +121,11 @@ export function ComicLabelSelectionModal({
     }
     if (seededOpen.current) return;
     seededOpen.current = true;
-    // API application order is oldest→newest; keep haiku order for save payload.
-    setSelectedIds([...haiku.labels].map((l) => l.id).reverse());
+    setSelectedIds([...seedLabelSource]);
     window.requestAnimationFrame(() => {
       searchRef.current?.focus();
     });
-  }, [open, haiku.labels]);
+  }, [open, seedLabelSource]);
 
   const {
     pagedLabels,
@@ -111,7 +136,7 @@ export function ComicLabelSelectionModal({
     setHaikuLabels,
     isSettingLabels,
   } = useAccountLabels({
-    accountId: haiku.accountId,
+    accountId,
     autofetch: open,
     pageSize: PAGE_SIZE,
     q: debouncedQ,
@@ -119,7 +144,7 @@ export function ComicLabelSelectionModal({
 
   const labelById = useMemo(() => {
     const map = new Map<string, SelectableLabel>();
-    for (const label of haiku.labels) {
+    for (const label of haikuLabels) {
       map.set(label.id, {
         id: label.id,
         name: label.name,
@@ -136,7 +161,7 @@ export function ComicLabelSelectionModal({
       });
     }
     return map;
-  }, [haiku.labels, pagedLabels]);
+  }, [haikuLabels, pagedLabels]);
 
   const selectedIdSet = useMemo(() => new Set(selectedIds), [selectedIds]);
 
@@ -149,11 +174,8 @@ export function ComicLabelSelectionModal({
       orderQueryKey.current = debouncedQ;
     }
 
-    // Prefer live selection; fall back to haiku labels so first paint (before seed) still pins them.
     const seedIds =
-      selectedIds.length > 0
-        ? selectedIds
-        : [...haiku.labels].map((l) => l.id).reverse();
+      selectedIds.length > 0 ? selectedIds : seedLabelSource;
 
     setListOrderIds((prev) => {
       const base = rebuild ? [] : prev;
@@ -171,7 +193,6 @@ export function ComicLabelSelectionModal({
 
       for (const label of pagedLabels) {
         if (seen.has(label.id)) continue;
-        // Client-side guard: API may briefly return unfiltered pages.
         if (!matchesQuery(label.name, debouncedQ)) continue;
         next.push(label.id);
         seen.add(label.id);
@@ -186,7 +207,7 @@ export function ComicLabelSelectionModal({
       }
       return next;
     });
-  }, [open, debouncedQ, pagedLabels, selectedIds, labelById, haiku.labels]);
+  }, [open, debouncedQ, pagedLabels, selectedIds, labelById, seedLabelSource]);
 
   const displayLabels = useMemo((): SelectableLabel[] => {
     return listOrderIds
@@ -214,13 +235,14 @@ export function ComicLabelSelectionModal({
     void fetchNextPage();
   };
 
-  const submit = () => {
+  const submitAssign = () => {
+    if (isFilter) return;
     void setHaikuLabels({
-      haikuId: haiku.id,
+      haikuId: props.haiku.id,
       labelIds: selectedIds,
       onSuccess: async () => {
         comicToast.success("Labels saved");
-        onSaved?.();
+        props.onSaved?.();
         onClose();
       },
       onError: async () => {
@@ -229,13 +251,21 @@ export function ComicLabelSelectionModal({
     });
   };
 
-  const canSave = !isSettingLabels;
+  const submitFilter = () => {
+    if (!isFilter) return;
+    props.onApply(selectedIds);
+    onClose();
+  };
+
+  const canSave = isFilter ? true : !isSettingLabels;
+  const footerLabel = isFilter ? "Done" : "Save";
+  const onFooterClick = isFilter ? submitFilter : submitAssign;
 
   return (
     <ComicPageDialog
       open={open}
       showClose
-      title="Labels"
+      title={isFilter ? "Filter labels" : "Labels"}
       className={styles.pageShell}
       contentClassName={styles.dialogContent}
       onOpenChange={(nextOpen) => {
@@ -319,12 +349,12 @@ export function ComicLabelSelectionModal({
             type="button"
             className={styles.saveButton}
             disabled={!canSave}
-            aria-busy={isSettingLabels}
-            onClick={submit}
+            aria-busy={!isFilter && isSettingLabels}
+            onClick={onFooterClick}
           >
             <ComicBurstLabel
               className={styles.saveBurst}
-              text={formatComicLabelText("Save")}
+              text={formatComicLabelText(footerLabel)}
               fill={canSave ? SAVE_FILL : SAVE_DISABLED_FILL}
               shapeKind="rect"
             />

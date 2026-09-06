@@ -38,13 +38,22 @@ export function toLabelBeltItems(
     color?: string | null;
     shape?: string | null;
   }>,
+  excludeLabelIds?: ReadonlyArray<string> | ReadonlySet<string>,
 ): LabelBeltItem[] {
-  return labels.map((label) => ({
-    id: label.id,
-    name: label.name,
-    color: label.color || "#888888",
-    shape: label.shape ?? "classic",
-  }));
+  const exclude =
+    excludeLabelIds == null
+      ? null
+      : excludeLabelIds instanceof Set
+        ? excludeLabelIds
+        : new Set(excludeLabelIds);
+  return labels
+    .filter((label) => !exclude?.has(label.id))
+    .map((label) => ({
+      id: label.id,
+      name: label.name,
+      color: label.color || "#888888",
+      shape: label.shape ?? "classic",
+    }));
 }
 
 export type LabelBeltProps = {

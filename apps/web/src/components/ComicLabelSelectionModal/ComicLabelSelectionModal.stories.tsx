@@ -2,7 +2,10 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import type { HaikuDto } from "@/api/haikus";
 import { labelQueryKeys } from "@/api/labels";
 import { STORY_ACCOUNT_ID, withQueryClientSeed } from "@/storybook";
-import { ComicLabelSelectionModal } from "./ComicLabelSelectionModal";
+import {
+  ComicLabelSelectionModal,
+  type ComicLabelSelectionFilterProps,
+} from "./ComicLabelSelectionModal";
 
 const haiku: HaikuDto = {
   id: "00000000-0000-4000-8000-000000000010",
@@ -122,5 +125,16 @@ export const EmptyCatalog: Story = {
   ],
   args: {
     haiku: { ...haiku, labels: [] },
+  },
+};
+
+export const FilterMode: StoryObj<ComicLabelSelectionFilterProps> = {
+  args: {
+    mode: "filter",
+    open: true,
+    accountId: STORY_ACCOUNT_ID,
+    selectedIds: ["00000000-0000-4000-8000-000000000201"],
+    onApply: () => undefined,
+    onClose: () => undefined,
   },
 };

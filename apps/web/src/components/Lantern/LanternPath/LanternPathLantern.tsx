@@ -11,6 +11,7 @@ import styles from "./LanternPath.module.css";
 export type LanternPathLanternProps = HaikuContainerProps & {
   pathStop: number;
   className?: string;
+  excludeLabelIds?: string[];
   onDeleted?: () => void;
   onChanged?: () => void;
 };
@@ -18,6 +19,7 @@ export type LanternPathLanternProps = HaikuContainerProps & {
 export function LanternPathLantern({
   pathStop,
   className,
+  excludeLabelIds,
   onDeleted,
   onChanged,
   ...contentProps
@@ -46,7 +48,7 @@ export function LanternPathLantern({
 
   const beltLabels =
     "haiku" in contentProps && contentProps.haiku
-      ? toLabelBeltItems(contentProps.haiku.labels)
+      ? toLabelBeltItems(contentProps.haiku.labels, excludeLabelIds)
       : undefined;
 
   return (

@@ -68,6 +68,8 @@ export type SVGPathProps = {
   onHaikuDeleted?: (haiku: HaikuDto) => void;
   onHaikuDeleteFailed?: (haiku: HaikuDto) => void;
   onHaikuChanged?: () => void;
+  /** Label ids to omit from lantern belts (e.g. active filters). */
+  excludeLabelIds?: string[];
   className?: string;
   showGuides?: boolean;
 };
@@ -115,6 +117,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
     onHaikuDeleted,
     onHaikuDeleteFailed,
     onHaikuChanged,
+    excludeLabelIds,
     className,
     showGuides = false,
   },
@@ -364,6 +367,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
                 loading={loading}
                 transform={transform}
                 isAnimating={isAnimating || (deletePack != null && deletePackT < 1)}
+                excludeLabelIds={excludeLabelIds}
                 onDeleted={
                   haiku
                     ? (deleted) => handleLanternDeleted(deleted, transform)
@@ -378,6 +382,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
               key={`exiting-${haiku.id}`}
               haiku={haiku}
               transform={transform}
+              excludeLabelIds={excludeLabelIds}
               onComplete={handleLanternExitComplete}
             />
           ))}
@@ -387,6 +392,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
               generatingDraft={generatingDraft}
               transform={generatingTransform}
               isAnimating={isAnimating}
+              excludeLabelIds={excludeLabelIds}
             />
           ) : null}
         </div>

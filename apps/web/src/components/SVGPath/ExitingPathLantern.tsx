@@ -17,11 +17,17 @@ import styles from "./SVGPath.module.css";
 export type ExitingPathLanternProps = {
   haiku: HaikuDto;
   transform: LanternTransform;
+  excludeLabelIds?: string[];
   onComplete: (haiku: HaikuDto) => void;
 };
 
 /** Owns fly-away after the path lantern unmounts from the optimistic list update. */
-export function ExitingPathLantern({ haiku, transform, onComplete }: ExitingPathLanternProps) {
+export function ExitingPathLantern({
+  haiku,
+  transform,
+  excludeLabelIds,
+  onComplete,
+}: ExitingPathLanternProps) {
   const [flightStyle, setFlightStyle] = useState<CSSProperties>(() =>
     initialFlightCssVars(transform.positionMode),
   );
@@ -74,7 +80,7 @@ export function ExitingPathLantern({ haiku, transform, onComplete }: ExitingPath
       flightExiting={flightExiting}
       widthRem={19}
       ariaLabel={`Deleting haiku: ${haiku.title ?? ""}`}
-      labels={toLabelBeltItems(haiku.labels)}
+      labels={toLabelBeltItems(haiku.labels, excludeLabelIds)}
     >
       <Lantern haiku={haiku} showActions={false} />
     </LanternFrame>
