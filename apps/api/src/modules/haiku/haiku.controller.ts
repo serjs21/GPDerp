@@ -46,11 +46,13 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
       const q = req.query as Record<string, string | undefined>;
       const pageSize = Math.max(1, Math.min(Number(q.pageSize ?? "50") || 50, 100));
       const offset = Math.max(0, Number(q.offset ?? "0") || 0);
+      const search = (q.q ?? "").trim() || undefined;
       const result = await haikuService.listLabelsForUser({
         userId,
         accountId,
         pageSize,
         offset,
+        q: search,
       });
       if (!result.ok) {
         res.code(403).send({ ok: false, error: "Unauthorized" });

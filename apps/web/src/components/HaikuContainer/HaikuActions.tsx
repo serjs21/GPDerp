@@ -9,7 +9,7 @@ import { deleteHaiku } from "@/api/haikus";
 import { comicToast } from "@/components/ComicToast";
 import { DeleteConfirmModal } from "@/components/DeleteConfirmModal";
 import { SakuraPetalLoader } from "@/components/Loaders";
-import { ManageLabelsModal } from "@/components/ManageLabelsModal/ManageLabelsModal";
+import { ComicLabelSelectionModal } from "@/components/ComicLabelSelectionModal";
 import { ShareModal } from "@/components/ShareModal/ShareModal";
 import { useCopy } from "@/hooks/useCopy";
 import styles from "./HaikuActions.module.css";
@@ -122,7 +122,7 @@ export const HaikuActions = (props: HaikuActionsProps) => {
         open={shareOpen}
         onClose={() => setShareOpen(false)}
       />
-      <ManageLabelsModal
+      <ComicLabelSelectionModal
         open={labelsOpen}
         haiku={savedHaiku}
         onClose={() => setLabelsOpen(false)}

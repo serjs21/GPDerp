@@ -12,8 +12,8 @@ export type LabelDto = {
 export const labelQueryKeys = {
   all: ["labels"] as const,
   byAccount: (accountId: string) => [...labelQueryKeys.all, "account", accountId] as const,
-  pagedByAccount: (accountId: string, pageSize: number) =>
-    [...labelQueryKeys.all, "account", accountId, "paged", pageSize] as const,
+  pagedByAccount: (accountId: string, pageSize: number, q = "") =>
+    [...labelQueryKeys.all, "account", accountId, "paged", pageSize, q] as const,
   manageAccount: ["labels", "manage-account"] as const,
 };
 
@@ -78,10 +78,15 @@ export async function resolveManageLabelsAccountId(): Promise<string> {
 
 export async function fetchLabelsForAccountPaged(
   accountId: string,
-  params: { pageSize: number; offset: number },
+  params: { pageSize: number; offset: number; q?: string },
 ): Promise<{ labels: LabelDto[]; total: number; pageSize: number; offset: number }> {
+  const { pageSize, offset, q } = params;
   const { data } = await axios.get<PagedLabelsResponse>(`/haiku/labels/${encodeURIComponent(accountId)}`, {
-    params,
+    params: {
+      pageSize,
+      offset,
+      ...(q?.trim() ? { q: q.trim() } : null),
+    },
   });
   if (!data.ok) throw new Error(data.error ?? "Failed to fetch paged labels");
   return data.data;

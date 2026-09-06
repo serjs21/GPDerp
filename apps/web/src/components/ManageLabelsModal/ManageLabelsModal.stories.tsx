@@ -45,7 +45,7 @@ const labelCatalog = [
 ];
 
 const meta: Meta<typeof ManageLabelsModal> = {
-  title: "Haiku/ManageLabelsModal",
+  title: "Archive/Haiku/ManageLabelsModal",
   component: ManageLabelsModal,
   decorators: [
     withQueryClientSeed((qc) => {

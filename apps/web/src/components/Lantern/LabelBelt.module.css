@@ -59,18 +59,13 @@
   color: var(--sumi-ink, #2d2d2d);
   cursor: pointer;
   pointer-events: auto;
-  transition: color 160ms ease, filter 180ms ease;
+  filter: drop-shadow(0 0 0 transparent);
+  transition: filter 0.3s ease;
 }
 
-.navButton:hover {
-  color: color-mix(in srgb, var(--accent-red, #bc002d) 70%, var(--sumi-ink, #2d2d2d));
-  filter: drop-shadow(0 0 0.35rem color-mix(in srgb, #fff6d5 85%, transparent))
-    drop-shadow(0 0 0.75rem color-mix(in srgb, #ffcc66 55%, transparent))
-    drop-shadow(0 0 1.15rem color-mix(in srgb, var(--accent-red, #bc002d) 35%, transparent));
-}
-
-.navButton:hover:disabled {
-  filter: none;
+.navButton:hover:not(:disabled) {
+  filter: drop-shadow(0 0 0.55rem rgba(255, 240, 245, 0.95))
+    drop-shadow(0 0 1.1rem rgba(255, 230, 240, 0.55));
 }
 
 .navButton:focus-visible {

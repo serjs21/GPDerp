@@ -73,6 +73,7 @@ export const haikuService = {
     accountId: string;
     pageSize: number;
     offset: number;
+    q?: string;
   }): Promise<
     | { ok: false; reason: "forbidden" }
     | {
@@ -83,12 +84,12 @@ export const haikuService = {
         offset: number;
       }
   > {
-    const { userId, accountId, pageSize, offset } = params;
+    const { userId, accountId, pageSize, offset, q } = params;
     const allowed = await authRepository.findAccountIdForUser(userId, accountId);
     if (!allowed) return { ok: false, reason: "forbidden" };
     const [labels, total] = await Promise.all([
-      labelRepository.listForAccountPaged(accountId, pageSize, offset),
-      labelRepository.countForAccount(accountId),
+      labelRepository.listForAccountPaged(accountId, pageSize, offset, q),
+      labelRepository.countForAccount(accountId, q),
     ]);
     return { ok: true, labels, total, pageSize, offset };
   },

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import {
   createLabelForAccount,
   deleteLabel,
@@ -12,11 +12,14 @@ import {
   updateLabel,
   type LabelDto,
 } from "@/api/labels";
-import { useInfiniteQuery } from "@tanstack/react-query";
 
 export type UseAccountLabelsOptions = {
   accountId: string;
   autofetch?: boolean;
+  /** Page size for infinite paged query (default 50). */
+  pageSize?: number;
+  /** Optional name substring filter for paged query. */
+  q?: string;
 };
 
 export type UseAccountLabelsResult = {
@@ -59,6 +62,7 @@ export type UseAccountLabelsResult = {
   pagedLabels: LabelDto[];
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
+  isPagedLoading: boolean;
   fetchNextPage: () => Promise<void>;
   isCreating: boolean;
   isSettingLabels: boolean;
@@ -66,6 +70,12 @@ export type UseAccountLabelsResult = {
   isDeleting: boolean;
   isLoading: boolean;
 };
+
+function invalidatePagedQueries(queryClient: ReturnType<typeof useQueryClient>, accountId: string) {
+  return queryClient.invalidateQueries({
+    queryKey: [...labelQueryKeys.all, "account", accountId, "paged"],
+  });
+}
 
 export function useManageLabelsAccount() {
   return useQuery({
@@ -76,9 +86,9 @@ export function useManageLabelsAccount() {
 }
 
 export function useAccountLabels(options: UseAccountLabelsOptions): UseAccountLabelsResult {
-  const { accountId, autofetch = true } = options;
+  const { accountId, autofetch = true, pageSize = 50, q = "" } = options;
   const queryClient = useQueryClient();
-  const PAGE_SIZE = 50;
+  const searchQ = q.trim();
 
   const query = useQuery({
     queryKey: labelQueryKeys.byAccount(accountId),
@@ -114,7 +124,7 @@ export function useAccountLabels(options: UseAccountLabelsOptions): UseAccountLa
         if (current.some((l) => l.id === created.id)) return current;
         return [...current, created].sort((a, b) => a.name.localeCompare(b.name));
       });
-      await queryClient.invalidateQueries({ queryKey: labelQueryKeys.pagedByAccount(accountId, PAGE_SIZE) });
+      await invalidatePagedQueries(queryClient, accountId);
       return created;
     },
   });
@@ -167,7 +177,7 @@ export function useAccountLabels(options: UseAccountLabelsOptions): UseAccountLa
       queryClient.setQueryData<LabelDto[]>(labelQueryKeys.byAccount(accountId), (prev) =>
         (prev ?? []).map((l) => (l.id === updated.id ? updated : l)),
       );
-      await queryClient.invalidateQueries({ queryKey: labelQueryKeys.pagedByAccount(accountId, PAGE_SIZE) });
+      await invalidatePagedQueries(queryClient, accountId);
       await options.onSuccess?.(updated);
     } catch {
       await options.onError?.();
@@ -185,7 +195,7 @@ export function useAccountLabels(options: UseAccountLabelsOptions): UseAccountLa
       queryClient.setQueryData<LabelDto[]>(labelQueryKeys.byAccount(accountId), (prev) =>
         (prev ?? []).filter((l) => l.id !== options.labelId),
       );
-      await queryClient.invalidateQueries({ queryKey: labelQueryKeys.pagedByAccount(accountId, PAGE_SIZE) });
+      await invalidatePagedQueries(queryClient, accountId);
       await options.onSuccess?.();
     } catch {
       await options.onError?.();
@@ -194,9 +204,13 @@ export function useAccountLabels(options: UseAccountLabelsOptions): UseAccountLa
   };
 
   const pagedQuery = useInfiniteQuery({
-    queryKey: labelQueryKeys.pagedByAccount(accountId, PAGE_SIZE),
+    queryKey: labelQueryKeys.pagedByAccount(accountId, pageSize, searchQ),
     queryFn: ({ pageParam }) =>
-      fetchLabelsForAccountPaged(accountId, { pageSize: PAGE_SIZE, offset: pageParam as number }),
+      fetchLabelsForAccountPaged(accountId, {
+        pageSize,
+        offset: pageParam as number,
+        q: searchQ || undefined,
+      }),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => {
       const loaded = lastPage.offset + lastPage.labels.length;
@@ -217,6 +231,7 @@ export function useAccountLabels(options: UseAccountLabelsOptions): UseAccountLa
     pagedLabels,
     hasNextPage: pagedQuery.hasNextPage ?? false,
     isFetchingNextPage: pagedQuery.isFetchingNextPage,
+    isPagedLoading: pagedQuery.isPending,
     fetchNextPage: async () => {
       await pagedQuery.fetchNextPage();
     },

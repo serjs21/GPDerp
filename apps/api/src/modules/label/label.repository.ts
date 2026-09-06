@@ -1,3 +1,4 @@
+import type { Prisma } from "../../generated/prisma";
 import { prismaClient } from "../../lib/prisma";
 
 const labelSelect = {
@@ -9,6 +10,16 @@ const labelSelect = {
   createdAt: true,
 } as const;
 
+function accountLabelWhere(accountId: string, q?: string): Prisma.LabelWhereInput {
+  const trimmed = q?.trim();
+  return {
+    accountId,
+    ...(trimmed
+      ? { name: { contains: trimmed, mode: "insensitive" as const } }
+      : null),
+  };
+}
+
 export const labelRepository = {
   listForAccount(accountId: string) {
     return prismaClient.label.findMany({
@@ -18,9 +29,9 @@ export const labelRepository = {
     });
   },
 
-  listForAccountPaged(accountId: string, take: number, skip: number) {
+  listForAccountPaged(accountId: string, take: number, skip: number, q?: string) {
     return prismaClient.label.findMany({
-      where: { accountId },
+      where: accountLabelWhere(accountId, q),
       orderBy: [{ createdAt: "desc" }, { name: "asc" }],
       take,
       skip,
@@ -28,8 +39,8 @@ export const labelRepository = {
     });
   },
 
-  countForAccount(accountId: string) {
-    return prismaClient.label.count({ where: { accountId } });
+  countForAccount(accountId: string, q?: string) {
+    return prismaClient.label.count({ where: accountLabelWhere(accountId, q) });
   },
 
   createForAccount(accountId: string, name: string, color: string, shape: string) {

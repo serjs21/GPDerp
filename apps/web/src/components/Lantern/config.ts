@@ -37,12 +37,12 @@ function facingInsetFromOuter(outerPct: number): number {
 export const LABEL_BELT_STOPS: Record<LabelBeltStopId, LabelBeltStop> = {
   // Left column: pin RIGHT edge (was left: -30/-35/-34)
   bl: { id: "bl", side: "left", right: facingInsetFromOuter(0), top: 60, rotateDeg: -22 },
-  ml: { id: "ml", side: "left", right: facingInsetFromOuter(0), top: 32, rotateDeg: 0 },
+  ml: { id: "ml", side: "left", right: facingInsetFromOuter(-5), top: 32, rotateDeg: 0 },
   tl: { id: "tl", side: "left", right: facingInsetFromOuter(0), top: 0, rotateDeg: 22 },
   // Right column: pin LEFT edge (was right: -28/-38/-32)
-  tr: { id: "tr", side: "right", left: facingInsetFromOuter(-10), top: -5, rotateDeg: -22 },
-  mr: { id: "mr", side: "right", left: facingInsetFromOuter(-10), top: 28, rotateDeg: 0 },
-  br: { id: "br", side: "right", left: facingInsetFromOuter(-10), top: 62, rotateDeg: 22 },
+  tr: { id: "tr", side: "right", left: facingInsetFromOuter(0), top: -5, rotateDeg: -22 },
+  mr: { id: "mr", side: "right", left: facingInsetFromOuter(-5), top: 28, rotateDeg: 0 },
+  br: { id: "br", side: "right", left: facingInsetFromOuter(0), top: 62, rotateDeg: 22 },
 };
 
 /** CSS transform-origin for a stop’s lantern-facing text edge. */
