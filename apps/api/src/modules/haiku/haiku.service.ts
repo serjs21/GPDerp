@@ -6,6 +6,7 @@ import { runHaikuAgentStreamMock } from "../../mocks/textStream";
 import { authRepository } from "../auth/repository";
 import { haikuRepository } from "./haiku.repository";
 import { labelRepository } from "../label/label.repository";
+import { normalizeLabelShape } from "../label/labelShape";
 import { mailService } from "../email/mailService";
 import { buildShareHaikuEmail } from "../email/templates/shareHaikuTemplate";
 
@@ -42,7 +43,7 @@ export type HaikuPersistedPayload = {
   createdAt: string;
   accountId: string;
   createdById: string;
-  labels: Array<{ id: string; name: string; color: string }>;
+  labels: Array<{ id: string; name: string; color: string; shape: string }>;
 };
 
 export type HaikuStreamYield = string | { type: "saved"; haiku: HaikuPersistedPayload };
@@ -97,6 +98,7 @@ export const haikuService = {
     accountId: string;
     name: string;
     color: string;
+    shape?: string;
   }): Promise<
     | { ok: false; reason: "forbidden" | "invalid_name" | "duplicate" }
     | { ok: true; label: Awaited<ReturnType<typeof labelRepository.createForAccount>> }
@@ -104,11 +106,12 @@ export const haikuService = {
     const { userId, accountId } = params;
     const name = params.name.trim();
     const color = params.color.trim() || "default";
+    const shape = normalizeLabelShape(params.shape);
     if (name.length < 3) return { ok: false, reason: "invalid_name" };
     const allowed = await authRepository.findAccountIdForUser(userId, accountId);
     if (!allowed) return { ok: false, reason: "forbidden" };
     try {
-      const label = await labelRepository.createForAccount(accountId, name, color);
+      const label = await labelRepository.createForAccount(accountId, name, color, shape);
       return { ok: true, label };
     } catch (e: any) {
       if (e?.code === "P2002") return { ok: false, reason: "duplicate" };
@@ -121,6 +124,7 @@ export const haikuService = {
     labelId: string;
     name: string;
     color: string;
+    shape?: string;
   }): Promise<
     | { ok: false; reason: "not_found" | "forbidden" | "invalid_name" | "duplicate" }
     | { ok: true; label: Awaited<ReturnType<typeof labelRepository.updateById>> }
@@ -128,13 +132,14 @@ export const haikuService = {
     const { userId, labelId } = params;
     const name = params.name.trim();
     const color = params.color.trim() || "default";
+    const shape = normalizeLabelShape(params.shape);
     if (name.length < 3) return { ok: false, reason: "invalid_name" };
     const existing = await labelRepository.findById(labelId);
     if (!existing) return { ok: false, reason: "not_found" };
     const allowed = await authRepository.findAccountIdForUser(userId, existing.accountId);
     if (!allowed) return { ok: false, reason: "forbidden" };
     try {
-      const label = await labelRepository.updateById(labelId, { name, color });
+      const label = await labelRepository.updateById(labelId, { name, color, shape });
       return { ok: true, label };
     } catch (e: any) {
       if (e?.code === "P2002") return { ok: false, reason: "duplicate" };
@@ -268,7 +273,7 @@ export const haikuService = {
     labelIds: string[];
     accountLabelIds: Set<string>;
   }): Promise<
-    | { ok: true; labels: Array<{ id: string; name: string; color: string }> }
+    | { ok: true; labels: Array<{ id: string; name: string; color: string; shape: string }> }
     | { ok: false; reason: "not_found" | "forbidden" | "invalid_labels" }
   > {
     const { userId, haikuId, labelIds, accountLabelIds } = params;

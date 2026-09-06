@@ -13,7 +13,7 @@ export type HaikuDto = {
   createdAt: string;
   accountId: string;
   createdById: string;
-  labels: Array<{ id: string; name: string; color: string }>;
+  labels: Array<{ id: string; name: string; color: string; shape: string }>;
 };
 
 export type HaikuListSuccess = {

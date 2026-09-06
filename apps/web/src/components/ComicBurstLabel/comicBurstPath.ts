@@ -1,3 +1,4 @@
+import { COMIC_BURST_LONG_TEXT_THRESHOLD } from "./measureComicBurstText";
 import { createBurstRng } from "./comicBurstSeed";
 
 export type ComicBurstShapeKind = "burst" | "circle" | "square" | "rect" | "thought";
@@ -10,6 +11,11 @@ export type ComicBurstPathOptions = {
   kind?: ComicBurstShapeKind;
   /** Stable seed key (usually text or explicit seed). */
   seedKey: string | number;
+  /**
+   * Scale for left/right spike length only (1 = full, 0.5 = half).
+   * Top/bottom spikes stay full length. Used for long labels to avoid side clip.
+   */
+  sideSpikeLengthScale?: number;
 };
 
 export type ComicBurstLayout = {
@@ -148,6 +154,7 @@ export function buildComicBurstPath(options: ComicBurstPathOptions): ComicBurstL
     randomness = 0.18,
     kind = "burst",
     seedKey,
+    sideSpikeLengthScale = 1,
   } = options;
 
   if (kind === "circle") {
@@ -169,6 +176,7 @@ export function buildComicBurstPath(options: ComicBurstPathOptions): ComicBurstL
   const outerRy = (height / 2) * 1.22;
   const innerRx = outerRx * 0.66;
   const innerRy = outerRy * 0.64;
+  const sideScale = Math.min(1, Math.max(0, sideSpikeLengthScale));
 
   const rng = createBurstRng(seedKey);
   const count = Math.max(6, Math.floor(spikeCount));
@@ -179,7 +187,12 @@ export function buildComicBurstPath(options: ComicBurstPathOptions): ComicBurstL
     const base = (i / count) * Math.PI * 2 - Math.PI / 2;
     const tipAngle = base + (rng() - 0.5) * randomness * 0.16;
     const tipScale = 0.9 + rng() * randomness * 1.2;
-    tips.push(ellipsePoint(cx, cy, outerRx * tipScale, outerRy * tipScale, tipAngle));
+    const fullTip = ellipsePoint(cx, cy, outerRx * tipScale, outerRy * tipScale, tipAngle);
+    // |cos| ≈ 1 on left/right, ≈ 0 on top/bottom — shorten only side tips.
+    const sideWeight = Math.abs(Math.cos(tipAngle));
+    const tipKeep = 1 - sideWeight * (1 - sideScale);
+    const innerOnRay = ellipsePoint(cx, cy, innerRx, innerRy, tipAngle);
+    tips.push(lerp(innerOnRay, fullTip, tipKeep));
 
     const mid = ((i + 0.5) / count) * Math.PI * 2 - Math.PI / 2;
     const valleyAngle = mid + (rng() - 0.5) * randomness * 0.05;
@@ -247,6 +260,8 @@ export function layoutComicBurstLabel(params: {
   const width = Math.max(72, textWidth + paddingX * 2);
   const height = Math.max(48, fontSize * 1.35 + paddingY * 2);
   const detail = silhouetteDetailForTextLength(spikeCount, text || String(seedKey));
+  const sideSpikeLengthScale =
+    (text || String(seedKey)).trim().length >= COMIC_BURST_LONG_TEXT_THRESHOLD ? 0.5 : 1;
   return buildComicBurstPath({
     width,
     height,
@@ -254,5 +269,6 @@ export function layoutComicBurstLabel(params: {
     randomness,
     seedKey,
     kind,
+    sideSpikeLengthScale,
   });
 }

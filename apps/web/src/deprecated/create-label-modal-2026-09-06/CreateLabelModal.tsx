@@ -6,7 +6,7 @@ import { HexColorPicker } from "react-colorful";
 import type { LabelDto } from "@/api/labels";
 import { comicToast } from "@/components/ComicToast";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
-import { Label } from "@/components/Label/Label";
+import { Label } from "../label-tag-2026-09-06/Label";
 import { getRandomLabelColor } from "@/utils/colors";
 import styles from "./styles.module.css";
 
@@ -58,6 +58,7 @@ export function CreateLabelModal({
         labelId: label.id,
         name: trimmedName,
         color,
+        shape: "classic",
         onSuccess: async (updated) => {
           comicToast.success("Label updated");
           onUpdated?.(updated);
@@ -72,6 +73,7 @@ export function CreateLabelModal({
     void createLabel({
       name: trimmedName,
       color,
+      shape: "classic",
       onSuccess: async (created) => {
         comicToast.success("Label created");
         onCreated?.(created);

@@ -2,6 +2,7 @@ import { authRepository } from "../auth/repository";
 import { haikuRepository } from "../haiku/haiku.repository";
 import { haikuService } from "../haiku/haiku.service";
 import { labelRepository } from "./label.repository";
+import { normalizeLabelShape } from "./labelShape";
 
 export const labelService = {
   async listLabelsForAccount(params: {
@@ -23,6 +24,7 @@ export const labelService = {
     accountId: string;
     name: string;
     color: string;
+    shape?: string;
   }): Promise<
     | { ok: true; label: Awaited<ReturnType<typeof labelRepository.createForAccount>> }
     | { ok: false; reason: "forbidden" | "invalid_name" | "duplicate" }
@@ -30,13 +32,14 @@ export const labelService = {
     const { userId, accountId } = params;
     const rawName = params.name.trim();
     const color = (params.color || "default").trim() || "default";
+    const shape = normalizeLabelShape(params.shape);
     if (rawName.length < 3) return { ok: false, reason: "invalid_name" };
 
     const allowed = await authRepository.findAccountIdForUser(userId, accountId);
     if (!allowed) return { ok: false, reason: "forbidden" };
 
     try {
-      const label = await labelRepository.createForAccount(accountId, rawName, color);
+      const label = await labelRepository.createForAccount(accountId, rawName, color, shape);
       return { ok: true, label };
     } catch (e: any) {
       // accountId + name is unique in Prisma schema
@@ -50,7 +53,7 @@ export const labelService = {
     haikuId: string;
     labelIds: string[];
   }): Promise<
-    | { ok: true; labels: Array<{ id: string; name: string; color: string }> }
+    | { ok: true; labels: Array<{ id: string; name: string; color: string; shape: string }> }
     | { ok: false; reason: "not_found" | "forbidden" | "invalid_labels" }
   > {
     const { userId, haikuId, labelIds } = params;

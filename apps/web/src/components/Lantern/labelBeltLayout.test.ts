@@ -50,10 +50,13 @@ describe("labelBeltLayout", () => {
     expect(byId.tr!.rotateDeg).toBe(-22);
     expect(byId.br!.rotateDeg).toBe(22);
     expect(byId.mr!.rotateDeg).toBe(0);
-    expect(typeof LABEL_BELT_STOPS.bl.left).toBe("number");
+    expect(typeof LABEL_BELT_STOPS.bl.right).toBe("number");
     expect(typeof LABEL_BELT_STOPS.bl.top).toBe("number");
-    expect(typeof LABEL_BELT_STOPS.tr.right).toBe("number");
+    expect(typeof LABEL_BELT_STOPS.tr.left).toBe("number");
     expect(typeof LABEL_BELT_STOPS.tr.top).toBe("number");
+    // Lantern-facing pin: left column uses `right`, right column uses `left`.
+    expect(LABEL_BELT_STOPS.bl.right).toBe(130);
+    expect(LABEL_BELT_STOPS.tr.left).toBe(128);
   });
 
   it("walks ring neighbors for portal travel", () => {

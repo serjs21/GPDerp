@@ -10,6 +10,10 @@ import {
   withQueryClient,
   withThemedStoryStage,
 } from "@/storybook";
+import {
+  COMIC_LABEL_NAME_MAX,
+  COMIC_LABEL_NAME_MIN,
+} from "@/components/ComicLabelCreationModal";
 import { type LabelBeltItem } from "./LabelBelt";
 import { Lantern } from "./Lantern";
 import { LanternFrame } from "./LanternFrame";
@@ -96,9 +100,9 @@ export const Default: Story = {
 };
 
 const LANTERN_LABEL_FIXTURES = [
-  { id: "l-short", name: "Zen", color: "green" },
-  { id: "l-medium", name: "Morning mist", color: "blue" },
-  { id: "l-long", name: "Late autumn philosophy", color: "purple" },
+  { id: "l-short", name: "Zen", color: "green", shape: "classic" },
+  { id: "l-medium", name: "Morning mist", color: "blue", shape: "classic" },
+  { id: "l-long", name: "Late autumn philosophy", color: "purple", shape: "classic" },
 ] as const;
 
 const LANTERN_LABEL_SIZES = [
@@ -137,29 +141,60 @@ export const LanternsLabels: Story = {
   ),
 };
 
-const BELT_LABELS_FIVE: LabelBeltItem[] = [
-  { id: "b1", name: "Zen", color: "#52c41a" },
-  { id: "b2", name: "Mist", color: "#1677ff" },
-  { id: "b3", name: "Autumn", color: "#faad14" },
-  { id: "b4", name: "Moon", color: "#eb2f96" },
-  { id: "b5", name: "Night", color: "#722ed1" },
+const BELT_COLORS = [
+  "#52c41a",
+  "#1677ff",
+  "#faad14",
+  "#eb2f96",
+  "#722ed1",
+  "#13c2c2",
+] as const;
+
+/** Six 3-char labels — one per belt stop (fill order clockwise from bl). */
+const BELT_LABELS_MIN: LabelBeltItem[] = [
+  { id: "min-bl", name: "Zen", color: BELT_COLORS[0] },
+  { id: "min-br", name: "Fog", color: BELT_COLORS[1] },
+  { id: "min-mr", name: "Oak", color: BELT_COLORS[2] },
+  { id: "min-tr", name: "Ash", color: BELT_COLORS[3] },
+  { id: "min-tl", name: "Sky", color: BELT_COLORS[4] },
+  { id: "min-ml", name: "Ink", color: BELT_COLORS[5] },
 ];
+
+/** Six max-length (15-char) labels — same stop mapping / colors as min. */
+const BELT_LABELS_MAX: LabelBeltItem[] = [
+  { id: "max-bl", name: "AutumnPhilosphy", color: BELT_COLORS[0] },
+  { id: "max-br", name: "MorningMistPond", color: BELT_COLORS[1] },
+  { id: "max-mr", name: "LanternMoonRoad", color: BELT_COLORS[2] },
+  { id: "max-tr", name: "WitheredBranchX", color: BELT_COLORS[3] },
+  { id: "max-tl", name: "VillageTempleBe", color: BELT_COLORS[4] },
+  { id: "max-ml", name: "SummerGrassWind", color: BELT_COLORS[5] },
+];
+
+const BELT_LABELS_FIVE: LabelBeltItem[] = BELT_LABELS_MIN.slice(0, 5);
 
 const BELT_LABELS_TWELVE: LabelBeltItem[] = [
   ...BELT_LABELS_FIVE,
-  { id: "b6", name: "Pond", color: "#13c2c2" },
-  { id: "b7", name: "Crow", color: "#fa541c" },
-  { id: "b8", name: "Snow", color: "#ffffff" },
-  { id: "b9", name: "Bell", color: "#2f54eb" },
-  { id: "b10", name: "Grass", color: "#a0d911" },
-  { id: "b11", name: "Wind", color: "#eb2f96" },
-  { id: "b12", name: "Ink", color: "#17131A" },
+  { id: "b6", name: "Pond", color: "#13c2c2", shape: "classic" },
+  { id: "b7", name: "Crow", color: "#fa541c", shape: "classic" },
+  { id: "b8", name: "Snow", color: "#ffffff", shape: "classic" },
+  { id: "b9", name: "Bell", color: "#2f54eb", shape: "classic" },
+  { id: "b10", name: "Grass", color: "#a0d911", shape: "classic" },
+  { id: "b11", name: "Wind", color: "#eb2f96", shape: "classic" },
+  { id: "b12", name: "Ink", color: "#17131A", shape: "classic" },
 ];
 
-function LabelBeltLanternHost({ labels }: { labels: LabelBeltItem[] }) {
+function LabelBeltLanternHost({
+  labels,
+  ariaLabel = "Haiku lantern with label belt",
+  compact,
+}: {
+  labels: LabelBeltItem[];
+  ariaLabel?: string;
+  compact?: boolean;
+}) {
   return (
-    <div className={styles.beltStage}>
-      <LanternFrame ariaLabel="Haiku lantern with label belt" labels={labels}>
+    <div className={compact ? styles.beltCompareHost : styles.beltStage}>
+      <LanternFrame ariaLabel={ariaLabel} labels={labels}>
         <Lantern
           haiku={makeMockHaiku({
             id: "lantern-label-belt",
@@ -175,6 +210,33 @@ function LabelBeltLanternHost({ labels }: { labels: LabelBeltItem[] }) {
   );
 }
 
+function LabelBeltLengthCompareHost() {
+  return (
+    <div className={styles.beltCompareStage}>
+      <div className={styles.beltCompareSample}>
+        <LabelBeltLanternHost
+          labels={BELT_LABELS_MIN}
+          ariaLabel="Label belt min length (3 chars)"
+          compact
+        />
+        <p className={styles.beltCompareCaption}>
+          {COMIC_LABEL_NAME_MIN}-char names · same stops
+        </p>
+      </div>
+      <div className={styles.beltCompareSample}>
+        <LabelBeltLanternHost
+          labels={BELT_LABELS_MAX}
+          ariaLabel="Label belt max length (15 chars)"
+          compact
+        />
+        <p className={styles.beltCompareCaption}>
+          {COMIC_LABEL_NAME_MAX}-char names · same stops
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export const LabelBeltStory: Story = {
   name: "Label belt",
   render: () => <LabelBeltLanternHost labels={BELT_LABELS_FIVE} />,
@@ -183,6 +245,11 @@ export const LabelBeltStory: Story = {
 export const LabelBeltOverflow: Story = {
   name: "Label belt overflow",
   render: () => <LabelBeltLanternHost labels={BELT_LABELS_TWELVE} />,
+};
+
+export const LabelBeltLengthCompare: Story = {
+  name: "Label belt length compare",
+  render: () => <LabelBeltLengthCompareHost />,
 };
 
 type LanternPathStoryArgs = {

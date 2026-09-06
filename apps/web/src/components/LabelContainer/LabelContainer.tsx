@@ -7,6 +7,7 @@ import type { LabelDto } from "@/api/labels";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { ComicLabelCreationModal } from "@/components/ComicLabelCreationModal";
+import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import { comicToast } from "@/components/ComicToast";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
 import { useConfirm } from "@/hooks/useConfirm";
@@ -22,6 +23,7 @@ export function LabelContainer({ accountId, label, onChanged }: LabelContainerPr
   const [editOpen, setEditOpen] = useState(false);
   const { openConfirm } = useConfirm();
   const { deleteLabel } = useAccountLabels({ accountId, autofetch: false });
+  const shape = resolveComicLabelShapePreset(label.shape);
 
   const openDeleteConfirm = () => {
     openConfirm({
@@ -59,6 +61,10 @@ export function LabelContainer({ accountId, label, onChanged }: LabelContainerPr
       <ComicBurstLabel
         text={formatComicLabelText(label.name)}
         fill={label.color || "#888888"}
+        shapeKind={shape.kind}
+        spikeCount={shape.spikeCount}
+        randomness={shape.randomness}
+        seed={shape.id}
         fontSize={20}
       />
       <div className={styles.meta}>{new Date(label.createdAt).toLocaleString()}</div>

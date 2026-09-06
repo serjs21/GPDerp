@@ -9,6 +9,7 @@ import {
 } from "react";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
+import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import {
   labelBeltStopInsetStyle,
   labelBeltStopTransformOrigin,
@@ -27,15 +28,22 @@ export type LabelBeltItem = {
   id: string;
   name: string;
   color: string;
+  shape?: string;
 };
 
 export function toLabelBeltItems(
-  labels: ReadonlyArray<{ id: string; name: string; color?: string | null }>,
+  labels: ReadonlyArray<{
+    id: string;
+    name: string;
+    color?: string | null;
+    shape?: string | null;
+  }>,
 ): LabelBeltItem[] {
   return labels.map((label) => ({
     id: label.id,
     name: label.name,
     color: label.color || "#888888",
+    shape: label.shape ?? "classic",
   }));
 }
 
@@ -56,8 +64,16 @@ type PortalTransition = {
 };
 
 function burstFor(label: LabelBeltItem) {
+  const preset = resolveComicLabelShapePreset(label.shape);
   return (
-    <ComicBurstLabel text={formatComicLabelText(label.name)} fill={label.color} />
+    <ComicBurstLabel
+      text={formatComicLabelText(label.name)}
+      fill={label.color}
+      shapeKind={preset.kind}
+      spikeCount={preset.spikeCount}
+      randomness={preset.randomness}
+      seed={preset.id}
+    />
   );
 }
 
@@ -168,6 +184,8 @@ export function LabelBelt({
           <div
             key={slot.id}
             className={styles.slot}
+            data-belt-slot={slot.id}
+            data-belt-side={slot.side}
             style={
               {
                 ...inset,

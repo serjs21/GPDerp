@@ -6,6 +6,7 @@ export {
   COMIC_LABEL_SHAPE_PRESETS,
   COMIC_LABEL_NAME_MIN,
   COMIC_LABEL_NAME_MAX,
+  resolveComicLabelShapePreset,
   type ComicLabelShapeId,
   type ComicLabelShapePreset,
 } from "./comicLabelShapes";

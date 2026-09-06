@@ -1,17 +1,20 @@
 import { prismaClient } from "../../lib/prisma";
 
+const labelSelect = {
+  id: true,
+  name: true,
+  color: true,
+  shape: true,
+  accountId: true,
+  createdAt: true,
+} as const;
+
 export const labelRepository = {
   listForAccount(accountId: string) {
     return prismaClient.label.findMany({
       where: { accountId },
       orderBy: [{ name: "asc" }, { createdAt: "desc" }],
-      select: {
-        id: true,
-        name: true,
-        color: true,
-        accountId: true,
-        createdAt: true,
-      },
+      select: labelSelect,
     });
   },
 
@@ -21,13 +24,7 @@ export const labelRepository = {
       orderBy: [{ createdAt: "desc" }, { name: "asc" }],
       take,
       skip,
-      select: {
-        id: true,
-        name: true,
-        color: true,
-        accountId: true,
-        createdAt: true,
-      },
+      select: labelSelect,
     });
   },
 
@@ -35,47 +32,30 @@ export const labelRepository = {
     return prismaClient.label.count({ where: { accountId } });
   },
 
-  createForAccount(accountId: string, name: string, color: string) {
+  createForAccount(accountId: string, name: string, color: string, shape: string) {
     return prismaClient.label.create({
       data: {
         accountId,
         name,
         color,
+        shape,
       },
-      select: {
-        id: true,
-        name: true,
-        color: true,
-        accountId: true,
-        createdAt: true,
-      },
+      select: labelSelect,
     });
   },
 
   findById(id: string) {
     return prismaClient.label.findUnique({
       where: { id },
-      select: {
-        id: true,
-        name: true,
-        color: true,
-        accountId: true,
-        createdAt: true,
-      },
+      select: labelSelect,
     });
   },
 
-  updateById(id: string, data: { name: string; color: string }) {
+  updateById(id: string, data: { name: string; color: string; shape: string }) {
     return prismaClient.label.update({
       where: { id },
       data,
-      select: {
-        id: true,
-        name: true,
-        color: true,
-        accountId: true,
-        createdAt: true,
-      },
+      select: labelSelect,
     });
   },
 

@@ -26,6 +26,7 @@ export type UseAccountLabelsResult = {
     options: {
       name: string;
       color: string;
+      shape: string;
       onSuccess?: (label: LabelDto) => void | Promise<void>;
       onError?: () => void | Promise<void>;
     },
@@ -34,7 +35,7 @@ export type UseAccountLabelsResult = {
     options: {
       haikuId: string;
       labelIds: string[];
-      onSuccess?: (labels: Array<{ id: string; name: string; color: string }>) => void | Promise<void>;
+      onSuccess?: (labels: Array<{ id: string; name: string; color: string; shape: string }>) => void | Promise<void>;
       onError?: () => void | Promise<void>;
     },
   ) => Promise<void>;
@@ -43,6 +44,7 @@ export type UseAccountLabelsResult = {
       labelId: string;
       name: string;
       color: string;
+      shape: string;
       onSuccess?: (label: LabelDto) => void | Promise<void>;
       onError?: () => void | Promise<void>;
     },
@@ -99,11 +101,12 @@ export function useAccountLabels(options: UseAccountLabelsOptions): UseAccountLa
   };
 
   const createLabelMutation = useMutation({
-    mutationFn: async (input: { name: string; color: string }) => {
+    mutationFn: async (input: { name: string; color: string; shape: string }) => {
       const created = await createLabelForAccount({
         accountId,
         name: input.name,
         color: input.color,
+        shape: input.shape,
         createdAt: new Date().toISOString(),
       });
       queryClient.setQueryData<LabelDto[]>(labelQueryKeys.byAccount(accountId), (prev) => {
@@ -121,6 +124,7 @@ export function useAccountLabels(options: UseAccountLabelsOptions): UseAccountLa
       const created = await createLabelMutation.mutateAsync({
         name: options.name,
         color: options.color,
+        shape: options.shape,
       });
       await options.onSuccess?.(created);
     } catch {
@@ -148,7 +152,8 @@ export function useAccountLabels(options: UseAccountLabelsOptions): UseAccountLa
   };
 
   const updateMutation = useMutation({
-    mutationFn: (input: { labelId: string; name: string; color: string }) => updateLabel(input),
+    mutationFn: (input: { labelId: string; name: string; color: string; shape: string }) =>
+      updateLabel(input),
   });
 
   const updateLabelFromHook: UseAccountLabelsResult["updateLabel"] = async (options) => {
@@ -157,6 +162,7 @@ export function useAccountLabels(options: UseAccountLabelsOptions): UseAccountLa
         labelId: options.labelId,
         name: options.name,
         color: options.color,
+        shape: options.shape,
       });
       queryClient.setQueryData<LabelDto[]>(labelQueryKeys.byAccount(accountId), (prev) =>
         (prev ?? []).map((l) => (l.id === updated.id ? updated : l)),

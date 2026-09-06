@@ -114,7 +114,7 @@ export const LoggedInWithList: Story = {
         id: "h1",
         title: "Jean-Paul Sartickle",
         body: "Shadow questions rise,\na void whispers, \"Who are you?\"\nSelf slips through the cracks.",
-        labels: [{ id: "l1", name: "philosophy", color: "blue" }],
+        labels: [{ id: "l1", name: "philosophy", color: "blue", shape: "classic" }],
       }),
     ];
 

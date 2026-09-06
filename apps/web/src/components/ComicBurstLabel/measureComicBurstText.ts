@@ -3,8 +3,14 @@ export const COMIC_BURST_FONT_STACK = 'var(--font-comic-label), "Bangers", sans-
 /** Concrete family for canvas measureText (CSS vars do not resolve on canvas). */
 export const COMIC_BURST_MEASURE_FAMILY = '"Bangers", sans-serif';
 
-/** Fixed lettering size — longer labels grow the silhouette instead of shrinking type. */
+/** Fixed lettering size for short KA-BLAM copy. */
 export const COMIC_BURST_DEFAULT_FONT_SIZE = 28;
+
+/** Smaller lettering so max-length names fit the burst / belt clip. */
+export const COMIC_BURST_LONG_FONT_SIZE = 22;
+
+/** Display strings at or above this length (incl. trailing bang) use the long size. */
+export const COMIC_BURST_LONG_TEXT_THRESHOLD = 10;
 
 let canvas: HTMLCanvasElement | null = null;
 
@@ -36,7 +42,10 @@ export function measureComicBurstTextWidth(
   return ctx.measureText(text).width;
 }
 
-/** Stable display size for KA-BLAM lettering (no shrink for long copy). */
-export function burstDisplayFontSize(_text?: string): number {
+/** Display size for KA-BLAM lettering — shrinks slightly for long copy to avoid clip. */
+export function burstDisplayFontSize(text?: string): number {
+  if (text != null && text.length >= COMIC_BURST_LONG_TEXT_THRESHOLD) {
+    return COMIC_BURST_LONG_FONT_SIZE;
+  }
   return COMIC_BURST_DEFAULT_FONT_SIZE;
 }

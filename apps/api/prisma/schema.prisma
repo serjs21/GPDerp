@@ -26,30 +26,30 @@ enum EmailActionType {
 }
 
 model User {
-  id              String    @id @default(uuid()) @db.Uuid
-  email           String    @unique
-  firstName       String    @default("")
-  lastName        String    @default("")
-  avatar          String    @default("")
-  avatarManuallySet Boolean @default(false)
+  id                String    @id @default(uuid()) @db.Uuid
+  email             String    @unique
+  firstName         String    @default("")
+  lastName          String    @default("")
+  avatar            String    @default("")
+  avatarManuallySet Boolean   @default(false)
   /// Set after email verification via complete-registration (password sign-up) or at Google sign-up.
-  userName        String?   @unique
-  emailVerifiedAt DateTime?
-  blockedAt       DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  userName          String?   @unique
+  emailVerifiedAt   DateTime?
+  blockedAt         DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-  memberships Membership[]
-  createdAccounts Account[] @relation("AccountCreatedBy")
-  createdHaikus Haiku[] @relation("HaikuCreatedBy")
-  shareLinks   ShareLink[]
-  authIdentities AuthIdentity[]
-  passwordCredential PasswordCredential?
-  authSessions AuthSession[]
-  emailActionTokens EmailActionToken[]
-  emailChangeRequests UserEmailChangeRequest[]
+  memberships                    Membership[]
+  createdAccounts                Account[]                       @relation("AccountCreatedBy")
+  createdHaikus                  Haiku[]                         @relation("HaikuCreatedBy")
+  shareLinks                     ShareLink[]
+  authIdentities                 AuthIdentity[]
+  passwordCredential             PasswordCredential?
+  authSessions                   AuthSession[]
+  emailActionTokens              EmailActionToken[]
+  emailChangeRequests            UserEmailChangeRequest[]
   suspiciousRegistrationAttempts SuspiciousRegistrationAttempt[]
-  configuration UserConfiguration?
+  configuration                  UserConfiguration?
 }
 
 model UserConfiguration {
@@ -79,12 +79,12 @@ model SuspiciousRegistrationAttempt {
 }
 
 model UserEmailChangeRequest {
-  id            String   @id @default(uuid()) @db.Uuid
-  userId        String   @db.Uuid
+  id            String    @id @default(uuid()) @db.Uuid
+  userId        String    @db.Uuid
   oldEmail      String
   newEmail      String
-  tokenHash     String   @unique
-  createdAt     DateTime @default(now())
+  tokenHash     String    @unique
+  createdAt     DateTime  @default(now())
   expiresAt     DateTime
   sentAt        DateTime?
   consumedAt    DateTime?
@@ -144,8 +144,8 @@ model Haiku {
   body        String
   createdAt   DateTime @default(now())
 
-  accountId   String   @db.Uuid
-  createdById String   @db.Uuid
+  accountId   String @db.Uuid
+  createdById String @db.Uuid
 
   account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
   createdBy User    @relation("HaikuCreatedBy", fields: [createdById], references: [id])
@@ -187,10 +187,11 @@ model Label {
   id        String   @id @default(uuid()) @db.Uuid
   name      String
   color     String   @default("default")
+  shape     String   @default("classic")
   createdAt DateTime @default(now())
 
-  accountId String   @db.Uuid
-  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId String  @db.Uuid
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
   haikus Haiku[]
 
@@ -225,11 +226,11 @@ model PasswordCredential {
 }
 
 model AuthSession {
-  id           String   @id @default(uuid()) @db.Uuid
-  userId       String   @db.Uuid
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @db.Uuid
   ip           String?
   userAgent    String?
-  createdAt    DateTime @default(now())
+  createdAt    DateTime  @default(now())
   expiresAt    DateTime
   revokedAt    DateTime?
   revokeReason String?
@@ -242,12 +243,12 @@ model AuthSession {
 }
 
 model RefreshToken {
-  id                String   @id @default(uuid()) @db.Uuid
-  sessionId         String   @db.Uuid
-  tokenHash         String   @unique
-  parentTokenId     String?  @db.Uuid
-  replacedByTokenId String?  @db.Uuid
-  issuedAt          DateTime @default(now())
+  id                String    @id @default(uuid()) @db.Uuid
+  sessionId         String    @db.Uuid
+  tokenHash         String    @unique
+  parentTokenId     String?   @db.Uuid
+  replacedByTokenId String?   @db.Uuid
+  issuedAt          DateTime  @default(now())
   expiresAt         DateTime
   consumedAt        DateTime?
   revokedAt         DateTime?

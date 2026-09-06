@@ -39,8 +39,8 @@ export const SavedWithLabels: Story = {
       body: EXAMPLE_HAIKU_BODY,
       title: "Jean-Paul Sartickle",
       labels: [
-        { id: "l1", name: "philosophy", color: "blue" },
-        { id: "l2", name: "void", color: "default" },
+        { id: "l1", name: "philosophy", color: "blue", shape: "classic" },
+        { id: "l2", name: "void", color: "default", shape: "classic" },
       ],
     }),
   },

@@ -25,7 +25,7 @@ export type ComicBurstLabelProps = {
   strokeWidth?: number;
   /** Optional override; defaults to `text` for deterministic silhouettes. */
   seed?: string | number;
-  /** Optional fixed size; when omitted, uses the default display size (no auto-shrink). */
+  /** Optional fixed size; when omitted, uses short/long display size from text length. */
   fontSize?: number;
   className?: string;
 };
@@ -37,7 +37,7 @@ const DEFAULT_TEXT_COLOR = "#ffffff";
 /**
  * Comic-book impact burst label: procedural SVG spikes + Bangers KA-BLAM lettering.
  * Shape is seeded from `seed ?? text` so the silhouette stays stable across renders.
- * Longer text adds silhouette detail (spikes / lobes / corner roundness) instead of shrinking type.
+ * Longer text uses a slightly smaller display size so lettering stays inside the silhouette.
  */
 export function ComicBurstLabel({
   text,

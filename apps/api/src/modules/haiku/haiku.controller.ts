@@ -82,12 +82,13 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
         res.code(400).send({ ok: false, error: "Invalid accountId" });
         return;
       }
-      const body = (req.body as { name?: string; color?: string } | undefined) ?? {};
+      const body = (req.body as { name?: string; color?: string; shape?: string } | undefined) ?? {};
       const result = await haikuService.createLabelForUser({
         userId,
         accountId,
         name: (body.name ?? "").trim(),
         color: (body.color ?? "default").trim(),
+        shape: body.shape,
       });
       if (!result.ok) {
         if (result.reason === "invalid_name") {
@@ -119,12 +120,13 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
         res.code(400).send({ ok: false, error: "Invalid labelId" });
         return;
       }
-      const body = (req.body as { name?: string; color?: string } | undefined) ?? {};
+      const body = (req.body as { name?: string; color?: string; shape?: string } | undefined) ?? {};
       const result = await haikuService.updateLabelForUser({
         userId,
         labelId,
         name: (body.name ?? "").trim(),
         color: (body.color ?? "default").trim(),
+        shape: body.shape,
       });
       if (!result.ok) {
         if (result.reason === "not_found") {

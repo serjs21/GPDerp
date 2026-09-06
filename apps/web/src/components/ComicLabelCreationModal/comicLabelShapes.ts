@@ -25,6 +25,18 @@ export const COMIC_LABEL_SHAPE_PRESETS: readonly ComicLabelShapePreset[] = [
   { id: "thought", label: "Thought", kind: "thought", spikeCount: 12, randomness: 0.14 },
 ] as const;
 
+const PRESET_BY_ID = new Map(
+  COMIC_LABEL_SHAPE_PRESETS.map((preset) => [preset.id, preset] as const),
+);
+
+/** Resolve a persisted shape id (or unknown) to a known preset; defaults to classic. */
+export function resolveComicLabelShapePreset(shape?: string | null): ComicLabelShapePreset {
+  if (shape && PRESET_BY_ID.has(shape as ComicLabelShapeId)) {
+    return PRESET_BY_ID.get(shape as ComicLabelShapeId)!;
+  }
+  return COMIC_LABEL_SHAPE_PRESETS[0]!;
+}
+
 /** Silent silhouette chip in the shape picker (no visible lettering). */
 export const COMIC_LABEL_SHAPE_PREVIEW_TEXT = "";
 

@@ -12,8 +12,8 @@ const haiku: HaikuDto = {
   accountId: STORY_ACCOUNT_ID,
   createdById: "00000000-0000-4000-8000-000000000099",
   labels: [
-    { id: "00000000-0000-4000-8000-000000000201", name: "Nature", color: "green" },
-    { id: "00000000-0000-4000-8000-000000000202", name: "Morning", color: "blue" },
+    { id: "00000000-0000-4000-8000-000000000201", name: "Nature", color: "green", shape: "classic" },
+    { id: "00000000-0000-4000-8000-000000000202", name: "Morning", color: "blue", shape: "circle" },
   ],
 };
 
@@ -22,6 +22,7 @@ const labelCatalog = [
     id: "00000000-0000-4000-8000-000000000201",
     name: "Nature",
     color: "green",
+    shape: "classic",
     accountId: haiku.accountId,
     createdAt: new Date("2026-01-01T00:00:00.000Z").toISOString(),
   },
@@ -29,6 +30,7 @@ const labelCatalog = [
     id: "00000000-0000-4000-8000-000000000202",
     name: "Morning",
     color: "blue",
+    shape: "circle",
     accountId: haiku.accountId,
     createdAt: new Date("2026-01-01T00:00:00.000Z").toISOString(),
   },
@@ -36,6 +38,7 @@ const labelCatalog = [
     id: "00000000-0000-4000-8000-000000000203",
     name: "Philosophy",
     color: "purple",
+    shape: "thought",
     accountId: haiku.accountId,
     createdAt: new Date("2026-01-01T00:00:00.000Z").toISOString(),
   },

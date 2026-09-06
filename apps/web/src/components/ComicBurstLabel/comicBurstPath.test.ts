@@ -76,4 +76,20 @@ describe("buildComicBurstPath", () => {
     expect(silhouetteDetailForTextLength(12, "LONGER!!")).toBe(16);
     expect(silhouetteDetailForTextLength(12, "VERYLONGTEXT")).toBe(20);
   });
+
+  it("shortens side spikes for long labels only", () => {
+    const short = buildComicBurstPath({ ...base, seedKey: "ZEN!", sideSpikeLengthScale: 1 });
+    const longSides = buildComicBurstPath({
+      ...base,
+      seedKey: "ZEN!",
+      sideSpikeLengthScale: 0.5,
+    });
+    expect(short.d).not.toBe(longSides.d);
+    // Rightmost tip (east) should be closer to center when side spikes are halved.
+    const maxX = (d: string) =>
+      Math.max(
+        ...[...d.matchAll(/([-\d.]+) ([-\d.]+)/g)].map((m) => Number.parseFloat(m[1]!)),
+      );
+    expect(maxX(longSides.d)).toBeLessThan(maxX(short.d));
+  });
 });

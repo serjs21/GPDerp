@@ -88,8 +88,8 @@ export const WithLabels: Story = {
         body: exampleHaikus[0].body,
         title: "Jean-Paul Sartickle",
         labels: [
-          { id: "l1", name: "philosophy", color: "blue" },
-          { id: "l2", name: "existential", color: "green" },
+          { id: "l1", name: "philosophy", color: "blue", shape: "classic" },
+          { id: "l2", name: "existential", color: "green", shape: "classic" },
         ],
       }),
       ...exampleHaikus.slice(1),

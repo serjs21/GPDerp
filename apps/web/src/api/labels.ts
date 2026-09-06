@@ -4,6 +4,7 @@ export type LabelDto = {
   id: string;
   name: string;
   color: string;
+  shape: string;
   accountId: string;
   createdAt: string;
 };
@@ -25,7 +26,7 @@ type CreateLabelResponse =
   | { ok: false; error: string };
 
 type SetHaikuLabelsResponse =
-  | { ok: true; data: { labels: Array<{ id: string; name: string; color: string }> } }
+  | { ok: true; data: { labels: Array<{ id: string; name: string; color: string; shape: string }> } }
   | { ok: false; error: string };
 
 type ResolveManageAccountResponse =
@@ -45,10 +46,11 @@ export async function fetchLabelsForAccount(accountId: string): Promise<LabelDto
 export type CreateLabelForAccountOptions = Omit<LabelDto, "id">;
 
 export async function createLabelForAccount(options: CreateLabelForAccountOptions): Promise<LabelDto> {
-  const { accountId, name, color } = options;
+  const { accountId, name, color, shape } = options;
   const { data } = await axios.post<CreateLabelResponse>(`/haiku/label/${encodeURIComponent(accountId)}`, {
     name,
     color,
+    shape,
   });
   if (!data.ok) throw new Error(data.error ?? "Failed to create label");
   return data.data.label;
@@ -57,7 +59,7 @@ export async function createLabelForAccount(options: CreateLabelForAccountOption
 export async function setLabelsForHaiku(
   haikuId: string,
   labelIds: string[],
-): Promise<Array<{ id: string; name: string; color: string }>> {
+): Promise<Array<{ id: string; name: string; color: string; shape: string }>> {
   const { data } = await axios.put<SetHaikuLabelsResponse>(
     `/label/haiku/${encodeURIComponent(haikuId)}`,
     {
@@ -89,10 +91,11 @@ export async function updateLabel(options: {
   labelId: string;
   name: string;
   color: string;
+  shape: string;
 }): Promise<LabelDto> {
   const { data } = await axios.patch<CreateLabelResponse>(
     `/haiku/label/${encodeURIComponent(options.labelId)}`,
-    { name: options.name, color: options.color },
+    { name: options.name, color: options.color, shape: options.shape },
   );
   if (!data.ok) throw new Error(data.error ?? "Failed to update label");
   return data.data.label;

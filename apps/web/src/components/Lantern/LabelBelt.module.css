@@ -59,10 +59,18 @@
   color: var(--sumi-ink, #2d2d2d);
   cursor: pointer;
   pointer-events: auto;
+  transition: color 160ms ease, filter 180ms ease;
 }
 
 .navButton:hover {
   color: color-mix(in srgb, var(--accent-red, #bc002d) 70%, var(--sumi-ink, #2d2d2d));
+  filter: drop-shadow(0 0 0.35rem color-mix(in srgb, #fff6d5 85%, transparent))
+    drop-shadow(0 0 0.75rem color-mix(in srgb, #ffcc66 55%, transparent))
+    drop-shadow(0 0 1.15rem color-mix(in srgb, var(--accent-red, #bc002d) 35%, transparent));
+}
+
+.navButton:hover:disabled {
+  filter: none;
 }
 
 .navButton:focus-visible {
@@ -73,6 +81,12 @@
 .navButton:disabled {
   cursor: default;
   opacity: 0.45;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navButton {
+    transition: none;
+  }
 }
 
 .navPrev {

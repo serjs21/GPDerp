@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Label } from "./Label";
 
 const meta: Meta<typeof Label> = {
-  title: "Haiku/Label",
+  title: "Deprecated/Label",
   component: Label,
   args: {
     name: "Nature",

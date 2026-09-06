@@ -46,12 +46,14 @@ const labelPluginImpl = async (app: FastifyInstance) => {
         return;
       }
 
-      const { name, color } = (req.body as { name?: string; color?: string } | undefined) ?? {};
+      const { name, color, shape } =
+        (req.body as { name?: string; color?: string; shape?: string } | undefined) ?? {};
       const result = await labelService.createLabelForAccount({
         userId,
         accountId,
         name: (name ?? "").trim(),
         color: (color ?? "default").trim(),
+        shape,
       });
 
       if (!result.ok) {

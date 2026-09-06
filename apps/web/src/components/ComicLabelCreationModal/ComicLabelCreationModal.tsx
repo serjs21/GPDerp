@@ -26,6 +26,7 @@ import {
   COMIC_LABEL_NAME_MIN,
   COMIC_LABEL_SHAPE_PRESETS,
   COMIC_LABEL_SHAPE_PREVIEW_TEXT,
+  resolveComicLabelShapePreset,
   type ComicLabelShapeId,
 } from "./comicLabelShapes";
 import styles from "./ComicLabelCreationModal.module.css";
@@ -41,10 +42,6 @@ export type ComicLabelCreationModalProps = {
   onCreated?: (label: LabelDto) => void;
   onUpdated?: (label: LabelDto) => void;
 };
-
-function shapePreset(id: ComicLabelShapeId) {
-  return COMIC_LABEL_SHAPE_PRESETS.find((p) => p.id === id) ?? COMIC_LABEL_SHAPE_PRESETS[0]!;
-}
 
 export function ComicLabelCreationModal({
   open,
@@ -67,7 +64,7 @@ export function ComicLabelCreationModal({
   });
 
   const trimmedName = name.trim();
-  const shape = shapePreset(shapeId);
+  const shape = resolveComicLabelShapePreset(shapeId);
   const previewText =
     trimmedName.length > 0 ? formatComicLabelText(trimmedName) : formatComicLabelText("__");
   const saveText = formatComicLabelText(label ? "Save" : "Create");
@@ -97,7 +94,7 @@ export function ComicLabelCreationModal({
     }
     setName(label?.name ?? "");
     setColor(label?.color ?? getRandomLabelColor());
-    setShapeId("classic");
+    setShapeId(resolveComicLabelShapePreset(label?.shape).id);
     setPickerOpen(false);
 
     // Focus after dialog portal mounts; caret uses Bangers metrics via matched font styles.
@@ -138,6 +135,7 @@ export function ComicLabelCreationModal({
         labelId: label.id,
         name: trimmedName,
         color,
+        shape: shapeId,
         onSuccess: async (updated) => {
           comicToast.success("Label updated");
           onUpdated?.(updated);
@@ -152,6 +150,7 @@ export function ComicLabelCreationModal({
     void createLabel({
       name: trimmedName,
       color,
+      shape: shapeId,
       onSuccess: async (created) => {
         comicToast.success("Label created");
         onCreated?.(created);

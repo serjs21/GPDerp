@@ -1,7 +1,9 @@
 "use client";
 
 import type { HaikuDto } from "@/api/haikus";
-import { Label } from "@/components/Label/Label";
+import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
+import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
+import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import { formatCreatedAt } from "@/utils/date";
 import { formatHaikuTitle } from "@/utils/strings";
 import { HaikuActions } from "@/components/HaikuContainer/HaikuActions";
@@ -58,9 +60,21 @@ export function HaikuGenerationStickyNoteCard(props: HaikuGenerationStickyNoteCa
         footer={
           haiku.labels.length > 0 ? (
             <div className={styles.labels}>
-              {haiku.labels.map((label) => (
-                <Label key={label.id} name={label.name} color={label.color || "default"} />
-              ))}
+              {haiku.labels.map((label) => {
+                const shape = resolveComicLabelShapePreset(label.shape);
+                return (
+                  <ComicBurstLabel
+                    key={label.id}
+                    text={formatComicLabelText(label.name)}
+                    fill={label.color || "#888888"}
+                    shapeKind={shape.kind}
+                    spikeCount={shape.spikeCount}
+                    randomness={shape.randomness}
+                    seed={shape.id}
+                    fontSize={14}
+                  />
+                );
+              })}
             </div>
           ) : undefined
         }
