@@ -1,0 +1,131 @@
+.root {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.searchPanel {
+  flex: 0 0 auto;
+  min-height: 4.25rem;
+}
+
+.searchInput {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.35rem 0.15rem;
+  border: none;
+  background: transparent;
+  color: var(--sumi-ink, #2d2d2d);
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 1.15rem;
+  letter-spacing: 0.03em;
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: color-mix(in srgb, var(--sumi-ink, #2d2d2d) 45%, transparent);
+}
+
+.listScroll {
+  flex: 1 1 auto;
+  box-sizing: border-box;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.labelRows {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.labelRow {
+  flex: 0 0 auto;
+  gap: 0 !important;
+}
+
+.labelRow + .labelRow {
+  margin-top: calc(-1 * var(--comic-page-border, 4px));
+}
+
+.labelPanel {
+  min-height: 5.25rem;
+  min-width: 0;
+  border-radius: 0;
+}
+
+.labelPanel + .labelPanel {
+  margin-left: calc(-1 * var(--comic-page-border, 4px));
+}
+
+.labelPreview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.25rem;
+  line-height: 0;
+}
+
+.loaderRow,
+.nextPageRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 4rem;
+  padding: 0.75rem;
+}
+
+.empty {
+  margin: 0;
+  padding: 1.5rem 0.75rem;
+  color: var(--sumi-ink, #2d2d2d);
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  text-align: center;
+  opacity: 0.7;
+}
+
+.footerRow {
+  flex: 0 0 auto;
+  width: 100%;
+  padding-top: 0.15rem;
+}
+
+.saveButton {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.15rem 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+}
+
+.saveButton:disabled {
+  cursor: not-allowed;
+}
+
+.saveButton[aria-busy="true"] {
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.saveBurst {
+  display: block;
+  width: 100%;
+}
+
+.saveBurst svg {
+  width: 100%;
+  height: 3.35rem;
+}

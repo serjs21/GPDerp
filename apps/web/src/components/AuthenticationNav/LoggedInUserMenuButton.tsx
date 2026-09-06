@@ -28,14 +28,6 @@ export const LoggedInUserMenuButton = ({ user, onLogout }: LoggedInUserMenuButto
       ),
     },
     {
-      key: "manageLabels",
-      label: (
-        <Link href="/manage_labels">
-          <div className={navStyles.userDropdownItem}>Manage labels</div>
-        </Link>
-      ),
-    },
-    {
       key: "manageShareLinks",
       label: (
         <Link href="/manage_share_links">

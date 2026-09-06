@@ -6,11 +6,11 @@ import { useHaikuFilters } from "@/app/providers/HaikuFiltersProvider";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
-import { ComicLabelSelectionModal } from "@/components/ComicLabelSelectionModal";
+import { FilterManageLabelsModal } from "@/components/FilterManageLabelsModal";
 import { useAccountLabels, useManageLabelsAccount } from "@/hooks/useAccountLabels";
 import styles from "./HeaderHaikuTools.module.css";
 
-export function HeaderHaikuLabelFilter() {
+export function HeaderHaikuLabelManage() {
   const pathname = usePathname();
   const { selectedLabelIds, setSelectedLabelIds, removeLabelId } = useHaikuFilters();
   const [modalOpen, setModalOpen] = useState(false);
@@ -39,7 +39,7 @@ export function HeaderHaikuLabelFilter() {
         <button
           type="button"
           className={styles.iconButton}
-          aria-label="Filter by labels"
+          aria-label="Filter and manage labels"
           aria-expanded={modalOpen}
           onClick={() => setModalOpen(true)}
           disabled={!accountId}
@@ -86,10 +86,10 @@ export function HeaderHaikuLabelFilter() {
       ) : null}
 
       {accountId ? (
-        <ComicLabelSelectionModal
-          mode="filter"
+        <FilterManageLabelsModal
           open={modalOpen}
           accountId={accountId}
+          initialTab="filter"
           selectedIds={selectedLabelIds}
           onApply={setSelectedLabelIds}
           onClose={() => setModalOpen(false)}

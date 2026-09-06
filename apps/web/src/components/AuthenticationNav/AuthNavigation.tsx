@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
-import { HeaderHaikuLabelFilter, HeaderHaikuSearch } from "@/components/HeaderHaikuTools";
+import { HeaderHaikuLabelManage, HeaderHaikuSearch } from "@/components/HeaderHaikuTools";
 import { HeaderPreferences } from "./HeaderPreferences";
 import { LoggedInUserNav } from "./LoggedInUserNav";
 import styles from "./style.module.css";
@@ -17,7 +17,7 @@ export const AuthNavigation = () => {
         {isLoggedIn ? (
           <div className={toolStyles.toolsSlot}>
             <LoggedInUserNav user={user} onLogout={logout} />
-            <HeaderHaikuLabelFilter />
+            <HeaderHaikuLabelManage />
             <HeaderHaikuSearch />
           </div>
         ) : null}

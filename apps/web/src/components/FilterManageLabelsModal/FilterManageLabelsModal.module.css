@@ -1,0 +1,54 @@
+.dialogContent {
+  width: min(100%, 40rem);
+  max-height: min(94vh, 58rem);
+  overflow: hidden;
+}
+
+.body {
+  --label-hub-method-height: 6.5rem;
+  --label-hub-content-height: 26rem;
+  --label-hub-gap: var(--comic-page-gutter, 10px);
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--label-hub-gap);
+  width: 100%;
+  height: calc(
+    var(--label-hub-method-height) + var(--label-hub-content-height) + var(--label-hub-gap)
+  );
+  min-height: calc(
+    var(--label-hub-method-height) + var(--label-hub-content-height) + var(--label-hub-gap)
+  );
+}
+
+.methodRow {
+  position: relative;
+  z-index: 3;
+  flex: 0 0 auto;
+  min-height: var(--label-hub-method-height);
+  overflow: visible;
+}
+
+.methodPanel {
+  min-height: var(--label-hub-method-height);
+}
+
+.methodPanel + .methodPanel {
+  margin-left: calc(-1 * var(--comic-page-border, 4px));
+}
+
+.contentSlot {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+}
+
+.contentSlot > * {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}

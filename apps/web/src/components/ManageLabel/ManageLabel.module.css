@@ -1,0 +1,78 @@
+.root {
+  position: relative;
+  width: 100%;
+}
+
+.strip {
+  flex: 0 0 auto;
+  gap: 0 !important;
+  min-height: 4.75rem;
+}
+
+.labelPanel,
+.actionPanel {
+  min-height: 4.75rem;
+  min-width: 0;
+  border-radius: 0;
+}
+
+.labelPanel + .actionPanel,
+.actionPanel + .actionPanel {
+  margin-left: calc(-1 * var(--comic-page-border, 4px));
+}
+
+.root + .root .strip {
+  margin-top: calc(-1 * var(--comic-page-border, 4px));
+}
+
+.labelPreview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.4rem 0.35rem;
+  line-height: 0;
+}
+
+.actionPanel {
+  /* Keep action icons full-color (selectable panels default to grayscale). */
+  filter: none !important;
+  transform: none !important;
+}
+
+/*
+ * Hover wash over the solid panel fill. Opacity transitions reliably
+ * (CSS variables on background do not interpolate without @property).
+ */
+.actionPanel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--manage-label-hover-fill, transparent);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.actionPanel:hover::before,
+.actionPanel:focus-visible::before {
+  opacity: 1;
+}
+
+.actionIcon {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: auto;
+  height: 1.85rem;
+  object-fit: contain;
+  pointer-events: none;
+  transition: filter 0.2s ease;
+}
+
+.deletePanel:hover .actionIcon,
+.deletePanel:focus-visible .actionIcon {
+  /* Lighten ink icon against critical red wash */
+  filter: brightness(0) invert(1);
+}

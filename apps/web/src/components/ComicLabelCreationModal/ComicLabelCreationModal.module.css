@@ -11,6 +11,15 @@
   min-width: min(100%, 40rem);
 }
 
+.bodyEmbedded {
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
 .dialogContent {
   width: min(100%, 40rem);
   max-height: min(94vh, 58rem);

@@ -1,74 +1,29 @@
 "use client";
 
-import { useCallback, useRef } from "react";
-import { LabelCreateAction } from "@/components/LabelCreateAction/LabelCreateAction";
-import { LabelContainer } from "@/components/LabelContainer/LabelContainer";
+import { ManageLabelsPanel } from "@/components/ManageLabel";
 import { SakuraPetalLoader } from "@/components/Loaders";
-import { useAccountLabels, useManageLabelsAccount } from "@/hooks/useAccountLabels";
-import { useEndOfContentScroll } from "@/hooks/useEndOfContentScroll";
+import { useManageLabelsAccount } from "@/hooks/useAccountLabels";
 import styles from "./styles.module.css";
 
 export default function ManageLabelsPage() {
   const { data: accountId, isPending: isAccountPending } = useManageLabelsAccount();
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const sentinelRef = useRef<HTMLDivElement>(null);
-
-  const {
-    pagedLabels,
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage,
-    fetch,
-    isLoading,
-  } = useAccountLabels({
-    accountId: accountId ?? "",
-    autofetch: Boolean(accountId),
-  });
-
-  const onEnd = useCallback(() => {
-    if (!hasNextPage || isFetchingNextPage) return;
-    void fetchNextPage();
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
-
-  useEndOfContentScroll(scrollRef, sentinelRef, onEnd, {
-    enabled: Boolean(accountId) && hasNextPage && !isFetchingNextPage,
-  });
 
   return (
     <div className={styles.page}>
       <section className={styles.container}>
-        {accountId ? (
-          <LabelCreateAction
+        {isAccountPending ? (
+          <div className={styles.loaderRow}>
+            <SakuraPetalLoader />
+          </div>
+        ) : accountId ? (
+          <ManageLabelsPanel
             accountId={accountId}
-            className={styles.topAction}
-            onCreated={() => fetch(true)}
+            searchVariant="plain"
+            className={styles.panel}
           />
-        ) : null}
-
-        <div ref={scrollRef} className={styles.listShell}>
-          {isAccountPending || isLoading ? (
-            <div className={styles.loaderRow}>
-              <SakuraPetalLoader />
-            </div>
-          ) : pagedLabels.length === 0 ? (
-            <p className={styles.empty}>No labels yet.</p>
-          ) : (
-            pagedLabels.map((label) => (
-              <LabelContainer
-                key={label.id}
-                accountId={label.accountId}
-                label={label}
-                onChanged={() => void fetch(true)}
-              />
-            ))
-          )}
-          <div ref={sentinelRef} className={styles.sentinel} aria-hidden />
-          {isFetchingNextPage ? (
-            <div className={styles.loaderRow}>
-              <SakuraPetalLoader />
-            </div>
-          ) : null}
-        </div>
+        ) : (
+          <p className={styles.empty}>Unable to resolve account.</p>
+        )}
       </section>
     </div>
   );

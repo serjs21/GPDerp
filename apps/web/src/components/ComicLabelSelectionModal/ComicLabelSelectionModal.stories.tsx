@@ -91,7 +91,7 @@ function seedLabelQueries(
 }
 
 const meta: Meta<typeof ComicLabelSelectionModal> = {
-  title: "Haiku/ComicLabelSelectionModal",
+  title: "Haiku/ComicLabelSelectionModal (archive)",
   component: ComicLabelSelectionModal,
   decorators: [
     withQueryClientSeed((qc) => {

@@ -10,7 +10,10 @@ export type ComicPageDialogProps = {
   onOpenChange: (open: boolean) => void;
   title?: ReactNode;
   children: ReactNode;
+  /** Close when clicking outside the page content. Default true. */
   closeOnOverlayClick?: boolean;
+  /** Close when pressing Escape. Default true. */
+  closeOnEscape?: boolean;
   showClose?: boolean;
   className?: string;
   /** Applied to the dialog content shell (width / max-height). */
@@ -22,7 +25,8 @@ export function ComicPageDialog({
   onOpenChange,
   title,
   children,
-  closeOnOverlayClick = false,
+  closeOnOverlayClick = true,
+  closeOnEscape = true,
   showClose = false,
   className,
   contentClassName,
@@ -65,7 +69,7 @@ export function ComicPageDialog({
               if (!closeOnOverlayClick) event.preventDefault();
             }}
             onEscapeKeyDown={(event) => {
-              event.preventDefault();
+              if (!closeOnEscape) event.preventDefault();
             }}
           >
             <div

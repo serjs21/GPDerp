@@ -41,6 +41,12 @@ export type ComicLabelCreationModalProps = {
   onClose: () => void;
   onCreated?: (label: LabelDto) => void;
   onUpdated?: (label: LabelDto) => void;
+  /**
+   * When true, render the form body only (no outer ComicPageDialog).
+   * Parent controls visibility with `open` and owns the dialog shell.
+   */
+  embedded?: boolean;
+  className?: string;
 };
 
 export function ComicLabelCreationModal({
@@ -50,6 +56,8 @@ export function ComicLabelCreationModal({
   onClose,
   onCreated,
   onUpdated,
+  embedded = false,
+  className,
 }: ComicLabelCreationModalProps) {
   const [name, setName] = useState("");
   const [color, setColor] = useState(getRandomLabelColor);
@@ -157,7 +165,8 @@ export function ComicLabelCreationModal({
         setName("");
         setColor(getRandomLabelColor());
         setShapeId("classic");
-        onClose();
+        // Embedded hubs keep the shell open (e.g. switch to Add); standalone closes.
+        if (!embedded) onClose();
       },
       onError: async () => {
         comicToast.error("Could not create label");
@@ -170,6 +179,171 @@ export function ComicLabelCreationModal({
     setPickerOpen(true);
   };
 
+  const body = (
+    <div className={[styles.body, embedded ? styles.bodyEmbedded : "", className].filter(Boolean).join(" ")}>
+      <ComicPageRow columns="2fr-1fr" className={styles.topRow}>
+        <ComicPagePanel
+          background="solid"
+          color="white"
+          overflowVisible
+          contentAlign="center"
+          className={styles.previewPanel}
+          title="Name"
+          footer={
+            trimmedName.length > 0 && trimmedName.length < COMIC_LABEL_NAME_MIN
+              ? `Min ${COMIC_LABEL_NAME_MIN} chars`
+              : undefined
+          }
+        >
+          <div className={styles.previewStage}>
+            <div className={styles.burstWrap}>
+              <ComicBurstLabel
+                text={previewText}
+                fill={color}
+                shapeKind={shape.kind}
+                spikeCount={shape.spikeCount}
+                randomness={shape.randomness}
+                seed={shape.id}
+              />
+              <input
+                ref={nameInputRef}
+                className={styles.previewInput}
+                value={name}
+                maxLength={COMIC_LABEL_NAME_MAX}
+                aria-label="Label name"
+                placeholder=""
+                autoComplete="off"
+                spellCheck={false}
+                onChange={(e) => setName(e.target.value.slice(0, COMIC_LABEL_NAME_MAX))}
+              />
+            </div>
+            {trimmedName.length === 0 ? (
+              <p className={styles.previewHint}>Type a name (3–15)</p>
+            ) : null}
+          </div>
+        </ComicPagePanel>
+
+        <div ref={colorShellRef} className={styles.colorShell}>
+          <ComicPagePanel
+            title={pickerOpen ? undefined : "Color"}
+            background="solid"
+            color="white"
+            contentAlign="center"
+            className={[styles.colorPanel, pickerOpen ? styles.colorPanelOpen : ""]
+              .filter(Boolean)
+              .join(" ")}
+            ariaLabel="Label color"
+            style={colorPanelStyle}
+          >
+            {pickerOpen ? null : (
+              <button
+                type="button"
+                className={styles.colorBody}
+                onClick={openPicker}
+                aria-label="Open color picker"
+              >
+                <span className={styles.brushPad}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG asset */}
+                  <img className={styles.brush} src={BRUSH_SRC} alt="" draggable={false} />
+                </span>
+              </button>
+            )}
+          </ComicPagePanel>
+          {pickerOpen ? (
+            <div
+              className={styles.pickerWrap}
+              onClick={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              <HexColorPicker color={color} onChange={setColor} />
+            </div>
+          ) : null}
+        </div>
+      </ComicPageRow>
+
+      <div className={styles.shapeRows}>
+        {[COMIC_LABEL_SHAPE_PRESETS.slice(0, 3), COMIC_LABEL_SHAPE_PRESETS.slice(3)].map(
+          (row, rowIndex) => (
+            <ComicPageRow key={rowIndex} className={styles.shapeRow}>
+              {row.map((preset) => {
+                const selected = shapeId === preset.id;
+                return (
+                  <ComicPagePanel
+                    key={preset.id}
+                    selectable
+                    selected={selected}
+                    onSelect={() => setShapeId(preset.id)}
+                    background={selected ? "solid" : "halftone"}
+                    color="white"
+                    overflowVisible
+                    flexWeight={1}
+                    className={styles.shapePanel}
+                    ariaLabel={`${preset.label} shape`}
+                    style={
+                      selected
+                        ? ({ "--comic-panel-base": color } as CSSProperties)
+                        : undefined
+                    }
+                  >
+                    <div className={styles.shapePreview}>
+                      <ComicBurstLabel
+                        text={COMIC_LABEL_SHAPE_PREVIEW_TEXT}
+                        fill="#ffffff"
+                        stroke={selected ? "#111111" : "#555555"}
+                        shapeKind={preset.kind}
+                        spikeCount={preset.spikeCount}
+                        randomness={preset.randomness}
+                        seed={preset.id}
+                        fontSize={14}
+                        paddingX={22}
+                        paddingY={14}
+                      />
+                    </div>
+                  </ComicPagePanel>
+                );
+              })}
+            </ComicPageRow>
+          ),
+        )}
+      </div>
+
+      <div className={styles.footerRow}>
+        <Tooltip title={disabledReason ?? ""}>
+          <span className={styles.tooltipWrap}>
+            <button
+              type="button"
+              className={styles.saveButton}
+              disabled={!canSave}
+              aria-busy={busy || undefined}
+              aria-label={label ? "Save label" : "Create label"}
+              onClick={() => {
+                if (!canSave) return;
+                submit();
+              }}
+            >
+              <ComicBurstLabel
+                className={styles.saveBurst}
+                text={saveText}
+                fill={canSave ? color : SAVE_DISABLED_FILL}
+                shapeKind="rect"
+                seed="save-rect"
+                fontSize={22}
+                paddingX={48}
+                paddingY={10}
+                strokeWidth={3}
+              />
+            </button>
+          </span>
+        </Tooltip>
+      </div>
+    </div>
+  );
+
+  if (embedded) {
+    if (!open) return null;
+    return body;
+  }
+
   return (
     <ComicPageDialog
       open={open}
@@ -179,163 +353,7 @@ export function ComicLabelCreationModal({
         if (!nextOpen) onClose();
       }}
     >
-      <div className={styles.body}>
-        <ComicPageRow columns="2fr-1fr" className={styles.topRow}>
-          <ComicPagePanel
-            background="solid"
-            color="white"
-            overflowVisible
-            contentAlign="center"
-            className={styles.previewPanel}
-            title="Name"
-            footer={
-              trimmedName.length > 0 && trimmedName.length < COMIC_LABEL_NAME_MIN
-                ? `Min ${COMIC_LABEL_NAME_MIN} chars`
-                : undefined
-            }
-          >
-            <div className={styles.previewStage}>
-              <div className={styles.burstWrap}>
-                <ComicBurstLabel
-                  text={previewText}
-                  fill={color}
-                  shapeKind={shape.kind}
-                  spikeCount={shape.spikeCount}
-                  randomness={shape.randomness}
-                  seed={shape.id}
-                />
-                <input
-                  ref={nameInputRef}
-                  className={styles.previewInput}
-                  value={name}
-                  maxLength={COMIC_LABEL_NAME_MAX}
-                  aria-label="Label name"
-                  placeholder=""
-                  autoComplete="off"
-                  spellCheck={false}
-                  onChange={(e) => setName(e.target.value.slice(0, COMIC_LABEL_NAME_MAX))}
-                />
-              </div>
-              {trimmedName.length === 0 ? (
-                <p className={styles.previewHint}>Type a name (3–15)</p>
-              ) : null}
-            </div>
-          </ComicPagePanel>
-
-          <div ref={colorShellRef} className={styles.colorShell}>
-            <ComicPagePanel
-              title={pickerOpen ? undefined : "Color"}
-              background="solid"
-              color="white"
-              contentAlign="center"
-              className={[styles.colorPanel, pickerOpen ? styles.colorPanelOpen : ""]
-                .filter(Boolean)
-                .join(" ")}
-              ariaLabel="Label color"
-              style={colorPanelStyle}
-            >
-              {pickerOpen ? null : (
-                <button
-                  type="button"
-                  className={styles.colorBody}
-                  onClick={openPicker}
-                  aria-label="Open color picker"
-                >
-                  <span className={styles.brushPad}>
-                    {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG asset */}
-                    <img className={styles.brush} src={BRUSH_SRC} alt="" draggable={false} />
-                  </span>
-                </button>
-              )}
-            </ComicPagePanel>
-            {pickerOpen ? (
-              <div
-                className={styles.pickerWrap}
-                onClick={(e) => e.stopPropagation()}
-                onPointerDown={(e) => e.stopPropagation()}
-              >
-                <HexColorPicker color={color} onChange={setColor} />
-              </div>
-            ) : null}
-          </div>
-        </ComicPageRow>
-
-        <div className={styles.shapeRows}>
-          {[COMIC_LABEL_SHAPE_PRESETS.slice(0, 3), COMIC_LABEL_SHAPE_PRESETS.slice(3)].map(
-            (row, rowIndex) => (
-              <ComicPageRow key={rowIndex} className={styles.shapeRow}>
-                {row.map((preset) => {
-                  const selected = shapeId === preset.id;
-                  return (
-                    <ComicPagePanel
-                      key={preset.id}
-                      selectable
-                      selected={selected}
-                      onSelect={() => setShapeId(preset.id)}
-                      background={selected ? "solid" : "halftone"}
-                      color="white"
-                      overflowVisible
-                      flexWeight={1}
-                      className={styles.shapePanel}
-                      ariaLabel={`${preset.label} shape`}
-                      style={
-                        selected
-                          ? ({ "--comic-panel-base": color } as CSSProperties)
-                          : undefined
-                      }
-                    >
-                      <div className={styles.shapePreview}>
-                        <ComicBurstLabel
-                          text={COMIC_LABEL_SHAPE_PREVIEW_TEXT}
-                          fill="#ffffff"
-                          stroke={selected ? "#111111" : "#555555"}
-                          shapeKind={preset.kind}
-                          spikeCount={preset.spikeCount}
-                          randomness={preset.randomness}
-                          seed={preset.id}
-                          fontSize={14}
-                          paddingX={22}
-                          paddingY={14}
-                        />
-                      </div>
-                    </ComicPagePanel>
-                  );
-                })}
-              </ComicPageRow>
-            ),
-          )}
-        </div>
-
-        <div className={styles.footerRow}>
-          <Tooltip title={disabledReason ?? ""}>
-            <span className={styles.tooltipWrap}>
-              <button
-                type="button"
-                className={styles.saveButton}
-                disabled={!canSave}
-                aria-busy={busy || undefined}
-                aria-label={label ? "Save label" : "Create label"}
-                onClick={() => {
-                  if (!canSave) return;
-                  submit();
-                }}
-              >
-                <ComicBurstLabel
-                  className={styles.saveBurst}
-                  text={saveText}
-                  fill={canSave ? color : SAVE_DISABLED_FILL}
-                  shapeKind="rect"
-                  seed="save-rect"
-                  fontSize={22}
-                  paddingX={48}
-                  paddingY={10}
-                  strokeWidth={3}
-                />
-              </button>
-            </span>
-          </Tooltip>
-        </div>
-      </div>
+      {body}
     </ComicPageDialog>
   );
 }
