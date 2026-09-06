@@ -242,9 +242,6 @@ export function LabelBelt({
             {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG asset */}
             <img className={styles.navIcon} src={ARROW_SRC} alt="" draggable={false} />
           </button>
-          <p className={styles.navMeta} aria-live="polite">
-            {windowStart + 1}/{labels.length}
-          </p>
         </>
       ) : null}
     </div>

@@ -5,13 +5,35 @@
   gap: 0.55rem;
   width: 100%;
   min-width: min(100%, 36rem);
+  flex: 1 1 auto;
   min-height: 0;
 }
 
 .dialogContent {
   width: min(100%, 36rem);
-  max-height: min(94vh, 40rem);
+  height: min(90vh, 36rem);
+  max-height: min(90vh, 36rem);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.pageShell {
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.pageShell > div {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .searchPanel {
@@ -39,9 +61,9 @@
 }
 
 .listScroll {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   box-sizing: border-box;
-  height: min(48vh, 24rem);
+  min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;

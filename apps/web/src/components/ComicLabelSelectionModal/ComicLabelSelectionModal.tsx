@@ -171,11 +171,17 @@ export function ComicLabelSelectionModal({
 
       for (const label of pagedLabels) {
         if (seen.has(label.id)) continue;
+        // Client-side guard: API may briefly return unfiltered pages.
+        if (!matchesQuery(label.name, debouncedQ)) continue;
         next.push(label.id);
         seen.add(label.id);
       }
 
-      if (next.length === base.length && next.every((id, i) => id === base[i])) {
+      const keptPrev =
+        !rebuild &&
+        next.length === base.length &&
+        next.every((id, i) => id === base[i]);
+      if (keptPrev) {
         return prev;
       }
       return next;
@@ -185,8 +191,9 @@ export function ComicLabelSelectionModal({
   const displayLabels = useMemo((): SelectableLabel[] => {
     return listOrderIds
       .map((id) => labelById.get(id))
-      .filter((label): label is SelectableLabel => Boolean(label));
-  }, [listOrderIds, labelById]);
+      .filter((label): label is SelectableLabel => Boolean(label))
+      .filter((label) => matchesQuery(label.name, debouncedQ));
+  }, [listOrderIds, labelById, debouncedQ]);
 
   const rows = useMemo(() => chunkRows(displayLabels, 3), [displayLabels]);
 
@@ -229,6 +236,7 @@ export function ComicLabelSelectionModal({
       open={open}
       showClose
       title="Labels"
+      className={styles.pageShell}
       contentClassName={styles.dialogContent}
       onOpenChange={(nextOpen) => {
         if (!nextOpen) onClose();

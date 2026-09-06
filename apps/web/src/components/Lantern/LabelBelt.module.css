@@ -52,6 +52,8 @@
   align-items: center;
   justify-content: center;
   height: 4rem;
+  min-height: 4rem;
+  min-width: 4rem;
   padding: 0.15rem;
   border: none;
   border-radius: 0.25rem;
@@ -85,14 +87,14 @@
 }
 
 .navPrev {
-  left: 80%;
-  bottom: -35%;
+  left: 85%;
+  bottom: -30%;
   transform: translate(calc(-100% - 0.35rem), -50%);
 }
 
 .navNext {
-  right: 80%;
-  bottom: -35%;
+  right: 85%;
+  bottom: -30%;
   transform: translate(calc(100% + 0.35rem), -50%) scaleX(-1);
 }
 
