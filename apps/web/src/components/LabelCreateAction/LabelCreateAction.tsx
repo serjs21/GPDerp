@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/StyledComponents";
 import type { LabelDto } from "@/api/labels";
-import { CreateLabelModal } from "@/components/CreateLabelModal/CreateLabelModal";
+import { ComicLabelCreationModal } from "@/components/ComicLabelCreationModal";
 import { PlusOutlined } from "@ant-design/icons";
 
 export type LabelCreateActionProps = {
@@ -27,7 +27,7 @@ export function LabelCreateAction({
         <PlusOutlined />
         {buttonText}
       </Button>
-      <CreateLabelModal
+      <ComicLabelCreationModal
         open={open}
         accountId={accountId}
         onClose={() => setOpen(false)}

@@ -4,7 +4,7 @@ import { Button } from "@/components/StyledComponents";
 import { PaperModal } from "./PaperModal";
 
 const meta = {
-  title: "Haiku/PaperModal",
+  title: "Archive/Haiku/PaperModal",
   component: PaperModal,
   tags: ["autodocs"],
   parameters: {

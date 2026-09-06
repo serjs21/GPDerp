@@ -4,7 +4,7 @@ import { Button } from "@/components/StyledComponents";
 import { DeleteFailedModal } from "./DeleteFailedModal";
 
 const meta = {
-  title: "Haiku/DeleteFailedModal",
+  title: "Archive/Haiku/DeleteFailedModal",
   component: DeleteFailedModal,
   tags: ["autodocs"],
   parameters: {

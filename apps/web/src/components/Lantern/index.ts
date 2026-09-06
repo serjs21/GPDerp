@@ -1,6 +1,6 @@
 export { Lantern, type LanternProps, type LanternTransform } from "./Lantern";
 export { LanternFrame, type LanternFrameProps } from "./LanternFrame";
-export { LabelBelt, type LabelBeltItem, type LabelBeltProps } from "./LabelBelt";
+export { LabelBelt, toLabelBeltItems, type LabelBeltItem, type LabelBeltProps } from "./LabelBelt";
 export {
   LanternPath,
   type LanternPathProps,

@@ -4,7 +4,7 @@ import { Button } from "@/components/StyledComponents";
 import { DrawnModal } from "./DrawnModal";
 
 const meta = {
-  title: "Haiku/DrawnModal",
+  title: "Archive/Haiku/DrawnModal",
   component: DrawnModal,
   tags: ["autodocs"],
   parameters: {

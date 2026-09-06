@@ -1,7 +1,6 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Label } from "@/components/Label/Label";
 import { HaikuActions } from "@/components/HaikuContainer/HaikuActions";
 import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
@@ -60,14 +59,12 @@ function LanternContent({
   meta,
   bodyOnly,
   actions,
-  footer,
 }: {
   title?: string;
   body: string;
   meta?: string;
   bodyOnly: boolean;
   actions?: ReactNode;
-  footer?: ReactNode;
 }) {
   const { author } = parseHaikuBody(body);
 
@@ -81,7 +78,6 @@ function LanternContent({
       <LanternBodyLines body={body} />
       {author ? <p className={styles.author}>—{author}</p> : null}
       {meta ? <p className={styles.meta}>{meta}</p> : null}
-      {footer}
       {actions}
     </>
   );
@@ -136,17 +132,6 @@ export function Lantern(props: LanternProps) {
         body={body}
         meta={meta}
         bodyOnly={bodyOnly}
-        footer={
-          bodyOnly || haiku.labels.length === 0 ? undefined : (
-            <div className={styles.footer}>
-              <div className={styles.labels}>
-                {haiku.labels.map((label) => (
-                  <Label key={label.id} name={label.name} color={label.color || "default"} />
-                ))}
-              </div>
-            </div>
-          )
-        }
         actions={
           includeActions ? (
             <div className={styles.actions}>

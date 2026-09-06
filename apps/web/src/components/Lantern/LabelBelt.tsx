@@ -29,6 +29,16 @@ export type LabelBeltItem = {
   color: string;
 };
 
+export function toLabelBeltItems(
+  labels: ReadonlyArray<{ id: string; name: string; color?: string | null }>,
+): LabelBeltItem[] {
+  return labels.map((label) => ({
+    id: label.id,
+    name: label.name,
+    color: label.color || "#888888",
+  }));
+}
+
 export type LabelBeltProps = {
   labels: LabelBeltItem[];
   /** Override max visible slots (default 6). */

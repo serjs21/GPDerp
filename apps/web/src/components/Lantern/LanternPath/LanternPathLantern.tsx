@@ -2,6 +2,7 @@
 
 import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
 import { LanternFrame } from "../LanternFrame";
+import { toLabelBeltItems } from "../LabelBelt";
 import { Lantern } from "../Lantern";
 import { LANTERN_PATH_FOCUS_STOP } from "./lanternPath.config";
 import { resolveLanternAtPathStop } from "./resolveLanternAtPathStop";
@@ -43,12 +44,18 @@ export function LanternPathLantern({
     .filter(Boolean)
     .join(" ");
 
+  const beltLabels =
+    "haiku" in contentProps && contentProps.haiku
+      ? toLabelBeltItems(contentProps.haiku.labels)
+      : undefined;
+
   return (
     <LanternFrame
       className={lanternClassName}
       transform={transform}
       ariaLabel={ariaLabel}
       generating={"generatingDraft" in contentProps && Boolean(contentProps.generatingDraft)}
+      labels={beltLabels}
     >
       <Lantern
         {...contentProps}

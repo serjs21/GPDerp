@@ -3,7 +3,7 @@ import { STORY_ACCOUNT_ID, withQueryClientSeed } from "@/storybook";
 import { CreateLabelModal } from "./CreateLabelModal";
 
 const meta: Meta<typeof CreateLabelModal> = {
-  title: "Haiku/CreateLabelModal",
+  title: "Deprecated/CreateLabelModal",
   component: CreateLabelModal,
   decorators: [
     withQueryClientSeed((qc) => {

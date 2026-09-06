@@ -4,9 +4,10 @@ import { DeleteOutlined, EditOutlined, WarningOutlined } from "@ant-design/icons
 import { Button, Tooltip } from "@/components/StyledComponents";
 import { useState } from "react";
 import type { LabelDto } from "@/api/labels";
+import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
+import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
+import { ComicLabelCreationModal } from "@/components/ComicLabelCreationModal";
 import { comicToast } from "@/components/ComicToast";
-import { CreateLabelModal } from "@/components/CreateLabelModal/CreateLabelModal";
-import { Label } from "@/components/Label/Label";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
 import { useConfirm } from "@/hooks/useConfirm";
 import styles from "./LabelContainer.module.css";
@@ -55,9 +56,13 @@ export function LabelContainer({ accountId, label, onChanged }: LabelContainerPr
           <Button type="text" size="small" danger icon={<DeleteOutlined />} onClick={openDeleteConfirm} />
         </Tooltip>
       </div>
-      <Label name={label.name} color={label.color} />
+      <ComicBurstLabel
+        text={formatComicLabelText(label.name)}
+        fill={label.color || "#888888"}
+        fontSize={20}
+      />
       <div className={styles.meta}>{new Date(label.createdAt).toLocaleString()}</div>
-      <CreateLabelModal
+      <ComicLabelCreationModal
         open={editOpen}
         accountId={accountId}
         label={label}

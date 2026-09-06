@@ -60,9 +60,6 @@ export function ComicLabelCreationModal({
   const [pickerOpen, setPickerOpen] = useState(false);
   const colorShellRef = useRef<HTMLDivElement | null>(null);
   const nameInputRef = useRef<HTMLInputElement | null>(null);
-  const bodyRef = useRef<HTMLDivElement | null>(null);
-  const footerRowRef = useRef<HTMLDivElement | null>(null);
-  const saveButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const { labels, isLoading, createLabel, updateLabel, isCreating, isUpdating } = useAccountLabels({
     accountId,
@@ -126,71 +123,6 @@ export function ComicLabelCreationModal({
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, [pickerOpen]);
 
-  // #region agent log
-  useEffect(() => {
-    if (!open) return;
-    const measure = (runId: string) => {
-      const body = bodyRef.current;
-      const color = colorShellRef.current;
-      const footer = footerRowRef.current;
-      const save = saveButtonRef.current;
-      const saveSvg = save?.querySelector("svg");
-      const savePath = saveSvg?.querySelector("path");
-      const colorPanel = color?.firstElementChild as HTMLElement | null;
-      const topRow = color?.parentElement;
-      const preview = topRow?.firstElementChild as HTMLElement | null;
-      const svgW = saveSvg?.getBoundingClientRect().width ?? null;
-      const pathW = savePath?.getBoundingClientRect().width ?? null;
-      const data = {
-        bodyW: body?.getBoundingClientRect().width ?? null,
-        previewW: preview?.getBoundingClientRect().width ?? null,
-        colorShellW: color?.getBoundingClientRect().width ?? null,
-        colorPanelW: colorPanel?.getBoundingClientRect().width ?? null,
-        footerRowW: footer?.getBoundingClientRect().width ?? null,
-        saveButtonW: save?.getBoundingClientRect().width ?? null,
-        saveSvgW: svgW,
-        savePathW: pathW,
-        preserveAspectRatio: saveSvg?.getAttribute("preserveAspectRatio"),
-        pathFillsSvg:
-          svgW != null && pathW != null ? Math.abs(svgW - pathW) < 2 : null,
-        footerChildCount: footer?.childElementCount ?? null,
-        widthMatchBody:
-          !!body &&
-          !!save &&
-          Math.abs(body.getBoundingClientRect().width - save.getBoundingClientRect().width) < 1,
-        colorMatchBody:
-          !!body &&
-          !!color &&
-          Math.abs(body.getBoundingClientRect().width - color.getBoundingClientRect().width) < 1,
-        saveMatchColor:
-          !!save &&
-          !!color &&
-          Math.abs(save.getBoundingClientRect().width - color.getBoundingClientRect().width) < 1,
-      };
-      fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Debug-Session-Id": "8e01e4",
-        },
-        body: JSON.stringify({
-          sessionId: "8e01e4",
-          runId,
-          hypothesisId: "F",
-          location: "ComicLabelCreationModal.tsx:measureWidths",
-          message: "create svg box vs painted path width",
-          data,
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-    };
-    const raf = window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => measure("post-fix"));
-    });
-    return () => window.cancelAnimationFrame(raf);
-  }, [open, canSave, color, saveText]);
-  // #endregion
-
   const colorPanelStyle = useMemo(
     () =>
       ({
@@ -248,7 +180,7 @@ export function ComicLabelCreationModal({
         if (!nextOpen) onClose();
       }}
     >
-      <div ref={bodyRef} className={styles.body}>
+      <div className={styles.body}>
         <ComicPageRow columns="2fr-1fr" className={styles.topRow}>
           <ComicPagePanel
             background="solid"
@@ -375,11 +307,10 @@ export function ComicLabelCreationModal({
           )}
         </div>
 
-        <div ref={footerRowRef} className={styles.footerRow}>
+        <div className={styles.footerRow}>
           <Tooltip title={disabledReason ?? ""}>
             <span className={styles.tooltipWrap}>
               <button
-                ref={saveButtonRef}
                 type="button"
                 className={styles.saveButton}
                 disabled={!canSave}

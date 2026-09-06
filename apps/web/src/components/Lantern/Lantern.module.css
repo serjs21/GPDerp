@@ -125,18 +125,6 @@
   opacity: 1;
 }
 
-.footer {
-  margin-top: 0.15rem;
-  width: 100%;
-}
-
-.labels {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.25rem;
-}
-
 .title {
   margin: 0.75rem 0 1rem;
   align-self: stretch;
