@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { HaikuDto } from "@/api/haikus";
 import type { LabelDto } from "@/api/labels";
 import { ComicLabelCreationModal } from "@/components/ComicLabelCreationModal";
@@ -29,6 +29,12 @@ export type CreateAddLabelsModalProps = {
   onCreated?: (label: LabelDto) => void;
 };
 
+function sameIdSet(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) return false;
+  const set = new Set(a);
+  return b.every((id) => set.has(id));
+}
+
 export function CreateAddLabelsModal({
   open,
   onClose,
@@ -40,12 +46,6 @@ export function CreateAddLabelsModal({
   const [tab, setTab] = useState<CreateAddLabelsTab>(initialTab);
   /** Bump when a label is created so Add picker re-seeds / refreshes. */
   const [addEpoch, setAddEpoch] = useState(0);
-
-  useEffect(() => {
-    if (!open) return;
-    setTab(initialTab);
-    setAddEpoch(0);
-  }, [open, initialTab]);
 
   const accountId = haiku.accountId;
 
@@ -59,6 +59,18 @@ export function CreateAddLabelsModal({
     [haiku.labels],
   );
 
+  const [draftIds, setDraftIds] = useState<string[]>(addSeedIds);
+  const wasOpen = useRef(false);
+
+  useEffect(() => {
+    if (open && !wasOpen.current) {
+      setTab(initialTab);
+      setAddEpoch(0);
+      setDraftIds(addSeedIds);
+    }
+    wasOpen.current = open;
+  }, [open, initialTab, addSeedIds]);
+
   const knownAddLabels = useMemo(
     () =>
       haiku.labels.map((l) => ({
@@ -70,6 +82,28 @@ export function CreateAddLabelsModal({
     [haiku.labels],
   );
 
+  const flushAdd = useCallback(
+    (ids: string[], options?: { closeOnSuccess?: boolean }) => {
+      if (sameIdSet(ids, addSeedIds)) {
+        if (options?.closeOnSuccess) onClose();
+        return;
+      }
+      void setHaikuLabels({
+        haikuId: haiku.id,
+        labelIds: ids,
+        onSuccess: async () => {
+          comicToast.success("Labels saved");
+          onSaved?.();
+          if (options?.closeOnSuccess) onClose();
+        },
+        onError: async () => {
+          comicToast.error("Could not save labels");
+        },
+      });
+    },
+    [addSeedIds, haiku.id, onClose, onSaved, setHaikuLabels],
+  );
+
   const handleCreated = (label: LabelDto) => {
     onCreated?.(label);
     setAddEpoch((n) => n + 1);
@@ -77,18 +111,23 @@ export function CreateAddLabelsModal({
   };
 
   const submitAdd = (ids: string[]) => {
-    void setHaikuLabels({
-      haikuId: haiku.id,
-      labelIds: ids,
-      onSuccess: async () => {
-        comicToast.success("Labels saved");
-        onSaved?.();
-        onClose();
-      },
-      onError: async () => {
-        comicToast.error("Could not save labels");
-      },
-    });
+    setDraftIds(ids);
+    flushAdd(ids, { closeOnSuccess: true });
+  };
+
+  const selectTab = (next: CreateAddLabelsTab) => {
+    if (next === tab) return;
+    if (tab === "add") {
+      flushAdd(draftIds);
+    }
+    setTab(next);
+  };
+
+  const handleDismiss = () => {
+    flushAdd(draftIds, { closeOnSuccess: true });
+    if (sameIdSet(draftIds, addSeedIds)) {
+      onClose();
+    }
   };
 
   return (
@@ -97,7 +136,7 @@ export function CreateAddLabelsModal({
       showClose
       contentClassName={styles.dialogContent}
       onOpenChange={(nextOpen) => {
-        if (!nextOpen) onClose();
+        if (!nextOpen) handleDismiss();
       }}
     >
       <div className={styles.body}>
@@ -105,7 +144,7 @@ export function CreateAddLabelsModal({
           <ComicPagePanel
             selectable
             selected={tab === "create"}
-            onSelect={() => setTab("create")}
+            onSelect={() => selectTab("create")}
             background="sunburst"
             color="purple"
             title="Create"
@@ -127,7 +166,7 @@ export function CreateAddLabelsModal({
           <ComicPagePanel
             selectable
             selected={tab === "add"}
-            onSelect={() => setTab("add")}
+            onSelect={() => selectTab("add")}
             background="halftone"
             color="darkGreen"
             title="Add"
@@ -151,7 +190,7 @@ export function CreateAddLabelsModal({
               embedded
               open={open && tab === "create"}
               accountId={accountId}
-              onClose={onClose}
+              onClose={handleDismiss}
               onCreated={handleCreated}
             />
           ) : (
@@ -159,10 +198,11 @@ export function CreateAddLabelsModal({
               key={`add-${addEpoch}`}
               active={open && tab === "add"}
               accountId={accountId}
-              seedLabelIds={addSeedIds}
+              seedLabelIds={draftIds}
               knownLabels={knownAddLabels}
               footerLabel="Save"
               onFooter={submitAdd}
+              onSelectionChange={setDraftIds}
               footerBusy={isSettingLabels}
             />
           )}

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
   ComicPageCtaAction,
@@ -11,6 +10,7 @@ import {
 import { LabelMethodIcon } from "@/components/LabelMethodIcon";
 import { LoginFlow, type AuthFlowHandle } from "@/components/AuthFlows/LoginFlow";
 import { RegisterFlow } from "@/components/AuthFlows/RegisterFlow";
+import { useAuthenticationVerification } from "@/app/providers/AuthenticationVerificationProvider";
 import styles from "./styles.module.css";
 
 const SELECTED_PANEL_WEIGHT = 1.25;
@@ -23,6 +23,8 @@ type AuthGateModalProps = {
   onClose: () => void;
   onAuthenticated: () => void;
   initialMode?: AuthGateMode;
+  /** Story/test override; defaults to auth verification context. */
+  onForgotPassword?: () => void;
 };
 
 export function AuthGateModal({
@@ -30,7 +32,11 @@ export function AuthGateModal({
   onClose,
   onAuthenticated,
   initialMode = "login",
+  onForgotPassword,
 }: AuthGateModalProps) {
+  const authVerification = useAuthenticationVerification();
+  const openForgot =
+    onForgotPassword ?? (() => authVerification.openResetPasswordModal({ mode: "request" }));
   const [mode, setMode] = useState<AuthGateMode>(initialMode);
   const [submitting, setSubmitting] = useState(false);
   const loginRef = useRef<AuthFlowHandle>(null);
@@ -139,7 +145,13 @@ export function AuthGateModal({
               />
             )}
             <p className={styles.linkRow}>
-              <Link href="/reset_password">Forgot password?</Link>
+              <button
+                type="button"
+                className={styles.linkButton}
+                onClick={openForgot}
+              >
+                Forgot password?
+              </button>
             </p>
           </div>
         </div>

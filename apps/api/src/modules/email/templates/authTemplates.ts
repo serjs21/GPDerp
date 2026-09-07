@@ -10,7 +10,7 @@ export const buildVerificationEmail = (token: string) => {
 };
 
 export const buildPasswordResetEmail = (token: string) => {
-  const resetUrl = `${env.WEB_APP_URL}/reset_password?token=${encodeURIComponent(token)}`;
+  const resetUrl = `${env.WEB_APP_URL}/?resetToken=${encodeURIComponent(token)}`;
   return {
     subject: "Reset your password",
     text: `Reset your password by opening this link:\n${resetUrl}\n\nThis link expires in 24 hours.`,

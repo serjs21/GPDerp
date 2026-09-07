@@ -41,6 +41,8 @@ export type ComicLabelPickerPanelProps = {
   knownLabels?: ComicLabelPickerSeedLabel[];
   footerLabel: string;
   onFooter: (selectedIds: string[]) => void;
+  /** Fires whenever the in-panel selection changes (after seed or toggle). */
+  onSelectionChange?: (selectedIds: string[]) => void;
   footerBusy?: boolean;
   footerDisabled?: boolean;
   className?: string;
@@ -74,6 +76,7 @@ export function ComicLabelPickerPanel({
   knownLabels = [],
   footerLabel,
   onFooter,
+  onSelectionChange,
   footerBusy = false,
   footerDisabled = false,
   className,
@@ -111,6 +114,11 @@ export function ComicLabelPickerPanel({
       searchRef.current?.focus();
     });
   }, [active, seedLabelSource]);
+
+  useEffect(() => {
+    if (!active) return;
+    onSelectionChange?.(selectedIds);
+  }, [active, selectedIds, onSelectionChange]);
 
   const {
     pagedLabels,

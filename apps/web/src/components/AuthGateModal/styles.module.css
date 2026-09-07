@@ -65,8 +65,18 @@
   font-size: 1rem;
 }
 
-.linkRow a {
+.linkRow a,
+.linkButton {
   color: var(--sumi-ink, #2d2d2d);
   text-decoration: underline;
   text-underline-offset: 0.15em;
+}
+
+.linkButton {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
 }

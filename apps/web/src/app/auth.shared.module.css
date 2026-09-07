@@ -136,6 +136,18 @@
   text-align: center;
 }
 
+.textLinkButton {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
+}
+
 @media (max-width: 640px) {
   .socialBlock {
     margin-bottom: 0.9rem;

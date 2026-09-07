@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ComicLabelPickerPanel } from "@/components/ComicLabelPickerPanel";
 import {
   ComicPageDialog,
@@ -25,6 +25,12 @@ export type FilterManageLabelsModalProps = {
   onApply: (ids: string[]) => void;
 };
 
+function sameIdSet(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) return false;
+  const set = new Set(a);
+  return b.every((id) => set.has(id));
+}
+
 export function FilterManageLabelsModal({
   open,
   onClose,
@@ -34,14 +40,41 @@ export function FilterManageLabelsModal({
   onApply,
 }: FilterManageLabelsModalProps) {
   const [tab, setTab] = useState<FilterManageLabelsTab>(initialTab);
+  const [draftIds, setDraftIds] = useState<string[]>(selectedIds);
+  const wasOpen = useRef(false);
 
   useEffect(() => {
-    if (!open) return;
-    setTab(initialTab);
-  }, [open, initialTab]);
+    if (open && !wasOpen.current) {
+      setTab(initialTab);
+      setDraftIds(selectedIds);
+    }
+    wasOpen.current = open;
+  }, [open, initialTab, selectedIds]);
+
+  const applyDraft = useCallback(
+    (ids: string[] = draftIds) => {
+      if (sameIdSet(ids, selectedIds)) return;
+      onApply(ids);
+    },
+    [draftIds, onApply, selectedIds],
+  );
 
   const submitFilter = (ids: string[]) => {
+    setDraftIds(ids);
     onApply(ids);
+    onClose();
+  };
+
+  const selectTab = (next: FilterManageLabelsTab) => {
+    if (next === tab) return;
+    if (tab === "filter") {
+      applyDraft();
+    }
+    setTab(next);
+  };
+
+  const handleDismiss = () => {
+    applyDraft();
     onClose();
   };
 
@@ -51,7 +84,7 @@ export function FilterManageLabelsModal({
       showClose
       contentClassName={styles.dialogContent}
       onOpenChange={(nextOpen) => {
-        if (!nextOpen) onClose();
+        if (!nextOpen) handleDismiss();
       }}
     >
       <div className={styles.body}>
@@ -59,7 +92,7 @@ export function FilterManageLabelsModal({
           <ComicPagePanel
             selectable
             selected={tab === "filter"}
-            onSelect={() => setTab("filter")}
+            onSelect={() => selectTab("filter")}
             background="sunburst"
             color="blue"
             title="Filter"
@@ -81,7 +114,7 @@ export function FilterManageLabelsModal({
           <ComicPagePanel
             selectable
             selected={tab === "manage"}
-            onSelect={() => setTab("manage")}
+            onSelect={() => selectTab("manage")}
             background="halftone"
             color="green"
             title="Manage"
@@ -104,9 +137,10 @@ export function FilterManageLabelsModal({
             <ComicLabelPickerPanel
               active={open && tab === "filter"}
               accountId={accountId}
-              seedLabelIds={selectedIds}
+              seedLabelIds={draftIds}
               footerLabel="Done"
               onFooter={submitFilter}
+              onSelectionChange={setDraftIds}
             />
           ) : (
             <ManageLabelsPanel

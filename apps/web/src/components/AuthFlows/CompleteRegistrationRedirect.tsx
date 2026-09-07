@@ -9,7 +9,6 @@ const EXEMPT_PATHS = new Set([
   "/register",
   "/verify",
   "/complete-registration",
-  "/reset_password",
 ]);
 
 export function CompleteRegistrationRedirect() {
