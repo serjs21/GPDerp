@@ -10,7 +10,8 @@ export type ComicPanelColor =
   | "red"
   | "white"
   | "cream"
-  | "info";
+  | "info"
+  | "green";
 
 export const COMIC_PAGE_GUTTER_PX = 10;
 /** Black frame around the white page; sized to hold the close control. */
@@ -27,6 +28,7 @@ export const COMIC_PANEL_COLORS: Record<ComicPanelColor, { base: string; accent?
   blue: { base: "#2196f3", accent: "#64b5f6" },
   red: { base: "#f44336", accent: "#ef5350" },
   white: { base: "#ffffff", accent: "#c8c8c8" },
+  green: { base: "#81c784", accent: "#4caf50" },
   cream: { base: "#faf6ee", accent: "#f0e6d8" },
   info: { base: "#e8f4fc", accent: "#b3d9f0" },
 };

@@ -61,7 +61,7 @@ export function FilterManageLabelsModal({
             selected={tab === "filter"}
             onSelect={() => setTab("filter")}
             background="sunburst"
-            color="teal"
+            color="blue"
             title="Filter"
             isMotionBackground={false}
             shine={false}
@@ -72,7 +72,7 @@ export function FilterManageLabelsModal({
             className={styles.methodPanel}
           >
             <LabelMethodIcon
-              src="/label_modal/filter.svg"
+              src="/panel_actions/filter_label.svg"
               bubbleStyle="pointedArcs"
               sourceDirection="none"
               active={tab === "filter"}
@@ -83,7 +83,7 @@ export function FilterManageLabelsModal({
             selected={tab === "manage"}
             onSelect={() => setTab("manage")}
             background="halftone"
-            color="orange"
+            color="green"
             title="Manage"
             overflowVisible
             flexWeight={tab === "manage" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
@@ -91,7 +91,7 @@ export function FilterManageLabelsModal({
             className={styles.methodPanel}
           >
             <LabelMethodIcon
-              src="/label_modal/tag.svg"
+              src="/panel_actions/manage.svg"
               bubbleStyle="rectangle"
               sourceDirection="none"
               active={tab === "manage"}
