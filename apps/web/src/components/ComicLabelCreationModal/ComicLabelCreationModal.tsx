@@ -12,6 +12,7 @@ import { HexColorPicker } from "react-colorful";
 import type { LabelDto } from "@/api/labels";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
+import { ComicModalInput } from "@/components/ComicModalInput";
 import {
   ComicPageDialog,
   ComicPagePanel,
@@ -205,7 +206,7 @@ export function ComicLabelCreationModal({
                 randomness={shape.randomness}
                 seed={shape.id}
               />
-              <input
+              <ComicModalInput
                 ref={nameInputRef}
                 className={styles.previewInput}
                 value={name}

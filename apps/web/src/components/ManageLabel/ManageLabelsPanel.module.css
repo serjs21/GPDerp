@@ -10,7 +10,9 @@
 
 .searchPanel {
   flex: 0 0 auto;
-  min-height: 3.5rem;
+  min-height: 3.25rem;
+  margin: 0.5rem 0 1rem;
+
 }
 
 .searchPlain {
@@ -22,32 +24,27 @@
   background: color-mix(in srgb, var(--background-color, #fcfaf2) 90%, transparent);
 }
 
-.searchInput {
-  box-sizing: border-box;
-  display: block;
-  width: 100%;
-  margin: 0;
-  padding: 0.35rem 0.15rem;
-  border: none;
-  background: transparent;
-  color: var(--sumi-ink, #2d2d2d);
-  font-family: var(--font-lantern-script, cursive);
-  font-size: 1.15rem;
-  letter-spacing: 0.03em;
-  outline: none;
-}
-
-.searchInput::placeholder {
-  color: color-mix(in srgb, var(--sumi-ink, #2d2d2d) 45%, transparent);
-}
-
 .listScroll {
   flex: 1 1 auto;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
+}
+
+.emptyLayout {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.createDock {
+  margin-top: auto;
+  flex: 0 0 auto;
 }
 
 .loaderRow {

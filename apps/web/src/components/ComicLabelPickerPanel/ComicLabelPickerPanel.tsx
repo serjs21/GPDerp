@@ -11,6 +11,7 @@ import {
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
+import { ComicModalInput } from "@/components/ComicModalInput";
 import {
   ComicPagePanel,
   ComicPageRow,
@@ -213,9 +214,8 @@ export function ComicLabelPickerPanel({
   return (
     <div className={[styles.root, className].filter(Boolean).join(" ")}>
       <ComicPagePanel background="solid" color="white" className={styles.searchPanel}>
-        <input
+        <ComicModalInput
           ref={searchRef}
-          className={styles.searchInput}
           type="search"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}

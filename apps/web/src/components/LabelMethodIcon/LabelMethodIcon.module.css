@@ -36,6 +36,45 @@
   padding: 0.65rem 0.75rem;
 }
 
+.frameThought {
+  position: relative;
+  width: 3.7rem;
+  height: 3.35rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.thoughtOutline {
+  position: absolute;
+  inset: -0.2rem;
+  width: calc(100% + 0.4rem);
+  height: calc(100% + 0.4rem);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.frameThought .icon {
+  position: relative;
+  z-index: 1;
+  height: 1.85rem;
+}
+
+.frameDiamond {
+  width: 3.35rem;
+  height: 3.35rem;
+  padding: 0;
+  border-radius: 0.2rem;
+  transform: rotate(45deg);
+  /* Offset shadow follows the diamond axes after rotation */
+  box-shadow: 3px 3px 0 #111111;
+}
+
+.frameDiamond .icon {
+  transform: rotate(-45deg);
+}
+
 .icon {
   display: block;
   height: 2rem;

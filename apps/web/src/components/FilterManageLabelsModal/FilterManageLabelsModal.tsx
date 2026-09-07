@@ -73,7 +73,7 @@ export function FilterManageLabelsModal({
           >
             <LabelMethodIcon
               src="/panel_actions/filter_label.svg"
-              bubbleStyle="circle"
+              bubbleStyle="diamond"
               sourceDirection="none"
               active={tab === "filter"}
             />

@@ -3,6 +3,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState, type UIEvent } from "react";
 import { labelQueryKeys } from "@/api/labels";
+import { ComicModalInput } from "@/components/ComicModalInput";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
@@ -83,9 +84,8 @@ export function ManageLabelsPanel({
   };
 
   const searchInputEl = (
-    <input
+    <ComicModalInput
       ref={searchRef}
-      className={styles.searchInput}
       type="search"
       value={searchInput}
       onChange={(e) => setSearchInput(e.target.value)}
@@ -119,23 +119,30 @@ export function ManageLabelsPanel({
         ) : (
           <>
             {pagedLabels.length === 0 ? (
-              <p className={styles.empty}>{debouncedQ ? "No labels found" : "No labels yet."}</p>
-            ) : (
-              pagedLabels.map((label) => (
-                <ManageLabel
-                  key={label.id}
-                  accountId={label.accountId}
-                  label={label}
-                  onChanged={refresh}
-                />
-              ))
-            )}
-            {isFetchingNextPage ? (
-              <div className={styles.loaderRow}>
-                <SakuraPetalLoader />
+              <div className={styles.emptyLayout}>
+                <p className={styles.empty}>
+                  {debouncedQ ? "No labels found" : "No labels yet."}
+                </p>
+                {createPanel ? <div className={styles.createDock}>{createPanel}</div> : null}
               </div>
-            ) : null}
-            {createPanel}
+            ) : (
+              <>
+                {pagedLabels.map((label) => (
+                  <ManageLabel
+                    key={label.id}
+                    accountId={label.accountId}
+                    label={label}
+                    onChanged={refresh}
+                  />
+                ))}
+                {isFetchingNextPage ? (
+                  <div className={styles.loaderRow}>
+                    <SakuraPetalLoader />
+                  </div>
+                ) : null}
+                {createPanel}
+              </>
+            )}
           </>
         )}
       </div>
