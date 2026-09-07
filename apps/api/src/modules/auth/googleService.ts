@@ -3,6 +3,8 @@ import { env } from "../../env";
 
 const client = new OAuth2Client(env.GOOGLE_CLIENT_ID);
 
+const USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo";
+
 export type GoogleIdentity = {
   sub: string;
   email: string;
@@ -11,6 +13,20 @@ export type GoogleIdentity = {
   lastName: string;
   avatar: string;
 };
+
+type GoogleUserInfo = {
+  sub?: string;
+  email?: string;
+  email_verified?: boolean | string;
+  given_name?: string;
+  family_name?: string;
+  picture?: string;
+};
+
+function looksLikeJwt(token: string): boolean {
+  const parts = token.split(".");
+  return parts.length === 3 && parts.every((part) => part.length > 0);
+}
 
 export const googleService = {
   async verifyIdToken(idToken: string): Promise<GoogleIdentity> {
@@ -35,5 +51,56 @@ export const googleService = {
       lastName: payload.family_name ?? "",
       avatar: payload.picture ?? "",
     };
+  },
+
+  async verifyAccessToken(accessToken: string): Promise<GoogleIdentity> {
+    if (!env.GOOGLE_CLIENT_ID) {
+      throw new Error("GOOGLE_CLIENT_ID is not configured");
+    }
+
+    const tokenInfo = await client.getTokenInfo(accessToken);
+    if (tokenInfo.aud && tokenInfo.aud !== env.GOOGLE_CLIENT_ID) {
+      throw new Error("Google access token audience mismatch");
+    }
+
+    const response = await fetch(USERINFO_URL, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (!response.ok) {
+      throw new Error(`Google userinfo failed (${response.status})`);
+    }
+
+    const profile = (await response.json()) as GoogleUserInfo;
+    const email = profile.email ?? tokenInfo.email;
+    const emailVerified =
+      profile.email_verified === true ||
+      profile.email_verified === "true" ||
+      tokenInfo.email_verified === true;
+
+    if (!email || !emailVerified) {
+      throw new Error("Google email missing or not verified");
+    }
+
+    const sub = profile.sub ?? tokenInfo.sub;
+    if (!sub) {
+      throw new Error("Google subject missing");
+    }
+
+    return {
+      sub,
+      email,
+      emailVerified: true,
+      firstName: profile.given_name ?? "",
+      lastName: profile.family_name ?? "",
+      avatar: profile.picture ?? "",
+    };
+  },
+
+  /** Accepts GIS ID tokens (JWT) or OAuth access tokens from custom button popup. */
+  async verifyGoogleToken(token: string): Promise<GoogleIdentity> {
+    if (looksLikeJwt(token)) {
+      return googleService.verifyIdToken(token);
+    }
+    return googleService.verifyAccessToken(token);
   },
 };

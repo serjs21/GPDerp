@@ -702,9 +702,9 @@ const verifyAndNormalizeGoogleIdentity = async (
 ): Promise<GoogleIdentity> => {
   let googleIdentity: GoogleIdentity;
   try {
-    googleIdentity = await googleService.verifyIdToken(token);
+    googleIdentity = await googleService.verifyGoogleToken(token);
   } catch (err) {
-    logAuthFailure(app.log, "auth: Google login failed — id token verification error", {
+    logAuthFailure(app.log, "auth: Google login failed — token verification error", {
       reason: "google_token_verify_failed",
       err,
     });

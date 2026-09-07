@@ -35,6 +35,8 @@ jest.mock("../repository", () => ({
 jest.mock("../googleService", () => ({
   googleService: {
     verifyIdToken: jest.fn(),
+    verifyAccessToken: jest.fn(),
+    verifyGoogleToken: jest.fn(),
   },
 }));
 
@@ -218,7 +220,7 @@ describe("authService", () => {
   });
 
   it("creates a new user on first google login with a unique username", async () => {
-    googleService.verifyIdToken.mockResolvedValue({
+    googleService.verifyGoogleToken.mockResolvedValue({
       sub: "google-sub-new",
       email: "NEWGOOGLE@EXAMPLE.COM",
       emailVerified: true,
@@ -243,7 +245,7 @@ describe("authService", () => {
   });
 
   it("links google auth to existing manual user by same verified email", async () => {
-    googleService.verifyIdToken.mockResolvedValue({
+    googleService.verifyGoogleToken.mockResolvedValue({
       sub: "google-sub-1",
       email: "USER@EXAMPLE.COM",
       emailVerified: true,
@@ -268,7 +270,7 @@ describe("authService", () => {
   });
 
   it("rejects google auth when email is not verified", async () => {
-    googleService.verifyIdToken.mockResolvedValue({
+    googleService.verifyGoogleToken.mockResolvedValue({
       sub: "google-sub-1",
       email: "user@example.com",
       emailVerified: false,
@@ -395,7 +397,7 @@ describe("authService", () => {
   });
 
   it("returns signup_required profile for unknown google user in login flow", async () => {
-    googleService.verifyIdToken.mockResolvedValue({
+    googleService.verifyGoogleToken.mockResolvedValue({
       sub: "google-sub-signup",
       email: "new.signup@example.com",
       emailVerified: true,
@@ -422,7 +424,7 @@ describe("authService", () => {
   });
 
   it("registers google user with username and profile details", async () => {
-    googleService.verifyIdToken.mockResolvedValue({
+    googleService.verifyGoogleToken.mockResolvedValue({
       sub: "google-sub-register",
       email: "register@example.com",
       emailVerified: true,
