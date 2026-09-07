@@ -1,17 +1,31 @@
 "use client";
 
-import { Form, GoogleLoginButton, Input } from "@/components/StyledComponents";
-import { comicToast } from "@/components/ComicToast";
-import { UIButton } from "@/components/ui";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useState,
+  type FormEvent,
+} from "react";
 import axios from "axios";
 import authStyles from "@/app/auth.shared.module.css";
-import { useState } from "react";
 import { useGoogleOAuthAvailability } from "@/app/providers/GoogleOAuthAvailabilityProvider";
+import { AuthField, GoogleSquareButton } from "@/components/AuthFlows/AuthFlowChrome";
+import { ComicModalInput } from "@/components/ComicModalInput";
+import { ComicPageCtaAction } from "@/components/ComicPageLayout";
+import { comicToast } from "@/components/ComicToast";
+
+export type AuthFlowHandle = {
+  submit: () => void;
+};
 
 type LoginFlowProps = {
   onSuccess: () => void;
   showGoogle?: boolean;
   onGoogleSignupRequired?: () => void;
+  /** Hide in-flow CTA (parent provides ComicPageDialog ctaFooter). */
+  hideCta?: boolean;
+  onSubmittingChange?: (submitting: boolean) => void;
 };
 
 type LoginValues = {
@@ -19,21 +33,17 @@ type LoginValues = {
   password: string;
 };
 
-const logAuthDebug = (event: string, data: Record<string, unknown>) => {
-  if (process.env.NODE_ENV === "production") return;
-  console.info(`[auth-debug] ${event}`, data);
-};
-
 type GoogleSignupRequiredResponse = {
   error?: string;
   code?: string;
 };
 
-const logAxiosAuthError = (
-  event: string,
-  endpoint: string,
-  error: unknown,
-) => {
+const logAuthDebug = (event: string, data: Record<string, unknown>) => {
+  if (process.env.NODE_ENV === "production") return;
+  console.info(`[auth-debug] ${event}`, data);
+};
+
+const logAxiosAuthError = (event: string, endpoint: string, error: unknown) => {
   if (axios.isAxiosError(error)) {
     logAuthDebug(event, {
       endpoint: String(error.config?.url ?? endpoint),
@@ -79,90 +89,63 @@ const notifyGoogleLoginError = (
   comicToast.error("Google sign-in failed");
 };
 
-function LoginEmailPasswordForm({
-  onSubmit,
-}: {
-  onSubmit: (values: LoginValues) => Promise<void>;
-}) {
-  const [form] = Form.useForm<LoginValues>();
-  const [hasSubmitted, setHasSubmitted] = useState(false);
-
-  const submitWithReset = async (values: LoginValues) => {
-    await onSubmit(values);
-    form.resetFields();
-  };
-
-  return (
-    <Form
-      className={authStyles.flowForm}
-      form={form}
-      onFinish={(values) => {
-        setHasSubmitted(true);
-        void submitWithReset(values);
-      }}
-      onFinishFailed={() => {
-        setHasSubmitted(true);
-      }}
-      onValuesChange={(changedValues) => {
-        if (!hasSubmitted) return;
-        const changedFieldNames = Object.keys(changedValues) as Array<keyof LoginValues>;
-        form.setFields(
-          changedFieldNames.map((fieldName) => ({
-            name: fieldName,
-            errors: [],
-          })),
-        );
-        setHasSubmitted(false);
-      }}
-      layout="vertical"
-      requiredMark={false}
-      validateTrigger={false}
-      onKeyDown={(event) => {
-        if (event.key !== "Enter" || event.shiftKey) return;
-        event.preventDefault();
-        void form.submit();
-      }}
-    >
-      <Form.Item
-        className={authStyles.formItem}
-        name="email"
-        label="Email"
-        rules={[{ required: true, type: "email", message: "Enter a valid email" }]}
-      >
-        <Input autoComplete="email" type="email" />
-      </Form.Item>
-      <Form.Item className={authStyles.formItem} name="password" label="Password" rules={[{ required: true, message: "Required" }]}>
-        <Input.Password autoComplete="current-password" />
-      </Form.Item>
-      <Form.Item className={`${authStyles.formItem} ${authStyles.hiddenMirrorRow}`} label="Confirm password">
-        <Input.Password autoComplete="off" disabled />
-      </Form.Item>
-      <Form.Item className={authStyles.submitItem}>
-        <UIButton type="submit" variant="primary" className={authStyles.primaryCta}>
-          Sign in
-        </UIButton>
-      </Form.Item>
-    </Form>
-  );
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-export function LoginFlow({
-  onSuccess,
-  showGoogle = false,
-  onGoogleSignupRequired,
-}: LoginFlowProps) {
+export const LoginFlow = forwardRef<AuthFlowHandle, LoginFlowProps>(function LoginFlow(
+  {
+    onSuccess,
+    showGoogle = false,
+    onGoogleSignupRequired,
+    hideCta = false,
+    onSubmittingChange,
+  },
+  ref,
+) {
   const googleOAuthEnabled = useGoogleOAuthAvailability();
   const canShowGoogle = showGoogle && googleOAuthEnabled;
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    onSubmittingChange?.(submitting);
+  }, [onSubmittingChange, submitting]);
 
   const onFinish = async (values: LoginValues) => {
+    setSubmitting(true);
     try {
       await axios.post("/auth/login", values);
+      setEmail("");
+      setPassword("");
       onSuccess();
     } catch (e: unknown) {
       logAxiosAuthError("password_login_request_error", "/auth/login", e);
       notifyPasswordLoginError(e);
+    } finally {
+      setSubmitting(false);
     }
   };
+
+  const validateAndSubmit = () => {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !isValidEmail(trimmedEmail)) {
+      setError("Enter a valid email");
+      return;
+    }
+    if (!password) {
+      setError("Password is required");
+      return;
+    }
+    setError(null);
+    void onFinish({ email: trimmedEmail, password });
+  };
+
+  useImperativeHandle(ref, () => ({
+    submit: validateAndSubmit,
+  }));
 
   const onGoogleCredential = async (credential: string | undefined) => {
     if (!credential) {
@@ -178,22 +161,65 @@ export function LoginFlow({
     }
   };
 
+  const onFormSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    validateAndSubmit();
+  };
+
   return (
     <div className={authStyles.flow}>
       {canShowGoogle ? (
         <div className={authStyles.socialBlock}>
-          <div className={authStyles.googleRow}>
-            <GoogleLoginButton
-              onSuccess={(c) => void onGoogleCredential(c.credential)}
-              onError={() => comicToast.error("Google sign-in failed")}
-              text="signin_with"
-            />
-          </div>
+          <GoogleSquareButton
+            text="signin_with"
+            onSuccess={(credential) => void onGoogleCredential(credential)}
+            onError={() => comicToast.error("Google sign-in failed")}
+          />
           <div className={authStyles.divider}>or sign in with email</div>
         </div>
       ) : null}
 
-      <LoginEmailPasswordForm onSubmit={onFinish} />
+      <form className={authStyles.flowForm} onSubmit={onFormSubmit} noValidate>
+        <AuthField label="Email">
+          <ComicModalInput
+            type="email"
+            name="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setError(null);
+            }}
+            placeholder="Email"
+            aria-label="Email"
+          />
+        </AuthField>
+        <AuthField label="Password">
+          <ComicModalInput
+            type="password"
+            name="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setError(null);
+            }}
+            placeholder="Password"
+            aria-label="Password"
+          />
+        </AuthField>
+        {error ? <p className={authStyles.fieldError}>{error}</p> : null}
+        {!hideCta ? (
+          <div className={authStyles.submitItem}>
+            <ComicPageCtaAction
+              label={submitting ? "Signing in" : "Sign in"}
+              busy={submitting}
+              disabled={submitting}
+              onClick={validateAndSubmit}
+            />
+          </div>
+        ) : null}
+      </form>
     </div>
   );
-}
+});

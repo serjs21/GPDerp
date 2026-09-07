@@ -1,133 +1,72 @@
-.modal :global(.ant-modal-body) {
-  padding-top: 6px;
+.dialogContent {
+  width: min(100%, 40rem);
+  max-height: min(94vh, 58rem);
+  overflow: hidden;
 }
 
-.modal :global(.ant-modal-content) {
-  border-radius: 14px;
-}
+.body {
+  --auth-hub-method-height: 6.5rem;
+  --auth-hub-content-height: 26rem;
+  --auth-hub-gap: var(--comic-page-gutter, 10px);
 
-.modal :global(.ant-modal-close) {
-  width: 2.25rem;
-  height: 2.25rem;
-  inset-inline-end: 0.75rem;
-  top: 0.75rem;
-  border-radius: 999px;
-  background: transparent !important;
-  border: 1px solid transparent;
-  color: var(--text-color);
-}
-
-.modal :global(.ant-modal-close:hover) {
-  background: color-mix(in srgb, var(--accent-red) 12%, transparent) !important;
-  border-color: color-mix(in srgb, var(--accent-red) 28%, transparent);
-}
-
-.modal :global(.ant-modal-close:focus-visible) {
-  outline: 2px solid color-mix(in srgb, var(--accent-red) 36%, transparent);
-  outline-offset: 2px;
-}
-
-.modal :global(.ant-tabs-nav) {
-  margin-bottom: 24px;
-}
-
-.modal :global(.ant-tabs-nav-list) {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--auth-hub-gap);
   width: 100%;
+  height: calc(
+    var(--auth-hub-method-height) + var(--auth-hub-content-height) + var(--auth-hub-gap)
+  );
+  min-height: calc(
+    var(--auth-hub-method-height) + var(--auth-hub-content-height) + var(--auth-hub-gap)
+  );
 }
 
-.modal :global(.ant-tabs-tab) {
-  flex: 1 1 50%;
-  justify-content: center;
-  margin: 0 !important;
-  padding-left: 0;
-  padding-right: 0;
+.methodRow {
+  position: relative;
+  z-index: 3;
+  flex: 0 0 auto;
+  min-height: var(--auth-hub-method-height);
+  overflow: visible;
 }
 
-.modal :global(.ant-tabs-content-holder) {
-  max-width: 400px;
-  margin: 0 auto;
-  padding-top: 4px;
+.methodPanel {
+  min-height: var(--auth-hub-method-height);
+}
+
+.methodPanel + .methodPanel {
+  margin-left: calc(-1 * var(--comic-page-border, 4px));
+}
+
+.contentSlot {
+  box-sizing: border-box;
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
-}
-
-.modal :global(.ant-tabs-tabpane) {
+  width: 100%;
   min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
-.modal :global(.ant-tabs-content) {
-  flex: 1;
-}
-
-.modal :global(.ant-tabs-tabpane-active) {
+.tabPane {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
-  animation: none;
-}
-
-/* Keep default Ant Tabs overflow/display behavior; overrides here can reveal hidden panes. */
-
-.subtitle {
-  margin-bottom: 14px;
+  min-height: 0;
+  height: 100%;
 }
 
 .linkRow {
-  margin-top: 14px;
-  margin-bottom: 0;
+  margin: 0.85rem 0 0;
   text-align: center;
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 1rem;
 }
 
-.tabContent {
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-}
-
-.tabFlow {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-@media (max-width: 640px) {
-  .modal :global(.ant-modal) {
-    margin: 12px;
-    max-width: calc(100vw - 24px);
-  }
-
-  .modal :global(.ant-modal-content) {
-    border-radius: 12px;
-  }
-
-  .modal :global(.ant-modal-close) {
-    inset-inline-end: 0.6rem;
-    top: 0.6rem;
-  }
-
-  .modal :global(.ant-modal-body) {
-    padding-top: 4px;
-  }
-
-  .modal :global(.ant-tabs-content-holder) {
-    max-width: none;
-    padding-top: 8px;
-  }
-
-  .modal :global(.ant-tabs-tabpane) {
-    min-height: 0;
-  }
-
-  .subtitle {
-    margin-bottom: 12px;
-  }
-
-  .linkRow {
-    margin-top: 12px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .modal :global(.ant-tabs-tabpane-active) {
-    animation: none;
-  }
+.linkRow a {
+  color: var(--sumi-ink, #2d2d2d);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
 }

@@ -1,120 +1,161 @@
 "use client";
 
-import { Form, GoogleLoginButton, Input } from "@/components/StyledComponents";
-import { comicToast } from "@/components/ComicToast";
-import { UIButton } from "@/components/ui";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useState,
+  type FormEvent,
+} from "react";
 import authStyles from "@/app/auth.shared.module.css";
-import { useRegistration, type RegisterFormValues } from "@/hooks/useRegistration";
-import { useState } from "react";
 import { useGoogleOAuthAvailability } from "@/app/providers/GoogleOAuthAvailabilityProvider";
+import { AuthField, GoogleSquareButton } from "@/components/AuthFlows/AuthFlowChrome";
+import { ComicModalInput } from "@/components/ComicModalInput";
+import { ComicPageCtaAction } from "@/components/ComicPageLayout";
+import { comicToast } from "@/components/ComicToast";
+import { useRegistration, type RegisterFormValues } from "@/hooks/useRegistration";
+import type { AuthFlowHandle } from "./LoginFlow";
 
 type RegisterFlowProps = {
   onSuccess: () => void;
   showGoogle?: boolean;
+  /** Hide in-flow CTA (parent provides ComicPageDialog ctaFooter). */
+  hideCta?: boolean;
+  onSubmittingChange?: (submitting: boolean) => void;
 };
 
-export function RegisterFlow({ onSuccess, showGoogle = false }: RegisterFlowProps) {
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+export const RegisterFlow = forwardRef<AuthFlowHandle, RegisterFlowProps>(function RegisterFlow(
+  { onSuccess, showGoogle = false, hideCta = false, onSubmittingChange },
+  ref,
+) {
   const googleOAuthEnabled = useGoogleOAuthAvailability();
-  const [form] = Form.useForm<RegisterFormValues>();
-  const [hasSubmitted, setHasSubmitted] = useState(false);
   const canShowGoogle = showGoogle && googleOAuthEnabled;
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const { submitting, registerWithPassword, signUpWithGoogle } = useRegistration({
     onSuccess,
     afterAccountCreated: () => {
-      form.resetFields();
+      setEmail("");
+      setPassword("");
+      setConfirm("");
     },
   });
+
+  useEffect(() => {
+    onSubmittingChange?.(submitting);
+  }, [onSubmittingChange, submitting]);
+
+  const validateAndSubmit = () => {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !isValidEmail(trimmedEmail)) {
+      setError("Enter a valid email");
+      return;
+    }
+    if (!password) {
+      setError("Password is required");
+      return;
+    }
+    if (password.length < 8) {
+      setError("At least 8 characters");
+      return;
+    }
+    if (confirm !== password) {
+      setError("Passwords do not match");
+      return;
+    }
+    setError(null);
+    const values: RegisterFormValues = {
+      email: trimmedEmail,
+      password,
+      confirm,
+    };
+    void registerWithPassword(values);
+  };
+
+  useImperativeHandle(ref, () => ({
+    submit: validateAndSubmit,
+  }));
+
+  const onFormSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    validateAndSubmit();
+  };
 
   return (
     <div className={authStyles.flow}>
       {canShowGoogle ? (
         <div className={authStyles.socialBlock}>
-          <div className={authStyles.googleRow}>
-            <GoogleLoginButton
-              onSuccess={(c) => void signUpWithGoogle(c.credential)}
-              text="signup_with"
-              onError={() => comicToast.error("Google sign-up failed")}
-            />
-          </div>
+          <GoogleSquareButton
+            text="signup_with"
+            onSuccess={(credential) => void signUpWithGoogle(credential)}
+            onError={() => comicToast.error("Google sign-up failed")}
+          />
           <div className={authStyles.divider}>or register with email</div>
         </div>
       ) : null}
 
-      <Form
-        className={authStyles.flowForm}
-        form={form}
-        onFinish={(v) => {
-          setHasSubmitted(true);
-          void registerWithPassword(v);
-        }}
-        onFinishFailed={() => {
-          setHasSubmitted(true);
-        }}
-        onValuesChange={(changedValues) => {
-          if (!hasSubmitted) return;
-          const changedFieldNames = Object.keys(changedValues) as Array<keyof RegisterFormValues>;
-          form.setFields(
-            changedFieldNames.map((fieldName) => ({
-              name: fieldName,
-              errors: [],
-            })),
-          );
-          setHasSubmitted(false);
-        }}
-        layout="vertical"
-        requiredMark={false}
-        validateTrigger={false}
-        onKeyDown={(event) => {
-          if (event.key !== "Enter" || event.shiftKey) return;
-          event.preventDefault();
-          void form.submit();
-        }}
-      >
-        <Form.Item
-          className={authStyles.formItem}
-          name="email"
-          label="Email"
-          rules={[{ required: true, type: "email", message: "Enter a valid email" }]}
-        >
-          <Input autoComplete="email" type="email" />
-        </Form.Item>
-        <Form.Item
-          className={authStyles.formItem}
-          name="password"
-          label="Password"
-          rules={[
-            { required: true, message: "Required" },
-            { min: 8, message: "At least 8 characters" },
-          ]}
-        >
-          <Input.Password autoComplete="new-password" />
-        </Form.Item>
-        <Form.Item
-          className={authStyles.formItem}
-          name="confirm"
-          label="Confirm password"
-          dependencies={["password"]}
-          rules={[
-            { required: true, message: "Confirm your password" },
-            ({ getFieldValue }) => ({
-              validator(_, value) {
-                if (!value || getFieldValue("password") === value) {
-                  return Promise.resolve();
-                }
-                return Promise.reject(new Error("Passwords do not match"));
-              },
-            }),
-          ]}
-        >
-          <Input.Password autoComplete="new-password" />
-        </Form.Item>
-        <Form.Item className={authStyles.submitItem}>
-          <UIButton type="submit" variant="primary" loading={submitting} className={authStyles.primaryCta}>
-            {submitting ? "Creating account…" : "Create account"}
-          </UIButton>
-        </Form.Item>
-      </Form>
+      <form className={authStyles.flowForm} onSubmit={onFormSubmit} noValidate>
+        <AuthField label="Email">
+          <ComicModalInput
+            type="email"
+            name="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setError(null);
+            }}
+            placeholder="Email"
+            aria-label="Email"
+          />
+        </AuthField>
+        <AuthField label="Password">
+          <ComicModalInput
+            type="password"
+            name="password"
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setError(null);
+            }}
+            placeholder="Password"
+            aria-label="Password"
+          />
+        </AuthField>
+        <AuthField label="Confirm password">
+          <ComicModalInput
+            type="password"
+            name="confirm"
+            autoComplete="new-password"
+            value={confirm}
+            onChange={(e) => {
+              setConfirm(e.target.value);
+              setError(null);
+            }}
+            placeholder="Confirm password"
+            aria-label="Confirm password"
+          />
+        </AuthField>
+        {error ? <p className={authStyles.fieldError}>{error}</p> : null}
+        {!hideCta ? (
+          <div className={authStyles.submitItem}>
+            <ComicPageCtaAction
+              label={submitting ? "Creating account" : "Create account"}
+              busy={submitting}
+              disabled={submitting}
+              onClick={validateAndSubmit}
+            />
+          </div>
+        ) : null}
+      </form>
     </div>
   );
-}
+});
