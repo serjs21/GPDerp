@@ -1,20 +1,17 @@
 "use client";
 
-import { WarningOutlined } from "@ant-design/icons";
-import { useState, type CSSProperties } from "react";
+import { useCallback, useState } from "react";
 import type { LabelDto } from "@/api/labels";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { ComicLabelCreationModal } from "@/components/ComicLabelCreationModal";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
-import {
-  ComicPagePanel,
-  ComicPageRow,
-} from "@/components/ComicPageLayout";
+import { ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
 import { COMIC_PANEL_COLORS } from "@/components/ComicPageLayout/comicPagePresets";
 import { comicToast } from "@/components/ComicToast";
+import { DeleteConfirmModal } from "@/components/DeleteConfirmModal";
+import { SVGPanelActionButton } from "@/components/SVGPanelActionButton";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
-import { useConfirm } from "@/hooks/useConfirm";
 import styles from "./ManageLabel.module.css";
 
 export type ManageLabelProps = {
@@ -28,40 +25,29 @@ const DELETE_HOVER = "var(--accent-red, #aa1f3f)";
 
 export function ManageLabel({ accountId, label, onChanged }: ManageLabelProps) {
   const [editOpen, setEditOpen] = useState(false);
-  const { openConfirm } = useConfirm();
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const { deleteLabel } = useAccountLabels({ accountId, autofetch: false });
   const shape = resolveComicLabelShapePreset(label.shape);
 
-  const openDeleteConfirm = () => {
-    openConfirm({
-      title: "Delete this label?",
-      content: "This action cannot be undone.",
-      okText: "Delete",
-      danger: true,
-      cancelText: "Cancel",
-      icon: <WarningOutlined style={{ color: "var(--accent-red)" }} />,
-      onOk: async () => {
-        await deleteLabel({
-          labelId: label.id,
-          onSuccess: async () => {
-            comicToast.success("Label deleted");
-            onChanged?.();
-          },
-          onError: async () => {
-            comicToast.error("Could not delete label");
-          },
-        });
-      },
-    });
-  };
-
-  const editHoverStyle = {
-    "--manage-label-hover-fill": EDIT_HOVER,
-  } as CSSProperties;
-
-  const deleteHoverStyle = {
-    "--manage-label-hover-fill": DELETE_HOVER,
-  } as CSSProperties;
+  const handleDeleteConfirm = useCallback(async () => {
+    setDeleting(true);
+    try {
+      await deleteLabel({
+        labelId: label.id,
+        onSuccess: async () => {
+          comicToast.success("Label deleted");
+          onChanged?.();
+          setDeleteOpen(false);
+        },
+        onError: async () => {
+          comicToast.error("Could not delete label");
+        },
+      });
+    } finally {
+      setDeleting(false);
+    }
+  }, [deleteLabel, label.id, onChanged]);
 
   return (
     <article className={styles.root}>
@@ -87,51 +73,24 @@ export function ManageLabel({ accountId, label, onChanged }: ManageLabelProps) {
           </div>
         </ComicPagePanel>
 
-        <ComicPagePanel
-          selectable
-          selected
-          background="solid"
-          color="white"
-          flexWeight={1}
-          className={[styles.actionPanel, styles.editPanel].join(" ")}
-          style={editHoverStyle}
+        <SVGPanelActionButton
+          src="/panel_actions/edit.svg"
+          label="Edit"
           ariaLabel={`Edit ${label.name}`}
+          hoverFill={EDIT_HOVER}
           onSelect={() => setEditOpen(true)}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG asset */}
-          <img
-            className={styles.actionIcon}
-            src="/panel_actions/edit.svg"
-            alt=""
-            draggable={false}
-          />
-          <span className={styles.actionFooter} aria-hidden>
-            Edit
-          </span>
-        </ComicPagePanel>
+          className={styles.actionSlot}
+        />
 
-        <ComicPagePanel
-          selectable
-          selected
-          background="solid"
-          color="white"
-          flexWeight={1}
-          className={[styles.actionPanel, styles.deletePanel].join(" ")}
-          style={deleteHoverStyle}
+        <SVGPanelActionButton
+          src="/panel_actions/delete.svg"
+          label="Delete"
           ariaLabel={`Delete ${label.name}`}
-          onSelect={openDeleteConfirm}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG asset */}
-          <img
-            className={styles.actionIcon}
-            src="/panel_actions/delete.svg"
-            alt=""
-            draggable={false}
-          />
-          <span className={styles.actionFooter} aria-hidden>
-            Delete
-          </span>
-        </ComicPagePanel>
+          hoverFill={DELETE_HOVER}
+          invertIconOnHover
+          onSelect={() => setDeleteOpen(true)}
+          className={styles.actionSlot}
+        />
       </ComicPageRow>
 
       <ComicLabelCreationModal
@@ -142,6 +101,16 @@ export function ManageLabel({ accountId, label, onChanged }: ManageLabelProps) {
         onUpdated={async () => {
           onChanged?.();
         }}
+      />
+
+      <DeleteConfirmModal
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        onConfirm={handleDeleteConfirm}
+        confirming={deleting}
+        question="Delete this label?"
+        cancelLabel="Not yet"
+        confirmLabel="Delete"
       />
     </article>
   );
