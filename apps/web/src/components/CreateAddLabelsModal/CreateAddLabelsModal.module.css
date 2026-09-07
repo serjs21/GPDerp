@@ -6,7 +6,7 @@
 
 .body {
   --label-hub-method-height: 6.5rem;
-  --label-hub-content-height: 26rem;
+  --label-hub-content-height: 34rem;
   --label-hub-gap: var(--comic-page-gutter, 10px);
 
   box-sizing: border-box;
