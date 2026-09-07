@@ -73,6 +73,7 @@
 }
 
 .socialBlock {
+  padding-top: 1rem;
   display: grid;
   gap: 0.75rem;
   margin-top: 0.35rem;
