@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import {
   COMIC_PAGE_BLANK_TEMPLATE_ROWS,
+  ComicPageCtaAction,
+  ComicPageDialog,
   ComicPageLayout,
   ComicPagePanel,
   ComicPageRow,
@@ -243,4 +245,46 @@ function LoadingTransitionDemo() {
 
 export const LoadingTransition: Story = {
   render: () => <LoadingTransitionDemo />,
+};
+
+function CtaFooterDemo() {
+  const [open, setOpen] = useState(true);
+  const [lastAction, setLastAction] = useState("—");
+
+  return (
+    <div style={{ padding: "2rem", background: "#222", minHeight: "100vh" }}>
+      <button type="button" onClick={() => setOpen(true)}>
+        Open dialog
+      </button>
+      <p style={{ color: "#eee" }}>Last action: {lastAction}</p>
+      <ComicPageDialog
+        open={open}
+        showClose
+        title="CTA footer demo"
+        onOpenChange={setOpen}
+        ctaFooter={
+          <>
+            <ComicPageCtaAction label="Cancel" onClick={() => setLastAction("Cancel")} />
+            <ComicPageCtaAction label="Save" fill="#2f6fed" onClick={() => setLastAction("Save")} />
+          </>
+        }
+      >
+        {Array.from({ length: 12 }, (_, index) => (
+          <ComicPageRow key={index}>
+            <ComicPagePanel
+              span="full"
+              background={index % 2 === 0 ? "halftone" : "solid"}
+              color={index % 2 === 0 ? "teal" : "white"}
+            >
+              Scroll panel {index + 1} — footer stays sticky at the bottom center.
+            </ComicPagePanel>
+          </ComicPageRow>
+        ))}
+      </ComicPageDialog>
+    </div>
+  );
+}
+
+export const DialogCtaFooter: Story = {
+  render: () => <CtaFooterDemo />,
 };

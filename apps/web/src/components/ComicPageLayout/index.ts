@@ -3,6 +3,10 @@ export { ComicPageRow, type ComicPageRowProps } from "./ComicPageRow";
 export { ComicPagePanel, type ComicPagePanelProps } from "./ComicPagePanel";
 export { ComicPageDialog, type ComicPageDialogProps } from "./ComicPageDialog";
 export {
+  ComicPageCtaAction,
+  type ComicPageCtaActionProps,
+} from "./ComicPageCtaAction";
+export {
   COMIC_PAGE_BLANK_TEMPLATE_ROWS,
   COMIC_PANEL_COLORS,
   type ComicPanelBackground,

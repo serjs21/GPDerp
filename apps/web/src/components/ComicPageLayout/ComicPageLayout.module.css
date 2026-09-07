@@ -204,3 +204,25 @@
   display: grid;
   grid-template-columns: var(--comic-row-left, 1fr) var(--comic-row-right, 1fr);
 }
+
+.ctaFooter {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: auto;
+  padding: 0.35rem 0 0.15rem;
+  background: #fff;
+}
+
+.ctaFooterInner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+}

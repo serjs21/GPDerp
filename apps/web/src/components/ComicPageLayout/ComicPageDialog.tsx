@@ -10,6 +10,8 @@ export type ComicPageDialogProps = {
   onOpenChange: (open: boolean) => void;
   title?: ReactNode;
   children: ReactNode;
+  /** Sticky bottom-center action row (prefer `ComicPageCtaAction` children). */
+  ctaFooter?: ReactNode;
   /** Close when clicking outside the page content. Default true. */
   closeOnOverlayClick?: boolean;
   /** Close when pressing Escape. Default true. */
@@ -25,6 +27,7 @@ export function ComicPageDialog({
   onOpenChange,
   title,
   children,
+  ctaFooter,
   closeOnOverlayClick = true,
   closeOnEscape = true,
   showClose = false,
@@ -57,6 +60,11 @@ export function ComicPageDialog({
               )}
               <ComicPageLayout title={title} showClose={showClose} className={className}>
                 {children}
+                {ctaFooter ? (
+                  <div className={styles.ctaFooter}>
+                    <div className={styles.ctaFooterInner}>{ctaFooter}</div>
+                  </div>
+                ) : null}
               </ComicPageLayout>
             </div>
           </Dialog.Popup>

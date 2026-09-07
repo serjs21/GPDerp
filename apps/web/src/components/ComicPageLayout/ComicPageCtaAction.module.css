@@ -1,0 +1,27 @@
+.action {
+  display: block;
+  margin: 0;
+  padding: 0.15rem 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+}
+
+.action:disabled {
+  cursor: not-allowed;
+}
+
+.action[aria-busy="true"] {
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.burst {
+  display: block;
+}
+
+.burst svg {
+  width: auto;
+  height: 3.35rem;
+}
