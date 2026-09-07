@@ -105,6 +105,9 @@ export function ManageLabel({ accountId, label, onChanged }: ManageLabelProps) {
             alt=""
             draggable={false}
           />
+          <span className={styles.actionFooter} aria-hidden>
+            Edit
+          </span>
         </ComicPagePanel>
 
         <ComicPagePanel
@@ -125,6 +128,9 @@ export function ManageLabel({ accountId, label, onChanged }: ManageLabelProps) {
             alt=""
             draggable={false}
           />
+          <span className={styles.actionFooter} aria-hidden>
+            Delete
+          </span>
         </ComicPagePanel>
       </ComicPageRow>
 
