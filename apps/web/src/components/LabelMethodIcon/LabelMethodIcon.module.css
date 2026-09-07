@@ -38,9 +38,9 @@
 
 .frameThought {
   position: relative;
-  width: 3.7rem;
-  height: 3.35rem;
-  padding: 0;
+  width: 4rem;
+  height: 3.6rem;
+  padding: 0.65rem;
   border: none;
   background: transparent;
   box-shadow: none;
@@ -58,7 +58,7 @@
 .frameThought .icon {
   position: relative;
   z-index: 1;
-  height: 1.85rem;
+  height: 1.35rem;
 }
 
 .frameDiamond {

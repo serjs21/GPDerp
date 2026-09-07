@@ -28,12 +28,12 @@
 
 .topRow {
   flex: 0 0 auto;
-  min-height: 9.5rem;
+  min-height: 7.5rem;
 }
 
 .previewPanel {
   min-width: var(--comic-label-preview-min);
-  min-height: 9.5rem;
+  min-height: 7.5rem;
 }
 
 .previewStage {
@@ -42,7 +42,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 8.25rem;
+  min-height: 6.25rem;
   padding: 0.5rem;
 }
 
@@ -103,12 +103,12 @@
   display: flex;
   flex: 1 1 0;
   min-width: 0;
-  min-height: 9.5rem;
+  min-height: 7.5rem;
 }
 
 .colorPanel {
   width: 100%;
-  min-height: 9.5rem;
+  min-height: 7.5rem;
   cursor: pointer;
 }
 
@@ -122,7 +122,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 7.25rem;
+  min-height: 5.25rem;
   margin: 0;
   padding: 0;
   border: none;
