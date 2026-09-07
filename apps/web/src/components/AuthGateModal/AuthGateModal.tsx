@@ -120,6 +120,7 @@ export function AuthGateModal({
               bubbleStyle="pointedArcs"
               sourceDirection="none"
               active={mode === "register"}
+              className={styles.registerMethodIcon}
             />
           </ComicPagePanel>
         </ComicPageRow>

@@ -22,6 +22,7 @@ export type LabelMethodIconProps = {
   sourceDirection?: string;
   /** Dims the frame when the parent tab is inactive. */
   active?: boolean;
+  className?: string;
 };
 
 const THOUGHT_LAYOUT = buildComicBurstPath({
@@ -69,6 +70,7 @@ export function LabelMethodIcon({
   src,
   bubbleStyle = "rectangle",
   active = true,
+  className,
 }: LabelMethodIconProps) {
   const styleKey = String(bubbleStyle ?? "rectangle");
   const frameKey = frameClassKeyForStyle(styleKey);
@@ -83,7 +85,13 @@ export function LabelMethodIcon({
 
   return (
     <div
-      className={[styles.stage, active ? styles.active : styles.inactive].filter(Boolean).join(" ")}
+      className={[
+        styles.stage,
+        active ? styles.active : styles.inactive,
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
     >
       <div className={[styles.frame, frameClass].join(" ")}>
         {burstOutline ? (

@@ -3,10 +3,10 @@
    * Face anchors are % of the lantern box (mask contain + centered).
    * Large front panel sits roughly center-right on lantern_base_rotated.png.
    */
-  --auth-lantern-tilt: 14deg;
-  --auth-lantern-skew: 12deg;
-  --auth-lantern-label-x: 67%;
-  --auth-lantern-label-y: 38%;
+   --auth-lantern-tilt: 17deg;
+   --auth-lantern-skew: 25deg;
+   --auth-lantern-label-x: 68%;
+   --auth-lantern-label-y: 39%;
   --auth-lantern-size: var(--auth-lantern-size-override, 14.5rem);
 
   position: relative;

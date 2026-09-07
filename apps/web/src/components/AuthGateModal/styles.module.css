@@ -38,6 +38,15 @@
   margin-left: calc(-1 * var(--comic-page-border, 4px));
 }
 
+.registerMethodIcon > div {
+  width: 4rem;
+  height: 3.5rem;
+}
+
+.registerMethodIcon img {
+  height: 1.5rem;
+}
+
 .contentSlot {
   box-sizing: border-box;
   display: flex;
