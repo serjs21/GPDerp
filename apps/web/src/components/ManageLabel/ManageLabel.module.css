@@ -66,11 +66,20 @@
   position: relative;
   z-index: 2;
   display: block;
+  box-sizing: content-box;
   width: auto;
   height: 3.5rem;
+  padding-right: 0;
   object-fit: contain;
   pointer-events: none;
-  transition: filter 0.2s ease;
+  transition:
+    filter 0.2s ease,
+    padding-right 0.4s ease;
+}
+
+.actionPanel:hover .actionIcon,
+.actionPanel:focus-visible .actionIcon {
+  padding-right: 4rem;
 }
 
 .actionFooter {
@@ -109,6 +118,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .actionIcon {
+    transition: filter 0.2s ease;
+  }
+
   .actionFooter {
     transition: none;
   }
