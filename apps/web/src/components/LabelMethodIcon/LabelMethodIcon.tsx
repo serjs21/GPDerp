@@ -33,9 +33,21 @@ const THOUGHT_LAYOUT = buildComicBurstPath({
   seedKey: "label-method-thought",
 });
 
-function frameClassKeyForStyle(bubbleStyle: string): "diamond" | "round" | "rect" | "thought" {
+const POINTED_ARCS_LAYOUT = buildComicBurstPath({
+  width: 100,
+  height: 88,
+  kind: "burst",
+  spikeCount: 12,
+  randomness: 0.18,
+  seedKey: "label-method-pointed-arcs",
+});
+
+type FrameKey = "diamond" | "round" | "rect" | "thought" | "pointedArcs";
+
+function frameClassKeyForStyle(bubbleStyle: string): FrameKey {
   if (bubbleStyle === "diamond") return "diamond";
   if (bubbleStyle === "thought") return "thought";
+  if (bubbleStyle === "pointedArcs") return "pointedArcs";
   if (bubbleStyle === "circle") return "round";
   return "rect";
 }
@@ -44,6 +56,7 @@ function frameClassForStyle(bubbleStyle: string): string {
   const key = frameClassKeyForStyle(bubbleStyle);
   if (key === "diamond") return styles.frameDiamond;
   if (key === "thought") return styles.frameThought;
+  if (key === "pointedArcs") return styles.framePointedArcs;
   if (key === "round") return styles.frameRound;
   return styles.frameRect;
 }
@@ -60,36 +73,14 @@ export function LabelMethodIcon({
   const styleKey = String(bubbleStyle ?? "rectangle");
   const frameKey = frameClassKeyForStyle(styleKey);
   const frameClass = frameClassForStyle(styleKey);
-  // #region agent log
-  fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Debug-Session-Id": "320659",
-    },
-    body: JSON.stringify({
-      sessionId: "320659",
-      runId: "post-fix",
-      hypothesisId: "A",
-      location: "LabelMethodIcon.tsx:render",
-      message: "bubble style resolve",
-      data: {
-        bubbleStyle: styleKey,
-        frameKey,
-        thoughtMapsToRound: styleKey === "thought" && frameClass === styles.frameRound,
-        thoughtMapsToThought: styleKey === "thought" && frameClass === styles.frameThought,
-        circleMapsToRound: styleKey === "circle" && frameClass === styles.frameRound,
-        frameClassDefined: Boolean(frameClass),
-        hasDistinctThoughtClass: Boolean(
-          (styles as Record<string, string | undefined>).frameThought,
-        ),
-        src,
-        active,
-      },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
+
+  const burstOutline =
+    frameKey === "thought"
+      ? THOUGHT_LAYOUT
+      : frameKey === "pointedArcs"
+        ? POINTED_ARCS_LAYOUT
+        : null;
+
   return (
     <div
       className={[styles.stage, active ? styles.active : styles.inactive].filter(Boolean).join(" ")}
@@ -97,15 +88,15 @@ export function LabelMethodIcon({
       data-frame-key={frameKey}
     >
       <div className={[styles.frame, frameClass].join(" ")}>
-        {frameKey === "thought" ? (
+        {burstOutline ? (
           <svg
-            className={styles.thoughtOutline}
-            viewBox={`0 0 ${THOUGHT_LAYOUT.width} ${THOUGHT_LAYOUT.height}`}
+            className={styles.burstOutline}
+            viewBox={`0 0 ${burstOutline.width} ${burstOutline.height}`}
             aria-hidden
           >
-            <path d={THOUGHT_LAYOUT.d} fill="#111111" transform="translate(4 4)" />
+            <path d={burstOutline.d} fill="#111111" transform="translate(4 4)" />
             <path
-              d={THOUGHT_LAYOUT.d}
+              d={burstOutline.d}
               fill="#ffffff"
               stroke="#111111"
               strokeWidth="3.25"

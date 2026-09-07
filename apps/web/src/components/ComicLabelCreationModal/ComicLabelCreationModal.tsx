@@ -191,7 +191,7 @@ export function ComicLabelCreationModal({
           className={styles.previewPanel}
           title="Name"
           footer={
-            trimmedName.length > 0 && trimmedName.length < COMIC_LABEL_NAME_MIN
+            trimmedName.length >= 0 && trimmedName.length < COMIC_LABEL_NAME_MIN
               ? `Min ${COMIC_LABEL_NAME_MIN} chars`
               : undefined
           }
@@ -218,9 +218,6 @@ export function ComicLabelCreationModal({
                 onChange={(e) => setName(e.target.value.slice(0, COMIC_LABEL_NAME_MAX))}
               />
             </div>
-            {trimmedName.length === 0 ? (
-              <p className={styles.previewHint}>Type a name (3–15)</p>
-            ) : null}
           </div>
         </ComicPagePanel>
 

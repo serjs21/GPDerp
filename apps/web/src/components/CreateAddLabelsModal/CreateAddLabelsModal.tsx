@@ -107,7 +107,7 @@ export function CreateAddLabelsModal({
             selected={tab === "create"}
             onSelect={() => setTab("create")}
             background="sunburst"
-            color="teal"
+            color="purple"
             title="Create"
             isMotionBackground={false}
             shine={false}
@@ -118,7 +118,7 @@ export function CreateAddLabelsModal({
             className={styles.methodPanel}
           >
             <LabelMethodIcon
-              src="/label_modal/create.svg"
+              src="/panel_actions/create_new.svg"
               bubbleStyle="pointedArcs"
               sourceDirection="none"
               active={tab === "create"}
@@ -138,7 +138,7 @@ export function CreateAddLabelsModal({
           >
             <LabelMethodIcon
               src="/label_modal/tag.svg"
-              bubbleStyle="rectangle"
+              bubbleStyle="diamond"
               sourceDirection="none"
               active={tab === "add"}
             />
