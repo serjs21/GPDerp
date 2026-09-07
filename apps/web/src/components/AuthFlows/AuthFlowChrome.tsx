@@ -1,18 +1,9 @@
 "use client";
 
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
-import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
-import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import authStyles from "@/app/auth.shared.module.css";
-
-/** Matches Google Identity Services outline hover wash. */
-const GOOGLE_HOVER_WASH = "#e8f0fe";
-const BURST_FILL = "#17131A";
-const BURST_FONT_SIZE = 20;
-const BURST_PADDING_X = 28;
-const BURST_PADDING_Y = 10;
 
 type GoogleSquareButtonProps = {
   text: "signin_with" | "signup_with";
@@ -55,11 +46,9 @@ function GoogleGMark() {
 }
 
 /**
- * Comic burst label that opens Google’s OAuth popup (access token).
- * Call sites still receive the token via `onSuccess` for `/auth/google/*`.
+ * Full-width white comic button that opens Google’s OAuth popup (access token).
  */
 export function GoogleSquareButton({ text, onSuccess, onError }: GoogleSquareButtonProps) {
-  const [hovering, setHovering] = useState(false);
   const label = googleLabel(text);
 
   const startGoogleLogin = useGoogleLogin({
@@ -75,56 +64,28 @@ export function GoogleSquareButton({ text, onSuccess, onError }: GoogleSquareBut
 
   return (
     <div className={authStyles.googleRow}>
-      <ComicPagePanel
-        background="solid"
-        color="white"
-        contentAlign="center"
-        className={[authStyles.googleSquare, hovering ? authStyles.googleSquareHover : ""]
-          .filter(Boolean)
-          .join(" ")}
-        style={
-          hovering
-            ? ({ "--comic-panel-base": GOOGLE_HOVER_WASH } as CSSProperties)
-            : undefined
-        }
+      <button
+        type="button"
+        className={authStyles.googleAction}
+        aria-label={label}
+        onClick={() => {
+          startGoogleLogin();
+        }}
       >
-        <button
-          type="button"
-          className={authStyles.googleAction}
-          aria-label={label}
-          onPointerEnter={() => setHovering(true)}
-          onPointerLeave={() => setHovering(false)}
-          onClick={() => {
-            startGoogleLogin();
-          }}
-        >
-          <GoogleGMark />
-          <ComicBurstLabel
-            className={authStyles.googleBurst}
-            text={formatComicLabelText(label)}
-            fill={BURST_FILL}
-            shapeKind="rect"
-            seed={`google-${text}`}
-            fontSize={BURST_FONT_SIZE}
-            paddingX={BURST_PADDING_X}
-            paddingY={BURST_PADDING_Y}
-            strokeWidth={3}
-          />
-        </button>
-      </ComicPagePanel>
+        <GoogleGMark />
+        <span className={authStyles.googleLabel}>{label}</span>
+      </button>
     </div>
   );
 }
 
 type AuthFieldProps = {
-  label: string;
   children: ReactNode;
 };
 
-export function AuthField({ label, children }: AuthFieldProps) {
+export function AuthField({ children }: AuthFieldProps) {
   return (
     <label className={authStyles.field}>
-      <span className={authStyles.fieldLabel}>{label}</span>
       <ComicPagePanel background="solid" color="white" className={authStyles.fieldPanel}>
         {children}
       </ComicPagePanel>
