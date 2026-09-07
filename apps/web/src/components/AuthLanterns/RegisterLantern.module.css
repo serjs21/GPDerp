@@ -1,9 +1,13 @@
 .root {
-  /* Opposite lean after scaleX(-1) on the base; lettering stays readable. */
-  --auth-lantern-tilt: 38deg;
-  --auth-lantern-skew: 8deg;
-  --auth-lantern-size: 12.5rem;
-
+  /*
+   * Mirrored base flips the large face to center-left; label stays unmirrored.
+   */
+   --auth-lantern-tilt: -13deg;
+   --auth-lantern-skew: -8deg;
+   --auth-lantern-label-x: 32%;
+   --auth-lantern-label-y: 38%;
+   --auth-lantern-size: 12.5rem;
+   
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -65,20 +69,22 @@ div.root {
 }
 
 .label {
-  position: relative;
+  position: absolute;
+  left: var(--auth-lantern-label-x);
+  top: var(--auth-lantern-label-y);
   z-index: 1;
   display: block;
-  max-width: 68%;
+  max-width: 48%;
   color: #f7f4ef;
   font-family: var(--font-comic-label), "Bangers", sans-serif;
-  font-size: clamp(0.75rem, 2.1vw, 1rem);
+  font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1;
   text-align: center;
   text-transform: uppercase;
-  /* After scaleX(-1), large face sits on the left */
-  transform: translate(-10%, -30%) rotate(var(--auth-lantern-tilt)) skewX(var(--auth-lantern-skew));
+  transform: translate(-50%, -50%) rotate(var(--auth-lantern-tilt))
+    skewX(var(--auth-lantern-skew));
   transform-origin: center center;
   pointer-events: none;
   user-select: none;
