@@ -11,7 +11,8 @@ export type ComicPanelColor =
   | "white"
   | "cream"
   | "info"
-  | "green";
+  | "green"
+  | "darkGreen";
 
 export const COMIC_PAGE_GUTTER_PX = 10;
 /** Black frame around the white page; sized to hold the close control. */
@@ -31,6 +32,7 @@ export const COMIC_PANEL_COLORS: Record<ComicPanelColor, { base: string; accent?
   green: { base: "#81c784", accent: "#4caf50" },
   cream: { base: "#faf6ee", accent: "#f0e6d8" },
   info: { base: "#e8f4fc", accent: "#b3d9f0" },
+  "darkGreen": { base: "#4caf50", accent: "#81c784" },
 };
 
 export type ComicPageRowColumns = `${number}fr-${number}fr`;

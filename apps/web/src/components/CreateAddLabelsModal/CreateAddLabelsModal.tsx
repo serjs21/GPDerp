@@ -129,7 +129,7 @@ export function CreateAddLabelsModal({
             selected={tab === "add"}
             onSelect={() => setTab("add")}
             background="halftone"
-            color="orange"
+            color="darkGgireen"
             title="Add"
             overflowVisible
             flexWeight={tab === "add" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
