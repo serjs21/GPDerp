@@ -26,6 +26,7 @@
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
+  gap: 0.75rem;
 }
 
 .emptyLayout {

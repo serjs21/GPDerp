@@ -53,21 +53,13 @@
 
 .labelRow {
   flex: 0 0 auto;
-  gap: 0.5rem;
-}
-
-.labelRow + .labelRow {
-  margin-top: calc(-1 * var(--comic-page-border, 4px));
+  gap: 0.15rem;
 }
 
 .labelPanel {
   min-height: 5.25rem;
   min-width: 0;
   border-radius: 0;
-}
-
-.labelPanel + .labelPanel {
-  margin-left: calc(-1 * var(--comic-page-border, 4px));
 }
 
 .labelPreview {

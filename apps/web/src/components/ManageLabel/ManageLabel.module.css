@@ -5,7 +5,7 @@
 
 .strip {
   flex: 0 0 auto;
-  gap: 0 !important;
+  gap: 0.15rem !important;
   min-height: 4.75rem;
 }
 
@@ -16,11 +16,6 @@
   min-width: 0;
   width: 0;
   border-radius: 0;
-}
-
-.labelPanel + .actionSlot,
-.actionSlot + .actionSlot {
-  margin-left: calc(-1 * var(--comic-page-border, 4px));
 }
 
 .root + .root .strip {
