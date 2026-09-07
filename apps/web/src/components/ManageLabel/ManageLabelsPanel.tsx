@@ -1,10 +1,9 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef, useState, type UIEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type ChangeEvent, type UIEvent } from "react";
 import { labelQueryKeys } from "@/api/labels";
-import { ComicModalInput } from "@/components/ComicModalInput";
-import { ComicPagePanel } from "@/components/ComicPageLayout";
+import { ComicModalInput, ComicModalSearchPanel } from "@/components/ComicModalInput";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
 import { ManageLabel } from "./ManageLabel";
@@ -83,18 +82,16 @@ export function ManageLabelsPanel({
     void fetchNextPage();
   };
 
-  const searchInputEl = (
-    <ComicModalInput
-      ref={searchRef}
-      type="search"
-      value={searchInput}
-      onChange={(e) => setSearchInput(e.target.value)}
-      placeholder="Search labels…"
-      aria-label="Search labels by name"
-      autoComplete="off"
-      spellCheck={false}
-    />
-  );
+  const searchInputProps = {
+    ref: searchRef,
+    type: "search" as const,
+    value: searchInput,
+    onChange: (e: ChangeEvent<HTMLInputElement>) => setSearchInput(e.target.value),
+    placeholder: "Search labels…",
+    "aria-label": "Search labels by name",
+    autoComplete: "off" as const,
+    spellCheck: false,
+  };
 
   const createPanel =
     showCreate && !isPagedLoading ? (
@@ -104,11 +101,11 @@ export function ManageLabelsPanel({
   return (
     <div className={[styles.root, className].filter(Boolean).join(" ")}>
       {searchVariant === "comic" ? (
-        <ComicPagePanel background="solid" color="white" className={styles.searchPanel}>
-          {searchInputEl}
-        </ComicPagePanel>
+        <ComicModalSearchPanel {...searchInputProps} />
       ) : (
-        <div className={styles.searchPlain}>{searchInputEl}</div>
+        <div className={styles.searchPlain}>
+          <ComicModalInput {...searchInputProps} />
+        </div>
       )}
 
       <div className={styles.listScroll} onScroll={onListScroll}>

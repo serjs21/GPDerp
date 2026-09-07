@@ -8,12 +8,6 @@
   min-height: 0;
 }
 
-.searchPanel {
-  flex: 0 0 auto;
-  min-height: 3.25rem;
-  margin: 0.5rem 0 1rem;
-}
-
 .listScroll {
   flex: 1 1 auto;
   box-sizing: border-box;
@@ -26,12 +20,12 @@
 .labelRows {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 0.5rem;
 }
 
 .labelRow {
   flex: 0 0 auto;
-  gap: 0 !important;
+  gap: 0.5rem;
 }
 
 .labelRow + .labelRow {

@@ -8,13 +8,6 @@
   min-height: 0;
 }
 
-.searchPanel {
-  flex: 0 0 auto;
-  min-height: 3.25rem;
-  margin: 0.5rem 0 1rem;
-
-}
-
 .searchPlain {
   flex: 0 0 auto;
   box-sizing: border-box;

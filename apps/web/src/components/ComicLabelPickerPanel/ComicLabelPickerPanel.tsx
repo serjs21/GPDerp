@@ -11,7 +11,7 @@ import {
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
-import { ComicModalInput } from "@/components/ComicModalInput";
+import { ComicModalSearchPanel } from "@/components/ComicModalInput";
 import {
   ComicPagePanel,
   ComicPageRow,
@@ -213,18 +213,15 @@ export function ComicLabelPickerPanel({
 
   return (
     <div className={[styles.root, className].filter(Boolean).join(" ")}>
-      <ComicPagePanel background="solid" color="white" className={styles.searchPanel}>
-        <ComicModalInput
-          ref={searchRef}
-          type="search"
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          placeholder="Filter labels…"
-          aria-label="Filter labels"
-          autoComplete="off"
-          spellCheck={false}
-        />
-      </ComicPagePanel>
+      <ComicModalSearchPanel
+        ref={searchRef}
+        value={searchInput}
+        onChange={(e) => setSearchInput(e.target.value)}
+        placeholder="Filter labels…"
+        aria-label="Filter labels"
+        autoComplete="off"
+        spellCheck={false}
+      />
 
       <div className={styles.listScroll} onScroll={onListScroll}>
         {isPagedLoading ? (
