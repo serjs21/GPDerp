@@ -8,10 +8,6 @@
   min-height: 0;
 }
 
-.createRow {
-  flex: 0 0 auto;
-}
-
 .searchPanel {
   flex: 0 0 auto;
   min-height: 3.5rem;

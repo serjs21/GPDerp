@@ -4,10 +4,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState, type UIEvent } from "react";
 import { labelQueryKeys } from "@/api/labels";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
-import { LabelCreateAction } from "@/components/LabelCreateAction/LabelCreateAction";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
 import { ManageLabel } from "./ManageLabel";
+import { ManageLabelCreatePanel } from "./ManageLabelCreatePanel";
 import styles from "./ManageLabelsPanel.module.css";
 
 const SEARCH_DEBOUNCE_MS = 200;
@@ -96,14 +96,13 @@ export function ManageLabelsPanel({
     />
   );
 
+  const createPanel =
+    showCreate && !isPagedLoading ? (
+      <ManageLabelCreatePanel accountId={accountId} onCreated={() => refresh()} />
+    ) : null;
+
   return (
     <div className={[styles.root, className].filter(Boolean).join(" ")}>
-      {showCreate ? (
-        <div className={styles.createRow}>
-          <LabelCreateAction accountId={accountId} onCreated={() => refresh()} />
-        </div>
-      ) : null}
-
       {searchVariant === "comic" ? (
         <ComicPagePanel background="solid" color="white" className={styles.searchPanel}>
           {searchInputEl}
@@ -117,23 +116,28 @@ export function ManageLabelsPanel({
           <div className={styles.loaderRow}>
             <SakuraPetalLoader />
           </div>
-        ) : pagedLabels.length === 0 ? (
-          <p className={styles.empty}>{debouncedQ ? "No labels found" : "No labels yet."}</p>
         ) : (
-          pagedLabels.map((label) => (
-            <ManageLabel
-              key={label.id}
-              accountId={label.accountId}
-              label={label}
-              onChanged={refresh}
-            />
-          ))
+          <>
+            {pagedLabels.length === 0 ? (
+              <p className={styles.empty}>{debouncedQ ? "No labels found" : "No labels yet."}</p>
+            ) : (
+              pagedLabels.map((label) => (
+                <ManageLabel
+                  key={label.id}
+                  accountId={label.accountId}
+                  label={label}
+                  onChanged={refresh}
+                />
+              ))
+            )}
+            {isFetchingNextPage ? (
+              <div className={styles.loaderRow}>
+                <SakuraPetalLoader />
+              </div>
+            ) : null}
+            {createPanel}
+          </>
         )}
-        {isFetchingNextPage ? (
-          <div className={styles.loaderRow}>
-            <SakuraPetalLoader />
-          </div>
-        ) : null}
       </div>
     </div>
   );

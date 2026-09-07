@@ -11,8 +11,10 @@
 
 .labelPanel,
 .actionPanel {
+  flex: 1 1 0 !important;
   min-height: 4.75rem;
   min-width: 0;
+  width: 0;
   border-radius: 0;
 }
 
@@ -41,14 +43,14 @@
 }
 
 /*
- * Hover wash over the solid panel fill. Opacity transitions reliably
- * (CSS variables on background do not interpolate without @property).
+ * Hover wash above ComicPagePanel's solid bgLayer, below the icon.
+ * (A z-index:0 wash sat under bgSolid and never showed.)
  */
 .actionPanel::before {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: 1;
   background: var(--manage-label-hover-fill, transparent);
   opacity: 0;
   transition: opacity 0.2s ease;
@@ -62,7 +64,7 @@
 
 .actionIcon {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: block;
   width: auto;
   height: 1.85rem;

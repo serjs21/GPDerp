@@ -70,7 +70,7 @@ export function ManageLabel({ accountId, label, onChanged }: ManageLabelProps) {
           background="solid"
           color="white"
           overflowVisible
-          flexWeight={2.5}
+          flexWeight={1}
           className={styles.labelPanel}
           ariaLabel={label.name}
         >
@@ -92,7 +92,7 @@ export function ManageLabel({ accountId, label, onChanged }: ManageLabelProps) {
           selected
           background="solid"
           color="white"
-          flexWeight={0.7}
+          flexWeight={1}
           className={[styles.actionPanel, styles.editPanel].join(" ")}
           style={editHoverStyle}
           ariaLabel={`Edit ${label.name}`}
@@ -112,7 +112,7 @@ export function ManageLabel({ accountId, label, onChanged }: ManageLabelProps) {
           selected
           background="solid"
           color="white"
-          flexWeight={0.7}
+          flexWeight={1}
           className={[styles.actionPanel, styles.deletePanel].join(" ")}
           style={deleteHoverStyle}
           ariaLabel={`Delete ${label.name}`}

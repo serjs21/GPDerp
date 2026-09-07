@@ -1,0 +1,73 @@
+.root {
+  position: relative;
+  width: 100%;
+  /* Overlap comic borders with the preceding list row */
+  margin-top: calc(-1 * var(--comic-page-border, 4px));
+}
+
+.root:first-child {
+  margin-top: 0;
+}
+
+.strip {
+  flex: 0 0 auto;
+  gap: 0 !important;
+  min-height: 4.75rem;
+}
+
+.createPanel {
+  flex: 1 1 0 !important;
+  min-height: 4.75rem;
+  min-width: 0;
+  border-radius: 0;
+  filter: none !important;
+  transform: none !important;
+}
+
+.createPanel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--manage-create-hover-fill, transparent);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.createPanel:hover::before,
+.createPanel:focus-visible::before {
+  opacity: 1;
+}
+
+.createContent {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.4rem 0.75rem;
+  line-height: 0;
+}
+
+.createIcon {
+  display: block;
+  height: 1.65rem;
+  width: auto;
+  object-fit: contain;
+  pointer-events: none;
+  flex: 0 0 auto;
+}
+
+.createBurst {
+  display: block;
+  max-width: min(100%, 18rem);
+  pointer-events: none;
+}
+
+.createBurst svg {
+  width: 100%;
+  height: auto;
+}
