@@ -1,0 +1,19 @@
+.root {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1.25rem;
+}
+
+.register {
+  margin-top: 5rem;
+}
+
+.compact {
+  --auth-lantern-size-override: 4.5rem;
+  gap: 0.65rem;
+}
+
+.compact .register {
+  margin-top: 1.75rem;
+}

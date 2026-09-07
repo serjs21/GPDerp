@@ -68,7 +68,7 @@ export function HaikuDisplay() {
         open={creationOpen}
         haiku={creationHaiku}
         generatingDraft={modalGeneratingDraft}
-        sessionKey={creationSessionKey}
+        lanternSessionKey={creationSessionKey}
         onKeepScrolling={onKeepScrolling}
         onGoToHaiku={onGoToHaiku}
         onHaikuDeleted={(haiku) => {

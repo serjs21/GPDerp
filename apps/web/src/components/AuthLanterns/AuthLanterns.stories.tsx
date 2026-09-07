@@ -17,6 +17,7 @@ type Story = StoryObj<typeof meta>;
 
 /**
  * Side-by-side Login (light) and Register (mirrored dark) lanterns.
+ * Register sits lower (5rem) with flex-start alignment.
  */
 export const SideBySide: Story = {
   render: function SideBySideRender() {
@@ -26,9 +27,9 @@ export const SideBySide: Story = {
       <div
         style={{
           display: "flex",
-          alignItems: "center",
+          alignItems: "flex-start",
           justifyContent: "center",
-          gap: "2.5rem",
+          gap: "1.25rem",
           padding: "2rem",
           background:
             "linear-gradient(160deg, #e8e0d4 0%, #c9b8a4 45%, #9a8b7a 100%)",
@@ -39,10 +40,12 @@ export const SideBySide: Story = {
           selected={mode === "login"}
           onClick={() => setMode("login")}
         />
-        <RegisterLantern
-          selected={mode === "register"}
-          onClick={() => setMode("register")}
-        />
+        <div style={{ marginTop: "5rem" }}>
+          <RegisterLantern
+            selected={mode === "register"}
+            onClick={() => setMode("register")}
+          />
+        </div>
       </div>
     );
   },

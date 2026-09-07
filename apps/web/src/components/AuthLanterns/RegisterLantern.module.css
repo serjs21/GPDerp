@@ -2,11 +2,11 @@
   /*
    * Mirrored base flips the large face to center-left; label stays unmirrored.
    */
-   --auth-lantern-tilt: -13deg;
-   --auth-lantern-skew: -8deg;
-   --auth-lantern-label-x: 32%;
-   --auth-lantern-label-y: 38%;
-   --auth-lantern-size: 12.5rem;
+  --auth-lantern-tilt: -13deg;
+  --auth-lantern-skew: -8deg;
+  --auth-lantern-label-x: 32%;
+  --auth-lantern-label-y: 38%;
+  --auth-lantern-size: var(--auth-lantern-size-override, 14.5rem);
    
   position: relative;
   display: inline-flex;
@@ -37,7 +37,7 @@ div.root {
 }
 
 .idle {
-  opacity: 0.78;
+  opacity: 0.9;
 }
 
 .selected {

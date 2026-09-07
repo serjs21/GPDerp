@@ -5,7 +5,7 @@
 }
 
 .body {
-  --auth-hub-method-height: 7.75rem;
+  --auth-hub-method-height: 6.5rem;
   --auth-hub-content-height: 26rem;
   --auth-hub-gap: var(--comic-page-gutter, 10px);
 
@@ -32,12 +32,6 @@
 
 .methodPanel {
   min-height: var(--auth-hub-method-height);
-}
-
-.methodLantern {
-  --auth-lantern-size: 5.25rem;
-  display: block;
-  margin: 0.15rem auto 0;
 }
 
 .methodPanel + .methodPanel {

@@ -7,7 +7,7 @@ import {
   ComicPagePanel,
   ComicPageRow,
 } from "@/components/ComicPageLayout";
-import { LoginLantern, RegisterLantern } from "@/components/AuthLanterns";
+import { LabelMethodIcon } from "@/components/LabelMethodIcon";
 import { LoginFlow, type AuthFlowHandle } from "@/components/AuthFlows/LoginFlow";
 import { RegisterFlow } from "@/components/AuthFlows/RegisterFlow";
 import { useAuthenticationVerification } from "@/app/providers/AuthenticationVerificationProvider";
@@ -96,7 +96,12 @@ export function AuthGateModal({
             ariaLabel="Sign in"
             className={styles.methodPanel}
           >
-            <LoginLantern selected={mode === "login"} className={styles.methodLantern} />
+            <LabelMethodIcon
+              src="/login_modal/log-in.svg"
+              bubbleStyle="rectangle"
+              sourceDirection="none"
+              active={mode === "login"}
+            />
           </ComicPagePanel>
           <ComicPagePanel
             selectable
@@ -110,7 +115,12 @@ export function AuthGateModal({
             ariaLabel="Register"
             className={styles.methodPanel}
           >
-            <RegisterLantern selected={mode === "register"} className={styles.methodLantern} />
+            <LabelMethodIcon
+              src="/login_modal/sign-up.svg"
+              bubbleStyle="pointedArcs"
+              sourceDirection="none"
+              active={mode === "register"}
+            />
           </ComicPagePanel>
         </ComicPageRow>
 
