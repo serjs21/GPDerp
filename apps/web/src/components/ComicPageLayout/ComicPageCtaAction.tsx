@@ -16,6 +16,7 @@ export type ComicPageCtaActionProps = {
   disabled?: boolean;
   busy?: boolean;
   fill?: string;
+  textColor?: string;
   "aria-label"?: string;
 };
 
@@ -26,6 +27,7 @@ export function ComicPageCtaAction({
   disabled = false,
   busy = false,
   fill,
+  textColor,
   "aria-label": ariaLabel,
 }: ComicPageCtaActionProps) {
   const canPress = !disabled && !busy;
@@ -47,6 +49,7 @@ export function ComicPageCtaAction({
         className={styles.burst}
         text={formatComicLabelText(label)}
         fill={burstFill}
+        textColor={textColor}
         shapeKind="rect"
         seed={`cta-${label}`}
         fontSize={CTA_FONT_SIZE}

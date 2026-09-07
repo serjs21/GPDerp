@@ -14,24 +14,11 @@ const meta = {
     open: true,
     onOpenChange: () => undefined,
     question: "Delete this haiku?",
-    questionBubbleStyle: "pointedArcs",
-    optionsLayout: "auto",
-    closeOnOverlayClick: false,
+    confirmLabel: "Delete",
+    cancelLabel: "Not yet",
+    closeOnOverlayClick: true,
     closeOnSelect: true,
-    options: [
-      {
-        id: "cancel",
-        label: "Leave it be",
-        onSelect: () => undefined,
-        bubbleStyle: "speech",
-      },
-      {
-        id: "confirm",
-        label: "Retry",
-        onSelect: () => undefined,
-        bubbleStyle: "speech",
-      },
-    ],
+    onConfirm: () => undefined,
   },
 } satisfies Meta<typeof ComicConfirmModal>;
 
@@ -40,38 +27,20 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-export const ThreeOptions: Story = {
-  args: {
-    question: "Where should this lantern go?",
-    options: [
-      { id: "path", label: "Keep on path", onSelect: () => undefined, bubbleStyle: "speech" },
-      { id: "library", label: "Move to library", onSelect: () => undefined, bubbleStyle: "circle" },
-      { id: "archive", label: "Archive", onSelect: () => undefined, bubbleStyle: "rectangle" },
-    ],
-  },
-};
-
 export const DeleteFailedLike: Story = {
   args: {
     question: "Deletion failed!",
-    questionBubbleStyle: "pointedArcs",
-    options: [
-      { id: "leave", label: "Leave it be", onSelect: () => undefined },
-      { id: "retry", label: "Retry", onSelect: () => undefined, bubbleStyle: "pointedArcs" },
-    ],
+    cancelLabel: "Leave it be",
+    confirmLabel: "Retry",
   },
 };
 
 export const LongQuestion: Story = {
   args: {
     question:
-      "This haiku has been shared with others. Are you sure you want to remove it from your path and send it back to the shelf?",
-    questionBubbleStyle: "speech",
-    optionsLayout: "column",
-    options: [
-      { id: "keep", label: "Keep it here", onSelect: () => undefined },
-      { id: "remove", label: "Remove anyway", onSelect: () => undefined },
-    ],
+      "This haiku has been shared with others. Are you sure you want to remove it from your path?",
+    cancelLabel: "Keep it here",
+    confirmLabel: "Remove anyway",
   },
 };
 
@@ -89,19 +58,10 @@ function InteractiveComicConfirmDemo() {
         open={open}
         onOpenChange={setOpen}
         question="Send this lantern away?"
-        options={[
-          {
-            id: "stay",
-            label: "Not yet",
-            onSelect: () => setLastChoice("Not yet"),
-          },
-          {
-            id: "go",
-            label: "Let it fly",
-            onSelect: () => setLastChoice("Let it fly"),
-            bubbleStyle: "pointedArcs",
-          },
-        ]}
+        cancelLabel="Not yet"
+        confirmLabel="Let it fly"
+        onConfirm={() => setLastChoice("Let it fly")}
+        onCancel={() => setLastChoice("Not yet")}
       />
     </div>
   );

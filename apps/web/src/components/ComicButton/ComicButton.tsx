@@ -8,9 +8,21 @@ import {
   stagePaddingClassForDirection,
   type ComicSourceDirection,
 } from "../ComicConfirmModal/comicSourceDirection";
+import {
+  COMIC_PANEL_COLORS,
+  type ComicPanelColor,
+} from "../ComicPageLayout/comicPagePresets";
 import styles from "./ComicButton.module.css";
 
 export type ComicButtonMode = "standalone" | "embedded";
+
+function resolveFontColor(fontColor: ComicPanelColor | (string & {}) | undefined): string | undefined {
+  if (!fontColor) return undefined;
+  if (fontColor in COMIC_PANEL_COLORS) {
+    return COMIC_PANEL_COLORS[fontColor as ComicPanelColor].base;
+  }
+  return fontColor;
+}
 
 export type ComicButtonProps = {
   children: ReactNode;
@@ -25,6 +37,10 @@ export type ComicButtonProps = {
   style?: CSSProperties;
   type?: "button" | "submit" | "reset";
   onClick?: () => void;
+  /** Comical bubble fill(s). */
+  backgroundColors?: string[];
+  /** Label color: panel token (e.g. `darkGreen`) or any CSS color. */
+  fontColor?: ComicPanelColor | (string & {});
 };
 
 export const ComicButton = forwardRef<HTMLButtonElement, ComicButtonProps>(function ComicButton(
@@ -39,11 +55,17 @@ export const ComicButton = forwardRef<HTMLButtonElement, ComicButtonProps>(funct
     style,
     type = "button",
     onClick,
+    backgroundColors,
+    fontColor,
   },
   ref,
 ) {
   const stageRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const resolvedFontColor = resolveFontColor(fontColor);
+  const buttonStyle = resolvedFontColor
+    ? ({ ...style, color: resolvedFontColor } as CSSProperties)
+    : style;
 
   const setButtonRef = (node: HTMLButtonElement | null) => {
     buttonRef.current = node;
@@ -60,12 +82,14 @@ export const ComicButton = forwardRef<HTMLButtonElement, ComicButtonProps>(funct
         element: buttonRef.current,
         style: bubbleStyle,
         sourceDirection,
+        backgroundColors,
       },
     ],
-    [bubbleStyle, sourceDirection],
+    [backgroundColors, bubbleStyle, sourceDirection],
   );
 
   const labelKey = typeof children === "string" ? children : "node";
+  const colorsKey = backgroundColors?.join(",") ?? "";
 
   if (mode === "embedded") {
     return (
@@ -73,7 +97,7 @@ export const ComicButton = forwardRef<HTMLButtonElement, ComicButtonProps>(funct
         ref={setButtonRef}
         type={type}
         className={[styles.bubbleEmbedded, className].filter(Boolean).join(" ")}
-        style={style}
+        style={buttonStyle}
         disabled={disabled}
         data-comic-role="cta"
         data-bubble-style={bubbleStyle}
@@ -97,17 +121,17 @@ export const ComicButton = forwardRef<HTMLButtonElement, ComicButtonProps>(funct
     <ComicBubbleStage
       ref={stageRef}
       active
-      targetsKey={`btn:${bubbleStyle}:${sourceDirection}:${labelKey}`}
+      targetsKey={`btn:${bubbleStyle}:${sourceDirection}:${labelKey}:${colorsKey}:${resolvedFontColor ?? ""}`}
       getTargets={getTargets}
       className={[stageStyles.stage, styles.stageStandalone, stagePaddingClass, className]
         .filter(Boolean)
         .join(" ")}
-      style={style}
     >
       <button
         ref={setButtonRef}
         type={type}
         className={styles.bubble}
+        style={buttonStyle}
         disabled={disabled}
         data-bubble-style={bubbleStyle}
         data-source-direction={sourceDirection}

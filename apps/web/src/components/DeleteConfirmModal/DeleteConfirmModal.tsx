@@ -1,16 +1,15 @@
 "use client";
 
-import { type ReactNode } from "react";
-import { ComicConfirmModal, type ComicConfirmOption } from "@/components/ComicConfirmModal";
+import { ComicConfirmModal } from "@/components/ComicConfirmModal";
 
 export type DeleteConfirmModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void | Promise<void>;
   confirming?: boolean;
-  question?: ReactNode;
-  cancelLabel?: ReactNode;
-  confirmLabel?: ReactNode;
+  question?: string;
+  cancelLabel?: string;
+  confirmLabel?: string;
 };
 
 const DEFAULT_QUESTION = "Send this lantern away?";
@@ -26,36 +25,18 @@ export function DeleteConfirmModal({
   cancelLabel = DEFAULT_CANCEL,
   confirmLabel = DEFAULT_CONFIRM,
 }: DeleteConfirmModalProps) {
-  const options: ComicConfirmOption[] = [
-    {
-      id: "cancel",
-      label: cancelLabel,
-      onSelect: () => {
-        onOpenChange(false);
-      },
-      bubbleStyle: "speech",
-      disabled: confirming,
-    },
-    {
-      id: "confirm",
-      label: confirmLabel,
-      onSelect: () => {
-        void onConfirm();
-      },
-      bubbleStyle: "pointedArcs",
-      disabled: confirming,
-    },
-  ];
-
   return (
     <ComicConfirmModal
       open={open}
       onOpenChange={onOpenChange}
       question={question}
-      questionBubbleStyle="pointedArcs"
-      closeOnOverlayClick={false}
+      cancelLabel={cancelLabel}
+      confirmLabel={confirmLabel}
+      confirming={confirming}
       closeOnSelect={false}
-      options={options}
+      onConfirm={() => {
+        void onConfirm();
+      }}
     />
   );
 }
