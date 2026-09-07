@@ -38,9 +38,10 @@
 
 .frameThought {
   position: relative;
+  /* Taller than wide so the thought cloud reads puffy, not a flat oval. */
   width: 4rem;
-  height: 3.6rem;
-  padding: 0.65rem;
+  height: 4.45rem;
+  padding: 0.7rem;
   border: none;
   background: transparent;
   box-shadow: none;
@@ -69,7 +70,6 @@
 .framePointedArcs .icon {
   position: relative;
   z-index: 1;
-  min-height: 3.35rem;
 }
 
 .frameDiamond {

@@ -26,10 +26,10 @@ export type LabelMethodIconProps = {
 
 const THOUGHT_LAYOUT = buildComicBurstPath({
   width: 100,
-  height: 88,
+  height: 112,
   kind: "thought",
-  spikeCount: 10,
-  randomness: 0.14,
+  spikeCount: 12,
+  randomness: 0.18,
   seedKey: "label-method-thought",
 });
 
