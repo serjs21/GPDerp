@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
+import { memo, type CSSProperties, type ReactNode } from "react";
 import {
   LANTERN_ASSET_SRC,
   LANTERN_FLAME_ANCHOR_Y,
@@ -10,7 +10,7 @@ import {
   LANTERN_IMAGE_WIDTH,
   LANTERN_WIDTH_REM,
 } from "./constants";
-import { LabelBelt, type LabelBeltItem } from "./LabelBelt";
+import { LabelBelt, toLabelBeltItems, type LabelBeltItem } from "./LabelBelt";
 import {
   lanternTransformToCssVars,
   resolveLanternTransform,
@@ -19,6 +19,13 @@ import {
 } from "./lanternTransform";
 import styles from "./Lantern.module.css";
 
+export type LanternFrameLabelSource = {
+  id: string;
+  name: string;
+  color?: string | null;
+  shape?: string | null;
+};
+
 export type LanternFrameProps = LanternTransformInput & {
   className?: string;
   style?: CSSProperties;
@@ -26,10 +33,49 @@ export type LanternFrameProps = LanternTransformInput & {
   widthRem?: number;
   generating?: boolean;
   flightExiting?: boolean;
-  /** Comic labels rendered in an upper-half arc around this frame. */
+  /** Prebuilt belt items (stories). Prefer `haikuLabels` on the path hot path. */
   labels?: LabelBeltItem[];
+  /** Raw haiku labels; converted inside a memo boundary so tween frames skip the belt. */
+  haikuLabels?: ReadonlyArray<LanternFrameLabelSource>;
+  excludeLabelIds?: string[];
   children: ReactNode;
 };
+
+const LanternFrameShell = memo(function LanternFrameShell() {
+  return (
+    <div className={styles.shell} aria-hidden>
+      {/* eslint-disable-next-line @next/next/no-img-element -- decorative lantern art from /public */}
+      <img
+        className={styles.image}
+        src={LANTERN_ASSET_SRC}
+        alt=""
+        width={LANTERN_IMAGE_WIDTH}
+        height={LANTERN_IMAGE_HEIGHT}
+        draggable={false}
+        decoding="async"
+      />
+      <span className={styles.flame} />
+    </div>
+  );
+});
+
+const LanternFrameBelt = memo(function LanternFrameBelt({
+  labels,
+  haikuLabels,
+  excludeLabelIds,
+}: {
+  labels?: LabelBeltItem[];
+  haikuLabels?: ReadonlyArray<LanternFrameLabelSource>;
+  excludeLabelIds?: string[];
+}) {
+  const beltItems = labels?.length
+    ? labels
+    : haikuLabels?.length
+      ? toLabelBeltItems(haikuLabels, excludeLabelIds)
+      : null;
+  if (!beltItems || beltItems.length === 0) return null;
+  return <LabelBelt labels={beltItems} />;
+});
 
 export function LanternFrame({
   className,
@@ -39,6 +85,8 @@ export function LanternFrame({
   generating = false,
   flightExiting = false,
   labels,
+  haikuLabels,
+  excludeLabelIds,
   children,
   step,
   progress,
@@ -79,22 +127,13 @@ export function LanternFrame({
       aria-label={ariaLabel}
       {...(generating ? { "data-haiku-generating": true } : {})}
     >
-      <div className={styles.shell} aria-hidden>
-        {/* eslint-disable-next-line @next/next/no-img-element -- decorative lantern art from /public */}
-        <img
-          className={styles.image}
-          src={LANTERN_ASSET_SRC}
-          alt=""
-          width={LANTERN_IMAGE_WIDTH}
-          height={LANTERN_IMAGE_HEIGHT}
-          draggable={false}
-          decoding="async"
-        />
-        <span className={styles.flame} />
-      </div>
-
+      <LanternFrameShell />
       <div className={styles.content}>{children}</div>
-      {labels && labels.length > 0 ? <LabelBelt labels={labels} /> : null}
+      <LanternFrameBelt
+        labels={labels}
+        haikuLabels={haikuLabels}
+        excludeLabelIds={excludeLabelIds}
+      />
     </article>
   );
 }

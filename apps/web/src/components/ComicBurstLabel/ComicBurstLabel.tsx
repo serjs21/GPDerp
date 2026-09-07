@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, type CSSProperties } from "react";
+import { memo, useMemo, type CSSProperties } from "react";
 import {
   layoutComicBurstLabel,
   type ComicBurstShapeKind,
@@ -39,7 +39,7 @@ const DEFAULT_TEXT_COLOR = "#ffffff";
  * Shape is seeded from `seed ?? text` so the silhouette stays stable across renders.
  * Longer text uses a slightly smaller display size so lettering stays inside the silhouette.
  */
-export function ComicBurstLabel({
+export const ComicBurstLabel = memo(function ComicBurstLabel({
   text,
   fill = DEFAULT_FILL,
   stroke = DEFAULT_STROKE,
@@ -109,4 +109,4 @@ export function ComicBurstLabel({
       </span>
     </div>
   );
-}
+});

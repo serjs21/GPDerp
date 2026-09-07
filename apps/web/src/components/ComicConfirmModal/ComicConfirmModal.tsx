@@ -1,11 +1,13 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import { useCallback } from "react";
 import { ComicButton } from "@/components/ComicButton/ComicButton";
 import { ComicDialogContent } from "@/components/ComicDialogContent/ComicDialogContent";
 import { COMIC_PANEL_COLORS } from "@/components/ComicPageLayout/comicPagePresets";
+import { ComicBubbleStage } from "./ComicBubbleStage";
 import type { ComicBubbleStyle } from "./comicBubblePresets";
+import stageStyles from "./comicBubbleStage.module.css";
+import { useComicConfirmStage } from "./useComicConfirmStage";
 import styles from "./ComicConfirmModal.module.css";
 
 const DEFAULT_QUESTION_FILL = COMIC_PANEL_COLORS.cream.base;
@@ -63,18 +65,29 @@ export function ComicConfirmModal({
   className,
 }: ComicConfirmModalProps) {
   const allowOutsideDismiss = closeOnOverlayClick && !confirming;
+  const { questionRef, cancelRef, confirmRef, getTargets, targetsKey } = useComicConfirmStage({
+    question,
+    cancelLabel,
+    confirmLabel,
+    questionBubbleStyle,
+    cancelBubbleStyle,
+    confirmBubbleStyle,
+    questionFill,
+    cancelFill,
+    confirmFill,
+  });
 
-  const handleCancel = useCallback(() => {
+  const handleCancel = () => {
     if (confirming) return;
     onCancel?.();
     onOpenChange(false);
-  }, [confirming, onCancel, onOpenChange]);
+  };
 
-  const handleConfirm = useCallback(() => {
+  const handleConfirm = () => {
     if (confirming) return;
     onConfirm();
     if (closeOnSelect) onOpenChange(false);
-  }, [closeOnSelect, confirming, onConfirm, onOpenChange]);
+  };
 
   return (
     <Dialog.Root
@@ -104,40 +117,51 @@ export function ComicConfirmModal({
               Choose confirm or cancel.
             </Dialog.Description>
 
-            <div className={styles.dialogLayout}>
-              <div className={styles.question}>
-                <ComicDialogContent
-                  bubbleStyle={questionBubbleStyle}
-                  sourceDirection="none"
-                  backgroundColors={[questionFill]}
-                >
-                  {question}
-                </ComicDialogContent>
-              </div>
-
-              <div className={styles.ctaRow}>
-                <ComicButton
-                  bubbleStyle={cancelBubbleStyle}
-                  sourceDirection="none"
-                  fontColor="black"
-                  backgroundColors={[cancelFill]}
-                  disabled={confirming}
-                  onClick={handleCancel}
-                >
-                  {cancelLabel}
-                </ComicButton>
-                <ComicButton
-                  fontColor="white"
-                  bubbleStyle={confirmBubbleStyle}
-                  sourceDirection="none"
-                  backgroundColors={[confirmFill]}
-                  disabled={confirming}
-                  onClick={handleConfirm}
-                >
-                  {confirmLabel}
-                </ComicButton>
-              </div>
-            </div>
+            <ComicBubbleStage
+              active={open}
+              targetsKey={targetsKey}
+              getTargets={getTargets}
+              className={[stageStyles.stage, styles.dialogLayout].filter(Boolean).join(" ")}
+            >
+              <ComicDialogContent
+                ref={questionRef}
+                mode="embedded"
+                className={styles.question}
+                bubbleStyle={questionBubbleStyle}
+                sourceDirection="none"
+                backgroundColors={[questionFill]}
+              >
+                {question}
+              </ComicDialogContent>
+              <ComicButton
+                ref={cancelRef}
+                mode="embedded"
+                slot="start"
+                className={styles.ctaCancel}
+                bubbleStyle={cancelBubbleStyle}
+                sourceDirection="none"
+                fontColor="black"
+                backgroundColors={[cancelFill]}
+                disabled={confirming}
+                onClick={handleCancel}
+              >
+                {cancelLabel}
+              </ComicButton>
+              <ComicButton
+                ref={confirmRef}
+                mode="embedded"
+                slot="end"
+                className={styles.ctaConfirm}
+                fontColor="white"
+                bubbleStyle={confirmBubbleStyle}
+                sourceDirection="none"
+                backgroundColors={[confirmFill]}
+                disabled={confirming}
+                onClick={handleConfirm}
+              >
+                {confirmLabel}
+              </ComicButton>
+            </ComicBubbleStage>
           </div>
         </Dialog.Content>
       </Dialog.Portal>

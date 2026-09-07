@@ -5,7 +5,6 @@ import type { HaikuDto } from "@/api/haikus";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternDeleteExit } from "@/components/Lantern/LanternDeleteExit";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
-import { toLabelBeltItems } from "@/components/Lantern/LabelBelt";
 import type { LanternTransform } from "@/components/Lantern/lanternTransform";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
@@ -103,7 +102,8 @@ export function SVGPathLantern({
             flightExiting={flightExiting}
             widthRem={19}
             ariaLabel={ariaLabel}
-            labels={toLabelBeltItems(haiku.labels, excludeLabelIds)}
+            haikuLabels={haiku.labels}
+            excludeLabelIds={excludeLabelIds}
           >
             <SVGPathLanternBody
               haiku={haiku}

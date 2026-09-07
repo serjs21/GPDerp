@@ -4,7 +4,6 @@
   z-index: 1000;
   min-height: 100dvh;
   background: rgb(255 255 255 / 42%);
-  backdrop-filter: blur(1px);
   opacity: 1;
   transition: opacity 180ms ease-out;
 }
@@ -44,7 +43,6 @@
   transform-origin: center center;
   transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
   opacity: 1;
-  will-change: transform, opacity;
   transition:
     transform var(--comic-page-motion),
     opacity var(--comic-page-motion),
@@ -58,6 +56,11 @@
 }
 
 /* Opening / closing: fly a comic sheet onto / off the stack */
+.dialogPopup[data-starting-style],
+.dialogPopup[data-ending-style] {
+  will-change: transform, opacity;
+}
+
 .dialogPopup[data-starting-style] {
   opacity: 0;
   transform: translate3d(30px, 10px, 0) rotate(1deg) scale(0.985);

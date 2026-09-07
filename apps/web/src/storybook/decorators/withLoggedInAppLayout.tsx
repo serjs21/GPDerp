@@ -5,6 +5,7 @@ import { MockAuthenticationProvider } from "@/app/providers/AuthenticationProvid
 import { AuthenticationVerificationProvider } from "@/app/providers/AuthenticationVerificationProvider";
 import { CelestialAppShell } from "@/app/providers/CelestialAppShell";
 import { CelestialThemeProvider } from "@/app/providers/CelestialThemeProvider";
+import { HaikuFiltersProvider } from "@/app/providers/HaikuFiltersProvider";
 import headerStyles from "@/app/providers/headerStyles.module.css";
 import layoutStyles from "@/app/providers/layoutProviders.module.css";
 import { AuthNavigation } from "@/components/AuthenticationNav/AuthNavigation";
@@ -93,23 +94,25 @@ export const withLoggedInAppLayout: Decorator = (Story, { parameters }) => {
     <QueryClientProvider client={qc}>
       <MockAuthenticationProvider value={STORY_LOGGED_IN_AUTH}>
         <AuthenticationVerificationProvider>
-          <CelestialThemeProvider initialSlot={initialSlot}>
-            <CelestialAppShell className={layoutStyles.shell}>
-              <header className={headerStyles.header}>
-                <div className={headerStyles.headerBar}>
-                  <AuthNavigation />
-                </div>
-              </header>
-              <main className={layoutStyles.contentMain}>
-                <div className={layoutStyles.contentStretch}>
-                  <Story />
-                </div>
-              </main>
-              <footer className={layoutStyles.footerSlot}>
-                <SiteFooter />
-              </footer>
-            </CelestialAppShell>
-          </CelestialThemeProvider>
+          <HaikuFiltersProvider>
+            <CelestialThemeProvider initialSlot={initialSlot}>
+              <CelestialAppShell className={layoutStyles.shell}>
+                <header className={headerStyles.header}>
+                  <div className={headerStyles.headerBar}>
+                    <AuthNavigation />
+                  </div>
+                </header>
+                <main className={layoutStyles.contentMain}>
+                  <div className={layoutStyles.contentStretch}>
+                    <Story />
+                  </div>
+                </main>
+                <footer className={layoutStyles.footerSlot}>
+                  <SiteFooter />
+                </footer>
+              </CelestialAppShell>
+            </CelestialThemeProvider>
+          </HaikuFiltersProvider>
         </AuthenticationVerificationProvider>
       </MockAuthenticationProvider>
     </QueryClientProvider>

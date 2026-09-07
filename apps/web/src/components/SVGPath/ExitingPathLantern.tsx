@@ -4,7 +4,6 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import type { HaikuDto } from "@/api/haikus";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
-import { toLabelBeltItems } from "@/components/Lantern/LabelBelt";
 import type { LanternTransform } from "@/components/Lantern/lanternTransform";
 import {
   initialFlightCssVars,
@@ -80,7 +79,8 @@ export function ExitingPathLantern({
       flightExiting={flightExiting}
       widthRem={19}
       ariaLabel={`Deleting haiku: ${haiku.title ?? ""}`}
-      labels={toLabelBeltItems(haiku.labels, excludeLabelIds)}
+      haikuLabels={haiku.labels}
+      excludeLabelIds={excludeLabelIds}
     >
       <Lantern haiku={haiku} showActions={false} />
     </LanternFrame>

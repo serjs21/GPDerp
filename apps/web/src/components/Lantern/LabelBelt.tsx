@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  memo,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -91,7 +92,7 @@ function burstFor(label: LabelBeltItem) {
  * Overflow rotates with a stacked-block portal wipe: both labels are normal
  * flow blocks with 1rem gap; the portal clips; the entering block ends where idle sits.
  */
-export function LabelBelt({
+export const LabelBelt = memo(function LabelBelt({
   labels,
   maxVisible = LABEL_BELT_MAX_VISIBLE,
   className,
@@ -142,8 +143,6 @@ export function LabelBelt({
   }, [transition, runPortal, clearInlineStyles]);
 
   if (labels.length === 0) return null;
-
-  const windowStart = ((rotationOffset % labels.length) + labels.length) % labels.length;
 
   const step = (delta: 1 | -1) => {
     if (!overflow || busy || transition) return;
@@ -255,4 +254,4 @@ export function LabelBelt({
       ) : null}
     </div>
   );
-}
+});

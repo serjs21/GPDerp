@@ -100,6 +100,7 @@ export const ComicButton = forwardRef<HTMLButtonElement, ComicButtonProps>(funct
         style={buttonStyle}
         disabled={disabled}
         data-comic-role="cta"
+        data-comic-slot={slot}
         data-bubble-style={bubbleStyle}
         data-source-direction={sourceDirection}
         onClick={onClick}

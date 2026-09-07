@@ -6,7 +6,6 @@
   inset: 0;
   z-index: 1100;
   background: rgb(255 255 255 / 0.72);
-  backdrop-filter: blur(2px);
   opacity: 1;
 }
 
@@ -36,6 +35,10 @@
   transform-origin: center center;
   transform: translate(-50%, -50%) translate3d(0, 0, 0) rotate(0deg) scale(1);
   opacity: 1;
+}
+
+.contentRoot[data-state="open"],
+.contentRoot[data-state="closed"] {
   will-change: transform, opacity;
 }
 
@@ -56,32 +59,41 @@
 }
 
 .dialogLayout {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "question question"
+    "cancel confirm";
   align-items: center;
-  gap: 2rem;
+  justify-items: center;
+  column-gap: 1rem;
+  row-gap: 3.5rem;
   box-sizing: border-box;
   width: 100%;
-  padding: 2rem 1.25rem;
+  padding: 2.5rem 2.25rem;
   overflow: visible;
 }
 
 .question {
-  display: flex;
-  justify-content: center;
-  width: 100%;
+  grid-area: question;
+  justify-self: center;
+  width: fit-content;
+  max-width: 100%;
   overflow: visible;
 }
 
-.ctaRow {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  width: 100%;
+.ctaCancel {
+  grid-area: cancel;
+  justify-self: start;
+  align-self: center;
   min-height: 5.5rem;
-  overflow: visible;
+}
+
+.ctaConfirm {
+  grid-area: confirm;
+  justify-self: end;
+  align-self: center;
+  min-height: 5.5rem;
 }
 
 .visuallyHidden {
@@ -162,10 +174,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .overlay {
-    backdrop-filter: none;
-  }
-
   .overlay[data-state="open"],
   .overlay[data-state="closed"],
   .contentRoot[data-state="open"],
