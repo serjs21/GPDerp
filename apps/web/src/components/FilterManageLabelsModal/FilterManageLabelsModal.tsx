@@ -73,7 +73,7 @@ export function FilterManageLabelsModal({
           >
             <LabelMethodIcon
               src="/panel_actions/filter_label.svg"
-              bubbleStyle="pointedArcs"
+              bubbleStyle="circle"
               sourceDirection="none"
               active={tab === "filter"}
             />
@@ -92,7 +92,7 @@ export function FilterManageLabelsModal({
           >
             <LabelMethodIcon
               src="/panel_actions/manage.svg"
-              bubbleStyle="rectangle"
+              bubbleStyle="thought"
               sourceDirection="none"
               active={tab === "manage"}
             />

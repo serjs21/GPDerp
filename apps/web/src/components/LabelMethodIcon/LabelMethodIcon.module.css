@@ -1,0 +1,45 @@
+.stage {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  padding: 0.85rem;
+  transition: opacity 0.2s ease;
+}
+
+.active {
+  opacity: 1;
+}
+
+.inactive {
+  opacity: 0.72;
+}
+
+.frame {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 0.7rem;
+  background: #ffffff;
+  border: 3px solid #111111;
+  /* Hard comic offset — same idea as COMIC_SHADOW_OFFSET, no Comical canvas */
+  box-shadow: 4px 4px 0 #111111;
+}
+
+.frameRect {
+  border-radius: 0.15rem;
+}
+
+.frameRound {
+  border-radius: 999px;
+  padding: 0.65rem 0.75rem;
+}
+
+.icon {
+  display: block;
+  height: 2rem;
+  width: auto;
+  object-fit: contain;
+  pointer-events: none;
+}
