@@ -84,8 +84,6 @@ export function LabelMethodIcon({
   return (
     <div
       className={[styles.stage, active ? styles.active : styles.inactive].filter(Boolean).join(" ")}
-      data-bubble-style={styleKey}
-      data-frame-key={frameKey}
     >
       <div className={[styles.frame, frameClass].join(" ")}>
         {burstOutline ? (

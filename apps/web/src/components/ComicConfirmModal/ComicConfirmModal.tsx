@@ -119,6 +119,7 @@ export function ComicConfirmModal({
                 <ComicButton
                   bubbleStyle={cancelBubbleStyle}
                   sourceDirection="none"
+                  fontColor="black"
                   backgroundColors={[cancelFill]}
                   disabled={confirming}
                   onClick={handleCancel}
@@ -126,7 +127,7 @@ export function ComicConfirmModal({
                   {cancelLabel}
                 </ComicButton>
                 <ComicButton
-                  fontColor="darkGreen"
+                  fontColor="white"
                   bubbleStyle={confirmBubbleStyle}
                   sourceDirection="none"
                   backgroundColors={[confirmFill]}
