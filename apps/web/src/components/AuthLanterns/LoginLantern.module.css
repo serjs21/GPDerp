@@ -1,0 +1,84 @@
+.root {
+  /* Shared tilt for lettering on the large lantern face (~40° asset lean). */
+  --auth-lantern-tilt: -38deg;
+  --auth-lantern-skew: -8deg;
+  --auth-lantern-size: 12.5rem;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--auth-lantern-size);
+  height: var(--auth-lantern-size);
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+  transition:
+    transform 160ms ease,
+    opacity 160ms ease;
+}
+
+button.root:disabled,
+.root:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+div.root {
+  cursor: inherit;
+}
+
+.idle {
+  opacity: 0.78;
+}
+
+.selected {
+  opacity: 1;
+  transform: scale(1.06);
+}
+
+.root:hover:not(:disabled):not(div) {
+  opacity: 1;
+}
+
+.base {
+  position: absolute;
+  inset: 0;
+  background: #f7f4ef;
+  -webkit-mask-image: url("/lantern_base_rotated.png");
+  mask-image: url("/lantern_base_rotated.png");
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-source-type: luminance;
+  mask-mode: luminance;
+  filter: saturate(0.15) brightness(1.08) contrast(1.05);
+  pointer-events: none;
+}
+
+.label {
+  position: relative;
+  z-index: 1;
+  display: block;
+  max-width: 62%;
+  color: #111111;
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: clamp(0.85rem, 2.4vw, 1.15rem);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+  /* Large face sits on the right of lantern_base_rotated.png */
+  transform: translate(10%, -2%) rotate(var(--auth-lantern-tilt)) skewX(var(--auth-lantern-skew));
+  transform-origin: center center;
+  pointer-events: none;
+  user-select: none;
+}
