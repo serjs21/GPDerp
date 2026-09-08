@@ -24,6 +24,8 @@ type GoogleUserInfo = {
 };
 
 function looksLikeJwt(token: string): boolean {
+  // Google OAuth access tokens are opaque (`ya29.…`) and must never go through ID-token verify.
+  if (token.startsWith("ya29.")) return false;
   const parts = token.split(".");
   return parts.length === 3 && parts.every((part) => part.length > 0);
 }
@@ -99,7 +101,16 @@ export const googleService = {
   /** Accepts GIS ID tokens (JWT) or OAuth access tokens from custom button popup. */
   async verifyGoogleToken(token: string): Promise<GoogleIdentity> {
     if (looksLikeJwt(token)) {
-      return googleService.verifyIdToken(token);
+      try {
+        return await googleService.verifyIdToken(token);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        // Fallback if an opaque token was misclassified as JWT.
+        if (message.includes("Wrong number of segments")) {
+          return googleService.verifyAccessToken(token);
+        }
+        throw err;
+      }
     }
     return googleService.verifyAccessToken(token);
   },
