@@ -56,7 +56,7 @@ const bangers = Bangers({
 });
 
 export const metadata: Metadata = {
-  title: "GPDerp",
+  title: "GPDerp!",
   description: "AI, but useless",
   manifest: "/site.webmanifest",
   icons: {

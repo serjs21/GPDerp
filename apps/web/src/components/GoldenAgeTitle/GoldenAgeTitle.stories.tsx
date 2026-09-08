@@ -8,11 +8,6 @@ const meta = {
   parameters: {
     layout: "centered",
   },
-  args: {
-    title: "GPDERP",
-    subtitle: "THE HAIKU GENERATOR",
-    tagline: "AI, BUT IMPRACTICAL!",
-  },
 } satisfies Meta<typeof GoldenAgeTitle>;
 
 export default meta;
