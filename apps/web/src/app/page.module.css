@@ -50,10 +50,10 @@
 
 .mastheadSlot {
   position: absolute;
-  top: clamp(0.75rem, 7vh, 4.5rem);
-  left: clamp(0.85rem, 6.5vw, 7vw);
+  top: clamp(0.5rem, 4.5vh, 3.25rem);
+  left: clamp(0.85rem, 6vw, 6.5vw);
   z-index: 1;
-  width: clamp(16rem, 44vw, 42rem);
+  width: clamp(16rem, 40vw, 40rem);
   max-width: calc(100% - 1.5rem);
   pointer-events: none;
   overflow-x: clip;
