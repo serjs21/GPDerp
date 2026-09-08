@@ -57,7 +57,7 @@ export function IconUploader({
           height={44}
           unoptimized
         />
-      ) : showRemoteImage ? (
+      ) : showRemoteImage && displayUrl ? (
         <Image
           src={displayUrl}
           alt={alt}

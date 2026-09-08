@@ -180,7 +180,7 @@ export const LoginFlow = forwardRef<AuthFlowHandle, LoginFlowProps>(function Log
       ) : null}
 
       <form className={authStyles.flowForm} onSubmit={onFormSubmit} noValidate>
-        <AuthField label="Email">
+        <AuthField>
           <ComicModalInput
             type="email"
             name="email"
@@ -194,7 +194,7 @@ export const LoginFlow = forwardRef<AuthFlowHandle, LoginFlowProps>(function Log
             aria-label="Email"
           />
         </AuthField>
-        <AuthField label="Password">
+        <AuthField>
           <ComicModalInput
             type="password"
             name="password"

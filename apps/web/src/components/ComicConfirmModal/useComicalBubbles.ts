@@ -176,7 +176,7 @@ export function useComicalBubbles(options: {
         if (!isClaimedEditingStage(stage)) return;
         applySpecs(comical, getTargetsRef.current());
         try {
-          if (!restartEditingIfCanvasStale(comical, stage, getTargetsRef.current())) {
+          if (!restartEditingIfCanvasStale(comical, stage, getTargetsRef.current)) {
             comical.Comical.update(stage);
             comical.Comical.hideHandles();
           }

@@ -102,7 +102,7 @@ export const RegisterFlow = forwardRef<AuthFlowHandle, RegisterFlowProps>(functi
       ) : null}
 
       <form className={authStyles.flowForm} onSubmit={onFormSubmit} noValidate>
-        <AuthField label="Email">
+        <AuthField>
           <ComicModalInput
             type="email"
             name="email"
@@ -116,7 +116,7 @@ export const RegisterFlow = forwardRef<AuthFlowHandle, RegisterFlowProps>(functi
             aria-label="Email"
           />
         </AuthField>
-        <AuthField label="Password">
+        <AuthField>
           <ComicModalInput
             type="password"
             name="password"
@@ -130,7 +130,7 @@ export const RegisterFlow = forwardRef<AuthFlowHandle, RegisterFlowProps>(functi
             aria-label="Password"
           />
         </AuthField>
-        <AuthField label="Confirm password">
+        <AuthField>
           <ComicModalInput
             type="password"
             name="confirm"

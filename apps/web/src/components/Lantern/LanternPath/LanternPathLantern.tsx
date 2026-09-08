@@ -2,7 +2,7 @@
 
 import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
 import { LanternFrame } from "../LanternFrame";
-import { Lantern } from "../Lantern";
+import { Lantern, type LanternProps } from "../Lantern";
 import { LANTERN_PATH_FOCUS_STOP } from "./lanternPath.config";
 import { resolveLanternAtPathStop } from "./resolveLanternAtPathStop";
 import styles from "./LanternPath.module.css";
@@ -58,10 +58,12 @@ export function LanternPathLantern({
       excludeLabelIds={excludeLabelIds}
     >
       <Lantern
-        {...contentProps}
-        bodyOnly={!isFocused}
-        onDeleted={onDeleted}
-        onChanged={onChanged}
+        {...({
+          ...contentProps,
+          bodyOnly: !isFocused,
+          onDeleted,
+          onChanged,
+        } as LanternProps)}
       />
     </LanternFrame>
   );
