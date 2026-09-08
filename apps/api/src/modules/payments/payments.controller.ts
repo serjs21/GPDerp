@@ -19,6 +19,17 @@ const paymentsPluginImpl = async (app: FastifyInstance) => {
   });
 
   app.post(
+    "/payments/purchase",
+    { preHandler: [app.requireAuthenticated] },
+    async (req: FastifyRequest, res: FastifyReply) => {
+      const userId = req.user?.sub;
+      if (!userId) return res.code(403).send({ ok: false, error: "Unauthorized" });
+      const purchase = await paymentsService.createPendingPurchaseForUser(userId);
+      return res.send({ ok: true, data: { purchaseId: purchase.id } });
+    },
+  );
+
+  app.post(
     "/payments/checkout",
     { preHandler: [app.requireAuthenticated] },
     async (req: FastifyRequest, res: FastifyReply) => {
