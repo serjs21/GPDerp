@@ -7,7 +7,7 @@ import styles from "./BuyGenerations.module.css";
 
 export function BuyGenerations() {
   const t = useTranslations("BuyGenerations");
-  const { credits, loadingCredits, startingCheckout, checkoutReady, buy } = useBuyGenerations();
+  const { credits, loadingCredits, startingCheckout, initializing, checkoutReady, buy } = useBuyGenerations();
 
   return (
     <UICard title={t("title")}>
@@ -16,12 +16,12 @@ export function BuyGenerations() {
           {loadingCredits || credits === null ? t("balanceUnknown") : t("balance", { count: credits })}
         </UIText>
         <UIText muted>{t("product")}</UIText>
-        {!checkoutReady ? <UIText muted>{t("unavailable")}</UIText> : null}
+        {!checkoutReady && !initializing ? <UIText muted>{t("unavailable")}</UIText> : null}
         <UIButton
           variant="primary"
           type="button"
-          loading={startingCheckout}
-          disabled={!checkoutReady || startingCheckout}
+          loading={startingCheckout || initializing}
+          disabled={!checkoutReady || startingCheckout || initializing}
           onClick={() => void buy()}
         >
           {t("buy")}

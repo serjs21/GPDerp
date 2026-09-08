@@ -15,11 +15,8 @@
     "balance": "Du hast {count} Generierungs-Credits.",
     "balanceUnknown": "Dein Credit-Stand erscheint hier.",
     "product": "100 Haiku-Generierungen — ein Kauf fügt genau 100 Credits hinzu.",
-    "buy": "Generierungen kaufen",
+    "buy": "100 Generierungen kaufen — $3.0",
     "unavailable": "Checkout ist gerade nicht verfügbar.",
-    "confirming": "Kauf wird bestätigt…",
-    "ready": "100 Generierungs-Credits wurden hinzugefügt.",
-    "pending": "Wenn du bezahlt hast, erscheinen die Credits in Kürze.",
     "error": "Checkout konnte nicht gestartet werden."
   },
   "ProfileInfo": {

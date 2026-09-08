@@ -1,21 +1,19 @@
 import axios from "axios";
 
-export type CheckoutResponse = {
-  purchaseReference: string;
-  priceId: string;
-  credits: number;
+export type PendingPurchaseResponse = {
+  purchaseId: string;
 };
 
 export type CreditsResponse = {
   credits: number;
 };
 
-type CheckoutApiResponse = { ok: true; data: CheckoutResponse } | { ok: false; error: string };
+type PurchaseApiResponse = { ok: true; data: PendingPurchaseResponse } | { ok: false; error: string };
 type CreditsApiResponse = { ok: true; data: CreditsResponse } | { ok: false; error: string };
 
-export async function createCheckout(): Promise<CheckoutResponse> {
-  const { data } = await axios.post<CheckoutApiResponse>("/payments/checkout");
-  if (!data.ok) throw new Error(data.error ?? "Failed to start checkout");
+export async function createPendingPurchase(): Promise<PendingPurchaseResponse> {
+  const { data } = await axios.post<PurchaseApiResponse>("/payments/purchase");
+  if (!data.ok) throw new Error(data.error ?? "Failed to start purchase");
   return data.data;
 }
 

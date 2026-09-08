@@ -15,11 +15,8 @@
     "balance": "You currently brandish {count} generation pellets.",
     "balanceUnknown": "The pellet counter is still warming up.",
     "product": "100 Haiku Generations — one ritual yields exactly 100 pellets.",
-    "buy": "Acquire more pellets",
+    "buy": "Acquire 100 pellets — $3.0",
     "unavailable": "The pellet vending portal is napping.",
-    "confirming": "Interrogating the pellet ledger…",
-    "ready": "100 generation pellets have materialized.",
-    "pending": "If you paid the pellet tax, they will arrive shortly.",
     "error": "The pellet portal refused to open."
   },
   "ProfileInfo": {

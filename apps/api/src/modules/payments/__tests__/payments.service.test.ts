@@ -39,7 +39,7 @@ const completedEvent = (overrides?: {
     eventId: overrides?.eventId ?? "evt_1",
     data: {
       id: overrides?.transactionId ?? "txn_1",
-      customData: overrides?.customData === undefined ? { purchaseReference } : overrides.customData,
+      customData: overrides?.customData === undefined ? { purchaseId: purchaseReference } : overrides.customData,
       items: [{ price: overrides?.priceId === null ? null : { id: overrides?.priceId ?? "pri_100_haiku" } }],
     },
   }) as never;
@@ -86,7 +86,7 @@ describe("paymentsService.handleVerifiedEvent", () => {
     expect(paymentsRepository.fulfillCompletedPurchase).not.toHaveBeenCalled();
   });
 
-  it("does not grant credits when purchaseReference is missing", async () => {
+  it("does not grant credits when purchaseId is missing", async () => {
     const result = await paymentsService.handleVerifiedEvent(completedEvent({ customData: {} }));
 
     expect(result).toEqual({ status: "ignored", reason: "missing_reference" });

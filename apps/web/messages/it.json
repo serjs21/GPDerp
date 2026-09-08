@@ -15,11 +15,8 @@
     "balance": "Hai {count} crediti di generazione.",
     "balanceUnknown": "Il saldo dei crediti apparira qui.",
     "product": "100 generazioni haiku — un acquisto aggiunge esattamente 100 crediti.",
-    "buy": "Compra generazioni",
+    "buy": "Compra 100 generazioni — $3.0",
     "unavailable": "Il checkout non e disponibile in questo momento.",
-    "confirming": "Conferma dell'acquisto in corso…",
-    "ready": "Sono stati aggiunti 100 crediti di generazione.",
-    "pending": "Se hai completato il pagamento, i crediti compariranno a breve.",
     "error": "Impossibile avviare il checkout."
   },
   "ProfileInfo": {

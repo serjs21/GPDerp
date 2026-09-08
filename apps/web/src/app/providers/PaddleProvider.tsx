@@ -1,55 +1,50 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { CheckoutEventNames, initializePaddle, type Paddle } from "@paddle/paddle-js";
-
-type CheckoutCompletedHandler = () => void;
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { initializePaddle, type Paddle } from "@paddle/paddle-js";
+import { readPaddleClientEnv } from "./paddleClientEnv";
 
 type PaddleContextValue = {
   paddle: Paddle | null;
   ready: boolean;
-  setCheckoutCompletedHandler: (handler: CheckoutCompletedHandler | null) => void;
+  initializing: boolean;
+  configured: boolean;
 };
 
 const PaddleContext = createContext<PaddleContextValue | undefined>(undefined);
 
-const paddleEnvironment = (): "sandbox" | "production" =>
-  process.env.NEXT_PUBLIC_PADDLE_ENV === "production" ? "production" : "sandbox";
-
 export const PaddleProvider = ({ children }: { children: ReactNode }) => {
+  const { token, environment, configured } = readPaddleClientEnv();
   const [paddle, setPaddle] = useState<Paddle | null>(null);
-  const checkoutCompletedHandlerRef = useRef<CheckoutCompletedHandler | null>(null);
-
-  const setCheckoutCompletedHandler = (handler: CheckoutCompletedHandler | null) => {
-    checkoutCompletedHandlerRef.current = handler;
-  };
+  const [initializing, setInitializing] = useState(configured);
 
   useEffect(() => {
-    const token = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN;
-    if (!token) return;
+    if (!configured || !token) return;
 
     let cancelled = false;
     void initializePaddle({
       token,
-      environment: paddleEnvironment(),
-      eventCallback: (event) => {
-        if (event.name === CheckoutEventNames.CHECKOUT_COMPLETED) {
-          checkoutCompletedHandlerRef.current?.();
-        }
-      },
-    }).then((instance) => {
-      if (!cancelled && instance) setPaddle(instance);
-    });
+      environment,
+    })
+      .then((instance) => {
+        if (cancelled) return;
+        if (instance) setPaddle(instance);
+        setInitializing(false);
+      })
+      .catch(() => {
+        if (!cancelled) setInitializing(false);
+      });
 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [configured, environment, token]);
 
   const value: PaddleContextValue = {
     paddle,
     ready: Boolean(paddle),
-    setCheckoutCompletedHandler,
+    initializing,
+    configured,
   };
 
   return <PaddleContext.Provider value={value}>{children}</PaddleContext.Provider>;
