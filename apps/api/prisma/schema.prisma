@@ -288,6 +288,7 @@ model GenerationPurchase {
   id                  String                   @id @default(uuid()) @db.Uuid
   userId              String                   @db.Uuid
   status              GenerationPurchaseStatus @default(PENDING)
+  productKey          String                   @default("haiku_generations_100")
   credits             Int                      @default(100)
   paddleTransactionId String?                  @unique
   paddleEventId       String?                  @unique

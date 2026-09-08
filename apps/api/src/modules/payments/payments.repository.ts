@@ -1,6 +1,19 @@
 import { GenerationPurchaseStatus } from "../../generated/prisma";
 import { prismaClient } from "../../lib/prisma";
 import { isUniqueConstraintError } from "../../utils/prismaErrors";
+import { GENERATION_PACK_CREDITS, GENERATION_PACK_PRODUCT_KEY } from "./constants";
+
+const pendingPurchaseSelect = {
+  id: true,
+  userId: true,
+  status: true,
+  productKey: true,
+  credits: true,
+  paddleTransactionId: true,
+  paddleEventId: true,
+  createdAt: true,
+  completedAt: true,
+} as const;
 
 export const paymentsRepository = {
   async getCredits(userId: string): Promise<number | null> {
@@ -11,14 +24,22 @@ export const paymentsRepository = {
     return user?.generationCredits ?? null;
   },
 
-  createPendingPurchase(userId: string, credits: number) {
+  createPendingPurchase(userId: string) {
     return prismaClient.generationPurchase.create({
       data: {
         userId,
-        credits,
+        productKey: GENERATION_PACK_PRODUCT_KEY,
+        credits: GENERATION_PACK_CREDITS,
         status: GenerationPurchaseStatus.PENDING,
       },
-      select: { id: true, credits: true },
+      select: pendingPurchaseSelect,
+    });
+  },
+
+  findById(purchaseReference: string) {
+    return prismaClient.generationPurchase.findUnique({
+      where: { id: purchaseReference },
+      select: pendingPurchaseSelect,
     });
   },
 

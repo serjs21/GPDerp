@@ -7,6 +7,7 @@ jest.mock("../../../env", () => ({
 jest.mock("../payments.repository", () => ({
   paymentsRepository: {
     createPendingPurchase: jest.fn(),
+    findById: jest.fn(),
     getCredits: jest.fn(),
     fulfillCompletedPurchase: jest.fn(),
   },
@@ -18,6 +19,7 @@ import { paymentsService } from "../payments.service";
 const { paymentsRepository } = jest.requireMock("../payments.repository") as {
   paymentsRepository: {
     createPendingPurchase: jest.Mock;
+    findById: jest.Mock;
     getCredits: jest.Mock;
     fulfillCompletedPurchase: jest.Mock;
   };
@@ -89,6 +91,31 @@ describe("paymentsService.handleVerifiedEvent", () => {
 
     expect(result).toEqual({ status: "ignored", reason: "missing_reference" });
     expect(paymentsRepository.fulfillCompletedPurchase).not.toHaveBeenCalled();
+  });
+});
+
+describe("paymentsService.createPendingPurchaseForUser", () => {
+  it("creates a pending purchase for the user", async () => {
+    const row = { id: purchaseReference, userId: "user-1", credits: 100 };
+    paymentsRepository.createPendingPurchase.mockResolvedValue(row);
+
+    await expect(paymentsService.createPendingPurchaseForUser("user-1")).resolves.toEqual(row);
+    expect(paymentsRepository.createPendingPurchase).toHaveBeenCalledWith("user-1");
+  });
+});
+
+describe("paymentsService.findPurchaseByReference", () => {
+  it("returns null for a non-uuid reference", async () => {
+    await expect(paymentsService.findPurchaseByReference("not-a-uuid")).resolves.toBeNull();
+    expect(paymentsRepository.findById).not.toHaveBeenCalled();
+  });
+
+  it("looks up a valid purchase reference", async () => {
+    const row = { id: purchaseReference, userId: "user-1" };
+    paymentsRepository.findById.mockResolvedValue(row);
+
+    await expect(paymentsService.findPurchaseByReference(purchaseReference)).resolves.toEqual(row);
+    expect(paymentsRepository.findById).toHaveBeenCalledWith(purchaseReference);
   });
 });
 

@@ -1,7 +1,7 @@
 import { EventName, type EventEntity, type TransactionNotification } from "@paddle/paddle-node-sdk";
 import { env } from "../../env";
 import { isUuid } from "../../utils/uuid";
-import { GENERATION_PACK_CREDITS, PURCHASE_REFERENCE_CUSTOM_DATA_KEY } from "./constants";
+import { PURCHASE_REFERENCE_CUSTOM_DATA_KEY } from "./constants";
 import { paymentsRepository } from "./payments.repository";
 
 const readPurchaseReference = (customData: unknown): string | null => {
@@ -14,8 +14,17 @@ const transactionHasExpectedPrice = (transaction: TransactionNotification, price
   transaction.items.some((item) => item.price?.id === priceId);
 
 export const paymentsService = {
+  createPendingPurchaseForUser(userId: string) {
+    return paymentsRepository.createPendingPurchase(userId);
+  },
+
+  findPurchaseByReference(purchaseReference: string) {
+    if (!isUuid(purchaseReference)) return Promise.resolve(null);
+    return paymentsRepository.findById(purchaseReference);
+  },
+
   async createCheckout(userId: string) {
-    const purchase = await paymentsRepository.createPendingPurchase(userId, GENERATION_PACK_CREDITS);
+    const purchase = await paymentsService.createPendingPurchaseForUser(userId);
     return {
       purchaseReference: purchase.id,
       priceId: env.PADDLE_PRICE_ID,

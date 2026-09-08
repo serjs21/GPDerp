@@ -2,20 +2,83 @@ jest.mock("../../../lib/prisma", () => ({
   prismaClient: {
     $transaction: jest.fn(),
     user: { findUnique: jest.fn() },
-    generationPurchase: { create: jest.fn() },
+    generationPurchase: { create: jest.fn(), findUnique: jest.fn() },
   },
 }));
 
 import { GenerationPurchaseStatus } from "../../../generated/prisma";
+import { GENERATION_PACK_CREDITS, GENERATION_PACK_PRODUCT_KEY } from "../constants";
 import { paymentsRepository } from "../payments.repository";
 
 const { prismaClient } = jest.requireMock("../../../lib/prisma") as {
   prismaClient: {
     $transaction: jest.Mock;
+    generationPurchase: {
+      create: jest.Mock;
+      findUnique: jest.Mock;
+    };
   };
 };
 
 const purchaseReference = "11111111-1111-4111-8111-111111111111";
+
+describe("paymentsRepository.createPendingPurchase", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("inserts a pending 100-credit pack for the user", async () => {
+    const row = {
+      id: purchaseReference,
+      userId: "user-1",
+      status: GenerationPurchaseStatus.PENDING,
+      productKey: GENERATION_PACK_PRODUCT_KEY,
+      credits: GENERATION_PACK_CREDITS,
+      paddleTransactionId: null,
+      paddleEventId: null,
+      createdAt: new Date("2026-09-08T00:00:00.000Z"),
+      completedAt: null,
+    };
+    prismaClient.generationPurchase.create.mockResolvedValue(row);
+
+    await expect(paymentsRepository.createPendingPurchase("user-1")).resolves.toEqual(row);
+    expect(prismaClient.generationPurchase.create).toHaveBeenCalledWith({
+      data: {
+        userId: "user-1",
+        productKey: GENERATION_PACK_PRODUCT_KEY,
+        credits: GENERATION_PACK_CREDITS,
+        status: GenerationPurchaseStatus.PENDING,
+      },
+      select: expect.objectContaining({
+        id: true,
+        productKey: true,
+        credits: true,
+      }),
+    });
+  });
+});
+
+describe("paymentsRepository.findById", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("returns the purchase when the reference exists", async () => {
+    const row = { id: purchaseReference, userId: "user-1" };
+    prismaClient.generationPurchase.findUnique.mockResolvedValue(row);
+
+    await expect(paymentsRepository.findById(purchaseReference)).resolves.toEqual(row);
+    expect(prismaClient.generationPurchase.findUnique).toHaveBeenCalledWith({
+      where: { id: purchaseReference },
+      select: expect.objectContaining({ id: true, userId: true }),
+    });
+  });
+
+  it("returns null when the reference is missing", async () => {
+    prismaClient.generationPurchase.findUnique.mockResolvedValue(null);
+    await expect(paymentsRepository.findById(purchaseReference)).resolves.toBeNull();
+  });
+});
 
 describe("paymentsRepository.fulfillCompletedPurchase", () => {
   beforeEach(() => {
