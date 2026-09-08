@@ -1,0 +1,67 @@
+import fp from "fastify-plugin";
+import rawBody from "fastify-raw-body";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { verifyPaddleWebhook } from "./paddleWebhook";
+import { paymentsService } from "./payments.service";
+
+const toRawBodyString = (rawBody: string | Buffer | undefined): string | null => {
+  if (typeof rawBody === "string" && rawBody.length > 0) return rawBody;
+  if (Buffer.isBuffer(rawBody) && rawBody.length > 0) return rawBody.toString("utf8");
+  return null;
+};
+
+const paymentsPluginImpl = async (app: FastifyInstance) => {
+  await app.register(rawBody, {
+    field: "rawBody",
+    global: false,
+    encoding: "utf8",
+    runFirst: true,
+  });
+
+  app.post(
+    "/payments/checkout",
+    { preHandler: [app.requireAuthenticated] },
+    async (req: FastifyRequest, res: FastifyReply) => {
+      const userId = req.user?.sub;
+      if (!userId) return res.code(403).send({ ok: false, error: "Unauthorized" });
+      const checkout = await paymentsService.createCheckout(userId);
+      return res.send({ ok: true, data: checkout });
+    },
+  );
+
+  app.get(
+    "/payments/credits",
+    { preHandler: [app.requireAuthenticated] },
+    async (req: FastifyRequest, res: FastifyReply) => {
+      const userId = req.user?.sub;
+      if (!userId) return res.code(403).send({ ok: false, error: "Unauthorized" });
+      const result = await paymentsService.getCredits(userId);
+      if (!result.ok) return res.code(404).send({ ok: false, error: "User not found" });
+      return res.send({ ok: true, data: { credits: result.credits } });
+    },
+  );
+
+  app.post(
+    "/webhooks/paddle",
+    { config: { rawBody: true } },
+    async (req: FastifyRequest, res: FastifyReply) => {
+      const signatureHeader = req.headers["paddle-signature"];
+      const signature = Array.isArray(signatureHeader) ? signatureHeader[0] : signatureHeader;
+      const raw = toRawBodyString(req.rawBody);
+      if (!signature || !raw) {
+        return res.code(400).send({ ok: false, error: "Invalid webhook" });
+      }
+
+      try {
+        const event = await verifyPaddleWebhook(raw, signature);
+        await paymentsService.handleVerifiedEvent(event);
+        return res.send({ ok: true });
+      } catch (error) {
+        req.log.warn({ err: error }, "paddle webhook rejected");
+        return res.code(400).send({ ok: false, error: "Invalid webhook" });
+      }
+    },
+  );
+};
+
+export const paymentsPlugin = fp(paymentsPluginImpl, { name: "payments-routes" });

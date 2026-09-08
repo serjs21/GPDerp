@@ -9,6 +9,10 @@ const REQUIRED_ENV_KEYS = [
   "R2_SECRET_ACCESS_KEY",
   "R2_BUCKET_NAME",
   "R2_PUBLIC_BASE_URL",
+  "PADDLE_API_KEY",
+  "PADDLE_WEBHOOK_SECRET",
+  "PADDLE_ENV",
+  "PADDLE_PRICE_ID",
 ] as const;
 
 const hasValue = (value: string | undefined) => typeof value === "string" && value.trim().length > 0;

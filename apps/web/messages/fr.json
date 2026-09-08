@@ -10,6 +10,18 @@
     "preferencesGroupLabel": "Affichage et langue",
     "preferencesSaveError": "Impossible d'enregistrer les preferences"
   },
+  "BuyGenerations": {
+    "title": "Generations de haiku",
+    "balance": "Vous avez {count} credits de generation.",
+    "balanceUnknown": "Votre solde de credits apparaitra ici.",
+    "product": "100 generations de haiku — un achat ajoute exactement 100 credits.",
+    "buy": "Acheter des generations",
+    "unavailable": "Le paiement n'est pas disponible pour le moment.",
+    "confirming": "Confirmation de votre achat…",
+    "ready": "100 credits de generation ont ete ajoutes.",
+    "pending": "Si vous avez paye, vos credits apparaitront sous peu.",
+    "error": "Impossible de demarrer le paiement."
+  },
   "ProfileInfo": {
     "firstName": "Prenom",
     "lastName": "Nom",

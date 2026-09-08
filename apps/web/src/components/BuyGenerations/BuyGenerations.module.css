@@ -1,0 +1,11 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  scroll-margin-top: calc(var(--layout-chrome-top) + 16px);
+}
+
+.body p {
+  margin: 0;
+}

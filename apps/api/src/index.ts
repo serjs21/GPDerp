@@ -10,6 +10,7 @@ import { labelPlugin } from "./modules/label/label.controller";
 import { shareLinkPlugin } from "./modules/shareLinks/shareLink.controller";
 import { userPlugin } from "./modules/user/user.controller";
 import { iconUploadPlugin } from "./modules/iconUpload/iconUpload.controller";
+import { paymentsPlugin } from "./modules/payments/payments.controller";
 
 const app = Fastify({
   logger: true,
@@ -43,6 +44,7 @@ async function run() {
 
   await app.register(webSocketPlugin);
   await app.register(authPlugin);
+  await app.register(paymentsPlugin);
   await app.register(haikuPlugin);
   await app.register(labelPlugin);
   await app.register(shareLinkPlugin);

@@ -13,6 +13,7 @@ import { AuthenticationVerificationProvider } from "./AuthenticationVerification
 import { CelestialAppShell } from "./CelestialAppShell";
 import { ComicToastProvider } from "@/components/ComicToast";
 import { HaikuFiltersProvider } from "./HaikuFiltersProvider";
+import { PaddleProvider } from "./PaddleProvider";
 
 export interface LayoutProviderProps {
   children: React.ReactNode;
@@ -24,29 +25,31 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
   useMarkHydrated();
 
   const withAuthVerification = (
-    <AuthenticationVerificationProvider>
-      <ComicToastProvider>
-        <HaikuFiltersProvider>
-          <>
-            <AxiosInit />
-            <CelestialAppShell className={layoutStyles.shell}>
-              <header className={styles.header}>
-                <div className={styles.headerBar}>
-                  <AuthNavigation />
-                </div>
-              </header>
-              <main className={layoutStyles.contentMain}>
-                <CompleteRegistrationRedirect />
-                <div className={layoutStyles.contentStretch}>{children}</div>
-              </main>
-              <footer className={layoutStyles.footerSlot}>
-                <SiteFooter />
-              </footer>
-            </CelestialAppShell>
-          </>
-        </HaikuFiltersProvider>
-      </ComicToastProvider>
-    </AuthenticationVerificationProvider>
+    <PaddleProvider>
+      <AuthenticationVerificationProvider>
+        <ComicToastProvider>
+          <HaikuFiltersProvider>
+            <>
+              <AxiosInit />
+              <CelestialAppShell className={layoutStyles.shell}>
+                <header className={styles.header}>
+                  <div className={styles.headerBar}>
+                    <AuthNavigation />
+                  </div>
+                </header>
+                <main className={layoutStyles.contentMain}>
+                  <CompleteRegistrationRedirect />
+                  <div className={layoutStyles.contentStretch}>{children}</div>
+                </main>
+                <footer className={layoutStyles.footerSlot}>
+                  <SiteFooter />
+                </footer>
+              </CelestialAppShell>
+            </>
+          </HaikuFiltersProvider>
+        </ComicToastProvider>
+      </AuthenticationVerificationProvider>
+    </PaddleProvider>
   );
 
   const withGoogleAvailability = (

@@ -25,6 +25,11 @@ enum EmailActionType {
   EMAIL_CHANGE
 }
 
+enum GenerationPurchaseStatus {
+  PENDING
+  COMPLETED
+}
+
 model User {
   id                String    @id @default(uuid()) @db.Uuid
   email             String    @unique
@@ -38,6 +43,7 @@ model User {
   blockedAt         DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
+  generationCredits Int       @default(0)
 
   memberships                    Membership[]
   createdAccounts                Account[]                       @relation("AccountCreatedBy")
@@ -50,6 +56,7 @@ model User {
   emailChangeRequests            UserEmailChangeRequest[]
   suspiciousRegistrationAttempts SuspiciousRegistrationAttempt[]
   configuration                  UserConfiguration?
+  generationPurchases            GenerationPurchase[]
 }
 
 model UserConfiguration {
@@ -275,4 +282,19 @@ model EmailActionToken {
   @@index([userId, type])
   @@index([userId, type, usedAt, invalidatedAt])
   @@index([expiresAt])
+}
+
+model GenerationPurchase {
+  id                  String                   @id @default(uuid()) @db.Uuid
+  userId              String                   @db.Uuid
+  status              GenerationPurchaseStatus @default(PENDING)
+  credits             Int                      @default(100)
+  paddleTransactionId String?                  @unique
+  paddleEventId       String?                  @unique
+  createdAt           DateTime                 @default(now())
+  completedAt         DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
 }

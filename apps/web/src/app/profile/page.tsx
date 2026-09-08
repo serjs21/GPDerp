@@ -25,8 +25,9 @@ import { useLocale } from "@/hooks/useLocale";
 import { useTranslations } from "next-intl";
 import { ProfileProvider, type ProfileContextValue } from "./ProfileContext";
 import { ProfileInfoTab } from "./components/ProfileInfoTab";
-import { UICard } from "@/components/ui";
+import { UICard, UIStack } from "@/components/ui";
 import { shouldApplyServerPreference } from "./tabState";
+import { BuyGenerations } from "@/components/BuyGenerations";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -244,9 +245,12 @@ export default function ProfilePage() {
       }}
     >
       <ProfileProvider value={profileContextValue}>
-        <UICard title={t("title")}>
-          <ProfileInfoTab />
-        </UICard>
+        <UIStack vertical gap={16} style={{ width: "100%" }}>
+          <UICard title={t("title")}>
+            <ProfileInfoTab />
+          </UICard>
+          <BuyGenerations />
+        </UIStack>
       </ProfileProvider>
     </main>
   );

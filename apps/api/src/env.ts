@@ -27,6 +27,13 @@ const requireMinLengthEnv = (key: string, minLength: number) => {
   }
   return value;
 };
+const requirePaddleEnv = (key: string) => {
+  const value = requireEnv(key);
+  if (value !== "sandbox" && value !== "production") {
+    throw new Error(`Invalid environment variable ${key}: expected sandbox or production`);
+  }
+  return value;
+};
 
 export const env = {
   PORT: Number(process.env.PORT ?? 3001),
@@ -78,4 +85,9 @@ POSTGRES_PORT: process.env.POSTGRES_PORT ?? "5433",
   R2_S3_ENDPOINT:
     process.env.R2_S3_ENDPOINT ??
     `https://${requireEnv("R2_ACCOUNT_ID")}.r2.cloudflarestorage.com`,
+
+  PADDLE_API_KEY: requireEnv("PADDLE_API_KEY"),
+  PADDLE_WEBHOOK_SECRET: requireEnv("PADDLE_WEBHOOK_SECRET"),
+  PADDLE_ENV: requirePaddleEnv("PADDLE_ENV"),
+  PADDLE_PRICE_ID: requireEnv("PADDLE_PRICE_ID"),
 };

@@ -1,10 +1,15 @@
-import type { FastifyReply, FastifyRequest } from "fastify";
+import type { FastifyReply } from "fastify";
 
 declare module "fastify" {
   type AuthenticatedUser = { sub: string; sid: string };
 
   interface FastifyRequest {
     user?: AuthenticatedUser;
+    rawBody?: string | Buffer;
+  }
+
+  interface FastifyContextConfig {
+    rawBody?: boolean;
   }
 
   interface FastifyInstance {

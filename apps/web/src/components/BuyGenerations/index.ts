@@ -1,0 +1,1 @@
+export { BuyGenerations } from "./BuyGenerations";

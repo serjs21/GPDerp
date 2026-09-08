@@ -28,6 +28,14 @@ export const LoggedInUserMenuButton = ({ user, onLogout }: LoggedInUserMenuButto
       ),
     },
     {
+      key: "buyGenerations",
+      label: (
+        <Link href="/profile#buy-generations">
+          <div className={navStyles.userDropdownItem}>Buy generations</div>
+        </Link>
+      ),
+    },
+    {
       key: "manageShareLinks",
       label: (
         <Link href="/manage_share_links">
