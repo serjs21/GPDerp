@@ -1,0 +1,119 @@
+.scene {
+  --lantern-width: 320px;
+  --lantern-depth: 320px;
+  --lantern-wall-height: 285px;
+  --lantern-half-depth: 160px;
+  --lantern-half-height: 142.5px;
+  --lantern-perspective: 900px;
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: calc(var(--lantern-wall-height) + var(--lantern-depth) * 0.55);
+  padding: 2.5rem 1rem;
+  perspective: var(--lantern-perspective);
+  perspective-origin: 50% 45%;
+  box-sizing: border-box;
+}
+
+.lantern {
+  position: relative;
+  width: var(--lantern-width);
+  height: var(--lantern-wall-height);
+  transform-style: preserve-3d;
+  transform-origin: center center;
+}
+
+.wall,
+.base {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.wall {
+  width: var(--lantern-width);
+  height: var(--lantern-wall-height);
+  margin-left: calc(var(--lantern-width) / -2);
+  margin-top: calc(var(--lantern-wall-height) / -2);
+  overflow: hidden;
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Dimensional shading overlays */
+.wall::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.08) 0%,
+    rgba(0, 0, 0, 0.22) 100%
+  );
+}
+
+.wallFront::after {
+  opacity: 0.25;
+}
+
+.wallRight::after {
+  opacity: 0.55;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.12) 0%,
+    rgba(0, 0, 0, 0.38) 100%
+  );
+}
+
+.wallLeft::after {
+  opacity: 0.5;
+  background: linear-gradient(
+    225deg,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(0, 0, 0, 0.35) 100%
+  );
+}
+
+.wallBack::after {
+  opacity: 0.85;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.base {
+  width: var(--lantern-width);
+  height: var(--lantern-depth);
+  margin-left: calc(var(--lantern-width) / -2);
+  margin-top: calc(var(--lantern-depth) / -2);
+  overflow: hidden;
+  /* Slight oversize so trapezoid seams meet wall edges more cleanly */
+  background-size: 102% 102%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.content {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 70%;
+  height: 55%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transform: translate(-50%, -50%) translateZ(0);
+  transform-style: preserve-3d;
+  pointer-events: auto;
+  z-index: 2;
+}
