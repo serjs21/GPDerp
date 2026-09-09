@@ -1,0 +1,59 @@
+.root :global([class*="option"]) {
+  gap: 0.55rem;
+}
+
+.root :global([class*="shell"]) {
+  min-width: 14rem;
+}
+
+.triggerInner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.triggerLabel {
+  line-height: 1.2;
+}
+
+.flag {
+  display: block;
+  width: 1.15rem;
+  height: auto;
+  flex: 0 0 auto;
+  border: 1px solid color-mix(in srgb, #111111 18%, transparent);
+}
+
+.fallbackIcon {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+}
+
+.optionLabel {
+  min-width: 0;
+  flex: 1 1 auto;
+  text-align: left;
+}
+
+.localeCode {
+  flex: 0 0 auto;
+  opacity: 0.55;
+  font-size: 0.85em;
+  letter-spacing: 0.04em;
+}
+
+.check {
+  flex: 0 0 auto;
+  width: 1rem;
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: 1.15rem;
+  line-height: 1;
+  color: #111111;
+  text-align: center;
+}
+
+.checkSpacer {
+  flex: 0 0 auto;
+  width: 1rem;
+}

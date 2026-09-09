@@ -6,6 +6,7 @@ import {
   useId,
   useRef,
   useState,
+  type ReactNode,
 } from "react";
 import { ComicBubbleStage } from "@/components/ComicConfirmModal/ComicBubbleStage";
 import stageStyles from "@/components/ComicConfirmModal/comicBubbleStage.module.css";
@@ -51,6 +52,17 @@ export type TextBubbleDropdownProps = {
   tailDirection?: TextBubbleTailDirection;
   /** Panel placement relative to the trigger. Default `down`. */
   dropDirection?: TextBubbleDropDirection;
+  /** Override the default text trigger button contents. */
+  renderTrigger?: (ctx: {
+    open: boolean;
+    label: string;
+    value: string | null;
+  }) => ReactNode;
+  /** Override default option row contents. */
+  renderOption?: (ctx: {
+    option: TextBubbleOption;
+    selected: boolean;
+  }) => ReactNode;
 };
 
 const DROP_PANEL_CLASS: Record<TextBubbleDropDirection, string> = {
@@ -79,6 +91,8 @@ export function TextBubbleDropdown({
   disabled = false,
   tailDirection = "top-left",
   dropDirection = "down",
+  renderTrigger,
+  renderOption,
 }: TextBubbleDropdownProps) {
   const listId = useId();
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -174,7 +188,9 @@ export function TextBubbleDropdown({
         disabled={disabled}
         onClick={toggle}
       >
-        {triggerLabel}
+        {renderTrigger
+          ? renderTrigger({ open, label: triggerLabel, value })
+          : triggerLabel}
       </button>
 
       {open ? (
@@ -205,12 +221,18 @@ export function TextBubbleDropdown({
                           .join(" ")}
                         onClick={() => selectOption(option.value)}
                       >
-                        <span className={styles.optionLabel}>{option.label}</span>
-                        {isSelected ? (
-                          <span className={styles.check} aria-hidden>
-                            ✓
-                          </span>
-                        ) : null}
+                        {renderOption ? (
+                          renderOption({ option, selected: isSelected })
+                        ) : (
+                          <>
+                            <span className={styles.optionLabel}>{option.label}</span>
+                            {isSelected ? (
+                              <span className={styles.check} aria-hidden>
+                                ✓
+                              </span>
+                            ) : null}
+                          </>
+                        )}
                       </button>
                     </li>
                   );
