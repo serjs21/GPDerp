@@ -1,7 +1,7 @@
 "use client";
 
 import { comicToast } from "@/components/ComicToast";
-import { LocaleSelector } from "@/components/LocaleSelector";
+import { LocaleBubbleSelector } from "@/components/LocaleBubbleSelector";
 import { CelestialThemeSelector } from "@/components/CelestialThemeSelector";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
@@ -54,12 +54,14 @@ export const HeaderPreferences = () => {
 
   return (
     <div className={styles.wrap} role="group" aria-label={t("preferencesGroupLabel")}>
-      <LocaleSelector
+      <LocaleBubbleSelector
         value={locale}
         options={languageOptions}
         onChange={onLocaleChange}
         className={styles.localeSelector}
-        getPopupContainer={(node) => node.parentElement ?? document.body}
+        dropDirection="down-left"
+        tailDirection="top-right"
+        ariaLabel={t("language")}
       />
     <CelestialThemeSelector
         slot={effectiveSlot}

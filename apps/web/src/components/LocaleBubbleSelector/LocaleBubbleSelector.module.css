@@ -6,6 +6,32 @@
   min-width: 14rem;
 }
 
+.search {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.4rem 0.55rem;
+  border: 2px solid color-mix(in srgb, #111111 55%, transparent);
+  border-radius: 0.15rem;
+  background: color-mix(in srgb, #ffffff 70%, #f7f4ef 30%);
+  color: var(--sumi-ink, #2d2d2d);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.search:focus {
+  outline: none;
+  border-color: #111111;
+}
+
+.search::placeholder {
+  color: color-mix(in srgb, #111111 45%, transparent);
+  opacity: 1;
+}
+
 .triggerInner {
   display: inline-flex;
   align-items: center;
@@ -34,13 +60,6 @@
   min-width: 0;
   flex: 1 1 auto;
   text-align: left;
-}
-
-.localeCode {
-  flex: 0 0 auto;
-  opacity: 0.55;
-  font-size: 0.85em;
-  letter-spacing: 0.04em;
 }
 
 .check {

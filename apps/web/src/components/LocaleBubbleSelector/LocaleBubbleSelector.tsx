@@ -1,7 +1,15 @@
 "use client";
 
-import type { ComponentType } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentType,
+} from "react";
 import { Languages } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { DE, ES, FR, IT, JP, PT, TH, US } from "country-flag-icons/react/3x2";
 import {
   TextBubbleDropdown,
@@ -10,6 +18,10 @@ import {
 } from "@/components/TextBubbleDropdown";
 import type { AppLocale } from "@/config/userConfiguration";
 import type { LocaleOption } from "@/components/LocaleSelector";
+import {
+  languageMatchesQuery,
+  nativeLanguageLabel,
+} from "./localeLanguageLabels";
 import styles from "./LocaleBubbleSelector.module.css";
 
 type FlagComponent = ComponentType<{
@@ -45,6 +57,7 @@ export type LocaleBubbleSelectorProps = {
 
 /**
  * Locale picker using the comic TextBubbleDropdown shell (Storybook-style speech menu).
+ * Options show endonyms; search matches language names across all supported locales.
  */
 export function LocaleBubbleSelector({
   value,
@@ -55,31 +68,85 @@ export function LocaleBubbleSelector({
   placeholder = "Language",
   dropDirection = "down",
   tailDirection = "top-left",
-  open,
-  defaultOpen,
+  open: openProp,
+  defaultOpen = false,
   onOpenChange,
   disabled,
 }: LocaleBubbleSelectorProps) {
+  const t = useTranslations("Profile");
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
+  const isControlled = openProp !== undefined;
+  const open = isControlled ? Boolean(openProp) : uncontrolledOpen;
+
   const SelectedFlag = LOCALE_FLAGS[value];
-  const selectedLabel = options.find((option) => option.value === value)?.label ?? value;
+  const selectedLabel = nativeLanguageLabel(value);
   const mergedAriaLabel = ariaLabel ?? `Language: ${selectedLabel}`;
+
+  const labeledOptions = useMemo(
+    () =>
+      options.map((option) => ({
+        value: option.value,
+        label: nativeLanguageLabel(option.value),
+      })),
+    [options],
+  );
+
+  const filteredOptions = useMemo(() => {
+    if (!searchQuery.trim()) return labeledOptions;
+    return labeledOptions.filter((option) =>
+      languageMatchesQuery(option.value, searchQuery),
+    );
+  }, [labeledOptions, searchQuery]);
+
+  const handleOpenChange = useCallback(
+    (next: boolean) => {
+      if (!isControlled) setUncontrolledOpen(next);
+      onOpenChange?.(next);
+      if (!next) setSearchQuery("");
+    },
+    [isControlled, onOpenChange],
+  );
+
+  useEffect(() => {
+    if (!open || disabled) return;
+    const id = requestAnimationFrame(() => {
+      searchInputRef.current?.focus();
+    });
+    return () => cancelAnimationFrame(id);
+  }, [disabled, open]);
 
   return (
     <TextBubbleDropdown
       className={[styles.root, className].filter(Boolean).join(" ")}
-      options={options.map((option) => ({
-        value: option.value,
-        label: option.label,
-      }))}
+      options={filteredOptions}
       value={value}
       onChange={(next) => onChange(next as AppLocale)}
       placeholder={placeholder}
       dropDirection={dropDirection}
       tailDirection={tailDirection}
       open={open}
-      defaultOpen={defaultOpen}
-      onOpenChange={onOpenChange}
+      onOpenChange={handleOpenChange}
       disabled={disabled}
+      emptyMessage={t("languageNoMatches")}
+      panelHeader={
+        <input
+          ref={searchInputRef}
+          type="search"
+          className={styles.search}
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+          placeholder={t("languageSearchPlaceholder")}
+          aria-label={t("languageSearchPlaceholder")}
+          onMouseDown={(event) => event.stopPropagation()}
+          onClick={(event) => event.stopPropagation()}
+          onKeyDown={(event) => {
+            // Keep typing from closing / toggling the trigger.
+            event.stopPropagation();
+          }}
+        />
+      }
       renderTrigger={() => (
         <span className={styles.triggerInner} aria-label={mergedAriaLabel}>
           {SelectedFlag ? (
@@ -100,9 +167,6 @@ export function LocaleBubbleSelector({
               <Languages className={styles.fallbackIcon} aria-hidden />
             )}
             <span className={styles.optionLabel}>{option.label}</span>
-            <span className={styles.localeCode} aria-hidden>
-              {locale.toUpperCase()}
-            </span>
             {selected ? (
               <span className={styles.check} aria-hidden>
                 ✓
