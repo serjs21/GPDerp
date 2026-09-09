@@ -12,7 +12,7 @@ type GoogleSquareButtonProps = {
 };
 
 function googleLabel(text: GoogleSquareButtonProps["text"]): string {
-  return text === "signup_with" ? "Sign up with Google" : "Sign in with Google";
+  return text === "signup_with" ? "Register with Google" : "Login with Google";
 }
 
 /** Official multicolor G — colors must stay unmodified per Google branding. */

@@ -212,7 +212,7 @@ export const LoginFlow = forwardRef<AuthFlowHandle, LoginFlowProps>(function Log
         {!hideCta ? (
           <div className={authStyles.submitItem}>
             <ComicPageCtaAction
-              label={submitting ? "Signing in" : "Sign in"}
+              label={submitting ? "Logging in" : "Login with password"}
               busy={submitting}
               disabled={submitting}
               onClick={validateAndSubmit}

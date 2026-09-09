@@ -64,7 +64,7 @@ export function AuthGateModal({
       ctaFooter={
         mode === "login" ? (
           <ComicPageCtaAction
-            label="Sign in"
+            label="Login with password"
             busy={submitting}
             disabled={submitting}
             onClick={() => loginRef.current?.submit()}
@@ -109,7 +109,7 @@ export function AuthGateModal({
             onSelect={() => setMode("register")}
             background="halftone"
             color="purple"
-            title="Register"
+            title="Sign up"
             overflowVisible
             flexWeight={mode === "register" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
             ariaLabel="Register"

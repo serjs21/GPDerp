@@ -38,14 +38,8 @@ const EXTRA_SEARCH_ALIASES: Partial<Record<AppLocale, readonly string[]>> = {
 };
 
 export function nativeLanguageLabel(locale: AppLocale): string {
-  const fallback = NATIVE_LABELS[locale] ?? locale;
-  if (locale === "lol") return fallback;
-  try {
-    const name = new Intl.DisplayNames([locale], { type: "language" }).of(locale);
-    return name ?? fallback;
-  } catch {
-    return fallback;
-  }
+  // Prefer curated endonyms so Latin names stay capitalized (Intl often returns "français").
+  return NATIVE_LABELS[locale] ?? locale;
 }
 
 /** Fold accents so "francais" matches "Français". */

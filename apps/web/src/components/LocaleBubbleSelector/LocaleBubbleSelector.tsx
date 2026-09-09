@@ -7,10 +7,12 @@ import {
   useRef,
   useState,
   type ComponentType,
+  type RefObject,
 } from "react";
-import { Languages } from "lucide-react";
+import { Languages, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { DE, ES, FR, IT, JP, PT, TH, US } from "country-flag-icons/react/3x2";
+import { Nuki } from "@/components/Dividers";
 import {
   TextBubbleDropdown,
   type TextBubbleDropDirection,
@@ -39,6 +41,42 @@ const LOCALE_FLAGS: Partial<Record<AppLocale, FlagComponent>> = {
   it: IT,
   pt: PT,
 };
+
+function LocaleSearchHeader({
+  inputRef,
+  value,
+  onChange,
+  placeholder,
+}: {
+  inputRef: RefObject<HTMLInputElement | null>;
+  value: string;
+  onChange: (next: string) => void;
+  placeholder: string;
+}) {
+  return (
+    <div className={styles.searchBlock}>
+      <div className={styles.searchRow}>
+        <Search className={styles.searchIcon} aria-hidden />
+        <input
+          ref={inputRef}
+          type="search"
+          className={styles.search}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder={placeholder}
+          aria-label={placeholder}
+          onMouseDown={(event) => event.stopPropagation()}
+          onClick={(event) => event.stopPropagation()}
+          onKeyDown={(event) => event.stopPropagation()}
+        />
+        <span className={styles.checkSpacer} aria-hidden />
+      </div>
+      <div className={styles.searchDivider}>
+        <Nuki />
+      </div>
+    </div>
+  );
+}
 
 export type LocaleBubbleSelectorProps = {
   value: AppLocale;
@@ -131,20 +169,11 @@ export function LocaleBubbleSelector({
       disabled={disabled}
       emptyMessage={t("languageNoMatches")}
       panelHeader={
-        <input
-          ref={searchInputRef}
-          type="search"
-          className={styles.search}
+        <LocaleSearchHeader
+          inputRef={searchInputRef}
           value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
+          onChange={setSearchQuery}
           placeholder={t("languageSearchPlaceholder")}
-          aria-label={t("languageSearchPlaceholder")}
-          onMouseDown={(event) => event.stopPropagation()}
-          onClick={(event) => event.stopPropagation()}
-          onKeyDown={(event) => {
-            // Keep typing from closing / toggling the trigger.
-            event.stopPropagation();
-          }}
         />
       }
       renderTrigger={() => (

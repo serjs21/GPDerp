@@ -7,30 +7,79 @@
   min-height: 10rem;
 }
 
-.search {
+.searchBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: 0 0 0.15rem;
+}
+
+.searchRow {
   box-sizing: border-box;
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
   width: 100%;
   margin: 0;
-  padding: 0.4rem 0.55rem;
-  border: 2px solid color-mix(in srgb, #111111 55%, transparent);
+  padding: 0.45rem 0.55rem;
+  border: none;
   border-radius: 0.15rem;
-  background: color-mix(in srgb, #ffffff 70%, #f7f4ef 30%);
+  background: transparent;
+  color: inherit;
+}
+
+.searchIcon {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: 0 0 auto;
   color: var(--sumi-ink, #2d2d2d);
+  stroke-width: 2.25px;
+}
+
+.search {
+  box-sizing: border-box;
+  min-width: 0;
+  flex: 1 1 auto;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
   font: inherit;
-  font-size: 0.95rem;
+  font-size: 1.08rem;
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1.25;
+  text-align: left;
 }
 
 .search:focus {
   outline: none;
-  border-color: #111111;
 }
 
 .search::placeholder {
   color: color-mix(in srgb, #111111 45%, transparent);
   opacity: 1;
+  font-weight: 600;
+}
+
+.search::-webkit-search-decoration,
+.search::-webkit-search-cancel-button,
+.search::-webkit-search-results-button,
+.search::-webkit-search-results-decoration {
+  display: none;
+}
+
+.searchDivider {
+  width: 100%;
+  margin: 0.25rem 0 0.2rem;
+  overflow: hidden;
+}
+
+.searchDivider :global([class*="nuki"]) {
+  width: 100%;
+  margin-top: 0;
+  height: 3px;
 }
 
 .triggerInner {
