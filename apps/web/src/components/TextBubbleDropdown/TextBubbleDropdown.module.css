@@ -1,0 +1,279 @@
+.root {
+  --text-bubble-motion: 260ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.rootOpen {
+  overflow: visible;
+}
+
+.trigger {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0.45rem 0.85rem;
+  border: 3px solid var(--sumi-ink, #2d2d2d);
+  border-radius: 0.2rem;
+  background: #f7f4ef;
+  color: var(--sumi-ink, #2d2d2d);
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 #111111;
+}
+
+.trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.trigger:hover:not(:disabled),
+.trigger[aria-expanded="true"]:not(:disabled) {
+  opacity: 0.92;
+}
+
+.panel {
+  position: absolute;
+  z-index: 20;
+  min-width: 16rem;
+  width: max-content;
+  max-width: min(24rem, 92vw);
+  overflow: visible;
+  will-change: transform, opacity;
+}
+
+.panelDropDown {
+  top: calc(100% + 0.2rem);
+  left: 0;
+  transform-origin: top left;
+}
+
+.panelDropUp {
+  bottom: calc(100% + 0.2rem);
+  left: 0;
+  transform-origin: bottom left;
+}
+
+.panelDropLeft {
+  top: 0;
+  right: calc(100% + 0.2rem);
+  left: auto;
+  transform-origin: top right;
+}
+
+.panelDropRight {
+  top: 0;
+  left: calc(100% + 0.2rem);
+  transform-origin: top left;
+}
+
+.panelDropDownLeft {
+  top: calc(100% + 0.2rem);
+  right: 0;
+  left: auto;
+  transform-origin: top right;
+}
+
+.panelDropDownRight {
+  top: calc(100% + 0.2rem);
+  left: 0;
+  transform-origin: top left;
+}
+
+.panelDropUpLeft {
+  bottom: calc(100% + 0.2rem);
+  right: 0;
+  left: auto;
+  transform-origin: bottom right;
+}
+
+.panelDropUpRight {
+  bottom: calc(100% + 0.2rem);
+  left: 0;
+  transform-origin: bottom left;
+}
+
+.panel[data-state="open"] {
+  animation: textBubbleIn var(--text-bubble-motion) forwards;
+}
+
+.panelDropUp[data-state="open"],
+.panelDropUpLeft[data-state="open"],
+.panelDropUpRight[data-state="open"] {
+  animation-name: textBubbleInUp;
+}
+
+.panelDropLeft[data-state="open"] {
+  animation-name: textBubbleInLeft;
+}
+
+.panelDropRight[data-state="open"] {
+  animation-name: textBubbleInRight;
+}
+
+.stage {
+  display: block;
+  width: 100%;
+  max-width: none;
+  overflow: visible;
+}
+
+/*
+ * Extra inset so canvas contains stroke, shadow, and tail tip (TAIL_EXTENSION=36).
+ */
+.stageCompact {
+  padding: 2.75rem 3.25rem;
+}
+
+.stageTailBottom {
+  padding: 2.75rem 3.25rem 4.25rem;
+}
+
+.stageTailTop {
+  padding: 4.25rem 3.25rem 2.75rem;
+}
+
+.stageTailLeft {
+  padding: 2.75rem 3.25rem 2.75rem 4.25rem;
+}
+
+.stageTailRight {
+  padding: 2.75rem 4.25rem 2.75rem 3.25rem;
+}
+
+.shell {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  min-width: 12rem;
+  padding: 0.55rem 0.65rem;
+  border: none;
+  background: transparent;
+  color: var(--sumi-ink, #2d2d2d);
+  font-family: var(--font-lantern-script, cursive);
+  pointer-events: auto;
+}
+
+.list {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  max-height: 11.5rem;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  list-style: none;
+  overscroll-behavior: contain;
+}
+
+.item {
+  margin: 0;
+  padding: 0;
+}
+
+.option {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.45rem 0.55rem;
+  border: none;
+  border-radius: 0.15rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1.08rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+}
+
+.option:hover,
+.option:focus-visible {
+  background: color-mix(in srgb, #9ec9ef 55%, transparent);
+  outline: none;
+}
+
+.optionSelected {
+  background: #9ec9ef;
+}
+
+.optionLabel {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.check {
+  flex: 0 0 auto;
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: 1.15rem;
+  line-height: 1;
+  color: #111111;
+}
+
+@keyframes textBubbleIn {
+  from {
+    opacity: 0;
+    transform: translate3d(10px, 8px, 0) rotate(0.7deg) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes textBubbleInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(10px, -8px, 0) rotate(-0.7deg) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes textBubbleInLeft {
+  from {
+    opacity: 0;
+    transform: translate3d(-10px, 6px, 0) rotate(-0.7deg) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes textBubbleInRight {
+  from {
+    opacity: 0;
+    transform: translate3d(10px, 6px, 0) rotate(0.7deg) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel[data-state="open"] {
+    animation: none;
+  }
+}
