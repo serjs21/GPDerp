@@ -382,7 +382,7 @@ function TextBubbleDropdownInner({
         return;
       }
       const width = shell.offsetWidth;
-      const height = shell.offsetHeight;
+      const height = shell.offsetHeight - 100;
       if (width < 1 || height < 1) return;
       frozenShellSizeRef.current = { width, height };
       shell.style.minWidth = `${width}px`;

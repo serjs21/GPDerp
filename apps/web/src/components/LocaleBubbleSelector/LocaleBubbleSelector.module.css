@@ -3,8 +3,10 @@
 }
 
 .root :global([class*="shell"]) {
-  min-width: 14rem;
+  min-width: 10rem;
   min-height: 10rem;
+  /* dropdown overrides */
+  /* top: 10rem; */
 }
 
 .root :global([class*="panelHeader"]) {
