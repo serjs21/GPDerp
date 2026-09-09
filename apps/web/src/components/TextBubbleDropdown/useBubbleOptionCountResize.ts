@@ -7,7 +7,7 @@ import {
   BUBBLE_RESIZE_DURATION_MS,
   listViewportHeightForOptionCount,
   MAX_VISIBLE_ROWS,
-  MIN_VISIBLE_ROWS, 
+  MIN_VISIBLE_ROWS,
   scaleYForOptionCount,
 } from "./listViewportHeights";
 
@@ -41,33 +41,6 @@ function prefersReducedMotion() {
   );
 }
 
-function debugLog(
-  hypothesisId: string,
-  location: string,
-  message: string,
-  data: Record<string, unknown>,
-  runId = "pre-fix",
-) {
-  // #region agent log
-  fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Debug-Session-Id": "2d0294",
-    },
-    body: JSON.stringify({
-      sessionId: "2d0294",
-      runId,
-      hypothesisId,
-      location,
-      message,
-      data,
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
-}
-
 function lockMax5Base(
   resizeEl: HTMLElement,
   shellEl: HTMLElement,
@@ -86,22 +59,12 @@ function lockMax5Base(
     scaleY: targetScale === 0 ? 1 : 1 / targetScale,
     transformOrigin,
   });
-  debugLog("E", "useBubbleOptionCountResize.ts:lockBase", "locked base to max-5 viewport", {
-    optionCount,
-    capped,
-    targetScale,
-    baseHeight,
-    transformOrigin,
-    rectH: resizeEl.getBoundingClientRect().height,
-  });
 }
 
 function tweenScaleY(
   resizeEl: HTMLElement,
   shellEl: HTMLElement,
-  viewportEl: HTMLElement,
   transformOrigin: string,
-  optionCount: number,
   fromScale: number,
   toScale: number,
   bubbleAnimRef: { current: AnimLike | null },
@@ -111,20 +74,8 @@ function tweenScaleY(
   stopAnim(bubbleAnimRef.current);
   stopAnim(contentAnimRef.current);
 
-  const capped = Math.min(Math.max(optionCount, 0), MAX_VISIBLE_ROWS);
   const contentFrom = fromScale === 0 ? 1 : 1 / fromScale;
   const contentTo = toScale === 0 ? 1 : 1 / toScale;
-
-  debugLog("A", "useBubbleOptionCountResize.ts:runScale", "scale-only tween (no layout height change)", {
-    optionCount,
-    capped,
-    fromScale,
-    toScale,
-    contentFrom,
-    contentTo,
-    layoutHeightVar: viewportEl.style.getPropertyValue("--list-viewport-height"),
-    rectBefore: resizeEl.getBoundingClientRect().height,
-  });
 
   if (prefersReducedMotion()) {
     utils.set(resizeEl, { scaleY: toScale, transformOrigin });
@@ -143,10 +94,6 @@ function tweenScaleY(
     delay: 0,
     onComplete: () => {
       lastScaleRef.current = toScale;
-      debugLog("B", "useBubbleOptionCountResize.ts:onComplete", "bubble scale settled", {
-        toScale,
-        rectAfter: resizeEl.getBoundingClientRect().height,
-      });
     },
   }) as AnimLike;
 
@@ -216,9 +163,7 @@ export function useBubbleOptionCountResize({
         tweenScaleY(
           resizeEl,
           shellEl,
-          viewportEl,
           transformOrigin,
-          optionCount,
           lastScaleRef.current,
           targetScale,
           bubbleAnimRef,
@@ -227,13 +172,6 @@ export function useBubbleOptionCountResize({
         );
       },
     }) as TimerLike;
-
-    debugLog("B", "useBubbleOptionCountResize.ts:schedule", "scheduled scale after debounce", {
-      optionCount,
-      capped,
-      targetScale,
-      lastScale: lastScaleRef.current,
-    });
 
     return () => {
       try {

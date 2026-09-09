@@ -3,7 +3,7 @@
 }
 
 .root :global([class*="shell"]) {
-  min-width: 10rem;
+  min-width: 9rem;
   min-height: 10rem;
   /* dropdown overrides */
   /* top: 10rem; */
