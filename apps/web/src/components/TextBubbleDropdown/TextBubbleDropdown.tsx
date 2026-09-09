@@ -11,7 +11,10 @@ import {
 } from "react";
 import { ComicBubbleStage } from "@/components/ComicConfirmModal/ComicBubbleStage";
 import stageStyles from "@/components/ComicConfirmModal/comicBubbleStage.module.css";
-import type { ComicSourceDirection } from "@/components/ComicConfirmModal/comicSourceDirection";
+import {
+  stagePaddingClassForDirection,
+  type ComicSourceDirection,
+} from "@/components/ComicConfirmModal/comicSourceDirection";
 import styles from "./TextBubbleDropdown.module.css";
 
 export type TextBubbleOption = {
@@ -19,7 +22,7 @@ export type TextBubbleOption = {
   label: string;
 };
 
-/** Where the CSS speech pointer aims (toward the trigger). */
+/** Where the speech tail points (comical source direction). */
 export type TextBubbleTailDirection = ComicSourceDirection;
 
 /** Which side of the trigger the panel opens toward. */
@@ -44,7 +47,7 @@ export type TextBubbleDropdownProps = {
   className?: string;
   disabled?: boolean;
   /**
-   * CSS pointer orientation.
+   * Speech-tail orientation.
    * Default `top-left` so a downward dropdown points at the trigger.
    */
   tailDirection?: TextBubbleTailDirection;
@@ -76,17 +79,6 @@ const DROP_PANEL_CLASS: Record<TextBubbleDropDirection, string> = {
   "down-right": styles.panelDropDownRight,
   "up-left": styles.panelDropUpLeft,
   "up-right": styles.panelDropUpRight,
-};
-
-const CSS_TAIL_CLASS: Partial<Record<TextBubbleTailDirection, string>> = {
-  top: styles.shellTailTop,
-  "top-left": styles.shellTailTopLeft,
-  "top-right": styles.shellTailTopRight,
-  bottom: styles.shellTailBottom,
-  "bottom-left": styles.shellTailBottomLeft,
-  "bottom-right": styles.shellTailBottomRight,
-  left: styles.shellTailLeft,
-  right: styles.shellTailRight,
 };
 
 function useDismissOnOutside({
@@ -209,32 +201,33 @@ function TextBubblePanel({
   shellRef: RefObject<HTMLDivElement | null>;
   getTargets: () => Array<{
     element: HTMLDivElement | null;
-    style: "rectangle";
-    sourceDirection: "none";
+    style: "speech";
+    sourceDirection: TextBubbleTailDirection;
     isQuestion: boolean;
     backgroundColors: string[];
   }>;
   onSelect: (value: string) => void;
 }) {
-  const cssTailClass = CSS_TAIL_CLASS[tailDirection] ?? null;
   const panelClass = [styles.panel, DROP_PANEL_CLASS[dropDirection]].filter(Boolean).join(" ");
+  const stagePaddingClass = stagePaddingClassForDirection(tailDirection, {
+    stageTailBottom: styles.stageTailBottom,
+    stageTailTop: styles.stageTailTop,
+    stageTailLeft: styles.stageTailLeft,
+    stageTailRight: styles.stageTailRight,
+    stageCompact: styles.stageCompact,
+  });
 
   return (
     <div className={panelClass} data-state="open" data-drop={dropDirection}>
       <ComicBubbleStage
         active
-        targetsKey={`text-bubble-dropdown:none:${dropDirection}:${options.length}:${value ?? ""}`}
+        targetsKey={`text-bubble-dropdown:${tailDirection}:${dropDirection}:${options.length}:${value ?? ""}`}
         getTargets={getTargets}
-        className={[stageStyles.stage, styles.stage, styles.stageCompact]
+        className={[stageStyles.stage, styles.stage, stagePaddingClass]
           .filter(Boolean)
           .join(" ")}
       >
-        <div
-          ref={shellRef}
-          className={[styles.shell, cssTailClass].filter(Boolean).join(" ")}
-          data-comic-role="dialog-content"
-          data-css-tail={tailDirection}
-        >
+        <div ref={shellRef} className={styles.shell} data-comic-role="dialog-content">
           {panelHeader ? <div className={styles.panelHeader}>{panelHeader}</div> : null}
           <TextBubbleOptionList
             listId={listId}
@@ -277,7 +270,6 @@ function useOpenState({
 
 /**
  * Comic speech-bubble dropdown with scrollable options and a checkmarked selection.
- * Comical draws a tailless bubble; the pointer is a CSS ::before/::after on the shell.
  */
 export function TextBubbleDropdown(props: TextBubbleDropdownProps) {
   return (
@@ -350,14 +342,14 @@ function TextBubbleDropdownInner({
     () => [
       {
         element: shellRef.current,
-        // Tight box so the CSS ::after pointer sits on the edge (speech outlines overshoot tall lists).
-        style: "rectangle" as const,
-        sourceDirection: "none" as const,
+        style: "speech" as const,
+        sourceDirection: tailDirection,
+        // Must stay false: isQuestion strips tails in applySourceDirectionToSpec.
         isQuestion: false,
         backgroundColors: ["#f7f4ef"],
       },
     ],
-    [],
+    [tailDirection],
   );
 
   const toggle = () => {
