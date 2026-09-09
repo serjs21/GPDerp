@@ -347,30 +347,30 @@ function TextBubbleDropdownInner({
   }, [open]);
 
   // Lock shell box after first open layout so search/filter can't reshape the bubble.
-  useEffect(() => {
-    if (!open) return;
-    const shell = shellRef.current;
-    if (!shell) return;
+  // useEffect(() => {
+  //   if (!open) return;
+  //   const shell = shellRef.current;
+  //   if (!shell) return;
 
-    const lockSize = () => {
-      if (frozenShellSizeRef.current) {
-        shell.style.minWidth = `${frozenShellSizeRef.current.width}px`;
-        shell.style.minHeight = `${frozenShellSizeRef.current.height}px`;
-        return;
-      }
-      const width = shell.offsetWidth;
-      const height = shell.offsetHeight;
-      if (width < 1 || height < 1) return;
-      frozenShellSizeRef.current = { width, height };
-      shell.style.minWidth = `${width}px`;
-      shell.style.minHeight = `${height}px`;
-    };
+  //   const lockSize = () => {
+  //     if (frozenShellSizeRef.current) {
+  //       shell.style.minWidth = `${frozenShellSizeRef.current.width}px`;
+  //       shell.style.minHeight = `${frozenShellSizeRef.current.height}px`;
+  //       return;
+  //     }
+  //     const width = shell.offsetWidth;
+  //     const height = shell.offsetHeight;
+  //     if (width < 1 || height < 1) return;
+  //     frozenShellSizeRef.current = { width, height };
+  //     shell.style.minWidth = `${width}px`;
+  //     shell.style.minHeight = `${height}px`;
+  //   };
 
-    const frame = requestAnimationFrame(() => {
-      requestAnimationFrame(lockSize);
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [open]);
+  //   const frame = requestAnimationFrame(() => {
+  //     requestAnimationFrame(lockSize);
+  //   });
+  //   return () => cancelAnimationFrame(frame);
+  // }, [open]);
 
   const selected = options.find((option) => option.value === value) ?? null;
   const triggerLabel = selected?.label ?? placeholder;

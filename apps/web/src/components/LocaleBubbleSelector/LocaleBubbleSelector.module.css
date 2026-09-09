@@ -4,6 +4,7 @@
 
 .root :global([class*="shell"]) {
   min-width: 14rem;
+  min-height: 10rem;
 }
 
 .search {
