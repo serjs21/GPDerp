@@ -198,6 +198,8 @@ const TextBubbleStage = memo(function TextBubbleStage({
   getTargets,
   shellRef,
   open,
+  bubbleReady,
+  onBubblesReady,
   children,
 }: {
   dropDirection: TextBubbleDropDirection;
@@ -206,6 +208,8 @@ const TextBubbleStage = memo(function TextBubbleStage({
   getTargets: () => BubbleTarget[];
   shellRef: RefObject<HTMLDivElement | null>;
   open: boolean;
+  bubbleReady: boolean;
+  onBubblesReady: () => void;
   children: ReactNode;
 }) {
   const panelClass = useMemo(
@@ -228,11 +232,20 @@ const TextBubbleStage = memo(function TextBubbleStage({
     [stagePaddingClass],
   );
 
+  const revealOpen = open && bubbleReady;
+
   return (
     <div
-      className={[panelClass, open ? null : styles.panelClosed].filter(Boolean).join(" ")}
-      data-state={open ? "open" : "closed"}
+      className={[
+        panelClass,
+        open ? null : styles.panelClosed,
+        open && !bubbleReady ? styles.panelAwaitingBubble : null,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      data-state={revealOpen ? "open" : "closed"}
       data-drop={dropDirection}
+      data-bubble-ready={bubbleReady ? "true" : "false"}
       aria-hidden={!open}
     >
       <ComicBubbleStage
@@ -240,6 +253,7 @@ const TextBubbleStage = memo(function TextBubbleStage({
         targetsKey={targetsKey}
         getTargets={getTargets}
         className={stageClassName}
+        onBubblesReady={onBubblesReady}
       >
         <div ref={shellRef} className={styles.shell} data-comic-role="dialog-content">
           {children}
@@ -339,12 +353,21 @@ function TextBubbleDropdownInner({
   const frozenShellSizeRef = useRef<{ width: number; height: number } | null>(null);
   const { open, setOpen } = useOpenState({ openProp, defaultOpen, onOpenChange });
   const [stageMounted, setStageMounted] = useState(open || defaultOpen);
+  const [bubbleReady, setBubbleReady] = useState(false);
 
   useDismissOnOutside({ open, disabled, rootRef, setOpen });
 
   useEffect(() => {
     if (open) setStageMounted(true);
   }, [open]);
+
+  useEffect(() => {
+    if (!stageMounted) setBubbleReady(false);
+  }, [stageMounted]);
+
+  const handleBubblesReady = useCallback(() => {
+    setBubbleReady(true);
+  }, []);
 
   // Lock shell box after first open layout so search/filter can't reshape the bubble.
   useEffect(() => {
@@ -438,6 +461,8 @@ function TextBubbleDropdownInner({
           getTargets={getTargets}
           shellRef={shellRef}
           open={open}
+          bubbleReady={bubbleReady}
+          onBubblesReady={handleBubblesReady}
         >
           {panelHeader ? <div className={styles.panelHeader}>{panelHeader}</div> : null}
           <TextBubbleOptionList

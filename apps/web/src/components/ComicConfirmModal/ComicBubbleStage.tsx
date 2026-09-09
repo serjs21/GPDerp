@@ -21,6 +21,8 @@ export type ComicBubbleStageProps = {
   children: ReactNode;
   /** Receives refreshBubbles — e.g. after CTAs mount in the modal. */
   refreshRef?: MutableRefObject<(() => void) | null>;
+  /** Called when the comical canvas is first available. */
+  onBubblesReady?: () => void;
 };
 
 function mergeRefs<T>(...refs: Array<Ref<T> | undefined>) {
@@ -42,7 +44,7 @@ function mergeRefs<T>(...refs: Array<Ref<T> | undefined>) {
  */
 export const ComicBubbleStage = forwardRef<HTMLDivElement, ComicBubbleStageProps>(
   function ComicBubbleStage(
-    { active, targetsKey, getTargets, className, style, children, refreshRef },
+    { active, targetsKey, getTargets, className, style, children, refreshRef, onBubblesReady },
     forwardedRef,
   ) {
     const stageRef = useRef<HTMLDivElement | null>(null);
@@ -52,6 +54,7 @@ export const ComicBubbleStage = forwardRef<HTMLDivElement, ComicBubbleStageProps
       stageRef,
       targetsKey,
       getTargets,
+      onReady: onBubblesReady,
     });
 
     useEffect(() => {

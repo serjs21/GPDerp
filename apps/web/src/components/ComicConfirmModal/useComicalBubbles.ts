@@ -113,13 +113,17 @@ export function useComicalBubbles(options: {
   /** Stable key so effects re-run when bubble config changes. */
   targetsKey: string;
   getTargets: () => ComicalBubbleTarget[];
+  /** Fires once the comical canvas exists after startEditing. */
+  onReady?: () => void;
 }) {
-  const { active, stageRef, targetsKey, getTargets } = options;
+  const { active, stageRef, targetsKey, getTargets, onReady } = options;
   const comicalRef = useRef<ComicalModule | null>(null);
   const editingRef = useRef(false);
   const generationRef = useRef(0);
   const getTargetsRef = useRef(getTargets);
+  const onReadyRef = useRef(onReady);
   getTargetsRef.current = getTargets;
+  onReadyRef.current = onReady;
 
   const refreshBubbles = useCallback(() => {
     const stage = stageRef.current;
@@ -171,6 +175,10 @@ export function useComicalBubbles(options: {
       editingRef.current = true;
       comical.Comical.hideHandles();
 
+      if (stage.querySelector("canvas.comical-generated")) {
+        onReadyRef.current?.();
+      }
+
       requestAnimationFrame(() => {
         if (cancelled || generationRef.current !== gen) return;
         if (!isClaimedEditingStage(stage)) return;
@@ -182,6 +190,9 @@ export function useComicalBubbles(options: {
           }
         } catch {
           // stage may no longer be the active Comical edit root
+        }
+        if (stage.querySelector("canvas.comical-generated")) {
+          onReadyRef.current?.();
         }
       });
 

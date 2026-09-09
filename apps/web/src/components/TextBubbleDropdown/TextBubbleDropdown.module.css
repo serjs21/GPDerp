@@ -112,6 +112,13 @@
   opacity: 0;
 }
 
+/* Layout kept for comical sizing; hide until canvas exists (cold open). */
+.panelAwaitingBubble {
+  opacity: 0;
+  pointer-events: none;
+  animation: none !important;
+}
+
 .panelDropUp[data-state="open"],
 .panelDropUpLeft[data-state="open"],
 .panelDropUpRight[data-state="open"] {
