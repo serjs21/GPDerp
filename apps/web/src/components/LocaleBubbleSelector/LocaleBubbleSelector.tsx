@@ -22,6 +22,7 @@ import {
   languageMatchesQuery,
   nativeLanguageLabel,
 } from "./localeLanguageLabels";
+import { LocaleSearchHeader } from "./LocaleSearchHeader";
 import styles from "./LocaleBubbleSelector.module.css";
 
 type FlagComponent = ComponentType<{
@@ -131,20 +132,11 @@ export function LocaleBubbleSelector({
       disabled={disabled}
       emptyMessage={t("languageNoMatches")}
       panelHeader={
-        <input
-          ref={searchInputRef}
-          type="search"
-          className={styles.search}
+        <LocaleSearchHeader
+          inputRef={searchInputRef}
           value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
+          onChange={setSearchQuery}
           placeholder={t("languageSearchPlaceholder")}
-          aria-label={t("languageSearchPlaceholder")}
-          onMouseDown={(event) => event.stopPropagation()}
-          onClick={(event) => event.stopPropagation()}
-          onKeyDown={(event) => {
-            // Keep typing from closing / toggling the trigger.
-            event.stopPropagation();
-          }}
         />
       }
       renderTrigger={() => (

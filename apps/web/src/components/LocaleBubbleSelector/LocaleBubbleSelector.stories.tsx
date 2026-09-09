@@ -14,7 +14,6 @@ const LOCALE_OPTIONS = [
   { value: "it" as const, label: "Italiano" },
   { value: "pt" as const, label: "Português" },
   { value: "th" as const, label: "ไทย" },
-  { value: "lol" as const, label: "LOL" },
 ];
 
 const meta = {

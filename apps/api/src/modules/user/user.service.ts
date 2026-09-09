@@ -76,7 +76,7 @@ export type UserProfileView = {
 };
 
 const SUPPORTED_THEMES = new Set(["tokyo-dusk", "sumie", "night-sky"]);
-const SUPPORTED_LANGUAGES = new Set(["en", "ja", "es", "fr", "th", "de", "it", "pt", "lol"]);
+const SUPPORTED_LANGUAGES = new Set(["en", "ja", "es", "fr", "th", "de", "it", "pt"]);
 
 export const userService = {
   async checkEmailForPasswordRegistration(emailRaw: string) {

@@ -1,8 +1,5 @@
 import { SUPPORTED_LOCALES, type AppLocale } from "@/config/userConfiguration";
 
-/** Locales that Intl.DisplayNames understands well (exclude joke locale). */
-const DISPLAY_OF_LOCALES = SUPPORTED_LOCALES.filter((locale) => locale !== "lol");
-
 /** Endonym (name of the language in that language). */
 const NATIVE_LABELS: Record<AppLocale, string> = {
   en: "English",
@@ -13,10 +10,9 @@ const NATIVE_LABELS: Record<AppLocale, string> = {
   de: "Deutsch",
   it: "Italiano",
   pt: "Português",
-  lol: "LOL",
 };
 
-/** Extra aliases Intl may miss (accents, joke locale, common spellings). */
+/** Extra aliases Intl may miss (accents, common spellings). */
 const EXTRA_SEARCH_ALIASES: Partial<Record<AppLocale, readonly string[]>> = {
   fr: ["francais", "frances", "french"],
   es: ["espanol", "spanish", "castellano"],
@@ -26,23 +22,25 @@ const EXTRA_SEARCH_ALIASES: Partial<Record<AppLocale, readonly string[]>> = {
   th: ["thai", "thailandese", "tailandes"],
   en: ["english", "ingles", "anglais", "inglese"],
   it: ["italiano", "italian", "italien"],
-  lol: [
-    "lol",
-    "joke",
-    "joke language",
-    "meme",
-    "maximum meme dialect",
-    "idioma de broma",
-    "langue blague",
-  ],
 };
+
+export function capitalizeLanguageLabel(name: string): string {
+  const chars = Array.from(name);
+  if (chars.length === 0) return name;
+  const first = chars[0];
+  const upper = first.toLocaleUpperCase();
+  if (upper === first) return name;
+  chars[0] = upper;
+  return chars.join("");
+}
 
 export function nativeLanguageLabel(locale: AppLocale): string {
   const fallback = NATIVE_LABELS[locale] ?? locale;
-  if (locale === "lol") return fallback;
   try {
     const name = new Intl.DisplayNames([locale], { type: "language" }).of(locale);
-    return name ?? fallback;
+    if (!name) return fallback;
+    // Intl often lowercases Latin endonyms (français, español); restore capitals.
+    return capitalizeLanguageLabel(name);
   } catch {
     return fallback;
   }
@@ -59,12 +57,8 @@ export function normalizeLanguageQuery(value: string): string {
 
 function collectDisplayNames(locale: AppLocale): string[] {
   const names = new Set<string>([locale, NATIVE_LABELS[locale]]);
-  if (locale === "lol") {
-    for (const alias of EXTRA_SEARCH_ALIASES.lol ?? []) names.add(alias);
-    return [...names];
-  }
 
-  for (const ofLocale of DISPLAY_OF_LOCALES) {
+  for (const ofLocale of SUPPORTED_LOCALES) {
     try {
       const name = new Intl.DisplayNames([ofLocale], { type: "language" }).of(locale);
       if (name) names.add(name);
