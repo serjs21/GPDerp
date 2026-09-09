@@ -73,6 +73,7 @@
 }
 
   .panelDropDownLeft {
+    z-index: -1;
     top: 1rem;
     left: auto;
     right: -3rem;
@@ -101,6 +102,14 @@
 
 .panel[data-state="open"] {
   animation: textBubbleIn var(--text-bubble-motion) forwards;
+}
+
+.panelClosed {
+  visibility: hidden;
+  pointer-events: none;
+  /* Keep layout so the comical canvas size stays frozen between opens. */
+  position: absolute;
+  opacity: 0;
 }
 
 .panelDropUp[data-state="open"],

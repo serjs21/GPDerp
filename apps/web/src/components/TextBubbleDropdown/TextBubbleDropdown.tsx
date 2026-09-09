@@ -1,9 +1,11 @@
 "use client";
 
 import {
+  memo,
   useCallback,
   useEffect,
   useId,
+  useMemo,
   useRef,
   useState,
   type ReactNode,
@@ -70,6 +72,14 @@ export type TextBubbleDropdownProps = {
   emptyMessage?: ReactNode;
 };
 
+type BubbleTarget = {
+  element: HTMLDivElement | null;
+  style: "speech";
+  sourceDirection: TextBubbleTailDirection;
+  isQuestion: boolean;
+  backgroundColors: string[];
+};
+
 const DROP_PANEL_CLASS: Record<TextBubbleDropDirection, string> = {
   down: styles.panelDropDown,
   up: styles.panelDropUp,
@@ -80,6 +90,8 @@ const DROP_PANEL_CLASS: Record<TextBubbleDropDirection, string> = {
   "up-left": styles.panelDropUpLeft,
   "up-right": styles.panelDropUpRight,
 };
+
+const BUBBLE_FILL = ["#f7f4ef"] as const;
 
 function useDismissOnOutside({
   open,
@@ -119,7 +131,7 @@ function useDismissOnOutside({
   }, [disabled, open, rootRef, setOpen]);
 }
 
-function TextBubbleOptionList({
+const TextBubbleOptionList = memo(function TextBubbleOptionList({
   listId,
   options,
   value,
@@ -173,76 +185,69 @@ function TextBubbleOptionList({
       })}
     </ul>
   );
-}
+});
 
-function TextBubblePanel({
+/**
+ * Bubble stage stays mounted with a stable targetsKey so comical only
+ * (re)calculates when direction config changes — not on search/value churn.
+ */
+const TextBubbleStage = memo(function TextBubbleStage({
   dropDirection,
-  options,
-  value,
-  listId,
-  placeholder,
-  emptyMessage,
-  panelHeader,
-  renderOption,
   tailDirection,
-  shellRef,
+  targetsKey,
   getTargets,
-  onSelect,
+  shellRef,
+  open,
+  children,
 }: {
   dropDirection: TextBubbleDropDirection;
-  options: TextBubbleOption[];
-  value: string | null;
-  listId: string;
-  placeholder: string;
-  emptyMessage?: ReactNode;
-  panelHeader?: ReactNode;
-  renderOption?: TextBubbleDropdownProps["renderOption"];
   tailDirection: TextBubbleTailDirection;
+  targetsKey: string;
+  getTargets: () => BubbleTarget[];
   shellRef: RefObject<HTMLDivElement | null>;
-  getTargets: () => Array<{
-    element: HTMLDivElement | null;
-    style: "speech";
-    sourceDirection: TextBubbleTailDirection;
-    isQuestion: boolean;
-    backgroundColors: string[];
-  }>;
-  onSelect: (value: string) => void;
+  open: boolean;
+  children: ReactNode;
 }) {
-  const panelClass = [styles.panel, DROP_PANEL_CLASS[dropDirection]].filter(Boolean).join(" ");
-  const stagePaddingClass = stagePaddingClassForDirection(tailDirection, {
-    stageTailBottom: styles.stageTailBottom,
-    stageTailTop: styles.stageTailTop,
-    stageTailLeft: styles.stageTailLeft,
-    stageTailRight: styles.stageTailRight,
-    stageCompact: styles.stageCompact,
-  });
+  const panelClass = useMemo(
+    () => [styles.panel, DROP_PANEL_CLASS[dropDirection]].filter(Boolean).join(" "),
+    [dropDirection],
+  );
+  const stagePaddingClass = useMemo(
+    () =>
+      stagePaddingClassForDirection(tailDirection, {
+        stageTailBottom: styles.stageTailBottom,
+        stageTailTop: styles.stageTailTop,
+        stageTailLeft: styles.stageTailLeft,
+        stageTailRight: styles.stageTailRight,
+        stageCompact: styles.stageCompact,
+      }),
+    [tailDirection],
+  );
+  const stageClassName = useMemo(
+    () => [stageStyles.stage, styles.stage, stagePaddingClass].filter(Boolean).join(" "),
+    [stagePaddingClass],
+  );
 
   return (
-    <div className={panelClass} data-state="open" data-drop={dropDirection}>
+    <div
+      className={[panelClass, open ? null : styles.panelClosed].filter(Boolean).join(" ")}
+      data-state={open ? "open" : "closed"}
+      data-drop={dropDirection}
+      aria-hidden={!open}
+    >
       <ComicBubbleStage
-        active
-        targetsKey={`text-bubble-dropdown:${tailDirection}:${dropDirection}:${options.length}:${value ?? ""}`}
+        active={true}
+        targetsKey={targetsKey}
         getTargets={getTargets}
-        className={[stageStyles.stage, styles.stage, stagePaddingClass]
-          .filter(Boolean)
-          .join(" ")}
+        className={stageClassName}
       >
         <div ref={shellRef} className={styles.shell} data-comic-role="dialog-content">
-          {panelHeader ? <div className={styles.panelHeader}>{panelHeader}</div> : null}
-          <TextBubbleOptionList
-            listId={listId}
-            options={options}
-            value={value}
-            placeholder={placeholder}
-            emptyMessage={emptyMessage}
-            renderOption={renderOption}
-            onSelect={onSelect}
-          />
+          {children}
         </div>
       </ComicBubbleStage>
     </div>
   );
-}
+});
 
 function useOpenState({
   openProp,
@@ -331,40 +336,81 @@ function TextBubbleDropdownInner({
   const listId = useId();
   const rootRef = useRef<HTMLDivElement | null>(null);
   const shellRef = useRef<HTMLDivElement | null>(null);
+  const frozenShellSizeRef = useRef<{ width: number; height: number } | null>(null);
   const { open, setOpen } = useOpenState({ openProp, defaultOpen, onOpenChange });
+  const [stageMounted, setStageMounted] = useState(open || defaultOpen);
 
   useDismissOnOutside({ open, disabled, rootRef, setOpen });
+
+  useEffect(() => {
+    if (open) setStageMounted(true);
+  }, [open]);
+
+  // Lock shell box after first open layout so search/filter can't reshape the bubble.
+  useEffect(() => {
+    if (!open) return;
+    const shell = shellRef.current;
+    if (!shell) return;
+
+    const lockSize = () => {
+      if (frozenShellSizeRef.current) {
+        shell.style.minWidth = `${frozenShellSizeRef.current.width}px`;
+        shell.style.minHeight = `${frozenShellSizeRef.current.height}px`;
+        return;
+      }
+      const width = shell.offsetWidth;
+      const height = shell.offsetHeight;
+      if (width < 1 || height < 1) return;
+      frozenShellSizeRef.current = { width, height };
+      shell.style.minWidth = `${width}px`;
+      shell.style.minHeight = `${height}px`;
+    };
+
+    const frame = requestAnimationFrame(() => {
+      requestAnimationFrame(lockSize);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [open]);
 
   const selected = options.find((option) => option.value === value) ?? null;
   const triggerLabel = selected?.label ?? placeholder;
 
+  const targetsKey = useMemo(
+    () => `text-bubble-dropdown:${tailDirection}:${dropDirection}`,
+    [tailDirection, dropDirection],
+  );
+
   const getTargets = useCallback(
-    () => [
+    (): BubbleTarget[] => [
       {
         element: shellRef.current,
-        style: "speech" as const,
+        style: "speech",
         sourceDirection: tailDirection,
         // Must stay false: isQuestion strips tails in applySourceDirectionToSpec.
         isQuestion: false,
-        backgroundColors: ["#f7f4ef"],
+        backgroundColors: [...BUBBLE_FILL],
       },
     ],
     [tailDirection],
   );
 
-  const toggle = () => {
+  const toggle = useCallback(() => {
     if (disabled) return;
     setOpen(!open);
-  };
+  }, [disabled, open, setOpen]);
 
-  const selectOption = (nextValue: string) => {
-    onChange?.(nextValue);
-    setOpen(false);
-  };
+  const selectOption = useCallback(
+    (nextValue: string) => {
+      onChange?.(nextValue);
+      setOpen(false);
+    },
+    [onChange, setOpen],
+  );
 
-  const rootClass = [styles.root, open ? styles.rootOpen : null, className]
-    .filter(Boolean)
-    .join(" ");
+  const rootClass = useMemo(
+    () => [styles.root, open ? styles.rootOpen : null, className].filter(Boolean).join(" "),
+    [className, open],
+  );
 
   const triggerContent = renderTrigger
     ? renderTrigger({ open, label: triggerLabel, value })
@@ -377,28 +423,33 @@ function TextBubbleDropdownInner({
         className={styles.trigger}
         aria-expanded={open}
         aria-haspopup="listbox"
-        aria-controls={open ? listId : undefined}
+        aria-controls={open || stageMounted ? listId : undefined}
         disabled={disabled}
         onClick={toggle}
       >
         {triggerContent}
       </button>
 
-      {open ? (
-        <TextBubblePanel
+      {stageMounted ? (
+        <TextBubbleStage
           dropDirection={dropDirection}
-          options={options}
-          value={value}
-          listId={listId}
-          placeholder={placeholder}
-          emptyMessage={emptyMessage}
-          panelHeader={panelHeader}
-          renderOption={renderOption}
           tailDirection={tailDirection}
-          shellRef={shellRef}
+          targetsKey={targetsKey}
           getTargets={getTargets}
-          onSelect={selectOption}
-        />
+          shellRef={shellRef}
+          open={open}
+        >
+          {panelHeader ? <div className={styles.panelHeader}>{panelHeader}</div> : null}
+          <TextBubbleOptionList
+            listId={listId}
+            options={options}
+            value={value}
+            placeholder={placeholder}
+            emptyMessage={emptyMessage}
+            renderOption={renderOption}
+            onSelect={selectOption}
+          />
+        </TextBubbleStage>
       ) : null}
     </div>
   );
