@@ -83,6 +83,7 @@
 .triggerInner {
   display: inline-flex;
   align-items: center;
+  font-size: 0;
   gap: 0.45rem;
 }
 
@@ -92,7 +93,7 @@
 
 .flag {
   display: block;
-  width: 1.15rem;
+  width: 2.35rem;
   height: auto;
   flex: 0 0 auto;
   border: 1px solid color-mix(in srgb, #111111 18%, transparent);

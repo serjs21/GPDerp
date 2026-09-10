@@ -14,15 +14,11 @@
 .trigger {
   box-sizing: border-box;
   margin: 0;
-  padding: 0.45rem 0.85rem;
+  padding: 0;
+  font-size: 0;
   border: 3px solid var(--sumi-ink, #2d2d2d);
   border-radius: 0.2rem;
   background: #f7f4ef;
-  color: var(--sumi-ink, #2d2d2d);
-  font-family: var(--font-lantern-script, cursive);
-  font-size: 1.05rem;
-  font-weight: 600;
-  line-height: 1.2;
   cursor: pointer;
   box-shadow: 3px 3px 0 #111111;
 }
@@ -202,6 +198,7 @@
   overflow-x: hidden;
   overflow-y: auto;
   list-style: none;
+  scrollbar-width: none;
   overscroll-behavior: contain;
 }
 

@@ -6,6 +6,7 @@
 .trigger {
   width: 2.5rem;
   min-width: 0;
+  font-size: 0;
   height: 2.5rem;
   box-sizing: border-box;
   padding: var(--icon-button-padding, 4px) !important;
