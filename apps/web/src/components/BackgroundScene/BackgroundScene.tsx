@@ -55,6 +55,7 @@ export function BackgroundScene({
         <div className={styles.celestialLayer}>
           <BackgroundSceneStars
             opacity={backgroundBodies.moon.opacity}
+            sunOpacity={backgroundBodies.sun.opacity}
             moonColor={theme.moon}
           />
           <DaylightSun

@@ -1,4 +1,8 @@
 import type { CSSProperties } from "react";
+import {
+  BACKGROUND_SCENE_NN_STAR,
+  twilightSubPathOpacity,
+} from "./backgroundSceneNnStar.config";
 import styles from "./BackgroundSceneStars.module.css";
 
 const STAR_SRCS = [
@@ -85,35 +89,73 @@ const STAR_POSITIONS: readonly StarPlacement[] = [
 ];
 
 type BackgroundSceneStarsProps = {
+  /** Night field opacity (usual star scatter). */
   opacity: number;
+  /** Sun opacity drives nnstar twilight window (day↔night sub-path). */
+  sunOpacity: number;
   /** Kept for API compatibility; SVG stars use their own palette. */
   moonColor?: string;
 };
 
-export function BackgroundSceneStars({ opacity }: BackgroundSceneStarsProps) {
+function NnStar({ sunOpacity }: { sunOpacity: number }) {
+  const opacity = twilightSubPathOpacity(sunOpacity);
   if (opacity <= 0) return null;
 
+  const { src, leftPercent, topPercent, sizeRem, rotationDeg } =
+    BACKGROUND_SCENE_NN_STAR;
+
   return (
-    <div className={styles.field} aria-hidden style={{ opacity } as CSSProperties}>
-      {STAR_POSITIONS.map((position, index) => (
-        // eslint-disable-next-line @next/next/no-img-element -- public SVG sky assets
-        <img
-          key={`background-scene-star-${index}`}
-          src={starSrcForIndex(index)}
-          alt=""
-          draggable={false}
-          className={styles.star}
-          style={
-            {
-              left: position.left,
-              top: position.top,
-              width: `${position.sizeRem}rem`,
-              opacity: starOpacityForIndex(index),
-              transform: `translate(-50%, -50%) rotate(${position.rotationDeg}deg)`,
-            } as CSSProperties
-          }
-        />
-      ))}
+    // eslint-disable-next-line @next/next/no-img-element -- public SVG sky asset
+    <img
+      src={src}
+      alt=""
+      draggable={false}
+      className={styles.nnStar}
+      style={
+        {
+          left: `${leftPercent}%`,
+          top: `${topPercent}%`,
+          width: `${sizeRem}rem`,
+          opacity,
+          transform: `translate(-50%, -50%) rotate(${rotationDeg}deg)`,
+        } as CSSProperties
+      }
+    />
+  );
+}
+
+export function BackgroundSceneStars({
+  opacity,
+  sunOpacity,
+}: BackgroundSceneStarsProps) {
+  const showField = opacity > 0;
+  const showNnStar = twilightSubPathOpacity(sunOpacity) > 0;
+  if (!showField && !showNnStar) return null;
+
+  return (
+    <div className={styles.field} aria-hidden>
+      {showField
+        ? STAR_POSITIONS.map((position, index) => (
+            // eslint-disable-next-line @next/next/no-img-element -- public SVG sky assets
+            <img
+              key={`background-scene-star-${index}`}
+              src={starSrcForIndex(index)}
+              alt=""
+              draggable={false}
+              className={styles.star}
+              style={
+                {
+                  left: position.left,
+                  top: position.top,
+                  width: `${position.sizeRem}rem`,
+                  opacity: starOpacityForIndex(index) * opacity,
+                  transform: `translate(-50%, -50%) rotate(${position.rotationDeg}deg)`,
+                } as CSSProperties
+              }
+            />
+          ))
+        : null}
+      <NnStar sunOpacity={sunOpacity} />
     </div>
   );
 }
