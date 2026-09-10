@@ -6,9 +6,10 @@
 
 .star {
   position: absolute;
-  width: 2px;
-  height: 2px;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--moon-color, #f1f1e2) 88%, transparent);
-  box-shadow: 0 0 0.35rem color-mix(in srgb, var(--moon-color, #f1f1e2) 65%, transparent);
+  height: auto;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
 }

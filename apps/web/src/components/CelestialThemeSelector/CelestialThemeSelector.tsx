@@ -1,21 +1,19 @@
 "use client";
 
-import { AnimatePresence, LayoutGroup } from "motion/react";
-import { useCallback, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { UIButton } from "@/components/ui";
 import {
   CelestialThemeClock,
   type CelestialThemeClockHandle,
 } from "@/components/CelestialThemeClock";
-import { StyleNavigationWheel } from "@/components/StyleNavigationWheel";
 import { formatClockLabel } from "@/theme/celestialTime";
 import type { GeoCoordinates } from "@/theme/celestialTheme";
-import { getSelectorDialLayoutFromSlot } from "@/theme/celestialSelectorLayout";
 import { BANGKOK_COORDINATES } from "@/theme/useCelestialScene";
-import { CELESTIAL_SELECTOR_LAYOUT_ID_PREFIX } from "./celestialSelectorMotion";
 import { useCelestialSelectorOpenTransition } from "./useCelestialSelectorOpenTransition";
 import styles from "./CelestialThemeSelector.module.css";
+
+const ALIEN_TRIGGER_SRC = "/theme-selector/alien-obduction.svg";
 
 export type CelestialThemeSelectorProps = {
   slot: number;
@@ -38,10 +36,6 @@ export function CelestialThemeSelector({
 }: CelestialThemeSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const clockRef = useRef<CelestialThemeClockHandle>(null);
-  const triggerLayout = useMemo(
-    () => getSelectorDialLayoutFromSlot(slot, coordinates),
-    [slot, coordinates],
-  );
   const timeLabel = formatClockLabel(slot);
   const sceneStyle = sceneVars as CSSProperties | undefined;
 
@@ -69,49 +63,47 @@ export function CelestialThemeSelector({
   };
 
   const panel =
-    typeof document !== "undefined"
+    typeof document !== "undefined" && isOpen
       ? createPortal(
-          <AnimatePresence>
-            {isOpen ? (
-              <div
-                ref={panelRef}
-                className={styles.panel}
-                style={
-                  {
-                    "--panel-top": `${panelAnchor.top}px`,
-                    "--panel-left": `${panelAnchor.left}px`,
-                  } as CSSProperties
-                }
-                role="dialog"
-                aria-label={ariaLabel}
-              >
-                <div style={sceneStyle}>
-                  <CelestialThemeClock
-                    ref={clockRef}
-                    value={slot}
-                    onChange={handlePreview}
-                    onCommit={handleCommit}
-                    coordinates={coordinates}
-                    showBodyGlow
-                    motionLayoutIdPrefix={CELESTIAL_SELECTOR_LAYOUT_ID_PREFIX}
-                    motionInstant={reduceMotion ?? false}
-                    ariaLabel={ariaLabel}
-                  />
-                </div>
-              </div>
-            ) : null}
-          </AnimatePresence>,
+          <div
+            ref={panelRef}
+            className={styles.panel}
+            style={
+              {
+                "--panel-top": `${panelAnchor.top}px`,
+                "--panel-left": `${panelAnchor.left}px`,
+              } as CSSProperties
+            }
+            role="dialog"
+            aria-label={ariaLabel}
+          >
+            <div
+              className={`${styles.panelPop}${
+                reduceMotion ? ` ${styles.panelPopInstant}` : ""
+              }`}
+              style={sceneStyle}
+            >
+              <CelestialThemeClock
+                ref={clockRef}
+                value={slot}
+                onChange={handlePreview}
+                onCommit={handleCommit}
+                coordinates={coordinates}
+                showBodyGlow
+                ariaLabel={ariaLabel}
+              />
+            </div>
+          </div>,
           document.body,
         )
       : null;
 
   return (
-    <LayoutGroup id="celestial-theme-selector">
-      <div
-        className={`${styles.wrap}${className ? ` ${className}` : ""}`}
-        style={sceneStyle}
-      >
-        <div className={styles.perspectiveRoot}>
+    <div
+      className={`${styles.wrap}${className ? ` ${className}` : ""}`}
+      style={sceneStyle}
+    >
+      <div className={styles.perspectiveRoot}>
         <div ref={triggerRef} className={styles.triggerAnchor}>
           <UIButton
             type="button"
@@ -122,21 +114,19 @@ export function CelestialThemeSelector({
             onClick={() => (isOpen ? handleClose() : handleOpen())}
             style={{ "--icon-button-padding": "2px" } as CSSProperties}
           >
-            {!isOpen ? (
-              <StyleNavigationWheel
-                variant="trigger"
-                layout={triggerLayout}
-                slot={slot}
-                motionLayoutIdPrefix={CELESTIAL_SELECTOR_LAYOUT_ID_PREFIX}
-                motionInstant={reduceMotion ?? false}
-                className={styles.dialTrigger}
+            <span className={styles.triggerFace} aria-hidden>
+              {/* eslint-disable-next-line @next/next/no-img-element -- public SVG trigger asset */}
+              <img
+                src={ALIEN_TRIGGER_SRC}
+                alt=""
+                className={styles.triggerAlien}
+                draggable={false}
               />
-            ) : null}
+            </span>
           </UIButton>
         </div>
-          {panel}
-        </div>
+        {panel}
       </div>
-    </LayoutGroup>
+    </div>
   );
 }
