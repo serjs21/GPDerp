@@ -265,10 +265,13 @@ export function StyleNavigationWheel({
         className={styles.circleBase}
         style={{ transform: `rotate(${cosmicRotationDeg}deg)` }}
       >
-        <StarClusters nightOpacity={moonOpacity} />
+        <div className={styles.faceClip}>
+          <StarClusters nightOpacity={moonOpacity} />
+          <CompassRose />
+          <EarthIcon />
+        </div>
+        {/* Sibling of faceClip so half the SVG can render outside the rim. */}
         <StarsField />
-        <CompassRose />
-        <EarthIcon />
       </div>
     </MotionLayer>
   );
@@ -285,9 +288,11 @@ export function StyleNavigationWheel({
         elementRef={faceRef}
         pointerHandlers={interactive ? pointerHandlers : undefined}
       >
+        <div className={styles.faceDisc}>
+          <FixedSun opacity={sunOpacity} />
+          <FixedMoon opacity={moonOpacity} />
+        </div>
         {circleBaseNode}
-        <FixedSun opacity={sunOpacity} />
-        <FixedMoon opacity={moonOpacity} />
       </MotionLayer>
     </div>
   );

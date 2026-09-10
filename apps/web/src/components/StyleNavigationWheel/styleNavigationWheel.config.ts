@@ -10,10 +10,14 @@ export const STYLE_NAVIGATION_WHEEL = {
   stars: {
     src: "/theme-selector/stars-navigation.svg",
     /** Size as percent of dial face (independent of left/top). */
-    sizePercent: 5,
+    sizePercent: 8,
     initialRotationDeg: 0,
-    leftPercent: 66,
-    topPercent: 22,
+    /**
+     * Center of the SVG on the circle rim (50% radius from face center)
+     * so roughly half the art sits outside the disc.
+     */
+    leftPercent: 75,
+    topPercent: 7,
     /** Seconds for one full self-spin (CSS animation duration). */
     spinDurationSec: 48,
   },

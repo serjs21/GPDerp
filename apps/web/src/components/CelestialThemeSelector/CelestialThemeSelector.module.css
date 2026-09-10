@@ -1,14 +1,17 @@
 .wrap {
   display: inline-flex;
+  overflow: visible;
 }
 
 .perspectiveRoot {
   perspective: 900px;
   transform-style: preserve-3d;
+  overflow: visible;
 }
 
 .triggerAnchor {
   display: inline-flex;
+  overflow: visible;
 }
 
 .panel {
@@ -34,6 +37,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  overflow: visible;
   transition:
     color 3.3s ease,
     background-color 3.3s ease;
