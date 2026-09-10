@@ -17,6 +17,23 @@ export const STYLE_NAVIGATION_WHEEL = {
     /** Seconds for one full self-spin (CSS animation duration). */
     spinDurationSec: 48,
   },
+  /**
+   * Background star clusters on the rotating circle base.
+   * Each entry: size + center position (percent of dial face).
+   */
+  starClusters: {
+    src: "/theme-selector/stars-background.svg",
+    items: [
+      { sizePercent: 5, leftPercent: 22, topPercent: 18 },
+      { sizePercent: 5, leftPercent: 72, topPercent: 16 },
+      { sizePercent: 4, leftPercent: 88, topPercent: 42 },
+      { sizePercent: 4, leftPercent: 78, topPercent: 78 },
+      { sizePercent: 4, leftPercent: 48, topPercent: 88 },
+      { sizePercent: 3, leftPercent: 18, topPercent: 72 },
+      { sizePercent: 3, leftPercent: 12, topPercent: 42 },
+      { sizePercent: 3, leftPercent: 38, topPercent: 28 },
+    ],
+  },
   earth: {
     src: "/theme-selector/earth.svg",
     /** Size as fraction of dial face. */

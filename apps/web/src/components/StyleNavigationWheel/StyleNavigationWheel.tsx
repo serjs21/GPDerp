@@ -132,6 +132,31 @@ function StarsField() {
   );
 }
 
+function StarClusters() {
+  const { src, items } = STYLE_NAVIGATION_WHEEL.starClusters;
+  return (
+    <>
+      {items.map((cluster, index) => (
+        <div
+          key={`star-cluster-${index}`}
+          className={styles.starCluster}
+          style={
+            {
+              left: `${cluster.leftPercent}%`,
+              top: `${cluster.topPercent}%`,
+              "--stars-size": `${cluster.sizePercent}%`,
+            } as CSSProperties
+          }
+          aria-hidden
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element -- public SVG cluster asset */}
+          <img src={src} alt="" className={styles.starClusterImg} draggable={false} />
+        </div>
+      ))}
+    </>
+  );
+}
+
 function EarthIcon() {
   const { src, sizePercent } = STYLE_NAVIGATION_WHEEL.earth;
   return (
@@ -228,6 +253,7 @@ export function StyleNavigationWheel({
       className={styles.circleBase}
       style={{ transform: `rotate(${cosmicRotationDeg}deg)` }}
     >
+      <StarClusters />
       <StarsField />
       <CompassRose />
       <EarthIcon />

@@ -59,7 +59,8 @@
   pointer-events: none;
 }
 
-.stars {
+.stars,
+.starCluster {
   position: absolute;
   width: var(--stars-size, 10%);
   height: auto;
@@ -123,6 +124,7 @@
 
 .compassImg,
 .starsImg,
+.starClusterImg,
 .earthImg,
 .fixedBodyImg {
   display: block;
@@ -136,6 +138,7 @@
 
 .compassImg,
 .starsImg,
+.starClusterImg,
 .earthImg {
   height: 100%;
 }
