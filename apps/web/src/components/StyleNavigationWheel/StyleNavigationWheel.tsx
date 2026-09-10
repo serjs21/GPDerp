@@ -96,13 +96,16 @@ function CompassRose() {
 }
 
 function StarsField() {
-  const { src, scale, initialRotationDeg, spinDurationSec } =
+  const { src, scale, initialRotationDeg, spinDurationSec, leftPercent, topPercent } =
     STYLE_NAVIGATION_WHEEL.stars;
   return (
     <div
       className={styles.stars}
       style={{
         transform: `rotate(${initialRotationDeg}deg) scale(${scale})`,
+        left: `${leftPercent}%`,
+        top: `${topPercent}%`,
+        
       }}
       aria-hidden
     >

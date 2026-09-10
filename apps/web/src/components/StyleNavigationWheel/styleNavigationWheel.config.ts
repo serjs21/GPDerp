@@ -9,30 +9,32 @@ export const STYLE_NAVIGATION_WHEEL = {
   },
   stars: {
     src: "/theme-selector/stars-navigation.svg",
-    scale: 0.85,
+    scale: 0.10,
     initialRotationDeg: 0,
+    leftPercent: 70,
+    topPercent: 40,
     /** Seconds for one full self-spin (CSS animation duration). */
     spinDurationSec: 48,
   },
   earth: {
     src: "/theme-selector/earth.svg",
     /** Size as fraction of dial face. */
-    sizePercent: 12,
+    sizePercent: 10,
   },
   /** Fixed on the face (does not rotate with circleBase). */
   sun: {
     src: "/theme-selector/sun.svg",
     sizePercent: 12,
     /** Center of icon, percent of face. */
-    leftPercent: 50,
+    leftPercent: 67,
     topPercent: 8,
   },
   /** Fixed opposite the sun; self-spins. */
   moon: {
     src: "/theme-selector/moon.svg",
     sizePercent: 8,
-    leftPercent: 50,
-    topPercent: 92,
+    leftPercent: 42,
+    topPercent: 90,
     spinDurationSec: 36,
   },
 } as const;
