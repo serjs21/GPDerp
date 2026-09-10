@@ -9,10 +9,11 @@ export const STYLE_NAVIGATION_WHEEL = {
   },
   stars: {
     src: "/theme-selector/stars-navigation.svg",
-    scale: 0.10,
+    /** Size as percent of dial face (independent of left/top). */
+    sizePercent: 5,
     initialRotationDeg: 0,
-    leftPercent: 70,
-    topPercent: 40,
+    leftPercent: 85,
+    topPercent: 70,
     /** Seconds for one full self-spin (CSS animation duration). */
     spinDurationSec: 48,
   },

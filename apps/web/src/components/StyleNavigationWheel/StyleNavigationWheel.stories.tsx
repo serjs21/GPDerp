@@ -46,8 +46,8 @@ function WheelPreview({
         />
       </label>
       <p style={{ margin: 0, color: "#aaa", fontSize: "0.75rem", textAlign: "center" }}>
-        compass {compass.scale} · stars spin {stars.spinDurationSec}s · moon spin{" "}
-        {moon.spinDurationSec}s
+        compass {compass.scale} · stars size {stars.sizePercent}% · stars spin{" "}
+        {stars.spinDurationSec}s · moon spin {moon.spinDurationSec}s
       </p>
     </div>
   );
