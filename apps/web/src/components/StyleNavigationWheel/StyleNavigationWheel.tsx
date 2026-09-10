@@ -97,7 +97,7 @@ function CompassRose() {
   );
 }
 
-function StarsField({ nightOpacity }: { nightOpacity: number }) {
+function StarsField() {
   const {
     src,
     sizePercent,
@@ -113,7 +113,6 @@ function StarsField({ nightOpacity }: { nightOpacity: number }) {
         {
           left: `${leftPercent}%`,
           top: `${topPercent}%`,
-          opacity: nightOpacity,
           "--stars-size": `${sizePercent}%`,
           transform: `translate(-50%, -50%) rotate(${initialRotationDeg}deg)`,
         } as CSSProperties
@@ -259,13 +258,18 @@ export function StyleNavigationWheel({
       layoutId={layoutId("circle-base")}
       layoutEnabled={layoutEnabled}
       transition={transition}
-      className={styles.circleBase}
-      style={{ transform: `rotate(${cosmicRotationDeg}deg)` }}
+      className={styles.circleBaseShell}
     >
-      <StarClusters nightOpacity={moonOpacity} />
-      <StarsField nightOpacity={moonOpacity} />
-      <CompassRose />
-      <EarthIcon />
+      {/* Rotate on an inner node so shared-layout Motion does not overwrite slot transform. */}
+      <div
+        className={styles.circleBase}
+        style={{ transform: `rotate(${cosmicRotationDeg}deg)` }}
+      >
+        <StarClusters nightOpacity={moonOpacity} />
+        <StarsField />
+        <CompassRose />
+        <EarthIcon />
+      </div>
     </MotionLayer>
   );
 

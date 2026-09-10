@@ -12,8 +12,8 @@ export const STYLE_NAVIGATION_WHEEL = {
     /** Size as percent of dial face (independent of left/top). */
     sizePercent: 5,
     initialRotationDeg: 0,
-    leftPercent: 85,
-    topPercent: 70,
+    leftPercent: 66,
+    topPercent: 22,
     /** Seconds for one full self-spin (CSS animation duration). */
     spinDurationSec: 48,
   },
