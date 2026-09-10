@@ -27,33 +27,43 @@ export const STYLE_NAVIGATION_WHEEL = {
     spinDurationSec: 48,
   },
   /**
-   * Background star clusters on the rotating circle base.
+   * Background star icons on the rotating circle base.
+   * Icons are picked from `srcs` (stable pseudo-random per index).
+   * Centers stay outside the inner half-radius disc (see minCenterDistancePercent).
    * Each entry: size, position, opacity, and local rotation.
    */
   starClusters: {
-    src: "/theme-selector/stars-background.svg",
+    /** Face radius is 50% of width; stars stay ≥ this far from center. */
+    minCenterDistancePercent: 25,
+    srcs: [
+      "/stars/star1.svg",
+      "/stars/star2.svg",
+      "/stars/star3.svg",
+      "/stars/star4.svg",
+      "/stars/star5.svg",
+      "/stars/star6.svg",
+    ],
     items: [
-      { sizePercent: 2, leftPercent: 22, topPercent: 18, opacity: 0.85, rotationDeg: 0 },
-      { sizePercent: 2, leftPercent: 72, topPercent: 16, opacity: 0.7, rotationDeg: 40 },
-      { sizePercent: 2, leftPercent: 88, topPercent: 42, opacity: 0.9, rotationDeg: 95 },
-      { sizePercent: 2.5, leftPercent: 78, topPercent: 78, opacity: 0.65, rotationDeg: 150 },
-      { sizePercent: 2.5, leftPercent: 48, topPercent: 88, opacity: 0.8, rotationDeg: 200 },
-      { sizePercent: 2.5, leftPercent: 18, topPercent: 78, opacity: 0.65, rotationDeg: 150 },
-      { sizePercent: 2.5, leftPercent: 28, topPercent: 88, opacity: 0.8, rotationDeg: 200 },
-      { sizePercent: 3, leftPercent: 18, topPercent: 72, opacity: 0.75, rotationDeg: 250 },
-      { sizePercent: 3, leftPercent: 12, topPercent: 42, opacity: 0.6, rotationDeg: 300 },
-      { sizePercent: 3, leftPercent: 38, topPercent: 28, opacity: 0.95, rotationDeg: 25 },
-      // Additional clusters scattered through the dial
-      { sizePercent: 2.2, leftPercent: 50, topPercent: 12, opacity: 0.75, rotationDeg: 55 },
-      { sizePercent: 2.8, leftPercent: 82, topPercent: 28, opacity: 0.7, rotationDeg: 110 },
-      { sizePercent: 2, leftPercent: 92, topPercent: 58, opacity: 0.8, rotationDeg: 175 },
-      { sizePercent: 2.4, leftPercent: 68, topPercent: 62, opacity: 0.65, rotationDeg: 220 },
-      { sizePercent: 2.6, leftPercent: 58, topPercent: 72, opacity: 0.85, rotationDeg: 280 },
-      { sizePercent: 2.1, leftPercent: 32, topPercent: 58, opacity: 0.7, rotationDeg: 320 },
-      { sizePercent: 2.7, leftPercent: 28, topPercent: 42, opacity: 0.9, rotationDeg: 70 },
-      { sizePercent: 2.3, leftPercent: 55, topPercent: 32, opacity: 0.6, rotationDeg: 135 },
-      { sizePercent: 2.5, leftPercent: 42, topPercent: 48, opacity: 0.55, rotationDeg: 190 },
-      { sizePercent: 2.2, leftPercent: 65, topPercent: 48, opacity: 0.75, rotationDeg: 260 },
+      { sizePercent: 2, leftPercent: 50, topPercent: 22, opacity: 0.65, rotationDeg: 0 },
+      { sizePercent: 2, leftPercent: 61.1, topPercent: 15.8, opacity: 0.5, rotationDeg: 40 },
+      { sizePercent: 2, leftPercent: 75.9, topPercent: 14.4, opacity: 0.7, rotationDeg: 95 },
+      { sizePercent: 2.5, leftPercent: 72.7, topPercent: 33.5, opacity: 0.45, rotationDeg: 150 },
+      { sizePercent: 2.5, leftPercent: 84.2, topPercent: 38.9, opacity: 0.6, rotationDeg: 200 },
+      { sizePercent: 2.5, leftPercent: 94, topPercent: 50, opacity: 0.45, rotationDeg: 150 },
+      { sizePercent: 2.5, leftPercent: 76.6, topPercent: 58.7, opacity: 0.6, rotationDeg: 200 },
+      { sizePercent: 3, leftPercent: 79.1, topPercent: 71.2, opacity: 0.55, rotationDeg: 250 },
+      { sizePercent: 3, leftPercent: 75.9, topPercent: 85.6, opacity: 0.4, rotationDeg: 300 },
+      { sizePercent: 3, leftPercent: 58.7, topPercent: 76.6, opacity: 0.75, rotationDeg: 25 },
+      { sizePercent: 2.2, leftPercent: 50, topPercent: 86, opacity: 0.55, rotationDeg: 55 },
+      { sizePercent: 2.8, leftPercent: 36.4, topPercent: 91.8, opacity: 0.5, rotationDeg: 110 },
+      { sizePercent: 2, leftPercent: 33.5, topPercent: 72.7, opacity: 0.6, rotationDeg: 175 },
+      { sizePercent: 2.4, leftPercent: 20.9, topPercent: 71.2, opacity: 0.45, rotationDeg: 220 },
+      { sizePercent: 2.6, leftPercent: 8.2, topPercent: 63.6, opacity: 0.65, rotationDeg: 280 },
+      { sizePercent: 2.1, leftPercent: 22, topPercent: 50, opacity: 0.5, rotationDeg: 320 },
+      { sizePercent: 2.7, leftPercent: 15.8, topPercent: 38.9, opacity: 0.7, rotationDeg: 70 },
+      { sizePercent: 2.3, leftPercent: 14.4, topPercent: 24.1, opacity: 0.4, rotationDeg: 135 },
+      { sizePercent: 2.5, leftPercent: 33.5, topPercent: 27.3, opacity: 0.35, rotationDeg: 190 },
+      { sizePercent: 2.2, leftPercent: 38.9, topPercent: 15.8, opacity: 0.55, rotationDeg: 260 },
     ],
   },
   earth: {

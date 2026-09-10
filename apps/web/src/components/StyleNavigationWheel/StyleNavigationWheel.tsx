@@ -148,29 +148,73 @@ function StarsField() {
   );
 }
 
+/** Stable mix across `/stars/star*.svg` (avoids remount flicker / hydration drift). */
+function starSrcForCluster(
+  index: number,
+  srcs: readonly string[],
+): string {
+  if (srcs.length === 0) return "";
+  return srcs[(index * 5 + 1) % srcs.length]!;
+}
+
+/** Push a face % point onto / beyond the min radius ring around center (50, 50). */
+function clampOutsideInnerCircle(
+  leftPercent: number,
+  topPercent: number,
+  minCenterDistancePercent: number,
+): { leftPercent: number; topPercent: number } {
+  const dx = leftPercent - 50;
+  const dy = topPercent - 50;
+  const distance = Math.hypot(dx, dy);
+  if (distance >= minCenterDistancePercent) {
+    return { leftPercent, topPercent };
+  }
+  if (distance < 1e-6) {
+    return { leftPercent: 50 + minCenterDistancePercent, topPercent: 50 };
+  }
+  const scale = minCenterDistancePercent / distance;
+  return {
+    leftPercent: 50 + dx * scale,
+    topPercent: 50 + dy * scale,
+  };
+}
+
 function StarClusters({ nightOpacity }: { nightOpacity: number }) {
-  const { src, items } = STYLE_NAVIGATION_WHEEL.starClusters;
+  const { srcs, items, minCenterDistancePercent } =
+    STYLE_NAVIGATION_WHEEL.starClusters;
   return (
     <>
-      {items.map((cluster, index) => (
-        <div
-          key={`star-cluster-${index}`}
-          className={styles.starCluster}
-          style={
-            {
-              left: `${cluster.leftPercent}%`,
-              top: `${cluster.topPercent}%`,
-              opacity: cluster.opacity * nightOpacity,
-              "--stars-size": `${cluster.sizePercent}%`,
-              transform: `translate(-50%, -50%) rotate(${cluster.rotationDeg}deg)`,
-            } as CSSProperties
-          }
-          aria-hidden
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element -- public SVG cluster asset */}
-          <img src={src} alt="" className={styles.starClusterImg} draggable={false} />
-        </div>
-      ))}
+      {items.map((cluster, index) => {
+        const { leftPercent, topPercent } = clampOutsideInnerCircle(
+          cluster.leftPercent,
+          cluster.topPercent,
+          minCenterDistancePercent,
+        );
+        return (
+          <div
+            key={`star-cluster-${index}`}
+            className={styles.starCluster}
+            style={
+              {
+                left: `${leftPercent}%`,
+                top: `${topPercent}%`,
+                opacity: cluster.opacity * nightOpacity,
+                "--stars-size": `${cluster.sizePercent}%`,
+                transform: `translate(-50%, -50%) rotate(${cluster.rotationDeg}deg)`,
+              } as CSSProperties
+            }
+            aria-hidden
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element -- public SVG cluster asset */}
+            <img
+              src={starSrcForCluster(index, srcs)}
+              alt=""
+              className={styles.starClusterImg}
+              draggable={false}
+            />
+          </div>
+        );
+      })}
     </>
   );
 }
