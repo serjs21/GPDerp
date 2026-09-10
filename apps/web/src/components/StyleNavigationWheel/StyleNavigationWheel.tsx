@@ -3,7 +3,10 @@
 import { motion, type Transition } from "motion/react";
 import type { CSSProperties, PointerEventHandler, ReactNode, Ref } from "react";
 import type { SelectorDialLayout } from "@/theme/celestialSelectorLayout";
-import { selectorCosmicRotationDeg } from "@/theme/celestialSelectorLayout";
+import {
+  complementaryCelestialOpacities,
+  selectorCosmicRotationDeg,
+} from "@/theme/celestialSelectorLayout";
 import { celestialSelectorTransition } from "@/components/CelestialThemeSelector/celestialSelectorMotion";
 import { STYLE_NAVIGATION_WHEEL } from "./styleNavigationWheel.config";
 import styles from "./StyleNavigationWheel.module.css";
@@ -18,7 +21,6 @@ export type StyleNavigationWheelPointerHandlers = {
 };
 
 export type StyleNavigationWheelProps = {
-  /** Kept for dial API parity; unused by the dual-SVG wheel visuals. */
   layout: SelectorDialLayout;
   slot: number;
   variant?: "panel" | "trigger";
@@ -95,7 +97,7 @@ function CompassRose() {
   );
 }
 
-function StarsField() {
+function StarsField({ nightOpacity }: { nightOpacity: number }) {
   const {
     src,
     sizePercent,
@@ -111,6 +113,7 @@ function StarsField() {
         {
           left: `${leftPercent}%`,
           top: `${topPercent}%`,
+          opacity: nightOpacity,
           "--stars-size": `${sizePercent}%`,
           transform: `translate(-50%, -50%) rotate(${initialRotationDeg}deg)`,
         } as CSSProperties
@@ -132,7 +135,7 @@ function StarsField() {
   );
 }
 
-function StarClusters() {
+function StarClusters({ nightOpacity }: { nightOpacity: number }) {
   const { src, items } = STYLE_NAVIGATION_WHEEL.starClusters;
   return (
     <>
@@ -144,7 +147,7 @@ function StarClusters() {
             {
               left: `${cluster.leftPercent}%`,
               top: `${cluster.topPercent}%`,
-              opacity: cluster.opacity,
+              opacity: cluster.opacity * nightOpacity,
               "--stars-size": `${cluster.sizePercent}%`,
               transform: `translate(-50%, -50%) rotate(${cluster.rotationDeg}deg)`,
             } as CSSProperties
@@ -175,7 +178,7 @@ function EarthIcon() {
   );
 }
 
-function FixedSun() {
+function FixedSun({ opacity }: { opacity: number }) {
   const { src, sizePercent, leftPercent, topPercent } = STYLE_NAVIGATION_WHEEL.sun;
   return (
     <div
@@ -184,6 +187,7 @@ function FixedSun() {
         {
           left: `${leftPercent}%`,
           top: `${topPercent}%`,
+          opacity,
           "--body-size": `${sizePercent}%`,
         } as CSSProperties
       }
@@ -195,7 +199,7 @@ function FixedSun() {
   );
 }
 
-function FixedMoon() {
+function FixedMoon({ opacity }: { opacity: number }) {
   const { src, sizePercent, leftPercent, topPercent, spinDurationSec } =
     STYLE_NAVIGATION_WHEEL.moon;
   return (
@@ -205,6 +209,7 @@ function FixedMoon() {
         {
           left: `${leftPercent}%`,
           top: `${topPercent}%`,
+          opacity,
           "--body-size": `${sizePercent}%`,
         } as CSSProperties
       }
@@ -227,9 +232,10 @@ function FixedMoon() {
 
 /**
  * Style navigation wheel: stars + compass + earth on one slot-rotated circle base.
- * Sun/moon stay fixed on the face; moon also self-spins.
+ * Sun/moon stay fixed on the face; celestial opacities crossfade with slot.
  */
 export function StyleNavigationWheel({
+  layout,
   slot,
   variant = "panel",
   motionLayoutIdPrefix,
@@ -242,6 +248,7 @@ export function StyleNavigationWheel({
   const variantClass = variant === "trigger" ? styles.trigger : styles.panel;
   const interactiveClass = interactive ? styles.interactive : "";
   const cosmicRotationDeg = selectorCosmicRotationDeg(slot);
+  const { sunOpacity, moonOpacity } = complementaryCelestialOpacities(slot, layout);
   const layoutEnabled = Boolean(motionLayoutIdPrefix);
   const transition = celestialSelectorTransition(motionInstant);
   const layoutId = (suffix: string) =>
@@ -255,8 +262,8 @@ export function StyleNavigationWheel({
       className={styles.circleBase}
       style={{ transform: `rotate(${cosmicRotationDeg}deg)` }}
     >
-      <StarClusters />
-      <StarsField />
+      <StarClusters nightOpacity={moonOpacity} />
+      <StarsField nightOpacity={moonOpacity} />
       <CompassRose />
       <EarthIcon />
     </MotionLayer>
@@ -275,8 +282,8 @@ export function StyleNavigationWheel({
         pointerHandlers={interactive ? pointerHandlers : undefined}
       >
         {circleBaseNode}
-        <FixedSun />
-        <FixedMoon />
+        <FixedSun opacity={sunOpacity} />
+        <FixedMoon opacity={moonOpacity} />
       </MotionLayer>
     </div>
   );

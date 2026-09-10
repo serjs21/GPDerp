@@ -1,0 +1,34 @@
+.stage {
+  display: grid;
+  gap: 1rem;
+  justify-items: center;
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px;
+  background: linear-gradient(
+    180deg,
+    var(--sky-top, #0a1029) 0%,
+    var(--sky-mid, #1a2744) 54%,
+    var(--sky-horizon, #2a3550) 100%
+  );
+  color: var(--text-color, #eee);
+}
+
+.caption {
+  margin: 0;
+  font-size: 0.75rem;
+  text-align: center;
+  opacity: 0.75;
+}
+
+.slotLabel {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+}
+
+.scene {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+}
