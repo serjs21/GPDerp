@@ -1,5 +1,10 @@
 /** Compass, stars, and body icon tuning for StyleNavigationWheel. */
 export const STYLE_NAVIGATION_WHEEL = {
+  /**
+   * Extra degrees added to slot-driven circle rotation so dial clicks
+   * land on the center of stars-navigation.svg on the rim.
+   */
+  circleBaseRotationOffsetDeg: 22,
   compass: {
     src: "/theme-selector/compas_no_letters.svg",
     /** Uniform scale vs dial face (SVG has large padding). */

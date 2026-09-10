@@ -246,7 +246,9 @@ export function StyleNavigationWheel({
 }: StyleNavigationWheelProps) {
   const variantClass = variant === "trigger" ? styles.trigger : styles.panel;
   const interactiveClass = interactive ? styles.interactive : "";
-  const cosmicRotationDeg = selectorCosmicRotationDeg(slot);
+  const cosmicRotationDeg =
+    selectorCosmicRotationDeg(slot) +
+    STYLE_NAVIGATION_WHEEL.circleBaseRotationOffsetDeg;
   const { sunOpacity, moonOpacity } = complementaryCelestialOpacities(slot, layout);
   const layoutEnabled = Boolean(motionLayoutIdPrefix);
   const transition = celestialSelectorTransition(motionInstant);
