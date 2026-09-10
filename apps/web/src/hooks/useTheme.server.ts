@@ -13,7 +13,7 @@ import {
 } from "@/config/userConfiguration";
 import { clampSlot } from "@/theme/celestialTime";
 
-const DEFAULT_CELESTIAL_SLOT = 48;
+const DEFAULT_CELESTIAL_SLOT = 16;
 
 export type SsrThemeSettings = {
   initialTheme: ThemeName;

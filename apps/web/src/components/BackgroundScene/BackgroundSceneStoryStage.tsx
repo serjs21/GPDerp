@@ -20,7 +20,7 @@ import {
 import { useBackgroundSceneThemeBalance } from "./useBackgroundSceneThemeBalance";
 import styles from "./BackgroundSceneStoryStage.module.css";
 
-const DEFAULT_CELESTIAL_SLOT = 48;
+const DEFAULT_CELESTIAL_SLOT = 16;
 
 export type BackgroundSceneStoryStageProps = {
   children?: ReactNode;

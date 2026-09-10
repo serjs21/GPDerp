@@ -8,7 +8,7 @@ import {
   CelestialThemeClock,
   type CelestialThemeClockHandle,
 } from "@/components/CelestialThemeClock";
-import { CelestialThemeDial } from "@/components/CelestialThemeDial";
+import { StyleNavigationWheel } from "@/components/StyleNavigationWheel";
 import { formatClockLabel } from "@/theme/celestialTime";
 import type { GeoCoordinates } from "@/theme/celestialTheme";
 import { getSelectorDialLayoutFromSlot } from "@/theme/celestialSelectorLayout";
@@ -123,11 +123,10 @@ export function CelestialThemeSelector({
             style={{ "--icon-button-padding": "2px" } as CSSProperties}
           >
             {!isOpen ? (
-              <CelestialThemeDial
+              <StyleNavigationWheel
                 variant="trigger"
                 layout={triggerLayout}
                 slot={slot}
-                showBodyGlow={false}
                 motionLayoutIdPrefix={CELESTIAL_SELECTOR_LAYOUT_ID_PREFIX}
                 motionInstant={reduceMotion ?? false}
                 className={styles.dialTrigger}

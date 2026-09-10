@@ -41,7 +41,7 @@ function SelectorStory({
 }
 
 export const Default: Story = {
-  render: () => <SelectorStory initialSlot={48} />,
+  render: () => <SelectorStory initialSlot={16} />,
 };
 
 export const DayModeButton: Story = {

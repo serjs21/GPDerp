@@ -25,7 +25,7 @@ import {
   useCelestialScene,
 } from "@/theme/useCelestialScene";
 
-const DEFAULT_CELESTIAL_SLOT = 48;
+const DEFAULT_CELESTIAL_SLOT = 16;
 
 const writeCelestialSlotCookie = (slot: number) => {
   if (typeof document === "undefined") return;

@@ -13,7 +13,7 @@ export default meta;
 type Story = StoryObj<typeof BackgroundSceneStoryStage>;
 
 export const Interactive: Story = {
-  render: () => <BackgroundSceneStoryStage initialSlot={48} />,
+  render: () => <BackgroundSceneStoryStage initialSlot={16} />,
 };
 
 export const Sunset: Story = {

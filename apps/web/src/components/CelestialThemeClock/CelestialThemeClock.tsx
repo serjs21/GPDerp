@@ -9,7 +9,7 @@ import {
 } from "@/theme/celestialTime";
 import type { GeoCoordinates } from "@/theme/celestialTheme";
 import { getSelectorDialLayoutFromSlot } from "@/theme/celestialSelectorLayout";
-import { CelestialThemeDial } from "@/components/CelestialThemeDial";
+import { StyleNavigationWheel } from "@/components/StyleNavigationWheel";
 import { useDialPointerSelection } from "./hooks/useDialPointerSelection";
 import styles from "./CelestialThemeClock.module.css";
 
@@ -42,7 +42,6 @@ export const CelestialThemeClock = forwardRef<
     onChange,
     onCommit,
     coordinates,
-    showBodyGlow = false,
     motionLayoutIdPrefix,
     motionInstant = false,
     ariaLabel = "Time of day",
@@ -87,11 +86,10 @@ export const CelestialThemeClock = forwardRef<
 
   return (
     <div className={`${styles.root}${className ? ` ${className}` : ""}`}>
-      <CelestialThemeDial
+      <StyleNavigationWheel
         variant="panel"
         layout={layout}
         slot={value}
-        showBodyGlow={showBodyGlow}
         motionLayoutIdPrefix={motionLayoutIdPrefix}
         motionInstant={motionInstant}
         faceRef={faceRef}

@@ -24,7 +24,7 @@ type Story = StoryObj<typeof CelestialThemeClock>;
 
 export const Default: Story = {
   args: {
-    value: 72,
+    value: 16,
     onChange: () => undefined,
     coordinates: BANGKOK_COORDINATES,
     ariaLabel: "Time of day",
@@ -33,7 +33,7 @@ export const Default: Story = {
 
 export const Interactive: Story = {
   render: () => {
-    const [slot, setSlot] = useState(72);
+    const [slot, setSlot] = useState(16);
 
     return (
       <div className={styles.panel}>

@@ -54,11 +54,11 @@ function WheelPreview({
 }
 
 export const Panel: Story = {
-  render: () => <WheelPreview initialSlot={48} variant="panel" />,
+  render: () => <WheelPreview initialSlot={16} variant="panel" />,
 };
 
 export const Trigger: Story = {
-  render: () => <WheelPreview initialSlot={72} variant="trigger" />,
+  render: () => <WheelPreview initialSlot={16} variant="trigger" />,
 };
 
 export const NoonReference: Story = {
@@ -67,7 +67,7 @@ export const NoonReference: Story = {
     docs: {
       description: {
         story:
-          "Slot 48 (noon) → circle base at 0°. Compass + stars share base rotation; stars also self-spin.",
+          "Slot 48 (noon) → circle base at 0°. Default app slot is 16.",
       },
     },
   },

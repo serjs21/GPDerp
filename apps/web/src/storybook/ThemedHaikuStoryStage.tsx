@@ -12,7 +12,7 @@ import { dateToSlot, formatClockLabel } from "@/theme/celestialTime";
 import { BANGKOK_COORDINATES } from "@/theme/useCelestialScene";
 import styles from "./ThemedHaikuStoryStage.module.css";
 
-const DEFAULT_CELESTIAL_SLOT = 48;
+const DEFAULT_CELESTIAL_SLOT = 16;
 
 export type ThemedHaikuStoryStageProps = {
   children: ReactNode;
