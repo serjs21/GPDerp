@@ -1,7 +1,13 @@
 "use client";
 
 import { motion, type Transition } from "motion/react";
-import type { CSSProperties, PointerEventHandler, ReactNode, Ref } from "react";
+import {
+  useState,
+  type CSSProperties,
+  type PointerEventHandler,
+  type ReactNode,
+  type Ref,
+} from "react";
 import type { SelectorDialLayout } from "@/theme/celestialSelectorLayout";
 import {
   complementaryCelestialOpacities,
@@ -12,6 +18,14 @@ import { STYLE_NAVIGATION_WHEEL } from "./styleNavigationWheel.config";
 import styles from "./StyleNavigationWheel.module.css";
 
 const MOTION_PERSPECTIVE_PX = 900;
+
+/** Keep successive rotations within ±180° of the previous value (shortest turn). */
+function unwrapRotationDeg(previousDeg: number, targetDeg: number) {
+  let next = targetDeg;
+  while (next - previousDeg > 180) next -= 360;
+  while (next - previousDeg < -180) next += 360;
+  return next;
+}
 
 export type StyleNavigationWheelPointerHandlers = {
   onPointerDown?: PointerEventHandler<HTMLDivElement>;
@@ -246,9 +260,18 @@ export function StyleNavigationWheel({
 }: StyleNavigationWheelProps) {
   const variantClass = variant === "trigger" ? styles.trigger : styles.panel;
   const interactiveClass = interactive ? styles.interactive : "";
-  const cosmicRotationDeg =
+  const rawRotationDeg =
     selectorCosmicRotationDeg(slot) +
     STYLE_NAVIGATION_WHEEL.circleBaseRotationOffsetDeg;
+  const [cosmicRotationDeg, setCosmicRotationDeg] = useState(rawRotationDeg);
+  const continuousRotationDeg = unwrapRotationDeg(
+    cosmicRotationDeg,
+    rawRotationDeg,
+  );
+  if (continuousRotationDeg !== cosmicRotationDeg) {
+    setCosmicRotationDeg(continuousRotationDeg);
+  }
+
   const { sunOpacity, moonOpacity } = complementaryCelestialOpacities(slot, layout);
   const layoutEnabled = Boolean(motionLayoutIdPrefix);
   const transition = celestialSelectorTransition(motionInstant);
@@ -265,7 +288,7 @@ export function StyleNavigationWheel({
       {/* Rotate on an inner node so shared-layout Motion does not overwrite slot transform. */}
       <div
         className={styles.circleBase}
-        style={{ transform: `rotate(${cosmicRotationDeg}deg)` }}
+        style={{ transform: `rotate(${continuousRotationDeg}deg)` }}
       >
         <div className={styles.faceClip}>
           <StarClusters nightOpacity={moonOpacity} />
