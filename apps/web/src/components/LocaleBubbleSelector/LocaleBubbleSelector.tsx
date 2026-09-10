@@ -2,7 +2,6 @@
 
 import {
   useCallback,
-  useEffect,
   useMemo,
   useRef,
   useState,
@@ -23,6 +22,7 @@ import {
   nativeLanguageLabel,
 } from "./localeLanguageLabels";
 import { LocaleSearchHeader } from "./LocaleSearchHeader";
+import { useFocusSearchOnPanelReady } from "./useFocusSearchOnPanelReady";
 import styles from "./LocaleBubbleSelector.module.css";
 
 type FlagComponent = ComponentType<{
@@ -110,13 +110,7 @@ export function LocaleBubbleSelector({
     [isControlled, onOpenChange],
   );
 
-  useEffect(() => {
-    if (!open || disabled) return;
-    const id = requestAnimationFrame(() => {
-      searchInputRef.current?.focus();
-    });
-    return () => cancelAnimationFrame(id);
-  }, [disabled, open]);
+  useFocusSearchOnPanelReady(open, disabled, searchInputRef);
 
   return (
     <TextBubbleDropdown
