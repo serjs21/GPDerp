@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useMemo, useState } from "react";
 import { StyleNavigationWheel } from "./StyleNavigationWheel";
-import { STYLE_NAVIGATION_COMPASS } from "./styleNavigationCompass.config";
+import { STYLE_NAVIGATION_WHEEL } from "./styleNavigationWheel.config";
 import { CELESTIAL_SLOTS_PER_DAY } from "@/theme/celestialTime";
 import { getSelectorDialLayoutFromSlot } from "@/theme/celestialSelectorLayout";
 import { BANGKOK_COORDINATES } from "@/theme/useCelestialScene";
@@ -30,6 +30,7 @@ function WheelPreview({
     () => getSelectorDialLayoutFromSlot(slot, BANGKOK_COORDINATES),
     [slot],
   );
+  const { compass, stars } = STYLE_NAVIGATION_WHEEL;
 
   return (
     <div style={{ display: "grid", gap: "1rem", justifyItems: "center" }}>
@@ -44,9 +45,9 @@ function WheelPreview({
           onChange={(event) => setSlot(Number(event.target.value))}
         />
       </label>
-      <p style={{ margin: 0, color: "#aaa", fontSize: "0.75rem" }}>
-        compass scale {STYLE_NAVIGATION_COMPASS.scale} · initialRotation{" "}
-        {STYLE_NAVIGATION_COMPASS.initialRotationDeg}°
+      <p style={{ margin: 0, color: "#aaa", fontSize: "0.75rem", textAlign: "center" }}>
+        compass scale {compass.scale} · stars scale {stars.scale} · spin{" "}
+        {stars.spinDurationSec}s
       </p>
     </div>
   );
@@ -65,7 +66,8 @@ export const NoonReference: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Slot 48 (noon) → cosmic frame at 0°. Compass uses initialRotationDeg from config.",
+        story:
+          "Slot 48 (noon) → circle base at 0°. Compass + stars share base rotation; stars also self-spin.",
       },
     },
   },

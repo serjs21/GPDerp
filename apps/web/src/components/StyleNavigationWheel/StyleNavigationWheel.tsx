@@ -3,14 +3,10 @@
 import { motion, type Transition } from "motion/react";
 import type { CSSProperties, PointerEventHandler, ReactNode, Ref } from "react";
 import type { SelectorDialLayout } from "@/theme/celestialSelectorLayout";
-import {
-  complementaryCelestialOpacities,
-  selectorCosmicRotationDeg,
-} from "@/theme/celestialSelectorLayout";
+import { selectorCosmicRotationDeg } from "@/theme/celestialSelectorLayout";
 import { celestialSelectorTransition } from "@/components/CelestialThemeSelector/celestialSelectorMotion";
 import { ThemeSelectorNorthStar } from "@/components/CelestialThemeDial/ThemeSelectorNorthStar";
-import { ThemeSelectorStars } from "@/components/CelestialThemeDial/ThemeSelectorStars";
-import { STYLE_NAVIGATION_COMPASS } from "./styleNavigationCompass.config";
+import { STYLE_NAVIGATION_WHEEL } from "./styleNavigationWheel.config";
 import styles from "./StyleNavigationWheel.module.css";
 
 const MOTION_PERSPECTIVE_PX = 900;
@@ -23,6 +19,7 @@ export type StyleNavigationWheelPointerHandlers = {
 };
 
 export type StyleNavigationWheelProps = {
+  /** Kept for dial API parity; unused by the dual-SVG wheel visuals. */
   layout: SelectorDialLayout;
   slot: number;
   variant?: "panel" | "trigger";
@@ -84,7 +81,7 @@ function MotionLayer({
 }
 
 function CompassRose() {
-  const { src, scale, initialRotationDeg } = STYLE_NAVIGATION_COMPASS;
+  const { src, scale, initialRotationDeg } = STYLE_NAVIGATION_WHEEL.compass;
   return (
     <div
       className={styles.compass}
@@ -99,12 +96,37 @@ function CompassRose() {
   );
 }
 
+function StarsField() {
+  const { src, scale, initialRotationDeg, spinDurationSec } =
+    STYLE_NAVIGATION_WHEEL.stars;
+  return (
+    <div
+      className={styles.stars}
+      style={{
+        transform: `rotate(${initialRotationDeg}deg) scale(${scale})`,
+      }}
+      aria-hidden
+    >
+      <div
+        className={styles.starsSpin}
+        style={
+          {
+            "--stars-spin-duration": `${spinDurationSec}s`,
+          } as CSSProperties
+        }
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element -- public SVG field asset */}
+        <img src={src} alt="" className={styles.starsImg} draggable={false} />
+      </div>
+    </div>
+  );
+}
+
 /**
- * Style navigation wheel: star field + centered compass rose that rotates with slot.
- * Adapted from CelestialThemeDial without sun/moon/earth bodies.
+ * Style navigation wheel: stars + compass on one slot-rotated circle base.
+ * Stars also self-spin at a configurable duration.
  */
 export function StyleNavigationWheel({
-  layout,
   slot,
   variant = "panel",
   motionLayoutIdPrefix,
@@ -117,21 +139,20 @@ export function StyleNavigationWheel({
   const variantClass = variant === "trigger" ? styles.trigger : styles.panel;
   const interactiveClass = interactive ? styles.interactive : "";
   const cosmicRotationDeg = selectorCosmicRotationDeg(slot);
-  const { moonOpacity } = complementaryCelestialOpacities(slot, layout);
   const layoutEnabled = Boolean(motionLayoutIdPrefix);
   const transition = celestialSelectorTransition(motionInstant);
   const layoutId = (suffix: string) =>
     motionLayoutIdPrefix ? `${motionLayoutIdPrefix}-${suffix}` : undefined;
 
-  const cosmicFrameNode = (
+  const circleBaseNode = (
     <MotionLayer
-      layoutId={layoutId("cosmic-frame")}
+      layoutId={layoutId("circle-base")}
       layoutEnabled={layoutEnabled}
       transition={transition}
-      className={styles.cosmicFrame}
+      className={styles.circleBase}
       style={{ transform: `rotate(${cosmicRotationDeg}deg)` }}
     >
-      <ThemeSelectorStars opacity={moonOpacity} />
+      <StarsField />
       <CompassRose />
     </MotionLayer>
   );
@@ -148,8 +169,8 @@ export function StyleNavigationWheel({
         elementRef={faceRef}
         pointerHandlers={interactive ? pointerHandlers : undefined}
       >
-        <ThemeSelectorNorthStar slot={slot} />
-        {cosmicFrameNode}
+        {/* <ThemeSelectorNorthStar slot={slot} /> */}
+        {circleBaseNode}
       </MotionLayer>
     </div>
   );

@@ -3,4 +3,4 @@ export type {
   StyleNavigationWheelPointerHandlers,
   StyleNavigationWheelProps,
 } from "./StyleNavigationWheel";
-export { STYLE_NAVIGATION_COMPASS } from "./styleNavigationCompass.config";
+export { STYLE_NAVIGATION_WHEEL } from "./styleNavigationWheel.config";
