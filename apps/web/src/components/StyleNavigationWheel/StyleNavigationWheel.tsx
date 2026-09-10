@@ -5,7 +5,6 @@ import type { CSSProperties, PointerEventHandler, ReactNode, Ref } from "react";
 import type { SelectorDialLayout } from "@/theme/celestialSelectorLayout";
 import { selectorCosmicRotationDeg } from "@/theme/celestialSelectorLayout";
 import { celestialSelectorTransition } from "@/components/CelestialThemeSelector/celestialSelectorMotion";
-import { ThemeSelectorNorthStar } from "@/components/CelestialThemeDial/ThemeSelectorNorthStar";
 import { STYLE_NAVIGATION_WHEEL } from "./styleNavigationWheel.config";
 import styles from "./StyleNavigationWheel.module.css";
 
@@ -108,10 +107,10 @@ function StarsField() {
       aria-hidden
     >
       <div
-        className={styles.starsSpin}
+        className={styles.selfSpin}
         style={
           {
-            "--stars-spin-duration": `${spinDurationSec}s`,
+            "--self-spin-duration": `${spinDurationSec}s`,
           } as CSSProperties
         }
       >
@@ -122,9 +121,75 @@ function StarsField() {
   );
 }
 
+function EarthIcon() {
+  const { src, sizePercent } = STYLE_NAVIGATION_WHEEL.earth;
+  return (
+    <div className={styles.earth} aria-hidden>
+      {/* eslint-disable-next-line @next/next/no-img-element -- public SVG body asset */}
+      <img
+        src={src}
+        alt=""
+        className={styles.earthImg}
+        style={{ width: `${sizePercent}%`, height: "auto" }}
+        draggable={false}
+      />
+    </div>
+  );
+}
+
+function FixedSun() {
+  const { src, sizePercent, leftPercent, topPercent } = STYLE_NAVIGATION_WHEEL.sun;
+  return (
+    <div
+      className={styles.fixedBody}
+      style={
+        {
+          left: `${leftPercent}%`,
+          top: `${topPercent}%`,
+          "--body-size": `${sizePercent}%`,
+        } as CSSProperties
+      }
+      aria-hidden
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element -- public SVG body asset */}
+      <img src={src} alt="" className={styles.fixedBodyImg} draggable={false} />
+    </div>
+  );
+}
+
+function FixedMoon() {
+  const { src, sizePercent, leftPercent, topPercent, spinDurationSec } =
+    STYLE_NAVIGATION_WHEEL.moon;
+  return (
+    <div
+      className={styles.fixedBody}
+      style={
+        {
+          left: `${leftPercent}%`,
+          top: `${topPercent}%`,
+          "--body-size": `${sizePercent}%`,
+        } as CSSProperties
+      }
+      aria-hidden
+    >
+      <div
+        className={styles.fixedBodySpin}
+        style={
+          {
+            "--body-spin-duration": `${spinDurationSec}s`,
+          } as CSSProperties
+        }
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element -- public SVG body asset */}
+        <img src={src} alt="" className={styles.fixedBodyImg} draggable={false} />
+      </div>
+    </div>
+  );
+}
+
 /**
- * Style navigation wheel: stars + compass on one slot-rotated circle base.
- * Stars also self-spin at a configurable duration.
+ * Style navigation wheel: stars + compass + earth on one slot-rotated circle base.
+ * Sun/moon stay fixed on the face; moon also self-spins.
  */
 export function StyleNavigationWheel({
   slot,
@@ -154,6 +219,7 @@ export function StyleNavigationWheel({
     >
       <StarsField />
       <CompassRose />
+      <EarthIcon />
     </MotionLayer>
   );
 
@@ -169,8 +235,9 @@ export function StyleNavigationWheel({
         elementRef={faceRef}
         pointerHandlers={interactive ? pointerHandlers : undefined}
       >
-        {/* <ThemeSelectorNorthStar slot={slot} /> */}
         {circleBaseNode}
+        <FixedSun />
+        <FixedMoon />
       </MotionLayer>
     </div>
   );

@@ -30,7 +30,7 @@ function WheelPreview({
     () => getSelectorDialLayoutFromSlot(slot, BANGKOK_COORDINATES),
     [slot],
   );
-  const { compass, stars } = STYLE_NAVIGATION_WHEEL;
+  const { compass, stars, moon } = STYLE_NAVIGATION_WHEEL;
 
   return (
     <div style={{ display: "grid", gap: "1rem", justifyItems: "center" }}>
@@ -46,8 +46,8 @@ function WheelPreview({
         />
       </label>
       <p style={{ margin: 0, color: "#aaa", fontSize: "0.75rem", textAlign: "center" }}>
-        compass scale {compass.scale} · stars scale {stars.scale} · spin{" "}
-        {stars.spinDurationSec}s
+        compass {compass.scale} · stars spin {stars.spinDurationSec}s · moon spin{" "}
+        {moon.spinDurationSec}s
       </p>
     </div>
   );
