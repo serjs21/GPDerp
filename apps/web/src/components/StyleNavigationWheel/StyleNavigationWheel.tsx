@@ -144,7 +144,9 @@ function StarClusters() {
             {
               left: `${cluster.leftPercent}%`,
               top: `${cluster.topPercent}%`,
+              opacity: cluster.opacity,
               "--stars-size": `${cluster.sizePercent}%`,
+              transform: `translate(-50%, -50%) rotate(${cluster.rotationDeg}deg)`,
             } as CSSProperties
           }
           aria-hidden
