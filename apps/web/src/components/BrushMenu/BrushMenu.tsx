@@ -125,6 +125,7 @@ function BrushOptionList({
   brushPathsRef,
   labelElsRef,
   onSelect,
+  panelStyle,
 }: {
   listId: string;
   options: BrushMenuOption[];
@@ -134,6 +135,7 @@ function BrushOptionList({
   brushPathsRef: RefObject<(BrushOptionBrushPaths | null)[]>;
   labelElsRef: RefObject<(HTMLSpanElement | null)[]>;
   onSelect: (nextValue: string) => void;
+  panelStyle?: CSSProperties;
 }) {
   return (
     <ul
@@ -141,6 +143,7 @@ function BrushOptionList({
       className={styles.panel}
       role="listbox"
       aria-label={placeholder}
+      style={panelStyle}
     >
       {options.map((option, index) => (
         <li key={option.value} className={styles.item} role="none">
@@ -222,6 +225,9 @@ export function BrushMenu({
   const labelElsRef = useRef<(HTMLSpanElement | null)[]>([]);
   const { open, setOpen } = useOpenState(openProp, defaultOpen, onOpenChange);
   const [closing, setClosing] = useState(false);
+  const [paintOpenHeightPx, setPaintOpenHeightPx] = useState<number | null>(
+    null,
+  );
   const reducedMotion = useReducedMotion() ?? false;
 
   const panelMounted = open || closing;
@@ -262,14 +268,25 @@ export function BrushMenu({
     const shell = shellRef.current;
     if (!shell || shell.style.width) return;
     const closed = closedTriggerSizeRef.current;
+    // In-flow footprint: width starts closed; height stays avatar-sized.
     shell.style.width = `${closed.width}px`;
     shell.style.height = `${closed.height}px`;
   }, [open, closing, triggerBrush]);
+
+  // Position absolute panel under the full paint height as soon as options mount.
+  useLayoutEffect(() => {
+    if (!triggerBrush || !panelMounted) return;
+    const option = rootRef.current?.querySelector<HTMLElement>(
+      "[data-brush-option]",
+    );
+    if (option) setPaintOpenHeightPx(option.offsetHeight);
+  }, [triggerBrush, panelMounted, options]);
 
   const requestClose = useCallback(() => {
     if (disabled || closing || !open) return;
     if (reducedMotion) {
       setOpen(false);
+      setPaintOpenHeightPx(null);
       return;
     }
     setClosing(true);
@@ -278,12 +295,16 @@ export function BrushMenu({
 
   const handleCloseComplete = useCallback(() => {
     setClosing(false);
+    setPaintOpenHeightPx(null);
     triggerBrushPathsRef.current = null;
     brushPathsRef.current = [];
     labelElsRef.current = [];
     if (shellRef.current) {
       shellRef.current.style.width = "";
       shellRef.current.style.height = "";
+    }
+    if (triggerRef.current) {
+      triggerRef.current.style.height = "";
     }
   }, []);
 
@@ -319,6 +340,11 @@ export function BrushMenu({
     [triggerBrush],
   );
 
+  const getPaintEl = useCallback(
+    () => (triggerBrush ? triggerRef.current : null),
+    [triggerBrush],
+  );
+
   const getClosedTriggerSizePx = useCallback(
     () => closedTriggerSizeRef.current,
     [],
@@ -328,10 +354,9 @@ export function BrushMenu({
     const root = rootRef.current;
     const option = root?.querySelector<HTMLElement>("[data-brush-option]");
     const panel = root?.querySelector<HTMLElement>(`.${styles.panel}`);
-    // Prefer panel width so trigger matches the full menu label column.
     const width =
-      panel?.offsetWidth ||
       option?.offsetWidth ||
+      panel?.offsetWidth ||
       Math.max(
         closedTriggerSizeRef.current.width,
         BRUSH_OPTION_MIN_WIDTH_REM * 16,
@@ -341,14 +366,20 @@ export function BrushMenu({
     return { width, height };
   }, []);
 
+  const handleOpenSize = useCallback((size: BrushTriggerSizePx) => {
+    setPaintOpenHeightPx(size.height);
+  }, []);
+
   useBrushMenuDrawAnimation({
     phase: drawPhase,
     reducedMotion,
     getBrushPathGroups,
     getLabelEls,
     getSizeEl,
+    getPaintEl,
     getClosedTriggerSizePx,
     getOpenTriggerSizePx,
+    onOpenSize: handleOpenSize,
     onCloseComplete: handleCloseComplete,
   });
 
@@ -441,6 +472,15 @@ export function BrushMenu({
           brushPathsRef={brushPathsRef}
           labelElsRef={labelElsRef}
           onSelect={handleSelect}
+          panelStyle={
+            triggerBrush
+              ? {
+                  top: `calc(${
+                    paintOpenHeightPx ?? closedTriggerSizeRef.current.height
+                  }px + var(--brush-stack-gap))`,
+                }
+              : { top: "100%", marginTop: "var(--brush-stack-gap)" }
+          }
         />
       ) : null}
     </div>

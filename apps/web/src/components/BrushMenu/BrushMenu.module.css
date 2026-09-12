@@ -1,11 +1,16 @@
 .wrap {
   position: relative;
   display: inline-block;
+  /* Avoid inline-block baseline strut — it added extra space below the shell
+     so panel `top: 100%` sat lower than the gap between options. */
+  vertical-align: top;
+  line-height: 0;
   max-width: 100%;
   overflow: visible;
   --brush-option-min-width: 12rem;
   --brush-row-padding: 0.55rem 1.1rem 0.55rem 0;
   --brush-avatar-slot: 36px;
+  --brush-stack-gap: 0.2rem;
 }
 
 .trigger {
@@ -39,6 +44,7 @@
   box-sizing: border-box;
   max-width: 100%;
   overflow: visible;
+  line-height: normal;
 }
 
 /* Closed footprint — keeps layout when the trigger is position:absolute. */
@@ -59,8 +65,9 @@
   top: 0;
   left: 0;
   z-index: 1;
+  /* Width tracks in-flow shell; height is tweened to option row size. */
   width: 100%;
-  height: 100%;
+  height: var(--brush-avatar-slot);
   max-width: none;
   box-sizing: border-box;
   margin: 0;
@@ -89,7 +96,7 @@
   position: relative;
   z-index: 1;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: flex-start;
   gap: 0.5rem;
   width: 100%;
@@ -115,7 +122,7 @@
   align-items: center;
   align-self: stretch;
   /* Match BrushOption horizontal inset (padding lives on the option row). */
-  padding: 0.55rem 1.1rem 0.55rem 0;
+  padding: 0.25rem 1.1rem 0.55rem 0;
   box-sizing: border-box;
 }
 
@@ -142,19 +149,20 @@
 
 .panel {
   position: absolute;
-  top: 100%;
+  /* Offset set inline from open paint height so gap matches option stack gap. */
   left: 0;
   z-index: 40;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 0.2rem;
+  gap: var(--brush-stack-gap);
   /* Track shell width; never narrower than option min. */
   width: 100%;
   min-width: var(--brush-option-min-width, 12rem);
-  margin: 0.2rem 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
+  line-height: normal;
 }
 
 .item {

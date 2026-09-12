@@ -89,16 +89,23 @@ function brushStrokeMs(): number {
 /**
  * Paint-reveal on open; reverse undraw on close (same durations).
  * Panel stays mounted while `phase === "closing"` until `onCloseComplete`.
+ *
+ * In-flow `getSizeEl` (shell) tweens **width only** (pushes siblings).
+ * Absolute `getPaintEl` (trigger) tweens **height** to match option rows.
  */
 export function useBrushMenuDrawAnimation(options: {
   phase: BrushMenuDrawPhase | null;
   reducedMotion: boolean;
   getBrushPathGroups: () => BrushRevealPathGroup[];
   getLabelEls: () => HTMLElement[];
-  /** In-flow shell whose width/height tween pushes siblings; trigger paints inside. */
+  /** In-flow shell — width tween only. */
   getSizeEl?: () => HTMLElement | null;
+  /** Absolute trigger paint box — height tween to option row height. */
+  getPaintEl?: () => HTMLElement | null;
   getClosedTriggerSizePx?: () => BrushTriggerSizePx;
   getOpenTriggerSizePx?: () => BrushTriggerSizePx;
+  /** Fires with the open paint box size (for absolute panel offset). */
+  onOpenSize?: (size: BrushTriggerSizePx) => void;
   onCloseComplete?: () => void;
 }) {
   const {
@@ -107,14 +114,18 @@ export function useBrushMenuDrawAnimation(options: {
     getBrushPathGroups,
     getLabelEls,
     getSizeEl,
+    getPaintEl,
     getClosedTriggerSizePx,
     getOpenTriggerSizePx,
+    onOpenSize,
     onCloseComplete,
   } = options;
   const animationsRef = useRef<Animatable[]>([]);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onCloseCompleteRef = useRef(onCloseComplete);
   onCloseCompleteRef.current = onCloseComplete;
+  const onOpenSizeRef = useRef(onOpenSize);
+  onOpenSizeRef.current = onOpenSize;
 
   useEffect(() => {
     stopAll(animationsRef.current);
@@ -136,38 +147,50 @@ export function useBrushMenuDrawAnimation(options: {
       const labels = getLabelEls().filter(Boolean);
       const allPaths = groups.flat().filter(Boolean);
       const sizeEl = getSizeEl?.() ?? null;
+      const paintEl = getPaintEl?.() ?? null;
       const closedSize = getClosedTriggerSizePx?.() ?? {
         width: sizeEl?.offsetWidth || 36,
         height: sizeEl?.offsetHeight || 36,
       };
       const openSize = getOpenTriggerSizePx?.() ?? {
         width: Math.max(closedSize.width, sizeEl?.offsetWidth || 0),
-        height: Math.max(closedSize.height, sizeEl?.offsetHeight || 0),
+        height: Math.max(closedSize.height, paintEl?.offsetHeight || 0),
       };
 
-      if (allPaths.length === 0 && !sizeEl) {
+      if (allPaths.length === 0 && !sizeEl && !paintEl) {
         if (isClosing) onCloseCompleteRef.current?.();
         return;
       }
 
-      const clearSize = () => {
-        if (!sizeEl) return;
-        sizeEl.style.width = "";
-        sizeEl.style.height = "";
+      const clearSizes = () => {
+        if (sizeEl) {
+          sizeEl.style.width = "";
+          sizeEl.style.height = "";
+        }
+        if (paintEl) {
+          paintEl.style.height = "";
+        }
       };
+
+      if (!isClosing) {
+        onOpenSizeRef.current?.(openSize);
+      }
 
       if (reducedMotion) {
         if (isClosing) {
           prepareUndrawn(allPaths);
           prepareLabelsHidden(labels);
-          clearSize();
+          clearSizes();
           onCloseCompleteRef.current?.();
         } else {
           showFullyDrawn(allPaths);
           showLabelsFully(labels);
           if (sizeEl) {
             sizeEl.style.width = `${openSize.width}px`;
-            sizeEl.style.height = `${openSize.height}px`;
+            sizeEl.style.height = `${closedSize.height}px`;
+          }
+          if (paintEl) {
+            paintEl.style.height = `${openSize.height}px`;
           }
         }
         return;
@@ -213,12 +236,22 @@ export function useBrushMenuDrawAnimation(options: {
 
         if (sizeEl) {
           const fromWidth = sizeEl.offsetWidth || openSize.width;
-          const fromHeight = sizeEl.offsetHeight || openSize.height;
           sizeEl.style.width = `${fromWidth}px`;
-          sizeEl.style.height = `${fromHeight}px`;
+          sizeEl.style.height = `${closedSize.height}px`;
           nextAnimations.push(
             animate(sizeEl, {
               width: [`${fromWidth}px`, `${closedSize.width}px`],
+              duration: durationMs,
+              ease: BRUSH_REVEAL_EASE,
+            }) as Animatable,
+          );
+        }
+
+        if (paintEl) {
+          const fromHeight = paintEl.offsetHeight || openSize.height;
+          paintEl.style.height = `${fromHeight}px`;
+          nextAnimations.push(
+            animate(paintEl, {
               height: [`${fromHeight}px`, `${closedSize.height}px`],
               duration: durationMs,
               ease: BRUSH_REVEAL_EASE,
@@ -229,7 +262,7 @@ export function useBrushMenuDrawAnimation(options: {
         animationsRef.current = nextAnimations;
         closeTimerRef.current = setTimeout(() => {
           closeTimerRef.current = null;
-          clearSize();
+          clearSizes();
           onCloseCompleteRef.current?.();
         }, durationMs);
         return;
@@ -237,12 +270,24 @@ export function useBrushMenuDrawAnimation(options: {
 
       prepareLabelsHidden(labels);
 
+      // In-flow shell: width only (real width pushes SearchPanel).
       if (sizeEl) {
         sizeEl.style.width = `${closedSize.width}px`;
         sizeEl.style.height = `${closedSize.height}px`;
         nextAnimations.push(
           animate(sizeEl, {
             width: [`${closedSize.width}px`, `${openSize.width}px`],
+            duration: durationMs,
+            ease: BRUSH_REVEAL_EASE,
+          }) as Animatable,
+        );
+      }
+
+      // Absolute paint: grow height to match option rows.
+      if (paintEl) {
+        paintEl.style.height = `${closedSize.height}px`;
+        nextAnimations.push(
+          animate(paintEl, {
             height: [`${closedSize.height}px`, `${openSize.height}px`],
             duration: durationMs,
             ease: BRUSH_REVEAL_EASE,
@@ -298,6 +343,7 @@ export function useBrushMenuDrawAnimation(options: {
     getBrushPathGroups,
     getLabelEls,
     getSizeEl,
+    getPaintEl,
     getClosedTriggerSizePx,
     getOpenTriggerSizePx,
   ]);
