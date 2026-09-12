@@ -1,10 +1,9 @@
 "use client";
 
-import { animate, createDrawable, stagger } from "animejs";
+import { animate, createDrawable } from "animejs";
 import { useEffect, useRef } from "react";
 
 export const BRUSH_OPTION_DRAW_MS = 200;
-const STAGGER_MS = 40;
 const LABEL_CLIP_HIDDEN = "inset(0 100% 0 0)";
 const LABEL_CLIP_SHOWN = "inset(0 0% 0 0)";
 
@@ -55,9 +54,9 @@ function showLabelsFully(labels: HTMLElement[]) {
 }
 
 /**
- * On menu open, draw each BrushOption reveal path left → right over 200ms
- * via anime.js createDrawable, and clip labels in sync so copy only appears
- * over the drawn stroke.
+ * On menu open, draw all BrushOption reveal paths left → right together over
+ * 200ms via anime.js createDrawable, and clip labels in sync so copy only
+ * appears over the drawn stroke.
  */
 export function useBrushMenuDrawAnimation(options: {
   open: boolean;
@@ -96,7 +95,6 @@ export function useBrushMenuDrawAnimation(options: {
         draw: ["0 0", "0 1"],
         duration: BRUSH_OPTION_DRAW_MS,
         ease: "inOutQuad",
-        delay: stagger(STAGGER_MS),
       }) as Animatable;
 
       if (labels.length > 0) {
@@ -104,7 +102,6 @@ export function useBrushMenuDrawAnimation(options: {
           clipPath: [LABEL_CLIP_HIDDEN, LABEL_CLIP_SHOWN],
           duration: BRUSH_OPTION_DRAW_MS,
           ease: "inOutQuad",
-          delay: stagger(STAGGER_MS),
         }) as Animatable;
       }
     });
