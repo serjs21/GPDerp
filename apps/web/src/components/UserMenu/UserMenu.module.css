@@ -10,7 +10,7 @@
   color: inherit;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   font-family: inherit;
 }
 
@@ -26,6 +26,8 @@
   justify-content: flex-start;
   gap: 0.5rem;
   max-width: 100%;
+  /* Match trigger avatar box (36px) so row content shares the same start column. */
+  min-height: 36px;
 }
 
 .profileName {

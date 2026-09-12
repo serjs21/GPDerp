@@ -11,9 +11,11 @@ const avatarAristotle =
 function makeUser({
   userName,
   avatar,
+  avatarManuallySet = true,
 }: {
   userName: string;
   avatar: string;
+  avatarManuallySet?: boolean;
 }): UserObject {
   return {
     id: "user-1",
@@ -22,7 +24,7 @@ function makeUser({
     firstName: userName.split(" ")[0] ?? userName,
     lastName: userName.split(" ").slice(1).join(" "),
     avatar,
-    avatarManuallySet: true,
+    avatarManuallySet,
     emailVerifiedAt: null,
     providers: [AuthProvider.LOCAL],
   };
@@ -51,6 +53,17 @@ export const LongDisplayName: Story = {
     user: makeUser({
       userName: "Sun-Tzu Sunzi: Master Strategist of the Art of War",
       avatar: avatarAristotle,
+    }),
+  },
+};
+
+export const NoSavedAvatar: Story = {
+  name: "No saved avatar",
+  args: {
+    user: makeUser({
+      userName: "FML",
+      avatar: "",
+      avatarManuallySet: false,
     }),
   },
 };

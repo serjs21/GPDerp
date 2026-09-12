@@ -9,7 +9,7 @@ import type { UserObject } from "@/types";
 import { UserAvatar } from "@/components/AuthenticationNav/UserAvatar";
 import styles from "./UserMenu.module.css";
 
-const TRIGGER_AVATAR_SIZE = 28;
+const USER_MENU_AVATAR_SIZE = 36;
 
 export type UserMenuProps = {
   user: UserObject;
@@ -32,7 +32,7 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
         value: "profile",
         label: (
           <span className={styles.profileLabel}>
-            <UserAvatar user={user} />
+            <UserAvatar user={user} size={USER_MENU_AVATAR_SIZE} />
             <span className={styles.profileName}>{displayName}</span>
           </span>
         ),
@@ -82,13 +82,13 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
           spikeCount={sharpShape.spikeCount}
           randomness={sharpShape.randomness}
           seed={sharpShape.id}
-          fontSize={TRIGGER_AVATAR_SIZE}
+          fontSize={USER_MENU_AVATAR_SIZE}
           paddingX={0}
           paddingY={0}
           strokeWidth={3}
-          fill="#f4511e"
+          fill="#ffffff"
         >
-          <UserAvatar user={user} size={TRIGGER_AVATAR_SIZE} fill />
+          <UserAvatar user={user} size={USER_MENU_AVATAR_SIZE} fill />
         </ComicBurstLabel>
       )}
     />
