@@ -14,7 +14,7 @@
   font-size: 1.05rem;
   font-weight: 600;
   line-height: 1.2;
-  text-align: center;
+  text-align: start;
   cursor: pointer;
   overflow: visible;
 }
@@ -52,7 +52,11 @@
   position: relative;
   z-index: 1;
   display: block;
+  width: 100%;
   pointer-events: none;
   color: inherit;
+  text-align: start;
   mix-blend-mode: normal;
+  /* Hidden until draw animation reveals LTR with the brush. */
+  clip-path: inset(0 100% 0 0);
 }

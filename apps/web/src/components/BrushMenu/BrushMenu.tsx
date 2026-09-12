@@ -102,6 +102,7 @@ function BrushOptionList({
   disabled,
   placeholder,
   revealPathsRef,
+  labelElsRef,
   onSelect,
 }: {
   listId: string;
@@ -110,6 +111,7 @@ function BrushOptionList({
   disabled: boolean;
   placeholder: string;
   revealPathsRef: RefObject<(SVGPathElement | null)[]>;
+  labelElsRef: RefObject<(HTMLSpanElement | null)[]>;
   onSelect: (nextValue: string) => void;
 }) {
   return (
@@ -124,6 +126,9 @@ function BrushOptionList({
           <BrushOption
             ref={(node) => {
               revealPathsRef.current[index] = node;
+            }}
+            labelRef={(node) => {
+              labelElsRef.current[index] = node;
             }}
             index={index}
             label={option.label}
@@ -166,6 +171,7 @@ export function BrushMenu({
   const listId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const revealPathsRef = useRef<(SVGPathElement | null)[]>([]);
+  const labelElsRef = useRef<(HTMLSpanElement | null)[]>([]);
   const { open, setOpen } = useOpenState(openProp, defaultOpen, onOpenChange);
   const reducedMotion = useReducedMotion() ?? false;
 
@@ -179,10 +185,19 @@ export function BrushMenu({
     [],
   );
 
+  const getLabelEls = useCallback(
+    () =>
+      labelElsRef.current.filter(
+        (label): label is HTMLSpanElement => label != null,
+      ),
+    [],
+  );
+
   useBrushMenuDrawAnimation({
     open,
     reducedMotion,
     getRevealPaths,
+    getLabelEls,
   });
 
   const triggerLabel = resolveTriggerLabel(options, value, placeholder);
@@ -226,6 +241,7 @@ export function BrushMenu({
           disabled={disabled}
           placeholder={placeholder}
           revealPathsRef={revealPathsRef}
+          labelElsRef={labelElsRef}
           onSelect={handleSelect}
         />
       ) : null}

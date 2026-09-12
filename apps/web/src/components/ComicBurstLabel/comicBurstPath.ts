@@ -68,7 +68,7 @@ function buildSquarePath(
 ): ComicBurstLayout {
   const cx = width / 2;
   const cy = height / 2;
-  const inset = 3;
+  const inset = sharp ? 0 : 3;
   const maxR = Math.min(width, height) * 0.22;
   // Longer labels → more rounded corners; sharp rects stay radius 0.
   const r = sharp ? 0 : Math.min(maxR, 6 + cornerCount * 0.55);
@@ -245,6 +245,8 @@ export function layoutComicBurstLabel(params: {
   seedKey: string | number;
   kind?: ComicBurstShapeKind;
   text?: string;
+  /** Drop default lettering floors (for icon-only labels that fill the frame). */
+  tight?: boolean;
 }): ComicBurstLayout {
   const {
     textWidth,
@@ -256,9 +258,13 @@ export function layoutComicBurstLabel(params: {
     seedKey,
     kind = "burst",
     text = "",
+    tight = false,
   } = params;
-  const width = Math.max(72, textWidth + paddingX * 2);
-  const height = Math.max(48, fontSize * 1.35 + paddingY * 2);
+  const minWidth = tight ? 0 : 72;
+  const minHeight = tight ? 0 : 48;
+  const contentHeight = tight ? fontSize : fontSize * 1.35;
+  const width = Math.max(minWidth, textWidth + paddingX * 2);
+  const height = Math.max(minHeight, contentHeight + paddingY * 2);
   const detail = silhouetteDetailForTextLength(spikeCount, text || String(seedKey));
   const sideSpikeLengthScale =
     (text || String(seedKey)).trim().length >= COMIC_BURST_LONG_TEXT_THRESHOLD ? 0.5 : 1;

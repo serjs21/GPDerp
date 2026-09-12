@@ -1,27 +1,29 @@
 .trigger {
-  width: 2.75rem;
-  min-width: 2.75rem;
-  height: 2.75rem;
+  width: auto;
+  min-width: 0;
+  height: auto;
   padding: 0 !important;
-  border: 1px solid var(--profile-surface-border, #221e1f) !important;
-  border-radius: 12px;
-  background: color-mix(
-    in srgb,
-    var(--profile-surface-bg, #f7f4ef) 84%,
-    transparent
-  ) !important;
+  border: none !important;
+  border-radius: 0;
+  background: transparent !important;
   box-shadow: none !important;
-  color: var(--text-color, #221e1f);
+  color: inherit;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-family: inherit;
 }
 
+.triggerBurst {
+  display: block;
+  line-height: 0;
+  pointer-events: none;
+}
+
 .profileLabel {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.5rem;
   max-width: 100%;
 }

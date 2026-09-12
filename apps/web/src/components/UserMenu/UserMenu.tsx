@@ -3,9 +3,13 @@
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { BrushMenu, type BrushMenuOption } from "@/components/BrushMenu";
+import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
+import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import type { UserObject } from "@/types";
 import { UserAvatar } from "@/components/AuthenticationNav/UserAvatar";
 import styles from "./UserMenu.module.css";
+
+const TRIGGER_AVATAR_SIZE = 28;
 
 export type UserMenuProps = {
   user: UserObject;
@@ -20,6 +24,7 @@ function resolveDisplayName(user: UserObject) {
 export function UserMenu({ user, onLogout, className }: UserMenuProps) {
   const router = useRouter();
   const displayName = resolveDisplayName(user);
+  const sharpShape = resolveComicLabelShapePreset("sharp");
 
   const options = useMemo<BrushMenuOption[]>(
     () => [
@@ -69,7 +74,23 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
       options={options}
       placeholder={displayName}
       onChange={handleChange}
-      renderTrigger={() => <UserAvatar user={user} />}
+      renderTrigger={() => (
+        <ComicBurstLabel
+          className={styles.triggerBurst}
+          text={displayName}
+          shapeKind={sharpShape.kind}
+          spikeCount={sharpShape.spikeCount}
+          randomness={sharpShape.randomness}
+          seed={sharpShape.id}
+          fontSize={TRIGGER_AVATAR_SIZE}
+          paddingX={0}
+          paddingY={0}
+          strokeWidth={3}
+          fill="#f4511e"
+        >
+          <UserAvatar user={user} size={TRIGGER_AVATAR_SIZE} fill />
+        </ComicBurstLabel>
+      )}
     />
   );
 }

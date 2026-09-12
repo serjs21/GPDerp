@@ -5,6 +5,7 @@ import {
   useId,
   type ButtonHTMLAttributes,
   type ReactNode,
+  type Ref,
 } from "react";
 import {
   BRUSH_MENU_ICON_HEIGHT,
@@ -22,6 +23,8 @@ export type BrushOptionProps = {
   index?: number;
   /** Override round-robin icon when set. */
   iconSrc?: BrushMenuIconSrc | string;
+  /** Label node for clip-path sync with the brush draw. */
+  labelRef?: Ref<HTMLSpanElement>;
   selected?: boolean;
   disabled?: boolean;
   className?: string;
@@ -31,6 +34,7 @@ export type BrushOptionProps = {
 /**
  * Option row with brush_menu stroke as masked background.
  * Reveal path is exposed via ref for anime.js createDrawable (LTR mask reveal).
+ * Label is clipped in sync so copy only shows over the drawn stroke.
  */
 export const BrushOption = forwardRef<SVGPathElement, BrushOptionProps>(
   function BrushOption(
@@ -38,6 +42,7 @@ export const BrushOption = forwardRef<SVGPathElement, BrushOptionProps>(
       label,
       index = 0,
       iconSrc,
+      labelRef,
       selected = false,
       disabled = false,
       className,
@@ -101,7 +106,9 @@ export const BrushOption = forwardRef<SVGPathElement, BrushOptionProps>(
             />
           </g>
         </svg>
-        <span className={styles.label}>{label}</span>
+        <span ref={labelRef} className={styles.label}>
+          {label}
+        </span>
       </button>
     );
   },
