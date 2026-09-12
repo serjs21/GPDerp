@@ -95,8 +95,8 @@ export function useBrushMenuDrawAnimation(options: {
   reducedMotion: boolean;
   getBrushPathGroups: () => BrushRevealPathGroup[];
   getLabelEls: () => HTMLElement[];
-  /** In-flow trigger sized to match option rows while open. */
-  getTriggerEl?: () => HTMLElement | null;
+  /** In-flow shell whose width/height tween pushes siblings; trigger paints inside. */
+  getSizeEl?: () => HTMLElement | null;
   getClosedTriggerSizePx?: () => BrushTriggerSizePx;
   getOpenTriggerSizePx?: () => BrushTriggerSizePx;
   onCloseComplete?: () => void;
@@ -106,7 +106,7 @@ export function useBrushMenuDrawAnimation(options: {
     reducedMotion,
     getBrushPathGroups,
     getLabelEls,
-    getTriggerEl,
+    getSizeEl,
     getClosedTriggerSizePx,
     getOpenTriggerSizePx,
     onCloseComplete,
@@ -135,39 +135,39 @@ export function useBrushMenuDrawAnimation(options: {
       const groups = getBrushPathGroups();
       const labels = getLabelEls().filter(Boolean);
       const allPaths = groups.flat().filter(Boolean);
-      const triggerEl = getTriggerEl?.() ?? null;
+      const sizeEl = getSizeEl?.() ?? null;
       const closedSize = getClosedTriggerSizePx?.() ?? {
-        width: triggerEl?.offsetWidth || 36,
-        height: triggerEl?.offsetHeight || 36,
+        width: sizeEl?.offsetWidth || 36,
+        height: sizeEl?.offsetHeight || 36,
       };
       const openSize = getOpenTriggerSizePx?.() ?? {
-        width: Math.max(closedSize.width, triggerEl?.offsetWidth || 0),
-        height: Math.max(closedSize.height, triggerEl?.offsetHeight || 0),
+        width: Math.max(closedSize.width, sizeEl?.offsetWidth || 0),
+        height: Math.max(closedSize.height, sizeEl?.offsetHeight || 0),
       };
 
-      if (allPaths.length === 0 && !triggerEl) {
+      if (allPaths.length === 0 && !sizeEl) {
         if (isClosing) onCloseCompleteRef.current?.();
         return;
       }
 
-      const clearTriggerSize = () => {
-        if (!triggerEl) return;
-        triggerEl.style.width = "";
-        triggerEl.style.height = "";
+      const clearSize = () => {
+        if (!sizeEl) return;
+        sizeEl.style.width = "";
+        sizeEl.style.height = "";
       };
 
       if (reducedMotion) {
         if (isClosing) {
           prepareUndrawn(allPaths);
           prepareLabelsHidden(labels);
-          clearTriggerSize();
+          clearSize();
           onCloseCompleteRef.current?.();
         } else {
           showFullyDrawn(allPaths);
           showLabelsFully(labels);
-          if (triggerEl) {
-            triggerEl.style.width = `${openSize.width}px`;
-            triggerEl.style.height = `${openSize.height}px`;
+          if (sizeEl) {
+            sizeEl.style.width = `${openSize.width}px`;
+            sizeEl.style.height = `${openSize.height}px`;
           }
         }
         return;
@@ -177,7 +177,6 @@ export function useBrushMenuDrawAnimation(options: {
 
       if (isClosing) {
         showFullyDrawn(allPaths);
-        // Don't force labels visible — keep current opacity; fade from here.
         for (const label of labels) {
           if (!label.style.opacity) label.style.opacity = "1";
         }
@@ -200,7 +199,6 @@ export function useBrushMenuDrawAnimation(options: {
           );
         }
 
-        // Text out faster than brush so copy never sits on a vanishing stroke.
         if (labels.length > 0) {
           nextAnimations.push(
             animate(labels, {
@@ -213,13 +211,13 @@ export function useBrushMenuDrawAnimation(options: {
           );
         }
 
-        if (triggerEl) {
-          const fromWidth = triggerEl.offsetWidth || openSize.width;
-          const fromHeight = triggerEl.offsetHeight || openSize.height;
-          triggerEl.style.width = `${fromWidth}px`;
-          triggerEl.style.height = `${fromHeight}px`;
+        if (sizeEl) {
+          const fromWidth = sizeEl.offsetWidth || openSize.width;
+          const fromHeight = sizeEl.offsetHeight || openSize.height;
+          sizeEl.style.width = `${fromWidth}px`;
+          sizeEl.style.height = `${fromHeight}px`;
           nextAnimations.push(
-            animate(triggerEl, {
+            animate(sizeEl, {
               width: [`${fromWidth}px`, `${closedSize.width}px`],
               height: [`${fromHeight}px`, `${closedSize.height}px`],
               duration: durationMs,
@@ -231,7 +229,7 @@ export function useBrushMenuDrawAnimation(options: {
         animationsRef.current = nextAnimations;
         closeTimerRef.current = setTimeout(() => {
           closeTimerRef.current = null;
-          clearTriggerSize();
+          clearSize();
           onCloseCompleteRef.current?.();
         }, durationMs);
         return;
@@ -239,11 +237,11 @@ export function useBrushMenuDrawAnimation(options: {
 
       prepareLabelsHidden(labels);
 
-      if (triggerEl) {
-        triggerEl.style.width = `${closedSize.width}px`;
-        triggerEl.style.height = `${closedSize.height}px`;
+      if (sizeEl) {
+        sizeEl.style.width = `${closedSize.width}px`;
+        sizeEl.style.height = `${closedSize.height}px`;
         nextAnimations.push(
-          animate(triggerEl, {
+          animate(sizeEl, {
             width: [`${closedSize.width}px`, `${openSize.width}px`],
             height: [`${closedSize.height}px`, `${openSize.height}px`],
             duration: durationMs,
@@ -299,8 +297,9 @@ export function useBrushMenuDrawAnimation(options: {
     reducedMotion,
     getBrushPathGroups,
     getLabelEls,
-    getTriggerEl,
+    getSizeEl,
     getClosedTriggerSizePx,
     getOpenTriggerSizePx,
   ]);
 }
+

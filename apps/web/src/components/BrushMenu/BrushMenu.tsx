@@ -47,8 +47,8 @@ export type BrushMenuProps = {
   triggerClassName?: string;
   /**
    * Paint brush + expanding label on the trigger itself (in-flow width).
-   * Avatar/icon from `renderTrigger` stays mounted; brush and expand label
-   * draw behind it. Menu options render below the trigger.
+   * Avatar/icon from `renderTrigger` stays mounted at the closed origin;
+   * brush and expand label draw underneath / beside it.
    */
   triggerBrush?: boolean;
   /** Label shown beside the trigger when open (contributes real layout width). */
@@ -210,6 +210,7 @@ export function BrushMenu({
 }: BrushMenuProps) {
   const listId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const triggerBrushPathsRef = useRef<BrushOptionBrushPaths | null>(null);
   const triggerExpandLabelRef = useRef<HTMLSpanElement | null>(null);
@@ -231,27 +232,38 @@ export function BrushMenu({
       : null;
 
   const captureClosedTriggerSize = useCallback(() => {
-    const trigger = triggerRef.current;
-    if (!trigger) return;
+    const shell = shellRef.current;
+    if (!shell) return;
+    const prevW = shell.style.width;
+    const prevH = shell.style.height;
+    shell.style.width = "";
+    shell.style.height = "";
     closedTriggerSizeRef.current = {
-      width: trigger.offsetWidth || 36,
-      height: trigger.offsetHeight || 36,
+      width: shell.offsetWidth || 36,
+      height: shell.offsetHeight || 36,
     };
+    shell.style.width = prevW;
+    shell.style.height = prevH;
   }, []);
 
   useLayoutEffect(() => {
     if (panelMounted || !triggerBrush) return;
     captureClosedTriggerSize();
-  }, [panelMounted, triggerBrush, expandLabel, renderTrigger, captureClosedTriggerSize]);
+  }, [
+    panelMounted,
+    triggerBrush,
+    expandLabel,
+    renderTrigger,
+    captureClosedTriggerSize,
+  ]);
 
-  // Pin closed size before paint on open so the expand slot cannot inflate layout.
   useLayoutEffect(() => {
     if (!triggerBrush || !open || closing) return;
-    const trigger = triggerRef.current;
-    if (!trigger || trigger.style.width) return;
+    const shell = shellRef.current;
+    if (!shell || shell.style.width) return;
     const closed = closedTriggerSizeRef.current;
-    trigger.style.width = `${closed.width}px`;
-    trigger.style.height = `${closed.height}px`;
+    shell.style.width = `${closed.width}px`;
+    shell.style.height = `${closed.height}px`;
   }, [open, closing, triggerBrush]);
 
   const requestClose = useCallback(() => {
@@ -269,9 +281,9 @@ export function BrushMenu({
     triggerBrushPathsRef.current = null;
     brushPathsRef.current = [];
     labelElsRef.current = [];
-    if (triggerRef.current) {
-      triggerRef.current.style.width = "";
-      triggerRef.current.style.height = "";
+    if (shellRef.current) {
+      shellRef.current.style.width = "";
+      shellRef.current.style.height = "";
     }
   }, []);
 
@@ -302,8 +314,8 @@ export function BrushMenu({
     return labels;
   }, [triggerBrush]);
 
-  const getTriggerEl = useCallback(
-    () => (triggerBrush ? triggerRef.current : null),
+  const getSizeEl = useCallback(
+    () => (triggerBrush ? shellRef.current : null),
     [triggerBrush],
   );
 
@@ -334,7 +346,7 @@ export function BrushMenu({
     reducedMotion,
     getBrushPathGroups,
     getLabelEls,
-    getTriggerEl,
+    getSizeEl,
     getClosedTriggerSizePx,
     getOpenTriggerSizePx,
     onCloseComplete: handleCloseComplete,
@@ -361,6 +373,45 @@ export function BrushMenu({
   const showExpandLabel =
     triggerBrush && panelMounted && expandLabel != null;
 
+  const triggerButton = (
+    <button
+      ref={triggerRef}
+      type="button"
+      className={`${styles.trigger}${
+        triggerClassName ? ` ${triggerClassName}` : ""
+      }${triggerBrush ? ` ${styles.triggerAnchored}` : ""}${
+        showTriggerBrush ? ` ${styles.triggerBrushOpen}` : ""
+      }`}
+      data-brush-open={showTriggerBrush ? "true" : undefined}
+      disabled={disabled}
+      aria-haspopup="listbox"
+      aria-expanded={panelMounted}
+      aria-controls={panelMounted ? listId : undefined}
+      onClick={toggleOpen}
+    >
+      {showTriggerBrush ? (
+        <BrushPaintLayer
+          index={0}
+          onBrushPaths={(paths) => {
+            triggerBrushPathsRef.current = paths;
+          }}
+        />
+      ) : null}
+      <span className={styles.triggerFace}>
+        {renderTrigger
+          ? renderTrigger({ open: panelMounted, label: triggerLabel })
+          : triggerLabel}
+        {showExpandLabel ? (
+          <span className={styles.expandSlot}>
+            <span ref={triggerExpandLabelRef} className={styles.expandLabel}>
+              {expandLabel}
+            </span>
+          </span>
+        ) : null}
+      </span>
+    </button>
+  );
+
   return (
     <div
       ref={rootRef}
@@ -371,43 +422,14 @@ export function BrushMenu({
         } as CSSProperties
       }
     >
-      <button
-        ref={triggerRef}
-        type="button"
-        className={`${styles.trigger}${
-          triggerClassName ? ` ${triggerClassName}` : ""
-        }${showTriggerBrush ? ` ${styles.triggerBrushOpen}` : ""}`}
-        data-brush-open={showTriggerBrush ? "true" : undefined}
-        disabled={disabled}
-        aria-haspopup="listbox"
-        aria-expanded={panelMounted}
-        aria-controls={panelMounted ? listId : undefined}
-        onClick={toggleOpen}
-      >
-        {showTriggerBrush ? (
-          <BrushPaintLayer
-            index={0}
-            onBrushPaths={(paths) => {
-              triggerBrushPathsRef.current = paths;
-            }}
-          />
-        ) : null}
-        <span className={styles.triggerFace}>
-          {renderTrigger
-            ? renderTrigger({ open: panelMounted, label: triggerLabel })
-            : triggerLabel}
-          {showExpandLabel ? (
-            <span className={styles.expandSlot}>
-              <span
-                ref={triggerExpandLabelRef}
-                className={styles.expandLabel}
-              >
-                {expandLabel}
-              </span>
-            </span>
-          ) : null}
-        </span>
-      </button>
+      {triggerBrush ? (
+        <div ref={shellRef} className={styles.shell}>
+          <div className={styles.avatarSlot} aria-hidden />
+          {triggerButton}
+        </div>
+      ) : (
+        triggerButton
+      )}
 
       {panelMounted ? (
         <BrushOptionList

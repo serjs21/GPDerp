@@ -5,6 +5,7 @@
   overflow: visible;
   --brush-option-min-width: 12rem;
   --brush-row-padding: 0.55rem 1.1rem 0.55rem 0;
+  --brush-avatar-slot: 36px;
 }
 
 .trigger {
@@ -22,15 +23,52 @@
   line-height: 1.2;
   cursor: pointer;
   box-shadow: 2px 2px 0 #111111;
-  /* In-flow: size tween pushes siblings (e.g. SearchPanel). */
   display: inline-flex;
   align-items: center;
   max-width: 100%;
   overflow: hidden;
 }
 
+/*
+ * In-flow box that tweens open/closed size (pushes SearchPanel).
+ * Holds a fixed avatar slot so the absolute trigger can leave flow.
+ */
+.shell {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: visible;
+}
+
+/* Closed footprint — keeps layout when the trigger is position:absolute. */
+.avatarSlot {
+  display: block;
+  width: var(--brush-avatar-slot);
+  height: var(--brush-avatar-slot);
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+/*
+ * Pin trigger to the avatar origin. Shell grows down/right underneath;
+ * avatar stays put (no padding shift).
+ */
+.triggerAnchored {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
 .triggerBrushOpen {
-  /* Box size is tweened to the option border-box; padding lives on the face. */
   z-index: 1;
   box-sizing: border-box;
   padding: 0;
@@ -51,35 +89,35 @@
   position: relative;
   z-index: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
   gap: 0.5rem;
   width: 100%;
   min-width: 0;
   height: 100%;
   box-sizing: border-box;
-}
-
-.triggerBrushOpen .triggerFace {
-  /* Same inset as BrushOption content. */
-  padding: var(--brush-row-padding);
+  /* No padding — avatar stays at the closed origin; brush draws under it. */
+  padding: 0;
 }
 
 .triggerFace > :first-child {
   flex-shrink: 0;
 }
 
-/* Fills remaining trigger width so brush matches option row length. */
+/* Name sits beside the avatar inside the growing shell. */
 .expandSlot {
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
   display: flex;
   align-items: center;
-  height: 100%;
+  align-self: stretch;
+  /* Match option text vertical rhythm without moving the avatar. */
+  padding: 0.55rem 1.1rem 0.55rem 0;
+  box-sizing: border-box;
 }
 
-/* Opacity/scale only — box size comes from the trigger tween. */
+/* Opacity/scale only — box size comes from the shell tween. */
 .expandLabel {
   position: relative;
   z-index: 1;
