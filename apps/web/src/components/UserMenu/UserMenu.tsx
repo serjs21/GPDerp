@@ -64,6 +64,7 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
             text="Settings"
           />
         ),
+        backgroundColor: "#1ac3b0",
       },
       {
         value: "logout",
@@ -74,7 +75,8 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
             text="Logout"
           />
         ),
-        className: styles.logoutOption,
+        color: "rgb(255 110 110)",
+        backgroundColor: "#0f8051",
       },
     ],
     [],

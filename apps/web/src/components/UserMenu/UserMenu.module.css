@@ -33,8 +33,3 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-.logoutOption {
-  /* Slightly warmer ink read for destructive action on brush stroke. */
-  color: #ffd6d6;
-}

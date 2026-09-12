@@ -35,11 +35,11 @@
 
 .option:hover:not(:disabled):not(.displayOnly) .label,
 .option:focus-visible:not(.displayOnly) .label {
-  text-shadow: 0 0 0.35rem color-mix(in srgb, #f7f4ef 55%, transparent);
+  text-shadow: 0 0 0.35rem color-mix(in srgb, currentColor 55%, transparent);
 }
 
 .option:focus-visible {
-  outline: 2px solid color-mix(in srgb, #f7f4ef 70%, transparent);
+  outline: 2px solid color-mix(in srgb, currentColor 70%, transparent);
   outline-offset: 2px;
 }
 

@@ -124,7 +124,7 @@
   align-items: center;
   align-self: stretch;
   /* Match BrushOption horizontal inset (padding lives on the option row). */
-  padding: 0.25rem 1.1rem 0.55rem 0;
+  padding: 0.45rem 1.1rem 0.55rem 0;
   box-sizing: border-box;
 }
 

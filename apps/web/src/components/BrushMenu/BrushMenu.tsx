@@ -31,6 +31,10 @@ export type BrushMenuOption = {
   displayOnly?: boolean;
   /** Override round-robin brush stroke asset. */
   iconSrc?: string;
+  /** Label text color (defaults to cream). */
+  color?: string;
+  /** Comic-burst fill behind the option icon (`--brush-option-icon-fill`). */
+  backgroundColor?: string;
   className?: string;
 };
 
@@ -157,6 +161,8 @@ function BrushOptionList({
             index={index}
             iconSrc={option.iconSrc}
             label={option.label}
+            color={option.color}
+            backgroundColor={option.backgroundColor}
             selected={option.value === value}
             disabled={option.disabled || disabled}
             displayOnly={option.displayOnly}

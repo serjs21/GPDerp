@@ -22,7 +22,7 @@ export function UserMenuBurstFrame({
   label,
   className,
   size = USER_MENU_BURST_SIZE,
-  fill = "#ffffff",
+  fill = "var(--brush-option-icon-fill, #ffffff)",
   children,
 }: UserMenuBurstFrameProps) {
   const sharpShape = resolveComicLabelShapePreset("sharp");
