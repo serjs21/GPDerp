@@ -1,17 +1,36 @@
+.shell {
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  /* Match UserMenu avatar comic frame (36px). */
+  height: 36px;
+  line-height: 0;
+  vertical-align: middle;
+}
+
+.frame {
+  display: block;
+  line-height: 0;
+  /* Decorative only — interactive panel sits on top. */
+  pointer-events: none;
+}
+
 .panel {
   --search-panel-motion: 200ms ease;
-  --search-panel-slot: 2.5rem;
+  --search-panel-slot: 36px;
 
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   box-sizing: border-box;
-  height: var(--search-panel-slot);
-  padding: 0.15rem;
-  border: 1px solid color-mix(in srgb, var(--text-color, #222) 14%, transparent);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--profile-surface-bg, #fff) 72%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  margin: 0;
+  padding: 0 0.2rem;
+  /* Re-enable hits inside ComicBurstLabel's pointer-events: none overlay. */
+  pointer-events: auto;
 }
 
 .slot {
@@ -20,6 +39,33 @@
   width: var(--search-panel-slot);
   height: var(--search-panel-slot);
   overflow: hidden;
+}
+
+.panelButton {
+  appearance: none;
+  position: relative;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: #221e1f;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.panelButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.panelButton:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent-red, #c44) 70%, #f7f4ef 30%);
+  outline-offset: 1px;
 }
 
 .slotFace {
@@ -33,14 +79,8 @@
     opacity var(--search-panel-motion);
 }
 
-.slotFaceHiddenLeft {
-  transform: translateX(-110%);
-  opacity: 0;
-  pointer-events: none;
-}
-
-.slotFaceHiddenRight {
-  transform: translateX(110%);
+.slotFaceHidden {
+  transform: translateY(110%);
   opacity: 0;
   pointer-events: none;
 }
@@ -48,40 +88,41 @@
 .actionName {
   box-sizing: border-box;
   max-width: 100%;
-  padding: 0 0.15rem;
+  padding: 0 0.1rem;
   overflow: hidden;
-  color: var(--text-color, #222);
+  color: #221e1f;
   font-family: var(--font-comic-label), "Bangers", sans-serif;
-  font-size: 0.72rem;
+  font-size: 0.62rem;
   font-weight: 400;
   letter-spacing: 0.02em;
   line-height: 1;
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
-  pointer-events: none;
   user-select: none;
 }
 
-/* Transparent button chrome — panel supplies the shared surface. */
-.panelButton {
-  width: 100% !important;
-  height: 100% !important;
-  border: none !important;
-  border-radius: 8px !important;
-  background: transparent !important;
+.iconImg {
+  display: block;
+  width: 1.15rem;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
 }
 
-.panelButton:hover:not(:disabled),
-.panelButton:focus-visible {
-  background: color-mix(in srgb, var(--text-color, #222) 10%, transparent) !important;
+.iconImgLight {
+  /* tag_white_fill.svg → dark ink on cream label */
+  filter: invert(1);
 }
 
 .searchAnchor {
   position: relative;
   flex: 0 0 auto;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  align-self: center;
+  height: 36px;
+  line-height: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -89,8 +130,7 @@
     --search-panel-motion: 0ms;
   }
 
-  .slotFaceHiddenLeft,
-  .slotFaceHiddenRight {
+  .slotFaceHidden {
     transform: none;
   }
 }
