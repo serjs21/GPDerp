@@ -325,20 +325,20 @@ export function BrushMenu({
   );
 
   const getOpenTriggerSizePx = useCallback((): BrushTriggerSizePx => {
-    const option = rootRef.current?.querySelector<HTMLElement>(
-      "[data-brush-option]",
-    );
-    if (option) {
-      return {
-        width: option.offsetWidth,
-        height: option.offsetHeight,
-      };
-    }
-    const closed = closedTriggerSizeRef.current;
-    return {
-      width: Math.max(closed.width, BRUSH_OPTION_MIN_WIDTH_REM * 16),
-      height: closed.height,
-    };
+    const root = rootRef.current;
+    const option = root?.querySelector<HTMLElement>("[data-brush-option]");
+    const panel = root?.querySelector<HTMLElement>(`.${styles.panel}`);
+    // Prefer panel width so trigger matches the full menu label column.
+    const width =
+      panel?.offsetWidth ||
+      option?.offsetWidth ||
+      Math.max(
+        closedTriggerSizeRef.current.width,
+        BRUSH_OPTION_MIN_WIDTH_REM * 16,
+      );
+    const height =
+      option?.offsetHeight || closedTriggerSizeRef.current.height;
+    return { width, height };
   }, []);
 
   useBrushMenuDrawAnimation({

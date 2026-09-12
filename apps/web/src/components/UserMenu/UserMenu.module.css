@@ -27,6 +27,7 @@
 
 .optionName {
   display: block;
+  width: 8rem;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;

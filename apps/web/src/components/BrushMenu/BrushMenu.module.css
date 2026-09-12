@@ -104,24 +104,27 @@
   flex-shrink: 0;
 }
 
-/* Name sits beside the avatar inside the growing shell. */
+/* Name sits beside the avatar — same remaining width as option label text. */
 .expandSlot {
-  flex: 1 1 auto;
+  flex: 1 1 0;
+  text-align: start;
+  width: 9rem;
   min-width: 0;
   overflow: hidden;
   display: flex;
   align-items: center;
   align-self: stretch;
-  /* Match option text vertical rhythm without moving the avatar. */
+  /* Match BrushOption horizontal inset (padding lives on the option row). */
   padding: 0.55rem 1.1rem 0.55rem 0;
   box-sizing: border-box;
 }
 
-/* Opacity/scale only — box size comes from the shell tween. */
+/* Match BrushOption .label: span the full content width. */
 .expandLabel {
   position: relative;
   z-index: 1;
   display: block;
+  width: 100%;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -146,7 +149,9 @@
   flex-direction: column;
   align-items: stretch;
   gap: 0.2rem;
-  min-width: max(100%, var(--brush-option-min-width, 12rem));
+  /* Track shell width; never narrower than option min. */
+  width: 100%;
+  min-width: var(--brush-option-min-width, 12rem);
   margin: 0.2rem 0 0;
   padding: 0;
   list-style: none;
