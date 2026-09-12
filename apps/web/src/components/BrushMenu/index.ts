@@ -3,6 +3,7 @@ export type { BrushMenuOption, BrushMenuProps } from "./BrushMenu";
 export { BrushOption } from "./BrushOption";
 export type { BrushOptionBrushPaths, BrushOptionProps } from "./BrushOption";
 export {
+  BRUSH_MENU_ICON_SRC,
   BRUSH_MENU_ICON_SRCS,
   brushMenuIconForIndex,
 } from "./brushMenuIcons";

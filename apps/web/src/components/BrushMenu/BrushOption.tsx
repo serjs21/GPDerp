@@ -15,27 +15,21 @@ import {
   brushMenuIconForIndex,
   type BrushMenuIconSrc,
 } from "./brushMenuIcons";
-import {
-  BRUSH_REVEAL_PATHS,
-  type BrushRevealPass,
-} from "./brushRevealPaths";
+import { BRUSH_REVEAL_PATHS } from "./brushRevealPaths";
 import styles from "./BrushOption.module.css";
 
-export type BrushOptionBrushPaths = [
-  main: SVGPathElement,
-  upper: SVGPathElement,
-  lower: SVGPathElement,
-];
+/** One SVGPathElement per entry in BRUSH_REVEAL_PATHS (same order). */
+export type BrushOptionBrushPaths = SVGPathElement[];
 
 export type BrushOptionProps = {
   label: ReactNode;
-  /** Option index in the menu; selects brush_menu icon via round-robin. */
+  /** Option index in the menu (kept for API; ink brush is shared). */
   index?: number;
-  /** Override round-robin icon when set. */
+  /** Override default ink brush asset when set. */
   iconSrc?: BrushMenuIconSrc | string;
   /** Label node for opacity/scale sync with the brush paint. */
   labelRef?: Ref<HTMLSpanElement>;
-  /** Registers the three mask brush paths for Anime.js createDrawable. */
+  /** Registers mask brush paths for Anime.js createDrawable. */
   onBrushPaths?: (paths: BrushOptionBrushPaths | null) => void;
   selected?: boolean;
   disabled?: boolean;
@@ -50,8 +44,8 @@ function sanitizeSvgId(reactId: string): string {
 }
 
 /**
- * Option row with brush_menu stroke as masked background.
- * Three artificial brush paths in the mask are drawn L→R via createDrawable
+ * Option row with ink_brush stroke as masked background.
+ * Multiple artificial brush paths in the mask are drawn L→R via createDrawable
  * to paint-reveal the finished artwork (not the artwork outline).
  */
 export function BrushOption({
@@ -71,32 +65,25 @@ export function BrushOption({
   const reactId = useId();
   const idBase = sanitizeSvgId(reactId);
   const maskId = `brush-option-mask-${idBase}`;
-  const filterId = `brush-option-noise-${idBase}`;
   const resolvedIconSrc = iconSrc ?? brushMenuIconForIndex(index);
 
-  const mainRef = useRef<SVGPathElement | null>(null);
-  const upperRef = useRef<SVGPathElement | null>(null);
-  const lowerRef = useRef<SVGPathElement | null>(null);
+  const pathRefs = useRef<(SVGPathElement | null)[]>(
+    BRUSH_REVEAL_PATHS.map(() => null),
+  );
   const onBrushPathsRef = useRef(onBrushPaths);
   onBrushPathsRef.current = onBrushPaths;
 
   useEffect(() => {
-    const main = mainRef.current;
-    const upper = upperRef.current;
-    const lower = lowerRef.current;
-    if (main && upper && lower) {
-      onBrushPathsRef.current?.([main, upper, lower]);
+    const paths = pathRefs.current.filter(
+      (path): path is SVGPathElement => path != null,
+    );
+    if (paths.length === BRUSH_REVEAL_PATHS.length) {
+      onBrushPathsRef.current?.(paths);
     }
     return () => {
       onBrushPathsRef.current?.(null);
     };
   }, []);
-
-  const pathRefForPass = (pass: BrushRevealPass) => {
-    if (pass === "main") return mainRef;
-    if (pass === "upper") return upperRef;
-    return lowerRef;
-  };
 
   return (
     <button
@@ -121,29 +108,6 @@ export function BrushOption({
         aria-hidden
       >
         <defs>
-          <filter
-            id={filterId}
-            x="-5%"
-            y="-20%"
-            width="110%"
-            height="140%"
-            colorInterpolationFilters="sRGB"
-          >
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.015 0.12"
-              numOctaves={2}
-              seed={2}
-              result="noise"
-            />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="noise"
-              scale={2}
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
           <mask
             id={maskId}
             maskUnits="userSpaceOnUse"
@@ -157,18 +121,19 @@ export function BrushOption({
               height={BRUSH_MENU_ICON_HEIGHT}
               fill="#000000"
             />
-            {BRUSH_REVEAL_PATHS.map((def) => (
+            {BRUSH_REVEAL_PATHS.map((def, pathIndex) => (
               <path
-                key={def.pass}
-                ref={pathRefForPass(def.pass)}
+                key={def.id}
+                ref={(node) => {
+                  pathRefs.current[pathIndex] = node;
+                }}
                 d={def.d}
                 fill="none"
                 stroke="#ffffff"
                 strokeWidth={def.strokeWidth}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                filter={`url(#${filterId})`}
-                data-brush-pass={def.pass}
+                data-brush-pass={def.id}
               />
             ))}
           </mask>

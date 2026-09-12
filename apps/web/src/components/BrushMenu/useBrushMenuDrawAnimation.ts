@@ -7,8 +7,7 @@ import {
   BRUSH_REVEAL_EASE,
   BRUSH_REVEAL_LABEL_DELAY_MS,
   BRUSH_REVEAL_LABEL_DURATION_MS,
-  BRUSH_REVEAL_PASS_TIMING,
-  type BrushRevealPass,
+  BRUSH_REVEAL_PATHS,
 } from "./brushRevealPaths";
 
 export { BRUSH_OPTION_DRAW_MS };
@@ -19,11 +18,8 @@ type Animatable = {
   revert?: () => void;
 };
 
-export type BrushRevealPathGroup = {
-  main: SVGPathElement;
-  upper: SVGPathElement;
-  lower: SVGPathElement;
-};
+/** One option’s mask brush paths, indexed like BRUSH_REVEAL_PATHS. */
+export type BrushRevealPathGroup = SVGPathElement[];
 
 function stopAnimation(animation: Animatable | null) {
   if (!animation) return;
@@ -73,16 +69,9 @@ function showLabelsFully(labels: HTMLElement[]) {
   }
 }
 
-function pathsForPass(
-  groups: BrushRevealPathGroup[],
-  pass: BrushRevealPass,
-): SVGPathElement[] {
-  return groups.map((group) => group[pass]).filter(Boolean);
-}
-
 /**
- * On menu open, paint-reveal each BrushOption via three mask brush paths
- * (main + bristles) with Anime.js createDrawable, then fade labels in.
+ * On menu open, paint-reveal each BrushOption via multiple mask brush paths
+ * with Anime.js createDrawable, then fade labels in.
  * Deps stay on open/reducedMotion/getters so remount/open re-triggers once;
  * cleanup cancels in-flight animations (StrictMode-safe).
  */
@@ -106,11 +95,7 @@ export function useBrushMenuDrawAnimation(options: {
     const frame = requestAnimationFrame(() => {
       const groups = getBrushPathGroups();
       const labels = getLabelEls().filter(Boolean);
-      const allPaths = groups.flatMap((group) => [
-        group.main,
-        group.upper,
-        group.lower,
-      ]);
+      const allPaths = groups.flat().filter(Boolean);
       if (allPaths.length === 0) return;
 
       if (reducedMotion) {
@@ -122,18 +107,20 @@ export function useBrushMenuDrawAnimation(options: {
       prepareLabelsHidden(labels);
 
       const nextAnimations: Animatable[] = [];
-      const passes: BrushRevealPass[] = ["main", "upper", "lower"];
 
-      for (const pass of passes) {
-        const paths = pathsForPass(groups, pass);
+      for (let pathIndex = 0; pathIndex < BRUSH_REVEAL_PATHS.length; pathIndex++) {
+        const def = BRUSH_REVEAL_PATHS[pathIndex]!;
+        const paths = groups
+          .map((group) => group[pathIndex])
+          .filter((path): path is SVGPathElement => path != null);
         if (paths.length === 0) continue;
-        const timing = BRUSH_REVEAL_PASS_TIMING[pass];
+
         const drawable = prepareUndrawn(paths);
         nextAnimations.push(
           animate(drawable, {
             draw: ["0 0", "0 1"],
-            duration: timing.duration,
-            delay: timing.delay,
+            duration: def.duration,
+            delay: def.delay,
             ease: BRUSH_REVEAL_EASE,
           }) as Animatable,
         );

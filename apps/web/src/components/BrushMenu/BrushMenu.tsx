@@ -167,15 +167,12 @@ function resolveTriggerLabel(
 }
 
 function toPathGroups(
-  triples: (BrushOptionBrushPaths | null)[],
+  entries: (BrushOptionBrushPaths | null)[],
 ): BrushRevealPathGroup[] {
   const groups: BrushRevealPathGroup[] = [];
-  for (const triple of triples) {
-    if (!triple) continue;
-    const [main, upper, lower] = triple;
-    if (main && upper && lower) {
-      groups.push({ main, upper, lower });
-    }
+  for (const paths of entries) {
+    if (!paths || paths.length === 0) continue;
+    groups.push(paths);
   }
   return groups;
 }

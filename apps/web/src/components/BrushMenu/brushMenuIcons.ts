@@ -1,20 +1,16 @@
-/** Round-robin option backgrounds from `/public/brush_menu`. */
+/** Brush menu option backgrounds from `/public/ink_brush.svg`. */
 
-export const BRUSH_MENU_ICON_SRCS = [
-  "/brush_menu/brush-stroke-01.svg",
-  "/brush_menu/brush-stroke-02.svg",
-  "/brush_menu/brush-stroke-03.svg",
-] as const;
+export const BRUSH_MENU_ICON_SRC = "/ink_brush.svg" as const;
+
+export const BRUSH_MENU_ICON_SRCS = [BRUSH_MENU_ICON_SRC] as const;
 
 export type BrushMenuIconSrc = (typeof BRUSH_MENU_ICON_SRCS)[number];
 
-export function brushMenuIconForIndex(index: number): BrushMenuIconSrc {
-  const count = BRUSH_MENU_ICON_SRCS.length;
-  const safeIndex = ((index % count) + count) % count;
-  return BRUSH_MENU_ICON_SRCS[safeIndex]!;
+export function brushMenuIconForIndex(_index: number): BrushMenuIconSrc {
+  return BRUSH_MENU_ICON_SRC;
 }
 
-/** Shared viewBox for brush_menu stroke SVGs. */
-export const BRUSH_MENU_ICON_VIEWBOX = "0 0 240 40" as const;
-export const BRUSH_MENU_ICON_WIDTH = 240;
-export const BRUSH_MENU_ICON_HEIGHT = 40;
+/** Shared viewBox for ink_brush.svg. */
+export const BRUSH_MENU_ICON_VIEWBOX = "0 0 314 114" as const;
+export const BRUSH_MENU_ICON_WIDTH = 314;
+export const BRUSH_MENU_ICON_HEIGHT = 114;

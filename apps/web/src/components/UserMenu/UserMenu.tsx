@@ -132,9 +132,9 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
           if (loggingOut) return;
           setLogoutOpen(open);
         }}
-        question="Log out of Indra's Nest?"
-        cancelLabel="Stay"
-        confirmLabel="Log out"
+        question="Did you have enough fun?"
+        cancelLabel="Not yet"
+        confirmLabel="Yes"
         confirming={loggingOut}
         closeOnSelect={false}
         onConfirm={() => {
