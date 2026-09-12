@@ -21,12 +21,27 @@ export type SearchPanelProps = {
   forcedHover?: HoverTarget;
 };
 
-function SlotFace({ hidden, children }: { hidden: boolean; children: ReactNode }) {
+function SlotFace({
+  hidden,
+  enterFrom,
+  children,
+}: {
+  hidden?: boolean;
+  /** Horizontal slide origin for hover text (over the icon). */
+  enterFrom?: "left" | "right";
+  children: ReactNode;
+}) {
+  const className = [
+    styles.slotFace,
+    enterFrom === "left" ? styles.slotFaceFromLeft : "",
+    enterFrom === "right" ? styles.slotFaceFromRight : "",
+    hidden ? styles.slotFaceHidden : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <span
-      className={`${styles.slotFace}${hidden ? ` ${styles.slotFaceHidden}` : ""}`}
-      aria-hidden={hidden || undefined}
-    >
+    <span className={className} aria-hidden={hidden || undefined}>
       {children}
     </span>
   );
@@ -141,7 +156,7 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
                 onFocus={() => setHoverIfLive("labels")}
                 onClick={() => labels.setModalOpen(true)}
               >
-                <SlotFace hidden={activeHover === "labels"}>
+                <SlotFace>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/tag_white_fill.svg"
@@ -151,7 +166,10 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
                     height={28}
                   />
                 </SlotFace>
-                <SlotFace hidden={activeHover !== "labels"}>
+                <SlotFace
+                  enterFrom="left"
+                  hidden={activeHover !== "labels"}
+                >
                   <span className={styles.actionName}>Labels</span>
                 </SlotFace>
               </button>
@@ -167,7 +185,7 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
                 onFocus={() => setHoverIfLive("search")}
                 onClick={openSearch}
               >
-                <SlotFace hidden={activeHover === "search"}>
+                <SlotFace>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/search.svg"
@@ -177,7 +195,10 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
                     height={28}
                   />
                 </SlotFace>
-                <SlotFace hidden={activeHover !== "search"}>
+                <SlotFace
+                  enterFrom="right"
+                  hidden={activeHover !== "search"}
+                >
                   <span className={styles.actionName}>Search</span>
                 </SlotFace>
               </button>

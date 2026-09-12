@@ -79,18 +79,36 @@
     opacity var(--search-panel-motion);
 }
 
+.slotFaceFromLeft,
+.slotFaceFromRight {
+  z-index: 1;
+}
+
 .slotFaceHidden {
-  transform: translateY(110%);
   opacity: 0;
   pointer-events: none;
 }
 
+.slotFaceFromLeft.slotFaceHidden {
+  transform: translateX(-110%);
+}
+
+.slotFaceFromRight.slotFaceHidden {
+  transform: translateX(110%);
+}
+
 .actionName {
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
   max-width: 100%;
   padding: 0 0.1rem;
   overflow: hidden;
-  color: #221e1f;
+  background: #111;
+  color: #fff;
   font-family: var(--font-comic-label), "Bangers", sans-serif;
   font-size: 0.62rem;
   font-weight: 400;
