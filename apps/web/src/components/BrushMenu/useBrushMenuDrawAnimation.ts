@@ -3,14 +3,13 @@
 import { animate, createDrawable } from "animejs";
 import { useEffect, useRef } from "react";
 import {
-  BRUSH_OPTION_DRAW_MS,
-  BRUSH_OPTION_MIN_WIDTH_REM,
   BRUSH_REVEAL_EASE,
   BRUSH_REVEAL_LABEL_DELAY_MS,
   BRUSH_REVEAL_LABEL_DURATION_MS,
   BRUSH_REVEAL_PATHS,
   BRUSH_REVEAL_TEXT_CLOSE_DELAY_MS,
   BRUSH_REVEAL_TEXT_CLOSE_DURATION_MS,
+  BRUSH_OPTION_DRAW_MS,
 } from "./brushRevealPaths";
 
 export { BRUSH_OPTION_DRAW_MS };
@@ -18,7 +17,6 @@ export { BRUSH_OPTION_DRAW_MS };
 type Animatable = {
   pause?: () => void;
   cancel?: () => void;
-  revert?: () => void;
 };
 
 /** One option’s mask brush paths, indexed like BRUSH_REVEAL_PATHS. */
@@ -26,12 +24,17 @@ export type BrushRevealPathGroup = SVGPathElement[];
 
 export type BrushMenuDrawPhase = "open" | "closing";
 
+export type BrushTriggerSizePx = {
+  width: number;
+  height: number;
+};
+
 function stopAnimation(animation: Animatable | null) {
   if (!animation) return;
   try {
+    // pause/cancel only — revert() snaps width/height mid-flight and kills close tweens.
     animation.pause?.();
     animation.cancel?.();
-    animation.revert?.();
   } catch {
     // ignore teardown races
   }
@@ -74,22 +77,13 @@ function showLabelsFully(labels: HTMLElement[]) {
   }
 }
 
-function maxBrushMs(): number {
-  let max = BRUSH_OPTION_DRAW_MS;
+/** End time of the slowest brush stroke — shared by paint + trigger size tweens. */
+function brushStrokeMs(): number {
+  let max = 0;
   for (const def of BRUSH_REVEAL_PATHS) {
     max = Math.max(max, def.delay + def.duration);
   }
-  max = Math.max(
-    max,
-    BRUSH_REVEAL_LABEL_DELAY_MS + BRUSH_REVEAL_LABEL_DURATION_MS,
-  );
   return max;
-}
-
-function remToPx(rem: number): number {
-  if (typeof window === "undefined") return rem * 16;
-  const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
-  return rem * (Number.isFinite(rootPx) ? rootPx : 16);
 }
 
 /**
@@ -101,10 +95,10 @@ export function useBrushMenuDrawAnimation(options: {
   reducedMotion: boolean;
   getBrushPathGroups: () => BrushRevealPathGroup[];
   getLabelEls: () => HTMLElement[];
-  /** In-flow trigger whose width expands to option min-width when open. */
+  /** In-flow trigger sized to match option rows while open. */
   getTriggerEl?: () => HTMLElement | null;
-  /** Closed (avatar-only) trigger width in px; used for width tween. */
-  getClosedTriggerWidthPx?: () => number;
+  getClosedTriggerSizePx?: () => BrushTriggerSizePx;
+  getOpenTriggerSizePx?: () => BrushTriggerSizePx;
   onCloseComplete?: () => void;
 }) {
   const {
@@ -113,7 +107,8 @@ export function useBrushMenuDrawAnimation(options: {
     getBrushPathGroups,
     getLabelEls,
     getTriggerEl,
-    getClosedTriggerWidthPx,
+    getClosedTriggerSizePx,
+    getOpenTriggerSizePx,
     onCloseComplete,
   } = options;
   const animationsRef = useRef<Animatable[]>([]);
@@ -134,34 +129,46 @@ export function useBrushMenuDrawAnimation(options: {
     }
 
     const isClosing = phase === "closing";
-    const openWidthPx = remToPx(BRUSH_OPTION_MIN_WIDTH_REM);
-    const durationMs = maxBrushMs();
+    const durationMs = brushStrokeMs();
 
     const frame = requestAnimationFrame(() => {
       const groups = getBrushPathGroups();
       const labels = getLabelEls().filter(Boolean);
       const allPaths = groups.flat().filter(Boolean);
       const triggerEl = getTriggerEl?.() ?? null;
-      const closedWidthPx = Math.max(
-        1,
-        getClosedTriggerWidthPx?.() ?? triggerEl?.offsetWidth ?? 36,
-      );
+      const closedSize = getClosedTriggerSizePx?.() ?? {
+        width: triggerEl?.offsetWidth || 36,
+        height: triggerEl?.offsetHeight || 36,
+      };
+      const openSize = getOpenTriggerSizePx?.() ?? {
+        width: Math.max(closedSize.width, triggerEl?.offsetWidth || 0),
+        height: Math.max(closedSize.height, triggerEl?.offsetHeight || 0),
+      };
 
       if (allPaths.length === 0 && !triggerEl) {
         if (isClosing) onCloseCompleteRef.current?.();
         return;
       }
 
+      const clearTriggerSize = () => {
+        if (!triggerEl) return;
+        triggerEl.style.width = "";
+        triggerEl.style.height = "";
+      };
+
       if (reducedMotion) {
         if (isClosing) {
           prepareUndrawn(allPaths);
           prepareLabelsHidden(labels);
-          if (triggerEl) triggerEl.style.width = "";
+          clearTriggerSize();
           onCloseCompleteRef.current?.();
         } else {
           showFullyDrawn(allPaths);
           showLabelsFully(labels);
-          if (triggerEl) triggerEl.style.width = `${openWidthPx}px`;
+          if (triggerEl) {
+            triggerEl.style.width = `${openSize.width}px`;
+            triggerEl.style.height = `${openSize.height}px`;
+          }
         }
         return;
       }
@@ -170,7 +177,10 @@ export function useBrushMenuDrawAnimation(options: {
 
       if (isClosing) {
         showFullyDrawn(allPaths);
-        showLabelsFully(labels);
+        // Don't force labels visible — keep current opacity; fade from here.
+        for (const label of labels) {
+          if (!label.style.opacity) label.style.opacity = "1";
+        }
 
         for (let pathIndex = 0; pathIndex < BRUSH_REVEAL_PATHS.length; pathIndex++) {
           const def = BRUSH_REVEAL_PATHS[pathIndex]!;
@@ -190,7 +200,7 @@ export function useBrushMenuDrawAnimation(options: {
           );
         }
 
-        // Text out first / faster so copy never sits on a vanishing brush.
+        // Text out faster than brush so copy never sits on a vanishing stroke.
         if (labels.length > 0) {
           nextAnimations.push(
             animate(labels, {
@@ -204,11 +214,14 @@ export function useBrushMenuDrawAnimation(options: {
         }
 
         if (triggerEl) {
-          const fromWidth = triggerEl.offsetWidth || openWidthPx;
+          const fromWidth = triggerEl.offsetWidth || openSize.width;
+          const fromHeight = triggerEl.offsetHeight || openSize.height;
           triggerEl.style.width = `${fromWidth}px`;
+          triggerEl.style.height = `${fromHeight}px`;
           nextAnimations.push(
             animate(triggerEl, {
-              width: [`${fromWidth}px`, `${closedWidthPx}px`],
+              width: [`${fromWidth}px`, `${closedSize.width}px`],
+              height: [`${fromHeight}px`, `${closedSize.height}px`],
               duration: durationMs,
               ease: BRUSH_REVEAL_EASE,
             }) as Animatable,
@@ -218,7 +231,7 @@ export function useBrushMenuDrawAnimation(options: {
         animationsRef.current = nextAnimations;
         closeTimerRef.current = setTimeout(() => {
           closeTimerRef.current = null;
-          if (triggerEl) triggerEl.style.width = "";
+          clearTriggerSize();
           onCloseCompleteRef.current?.();
         }, durationMs);
         return;
@@ -227,10 +240,12 @@ export function useBrushMenuDrawAnimation(options: {
       prepareLabelsHidden(labels);
 
       if (triggerEl) {
-        triggerEl.style.width = `${closedWidthPx}px`;
+        triggerEl.style.width = `${closedSize.width}px`;
+        triggerEl.style.height = `${closedSize.height}px`;
         nextAnimations.push(
           animate(triggerEl, {
-            width: [`${closedWidthPx}px`, `${openWidthPx}px`],
+            width: [`${closedSize.width}px`, `${openSize.width}px`],
+            height: [`${closedSize.height}px`, `${openSize.height}px`],
             duration: durationMs,
             ease: BRUSH_REVEAL_EASE,
           }) as Animatable,
@@ -285,6 +300,7 @@ export function useBrushMenuDrawAnimation(options: {
     getBrushPathGroups,
     getLabelEls,
     getTriggerEl,
-    getClosedTriggerWidthPx,
+    getClosedTriggerSizePx,
+    getOpenTriggerSizePx,
   ]);
 }

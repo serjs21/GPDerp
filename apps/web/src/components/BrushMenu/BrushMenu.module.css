@@ -4,6 +4,7 @@
   max-width: 100%;
   overflow: visible;
   --brush-option-min-width: 12rem;
+  --brush-row-padding: 0.55rem 1.1rem 0.55rem 0;
 }
 
 .trigger {
@@ -21,7 +22,7 @@
   line-height: 1.2;
   cursor: pointer;
   box-shadow: 2px 2px 0 #111111;
-  /* In-flow: width tween pushes siblings (e.g. SearchPanel). */
+  /* In-flow: size tween pushes siblings (e.g. SearchPanel). */
   display: inline-flex;
   align-items: center;
   max-width: 100%;
@@ -29,9 +30,10 @@
 }
 
 .triggerBrushOpen {
-  /* Full open width matches option rows; JS tweens from closed width. */
-  min-width: 0;
+  /* Box size is tweened to the option border-box; padding lives on the face. */
   z-index: 1;
+  box-sizing: border-box;
+  padding: 0;
   overflow: hidden;
 }
 
@@ -54,6 +56,13 @@
   gap: 0.5rem;
   width: 100%;
   min-width: 0;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.triggerBrushOpen .triggerFace {
+  /* Same inset as BrushOption content. */
+  padding: var(--brush-row-padding);
 }
 
 .triggerFace > :first-child {
@@ -67,9 +76,10 @@
   overflow: hidden;
   display: flex;
   align-items: center;
+  height: 100%;
 }
 
-/* Opacity/scale only — width comes from the trigger tween. */
+/* Opacity/scale only — box size comes from the trigger tween. */
 .expandLabel {
   position: relative;
   z-index: 1;

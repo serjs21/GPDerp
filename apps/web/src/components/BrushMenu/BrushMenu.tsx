@@ -19,6 +19,7 @@ import {
   useBrushMenuDrawAnimation,
   type BrushMenuDrawPhase,
   type BrushRevealPathGroup,
+  type BrushTriggerSizePx,
 } from "./useBrushMenuDrawAnimation";
 import styles from "./BrushMenu.module.css";
 
@@ -159,6 +160,7 @@ function BrushOptionList({
             className={option.className}
             role="option"
             aria-selected={option.value === value}
+            data-brush-option=""
             onSelect={() => {
               if (option.displayOnly) return;
               onSelect(option.value);
@@ -211,7 +213,10 @@ export function BrushMenu({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const triggerBrushPathsRef = useRef<BrushOptionBrushPaths | null>(null);
   const triggerExpandLabelRef = useRef<HTMLSpanElement | null>(null);
-  const closedTriggerWidthRef = useRef(36);
+  const closedTriggerSizeRef = useRef<BrushTriggerSizePx>({
+    width: 36,
+    height: 36,
+  });
   const brushPathsRef = useRef<(BrushOptionBrushPaths | null)[]>([]);
   const labelElsRef = useRef<(HTMLSpanElement | null)[]>([]);
   const { open, setOpen } = useOpenState(openProp, defaultOpen, onOpenChange);
@@ -225,19 +230,28 @@ export function BrushMenu({
       ? "open"
       : null;
 
-  useLayoutEffect(() => {
-    if (panelMounted || !triggerBrush) return;
+  const captureClosedTriggerSize = useCallback(() => {
     const trigger = triggerRef.current;
     if (!trigger) return;
-    closedTriggerWidthRef.current = trigger.offsetWidth || 36;
-  }, [panelMounted, triggerBrush, expandLabel, renderTrigger]);
+    closedTriggerSizeRef.current = {
+      width: trigger.offsetWidth || 36,
+      height: trigger.offsetHeight || 36,
+    };
+  }, []);
 
-  // Pin closed width before paint on open so the expand slot cannot inflate layout.
+  useLayoutEffect(() => {
+    if (panelMounted || !triggerBrush) return;
+    captureClosedTriggerSize();
+  }, [panelMounted, triggerBrush, expandLabel, renderTrigger, captureClosedTriggerSize]);
+
+  // Pin closed size before paint on open so the expand slot cannot inflate layout.
   useLayoutEffect(() => {
     if (!triggerBrush || !open || closing) return;
     const trigger = triggerRef.current;
     if (!trigger || trigger.style.width) return;
-    trigger.style.width = `${closedTriggerWidthRef.current}px`;
+    const closed = closedTriggerSizeRef.current;
+    trigger.style.width = `${closed.width}px`;
+    trigger.style.height = `${closed.height}px`;
   }, [open, closing, triggerBrush]);
 
   const requestClose = useCallback(() => {
@@ -255,7 +269,10 @@ export function BrushMenu({
     triggerBrushPathsRef.current = null;
     brushPathsRef.current = [];
     labelElsRef.current = [];
-    if (triggerRef.current) triggerRef.current.style.width = "";
+    if (triggerRef.current) {
+      triggerRef.current.style.width = "";
+      triggerRef.current.style.height = "";
+    }
   }, []);
 
   useDismissOnOutside({
@@ -290,10 +307,27 @@ export function BrushMenu({
     [triggerBrush],
   );
 
-  const getClosedTriggerWidthPx = useCallback(
-    () => closedTriggerWidthRef.current,
+  const getClosedTriggerSizePx = useCallback(
+    () => closedTriggerSizeRef.current,
     [],
   );
+
+  const getOpenTriggerSizePx = useCallback((): BrushTriggerSizePx => {
+    const option = rootRef.current?.querySelector<HTMLElement>(
+      "[data-brush-option]",
+    );
+    if (option) {
+      return {
+        width: option.offsetWidth,
+        height: option.offsetHeight,
+      };
+    }
+    const closed = closedTriggerSizeRef.current;
+    return {
+      width: Math.max(closed.width, BRUSH_OPTION_MIN_WIDTH_REM * 16),
+      height: closed.height,
+    };
+  }, []);
 
   useBrushMenuDrawAnimation({
     phase: drawPhase,
@@ -301,7 +335,8 @@ export function BrushMenu({
     getBrushPathGroups,
     getLabelEls,
     getTriggerEl,
-    getClosedTriggerWidthPx,
+    getClosedTriggerSizePx,
+    getOpenTriggerSizePx,
     onCloseComplete: handleCloseComplete,
   });
 
@@ -318,9 +353,7 @@ export function BrushMenu({
       requestClose();
       return;
     }
-    if (triggerBrush && triggerRef.current) {
-      closedTriggerWidthRef.current = triggerRef.current.offsetWidth || 36;
-    }
+    if (triggerBrush) captureClosedTriggerSize();
     setOpen(true);
   };
 
@@ -344,6 +377,7 @@ export function BrushMenu({
         className={`${styles.trigger}${
           triggerClassName ? ` ${triggerClassName}` : ""
         }${showTriggerBrush ? ` ${styles.triggerBrushOpen}` : ""}`}
+        data-brush-open={showTriggerBrush ? "true" : undefined}
         disabled={disabled}
         aria-haspopup="listbox"
         aria-expanded={panelMounted}
