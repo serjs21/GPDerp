@@ -123,6 +123,7 @@ function BrushOptionList({
             ref={(node) => {
               revealPathsRef.current[index] = node;
             }}
+            index={index}
             label={option.label}
             selected={option.value === value}
             disabled={option.disabled || disabled}

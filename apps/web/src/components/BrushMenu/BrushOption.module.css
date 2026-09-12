@@ -10,7 +10,7 @@
   border-radius: 0;
   background: transparent;
   color: #f7f4ef;
-  font-family: var(--font-lantern-script, cursive);
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
   font-size: 1.05rem;
   font-weight: 600;
   line-height: 1.2;
