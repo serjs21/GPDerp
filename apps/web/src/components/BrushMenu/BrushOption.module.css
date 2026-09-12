@@ -66,6 +66,8 @@
   color: inherit;
   text-align: start;
   mix-blend-mode: normal;
-  /* Hidden until draw animation reveals LTR with the brush. */
-  clip-path: inset(0 100% 0 0);
+  /* Hidden until brush paint is mostly across; anime fades opacity/scale. */
+  opacity: 0;
+  transform: scale(0.98);
+  transform-origin: left center;
 }

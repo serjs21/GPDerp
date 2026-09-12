@@ -2,15 +2,27 @@
 
 import { animate, createDrawable } from "animejs";
 import { useEffect, useRef } from "react";
+import {
+  BRUSH_OPTION_DRAW_MS,
+  BRUSH_REVEAL_EASE,
+  BRUSH_REVEAL_LABEL_DELAY_MS,
+  BRUSH_REVEAL_LABEL_DURATION_MS,
+  BRUSH_REVEAL_PASS_TIMING,
+  type BrushRevealPass,
+} from "./brushRevealPaths";
 
-export const BRUSH_OPTION_DRAW_MS = 200;
-const LABEL_CLIP_HIDDEN = "inset(0 100% 0 0)";
-const LABEL_CLIP_SHOWN = "inset(0 0% 0 0)";
+export { BRUSH_OPTION_DRAW_MS };
 
 type Animatable = {
   pause?: () => void;
   cancel?: () => void;
   revert?: () => void;
+};
+
+export type BrushRevealPathGroup = {
+  main: SVGPathElement;
+  upper: SVGPathElement;
+  lower: SVGPathElement;
 };
 
 function stopAnimation(animation: Animatable | null) {
@@ -21,6 +33,12 @@ function stopAnimation(animation: Animatable | null) {
     animation.revert?.();
   } catch {
     // ignore teardown races
+  }
+}
+
+function stopAll(animations: Animatable[]) {
+  for (const animation of animations) {
+    stopAnimation(animation);
   }
 }
 
@@ -43,75 +61,103 @@ function showFullyDrawn(paths: SVGPathElement[]) {
 
 function prepareLabelsHidden(labels: HTMLElement[]) {
   for (const label of labels) {
-    label.style.clipPath = LABEL_CLIP_HIDDEN;
+    label.style.opacity = "0";
+    label.style.transform = "scale(0.98)";
   }
 }
 
 function showLabelsFully(labels: HTMLElement[]) {
   for (const label of labels) {
-    label.style.clipPath = LABEL_CLIP_SHOWN;
+    label.style.opacity = "1";
+    label.style.transform = "scale(1)";
   }
 }
 
+function pathsForPass(
+  groups: BrushRevealPathGroup[],
+  pass: BrushRevealPass,
+): SVGPathElement[] {
+  return groups.map((group) => group[pass]).filter(Boolean);
+}
+
 /**
- * On menu open, draw all BrushOption reveal paths left → right together over
- * 200ms via anime.js createDrawable, and clip labels in sync so copy only
- * appears over the drawn stroke.
+ * On menu open, paint-reveal each BrushOption via three mask brush paths
+ * (main + bristles) with Anime.js createDrawable, then fade labels in.
+ * Deps stay on open/reducedMotion/getters so remount/open re-triggers once;
+ * cleanup cancels in-flight animations (StrictMode-safe).
  */
 export function useBrushMenuDrawAnimation(options: {
   open: boolean;
   reducedMotion: boolean;
-  getRevealPaths: () => SVGPathElement[];
+  getBrushPathGroups: () => BrushRevealPathGroup[];
   getLabelEls: () => HTMLElement[];
 }) {
-  const { open, reducedMotion, getRevealPaths, getLabelEls } = options;
-  const brushAnimationRef = useRef<Animatable | null>(null);
-  const labelAnimationRef = useRef<Animatable | null>(null);
+  const { open, reducedMotion, getBrushPathGroups, getLabelEls } = options;
+  const animationsRef = useRef<Animatable[]>([]);
 
   useEffect(() => {
-    stopAnimation(brushAnimationRef.current);
-    stopAnimation(labelAnimationRef.current);
-    brushAnimationRef.current = null;
-    labelAnimationRef.current = null;
+    stopAll(animationsRef.current);
+    animationsRef.current = [];
 
     if (!open) {
       return;
     }
 
     const frame = requestAnimationFrame(() => {
-      const paths = getRevealPaths().filter(Boolean);
+      const groups = getBrushPathGroups();
       const labels = getLabelEls().filter(Boolean);
-      if (paths.length === 0) return;
+      const allPaths = groups.flatMap((group) => [
+        group.main,
+        group.upper,
+        group.lower,
+      ]);
+      if (allPaths.length === 0) return;
 
       if (reducedMotion) {
-        showFullyDrawn(paths);
+        showFullyDrawn(allPaths);
         showLabelsFully(labels);
         return;
       }
 
       prepareLabelsHidden(labels);
-      const drawable = prepareUndrawn(paths);
-      brushAnimationRef.current = animate(drawable, {
-        draw: ["0 0", "0 1"],
-        duration: BRUSH_OPTION_DRAW_MS,
-        ease: "inOutQuad",
-      }) as Animatable;
+
+      const nextAnimations: Animatable[] = [];
+      const passes: BrushRevealPass[] = ["main", "upper", "lower"];
+
+      for (const pass of passes) {
+        const paths = pathsForPass(groups, pass);
+        if (paths.length === 0) continue;
+        const timing = BRUSH_REVEAL_PASS_TIMING[pass];
+        const drawable = prepareUndrawn(paths);
+        nextAnimations.push(
+          animate(drawable, {
+            draw: ["0 0", "0 1"],
+            duration: timing.duration,
+            delay: timing.delay,
+            ease: BRUSH_REVEAL_EASE,
+          }) as Animatable,
+        );
+      }
 
       if (labels.length > 0) {
-        labelAnimationRef.current = animate(labels, {
-          clipPath: [LABEL_CLIP_HIDDEN, LABEL_CLIP_SHOWN],
-          duration: BRUSH_OPTION_DRAW_MS,
-          ease: "inOutQuad",
-        }) as Animatable;
+        nextAnimations.push(
+          animate(labels, {
+            opacity: [0, 1],
+            scale: [0.98, 1],
+            duration: BRUSH_REVEAL_LABEL_DURATION_MS,
+            delay: BRUSH_REVEAL_LABEL_DELAY_MS,
+            ease: BRUSH_REVEAL_EASE,
+          }) as Animatable,
+        );
       }
+
+      animationsRef.current = nextAnimations;
     });
 
     return () => {
       cancelAnimationFrame(frame);
-      stopAnimation(brushAnimationRef.current);
-      stopAnimation(labelAnimationRef.current);
-      brushAnimationRef.current = null;
-      labelAnimationRef.current = null;
+      stopAll(animationsRef.current);
+      animationsRef.current = [];
     };
-  }, [open, reducedMotion, getRevealPaths, getLabelEls]);
+  }, [open, reducedMotion, getBrushPathGroups, getLabelEls]);
 }

@@ -18,5 +18,3 @@ export function brushMenuIconForIndex(index: number): BrushMenuIconSrc {
 export const BRUSH_MENU_ICON_VIEWBOX = "0 0 240 40" as const;
 export const BRUSH_MENU_ICON_WIDTH = 240;
 export const BRUSH_MENU_ICON_HEIGHT = 40;
-
-export const BRUSH_MENU_REVEAL_D = `M0 ${BRUSH_MENU_ICON_HEIGHT / 2} H${BRUSH_MENU_ICON_WIDTH}`;

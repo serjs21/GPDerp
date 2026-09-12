@@ -10,8 +10,11 @@ import {
   type RefObject,
 } from "react";
 import { useReducedMotion } from "motion/react";
-import { BrushOption } from "./BrushOption";
-import { useBrushMenuDrawAnimation } from "./useBrushMenuDrawAnimation";
+import { BrushOption, type BrushOptionBrushPaths } from "./BrushOption";
+import {
+  useBrushMenuDrawAnimation,
+  type BrushRevealPathGroup,
+} from "./useBrushMenuDrawAnimation";
 import styles from "./BrushMenu.module.css";
 
 export type BrushMenuOption = {
@@ -105,7 +108,7 @@ function BrushOptionList({
   value,
   disabled,
   placeholder,
-  revealPathsRef,
+  brushPathsRef,
   labelElsRef,
   onSelect,
 }: {
@@ -114,7 +117,7 @@ function BrushOptionList({
   value: string | null;
   disabled: boolean;
   placeholder: string;
-  revealPathsRef: RefObject<(SVGPathElement | null)[]>;
+  brushPathsRef: RefObject<(BrushOptionBrushPaths | null)[]>;
   labelElsRef: RefObject<(HTMLSpanElement | null)[]>;
   onSelect: (nextValue: string) => void;
 }) {
@@ -128,8 +131,8 @@ function BrushOptionList({
       {options.map((option, index) => (
         <li key={option.value} className={styles.item} role="none">
           <BrushOption
-            ref={(node) => {
-              revealPathsRef.current[index] = node;
+            onBrushPaths={(paths) => {
+              brushPathsRef.current[index] = paths;
             }}
             labelRef={(node) => {
               labelElsRef.current[index] = node;
@@ -163,6 +166,20 @@ function resolveTriggerLabel(
   return typeof selected.label === "string" ? selected.label : placeholder;
 }
 
+function toPathGroups(
+  triples: (BrushOptionBrushPaths | null)[],
+): BrushRevealPathGroup[] {
+  const groups: BrushRevealPathGroup[] = [];
+  for (const triple of triples) {
+    if (!triple) continue;
+    const [main, upper, lower] = triple;
+    if (main && upper && lower) {
+      groups.push({ main, upper, lower });
+    }
+  }
+  return groups;
+}
+
 export function BrushMenu({
   options,
   value = null,
@@ -178,18 +195,15 @@ export function BrushMenu({
 }: BrushMenuProps) {
   const listId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
-  const revealPathsRef = useRef<(SVGPathElement | null)[]>([]);
+  const brushPathsRef = useRef<(BrushOptionBrushPaths | null)[]>([]);
   const labelElsRef = useRef<(HTMLSpanElement | null)[]>([]);
   const { open, setOpen } = useOpenState(openProp, defaultOpen, onOpenChange);
   const reducedMotion = useReducedMotion() ?? false;
 
   useDismissOnOutside({ open, disabled, rootRef, setOpen });
 
-  const getRevealPaths = useCallback(
-    () =>
-      revealPathsRef.current.filter(
-        (path): path is SVGPathElement => path != null,
-      ),
+  const getBrushPathGroups = useCallback(
+    () => toPathGroups(brushPathsRef.current),
     [],
   );
 
@@ -204,7 +218,7 @@ export function BrushMenu({
   useBrushMenuDrawAnimation({
     open,
     reducedMotion,
-    getRevealPaths,
+    getBrushPathGroups,
     getLabelEls,
   });
 
@@ -248,7 +262,7 @@ export function BrushMenu({
           value={value}
           disabled={disabled}
           placeholder={placeholder}
-          revealPathsRef={revealPathsRef}
+          brushPathsRef={brushPathsRef}
           labelElsRef={labelElsRef}
           onSelect={handleSelect}
         />
