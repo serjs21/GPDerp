@@ -3,13 +3,9 @@
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { BrushMenu, type BrushMenuOption } from "@/components/BrushMenu";
-import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
-import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import type { UserObject } from "@/types";
-import { UserAvatar } from "@/components/AuthenticationNav/UserAvatar";
+import { UserAvatar } from "./UserAvatar";
 import styles from "./UserMenu.module.css";
-
-const USER_MENU_AVATAR_SIZE = 36;
 
 export type UserMenuProps = {
   user: UserObject;
@@ -24,7 +20,6 @@ function resolveDisplayName(user: UserObject) {
 export function UserMenu({ user, onLogout, className }: UserMenuProps) {
   const router = useRouter();
   const displayName = resolveDisplayName(user);
-  const sharpShape = resolveComicLabelShapePreset("sharp");
 
   const options = useMemo<BrushMenuOption[]>(
     () => [
@@ -32,7 +27,7 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
         value: "profile",
         label: (
           <span className={styles.profileLabel}>
-            <UserAvatar user={user} size={USER_MENU_AVATAR_SIZE} />
+            <UserAvatar user={user} label={displayName} />
             <span className={styles.profileName}>{displayName}</span>
           </span>
         ),
@@ -75,21 +70,7 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
       placeholder={displayName}
       onChange={handleChange}
       renderTrigger={() => (
-        <ComicBurstLabel
-          className={styles.triggerBurst}
-          text={displayName}
-          shapeKind={sharpShape.kind}
-          spikeCount={sharpShape.spikeCount}
-          randomness={sharpShape.randomness}
-          seed={sharpShape.id}
-          fontSize={USER_MENU_AVATAR_SIZE}
-          paddingX={0}
-          paddingY={0}
-          strokeWidth={3}
-          fill="#ffffff"
-        >
-          <UserAvatar user={user} size={USER_MENU_AVATAR_SIZE} fill />
-        </ComicBurstLabel>
+        <UserAvatar user={user} label={displayName} />
       )}
     />
   );

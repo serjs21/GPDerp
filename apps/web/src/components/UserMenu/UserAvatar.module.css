@@ -1,0 +1,6 @@
+.burst {
+  display: block;
+  line-height: 0;
+  height: 36px;
+  pointer-events: none;
+}

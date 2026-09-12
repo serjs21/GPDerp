@@ -15,13 +15,6 @@
   line-height: 0;
 }
 
-.triggerBurst {
-  display: block;
-  line-height: 0;
-  height: 36px;
-  pointer-events: none;
-}
-
 .profileLabel {
   display: inline-flex;
   align-items: center;
