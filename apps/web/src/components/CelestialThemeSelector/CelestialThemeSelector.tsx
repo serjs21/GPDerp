@@ -115,6 +115,7 @@ export function CelestialThemeSelector({
             style={{ "--icon-button-padding": "2px" } as CSSProperties}
           >
             <span className={styles.triggerFace} aria-hidden>
+              <span className={styles.triggerSky} />
               {/* eslint-disable-next-line @next/next/no-img-element -- public SVG trigger asset */}
               <img
                 src={ALIEN_TRIGGER_SRC}
