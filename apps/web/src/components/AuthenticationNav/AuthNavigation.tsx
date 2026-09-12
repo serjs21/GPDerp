@@ -17,8 +17,8 @@ export const AuthNavigation = () => {
       <div className={styles.headerNavSlot}>
         {isLoggedIn ? (
           <div className={toolStyles.toolsSlot}>
-            <GoHome />
             <LoggedInUserNav user={user} onLogout={logout} />
+            <GoHome />
             <SearchPanel />
           </div>
         ) : null}

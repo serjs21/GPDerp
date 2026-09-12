@@ -3,7 +3,7 @@
 import { animate, createDrawable } from "animejs";
 import { useEffect, useRef } from "react";
 
-export const BRUSH_OPTION_DRAW_MS = 100;
+export const BRUSH_OPTION_DRAW_MS = 500;
 const LABEL_CLIP_HIDDEN = "inset(0 100% 0 0)";
 const LABEL_CLIP_SHOWN = "inset(0 0% 0 0)";
 
