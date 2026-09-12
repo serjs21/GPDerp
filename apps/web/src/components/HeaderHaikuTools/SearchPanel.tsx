@@ -1,6 +1,11 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useState,
+  type FocusEvent,
+  type ReactNode,
+} from "react";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
@@ -49,8 +54,10 @@ function SlotFace({
 
 function LabelFilterExtras({
   labels,
+  onModalClose,
 }: {
   labels: ReturnType<typeof useHeaderHaikuLabelManage>;
+  onModalClose: () => void;
 }) {
   return (
     <>
@@ -91,7 +98,7 @@ function LabelFilterExtras({
           initialTab="filter"
           selectedIds={labels.selectedLabelIds}
           onApply={labels.setSelectedLabelIds}
-          onClose={() => labels.setModalOpen(false)}
+          onClose={onModalClose}
         />
       ) : null}
     </>
@@ -114,22 +121,44 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
     inputRef,
   } = useHeaderHaikuSearch();
 
-  if (!labels.enabled || !searchEnabled) return null;
-
   const setHoverIfLive = (next: HoverTarget) => {
     if (forcedHover === undefined) setHover(next);
   };
+
+  const clearHover = () => setHoverIfLive(null);
+
+  // Modal open must not leave the expand/label hover state stuck.
+  useEffect(() => {
+    if (labels.modalOpen) setHoverIfLive(null);
+    // Intentionally only depend on modal visibility.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [labels.modalOpen]);
+
+  const setHoverFromFocus = (next: HoverTarget, target: HTMLElement) => {
+    // Pointer click + focus restore after modal must not re-stick hover.
+    if (target.matches(":focus-visible")) setHoverIfLive(next);
+  };
+
+  const clearHoverFromBlur = (event: FocusEvent<HTMLButtonElement>) => {
+    const root = event.currentTarget.closest("[data-search-panel-anchor]");
+    const related = event.relatedTarget;
+    if (related instanceof Node && root?.contains(related)) return;
+    clearHover();
+  };
+
+  if (!labels.enabled || !searchEnabled) return null;
 
   return (
     <>
       <div
         className={`${styles.searchAnchor}${className ? ` ${className}` : ""}`}
-        onMouseLeave={() => setHoverIfLive(null)}
+        data-search-panel-anchor=""
+        onMouseLeave={clearHover}
       >
         <div className={styles.shell}>
           <ComicBurstLabel
             className={styles.frame}
-            text="Haiku tools"
+            text=""
             shapeKind={sharpShape.kind}
             spikeCount={sharpShape.spikeCount}
             randomness={sharpShape.randomness}
@@ -163,13 +192,19 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
                 aria-expanded={labels.modalOpen}
                 disabled={!labels.canOpen}
                 onMouseEnter={() => setHoverIfLive("filter")}
-                onFocus={() => setHoverIfLive("filter")}
-                onClick={() => labels.setModalOpen(true)}
+                onFocus={(event) =>
+                  setHoverFromFocus("filter", event.currentTarget)
+                }
+                onBlur={clearHoverFromBlur}
+                onClick={() => {
+                  clearHover();
+                  labels.setModalOpen(true);
+                }}
               >
                 <SlotFace>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/tag_white_fill.svg"
+                    src="/filter_label_icon.svg"
                     alt=""
                     className={`${styles.iconImg} ${styles.iconImgLight}`}
                     width={22}
@@ -192,13 +227,16 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
                 aria-label="Search haikus"
                 aria-expanded={expanded}
                 onMouseEnter={() => setHoverIfLive("search")}
-                onFocus={() => setHoverIfLive("search")}
+                onFocus={(event) =>
+                  setHoverFromFocus("search", event.currentTarget)
+                }
+                onBlur={clearHoverFromBlur}
                 onClick={openSearch}
               >
                 <SlotFace>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/search.svg"
+                    src="/search-icon.svg"
                     alt=""
                     className={styles.iconImg}
                     width={28}
@@ -237,7 +275,13 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
         ) : null}
       </div>
 
-      <LabelFilterExtras labels={labels} />
+      <LabelFilterExtras
+        labels={labels}
+        onModalClose={() => {
+          labels.setModalOpen(false);
+          clearHover();
+        }}
+      />
     </>
   );
 }

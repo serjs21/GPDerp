@@ -25,9 +25,9 @@ type Story = StoryObj<typeof meta>;
 
 export const Idle: Story = {};
 
-export const HoverLabels: Story = {
+export const HoverFilter: Story = {
   args: {
-    forcedHover: "labels",
+    forcedHover: "filter",
   },
 };
 

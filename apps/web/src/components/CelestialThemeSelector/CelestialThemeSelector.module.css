@@ -65,9 +65,9 @@
 }
 
 .trigger {
-  width: 4rem;
+  width: 3rem;
   min-width: 0;
-  height: 4rem;
+  height: 3rem;
   box-sizing: border-box;
   padding: 0 !important;
   border-radius: 0;

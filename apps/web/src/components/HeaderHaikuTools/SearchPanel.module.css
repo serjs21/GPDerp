@@ -139,7 +139,7 @@
 
 .iconImg {
   display: block;
-  width: 1.15rem;
+  width: 2.15rem;
   height: auto;
   object-fit: contain;
   pointer-events: none;
@@ -147,7 +147,7 @@
 
 .iconImgLight {
   /* tag_white_fill.svg → dark ink on cream label */
-  filter: invert(1);
+  /* filter: invert(1); */
 }
 
 .searchAnchor {
