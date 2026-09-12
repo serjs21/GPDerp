@@ -1,0 +1,40 @@
+.trigger {
+  width: 2.75rem;
+  min-width: 2.75rem;
+  height: 2.75rem;
+  padding: 0 !important;
+  border: 1px solid var(--profile-surface-border, #221e1f) !important;
+  border-radius: 12px;
+  background: color-mix(
+    in srgb,
+    var(--profile-surface-bg, #f7f4ef) 84%,
+    transparent
+  ) !important;
+  box-shadow: none !important;
+  color: var(--text-color, #221e1f);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+}
+
+.profileLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  max-width: 100%;
+}
+
+.profileName {
+  display: block;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logoutOption {
+  /* Slightly warmer ink read for destructive action on brush stroke. */
+  color: #ffd6d6;
+}

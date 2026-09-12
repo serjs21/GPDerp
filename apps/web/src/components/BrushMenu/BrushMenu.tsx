@@ -16,8 +16,9 @@ import styles from "./BrushMenu.module.css";
 
 export type BrushMenuOption = {
   value: string;
-  label: string;
+  label: ReactNode;
   disabled?: boolean;
+  className?: string;
 };
 
 export type BrushMenuProps = {
@@ -30,6 +31,7 @@ export type BrushMenuProps = {
   placeholder?: string;
   disabled?: boolean;
   className?: string;
+  triggerClassName?: string;
   renderTrigger?: (ctx: { open: boolean; label: string }) => ReactNode;
 };
 
@@ -127,6 +129,7 @@ function BrushOptionList({
             label={option.label}
             selected={option.value === value}
             disabled={option.disabled || disabled}
+            className={option.className}
             role="option"
             aria-selected={option.value === value}
             onSelect={() => onSelect(option.value)}
@@ -142,7 +145,9 @@ function resolveTriggerLabel(
   value: string | null,
   placeholder: string,
 ) {
-  return options.find((option) => option.value === value)?.label ?? placeholder;
+  const selected = options.find((option) => option.value === value);
+  if (!selected) return placeholder;
+  return typeof selected.label === "string" ? selected.label : placeholder;
 }
 
 export function BrushMenu({
@@ -155,6 +160,7 @@ export function BrushMenu({
   placeholder = "Select",
   disabled = false,
   className,
+  triggerClassName,
   renderTrigger,
 }: BrushMenuProps) {
   const listId = useId();
@@ -198,7 +204,9 @@ export function BrushMenu({
     >
       <button
         type="button"
-        className={styles.trigger}
+        className={`${styles.trigger}${
+          triggerClassName ? ` ${triggerClassName}` : ""
+        }`}
         disabled={disabled}
         aria-haspopup="listbox"
         aria-expanded={open}

@@ -1,7 +1,7 @@
 "use client";
 
 import type { UserObject } from "@/types";
-import { LoggedInUserMenuButton } from "./LoggedInUserMenuButton";
+import { UserMenu } from "@/components/UserMenu";
 
 type LoggedInUserNavProps = {
   user: UserObject;
@@ -9,5 +9,5 @@ type LoggedInUserNavProps = {
 };
 
 export const LoggedInUserNav = ({ user, onLogout }: LoggedInUserNavProps) => (
-  <LoggedInUserMenuButton user={user} onLogout={onLogout} />
+  <UserMenu user={user} onLogout={onLogout} />
 );
