@@ -1,12 +1,13 @@
 "use client";
 
-import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
-import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import { UserAvatar as AuthUserAvatar } from "@/components/AuthenticationNav/UserAvatar";
 import type { UserObject } from "@/types";
-import styles from "./UserAvatar.module.css";
+import {
+  UserMenuBurstFrame,
+  USER_MENU_BURST_SIZE,
+} from "./UserMenuBurstFrame";
 
-export const USER_MENU_AVATAR_SIZE = 36;
+export const USER_MENU_AVATAR_SIZE = USER_MENU_BURST_SIZE;
 
 export type UserAvatarProps = {
   user: UserObject;
@@ -23,23 +24,9 @@ export function UserAvatar({
   className,
   size = USER_MENU_AVATAR_SIZE,
 }: UserAvatarProps) {
-  const sharpShape = resolveComicLabelShapePreset("sharp");
-
   return (
-    <ComicBurstLabel
-      className={`${styles.burst}${className ? ` ${className}` : ""}`}
-      text={label}
-      shapeKind={sharpShape.kind}
-      spikeCount={sharpShape.spikeCount}
-      randomness={sharpShape.randomness}
-      seed={sharpShape.id}
-      fontSize={size}
-      paddingX={0}
-      paddingY={0}
-      strokeWidth={3}
-      fill="#ffffff"
-    >
+    <UserMenuBurstFrame label={label} className={className} size={size}>
       <AuthUserAvatar user={user} size={size} fill />
-    </ComicBurstLabel>
+    </UserMenuBurstFrame>
   );
 }

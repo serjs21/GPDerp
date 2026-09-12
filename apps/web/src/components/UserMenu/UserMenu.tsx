@@ -6,6 +6,8 @@ import { BrushMenu, type BrushMenuOption } from "@/components/BrushMenu";
 import { ComicConfirmModal } from "@/components/ComicConfirmModal";
 import type { UserObject } from "@/types";
 import { UserAvatar } from "./UserAvatar";
+import { UserMenuBurstFrame } from "./UserMenuBurstFrame";
+import frameStyles from "./UserMenuBurstFrame.module.css";
 import styles from "./UserMenu.module.css";
 
 export type UserMenuProps = {
@@ -16,6 +18,33 @@ export type UserMenuProps = {
 
 function resolveDisplayName(user: UserObject) {
   return user.userName || user.email || "User";
+}
+
+function OptionIconLabel({
+  src,
+  iconLabel,
+  text,
+}: {
+  src: string;
+  iconLabel: string;
+  text: string;
+}) {
+  return (
+    <span className={styles.optionLabel}>
+      <UserMenuBurstFrame label={iconLabel}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- public SVG asset */}
+        <img
+          className={frameStyles.icon}
+          src={src}
+          alt=""
+          width={36}
+          height={36}
+          draggable={false}
+        />
+      </UserMenuBurstFrame>
+      <span className={styles.optionName}>{text}</span>
+    </span>
+  );
 }
 
 export function UserMenu({ user, onLogout, className }: UserMenuProps) {
@@ -30,32 +59,31 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
         value: "profile",
         displayOnly: true,
         label: (
-          <span className={styles.profileLabel}>
+          <span className={styles.optionLabel}>
             <UserAvatar user={user} label={displayName} />
-            <span className={styles.profileName}>{displayName}</span>
+            <span className={styles.optionName}>{displayName}</span>
           </span>
         ),
       },
       {
         value: "settings",
         label: (
-          <span className={styles.settingsLabel}>
-            {/* eslint-disable-next-line @next/next/no-img-element -- public SVG asset */}
-            <img
-              className={styles.settingsIcon}
-              src="/settings.svg"
-              alt=""
-              width={28}
-              height={28}
-              draggable={false}
-            />
-            Settings
-          </span>
+          <OptionIconLabel
+            src="/settings.svg"
+            iconLabel="Settings"
+            text="Settings"
+          />
         ),
       },
       {
         value: "logout",
-        label: "Logout",
+        label: (
+          <OptionIconLabel
+            src="/logout.svg"
+            iconLabel="Logout"
+            text="Logout"
+          />
+        ),
         className: styles.logoutOption,
       },
     ],
