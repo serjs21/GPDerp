@@ -137,8 +137,8 @@
   position: relative;
   flex: 0 0 auto;
   display: inline-flex;
-  align-items: center;
-  align-self: center;
+  align-items: flex-start;
+  align-self: flex-start;
   height: 36px;
   line-height: 0;
 }

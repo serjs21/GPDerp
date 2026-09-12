@@ -1,6 +1,6 @@
 .header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     padding: calc(0.8rem + env(safe-area-inset-top)) 1rem 0.8rem;
     height: 5rem;
     flex-shrink: 0;
@@ -12,7 +12,7 @@
 
 .headerBar {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 1rem;
     width: min(100%, 76rem);
@@ -21,7 +21,7 @@
 
 .headerAuth {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: flex-end;
     flex: 1;
     min-width: 0;

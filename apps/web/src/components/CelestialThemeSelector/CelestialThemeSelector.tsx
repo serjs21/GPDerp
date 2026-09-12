@@ -133,26 +133,27 @@ export function CelestialThemeSelector({
             aria-expanded={isOpen}
             aria-haspopup="dialog"
             onClick={() => (isOpen ? handleClose() : handleOpen())}
-            style={{ "--icon-button-padding": "2px" } as CSSProperties}
           >
             <span className={styles.triggerFace} aria-hidden>
-              <span className={styles.triggerSky} />
-              {/* eslint-disable-next-line @next/next/no-img-element -- public SVG trigger asset */}
-              <img
-                src={ALIEN_TRIGGER_SRC}
-                alt=""
-                className={styles.triggerAlien}
-                draggable={false}
-              />
-              {/* eslint-disable-next-line @next/next/no-img-element -- public SVG body badge */}
-              <img
-                src={bodyBadge.src}
-                alt=""
-                className={styles.triggerBodyBadge}
-                style={bodyBadgeStyle}
-                data-body={bodyBadge.label}
-                draggable={false}
-              />
+              <span className={styles.triggerArt}>
+                <span className={styles.triggerSky} />
+                {/* eslint-disable-next-line @next/next/no-img-element -- public SVG trigger asset */}
+                <img
+                  src={ALIEN_TRIGGER_SRC}
+                  alt=""
+                  className={styles.triggerAlien}
+                  draggable={false}
+                />
+                {/* eslint-disable-next-line @next/next/no-img-element -- public SVG body badge */}
+                <img
+                  src={bodyBadge.src}
+                  alt=""
+                  className={styles.triggerBodyBadge}
+                  style={bodyBadgeStyle}
+                  data-body={bodyBadge.label}
+                  draggable={false}
+                />
+              </span>
             </span>
           </UIButton>
         </div>

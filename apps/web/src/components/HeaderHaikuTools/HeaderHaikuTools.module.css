@@ -136,7 +136,7 @@
 .toolsSlot {
   position: relative;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.45rem;
   flex: 0 0 auto;
   min-width: 0;
