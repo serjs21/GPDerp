@@ -17,28 +17,45 @@
 
 .panel {
   --search-panel-motion: 200ms ease;
-  --search-panel-slot: 36px;
 
   position: absolute;
   inset: 0;
   z-index: 1;
   box-sizing: border-box;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.2rem;
+  align-items: stretch;
+  justify-content: stretch;
+  gap: 0;
   margin: 0;
-  padding: 0 0.2rem;
+  padding: 0;
   /* Re-enable hits inside ComicBurstLabel's pointer-events: none overlay. */
   pointer-events: auto;
 }
 
 .slot {
   position: relative;
-  flex: 0 0 var(--search-panel-slot);
-  width: var(--search-panel-slot);
-  height: var(--search-panel-slot);
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+  height: 100%;
   overflow: hidden;
+  transition: flex-grow var(--search-panel-motion);
+}
+
+.panelHoverLabels .slotLabels {
+  flex-grow: 7;
+}
+
+.panelHoverLabels .slotSearch {
+  flex-grow: 3;
+}
+
+.panelHoverSearch .slotSearch {
+  flex-grow: 7;
+}
+
+.panelHoverSearch .slotLabels {
+  flex-grow: 3;
 }
 
 .panelButton {
@@ -64,7 +81,7 @@
 }
 
 .panelButton:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent-red, #c44) 70%, #f7f4ef 30%);
+  outline: 2px solid color-mix(in srgb, var(--accent-red, #c44) 65%, #f7f4ef 30%);
   outline-offset: 1px;
 }
 
@@ -105,7 +122,7 @@
   width: 100%;
   height: 100%;
   max-width: 100%;
-  padding: 0 0.1rem;
+  padding: 0;
   overflow: hidden;
   background: #111;
   color: #fff;

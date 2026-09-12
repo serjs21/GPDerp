@@ -13,7 +13,7 @@ import styles from "./SearchPanel.module.css";
 /** Match UserMenu trigger comic-label height (36px avatar frame). */
 const PANEL_HEIGHT_PX = 36;
 
-type HoverTarget = "labels" | "search" | null;
+type HoverTarget = "filter" | "search" | null;
 
 export type SearchPanelProps = {
   className?: string;
@@ -144,16 +144,26 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
             <span aria-hidden />
           </ComicBurstLabel>
 
-          <div className={styles.panel} role="group" aria-label="Haiku tools">
-            <div className={styles.slot}>
+          <div
+            className={[
+              styles.panel,
+              activeHover === "filter" ? styles.panelHoverLabels : "",
+              activeHover === "search" ? styles.panelHoverSearch : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            role="group"
+            aria-label="Haiku tools"
+          >
+            <div className={`${styles.slot} ${styles.slotLabels}`}>
               <button
                 type="button"
                 className={styles.panelButton}
                 aria-label="Filter and manage labels"
                 aria-expanded={labels.modalOpen}
                 disabled={!labels.canOpen}
-                onMouseEnter={() => setHoverIfLive("labels")}
-                onFocus={() => setHoverIfLive("labels")}
+                onMouseEnter={() => setHoverIfLive("filter")}
+                onFocus={() => setHoverIfLive("filter")}
                 onClick={() => labels.setModalOpen(true)}
               >
                 <SlotFace>
@@ -168,14 +178,14 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
                 </SlotFace>
                 <SlotFace
                   enterFrom="left"
-                  hidden={activeHover !== "labels"}
+                  hidden={activeHover !== "filter"}
                 >
-                  <span className={styles.actionName}>Labels</span>
+                  <span className={styles.actionName}>Filter</span>
                 </SlotFace>
               </button>
             </div>
 
-            <div className={styles.slot}>
+            <div className={`${styles.slot} ${styles.slotSearch}`}>
               <button
                 type="button"
                 className={styles.panelButton}

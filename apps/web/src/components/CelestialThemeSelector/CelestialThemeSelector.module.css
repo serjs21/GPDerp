@@ -144,8 +144,8 @@
   z-index: 1;
   display: block;
   /* Slightly larger than the sky frame so art can break the border. */
-  width: calc(100% + 8px);
-  height: calc(100% + 8px);
+  width: calc(100% + 6px);
+  height: calc(100% + 6px);
   object-fit: cover;
   object-position: top left;
   /* Saturate alien palette against the dynamic sky disc. */
