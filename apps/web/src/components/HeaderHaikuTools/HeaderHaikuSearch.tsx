@@ -1,56 +1,21 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
-import { useHaikuFilters } from "@/app/providers/HaikuFiltersProvider";
+import { useHeaderHaikuSearch } from "./useHeaderHaikuSearch";
 import styles from "./HeaderHaikuTools.module.css";
 
-const FADE_MS = 100;
-
 export function HeaderHaikuSearch() {
-  const pathname = usePathname();
-  const { searchString, setSearchString } = useHaikuFilters();
-  const [expanded, setExpanded] = useState(false);
-  const [fadingOut, setFadingOut] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const fadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const {
+    enabled,
+    expanded,
+    fadingOut,
+    searchString,
+    setSearchString,
+    openSearch,
+    onBlur,
+    inputRef,
+  } = useHeaderHaikuSearch();
 
-  useEffect(() => {
-    if (searchString.trim()) setExpanded(true);
-  }, [searchString]);
-
-  useEffect(() => {
-    return () => {
-      if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (expanded && !fadingOut) {
-      window.requestAnimationFrame(() => inputRef.current?.focus());
-    }
-  }, [expanded, fadingOut]);
-
-  if (pathname !== "/") return null;
-
-  const openSearch = () => {
-    if (fadeTimerRef.current) {
-      clearTimeout(fadeTimerRef.current);
-      fadeTimerRef.current = null;
-    }
-    setFadingOut(false);
-    setExpanded(true);
-  };
-
-  const onBlur = () => {
-    if (searchString.trim()) return;
-    setFadingOut(true);
-    fadeTimerRef.current = setTimeout(() => {
-      setExpanded(false);
-      setFadingOut(false);
-      fadeTimerRef.current = null;
-    }, FADE_MS);
-  };
+  if (!enabled) return null;
 
   return (
     <div className={styles.searchRoot}>

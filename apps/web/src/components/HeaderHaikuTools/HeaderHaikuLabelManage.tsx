@@ -1,37 +1,26 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { usePathname } from "next/navigation";
-import { useHaikuFilters } from "@/app/providers/HaikuFiltersProvider";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import { FilterManageLabelsModal } from "@/components/FilterManageLabelsModal";
-import { useAccountLabels, useManageLabelsAccount } from "@/hooks/useAccountLabels";
+import { useHeaderHaikuLabelManage } from "./useHeaderHaikuLabelManage";
 import styles from "./HeaderHaikuTools.module.css";
 
 export function HeaderHaikuLabelManage() {
-  const pathname = usePathname();
-  const { selectedLabelIds, setSelectedLabelIds, removeLabelId } = useHaikuFilters();
-  const [modalOpen, setModalOpen] = useState(false);
-
-  const { data: manageAccountId } = useManageLabelsAccount();
-  const accountId = manageAccountId ?? "";
-  const { labels } = useAccountLabels({
+  const {
+    enabled,
     accountId,
-    autofetch: Boolean(accountId) && (modalOpen || selectedLabelIds.length > 0),
-  });
+    modalOpen,
+    setModalOpen,
+    chips,
+    selectedLabelIds,
+    setSelectedLabelIds,
+    removeLabelId,
+    canOpen,
+  } = useHeaderHaikuLabelManage();
 
-  const labelById = useMemo(() => {
-    const map = new Map(labels.map((l) => [l.id, l]));
-    return map;
-  }, [labels]);
-
-  if (pathname !== "/") return null;
-
-  const chips = selectedLabelIds
-    .map((id) => labelById.get(id))
-    .filter((label): label is NonNullable<typeof label> => Boolean(label));
+  if (!enabled) return null;
 
   return (
     <>
@@ -42,7 +31,7 @@ export function HeaderHaikuLabelManage() {
           aria-label="Filter and manage labels"
           aria-expanded={modalOpen}
           onClick={() => setModalOpen(true)}
-          disabled={!accountId}
+          disabled={!canOpen}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

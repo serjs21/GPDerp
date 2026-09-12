@@ -1,0 +1,96 @@
+.panel {
+  --search-panel-motion: 200ms ease;
+  --search-panel-slot: 2.5rem;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  box-sizing: border-box;
+  height: var(--search-panel-slot);
+  padding: 0.15rem;
+  border: 1px solid color-mix(in srgb, var(--text-color, #222) 14%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--profile-surface-bg, #fff) 72%, transparent);
+}
+
+.slot {
+  position: relative;
+  flex: 0 0 var(--search-panel-slot);
+  width: var(--search-panel-slot);
+  height: var(--search-panel-slot);
+  overflow: hidden;
+}
+
+.slotFace {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform var(--search-panel-motion),
+    opacity var(--search-panel-motion);
+}
+
+.slotFaceHiddenLeft {
+  transform: translateX(-110%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.slotFaceHiddenRight {
+  transform: translateX(110%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.actionName {
+  box-sizing: border-box;
+  max-width: 100%;
+  padding: 0 0.15rem;
+  overflow: hidden;
+  color: var(--text-color, #222);
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Transparent button chrome — panel supplies the shared surface. */
+.panelButton {
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+}
+
+.panelButton:hover:not(:disabled),
+.panelButton:focus-visible {
+  background: color-mix(in srgb, var(--text-color, #222) 10%, transparent) !important;
+}
+
+.searchAnchor {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    --search-panel-motion: 0ms;
+  }
+
+  .slotFaceHiddenLeft,
+  .slotFaceHiddenRight {
+    transform: none;
+  }
+}
