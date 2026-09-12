@@ -3,6 +3,7 @@
   display: inline-block;
   max-width: 100%;
   overflow: visible;
+  --brush-option-min-width: 12rem;
 }
 
 .trigger {
@@ -20,16 +21,18 @@
   line-height: 1.2;
   cursor: pointer;
   box-shadow: 2px 2px 0 #111111;
-  /* In-flow: expanding label width pushes siblings (e.g. SearchPanel). */
+  /* In-flow: width tween pushes siblings (e.g. SearchPanel). */
   display: inline-flex;
   align-items: center;
   max-width: 100%;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .triggerBrushOpen {
-  /* Brush layer needs a positioned containing block. */
+  /* Full open width matches option rows; JS tweens from closed width. */
+  min-width: 0;
   z-index: 1;
+  overflow: hidden;
 }
 
 .trigger:disabled {
@@ -45,11 +48,11 @@
 .triggerFace {
   position: relative;
   z-index: 1;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: 0.5rem;
-  max-width: 100%;
+  width: 100%;
   min-width: 0;
 }
 
@@ -57,12 +60,21 @@
   flex-shrink: 0;
 }
 
-/* Real layout width; opacity/scale animated with the brush paint. */
+/* Fills remaining trigger width so brush matches option row length. */
+.expandSlot {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+/* Opacity/scale only — width comes from the trigger tween. */
 .expandLabel {
   position: relative;
   z-index: 1;
   display: block;
-  max-width: 14rem;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -86,7 +98,7 @@
   flex-direction: column;
   align-items: stretch;
   gap: 0.2rem;
-  min-width: max(100%, 12rem);
+  min-width: max(100%, var(--brush-option-min-width, 12rem));
   margin: 0.2rem 0 0;
   padding: 0;
   list-style: none;

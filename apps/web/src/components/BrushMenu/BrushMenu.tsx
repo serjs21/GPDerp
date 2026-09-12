@@ -4,14 +4,17 @@ import {
   useCallback,
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
+  type CSSProperties,
   type ReactNode,
   type RefObject,
 } from "react";
 import { useReducedMotion } from "motion/react";
 import { BrushOption, type BrushOptionBrushPaths } from "./BrushOption";
 import { BrushPaintLayer } from "./BrushPaintLayer";
+import { BRUSH_OPTION_MIN_WIDTH_REM } from "./brushRevealPaths";
 import {
   useBrushMenuDrawAnimation,
   type BrushMenuDrawPhase,
@@ -205,8 +208,10 @@ export function BrushMenu({
 }: BrushMenuProps) {
   const listId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const triggerBrushPathsRef = useRef<BrushOptionBrushPaths | null>(null);
   const triggerExpandLabelRef = useRef<HTMLSpanElement | null>(null);
+  const closedTriggerWidthRef = useRef(36);
   const brushPathsRef = useRef<(BrushOptionBrushPaths | null)[]>([]);
   const labelElsRef = useRef<(HTMLSpanElement | null)[]>([]);
   const { open, setOpen } = useOpenState(openProp, defaultOpen, onOpenChange);
@@ -219,6 +224,21 @@ export function BrushMenu({
     : open
       ? "open"
       : null;
+
+  useLayoutEffect(() => {
+    if (panelMounted || !triggerBrush) return;
+    const trigger = triggerRef.current;
+    if (!trigger) return;
+    closedTriggerWidthRef.current = trigger.offsetWidth || 36;
+  }, [panelMounted, triggerBrush, expandLabel, renderTrigger]);
+
+  // Pin closed width before paint on open so the expand slot cannot inflate layout.
+  useLayoutEffect(() => {
+    if (!triggerBrush || !open || closing) return;
+    const trigger = triggerRef.current;
+    if (!trigger || trigger.style.width) return;
+    trigger.style.width = `${closedTriggerWidthRef.current}px`;
+  }, [open, closing, triggerBrush]);
 
   const requestClose = useCallback(() => {
     if (disabled || closing || !open) return;
@@ -235,6 +255,7 @@ export function BrushMenu({
     triggerBrushPathsRef.current = null;
     brushPathsRef.current = [];
     labelElsRef.current = [];
+    if (triggerRef.current) triggerRef.current.style.width = "";
   }, []);
 
   useDismissOnOutside({
@@ -264,11 +285,23 @@ export function BrushMenu({
     return labels;
   }, [triggerBrush]);
 
+  const getTriggerEl = useCallback(
+    () => (triggerBrush ? triggerRef.current : null),
+    [triggerBrush],
+  );
+
+  const getClosedTriggerWidthPx = useCallback(
+    () => closedTriggerWidthRef.current,
+    [],
+  );
+
   useBrushMenuDrawAnimation({
     phase: drawPhase,
     reducedMotion,
     getBrushPathGroups,
     getLabelEls,
+    getTriggerEl,
+    getClosedTriggerWidthPx,
     onCloseComplete: handleCloseComplete,
   });
 
@@ -285,6 +318,9 @@ export function BrushMenu({
       requestClose();
       return;
     }
+    if (triggerBrush && triggerRef.current) {
+      closedTriggerWidthRef.current = triggerRef.current.offsetWidth || 36;
+    }
     setOpen(true);
   };
 
@@ -296,8 +332,14 @@ export function BrushMenu({
     <div
       ref={rootRef}
       className={`${styles.wrap}${className ? ` ${className}` : ""}`}
+      style={
+        {
+          ["--brush-option-min-width"]: `${BRUSH_OPTION_MIN_WIDTH_REM}rem`,
+        } as CSSProperties
+      }
     >
       <button
+        ref={triggerRef}
         type="button"
         className={`${styles.trigger}${
           triggerClassName ? ` ${triggerClassName}` : ""
@@ -321,11 +363,13 @@ export function BrushMenu({
             ? renderTrigger({ open: panelMounted, label: triggerLabel })
             : triggerLabel}
           {showExpandLabel ? (
-            <span
-              ref={triggerExpandLabelRef}
-              className={styles.expandLabel}
-            >
-              {expandLabel}
+            <span className={styles.expandSlot}>
+              <span
+                ref={triggerExpandLabelRef}
+                className={styles.expandLabel}
+              >
+                {expandLabel}
+              </span>
             </span>
           ) : null}
         </span>

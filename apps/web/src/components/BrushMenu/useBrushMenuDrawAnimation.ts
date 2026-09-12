@@ -4,10 +4,13 @@ import { animate, createDrawable } from "animejs";
 import { useEffect, useRef } from "react";
 import {
   BRUSH_OPTION_DRAW_MS,
+  BRUSH_OPTION_MIN_WIDTH_REM,
   BRUSH_REVEAL_EASE,
   BRUSH_REVEAL_LABEL_DELAY_MS,
   BRUSH_REVEAL_LABEL_DURATION_MS,
   BRUSH_REVEAL_PATHS,
+  BRUSH_REVEAL_TEXT_CLOSE_DELAY_MS,
+  BRUSH_REVEAL_TEXT_CLOSE_DURATION_MS,
 } from "./brushRevealPaths";
 
 export { BRUSH_OPTION_DRAW_MS };
@@ -83,6 +86,12 @@ function maxBrushMs(): number {
   return max;
 }
 
+function remToPx(rem: number): number {
+  if (typeof window === "undefined") return rem * 16;
+  const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
+  return rem * (Number.isFinite(rootPx) ? rootPx : 16);
+}
+
 /**
  * Paint-reveal on open; reverse undraw on close (same durations).
  * Panel stays mounted while `phase === "closing"` until `onCloseComplete`.
@@ -92,6 +101,10 @@ export function useBrushMenuDrawAnimation(options: {
   reducedMotion: boolean;
   getBrushPathGroups: () => BrushRevealPathGroup[];
   getLabelEls: () => HTMLElement[];
+  /** In-flow trigger whose width expands to option min-width when open. */
+  getTriggerEl?: () => HTMLElement | null;
+  /** Closed (avatar-only) trigger width in px; used for width tween. */
+  getClosedTriggerWidthPx?: () => number;
   onCloseComplete?: () => void;
 }) {
   const {
@@ -99,6 +112,8 @@ export function useBrushMenuDrawAnimation(options: {
     reducedMotion,
     getBrushPathGroups,
     getLabelEls,
+    getTriggerEl,
+    getClosedTriggerWidthPx,
     onCloseComplete,
   } = options;
   const animationsRef = useRef<Animatable[]>([]);
@@ -119,12 +134,20 @@ export function useBrushMenuDrawAnimation(options: {
     }
 
     const isClosing = phase === "closing";
+    const openWidthPx = remToPx(BRUSH_OPTION_MIN_WIDTH_REM);
+    const durationMs = maxBrushMs();
 
     const frame = requestAnimationFrame(() => {
       const groups = getBrushPathGroups();
       const labels = getLabelEls().filter(Boolean);
       const allPaths = groups.flat().filter(Boolean);
-      if (allPaths.length === 0) {
+      const triggerEl = getTriggerEl?.() ?? null;
+      const closedWidthPx = Math.max(
+        1,
+        getClosedTriggerWidthPx?.() ?? triggerEl?.offsetWidth ?? 36,
+      );
+
+      if (allPaths.length === 0 && !triggerEl) {
         if (isClosing) onCloseCompleteRef.current?.();
         return;
       }
@@ -133,10 +156,12 @@ export function useBrushMenuDrawAnimation(options: {
         if (isClosing) {
           prepareUndrawn(allPaths);
           prepareLabelsHidden(labels);
+          if (triggerEl) triggerEl.style.width = "";
           onCloseCompleteRef.current?.();
         } else {
           showFullyDrawn(allPaths);
           showLabelsFully(labels);
+          if (triggerEl) triggerEl.style.width = `${openWidthPx}px`;
         }
         return;
       }
@@ -165,13 +190,26 @@ export function useBrushMenuDrawAnimation(options: {
           );
         }
 
+        // Text out first / faster so copy never sits on a vanishing brush.
         if (labels.length > 0) {
           nextAnimations.push(
             animate(labels, {
               opacity: [1, 0],
               scale: [1, 0.98],
-              duration: BRUSH_REVEAL_LABEL_DURATION_MS,
-              delay: BRUSH_REVEAL_LABEL_DELAY_MS,
+              duration: BRUSH_REVEAL_TEXT_CLOSE_DURATION_MS,
+              delay: BRUSH_REVEAL_TEXT_CLOSE_DELAY_MS,
+              ease: BRUSH_REVEAL_EASE,
+            }) as Animatable,
+          );
+        }
+
+        if (triggerEl) {
+          const fromWidth = triggerEl.offsetWidth || openWidthPx;
+          triggerEl.style.width = `${fromWidth}px`;
+          nextAnimations.push(
+            animate(triggerEl, {
+              width: [`${fromWidth}px`, `${closedWidthPx}px`],
+              duration: durationMs,
               ease: BRUSH_REVEAL_EASE,
             }) as Animatable,
           );
@@ -180,12 +218,24 @@ export function useBrushMenuDrawAnimation(options: {
         animationsRef.current = nextAnimations;
         closeTimerRef.current = setTimeout(() => {
           closeTimerRef.current = null;
+          if (triggerEl) triggerEl.style.width = "";
           onCloseCompleteRef.current?.();
-        }, maxBrushMs());
+        }, durationMs);
         return;
       }
 
       prepareLabelsHidden(labels);
+
+      if (triggerEl) {
+        triggerEl.style.width = `${closedWidthPx}px`;
+        nextAnimations.push(
+          animate(triggerEl, {
+            width: [`${closedWidthPx}px`, `${openWidthPx}px`],
+            duration: durationMs,
+            ease: BRUSH_REVEAL_EASE,
+          }) as Animatable,
+        );
+      }
 
       for (let pathIndex = 0; pathIndex < BRUSH_REVEAL_PATHS.length; pathIndex++) {
         const def = BRUSH_REVEAL_PATHS[pathIndex]!;
@@ -229,5 +279,12 @@ export function useBrushMenuDrawAnimation(options: {
       stopAll(animationsRef.current);
       animationsRef.current = [];
     };
-  }, [phase, reducedMotion, getBrushPathGroups, getLabelEls]);
+  }, [
+    phase,
+    reducedMotion,
+    getBrushPathGroups,
+    getLabelEls,
+    getTriggerEl,
+    getClosedTriggerWidthPx,
+  ]);
 }

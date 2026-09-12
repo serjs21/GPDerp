@@ -3,7 +3,7 @@
   box-sizing: border-box;
   display: block;
   width: 100%;
-  min-width: 12rem;
+  min-width: var(--brush-option-min-width, 12rem);
   margin: 0;
   padding: 0.55rem 1.1rem 0.55rem 0;
   border: none;

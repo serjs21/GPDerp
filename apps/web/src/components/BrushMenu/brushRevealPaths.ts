@@ -54,11 +54,19 @@ export const BRUSH_REVEAL_PATHS: readonly BrushRevealPathDef[] = [
   },
 ] as const;
 
-/** Label fade starts once the brush is mostly across. */
+/** Label fade starts once the brush is mostly across (open). */
 export const BRUSH_REVEAL_LABEL_DELAY_MS = 200;
 export const BRUSH_REVEAL_LABEL_DURATION_MS = 180;
-/** Alias: approximate settle time for the full paint. */
+/**
+ * Close: text opacity drops quickly so copy never sits on an undrawn brush.
+ * Keep well under the main stroke duration.
+ */
+export const BRUSH_REVEAL_TEXT_CLOSE_DURATION_MS = 90;
+export const BRUSH_REVEAL_TEXT_CLOSE_DELAY_MS = 0;
+/** Alias: approximate settle time for the full paint / width expand. */
 export const BRUSH_OPTION_DRAW_MS =
   BRUSH_REVEAL_LABEL_DELAY_MS + BRUSH_REVEAL_LABEL_DURATION_MS;
+/** Match BrushOption / panel min width (trigger brush when open). */
+export const BRUSH_OPTION_MIN_WIDTH_REM = 12;
 
 export const BRUSH_REVEAL_EASE = "out(2)" as const;
