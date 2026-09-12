@@ -1,4 +1,9 @@
 import type { CSSProperties } from "react";
+import {
+  formatCssDegrees,
+  formatCssNumber,
+  formatCssPercent,
+} from "@/theme/celestialTheme";
 import { CELESTIAL_BACKGROUND_BODY_ASSETS } from "./celestialBackgroundBodyAssets";
 import { CelestialArtImage } from "./CelestialArtImage";
 import styles from "./DaylightMoon.module.css";
@@ -18,11 +23,11 @@ type DaylightMoonProps = {
 export const DaylightMoon = ({ style, celestial }: DaylightMoonProps) => {
   const celestialStyle: CSSProperties | undefined = celestial
     ? {
-        left: `${celestial.x}%`,
-        top: `${celestial.y}%`,
+        left: formatCssPercent(celestial.x),
+        top: formatCssPercent(celestial.y),
         right: "auto",
-        opacity: celestial.opacity,
-        transform: `translate(-50%, -50%) rotate(${celestial.limbAngleDeg}deg)`,
+        opacity: Number(formatCssNumber(celestial.opacity)),
+        transform: `translate(-50%, -50%) rotate(${formatCssDegrees(celestial.limbAngleDeg)})`,
       }
     : undefined;
 

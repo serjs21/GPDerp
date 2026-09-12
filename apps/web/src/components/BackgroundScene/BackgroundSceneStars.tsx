@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { formatCssNumber } from "@/theme/celestialTheme";
 import {
   BACKGROUND_SCENE_NN_STAR,
   twilightSubPathOpacity,
@@ -26,7 +27,7 @@ function unitNoise(index: number, salt: number): number {
 }
 
 function starOpacityForIndex(index: number): number {
-  return 0.2 + unitNoise(index, 1) * 0.4;
+  return Number((0.2 + unitNoise(index, 1) * 0.4).toFixed(4));
 }
 
 type StarPlacement = {
@@ -116,7 +117,7 @@ function NnStar({ sunOpacity }: { sunOpacity: number }) {
           left: `${leftPercent}%`,
           top: `${topPercent}%`,
           width: `${sizeRem}rem`,
-          opacity,
+          opacity: Number(formatCssNumber(opacity)),
           transform: `translate(-50%, -50%) rotate(${rotationDeg}deg)`,
         } as CSSProperties
       }
@@ -129,7 +130,9 @@ export function BackgroundSceneStars({
   sunOpacity,
 }: BackgroundSceneStarsProps) {
   const showField = opacity > 0;
-  const showNnStar = twilightSubPathOpacity(sunOpacity) > 0;
+  const nnOpacity = twilightSubPathOpacity(sunOpacity);
+  const showNnStar = nnOpacity > 0;
+
   if (!showField && !showNnStar) return null;
 
   return (
@@ -148,7 +151,9 @@ export function BackgroundSceneStars({
                   left: position.left,
                   top: position.top,
                   width: `${position.sizeRem}rem`,
-                  opacity: starOpacityForIndex(index) * opacity,
+                  opacity: Number(
+                    formatCssNumber(starOpacityForIndex(index) * opacity),
+                  ),
                   transform: `translate(-50%, -50%) rotate(${position.rotationDeg}deg)`,
                 } as CSSProperties
               }

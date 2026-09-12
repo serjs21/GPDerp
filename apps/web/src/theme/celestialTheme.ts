@@ -217,12 +217,14 @@ const clamp = (value: number, min = 0, max = 1) =>
 const clamp01 = (value: number) => clamp(value, 0, 1);
 
 /** Stable string formatting for SSR/client hydration of inline CSS values. */
-const formatCssNumber = (value: number, fractionDigits = 4) =>
+export const formatCssNumber = (value: number, fractionDigits = 4) =>
   Number(value.toFixed(fractionDigits)).toString();
 
-const formatCssPercent = (value: number) => `${formatCssNumber(value)}%`;
+export const formatCssPercent = (value: number) => `${formatCssNumber(value)}%`;
 
-const formatCssDegrees = (value: number) => `${formatCssNumber(value)}deg`;
+export const formatCssDegrees = (value: number) => `${formatCssNumber(value)}deg`;
+
+export const formatCssRem = (value: number) => `${formatCssNumber(value)}rem`;
 
 const smoothstep = (value: number) => {
   const t = clamp01(value);

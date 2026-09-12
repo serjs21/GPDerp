@@ -2,7 +2,11 @@
 
 import { useId, useRef, type CSSProperties } from "react";
 import type { SelectorBackgroundBodies } from "@/theme/celestialSelectorLayout";
-import { getSkyGradientCss, type ThemeColors } from "@/theme/celestialTheme";
+import {
+  formatCssRem,
+  getSkyGradientCss,
+  type ThemeColors,
+} from "@/theme/celestialTheme";
 import {
   CELESTIAL_MOON_BODY_WIDTH_REM,
   CELESTIAL_SUN_BODY_WIDTH_REM,
@@ -64,7 +68,7 @@ export function BackgroundScene({
               y: backgroundBodies.sun.y,
               opacity: backgroundBodies.sun.opacity,
             }}
-            style={{ width: `${CELESTIAL_SUN_BODY_WIDTH_REM}rem` }}
+            style={{ width: formatCssRem(CELESTIAL_SUN_BODY_WIDTH_REM) }}
           />
           <DaylightMoon
             celestial={{
@@ -73,7 +77,7 @@ export function BackgroundScene({
               opacity: backgroundBodies.moon.opacity,
               limbAngleDeg: backgroundBodies.moon.limbAngleDeg,
             }}
-            style={{ width: `${CELESTIAL_MOON_BODY_WIDTH_REM}rem` }}
+            style={{ width: formatCssRem(CELESTIAL_MOON_BODY_WIDTH_REM) }}
           />
         </div>
 
