@@ -25,8 +25,7 @@
 }
 
 .panel {
-  --go-home-motion: 0.4s ease;
-  --go-home-fade: 0.2s ease;
+  --go-home-motion: 0.35s ease;
 
   appearance: none;
   position: absolute;
@@ -34,10 +33,11 @@
   z-index: 1;
   box-sizing: border-box;
   display: flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   margin: 0;
-  padding: 0 0.35rem;
+  padding: 0;
   border: none;
   border-radius: 0;
   background: transparent;
@@ -53,67 +53,59 @@
   outline-offset: 1px;
 }
 
-/*
- * Same idea as SVGPanelActionButton: grow padding-right so the icon
- * stays left while room opens for the footer label on the right.
- */
+.panel:hover,
+.panel:focus-visible {
+  justify-content: flex-start;
+}
+
 .actionIcon {
-  position: relative;
-  z-index: 1;
   display: block;
-  box-sizing: content-box;
   width: auto;
   height: 1.35rem;
   max-width: none;
   flex-shrink: 0;
-  padding-right: 0;
   object-fit: contain;
   pointer-events: none;
-  transition: padding-right var(--go-home-motion);
 }
 
-.panel:hover .actionIcon,
-.panel:focus-visible .actionIcon {
-  padding-right: 3.75rem;
-}
-
+/*
+ * flex-basis/width 0 at rest; flex-grow fills to the right edge on hover
+ * (no cream gap), pushing the icon left from center.
+ */
 .actionFooter {
-  position: absolute;
-  right: 0.35rem;
-  top: 50%;
-  z-index: 1;
   box-sizing: border-box;
-  width: fit-content;
-  max-width: min(100%, 5.5rem);
-  padding: 0.12rem 0.35rem;
-  border: 2px solid #111;
-  background: #fff;
-  color: var(--sumi-ink, #2d2d2d);
-  font-family: var(--font-lantern-script, cursive);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 1 0;
+  width: 0;
+  min-width: 0;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #111;
+  color: #fff;
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
   font-size: 0.62rem;
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: 0.04em;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1;
   text-align: center;
-  text-transform: uppercase;
   white-space: nowrap;
   pointer-events: none;
-  opacity: 0;
-  transform: translateY(-50%);
-  transition: opacity var(--go-home-fade);
+  user-select: none;
+  transition: flex-grow var(--go-home-motion);
 }
 
 .panel:hover .actionFooter,
 .panel:focus-visible .actionFooter {
-  opacity: 1;
+  flex-grow: 1;
+  padding: 0 0.3rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .actionIcon {
-    transition: none;
-  }
-
-  .actionFooter {
-    transition: none;
+  .panel {
+    --go-home-motion: 0ms;
   }
 }

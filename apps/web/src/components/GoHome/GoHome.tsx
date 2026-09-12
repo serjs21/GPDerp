@@ -19,7 +19,7 @@ export type GoHomeProps = {
 
 /**
  * Header “go home” control — same ComicBurstLabel shell as SearchPanel /
- * UserMenu, with SVGPanelActionButton-style hover (icon slides, label fades in).
+ * UserMenu. Hover expands a zero-width label and pushes the centered icon left.
  */
 export function GoHome({ className, forceShow = false }: GoHomeProps) {
   const pathname = usePathname();
