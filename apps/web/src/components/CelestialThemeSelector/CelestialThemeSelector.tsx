@@ -9,7 +9,12 @@ import {
 } from "@/components/CelestialThemeClock";
 import { formatClockLabel } from "@/theme/celestialTime";
 import type { GeoCoordinates } from "@/theme/celestialTheme";
+import {
+  selectorButtonModeFromSunY,
+  selectorViewerSunYPercent,
+} from "@/theme/celestialSelectorLayout";
 import { BANGKOK_COORDINATES } from "@/theme/useCelestialScene";
+import { CELESTIAL_TRIGGER_BODY_BADGE } from "./celestialTriggerBodyBadge.config";
 import { useCelestialSelectorOpenTransition } from "./useCelestialSelectorOpenTransition";
 import styles from "./CelestialThemeSelector.module.css";
 
@@ -38,6 +43,22 @@ export function CelestialThemeSelector({
   const clockRef = useRef<CelestialThemeClockHandle>(null);
   const timeLabel = formatClockLabel(slot);
   const sceneStyle = sceneVars as CSSProperties | undefined;
+  const dialHalf = selectorButtonModeFromSunY(selectorViewerSunYPercent(slot));
+  const bodyBadge =
+    dialHalf === "day"
+      ? {
+          src: CELESTIAL_TRIGGER_BODY_BADGE.sunSrc,
+          label: "sun",
+        }
+      : {
+          src: CELESTIAL_TRIGGER_BODY_BADGE.moonSrc,
+          label: "moon",
+        };
+  const bodyBadgeStyle = {
+    left: `${CELESTIAL_TRIGGER_BODY_BADGE.leftPercent}%`,
+    top: `${CELESTIAL_TRIGGER_BODY_BADGE.topPercent}%`,
+    width: `${CELESTIAL_TRIGGER_BODY_BADGE.sizePercent}%`,
+  } as CSSProperties;
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
@@ -121,6 +142,15 @@ export function CelestialThemeSelector({
                 src={ALIEN_TRIGGER_SRC}
                 alt=""
                 className={styles.triggerAlien}
+                draggable={false}
+              />
+              {/* eslint-disable-next-line @next/next/no-img-element -- public SVG body badge */}
+              <img
+                src={bodyBadge.src}
+                alt=""
+                className={styles.triggerBodyBadge}
+                style={bodyBadgeStyle}
+                data-body={bodyBadge.label}
                 draggable={false}
               />
             </span>

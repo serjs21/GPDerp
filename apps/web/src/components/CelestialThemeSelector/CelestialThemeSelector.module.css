@@ -110,8 +110,10 @@
   /* Tune sky disc without changing the SVG size. */
   width: 85%;
   height: 85%;
-  border-radius: 0;
+  border-radius: 6px 4px 5px 0px;
   border: 3px solid #111111;
+  border-left: 1px solid #111111;
+  border-top: 1px solid #111111;
   background: linear-gradient(
     180deg,
     var(--sky-top, #7eb6d9) 0%,
@@ -133,4 +135,16 @@
   object-position: center;
   /* Saturate alien palette against the dynamic sky disc. */
   filter: saturate(var(--celestial-trigger-saturate));
+}
+
+.triggerBodyBadge {
+  position: absolute;
+  z-index: 2;
+  height: auto;
+  object-fit: contain;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
 }
