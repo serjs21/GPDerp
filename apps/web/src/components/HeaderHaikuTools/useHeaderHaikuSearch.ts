@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useHaikuFilters } from "@/app/providers/HaikuFiltersProvider";
 
-const FADE_MS = 100;
+const FADE_MS = 200;
 
 export function useHeaderHaikuSearch() {
   const pathname = usePathname();

@@ -11,8 +11,10 @@ import {
 } from "react";
 import { useReducedMotion } from "motion/react";
 import { BrushOption, type BrushOptionBrushPaths } from "./BrushOption";
+import { BrushPaintLayer } from "./BrushPaintLayer";
 import {
   useBrushMenuDrawAnimation,
+  type BrushMenuDrawPhase,
   type BrushRevealPathGroup,
 } from "./useBrushMenuDrawAnimation";
 import styles from "./BrushMenu.module.css";
@@ -39,6 +41,14 @@ export type BrushMenuProps = {
   disabled?: boolean;
   className?: string;
   triggerClassName?: string;
+  /**
+   * Paint brush + expanding label on the trigger itself (in-flow width).
+   * Avatar/icon from `renderTrigger` stays mounted; brush and expand label
+   * draw behind it. Menu options render below the trigger.
+   */
+  triggerBrush?: boolean;
+  /** Label shown beside the trigger when open (contributes real layout width). */
+  expandLabel?: ReactNode;
   renderTrigger?: (ctx: { open: boolean; label: string }) => ReactNode;
 };
 
@@ -68,12 +78,12 @@ function useDismissOnOutside({
   open,
   disabled,
   rootRef,
-  setOpen,
+  requestClose,
 }: {
   open: boolean;
   disabled: boolean;
   rootRef: RefObject<HTMLDivElement | null>;
-  setOpen: (next: boolean) => void;
+  requestClose: () => void;
 }) {
   useEffect(() => {
     if (!open || disabled) return;
@@ -82,14 +92,14 @@ function useDismissOnOutside({
       const root = rootRef.current;
       if (!root) return;
       if (event.target instanceof Node && !root.contains(event.target)) {
-        setOpen(false);
+        requestClose();
       }
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
-        setOpen(false);
+        requestClose();
       }
     };
 
@@ -99,7 +109,7 @@ function useDismissOnOutside({
       document.removeEventListener("pointerdown", onPointerDown);
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [disabled, open, rootRef, setOpen]);
+  }, [disabled, open, rootRef, requestClose]);
 }
 
 function BrushOptionList({
@@ -146,9 +156,10 @@ function BrushOptionList({
             className={option.className}
             role="option"
             aria-selected={option.value === value}
-            onSelect={
-              option.displayOnly ? undefined : () => onSelect(option.value)
-            }
+            onSelect={() => {
+              if (option.displayOnly) return;
+              onSelect(option.value);
+            }}
           />
         </li>
       ))}
@@ -188,48 +199,98 @@ export function BrushMenu({
   disabled = false,
   className,
   triggerClassName,
+  triggerBrush = false,
+  expandLabel,
   renderTrigger,
 }: BrushMenuProps) {
   const listId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
+  const triggerBrushPathsRef = useRef<BrushOptionBrushPaths | null>(null);
+  const triggerExpandLabelRef = useRef<HTMLSpanElement | null>(null);
   const brushPathsRef = useRef<(BrushOptionBrushPaths | null)[]>([]);
   const labelElsRef = useRef<(HTMLSpanElement | null)[]>([]);
   const { open, setOpen } = useOpenState(openProp, defaultOpen, onOpenChange);
+  const [closing, setClosing] = useState(false);
   const reducedMotion = useReducedMotion() ?? false;
 
-  useDismissOnOutside({ open, disabled, rootRef, setOpen });
+  const panelMounted = open || closing;
+  const drawPhase: BrushMenuDrawPhase | null = closing
+    ? "closing"
+    : open
+      ? "open"
+      : null;
 
-  const getBrushPathGroups = useCallback(
-    () => toPathGroups(brushPathsRef.current),
-    [],
-  );
+  const requestClose = useCallback(() => {
+    if (disabled || closing || !open) return;
+    if (reducedMotion) {
+      setOpen(false);
+      return;
+    }
+    setClosing(true);
+    setOpen(false);
+  }, [closing, disabled, open, reducedMotion, setOpen]);
 
-  const getLabelEls = useCallback(
-    () =>
-      labelElsRef.current.filter(
-        (label): label is HTMLSpanElement => label != null,
-      ),
-    [],
-  );
+  const handleCloseComplete = useCallback(() => {
+    setClosing(false);
+    triggerBrushPathsRef.current = null;
+    brushPathsRef.current = [];
+    labelElsRef.current = [];
+  }, []);
+
+  useDismissOnOutside({
+    open: panelMounted && !closing,
+    disabled,
+    rootRef,
+    requestClose,
+  });
+
+  const getBrushPathGroups = useCallback(() => {
+    const groups: BrushRevealPathGroup[] = [];
+    if (triggerBrush && triggerBrushPathsRef.current) {
+      groups.push(triggerBrushPathsRef.current);
+    }
+    groups.push(...toPathGroups(brushPathsRef.current));
+    return groups;
+  }, [triggerBrush]);
+
+  const getLabelEls = useCallback(() => {
+    const labels: HTMLSpanElement[] = [];
+    if (triggerBrush && triggerExpandLabelRef.current) {
+      labels.push(triggerExpandLabelRef.current);
+    }
+    for (const label of labelElsRef.current) {
+      if (label) labels.push(label);
+    }
+    return labels;
+  }, [triggerBrush]);
 
   useBrushMenuDrawAnimation({
-    open,
+    phase: drawPhase,
     reducedMotion,
     getBrushPathGroups,
     getLabelEls,
+    onCloseComplete: handleCloseComplete,
   });
 
   const triggerLabel = resolveTriggerLabel(options, value, placeholder);
 
   const handleSelect = (nextValue: string) => {
     onChange?.(nextValue);
-    setOpen(false);
+    requestClose();
   };
 
   const toggleOpen = () => {
-    if (disabled) return;
-    setOpen(!open);
+    if (disabled || closing) return;
+    if (open) {
+      requestClose();
+      return;
+    }
+    setOpen(true);
   };
+
+  const showTriggerBrush = triggerBrush && panelMounted;
+  const showExpandLabel =
+    triggerBrush && panelMounted && expandLabel != null;
 
   return (
     <div
@@ -240,19 +301,37 @@ export function BrushMenu({
         type="button"
         className={`${styles.trigger}${
           triggerClassName ? ` ${triggerClassName}` : ""
-        }`}
+        }${showTriggerBrush ? ` ${styles.triggerBrushOpen}` : ""}`}
         disabled={disabled}
         aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-controls={open ? listId : undefined}
+        aria-expanded={panelMounted}
+        aria-controls={panelMounted ? listId : undefined}
         onClick={toggleOpen}
       >
-        {renderTrigger
-          ? renderTrigger({ open, label: triggerLabel })
-          : triggerLabel}
+        {showTriggerBrush ? (
+          <BrushPaintLayer
+            index={0}
+            onBrushPaths={(paths) => {
+              triggerBrushPathsRef.current = paths;
+            }}
+          />
+        ) : null}
+        <span className={styles.triggerFace}>
+          {renderTrigger
+            ? renderTrigger({ open: panelMounted, label: triggerLabel })
+            : triggerLabel}
+          {showExpandLabel ? (
+            <span
+              ref={triggerExpandLabelRef}
+              className={styles.expandLabel}
+            >
+              {expandLabel}
+            </span>
+          ) : null}
+        </span>
       </button>
 
-      {open ? (
+      {panelMounted ? (
         <BrushOptionList
           listId={listId}
           options={options}

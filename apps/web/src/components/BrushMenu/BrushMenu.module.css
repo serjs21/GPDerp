@@ -6,6 +6,7 @@
 }
 
 .trigger {
+  position: relative;
   box-sizing: border-box;
   margin: 0;
   padding: 0.4rem 0.75rem;
@@ -19,6 +20,16 @@
   line-height: 1.2;
   cursor: pointer;
   box-shadow: 2px 2px 0 #111111;
+  /* In-flow: expanding label width pushes siblings (e.g. SearchPanel). */
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.triggerBrushOpen {
+  /* Brush layer needs a positioned containing block. */
+  z-index: 1;
 }
 
 .trigger:disabled {
@@ -31,9 +42,44 @@
   outline-offset: 2px;
 }
 
+.triggerFace {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.triggerFace > :first-child {
+  flex-shrink: 0;
+}
+
+/* Real layout width; opacity/scale animated with the brush paint. */
+.expandLabel {
+  position: relative;
+  z-index: 1;
+  display: block;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.98);
+  transform-origin: left center;
+  color: #f7f4ef;
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
 .panel {
   position: absolute;
-  top: calc(100% + 0.35rem);
+  top: 100%;
   left: 0;
   z-index: 40;
   display: flex;
@@ -41,7 +87,7 @@
   align-items: stretch;
   gap: 0.2rem;
   min-width: max(100%, 12rem);
-  margin: 0;
+  margin: 0.2rem 0 0;
   padding: 0;
   list-style: none;
 }

@@ -56,16 +56,6 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
   const options = useMemo<BrushMenuOption[]>(
     () => [
       {
-        value: "profile",
-        displayOnly: true,
-        label: (
-          <span className={styles.optionLabel}>
-            <UserAvatar user={user} label={displayName} />
-            <span className={styles.optionName}>{displayName}</span>
-          </span>
-        ),
-      },
-      {
         value: "settings",
         label: (
           <OptionIconLabel
@@ -87,7 +77,7 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
         className: styles.logoutOption,
       },
     ],
-    [displayName, user],
+    [],
   );
 
   const handleChange = (key: string) => {
@@ -118,6 +108,8 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
       <BrushMenu
         className={className}
         triggerClassName={styles.trigger}
+        triggerBrush
+        expandLabel={displayName}
         options={options}
         placeholder={displayName}
         onChange={handleChange}

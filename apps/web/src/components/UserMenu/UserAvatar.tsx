@@ -17,7 +17,7 @@ export type UserAvatarProps = {
   size?: number;
 };
 
-/** Comic-burst framed avatar used in the UserMenu trigger and profile row. */
+/** Comic-burst framed avatar used as the UserMenu trigger (stays mounted on open). */
 export function UserAvatar({
   user,
   label,

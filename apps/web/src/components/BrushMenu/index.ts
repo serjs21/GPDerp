@@ -2,6 +2,8 @@ export { BrushMenu } from "./BrushMenu";
 export type { BrushMenuOption, BrushMenuProps } from "./BrushMenu";
 export { BrushOption } from "./BrushOption";
 export type { BrushOptionBrushPaths, BrushOptionProps } from "./BrushOption";
+export { BrushPaintLayer } from "./BrushPaintLayer";
+export type { BrushPaintLayerProps } from "./BrushPaintLayer";
 export {
   BRUSH_MENU_ICON_SRC,
   BRUSH_MENU_ICON_SRCS,
