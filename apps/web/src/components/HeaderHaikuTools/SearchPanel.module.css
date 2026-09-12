@@ -39,7 +39,16 @@
   min-width: 0;
   height: 100%;
   overflow: hidden;
+  box-sizing: border-box;
   transition: flex-grow var(--search-panel-motion);
+}
+
+.slotLabels {
+  border-right: 1.5px solid #111;
+}
+
+.slotSearch {
+  border-left: 1.5px solid #111;
 }
 
 .panelHoverLabels .slotLabels {
@@ -48,6 +57,8 @@
 
 .panelHoverLabels .slotSearch {
   flex-grow: 3;
+  /* Let the oversized icon keep full size in the compressed slot. */
+  overflow: hidden;
 }
 
 .panelHoverSearch .slotSearch {
@@ -56,6 +67,7 @@
 
 .panelHoverSearch .slotLabels {
   flex-grow: 3;
+  overflow: hidden;
 }
 
 .panelButton {
@@ -127,7 +139,7 @@
   background: #111;
   color: #fff;
   font-family: var(--font-comic-label), "Bangers", sans-serif;
-  font-size: 0.62rem;
+  font-size: 0.92rem;
   font-weight: 400;
   letter-spacing: 0.02em;
   line-height: 1;
@@ -139,8 +151,10 @@
 
 .iconImg {
   display: block;
+  flex-shrink: 0;
   width: 3rem;
-  height: auto;
+  height: 3rem;
+  max-width: none;
   object-fit: contain;
   pointer-events: none;
 }
