@@ -1,0 +1,119 @@
+.anchor {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: flex-start;
+  align-self: flex-start;
+  height: 36px;
+  line-height: 0;
+}
+
+.shell {
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  height: 36px;
+  line-height: 0;
+  vertical-align: middle;
+}
+
+.frame {
+  display: block;
+  line-height: 0;
+  /* Decorative only — interactive panel sits on top. */
+  pointer-events: none;
+}
+
+.panel {
+  --go-home-motion: 0.4s ease;
+  --go-home-fade: 0.2s ease;
+
+  appearance: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 0;
+  padding: 0 0.35rem;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  pointer-events: auto;
+  overflow: hidden;
+}
+
+.panel:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent-red, #c44) 65%, #f7f4ef 30%);
+  outline-offset: 1px;
+}
+
+/*
+ * Same idea as SVGPanelActionButton: grow padding-right so the icon
+ * stays left while room opens for the footer label on the right.
+ */
+.actionIcon {
+  position: relative;
+  z-index: 1;
+  display: block;
+  box-sizing: content-box;
+  width: auto;
+  height: 1.35rem;
+  max-width: none;
+  flex-shrink: 0;
+  padding-right: 0;
+  object-fit: contain;
+  pointer-events: none;
+  transition: padding-right var(--go-home-motion);
+}
+
+.panel:hover .actionIcon,
+.panel:focus-visible .actionIcon {
+  padding-right: 3.75rem;
+}
+
+.actionFooter {
+  position: absolute;
+  right: 0.35rem;
+  top: 50%;
+  z-index: 1;
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: min(100%, 5.5rem);
+  padding: 0.12rem 0.35rem;
+  border: 2px solid #111;
+  background: #fff;
+  color: var(--sumi-ink, #2d2d2d);
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-50%);
+  transition: opacity var(--go-home-fade);
+}
+
+.panel:hover .actionFooter,
+.panel:focus-visible .actionFooter {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .actionIcon {
+    transition: none;
+  }
+
+  .actionFooter {
+    transition: none;
+  }
+}

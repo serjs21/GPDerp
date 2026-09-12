@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
+import { GoHome } from "@/components/GoHome";
 import { SearchPanel } from "@/components/HeaderHaikuTools";
 import { HeaderPreferences } from "./HeaderPreferences";
 import { LoggedInUserNav } from "./LoggedInUserNav";
@@ -16,6 +17,7 @@ export const AuthNavigation = () => {
       <div className={styles.headerNavSlot}>
         {isLoggedIn ? (
           <div className={toolStyles.toolsSlot}>
+            <GoHome />
             <LoggedInUserNav user={user} onLogout={logout} />
             <SearchPanel />
           </div>
