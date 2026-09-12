@@ -33,6 +33,24 @@
   white-space: nowrap;
 }
 
+.settingsLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.45rem;
+  max-width: 100%;
+  min-height: 1.35em;
+}
+
+.settingsIcon {
+  display: block;
+  flex-shrink: 0;
+  width: 1.35rem;
+  height: 1.35rem;
+  object-fit: contain;
+  pointer-events: none;
+}
+
 .logoutOption {
   /* Slightly warmer ink read for destructive action on brush stroke. */
   color: #ffd6d6;

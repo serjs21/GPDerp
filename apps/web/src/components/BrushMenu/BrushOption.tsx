@@ -27,6 +27,8 @@ export type BrushOptionProps = {
   labelRef?: Ref<HTMLSpanElement>;
   selected?: boolean;
   disabled?: boolean;
+  /** Non-interactive row (e.g. profile header). */
+  displayOnly?: boolean;
   className?: string;
   onSelect?: () => void;
 } & Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onClick" | "children">;
@@ -45,6 +47,7 @@ export const BrushOption = forwardRef<SVGPathElement, BrushOptionProps>(
       labelRef,
       selected = false,
       disabled = false,
+      displayOnly = false,
       className,
       onSelect,
       type = "button",
@@ -60,15 +63,17 @@ export const BrushOption = forwardRef<SVGPathElement, BrushOptionProps>(
       <button
         type={type}
         className={`${styles.option}${selected ? ` ${styles.selected}` : ""}${
-          className ? ` ${className}` : ""
-        }`}
+          displayOnly ? ` ${styles.displayOnly}` : ""
+        }${className ? ` ${className}` : ""}`}
         disabled={disabled}
         aria-pressed={selected}
-        onClick={() => {
-          if (disabled) return;
-          onSelect?.();
-        }}
         {...rest}
+        tabIndex={displayOnly ? -1 : rest.tabIndex}
+        aria-disabled={displayOnly || disabled || undefined}
+        onClick={() => {
+          if (disabled || displayOnly || !onSelect) return;
+          onSelect();
+        }}
       >
         <svg
           className={styles.brush}

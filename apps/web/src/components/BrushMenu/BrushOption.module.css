@@ -24,8 +24,17 @@
   opacity: 0.45;
 }
 
-.option:hover:not(:disabled) .label,
-.option:focus-visible .label {
+.displayOnly {
+  cursor: default;
+}
+
+.displayOnly:hover .label,
+.displayOnly:focus-visible .label {
+  text-shadow: none;
+}
+
+.option:hover:not(:disabled):not(.displayOnly) .label,
+.option:focus-visible:not(.displayOnly) .label {
   text-shadow: 0 0 0.35rem color-mix(in srgb, #f7f4ef 55%, transparent);
 }
 

@@ -18,6 +18,10 @@ export type BrushMenuOption = {
   value: string;
   label: ReactNode;
   disabled?: boolean;
+  /** Show the row but do not select or close the menu. */
+  displayOnly?: boolean;
+  /** Override round-robin brush stroke asset. */
+  iconSrc?: string;
   className?: string;
 };
 
@@ -131,13 +135,17 @@ function BrushOptionList({
               labelElsRef.current[index] = node;
             }}
             index={index}
+            iconSrc={option.iconSrc}
             label={option.label}
             selected={option.value === value}
             disabled={option.disabled || disabled}
+            displayOnly={option.displayOnly}
             className={option.className}
             role="option"
             aria-selected={option.value === value}
-            onSelect={() => onSelect(option.value)}
+            onSelect={
+              option.displayOnly ? undefined : () => onSelect(option.value)
+            }
           />
         </li>
       ))}
