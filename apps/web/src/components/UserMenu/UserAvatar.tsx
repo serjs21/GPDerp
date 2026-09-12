@@ -15,6 +15,8 @@ export type UserAvatarProps = {
   label: string;
   className?: string;
   size?: number;
+  /** Comic burst fill (default white; cream for header trigger chrome). */
+  frameFill?: string;
 };
 
 /** Comic-burst framed avatar used as the UserMenu trigger (stays mounted on open). */
@@ -23,9 +25,15 @@ export function UserAvatar({
   label,
   className,
   size = USER_MENU_AVATAR_SIZE,
+  frameFill,
 }: UserAvatarProps) {
   return (
-    <UserMenuBurstFrame label={label} className={className} size={size}>
+    <UserMenuBurstFrame
+      label={label}
+      className={className}
+      size={size}
+      fill={frameFill}
+    >
       <AuthUserAvatar user={user} size={size} fill />
     </UserMenuBurstFrame>
   );

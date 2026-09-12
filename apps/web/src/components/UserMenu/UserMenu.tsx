@@ -114,7 +114,12 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
         placeholder={displayName}
         onChange={handleChange}
         renderTrigger={() => (
-          <UserAvatar user={user} label={displayName} />
+          <UserAvatar
+            user={user}
+            label={displayName}
+            /* Match SearchPanel / GoHome header chrome. */
+            frameFill="#f7f4ef"
+          />
         )}
       />
 

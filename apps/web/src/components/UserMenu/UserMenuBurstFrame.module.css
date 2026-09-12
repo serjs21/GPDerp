@@ -2,7 +2,9 @@
   display: block;
   line-height: 0;
   height: 36px;
+  /* Frame is decorative; the BrushMenu button handles hits. */
   pointer-events: none;
+  overflow: visible;
 }
 
 .icon {

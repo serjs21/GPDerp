@@ -12,6 +12,8 @@ export type UserMenuBurstFrameProps = {
   label: string;
   className?: string;
   size?: number;
+  /** Silhouette fill — cream for header chrome, white for option icons. */
+  fill?: string;
   children: ReactNode;
 };
 
@@ -20,6 +22,7 @@ export function UserMenuBurstFrame({
   label,
   className,
   size = USER_MENU_BURST_SIZE,
+  fill = "#ffffff",
   children,
 }: UserMenuBurstFrameProps) {
   const sharpShape = resolveComicLabelShapePreset("sharp");
@@ -36,7 +39,7 @@ export function UserMenuBurstFrame({
       paddingX={0}
       paddingY={0}
       strokeWidth={3}
-      fill="#ffffff"
+      fill={fill}
     >
       {children}
     </ComicBurstLabel>

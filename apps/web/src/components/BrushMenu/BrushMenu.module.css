@@ -72,13 +72,15 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  /* Let comic-burst spikes / drop-shadow paint outside the 36px box. */
+  overflow: visible;
 }
 
 .triggerBrushOpen {
   z-index: 1;
   box-sizing: border-box;
   padding: 0;
+  /* Clip brush paint to the open trigger box. */
   overflow: hidden;
 }
 
