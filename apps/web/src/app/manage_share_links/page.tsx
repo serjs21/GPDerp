@@ -1,91 +1,17 @@
 "use client";
 
-import { Input, Select, Space, Typography } from "@/components/StyledComponents";
-import { useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { ShareLink } from "@/components/ShareLink/ShareLink";
-import { SakuraPetalLoader } from "@/components/Loaders";
-import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
-import { useEndOfContentScroll } from "@/hooks/useEndOfContentScroll";
-import { useShareLinks } from "@/hooks/useShareLinks";
-import styles from "./styles.module.css";
+import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function ManageShareLinksPage() {
   const router = useRouter();
-  const { initialized, isLoggedIn } = useAuthenticationState();
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (!initialized) return;
-    if (!isLoggedIn) router.replace("/");
-  }, [initialized, isLoggedIn, router]);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", "share-links");
+    router.replace(`/profile?${params.toString()}`);
+  }, [router, searchParams]);
 
-  const { query, items, filter, search, searchInput, setSearchInput, updateSearchParams, onEnd } =
-    useShareLinks(initialized && isLoggedIn);
-
-  useEndOfContentScroll(scrollRef, sentinelRef, onEnd, {
-    enabled: Boolean(initialized && isLoggedIn && query.hasNextPage && !query.isFetchingNextPage),
-  });
-
-  if (!initialized || !isLoggedIn) return null;
-
-  return (
-    <div className={styles.page}>
-      <section className={styles.container}>
-        <Space className={styles.filters} wrap>
-          <Input.Search
-            placeholder="Search haiku subject"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            onSearch={(value) => updateSearchParams({ filter, search: value })}
-            allowClear
-            style={{ width: 280 }}
-          />
-          <Select
-            allowClear
-            placeholder="Filter"
-            value={filter}
-            onChange={(value) => updateSearchParams({ filter: value, search })}
-            options={[
-              { value: "active", label: "Active" },
-              { value: "inactive", label: "Inactive" },
-              { value: "expired", label: "Expired" },
-              { value: "view_limit_reached", label: "View limit reached" },
-            ]}
-            style={{ width: 220 }}
-          />
-        </Space>
-
-        <div ref={scrollRef} className={styles.listShell}>
-          {query.isPending ? (
-            <div className={styles.loaderRow}>
-              <SakuraPetalLoader />
-            </div>
-          ) : items.length === 0 ? (
-            <Typography.Paragraph type="secondary" className={styles.empty}>
-              No share links found.
-            </Typography.Paragraph>
-          ) : (
-            items.map((link) => (
-              <ShareLink
-                key={link.id}
-                link={link}
-                haikuId={link.sharedHaikuId ?? ""}
-                haikuSubject={link.haikuSubject}
-                onChanged={() => void query.refetch()}
-              />
-            ))
-          )}
-
-          <div ref={sentinelRef} className={styles.sentinel} aria-hidden />
-          {query.isFetchingNextPage ? (
-            <div className={styles.loaderRow}>
-              <SakuraPetalLoader />
-            </div>
-          ) : null}
-        </div>
-      </section>
-    </div>
-  );
+  return null;
 }

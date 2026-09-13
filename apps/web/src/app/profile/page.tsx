@@ -3,6 +3,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { comicToast } from "@/components/ComicToast";
+import {
+  ComicPageLayout,
+  ComicPagePanel,
+  ComicPageRow,
+} from "@/components/ComicPageLayout";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { AuthProvider } from "@/types";
 import { isValidEmail } from "@/utils/strings";
@@ -23,11 +28,73 @@ import {
 import { useTheme } from "@/hooks/useTheme";
 import { useLocale } from "@/hooks/useLocale";
 import { useTranslations } from "next-intl";
+import { LabelMethodIcon } from "@/components/LabelMethodIcon";
+import { ManageLabelsPanel } from "@/components/ManageLabel";
+import { ShareLinkManagement } from "@/components/ShareLinkManagement";
+import { BuyGenerations } from "@/components/BuyGenerations";
 import { ProfileProvider, type ProfileContextValue } from "./ProfileContext";
 import { ProfileInfoTab } from "./components/ProfileInfoTab";
-import { UICard, UIStack } from "@/components/ui";
 import { shouldApplyServerPreference } from "./tabState";
-import { BuyGenerations } from "@/components/BuyGenerations";
+import styles from "./profilePage.module.css";
+
+const SELECTED_PANEL_WEIGHT = 1.25;
+const UNSELECTED_PANEL_WEIGHT = 0.75;
+
+export type ProfilePageTab = "profile" | "tokens" | "share-links" | "labels";
+
+const PROFILE_TABS: ProfilePageTab[] = ["profile", "tokens", "share-links", "labels"];
+
+function parseProfileTab(value: string | null): ProfilePageTab {
+  if (value && PROFILE_TABS.includes(value as ProfilePageTab)) {
+    return value as ProfilePageTab;
+  }
+  return "profile";
+}
+
+const TAB_META: Record<
+  ProfilePageTab,
+  {
+    title: string;
+    background: "sunburst" | "halftone" | "solid";
+    color: "blue" | "orange" | "teal" | "green";
+    ariaLabel: string;
+    iconSrc: string;
+    bubbleStyle: "circle" | "diamond" | "thought" | "rectangle";
+  }
+> = {
+  profile: {
+    title: "Profile",
+    background: "sunburst",
+    color: "blue",
+    ariaLabel: "Profile information",
+    iconSrc: "/profile/profile.svg",
+    bubbleStyle: "circle",
+  },
+  tokens: {
+    title: "Tokens",
+    background: "halftone",
+    color: "orange",
+    ariaLabel: "Generation tokens",
+    iconSrc: "/profile/tokens.svg",
+    bubbleStyle: "diamond",
+  },
+  "share-links": {
+    title: "Share Links",
+    background: "solid",
+    color: "teal",
+    ariaLabel: "Manage share links",
+    iconSrc: "/profile/share_link.svg",
+    bubbleStyle: "rectangle",
+  },
+  labels: {
+    title: "Labels",
+    background: "halftone",
+    color: "green",
+    ariaLabel: "Manage labels",
+    iconSrc: "/profile/labels.svg",
+    bubbleStyle: "thought",
+  },
+};
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -50,10 +117,35 @@ export default function ProfilePage() {
   const { setLocale } = useLocale();
   const t = useTranslations("Profile");
 
+  const tab = parseProfileTab(tabParam);
+
   useEffect(() => {
-    if (tabParam !== "settings") return;
-    router.replace("/profile", { scroll: false });
-  }, [tabParam, router]);
+    if (typeof window === "undefined") return;
+    if (window.location.hash === "#buy-generations" && tab !== "tokens") {
+      router.replace("/profile?tab=tokens", { scroll: false });
+    }
+  }, [router, tab]);
+
+  useEffect(() => {
+    if (tabParam === "settings") {
+      router.replace("/profile?tab=profile", { scroll: false });
+      return;
+    }
+    if (tabParam != null && tabParam !== tab) {
+      router.replace("/profile?tab=profile", { scroll: false });
+    }
+  }, [tabParam, tab, router]);
+
+  const setTab = (next: ProfilePageTab) => {
+    if (next === tab) return;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", next);
+    if (next !== "share-links") {
+      params.delete("filter");
+      params.delete("search");
+    }
+    router.replace(`/profile?${params.toString()}`, { scroll: false });
+  };
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -233,24 +325,57 @@ export default function ProfilePage() {
   };
 
   return (
-    <main
-      style={{
-        flex: 1,
-        minHeight: 0,
-        width: "100%",
-        maxWidth: 720,
-        margin: "24px auto",
-        padding: "0 16px",
-        boxSizing: "border-box",
-      }}
-    >
+    <main className={styles.page}>
       <ProfileProvider value={profileContextValue}>
-        <UIStack vertical gap={16} style={{ width: "100%" }}>
-          <UICard title={t("title")}>
-            <ProfileInfoTab />
-          </UICard>
-          <BuyGenerations />
-        </UIStack>
+        <ComicPageLayout title={t("title")} className={styles.layout}>
+          <div className={styles.body}>
+            <ComicPageRow className={styles.tabRow}>
+              {PROFILE_TABS.map((id) => {
+                const meta = TAB_META[id];
+                const selected = tab === id;
+                return (
+                  <ComicPagePanel
+                    key={id}
+                    selectable
+                    selected={selected}
+                    onSelect={() => setTab(id)}
+                    background={meta.background}
+                    color={meta.color}
+                    title={meta.title}
+                    isMotionBackground={false}
+                    shine={false}
+                    sunburstHalftone={false}
+                    overflowVisible
+                    flexWeight={selected ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
+                    ariaLabel={meta.ariaLabel}
+                    className={styles.tabPanel}
+                  >
+                    <LabelMethodIcon
+                      src={meta.iconSrc}
+                      bubbleStyle={meta.bubbleStyle}
+                      sourceDirection="none"
+                      active={selected}
+                    />
+                  </ComicPagePanel>
+                );
+              })}
+            </ComicPageRow>
+
+            <div className={styles.contentSlot}>
+              {tab === "profile" ? <ProfileInfoTab /> : null}
+              {tab === "tokens" ? <BuyGenerations /> : null}
+              {tab === "share-links" ? <ShareLinkManagement active /> : null}
+              {tab === "labels" ? (
+                <ManageLabelsPanel
+                  accountId={profile.id}
+                  active
+                  searchVariant="comic"
+                  showCreate
+                />
+              ) : null}
+            </div>
+          </div>
+        </ComicPageLayout>
       </ProfileProvider>
     </main>
   );

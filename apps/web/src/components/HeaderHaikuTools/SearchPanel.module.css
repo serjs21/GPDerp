@@ -45,10 +45,12 @@
 
 .slotLabels {
   border-right: 1.5px solid #111;
+  background-color: var(--accent-red, #bc002d);
 }
 
 .slotSearch {
   border-left: 1.5px solid #111;
+  background-color: #1a5fb4;
 }
 
 .panelHoverLabels .slotLabels {

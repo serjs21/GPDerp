@@ -1,11 +1,56 @@
-.body {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
+.root {
+  width: 100%;
   scroll-margin-top: calc(var(--layout-chrome-top) + 16px);
 }
 
-.body p {
+.row {
+  min-height: 12rem;
+}
+
+.balancePanel,
+.buyPanel {
+  min-height: 12rem;
+}
+
+.balancePanel + .buyPanel {
+  margin-left: calc(-1 * var(--comic-page-border, 4px));
+}
+
+.panelBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  height: 100%;
+  padding: 1rem 0.85rem 0.85rem;
+  box-sizing: border-box;
+  font-family: var(--font-lantern-script, cursive);
+  color: var(--sumi-ink, #2d2d2d);
+}
+
+.balance {
   margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.product {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.muted {
+  margin: 0;
+  opacity: 0.7;
+  font-size: 0.95rem;
+}
+
+.buyBody {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
 }

@@ -54,12 +54,13 @@ export function useShareLinks(enabled: boolean) {
   const updateSearchParams = useCallback(
     (next: { filter?: ShareLinkFilter; search?: string }) => {
       const params = new URLSearchParams(searchParams.toString());
+      params.set("tab", "share-links");
       if (next.filter) params.set("filter", next.filter);
       else params.delete("filter");
       if (next.search && next.search.trim().length > 0) params.set("search", next.search.trim());
       else params.delete("search");
       const queryString = params.toString();
-      router.replace(queryString ? `/manage_share_links?${queryString}` : "/manage_share_links");
+      router.replace(`/profile?${queryString}`);
     },
     [router, searchParams],
   );

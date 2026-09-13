@@ -1,0 +1,58 @@
+.page {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+  padding: clamp(0.75rem, 2vw, 1.5rem);
+  overflow: auto;
+}
+
+.layout {
+  width: min(100%, 56rem);
+  margin: 0 auto;
+}
+
+.body {
+  --profile-tab-height: 6.5rem;
+  --profile-gap: var(--comic-page-gutter, 10px);
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--profile-gap);
+  width: 100%;
+  min-height: 0;
+}
+
+.tabRow {
+  position: relative;
+  z-index: 3;
+  flex: 0 0 auto;
+  min-height: var(--profile-tab-height);
+  overflow: visible;
+}
+
+.tabPanel {
+  min-height: var(--profile-tab-height);
+}
+
+.tabPanel + .tabPanel {
+  margin-left: calc(-1 * var(--comic-page-border, 4px));
+}
+
+.contentSlot {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  min-height: 22rem;
+}
+
+.contentSlot > * {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
