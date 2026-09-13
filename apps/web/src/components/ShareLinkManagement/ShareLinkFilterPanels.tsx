@@ -44,7 +44,7 @@ const FILTER_OPTIONS: Array<{
   },
   {
     id: "view_limit_reached",
-    title: "Use limit reached",
+    title: "0 hits left",
     iconSrc: "/share_links_filter/limit_reached.svg",
     background: "halftone",
     color: "magenta",
