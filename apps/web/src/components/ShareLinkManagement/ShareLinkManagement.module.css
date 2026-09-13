@@ -9,11 +9,73 @@
   align-items: stretch;
 }
 
-.searchPanel {
+.searchCell {
   grid-column: 1;
   grid-row: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.45rem;
+  min-width: 0;
   min-height: 5.5rem;
+}
+
+.searchInputPanel {
   width: 100%;
+  min-height: 0;
+}
+
+.searchInput {
+  width: 100%;
+  padding-top: 0.4rem;
+}
+
+.searchActions {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0 0.3rem;
+}
+
+.searchActionsEnd {
+  justify-content: flex-end;
+}
+
+.searchActionsSplit {
+  padding: 0 0.3rem;
+  justify-content: space-between;
+}
+
+.sharpAction {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+  line-height: 0;
+}
+
+.sharpActionBurst {
+  display: block;
+  pointer-events: none;
+}
+
+.sharpActionBurst svg {
+  width: auto;
+  height: 2.5rem;
+}
+
+.resetAction {
+  justify-self: start;
+}
+
+.searchAction {
+  justify-self: end;
+  min-width: 6rem;
 }
 
 .filtersCell {
@@ -23,14 +85,6 @@
   align-items: stretch;
   min-width: 0;
   min-height: 5.5rem;
-}
-
-.searchForm {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  min-height: 2.75rem;
 }
 
 .listShell {
