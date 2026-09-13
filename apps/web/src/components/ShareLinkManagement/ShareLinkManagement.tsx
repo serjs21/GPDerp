@@ -14,9 +14,10 @@ import { ShareLinkManagementRow } from "./ShareLinkManagementRow";
 import { useShareLinkHaikuEnrichment } from "./useShareLinkHaikuEnrichment";
 import styles from "./ShareLinkManagement.module.css";
 
-const SEARCH_ACTION_FONT_SIZE = 18;
-const SEARCH_ACTION_PADDING_X = 20;
-const SEARCH_ACTION_PADDING_Y = 6;
+/** Intrinsic sharp-label box: 8rem wide × 2.5rem tall (at 16px root). */
+const SEARCH_ACTION_HEIGHT_PX = 40;
+const SEARCH_ACTION_WIDTH_PX = 128;
+const SEARCH_ACTION_PAD_X = (SEARCH_ACTION_WIDTH_PX - SEARCH_ACTION_HEIGHT_PX) / 2;
 
 export type ShareLinkManagementProps = {
   active?: boolean;
@@ -27,13 +28,17 @@ function SharpLabelButton({
   type = "button",
   onClick,
   className,
+  color = "#17131A",
 }: {
   label: string;
   type?: "button" | "submit";
   onClick?: () => void;
   className?: string;
+  /** Background fill for the sharp comic label. */
+  color?: string;
 }) {
   const sharpShape = resolveComicLabelShapePreset("sharp");
+  const display = formatComicLabelText(label);
   return (
     <button
       type={type}
@@ -43,18 +48,20 @@ function SharpLabelButton({
     >
       <ComicBurstLabel
         className={styles.sharpActionBurst}
-        text={formatComicLabelText(label)}
-        fill="#17131A"
+        text={display}
+        fill={color}
         textColor="#ffffff"
         shapeKind={sharpShape.kind}
         spikeCount={sharpShape.spikeCount}
         randomness={sharpShape.randomness}
         seed={sharpShape.id}
-        fontSize={SEARCH_ACTION_FONT_SIZE}
-        paddingX={SEARCH_ACTION_PADDING_X}
-        paddingY={SEARCH_ACTION_PADDING_Y}
+        fontSize={SEARCH_ACTION_HEIGHT_PX}
+        paddingX={SEARCH_ACTION_PAD_X}
+        paddingY={0}
         strokeWidth={3}
-      />
+      >
+        <span className={styles.sharpActionLabel}>{display}</span>
+      </ComicBurstLabel>
     </button>
   );
 }
