@@ -7,15 +7,22 @@
   --comic-page-border: 3px;
 }
 
-.panel {
+.slot {
   min-height: 5.5rem;
-  flex: 1 1 0;
-  transform: none;
-  z-index: 0;
 }
 
-.panel + .panel {
+.slotChecked {
+  z-index: 1;
+}
+
+.group > .slot + .slot {
   margin-left: calc(-1 * var(--comic-page-border, 3px));
+}
+
+.panel {
+  min-height: 5.5rem;
+  transform: none;
+  z-index: 0;
 }
 
 /* Greyscale children (not the panel root) so overflow spikes stay visible. */

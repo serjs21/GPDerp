@@ -3,6 +3,7 @@
 import { ALL_SHARE_LINK_FILTERS, type ShareLinkFilter } from "@/api/shareLinks";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { LabelMethodIcon } from "@/components/LabelMethodIcon";
+import { OverlayTitle } from "@/components/OverlayTitle";
 import styles from "./ShareLinkFilterPanels.module.css";
 
 const FILTER_OPTIONS: Array<{
@@ -72,30 +73,37 @@ export function ShareLinkFilterPanels({ selected, onChange }: ShareLinkFilterPan
       {FILTER_OPTIONS.map((option) => {
         const checked = selectedSet.has(option.id);
         return (
-          <ComicPagePanel
+          <OverlayTitle
             key={option.id}
-            selectable
-            selected={checked}
-            onSelect={() => toggle(option.id)}
-            background={option.background}
-            color={option.color}
-            isMotionBackground={false}
-            shine={false}
-            sunburstHalftone={false}
-            overflowVisible
-            flexWeight={1}
-            ariaLabel={option.ariaLabel}
-            className={[styles.panel, checked ? styles.panelChecked : styles.panelUnchecked].join(
-              " ",
-            )}
+            title={option.title}
+            direction="bottom"
+            active={checked}
+            className={[styles.slot, checked ? styles.slotChecked : ""].filter(Boolean).join(" ")}
           >
-            <LabelMethodIcon
-              src={option.iconSrc}
-              bubbleStyle={option.bubbleStyle}
-              sourceDirection="none"
-              active={checked}
-            />
-          </ComicPagePanel>
+            <ComicPagePanel
+              selectable
+              selected={checked}
+              onSelect={() => toggle(option.id)}
+              background={option.background}
+              color={option.color}
+              isMotionBackground={false}
+              shine={false}
+              sunburstHalftone={false}
+              overflowVisible
+              flexWeight={1}
+              ariaLabel={option.ariaLabel}
+              className={[styles.panel, checked ? styles.panelChecked : styles.panelUnchecked].join(
+                " ",
+              )}
+            >
+              <LabelMethodIcon
+                src={option.iconSrc}
+                bubbleStyle={option.bubbleStyle}
+                sourceDirection="none"
+                active={checked}
+              />
+            </ComicPagePanel>
+          </OverlayTitle>
         );
       })}
     </div>

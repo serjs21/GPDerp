@@ -1,0 +1,85 @@
+.root {
+  --overlay-title-motion: 0.2s;
+  position: relative;
+  display: flex;
+  flex: 1 1 0;
+  align-items: stretch;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.root > :first-child {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.45rem;
+  background: color-mix(in srgb, #111 58%, transparent);
+  pointer-events: none;
+  user-select: none;
+  transition: transform var(--overlay-title-motion) cubic-bezier(0.45, 0.05, 0.55, 0.95);
+}
+
+.overlayActive {
+  filter: none;
+}
+
+.overlayInactive {
+  filter: grayscale(1);
+}
+
+.title {
+  margin: 0;
+  color: #fff;
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: clamp(0.85rem, 2vw, 1.15rem);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.fromBottom {
+  transform: translateY(100%);
+}
+
+.fromTop {
+  transform: translateY(-100%);
+}
+
+.fromLeft {
+  transform: translateX(-100%);
+}
+
+.fromRight {
+  transform: translateX(100%);
+}
+
+.root:hover .fromBottom,
+.root:focus-within .fromBottom,
+.root:hover .fromTop,
+.root:focus-within .fromTop,
+.root:hover .fromLeft,
+.root:focus-within .fromLeft,
+.root:hover .fromRight,
+.root:focus-within .fromRight {
+  transform: translate(0, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    --overlay-title-motion: 0ms;
+  }
+}
