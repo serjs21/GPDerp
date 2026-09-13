@@ -2,13 +2,12 @@
 
 import type { ShareLinkListItem } from "@/api/shareLinks";
 import type { HaikuDto } from "@/api/haikus";
-import { ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
+import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { Sway } from "@/components/Sway";
 import shareStyles from "@/components/ShareLink/ShareLink.module.css";
-import { ShareLinkMeters } from "@/components/ShareLink/ShareLinkMeters";
 import { ShareLinkSettingsControls } from "@/components/ShareLink/ShareLinkSettingsControls";
 import { useShareLinkControls } from "@/components/ShareLink/useShareLinkControls";
 import styles from "./ShareLinkManagement.module.css";
@@ -58,7 +57,7 @@ export function ShareLinkManagementRow({
   );
 
   return (
-    <ComicPageRow className={styles.linkRow}>
+    <div className={styles.linkRow}>
       <ComicPagePanel
         background="halftone"
         color="yellow"
@@ -68,7 +67,6 @@ export function ShareLinkManagementRow({
           styles.lanternPanel,
           ctrl.grayscale ? shareStyles.panelShellInactive : shareStyles.panelShellActive,
         ].join(" ")}
-        flexWeight={0.9}
         ariaLabel={`Lantern preview for ${ctrl.subject}`}
       >
         <div className={styles.lanternWrap}>
@@ -89,42 +87,12 @@ export function ShareLinkManagementRow({
         </div>
       </ComicPagePanel>
 
-      {/* <ComicPagePanel
-        background="sunburst"
-        sunburstHalftone={false}
-        color={ctrl.active && !ctrl.activating && !ctrl.deactivating ? "orange" : "white"}
-        shine={ctrl.shine}
-        contentAlign="center"
-        className={[
-          styles.statsPanel,
-          ctrl.grayscale ? shareStyles.panelShellInactive : shareStyles.panelShellActive,
-        ].join(" ")}
-        title="Stats"
-        footer={ctrl.copyEnabled ? "Click to copy the link" : undefined}
-        footerColor="info"
-        flexWeight={1.1}
-        ariaLabel={`Share link stats for ${ctrl.subject}`}
-      >
-        <ShareLinkMeters
-          hits={ctrl.hits}
-          time={ctrl.time}
-          hitsLabel={ctrl.hitsLabel}
-          timeLabel={ctrl.timeLabel}
-          planePhase={ctrl.planePhase}
-          planeInitial={ctrl.planeInitial}
-          copyEnabled={ctrl.copyEnabled}
-          onCopy={ctrl.onCopy}
-          className={styles.statsBody}
-        />
-      </ComicPagePanel> */}
-
       <ComicPagePanel
         background="solid"
         color="white"
         title="Settings"
         contentAlign="start"
         className={styles.settingsPanel}
-        flexWeight={1.25}
         ariaLabel={`Share link settings for ${ctrl.subject}`}
       >
         <div className={styles.settingsBody}>
@@ -147,6 +115,6 @@ export function ShareLinkManagementRow({
           />
         </div>
       </ComicPagePanel>
-    </ComicPageRow>
+    </div>
   );
 }

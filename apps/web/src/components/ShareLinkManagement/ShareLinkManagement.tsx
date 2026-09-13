@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { ComicModalInput } from "@/components/ComicModalInput";
-import { ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
+import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { useEndOfContentScroll } from "@/hooks/useEndOfContentScroll";
 import { useShareLinks } from "@/hooks/useShareLinks";
@@ -45,34 +45,35 @@ export function ShareLinkManagement({ active = true }: ShareLinkManagementProps)
 
   return (
     <div className={styles.root}>
-      <ComicPageRow className={styles.filtersRow}>
-        <ComicPagePanel
-          background="solid"
-          color="white"
-          contentAlign="start"
-          className={styles.filterPanel}
-          flexWeight={1.6}
+      <ComicPagePanel
+        background="solid"
+        color="white"
+        contentAlign="start"
+        className={styles.searchPanel}
+        ariaLabel="Search share links"
+      >
+        <form
+          className={styles.searchForm}
+          onSubmit={(e) => {
+            e.preventDefault();
+            updateSearchParams({ filters, search: searchInput });
+          }}
         >
-          <form
-            className={styles.searchForm}
-            onSubmit={(e) => {
-              e.preventDefault();
-              updateSearchParams({ filters, search: searchInput });
-            }}
-          >
-            <ComicModalInput
-              placeholder="Search by title"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              aria-label="Search by title"
-            />
-          </form>
-        </ComicPagePanel>
+          <ComicModalInput
+            placeholder="Search by title"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            aria-label="Search by title"
+          />
+        </form>
+      </ComicPagePanel>
+
+      <div className={styles.filtersCell}>
         <ShareLinkFilterPanels
           selected={filters}
           onChange={(next) => updateSearchParams({ filters: next, search })}
         />
-      </ComicPageRow>
+      </div>
 
       <div ref={scrollRef} className={styles.listShell}>
         {showCenterLoader ? (
