@@ -67,14 +67,15 @@
   transform: translateX(100%);
 }
 
+/* Hover only for pointer; :focus-visible for keyboard (not mouse click focus). */
 .root:hover .fromBottom,
-.root:focus-within .fromBottom,
+.root:has(:focus-visible) .fromBottom,
 .root:hover .fromTop,
-.root:focus-within .fromTop,
+.root:has(:focus-visible) .fromTop,
 .root:hover .fromLeft,
-.root:focus-within .fromLeft,
+.root:has(:focus-visible) .fromLeft,
 .root:hover .fromRight,
-.root:focus-within .fromRight {
+.root:has(:focus-visible) .fromRight {
   transform: translate(0, 0);
 }
 
