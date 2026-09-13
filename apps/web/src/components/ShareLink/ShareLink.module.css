@@ -260,7 +260,7 @@
 
 .actionIcon {
   display: block;
-  width: 3.5rem;
+  width: auto;
   height: 1.25rem;
   object-fit: contain;
   pointer-events: none;

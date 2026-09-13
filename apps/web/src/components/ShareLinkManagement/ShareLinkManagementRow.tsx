@@ -74,7 +74,7 @@ export function ShareLinkManagementRow({
         <div className={styles.lanternWrap}>
           <Sway
             className={styles.lanternSway}
-            disabled={showLoader}
+            disabled={!ctrl.active}
             speed={4.6}
             amplitude={3.25}
           >
