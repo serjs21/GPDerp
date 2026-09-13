@@ -98,6 +98,16 @@
   box-sizing: border-box;
 }
 
+.lanternLoader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 6rem;
+  padding: 1rem 0.5rem;
+  box-sizing: border-box;
+}
+
 .statsBody {
   min-height: 10rem;
 }

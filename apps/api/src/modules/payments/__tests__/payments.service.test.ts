@@ -1,6 +1,6 @@
 jest.mock("../../../env", () => ({
   env: {
-    PADDLE_PRICE_ID: "pri_100_haiku",
+    PADDLE_PRICE_ID_100_HAIKUS: "pri_100_haiku",
   },
 }));
 

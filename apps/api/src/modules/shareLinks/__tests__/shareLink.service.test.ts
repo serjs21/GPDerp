@@ -107,6 +107,7 @@ describe("shareLinkService.setShareLinkDisabled", () => {
     expect(shareLinkRepository.updateDisabledById).toHaveBeenCalledWith({
       id: "link-1",
       disabled: true,
+      deactivationReason: "manual",
     });
   });
 });

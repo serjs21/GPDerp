@@ -240,6 +240,29 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
     },
   );
 
+  app.post(
+    "/haiku/batch",
+    { preHandler: [app.requireAuthenticated] },
+    async (req: FastifyRequest, res: FastifyReply) => {
+      const userId = req.user?.sub;
+      if (!userId) {
+        res.code(403).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+
+      const body = (req.body as { ids?: unknown } | undefined) ?? {};
+      const rawIds = Array.isArray(body.ids) ? body.ids : [];
+      const ids = rawIds.filter((id): id is string => typeof id === "string" && isUuid(id));
+      if (ids.length === 0 && rawIds.length > 0) {
+        res.code(400).send({ ok: false, error: "Invalid haiku ids" });
+        return;
+      }
+
+      const result = await haikuService.getHaikusByIdsForUser({ userId, ids });
+      res.send({ ok: true, data: { haikus: result.haikus } });
+    },
+  );
+
   app.delete(
     "/haiku/:haikuId",
     { preHandler: [app.requireAuthenticated] },

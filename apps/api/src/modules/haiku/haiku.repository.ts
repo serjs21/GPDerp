@@ -127,6 +127,35 @@ export const haikuRepository = {
     });
   },
 
+  findFullByIdsForAccounts(ids: string[], accountIds: string[]) {
+    if (ids.length === 0 || accountIds.length === 0) {
+      return Promise.resolve([]);
+    }
+    return prismaClient.haiku.findMany({
+      where: {
+        id: { in: ids },
+        accountId: { in: accountIds },
+      },
+      select: {
+        id: true,
+        title: true,
+        titleSuffix: true,
+        body: true,
+        createdAt: true,
+        accountId: true,
+        createdById: true,
+        labels: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+            shape: true,
+          },
+        },
+      },
+    });
+  },
+
   setLabels(id: string, labelIds: string[]) {
     return prismaClient.haiku.update({
       where: { id },

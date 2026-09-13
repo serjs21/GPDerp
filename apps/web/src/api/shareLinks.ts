@@ -1,5 +1,7 @@
 import axios from "axios";
 
+export type ShareLinkDeactivationReason = "manual" | "timeout" | "limit_reached";
+
 export type CreateShareLinkBody = {
   haikuId: string;
   expirationDate?: string | null;
@@ -19,6 +21,7 @@ export type CreateShareLinkResponse = {
     maxViews: number | null;
     viewCount: number;
     disabled: boolean;
+    deactivationReason?: ShareLinkDeactivationReason | null;
   };
 };
 
@@ -35,6 +38,7 @@ export type ShareLinkListItem = {
   maxViews: number | null;
   viewCount: number;
   disabled: boolean;
+  deactivationReason?: ShareLinkDeactivationReason | null;
 };
 
 export const createShareLink = async (body: CreateShareLinkBody): Promise<CreateShareLinkResponse["data"]> => {

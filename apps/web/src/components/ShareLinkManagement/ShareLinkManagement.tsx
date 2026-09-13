@@ -8,6 +8,7 @@ import { Select } from "@/components/StyledComponents";
 import { useEndOfContentScroll } from "@/hooks/useEndOfContentScroll";
 import { useShareLinks } from "@/hooks/useShareLinks";
 import { ShareLinkManagementRow } from "./ShareLinkManagementRow";
+import { useShareLinkHaikuEnrichment } from "./useShareLinkHaikuEnrichment";
 import styles from "./ShareLinkManagement.module.css";
 
 export type ShareLinkManagementProps = {
@@ -20,6 +21,8 @@ export function ShareLinkManagement({ active = true }: ShareLinkManagementProps)
 
   const { query, items, filter, search, searchInput, setSearchInput, updateSearchParams, onEnd } =
     useShareLinks(active);
+
+  const { getHaiku, isLoading: haikusLoading } = useShareLinkHaikuEnrichment(items, active);
 
   useEndOfContentScroll(scrollRef, sentinelRef, onEnd, {
     enabled: Boolean(active && query.hasNextPage && !query.isFetchingNextPage),
@@ -85,13 +88,19 @@ export function ShareLinkManagement({ active = true }: ShareLinkManagementProps)
         ) : items.length === 0 ? (
           <p className={styles.empty}>No share links found.</p>
         ) : (
-          items.map((link) => (
-            <ShareLinkManagementRow
-              key={link.id}
-              link={link}
-              onChanged={() => void query.refetch()}
-            />
-          ))
+          items.map((link) => {
+              const haikuId = link.sharedHaikuId;
+              const haiku = getHaiku(haikuId);
+              return (
+                <ShareLinkManagementRow
+                  key={link.id}
+                  link={link}
+                  haiku={haiku}
+                  haikuLoading={Boolean(haikuId) && !haiku && haikusLoading}
+                  onChanged={() => void query.refetch()}
+                />
+              );
+            })
         )}
 
         <div ref={sentinelRef} className={styles.sentinel} aria-hidden />

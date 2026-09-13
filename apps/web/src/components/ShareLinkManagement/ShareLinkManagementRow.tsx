@@ -1,9 +1,11 @@
 "use client";
 
 import type { ShareLinkListItem } from "@/api/shareLinks";
+import type { HaikuDto } from "@/api/haikus";
 import { ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
+import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
-import lanternStyles from "@/components/Lantern/Lantern.module.css";
+import { SakuraPetalLoader } from "@/components/Loaders";
 import shareStyles from "@/components/ShareLink/ShareLink.module.css";
 import { ShareLinkMeters } from "@/components/ShareLink/ShareLinkMeters";
 import { ShareLinkSettingsControls } from "@/components/ShareLink/ShareLinkSettingsControls";
@@ -12,16 +14,47 @@ import styles from "./ShareLinkManagement.module.css";
 
 export type ShareLinkManagementRowProps = {
   link: ShareLinkListItem;
+  haiku?: HaikuDto;
+  haikuLoading?: boolean;
   onChanged: () => void;
 };
 
-export function ShareLinkManagementRow({ link, onChanged }: ShareLinkManagementRowProps) {
+export function ShareLinkManagementRow({
+  link,
+  haiku,
+  haikuLoading = false,
+  onChanged,
+}: ShareLinkManagementRowProps) {
   const ctrl = useShareLinkControls({
     link,
     haikuId: link.sharedHaikuId ?? "",
     haikuSubject: link.haikuSubject,
     onChanged,
   });
+
+  const showLoader = haikuLoading;
+  const lanternContent = haiku ? (
+    <Lantern haiku={haiku} showActions={false} bodyOnly />
+  ) : showLoader ? (
+    <div className={styles.lanternLoader}>
+      <SakuraPetalLoader />
+    </div>
+  ) : (
+    <Lantern
+      haiku={{
+        id: link.sharedHaikuId ?? link.id,
+        title: ctrl.subject,
+        titleSuffix: 0,
+        body: "",
+        createdAt: link.createdAt,
+        accountId: "",
+        createdById: "",
+        labels: [],
+      }}
+      showActions={false}
+      bodyOnly
+    />
+  );
 
   return (
     <ComicPageRow className={styles.linkRow}>
@@ -36,9 +69,7 @@ export function ShareLinkManagementRow({ link, onChanged }: ShareLinkManagementR
       >
         <div className={styles.lanternWrap}>
           <LanternFrame ariaLabel={`Haiku lantern: ${ctrl.subject}`} widthRem={9}>
-            <div className={lanternStyles.haikuStack}>
-              <p className={lanternStyles.title}>{ctrl.subject}</p>
-            </div>
+            {lanternContent}
           </LanternFrame>
         </div>
       </ComicPagePanel>

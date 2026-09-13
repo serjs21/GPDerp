@@ -56,6 +56,19 @@ export async function fetchHaikusPage(params: FetchHaikusParams): Promise<HaikuL
   return data;
 }
 
+type HaikuBatchResponse =
+  | { ok: true; data: { haikus: HaikuDto[] } }
+  | { ok: false; error: string };
+
+/** POST /haiku/batch — authenticated; load lantern-ready haikus by id. */
+export async function fetchHaikusByIds(ids: string[]): Promise<HaikuDto[]> {
+  const uniqueIds = [...new Set(ids.filter(Boolean))];
+  if (uniqueIds.length === 0) return [];
+  const { data } = await axios.post<HaikuBatchResponse>("/haiku/batch", { ids: uniqueIds });
+  if (!data.ok) throw new Error(data.error ?? "Failed to load haikus");
+  return data.data.haikus;
+}
+
 export type DeleteHaikuResponse = { ok: true } | { ok: false; error: string };
 
 export async function deleteHaiku(haikuId: string): Promise<void> {

@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import type { Prisma } from "../../generated/prisma";
+import type { Prisma, ShareLinkDeactivationReason } from "../../generated/prisma";
 import { env } from "../../env";
 import { prismaClient } from "../../lib/prisma";
 import { isUniqueConstraintError } from "../../utils/prismaErrors";
@@ -50,8 +50,31 @@ type ShareLinkListRow = {
   maxViews: number | null;
   viewCount: number;
   disabled: boolean;
+  deactivationReason?: ShareLinkDeactivationReason | null;
   haikuSubject: string;
   sharedHaikuId: string;
+};
+
+const isShareLinkExpired = (row: { expirationDate: Date | null }, now = new Date()) =>
+  row.expirationDate != null && row.expirationDate <= now;
+
+const isShareLinkViewLimitReached = (row: { maxViews: number | null; viewCount: number }) =>
+  row.maxViews != null && row.viewCount >= row.maxViews;
+
+const withinShareLinkLimits = (
+  row: { expirationDate: Date | null; maxViews: number | null; viewCount: number },
+  now = new Date(),
+) => !isShareLinkExpired(row, now) && !isShareLinkViewLimitReached(row);
+
+const resolveDeactivationReason = (
+  row: ShareLinkListRow,
+  now = new Date(),
+): ShareLinkDeactivationReason | null => {
+  if (row.deactivationReason) return row.deactivationReason;
+  if (isShareLinkExpired(row, now)) return "timeout";
+  if (isShareLinkViewLimitReached(row)) return "limit_reached";
+  if (row.disabled) return "manual";
+  return null;
 };
 
 const shareLinkItemFromRow = (row: ShareLinkListRow) => ({
@@ -65,16 +88,8 @@ const shareLinkItemFromRow = (row: ShareLinkListRow) => ({
   maxViews: row.maxViews,
   viewCount: row.viewCount,
   disabled: row.disabled,
+  deactivationReason: resolveDeactivationReason(row),
 });
-
-const isShareLinkExpired = (row: { expirationDate: Date | null }, now = new Date()) =>
-  row.expirationDate != null && row.expirationDate <= now;
-
-const isShareLinkViewLimitReached = (row: { maxViews: number | null; viewCount: number }) =>
-  row.maxViews != null && row.viewCount >= row.maxViews;
-
-const withinShareLinkLimits = (row: { expirationDate: Date | null; maxViews: number | null; viewCount: number }, now = new Date()) =>
-  !isShareLinkExpired(row, now) && !isShareLinkViewLimitReached(row);
 
 export const shareLinkService = {
   async userCanAccessHaiku(userId: string, haikuId: string): Promise<boolean> {
@@ -193,6 +208,7 @@ export const shareLinkService = {
     const updated = await shareLinkRepository.updateDisabledById({
       id: params.shareLinkId,
       disabled: params.disabled,
+      deactivationReason: params.disabled ? "manual" : null,
     });
 
     return { ok: true, shareLink: shareLinkItemFromRow(updated) };
@@ -227,6 +243,7 @@ export const shareLinkService = {
       maxViews: number | null;
       viewCount: number;
       disabled: boolean;
+      deactivationReason: ShareLinkDeactivationReason | null;
     }>;
     total: number;
     pageSize: number;
@@ -343,10 +360,18 @@ export const shareLinkService = {
 
     const now = new Date();
     if (row.expirationDate && row.expirationDate <= now) {
+      await shareLinkRepository.markDeactivatedById({
+        id: row.id,
+        deactivationReason: "timeout",
+      });
       return { ok: false, reason: "This share link has expired" };
     }
 
     if (row.maxViews != null && row.viewCount >= row.maxViews) {
+      await shareLinkRepository.markDeactivatedById({
+        id: row.id,
+        deactivationReason: "limit_reached",
+      });
       return { ok: false, reason: "This share link has reached its view limit" };
     }
 
@@ -376,6 +401,13 @@ export const shareLinkService = {
     const newCount = updated.viewCount;
     const remainingViews =
       row.maxViews != null ? Math.max(0, row.maxViews - newCount) : null;
+
+    if (row.maxViews != null && newCount >= row.maxViews) {
+      await shareLinkRepository.markDeactivatedById({
+        id: row.id,
+        deactivationReason: "limit_reached",
+      });
+    }
 
     return {
       ok: true,

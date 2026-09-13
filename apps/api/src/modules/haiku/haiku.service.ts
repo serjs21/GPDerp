@@ -244,6 +244,36 @@ export const haikuService = {
     return { ok: true, items, total, pageSize, offset };
   },
 
+  async getHaikusByIdsForUser(params: {
+    userId: string;
+    ids: string[];
+  }): Promise<{ ok: true; haikus: HaikuPersistedPayload[] }> {
+    const uniqueIds = [...new Set(params.ids)].slice(0, 50);
+    if (uniqueIds.length === 0) {
+      return { ok: true, haikus: [] };
+    }
+
+    const accountIds = await authRepository.listAccountIdsForUser(params.userId);
+    if (accountIds.length === 0) {
+      return { ok: true, haikus: [] };
+    }
+
+    const rows = await haikuRepository.findFullByIdsForAccounts(uniqueIds, accountIds);
+    return {
+      ok: true,
+      haikus: rows.map((row) => ({
+        id: row.id,
+        title: row.title,
+        titleSuffix: row.titleSuffix,
+        body: row.body,
+        createdAt: row.createdAt.toISOString(),
+        accountId: row.accountId,
+        createdById: row.createdById,
+        labels: row.labels,
+      })),
+    };
+  },
+
   async deleteHaikuForUser(params: {
     userId: string;
     haikuId: string;

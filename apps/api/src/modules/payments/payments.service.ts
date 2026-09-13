@@ -27,7 +27,7 @@ export const paymentsService = {
     const purchase = await paymentsService.createPendingPurchaseForUser(userId);
     return {
       purchaseReference: purchase.id,
-      priceId: env.PADDLE_PRICE_ID,
+      priceId: env.PADDLE_PRICE_ID_100_HAIKUS,
       credits: purchase.credits,
     };
   },

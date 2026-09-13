@@ -28,7 +28,7 @@ describe("envSanity", () => {
         PADDLE_API_KEY: "paddle-api-key",
         PADDLE_WEBHOOK_SECRET: "paddle-webhook-secret",
         PADDLE_ENV: "sandbox",
-        PADDLE_PRICE_ID: "pri_test",
+        PADDLE_PRICE_ID_100_HAIKUS: "pri_100_haiku",
       } as NodeJS.ProcessEnv),
     ).not.toThrow();
   });

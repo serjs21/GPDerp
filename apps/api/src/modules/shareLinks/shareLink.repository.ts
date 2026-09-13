@@ -1,5 +1,18 @@
 import { prismaClient } from "../../lib/prisma";
-import type { Prisma } from "../../generated/prisma";
+import type { Prisma, ShareLinkDeactivationReason } from "../../generated/prisma";
+
+const shareLinkSelect = {
+  id: true,
+  shareHash: true,
+  createdAt: true,
+  expirationDate: true,
+  maxViews: true,
+  viewCount: true,
+  disabled: true,
+  deactivationReason: true,
+  sharedHaikuId: true,
+  haikuSubject: true,
+} as const;
 
 export const shareLinkRepository = {
   create(data: {
@@ -19,17 +32,7 @@ export const shareLinkRepository = {
         expirationDate: data.expirationDate,
         maxViews: data.maxViews,
       },
-      select: {
-        id: true,
-        shareHash: true,
-        createdAt: true,
-        expirationDate: true,
-        maxViews: true,
-        viewCount: true,
-        disabled: true,
-        sharedHaikuId: true,
-        haikuSubject: true,
-      },
+      select: shareLinkSelect,
     });
   },
 
@@ -43,15 +46,7 @@ export const shareLinkRepository = {
     return prismaClient.shareLink.findUnique({
       where: { sharedHaikuId },
       select: {
-        id: true,
-        shareHash: true,
-        createdAt: true,
-        expirationDate: true,
-        maxViews: true,
-        viewCount: true,
-        disabled: true,
-        sharedHaikuId: true,
-        haikuSubject: true,
+        ...shareLinkSelect,
         createdByUserId: true,
       },
     });
@@ -69,6 +64,7 @@ export const shareLinkRepository = {
         maxViews: true,
         viewCount: true,
         disabled: true,
+        deactivationReason: true,
         createdAt: true,
         createdBy: {
           select: {
@@ -102,17 +98,7 @@ export const shareLinkRepository = {
       orderBy: { createdAt: "desc" },
       skip: params.offset,
       take: params.pageSize,
-      select: {
-        id: true,
-        shareHash: true,
-        createdAt: true,
-        expirationDate: true,
-        maxViews: true,
-        viewCount: true,
-        disabled: true,
-        sharedHaikuId: true,
-        haikuSubject: true,
-      },
+      select: shareLinkSelect,
     });
   },
 
@@ -140,35 +126,36 @@ export const shareLinkRepository = {
         maxViews: params.maxViews,
         viewCount: 0,
       },
-      select: {
-        id: true,
-        shareHash: true,
-        createdAt: true,
-        expirationDate: true,
-        maxViews: true,
-        viewCount: true,
-        disabled: true,
-        sharedHaikuId: true,
-        haikuSubject: true,
-      },
+      select: shareLinkSelect,
     });
   },
 
-  updateDisabledById(params: { id: string; disabled: boolean }) {
+  updateDisabledById(params: {
+    id: string;
+    disabled: boolean;
+    deactivationReason: ShareLinkDeactivationReason | null;
+  }) {
     return prismaClient.shareLink.update({
       where: { id: params.id },
-      data: { disabled: params.disabled },
-      select: {
-        id: true,
-        shareHash: true,
-        createdAt: true,
-        expirationDate: true,
-        maxViews: true,
-        viewCount: true,
-        disabled: true,
-        sharedHaikuId: true,
-        haikuSubject: true,
+      data: {
+        disabled: params.disabled,
+        deactivationReason: params.deactivationReason,
       },
+      select: shareLinkSelect,
+    });
+  },
+
+  markDeactivatedById(params: {
+    id: string;
+    deactivationReason: ShareLinkDeactivationReason;
+  }) {
+    return prismaClient.shareLink.update({
+      where: { id: params.id },
+      data: {
+        disabled: true,
+        deactivationReason: params.deactivationReason,
+      },
+      select: shareLinkSelect,
     });
   },
 };

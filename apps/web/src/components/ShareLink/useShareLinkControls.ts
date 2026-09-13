@@ -15,7 +15,7 @@ import {
   getTimeMeterDisplay,
   shouldTickShareLinkClock,
 } from "@/utils/shareLinkDisplay";
-import { canStartShareLink, isActiveShareLink } from "@/utils/shareLinkStatus";
+import { canStartShareLink, isActiveShareLink, isExpired, isViewLimitReached } from "@/utils/shareLinkStatus";
 
 export const PAPER_PLANE_SRC = "/share_modal/link/paper_plane.svg";
 export const START_ICON_SRC = "/share_modal/link/start.svg";
@@ -92,6 +92,12 @@ const defaultLimitForm = (): LimitForm => ({
 
 export const formFromLink = (link: ShareLinkListItem | null): LimitForm => {
   if (!link) return defaultLimitForm();
+  const reason = link.deactivationReason;
+  const shouldClearLimits =
+    reason === "timeout" ||
+    reason === "limit_reached" ||
+    (!isActiveShareLink(link) && (isExpired(link) || isViewLimitReached(link)));
+  if (shouldClearLimits) return defaultLimitForm();
   return {
     maxViews: link.maxViews,
     expiresAt: link.expirationDate ? dayjs(link.expirationDate) : null,

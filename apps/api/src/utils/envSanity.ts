@@ -12,7 +12,7 @@ const REQUIRED_ENV_KEYS = [
   "PADDLE_API_KEY",
   "PADDLE_WEBHOOK_SECRET",
   "PADDLE_ENV",
-  "PADDLE_PRICE_ID",
+  "PADDLE_PRICE_ID_100_HAIKUS",
 ] as const;
 
 const hasValue = (value: string | undefined) => typeof value === "string" && value.trim().length > 0;
