@@ -63,12 +63,19 @@ export function ShareLinkManagementRow({
         color="yellow"
         title={link.haikuSubject}
         contentAlign="center"
-        className={styles.lanternPanel}
+        className={[
+          styles.lanternPanel,
+          ctrl.grayscale ? shareStyles.panelShellInactive : shareStyles.panelShellActive,
+        ].join(" ")}
         flexWeight={0.9}
         ariaLabel={`Lantern preview for ${ctrl.subject}`}
       >
         <div className={styles.lanternWrap}>
-          <LanternFrame ariaLabel={`Haiku lantern: ${ctrl.subject}`} widthRem={9}>
+          <LanternFrame
+            ariaLabel={`Haiku lantern: ${ctrl.subject}`}
+            className={styles.lanternFrame}
+            widthRem={9}
+          >
             {lanternContent}
           </LanternFrame>
         </div>

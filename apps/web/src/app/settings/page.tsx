@@ -341,7 +341,7 @@ export default function ProfilePage() {
                     onSelect={() => setTab(id)}
                     background={meta.background}
                     color={meta.color}
-                    footer={meta.title}
+                    title={meta.title}
                     isMotionBackground={false}
                     shine={false}
                     sunburstHalftone={false}
