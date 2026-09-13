@@ -60,7 +60,7 @@ export function useShareLinks(enabled: boolean) {
       if (next.search && next.search.trim().length > 0) params.set("search", next.search.trim());
       else params.delete("search");
       const queryString = params.toString();
-      router.replace(`/profile?${queryString}`);
+      router.replace(`/settings?${queryString}`);
     },
     [router, searchParams],
   );

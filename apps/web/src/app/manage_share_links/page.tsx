@@ -10,7 +10,7 @@ export default function ManageShareLinksPage() {
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("tab", "share-links");
-    router.replace(`/profile?${params.toString()}`);
+    router.replace(`/settings?${params.toString()}`);
   }, [router, searchParams]);
 
   return null;

@@ -12,7 +12,7 @@ const meta = {
     nextjs: {
       appDirectory: true,
       navigation: {
-        pathname: "/profile",
+        pathname: "/settings",
       },
     },
   },

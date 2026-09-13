@@ -1,0 +1,382 @@
+"use client";
+
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { comicToast } from "@/components/ComicToast";
+import {
+  ComicPageLayout,
+  ComicPagePanel,
+  ComicPageRow,
+} from "@/components/ComicPageLayout";
+import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
+import { AuthProvider } from "@/types";
+import { isValidEmail } from "@/utils/strings";
+import {
+  fetchOwnProfile,
+  requestEmailChange,
+  resendEmailChange,
+  updateOwnAvatar,
+  updateOwnProfile,
+  type UserProfileResponse,
+} from "@/api/user";
+import {
+  isAppLocale,
+  isThemeName,
+  PREFERENCE_LOCALE_STORAGE_KEY,
+  PREFERENCE_THEME_STORAGE_KEY,
+} from "@/config/userConfiguration";
+import { useTheme } from "@/hooks/useTheme";
+import { useLocale } from "@/hooks/useLocale";
+import { useTranslations } from "next-intl";
+import { LabelMethodIcon } from "@/components/LabelMethodIcon";
+import { ManageLabelsPanel } from "@/components/ManageLabel";
+import { ShareLinkManagement } from "@/components/ShareLinkManagement";
+import { BuyGenerations } from "@/components/BuyGenerations";
+import { ProfileProvider, type ProfileContextValue } from "./ProfileContext";
+import { ProfileInfoTab } from "./components/ProfileInfoTab";
+import { shouldApplyServerPreference } from "./tabState";
+import styles from "./profilePage.module.css";
+
+const SELECTED_PANEL_WEIGHT = 1.25;
+const UNSELECTED_PANEL_WEIGHT = 0.75;
+
+export type ProfilePageTab = "profile" | "tokens" | "share-links" | "labels";
+
+const PROFILE_TABS: ProfilePageTab[] = ["profile", "tokens", "share-links", "labels"];
+
+function parseProfileTab(value: string | null): ProfilePageTab {
+  if (value && PROFILE_TABS.includes(value as ProfilePageTab)) {
+    return value as ProfilePageTab;
+  }
+  return "profile";
+}
+
+const TAB_META: Record<
+  ProfilePageTab,
+  {
+    title: string;
+    background: "sunburst" | "halftone" | "solid";
+    color: "blue" | "orange" | "teal" | "green";
+    ariaLabel: string;
+    iconSrc: string;
+    bubbleStyle: "circle" | "diamond" | "thought" | "rectangle";
+  }
+> = {
+  profile: {
+    title: "Profile",
+    background: "sunburst",
+    color: "blue",
+    ariaLabel: "Profile information",
+    iconSrc: "/profile/profile.svg",
+    bubbleStyle: "circle",
+  },
+  tokens: {
+    title: "Tokens",
+    background: "halftone",
+    color: "orange",
+    ariaLabel: "Generation tokens",
+    iconSrc: "/profile/tokens.svg",
+    bubbleStyle: "diamond",
+  },
+  "share-links": {
+    title: "Share Links",
+    background: "solid",
+    color: "teal",
+    ariaLabel: "Manage share links",
+    iconSrc: "/profile/share_link.svg",
+    bubbleStyle: "rectangle",
+  },
+  labels: {
+    title: "Labels",
+    background: "halftone",
+    color: "green",
+    ariaLabel: "Manage labels",
+    iconSrc: "/profile/labels.svg",
+    bubbleStyle: "thought",
+  },
+};
+
+export default function ProfilePage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const { initialized, isLoggedIn, checkAuthentication } = useAuthenticationState();
+  const hasStoredTheme = useRef(false);
+  const hasStoredLanguage = useRef(false);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [profile, setProfile] = useState<UserProfileResponse | null>(null);
+  const [emailDraft, setEmailDraft] = useState("");
+  const [emailConfirmOpen, setEmailConfirmOpen] = useState(false);
+  const [resendOpen, setResendOpen] = useState(false);
+  const [resendEmailDraft, setResendEmailDraft] = useState("");
+  const [requestingEmailChange, setRequestingEmailChange] = useState(false);
+  const [resendingEmailChange, setResendingEmailChange] = useState(false);
+  const [savingAvatar, setSavingAvatar] = useState(false);
+  const { setTheme } = useTheme();
+  const { setLocale } = useLocale();
+  const t = useTranslations("Profile");
+
+  const tab = parseProfileTab(tabParam);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.location.hash === "#buy-generations" && tab !== "tokens") {
+      router.replace("/settings?tab=tokens", { scroll: false });
+    }
+  }, [router, tab]);
+
+  useEffect(() => {
+    if (tabParam === "settings") {
+      router.replace("/settings?tab=profile", { scroll: false });
+      return;
+    }
+    if (tabParam != null && tabParam !== tab) {
+      router.replace("/settings?tab=profile", { scroll: false });
+    }
+  }, [tabParam, tab, router]);
+
+  const setTab = (next: ProfilePageTab) => {
+    if (next === tab) return;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", next);
+    if (next !== "share-links") {
+      params.delete("filter");
+      params.delete("search");
+    }
+    router.replace(`/settings?${params.toString()}`, { scroll: false });
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const storedTheme = window.localStorage.getItem(PREFERENCE_THEME_STORAGE_KEY);
+    if (storedTheme && isThemeName(storedTheme)) {
+      hasStoredTheme.current = true;
+      setTheme(storedTheme);
+    }
+    const storedLanguage = window.localStorage.getItem(PREFERENCE_LOCALE_STORAGE_KEY);
+    if (storedLanguage && isAppLocale(storedLanguage)) {
+      hasStoredLanguage.current = true;
+      setLocale(storedLanguage);
+    }
+  }, [setLocale, setTheme]);
+
+  useEffect(() => {
+    if (!initialized) return;
+    if (!isLoggedIn) router.replace("/");
+  }, [initialized, isLoggedIn, router]);
+
+  const validEmailDraft = useMemo(() => isValidEmail(emailDraft), [emailDraft]);
+
+  useEffect(() => {
+    if (!initialized || !isLoggedIn) return;
+    setLoading(true);
+    void fetchOwnProfile()
+      .then((data) => {
+        setProfile(data);
+        if (
+          shouldApplyServerPreference({
+            hasClientPreference: hasStoredTheme.current,
+            isValidServerValue: isThemeName(data.configuration.theme),
+          })
+        ) {
+          setTheme(data.configuration.theme);
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem(PREFERENCE_THEME_STORAGE_KEY, data.configuration.theme);
+          }
+        }
+        if (
+          shouldApplyServerPreference({
+            hasClientPreference: hasStoredLanguage.current,
+            isValidServerValue: isAppLocale(data.configuration.language),
+          })
+        ) {
+          setLocale(data.configuration.language);
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem(PREFERENCE_LOCALE_STORAGE_KEY, data.configuration.language);
+          }
+        }
+      })
+      .catch(() => {
+        comicToast.error("Could not load profile");
+      })
+      .finally(() => setLoading(false));
+  }, [initialized, isLoggedIn, setLocale, setTheme]);
+
+  if (!initialized || !isLoggedIn) return null;
+  if (loading || !profile) return null;
+
+  const displayName = profile.userName || profile.email || "User";
+  const isGoogleUser = profile.providers.includes(AuthProvider.GOOGLE);
+  const pendingNewEmail = profile.pendingEmailChange?.newEmail ?? null;
+
+  const onSaveProfile = async (values: { firstName?: string; lastName?: string }) => {
+    try {
+      setSaving(true);
+      const updated = await updateOwnProfile({
+        firstName: values.firstName,
+        lastName: values.lastName,
+      });
+      setProfile(updated);
+      comicToast.success("Profile updated");
+      checkAuthentication();
+    } catch {
+      comicToast.error("Could not update profile");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const createEmailChange = async () => {
+    try {
+      setRequestingEmailChange(true);
+      const result = await requestEmailChange(emailDraft.trim());
+      setProfile((prev) =>
+        prev
+          ? {
+              ...prev,
+              pendingEmailChange: {
+                newEmail: result.pendingEmail,
+                expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+                requestedAt: new Date().toISOString(),
+              },
+            }
+          : prev,
+      );
+      setEmailConfirmOpen(false);
+      comicToast.success("Email change verification sent");
+    } catch {
+      comicToast.error("Could not create email change request");
+    } finally {
+      setRequestingEmailChange(false);
+    }
+  };
+
+  const resendChange = async () => {
+    try {
+      setResendingEmailChange(true);
+      const result = await resendEmailChange(resendEmailDraft.trim() || undefined);
+      setProfile((prev) =>
+        prev
+          ? {
+              ...prev,
+              pendingEmailChange: {
+                newEmail: result.pendingEmail,
+                expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+                requestedAt: new Date().toISOString(),
+              },
+            }
+          : prev,
+      );
+      setResendOpen(false);
+      comicToast.success("Verification email sent");
+    } catch {
+      comicToast.error("Could not resend verification email");
+    } finally {
+      setResendingEmailChange(false);
+    }
+  };
+
+  const profileContextValue: ProfileContextValue = {
+    displayName,
+    avatarUrl: profile.avatar,
+    email: profile.email,
+    firstName: profile.firstName,
+    lastName: profile.lastName,
+    isGoogleUser,
+    pendingEmailChange: pendingNewEmail ? { newEmail: pendingNewEmail } : null,
+    emailDraft,
+    resendEmailDraft,
+    validEmailDraft,
+    saving,
+    savingAvatar,
+    requestingEmailChange,
+    resendingEmailChange,
+    emailConfirmOpen,
+    resendOpen,
+    saveProfileLabel: t("saveProfile"),
+    onSaveProfile,
+    onAvatarUploaded: ({ publicUrl }) => {
+      void (async () => {
+        try {
+          setSavingAvatar(true);
+          const updated = await updateOwnAvatar(publicUrl);
+          setProfile(updated);
+          comicToast.success("Profile picture saved");
+          checkAuthentication();
+        } catch {
+          comicToast.error("Could not save profile picture to your account");
+        } finally {
+          setSavingAvatar(false);
+        }
+      })();
+    },
+    onEmailDraftChange: setEmailDraft,
+    onResendEmailDraftChange: setResendEmailDraft,
+    onOpenEmailConfirm: () => setEmailConfirmOpen(true),
+    onCloseEmailConfirm: () => setEmailConfirmOpen(false),
+    onConfirmEmailChange: () => void createEmailChange(),
+    onOpenResend: () => {
+      setResendEmailDraft(pendingNewEmail ?? "");
+      setResendOpen(true);
+    },
+    onCloseResend: () => setResendOpen(false),
+    onConfirmResend: () => void resendChange(),
+  };
+
+  return (
+    <main className={styles.page}>
+      <ProfileProvider value={profileContextValue}>
+        <ComicPageLayout title={t("title")} className={styles.layout}>
+          <div className={styles.body}>
+            <ComicPageRow className={styles.tabRow}>
+              {PROFILE_TABS.map((id) => {
+                const meta = TAB_META[id];
+                const selected = tab === id;
+                return (
+                  <ComicPagePanel
+                    key={id}
+                    selectable
+                    selected={selected}
+                    onSelect={() => setTab(id)}
+                    background={meta.background}
+                    color={meta.color}
+                    title={meta.title}
+                    isMotionBackground={false}
+                    shine={false}
+                    sunburstHalftone={false}
+                    overflowVisible
+                    flexWeight={selected ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
+                    ariaLabel={meta.ariaLabel}
+                    className={styles.tabPanel}
+                  >
+                    <LabelMethodIcon
+                      src={meta.iconSrc}
+                      bubbleStyle={meta.bubbleStyle}
+                      sourceDirection="none"
+                      active={selected}
+                    />
+                  </ComicPagePanel>
+                );
+              })}
+            </ComicPageRow>
+
+            <div className={styles.contentSlot}>
+              {tab === "profile" ? <ProfileInfoTab /> : null}
+              {tab === "tokens" ? <BuyGenerations /> : null}
+              {tab === "share-links" ? <ShareLinkManagement active /> : null}
+              {tab === "labels" ? (
+                <ManageLabelsPanel
+                  accountId={profile.id}
+                  active
+                  searchVariant="comic"
+                  showCreate
+                />
+              ) : null}
+            </div>
+          </div>
+        </ComicPageLayout>
+      </ProfileProvider>
+    </main>
+  );
+}

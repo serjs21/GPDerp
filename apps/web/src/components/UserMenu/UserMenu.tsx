@@ -85,7 +85,7 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
   const handleChange = (key: string) => {
     switch (key) {
       case "settings":
-        router.push("/profile");
+        router.push("/settings");
         break;
       case "logout":
         setLogoutOpen(true);

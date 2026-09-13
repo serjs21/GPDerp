@@ -19,7 +19,7 @@ export const LoggedInUserMenuButton = ({ user, onLogout }: LoggedInUserMenuButto
     {
       key: "profile",
       label: (
-        <Link href="/profile">
+        <Link href="/settings">
           <div className={navStyles.userDropdownItem}>
             <UserAvatar user={user} />
             <span className={navStyles.userDropdownLink}>{displayName}</span>
@@ -30,7 +30,7 @@ export const LoggedInUserMenuButton = ({ user, onLogout }: LoggedInUserMenuButto
     {
       key: "buyGenerations",
       label: (
-        <Link href="/profile?tab=tokens">
+        <Link href="/settings?tab=tokens">
           <div className={navStyles.userDropdownItem}>Buy generations</div>
         </Link>
       ),
@@ -38,7 +38,7 @@ export const LoggedInUserMenuButton = ({ user, onLogout }: LoggedInUserMenuButto
     {
       key: "manageShareLinks",
       label: (
-        <Link href="/profile?tab=share-links">
+        <Link href="/settings?tab=share-links">
           <div className={navStyles.userDropdownItem}>Manage share links</div>
         </Link>
       ),
