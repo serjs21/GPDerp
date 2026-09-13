@@ -28,7 +28,7 @@ export function ShareLinkManagementRow({ link, onChanged }: ShareLinkManagementR
       <ComicPagePanel
         background="halftone"
         color="yellow"
-        title="Lantern"
+        title={link.haikuSubject}
         contentAlign="center"
         className={styles.lanternPanel}
         flexWeight={0.9}

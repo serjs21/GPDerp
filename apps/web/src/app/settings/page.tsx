@@ -327,7 +327,7 @@ export default function ProfilePage() {
   return (
     <main className={styles.page}>
       <ProfileProvider value={profileContextValue}>
-        <ComicPageLayout title={t("title")} className={styles.layout}>
+        <ComicPageLayout className={styles.layout}>
           <div className={styles.body}>
             <ComicPageRow className={styles.tabRow}>
               {PROFILE_TABS.map((id) => {
