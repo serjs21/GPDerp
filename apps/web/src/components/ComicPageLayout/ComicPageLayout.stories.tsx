@@ -38,6 +38,8 @@ const BACKGROUND_SAMPLES: Array<{
   { background: "sunburst", color: "orange", label: "Sunburst" },
   { background: "halftone", color: "purple", label: "Halftone" },
   { background: "solid", color: "blue", label: "Solid" },
+  { background: "solid", color: "sky", label: "Solid sky" },
+  { background: "sunburst", color: "sky", label: "Sunburst sky" },
 ];
 
 export const BlankTemplate: Story = {
@@ -87,6 +89,17 @@ export const BackgroundGallery: Story = {
         </ComicPageRow>
         <ComicPageRow columns="1fr-1fr">
           {BACKGROUND_SAMPLES.slice(4, 6).map((sample) => (
+            <ComicPagePanel
+              key={sample.label}
+              background={sample.background}
+              color={sample.color}
+            >
+              {sample.label}
+            </ComicPagePanel>
+          ))}
+        </ComicPageRow>
+        <ComicPageRow columns="1fr-1fr">
+          {BACKGROUND_SAMPLES.slice(6).map((sample) => (
             <ComicPagePanel
               key={sample.label}
               background={sample.background}

@@ -60,7 +60,7 @@ export function ShareLinkManagementRow({
     <div className={styles.linkRow}>
       <ComicPagePanel
         background="halftone"
-        color="yellow"
+        color="sky"
         title={link.haikuSubject}
         contentAlign="center"
         className={[
