@@ -3,8 +3,9 @@
   flex: 1 1 auto;
   align-items: stretch;
   min-width: 0;
+  max-width: 27.5rem;
   gap: 0;
-  --comic-page-border: 3px;
+  border: 1px solid black;
 }
 
 .slot {
@@ -15,9 +16,6 @@
   z-index: 1;
 }
 
-.group > .slot + .slot {
-  margin-left: calc(-1 * var(--comic-page-border, 3px));
-}
 
 .panel {
   min-height: 5.5rem;

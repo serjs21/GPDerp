@@ -49,10 +49,9 @@ export function ShareLinkManagement({ active = true }: ShareLinkManagementProps)
         <ComicPagePanel
           background="solid"
           color="white"
-          title="Search"
           contentAlign="start"
           className={styles.filterPanel}
-          flexWeight={1.1}
+          flexWeight={1.6}
         >
           <form
             className={styles.searchForm}
@@ -62,10 +61,10 @@ export function ShareLinkManagement({ active = true }: ShareLinkManagementProps)
             }}
           >
             <ComicModalInput
-              placeholder="Search haiku subject"
+              placeholder="Search by title"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              aria-label="Search haiku subject"
+              aria-label="Search by title"
             />
           </form>
         </ComicPagePanel>
