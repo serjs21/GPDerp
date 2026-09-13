@@ -110,7 +110,7 @@ function ShareLinkSearchCell({
         ].join(" ")}
       >
         {hasActiveSearch ? (
-          <SharpLabelButton label="Reset" onClick={onResetSearch} className={styles.resetAction} />
+          <SharpLabelButton label="Reset" onClick={onResetSearch} color="#940000" className={styles.resetAction} />
         ) : null}
         <SharpLabelButton label="Search" type="submit" className={styles.searchAction} />
       </div>

@@ -112,6 +112,7 @@ export function ShareLinkManagementRow({
             onUpdateLimits={ctrl.onUpdateLimits}
             onStart={ctrl.onStart}
             onStop={ctrl.onStop}
+            stopButtonClassName={shareStyles.stopButton}
           />
         </div>
       </ComicPagePanel>

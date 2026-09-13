@@ -258,6 +258,15 @@
   opacity: 0.55;
 }
 
+.stopButton {
+  background: #940000;
+  color: #fff;
+}
+
+.stopButton:hover:not(:disabled) {
+  background: color-mix(in srgb, #111 10%, #940000);
+}
+
 .actionIcon {
   display: block;
   width: auto;
@@ -268,6 +277,7 @@
 
 .actionLabel {
   display: inline-flex;
+  padding-bottom: 0.12rem;
   align-items: baseline;
   min-width: 0;
 }

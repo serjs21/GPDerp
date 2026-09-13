@@ -27,6 +27,7 @@ export type ShareLinkSettingsControlsProps = {
   onUpdateLimits: () => void | Promise<void>;
   onStart: () => void | Promise<void>;
   onStop: () => void | Promise<void>;
+  stopButtonClassName?: string;
 };
 
 // eslint-disable-next-line max-lines-per-function -- mirrors share modal settings chrome
@@ -46,6 +47,7 @@ export function ShareLinkSettingsControls({
   onUpdateLimits,
   onStart,
   onStop,
+  stopButtonClassName,
 }: ShareLinkSettingsControlsProps) {
   return (
     <>
@@ -137,7 +139,7 @@ export function ShareLinkSettingsControls({
         ) : active ? (
           <button
             type="button"
-            className={styles.actionButton}
+            className={[styles.actionButton, stopButtonClassName].filter(Boolean).join(" ")}
             disabled={isUpdating || busy}
             onClick={() => void onStop()}
             aria-label="Stop link"
