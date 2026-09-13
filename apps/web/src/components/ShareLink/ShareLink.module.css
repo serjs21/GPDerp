@@ -125,10 +125,11 @@
 
 .limitsRow {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-wrap: nowrap;
+  align-items: stretch;
   gap: 0.65rem 0.75rem;
   flex: 0 0 auto;
+  min-width: 0;
   padding: 0.15rem 0.1rem;
 }
 
@@ -136,7 +137,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  flex: 1 1 14rem;
+  flex: 1 1 0;
   min-width: 0;
 }
 
@@ -160,11 +161,14 @@
 .limitControl {
   flex: 1 1 0;
   min-width: 0;
+  max-width: 100%;
 }
 
 .limitInput,
 .limitDate {
-  width: 17rem !important;
+  /* Fill the flex control; never overflow into the Update button. */
+  width: 100% !important;
+  max-width: 100% !important;
   min-width: 0 !important;
 }
 
@@ -175,9 +179,9 @@
   gap: 0.45rem;
   box-sizing: border-box;
   flex: 0 0 auto;
-  align-self: center;
+  align-self: stretch;
+  min-width: 6rem;
   min-height: 2.6rem;
-  height: 100%;
   padding: 0.4rem 0.85rem;
   border: 2px solid #111;
   border-radius: 0.3rem;

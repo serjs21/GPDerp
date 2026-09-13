@@ -6,6 +6,7 @@ import { ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { SakuraPetalLoader } from "@/components/Loaders";
+import { Sway } from "@/components/Sway";
 import shareStyles from "@/components/ShareLink/ShareLink.module.css";
 import { ShareLinkMeters } from "@/components/ShareLink/ShareLinkMeters";
 import { ShareLinkSettingsControls } from "@/components/ShareLink/ShareLinkSettingsControls";
@@ -71,17 +72,24 @@ export function ShareLinkManagementRow({
         ariaLabel={`Lantern preview for ${ctrl.subject}`}
       >
         <div className={styles.lanternWrap}>
-          <LanternFrame
-            ariaLabel={`Haiku lantern: ${ctrl.subject}`}
-            className={styles.lanternFrame}
-            widthRem={9}
+          <Sway
+            className={styles.lanternSway}
+            disabled={showLoader}
+            speed={4.6}
+            amplitude={3.25}
           >
-            {lanternContent}
-          </LanternFrame>
+            <LanternFrame
+              ariaLabel={`Haiku lantern: ${ctrl.subject}`}
+              className={styles.lanternFrame}
+              widthRem={9}
+            >
+              {lanternContent}
+            </LanternFrame>
+          </Sway>
         </div>
       </ComicPagePanel>
 
-      <ComicPagePanel
+      {/* <ComicPagePanel
         background="sunburst"
         sunburstHalftone={false}
         color={ctrl.active && !ctrl.activating && !ctrl.deactivating ? "orange" : "white"}
@@ -108,7 +116,7 @@ export function ShareLinkManagementRow({
           onCopy={ctrl.onCopy}
           className={styles.statsBody}
         />
-      </ComicPagePanel>
+      </ComicPagePanel> */}
 
       <ComicPagePanel
         background="solid"
