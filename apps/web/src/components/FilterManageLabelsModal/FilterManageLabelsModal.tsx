@@ -2,17 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ComicLabelPickerPanel } from "@/components/ComicLabelPickerPanel";
-import {
-  ComicPageDialog,
-  ComicPagePanel,
-  ComicPageRow,
-} from "@/components/ComicPageLayout";
+import { ComicPageDialog } from "@/components/ComicPageLayout";
+import { ComicPanelTabs } from "@/components/ComicPanelTabs";
 import { LabelMethodIcon } from "@/components/LabelMethodIcon";
 import { ManageLabelsPanel } from "@/components/ManageLabel";
 import styles from "./FilterManageLabelsModal.module.css";
-
-const SELECTED_PANEL_WEIGHT = 1.25;
-const UNSELECTED_PANEL_WEIGHT = 0.75;
 
 export type FilterManageLabelsTab = "filter" | "manage";
 
@@ -88,49 +82,48 @@ export function FilterManageLabelsModal({
       }}
     >
       <div className={styles.body}>
-        <ComicPageRow className={styles.methodRow}>
-          <ComicPagePanel
-            selectable
-            selected={tab === "filter"}
-            onSelect={() => selectTab("filter")}
-            background="sunburst"
-            color="blue"
-            title="Filter"
-            isMotionBackground={false}
-            shine={false}
-            sunburstHalftone={false}
-            overflowVisible
-            flexWeight={tab === "filter" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
-            ariaLabel="Filter haikus by labels"
-            className={styles.methodPanel}
-          >
-            <LabelMethodIcon
-              src="/panel_actions/filter_label.svg"
-              bubbleStyle="diamond"
-              sourceDirection="none"
-              active={tab === "filter"}
-            />
-          </ComicPagePanel>
-          <ComicPagePanel
-            selectable
-            selected={tab === "manage"}
-            onSelect={() => selectTab("manage")}
-            background="halftone"
-            color="green"
-            title="Manage"
-            overflowVisible
-            flexWeight={tab === "manage" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
-            ariaLabel="Manage account labels"
-            className={styles.methodPanel}
-          >
-            <LabelMethodIcon
-              src="/panel_actions/manage.svg"
-              bubbleStyle="thought"
-              sourceDirection="none"
-              active={tab === "manage"}
-            />
-          </ComicPagePanel>
-        </ComicPageRow>
+        <ComicPanelTabs
+          className={styles.methodRow}
+          panelClassName={styles.methodPanel}
+          value={tab}
+          onChange={selectTab}
+          tabs={[
+            {
+              id: "filter",
+              panel: {
+                background: "sunburst",
+                color: "blue",
+                title: "Filter",
+                ariaLabel: "Filter haikus by labels",
+              },
+              content: (
+                <LabelMethodIcon
+                  src="/panel_actions/filter_label.svg"
+                  bubbleStyle="diamond"
+                  sourceDirection="none"
+                  active={tab === "filter"}
+                />
+              ),
+            },
+            {
+              id: "manage",
+              panel: {
+                background: "halftone",
+                color: "green",
+                title: "Manage",
+                ariaLabel: "Manage account labels",
+              },
+              content: (
+                <LabelMethodIcon
+                  src="/panel_actions/manage.svg"
+                  bubbleStyle="thought"
+                  sourceDirection="none"
+                  active={tab === "manage"}
+                />
+              ),
+            },
+          ]}
+        />
 
         <div className={styles.contentSlot}>
           {tab === "filter" ? (

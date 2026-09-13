@@ -4,17 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import {
   ComicPageCtaAction,
   ComicPageDialog,
-  ComicPagePanel,
-  ComicPageRow,
 } from "@/components/ComicPageLayout";
+import { ComicPanelTabs } from "@/components/ComicPanelTabs";
 import { LabelMethodIcon } from "@/components/LabelMethodIcon";
 import { LoginFlow, type AuthFlowHandle } from "@/components/AuthFlows/LoginFlow";
 import { RegisterFlow } from "@/components/AuthFlows/RegisterFlow";
 import { useAuthenticationVerification } from "@/app/providers/AuthenticationVerificationProvider";
 import styles from "./styles.module.css";
-
-const SELECTED_PANEL_WEIGHT = 1.25;
-const UNSELECTED_PANEL_WEIGHT = 0.75;
 
 export type AuthGateMode = "login" | "register";
 
@@ -80,50 +76,49 @@ export function AuthGateModal({
       }
     >
       <div className={styles.body}>
-        <ComicPageRow className={styles.methodRow}>
-          <ComicPagePanel
-            selectable
-            selected={mode === "login"}
-            onSelect={() => setMode("login")}
-            background="sunburst"
-            color="blue"
-            title="Sign in"
-            isMotionBackground={false}
-            shine={false}
-            sunburstHalftone={false}
-            overflowVisible
-            flexWeight={mode === "login" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
-            ariaLabel="Sign in"
-            className={styles.methodPanel}
-          >
-            <LabelMethodIcon
-              src="/login_modal/log-in.svg"
-              bubbleStyle="rectangle"
-              sourceDirection="none"
-              active={mode === "login"}
-            />
-          </ComicPagePanel>
-          <ComicPagePanel
-            selectable
-            selected={mode === "register"}
-            onSelect={() => setMode("register")}
-            background="halftone"
-            color="purple"
-            title="Register"
-            overflowVisible
-            flexWeight={mode === "register" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
-            ariaLabel="Register"
-            className={styles.methodPanel}
-          >
-            <LabelMethodIcon
-              src="/login_modal/sign-up.svg"
-              bubbleStyle="pointedArcs"
-              sourceDirection="none"
-              active={mode === "register"}
-              className={styles.registerMethodIcon}
-            />
-          </ComicPagePanel>
-        </ComicPageRow>
+        <ComicPanelTabs
+          className={styles.methodRow}
+          panelClassName={styles.methodPanel}
+          value={mode}
+          onChange={setMode}
+          tabs={[
+            {
+              id: "login",
+              panel: {
+                background: "sunburst",
+                color: "blue",
+                title: "Sign in",
+                ariaLabel: "Sign in",
+              },
+              content: (
+                <LabelMethodIcon
+                  src="/login_modal/log-in.svg"
+                  bubbleStyle="rectangle"
+                  sourceDirection="none"
+                  active={mode === "login"}
+                />
+              ),
+            },
+            {
+              id: "register",
+              panel: {
+                background: "halftone",
+                color: "purple",
+                title: "Register",
+                ariaLabel: "Register",
+              },
+              content: (
+                <LabelMethodIcon
+                  src="/login_modal/sign-up.svg"
+                  bubbleStyle="pointedArcs"
+                  sourceDirection="none"
+                  active={mode === "register"}
+                  className={styles.registerMethodIcon}
+                />
+              ),
+            },
+          ]}
+        />
 
         <div className={styles.contentSlot}>
           <div className={styles.tabPane}>

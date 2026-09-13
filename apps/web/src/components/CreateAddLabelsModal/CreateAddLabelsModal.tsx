@@ -5,18 +5,12 @@ import type { HaikuDto } from "@/api/haikus";
 import type { LabelDto } from "@/api/labels";
 import { ComicLabelCreationModal } from "@/components/ComicLabelCreationModal";
 import { ComicLabelPickerPanel } from "@/components/ComicLabelPickerPanel";
-import {
-  ComicPageDialog,
-  ComicPagePanel,
-  ComicPageRow,
-} from "@/components/ComicPageLayout";
+import { ComicPageDialog } from "@/components/ComicPageLayout";
+import { ComicPanelTabs } from "@/components/ComicPanelTabs";
 import { comicToast } from "@/components/ComicToast";
 import { LabelMethodIcon } from "@/components/LabelMethodIcon";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
 import styles from "./CreateAddLabelsModal.module.css";
-
-const SELECTED_PANEL_WEIGHT = 1.25;
-const UNSELECTED_PANEL_WEIGHT = 0.75;
 
 export type CreateAddLabelsTab = "create" | "add";
 
@@ -140,49 +134,48 @@ export function CreateAddLabelsModal({
       }}
     >
       <div className={styles.body}>
-        <ComicPageRow className={styles.methodRow}>
-          <ComicPagePanel
-            selectable
-            selected={tab === "create"}
-            onSelect={() => selectTab("create")}
-            background="sunburst"
-            color="purple"
-            title="Create"
-            isMotionBackground={false}
-            shine={false}
-            sunburstHalftone={false}
-            overflowVisible
-            flexWeight={tab === "create" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
-            ariaLabel="Create a new label"
-            className={styles.methodPanel}
-          >
-            <LabelMethodIcon
-              src="/panel_actions/create_new.svg"
-              bubbleStyle="pointedArcs"
-              sourceDirection="none"
-              active={tab === "create"}
-            />
-          </ComicPagePanel>
-          <ComicPagePanel
-            selectable
-            selected={tab === "add"}
-            onSelect={() => selectTab("add")}
-            background="halftone"
-            color="darkGreen"
-            title="Add"
-            overflowVisible
-            flexWeight={tab === "add" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
-            ariaLabel="Add labels to this haiku"
-            className={styles.methodPanel}
-          >
-            <LabelMethodIcon
-              src="/label_modal/tag.svg"
-              bubbleStyle="diamond"
-              sourceDirection="none"
-              active={tab === "add"}
-            />
-          </ComicPagePanel>
-        </ComicPageRow>
+        <ComicPanelTabs
+          className={styles.methodRow}
+          panelClassName={styles.methodPanel}
+          value={tab}
+          onChange={selectTab}
+          tabs={[
+            {
+              id: "create",
+              panel: {
+                background: "sunburst",
+                color: "purple",
+                title: "Create",
+                ariaLabel: "Create a new label",
+              },
+              content: (
+                <LabelMethodIcon
+                  src="/panel_actions/create_new.svg"
+                  bubbleStyle="pointedArcs"
+                  sourceDirection="none"
+                  active={tab === "create"}
+                />
+              ),
+            },
+            {
+              id: "add",
+              panel: {
+                background: "halftone",
+                color: "darkGreen",
+                title: "Add",
+                ariaLabel: "Add labels to this haiku",
+              },
+              content: (
+                <LabelMethodIcon
+                  src="/label_modal/tag.svg"
+                  bubbleStyle="diamond"
+                  sourceDirection="none"
+                  active={tab === "add"}
+                />
+              ),
+            },
+          ]}
+        />
 
         <div className={styles.contentSlot}>
           {tab === "create" ? (

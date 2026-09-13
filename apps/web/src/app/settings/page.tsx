@@ -5,8 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { comicToast } from "@/components/ComicToast";
 import {
   ComicPageLayout,
-  ComicPagePanel,
-  ComicPageRow,
 } from "@/components/ComicPageLayout";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { AuthProvider } from "@/types";
@@ -32,13 +30,11 @@ import { LabelMethodIcon } from "@/components/LabelMethodIcon";
 import { ManageLabelsPanel } from "@/components/ManageLabel";
 import { ShareLinkManagement } from "@/components/ShareLinkManagement";
 import { BuyGenerations } from "@/components/BuyGenerations";
+import { ComicPanelTabs } from "@/components/ComicPanelTabs";
 import { ProfileProvider, type ProfileContextValue } from "./ProfileContext";
 import { ProfileInfoTab } from "./components/ProfileInfoTab";
 import { shouldApplyServerPreference } from "./tabState";
 import styles from "./profilePage.module.css";
-
-const SELECTED_PANEL_WEIGHT = 1.25;
-const UNSELECTED_PANEL_WEIGHT = 0.75;
 
 export type ProfilePageTab = "profile" | "tokens" | "share-links" | "labels";
 
@@ -329,37 +325,32 @@ export default function ProfilePage() {
       <ProfileProvider value={profileContextValue}>
         <ComicPageLayout className={styles.layout}>
           <div className={styles.body}>
-            <ComicPageRow className={styles.tabRow}>
-              {PROFILE_TABS.map((id) => {
+            <ComicPanelTabs
+              className={styles.tabRow}
+              panelClassName={styles.tabPanel}
+              value={tab}
+              onChange={setTab}
+              tabs={PROFILE_TABS.map((id) => {
                 const meta = TAB_META[id];
-                const selected = tab === id;
-                return (
-                  <ComicPagePanel
-                    key={id}
-                    selectable
-                    selected={selected}
-                    onSelect={() => setTab(id)}
-                    background={meta.background}
-                    color={meta.color}
-                    title={meta.title}
-                    isMotionBackground={false}
-                    shine={false}
-                    sunburstHalftone={false}
-                    overflowVisible
-                    flexWeight={selected ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
-                    ariaLabel={meta.ariaLabel}
-                    className={styles.tabPanel}
-                  >
+                return {
+                  id,
+                  panel: {
+                    title: meta.title,
+                    background: meta.background,
+                    color: meta.color,
+                    ariaLabel: meta.ariaLabel,
+                  },
+                  content: (
                     <LabelMethodIcon
                       src={meta.iconSrc}
                       bubbleStyle={meta.bubbleStyle}
                       sourceDirection="none"
-                      active={selected}
+                      active={tab === id}
                     />
-                  </ComicPagePanel>
-                );
+                  ),
+                };
               })}
-            </ComicPageRow>
+            />
 
             <div className={styles.contentSlot}>
               {tab === "profile" ? <ProfileInfoTab /> : null}

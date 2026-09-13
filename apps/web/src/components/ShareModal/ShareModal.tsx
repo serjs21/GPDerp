@@ -4,8 +4,8 @@ import { Button, Typography } from "@/components/StyledComponents";
 import {
   ComicPageDialog,
   ComicPagePanel,
-  ComicPageRow,
 } from "@/components/ComicPageLayout";
+import { ComicPanelTabs } from "@/components/ComicPanelTabs";
 import type { ShareLinkListItem } from "@/api/shareLinks";
 import { ShareLink } from "@/components/ShareLink/ShareLink";
 import { SendShareEmailContent } from "./SendShareEmailContent";
@@ -35,8 +35,6 @@ export type ShareModalProps = {
   initialEmailRecipients?: string[];
 };
 
-const SELECTED_PANEL_WEIGHT = 1.25;
-const UNSELECTED_PANEL_WEIGHT = 0.75;
 const EMPTY_EMAIL_RECIPIENTS: string[] = [];
 
 export function ShareModal({
@@ -79,14 +77,6 @@ export function ShareModal({
 
   const showMethodRow = !emailSent;
 
-  const selectLink = () => {
-    setMethod("link");
-  };
-
-  const selectEmail = () => {
-    setMethod("email");
-  };
-
   return (
     <ComicPageDialog
       open={open}
@@ -97,49 +87,48 @@ export function ShareModal({
     >
       <div className={styles.body}>
         {showMethodRow ? (
-          <ComicPageRow className={styles.methodRow}>
-            <ComicPagePanel
-              selectable
-              selected={method === "link"}
-              onSelect={selectLink}
-              background="sunburst"
-              color="teal"
-              title="Link"
-              isMotionBackground={false}
-              shine={false}
-              sunburstHalftone={false}
-              overflowVisible
-              flexWeight={method === "link" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
-              ariaLabel="Share by link"
-              className={styles.methodPanel}
-            >
-              <ShareMethodIcon
-                src="/share_modal/link.svg"
-                bubbleStyle="pointedArcs"
-                sourceDirection="none"
-                active={method === "link"}
-              />
-            </ComicPagePanel>
-            <ComicPagePanel
-              selectable
-              selected={method === "email"}
-              onSelect={selectEmail}
-              background="halftone"
-              color="orange"
-              overflowVisible
-              flexWeight={method === "email" ? SELECTED_PANEL_WEIGHT : UNSELECTED_PANEL_WEIGHT}
-              ariaLabel="Share via email"
-              title="Email"
-              className={styles.methodPanel}
-            >
-              <ShareMethodIcon
-                src="/share_modal/email.svg"
-                bubbleStyle="rectangle"
-                sourceDirection="none"
-                active={method === "email"}
-              />
-            </ComicPagePanel>
-          </ComicPageRow>
+          <ComicPanelTabs
+            className={styles.methodRow}
+            panelClassName={styles.methodPanel}
+            value={method}
+            onChange={setMethod}
+            tabs={[
+              {
+                id: "link",
+                panel: {
+                  background: "sunburst",
+                  color: "teal",
+                  title: "Link",
+                  ariaLabel: "Share by link",
+                },
+                content: (
+                  <ShareMethodIcon
+                    src="/share_modal/link.svg"
+                    bubbleStyle="pointedArcs"
+                    sourceDirection="none"
+                    active={method === "link"}
+                  />
+                ),
+              },
+              {
+                id: "email",
+                panel: {
+                  background: "halftone",
+                  color: "orange",
+                  title: "Email",
+                  ariaLabel: "Share via email",
+                },
+                content: (
+                  <ShareMethodIcon
+                    src="/share_modal/email.svg"
+                    bubbleStyle="rectangle"
+                    sourceDirection="none"
+                    active={method === "email"}
+                  />
+                ),
+              },
+            ]}
+          />
         ) : null}
 
         <div className={styles.contentSlot}>

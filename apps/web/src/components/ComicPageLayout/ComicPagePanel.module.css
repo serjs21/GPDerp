@@ -51,8 +51,10 @@
   appearance: none;
 }
 
+.panelSelectable:not(.panelSelected) .bgLayer,
 .panelSelectable:not(.panelSelected) .content,
-.panelSelectable:not(.panelSelected) .panelTitle {
+.panelSelectable:not(.panelSelected) .panelTitle,
+.panelSelectable:not(.panelSelected) .panelFooter {
   filter: grayscale(1);
 }
 
