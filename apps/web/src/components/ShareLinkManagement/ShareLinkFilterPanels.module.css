@@ -1,0 +1,32 @@
+.group {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: stretch;
+  min-width: 0;
+  gap: 0;
+  --comic-page-border: 3px;
+}
+
+.panel {
+  min-height: 5.5rem;
+  flex: 1 1 0;
+  transform: none;
+  z-index: 0;
+}
+
+.panel + .panel {
+  margin-left: calc(-1 * var(--comic-page-border, 3px));
+}
+
+/* Greyscale children (not the panel root) so overflow spikes stay visible. */
+.panelUnchecked > * {
+  filter: grayscale(1);
+}
+
+.panelChecked > * {
+  filter: none;
+}
+
+.panelChecked {
+  z-index: 1;
+}

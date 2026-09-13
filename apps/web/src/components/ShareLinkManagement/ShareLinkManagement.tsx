@@ -4,9 +4,9 @@ import { useRef } from "react";
 import { ComicModalInput } from "@/components/ComicModalInput";
 import { ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
 import { SakuraPetalLoader } from "@/components/Loaders";
-import { Select } from "@/components/StyledComponents";
 import { useEndOfContentScroll } from "@/hooks/useEndOfContentScroll";
 import { useShareLinks } from "@/hooks/useShareLinks";
+import { ShareLinkFilterPanels } from "./ShareLinkFilterPanels";
 import { ShareLinkManagementRow } from "./ShareLinkManagementRow";
 import { useShareLinkHaikuEnrichment } from "./useShareLinkHaikuEnrichment";
 import styles from "./ShareLinkManagement.module.css";
@@ -19,14 +19,29 @@ export function ShareLinkManagement({ active = true }: ShareLinkManagementProps)
   const scrollRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
-  const { query, items, filter, search, searchInput, setSearchInput, updateSearchParams, onEnd } =
-    useShareLinks(active);
+  const {
+    query,
+    items,
+    filters,
+    search,
+    searchInput,
+    setSearchInput,
+    updateSearchParams,
+    onEnd,
+  } = useShareLinks(active);
 
   const { getHaiku, isLoading: haikusLoading } = useShareLinkHaikuEnrichment(items, active);
 
   useEndOfContentScroll(scrollRef, sentinelRef, onEnd, {
     enabled: Boolean(active && query.hasNextPage && !query.isFetchingNextPage),
   });
+
+  const isInitialPending = query.isPending && !query.isPlaceholderData;
+  const isFilterRefetching =
+    query.isFetching && !query.isFetchingNextPage && !isInitialPending;
+  const showCenterLoader = isInitialPending || (items.length === 0 && isFilterRefetching);
+  const showEmpty = items.length === 0 && !query.isFetching && !isInitialPending;
+  const showBottomLoader = query.isFetchingNextPage || (items.length > 0 && isFilterRefetching);
 
   return (
     <div className={styles.root}>
@@ -37,13 +52,13 @@ export function ShareLinkManagement({ active = true }: ShareLinkManagementProps)
           title="Search"
           contentAlign="start"
           className={styles.filterPanel}
-          flexWeight={1.4}
+          flexWeight={1.1}
         >
           <form
             className={styles.searchForm}
             onSubmit={(e) => {
               e.preventDefault();
-              updateSearchParams({ filter, search: searchInput });
+              updateSearchParams({ filters, search: searchInput });
             }}
           >
             <ComicModalInput
@@ -54,57 +69,37 @@ export function ShareLinkManagement({ active = true }: ShareLinkManagementProps)
             />
           </form>
         </ComicPagePanel>
-        <ComicPagePanel
-          background="halftone"
-          color="blue"
-          title="Filter"
-          contentAlign="start"
-          className={styles.filterPanel}
-          flexWeight={0.9}
-        >
-          <div className={styles.filterControl}>
-            <Select
-              allowClear
-              placeholder="All"
-              value={filter}
-              onChange={(value) => updateSearchParams({ filter: value, search })}
-              options={[
-                { value: "active", label: "Active" },
-                { value: "inactive", label: "Inactive" },
-                { value: "expired", label: "Expired" },
-                { value: "view_limit_reached", label: "View limit reached" },
-              ]}
-              className={styles.filterSelect}
-            />
-          </div>
-        </ComicPagePanel>
+        <ShareLinkFilterPanels
+          selected={filters}
+          onChange={(next) => updateSearchParams({ filters: next, search })}
+        />
       </ComicPageRow>
 
       <div ref={scrollRef} className={styles.listShell}>
-        {query.isPending ? (
+        {showCenterLoader ? (
           <div className={styles.loaderRow}>
             <SakuraPetalLoader />
           </div>
-        ) : items.length === 0 ? (
+        ) : showEmpty ? (
           <p className={styles.empty}>No share links found.</p>
         ) : (
           items.map((link) => {
-              const haikuId = link.sharedHaikuId;
-              const haiku = getHaiku(haikuId);
-              return (
-                <ShareLinkManagementRow
-                  key={link.id}
-                  link={link}
-                  haiku={haiku}
-                  haikuLoading={Boolean(haikuId) && !haiku && haikusLoading}
-                  onChanged={() => void query.refetch()}
-                />
-              );
-            })
+            const haikuId = link.sharedHaikuId;
+            const haiku = getHaiku(haikuId);
+            return (
+              <ShareLinkManagementRow
+                key={link.id}
+                link={link}
+                haiku={haiku}
+                haikuLoading={Boolean(haikuId) && !haiku && haikusLoading}
+                onChanged={() => void query.refetch()}
+              />
+            );
+          })
         )}
 
         <div ref={sentinelRef} className={styles.sentinel} aria-hidden />
-        {query.isFetchingNextPage ? (
+        {showBottomLoader ? (
           <div className={styles.loaderRow}>
             <SakuraPetalLoader />
           </div>

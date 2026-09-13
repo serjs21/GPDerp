@@ -17,20 +17,24 @@ const shareLinkPluginImpl = async (app: FastifyInstance) => {
       const pageSize = Math.max(1, Math.min(Number(q.pageSize ?? "50") || 50, 50));
       const offset = Math.max(0, Number(q.offset ?? "0") || 0);
       const filterRaw = (q.filter ?? "").trim().toLowerCase();
-      const filter =
-        filterRaw === "active" ||
-        filterRaw === "inactive" ||
-        filterRaw === "expired" ||
-        filterRaw === "view_limit_reached"
-          ? filterRaw
-          : undefined;
+      const allowed = new Set(["active", "inactive", "expired", "view_limit_reached"] as const);
+      const filters = [
+        ...new Set(
+          filterRaw
+            .split(",")
+            .map((part) => part.trim())
+            .filter((part): part is "active" | "inactive" | "expired" | "view_limit_reached" =>
+              allowed.has(part as "active" | "inactive" | "expired" | "view_limit_reached"),
+            ),
+        ),
+      ];
       const search = (q.search ?? "").trim();
 
       const result = await shareLinkService.listShareLinksForUser({
         userId,
         pageSize,
         offset,
-        filter,
+        filters: filters.length > 0 ? filters : undefined,
         search: search || undefined,
       });
 

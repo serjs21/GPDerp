@@ -1,40 +1,33 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
-import { LabelFilter } from "./LabelFilter";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ALL_SHARE_LINK_FILTERS, type ShareLinkFilter } from "@/api/shareLinks";
+import { ComicPageRow } from "@/components/ComicPageLayout";
+import { ShareLinkFilterPanels } from "@/components/ShareLinkManagement/ShareLinkFilterPanels";
 
-const queryClient = new QueryClient();
+function ShareLinkFilterPanelsStoryShell() {
+  return null;
+}
 
-const meta: Meta<typeof LabelFilter> = {
+const meta = {
   title: "Components/LabelFilter",
-  component: LabelFilter,
+  component: ShareLinkFilterPanelsStoryShell,
   parameters: {
     layout: "centered",
   },
-  decorators: [
-    (Story) => (
-      <QueryClientProvider client={queryClient}>
-        <Story />
-      </QueryClientProvider>
-    ),
-  ],
-};
+} satisfies Meta<typeof ShareLinkFilterPanelsStoryShell>;
 
 export default meta;
-type Story = StoryObj<typeof LabelFilter>;
+type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  render: (args) => {
-    const [selectedIds, setSelectedIds] = useState<string[]>(args.selectedLabelIds || []);
+  render: () => {
+    const [selected, setSelected] = useState<ShareLinkFilter[]>([...ALL_SHARE_LINK_FILTERS]);
     return (
-      <LabelFilter 
-        {...args} 
-        selectedLabelIds={selectedIds} 
-        onChange={(val) => {
-          setSelectedIds(val);
-          args.onChange?.(val);
-        }} 
-      />
+      <div style={{ width: "min(36rem, 92vw)" }}>
+        <ComicPageRow>
+          <ShareLinkFilterPanels selected={selected} onChange={setSelected} />
+        </ComicPageRow>
+      </div>
     );
   },
 };

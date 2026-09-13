@@ -229,7 +229,7 @@ export const shareLinkService = {
     userId: string;
     pageSize: number;
     offset: number;
-    filter?: "active" | "inactive" | "expired" | "view_limit_reached";
+    filters?: Array<"active" | "inactive" | "expired" | "view_limit_reached">;
     search?: string;
   }): Promise<{
     ok: true;
@@ -261,24 +261,60 @@ export const shareLinkService = {
       };
     }
 
-    if (params.filter === "active") {
-      where.AND = [
-        { disabled: false },
-        { OR: [{ expirationDate: null }, { expirationDate: { gt: now } }] },
-        { OR: [{ maxViews: null }, { viewCount: { lt: prismaClient.shareLink.fields.maxViews } }] },
-      ];
-    } else if (params.filter === "inactive") {
-      where.OR = [
-        { disabled: true },
-        { expirationDate: { lte: now } },
-        {
-          AND: [{ maxViews: { not: null } }, { viewCount: { gte: prismaClient.shareLink.fields.maxViews } }],
-        },
-      ];
-    } else if (params.filter === "expired") {
-      where.expirationDate = { lte: now };
-    } else if (params.filter === "view_limit_reached") {
-      where.AND = [{ maxViews: { not: null } }, { viewCount: { gte: prismaClient.shareLink.fields.maxViews } }];
+    const ALL_FILTERS = ["active", "inactive", "expired", "view_limit_reached"] as const;
+    const filters = [...new Set(params.filters ?? [])].filter((f) =>
+      (ALL_FILTERS as readonly string[]).includes(f),
+    ) as Array<(typeof ALL_FILTERS)[number]>;
+    const applyStatusFilter = filters.length > 0 && filters.length < ALL_FILTERS.length;
+
+    if (applyStatusFilter) {
+      const statusOr: Prisma.ShareLinkWhereInput[] = [];
+
+      if (filters.includes("active")) {
+        statusOr.push({
+          AND: [
+            { disabled: false },
+            { OR: [{ expirationDate: null }, { expirationDate: { gt: now } }] },
+            {
+              OR: [{ maxViews: null }, { viewCount: { lt: prismaClient.shareLink.fields.maxViews } }],
+            },
+          ],
+        });
+      }
+      if (filters.includes("inactive")) {
+        statusOr.push({
+          AND: [
+            { disabled: true },
+            {
+              OR: [{ deactivationReason: null }, { deactivationReason: "manual" }],
+            },
+          ],
+        });
+      }
+      if (filters.includes("expired")) {
+        statusOr.push({
+          OR: [{ expirationDate: { lte: now } }, { deactivationReason: "timeout" }],
+        });
+      }
+      if (filters.includes("view_limit_reached")) {
+        statusOr.push({
+          OR: [
+            {
+              AND: [
+                { maxViews: { not: null } },
+                { viewCount: { gte: prismaClient.shareLink.fields.maxViews } },
+              ],
+            },
+            { deactivationReason: "limit_reached" },
+          ],
+        });
+      }
+
+      if (statusOr.length === 1) {
+        Object.assign(where, statusOr[0]);
+      } else if (statusOr.length > 1) {
+        where.OR = statusOr;
+      }
     }
 
     const [rows, total] = await Promise.all([
