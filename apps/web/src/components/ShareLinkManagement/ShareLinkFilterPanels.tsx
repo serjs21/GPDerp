@@ -72,10 +72,11 @@ export function ShareLinkFilterPanels({ selected, onChange }: ShareLinkFilterPan
     <div className={styles.group} role="group" aria-label="Filter share links by status">
       {FILTER_OPTIONS.map((option) => {
         const checked = selectedSet.has(option.id);
+        const action = checked ? "Hide" : "Show";
         return (
           <OverlayTitle
             key={option.id}
-            title={option.title}
+            title={`${action}\r\n ${option.title}`}
             direction="bottom"
             active={checked}
             className={[styles.slot, checked ? styles.slotChecked : ""].filter(Boolean).join(" ")}
@@ -91,7 +92,9 @@ export function ShareLinkFilterPanels({ selected, onChange }: ShareLinkFilterPan
               sunburstHalftone={false}
               overflowVisible
               flexWeight={1}
-              ariaLabel={option.ariaLabel}
+              ariaLabel={
+                checked ? option.ariaLabel.replace(/^Show/, "Hide") : option.ariaLabel
+              }
               className={[styles.panel, checked ? styles.panelChecked : styles.panelUnchecked].join(
                 " ",
               )}
