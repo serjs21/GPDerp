@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import type { ShareLinkListItem } from "@/api/shareLinks";
 import type { HaikuDto } from "@/api/haikus";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
@@ -10,7 +11,22 @@ import { Sway } from "@/components/Sway";
 import shareStyles from "@/components/ShareLink/ShareLink.module.css";
 import { ShareLinkSettingsControls } from "@/components/ShareLink/ShareLinkSettingsControls";
 import { useShareLinkControls } from "@/components/ShareLink/useShareLinkControls";
+import { HAIKU_MAX_LINE_CHARS, parseHaikuBody } from "@/utils/parseHaikuBody";
 import styles from "./ShareLinkManagement.module.css";
+
+/** Cursive em-width so a max-length line stays on one row in the 9rem preview. */
+const PREVIEW_CHAR_EM = 0.58;
+
+function previewLanternBodyStyle(body: string) {
+  const longest = Math.max(
+    ...parseHaikuBody(body).lines.map((line) => line.length),
+    1,
+  );
+  const fitChars = Math.min(HAIKU_MAX_LINE_CHARS, Math.max(longest, 8));
+  return {
+    "--lantern-body-font-size": `clamp(0.32rem, calc(100cqi / ${fitChars * PREVIEW_CHAR_EM}), 0.85rem)`,
+  } as CSSProperties;
+}
 
 export type ShareLinkManagementRowProps = {
   link: ShareLinkListItem;
@@ -33,8 +49,15 @@ export function ShareLinkManagementRow({
   });
 
   const showLoader = haikuLoading;
+  const previewBody = haiku?.body ?? "";
   const lanternContent = haiku ? (
-    <Lantern haiku={haiku} showActions={false} bodyOnly />
+    <Lantern
+      haiku={haiku}
+      showActions={false}
+      bodyOnly
+      className={styles.previewLantern}
+      style={previewLanternBodyStyle(previewBody)}
+    />
   ) : showLoader ? (
     <div className={styles.lanternLoader}>
       <SakuraPetalLoader />
@@ -53,6 +76,7 @@ export function ShareLinkManagementRow({
       }}
       showActions={false}
       bodyOnly
+      className={styles.previewLantern}
     />
   );
 

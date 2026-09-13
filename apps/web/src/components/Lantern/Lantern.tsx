@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { HaikuActions } from "@/components/HaikuContainer/HaikuActions";
 import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
@@ -11,6 +11,7 @@ import styles from "./Lantern.module.css";
 
 export type LanternProps = HaikuContainerProps & {
   className?: string;
+  style?: CSSProperties;
   /** Show only the haiku body (handwritten-on-paper presentation). */
   bodyOnly?: boolean;
   /** Hover actions; omit during path tween so content stays cheap. */
@@ -86,6 +87,7 @@ function LanternContent({
 export function Lantern(props: LanternProps) {
   const {
     className,
+    style,
     bodyOnly = false,
     showActions = true,
     onDelete,
@@ -100,7 +102,7 @@ export function Lantern(props: LanternProps) {
   if ("generatingDraft" in noteProps && noteProps.generatingDraft) {
     const { title, body, meta } = resolveGeneratingContent(noteProps.generatingDraft);
     return (
-      <div className={stackClass}>
+      <div className={stackClass} style={style}>
         <LanternContent
           title={title}
           body={body}
@@ -126,7 +128,7 @@ export function Lantern(props: LanternProps) {
   const { title, body, meta } = resolveSavedContent(haiku);
 
   return (
-    <div className={stackClass}>
+    <div className={stackClass} style={style}>
       <LanternContent
         title={title}
         body={body}
