@@ -7,7 +7,6 @@ const TEXT_MS = 220;
 const CHAR_STAGGER_MS = 22;
 const HIPOINTS_MS = 300;
 const EMBLEM_MS = 200;
-const BANNER_MS = 180;
 
 type AnimLike = {
   pause?: () => void;
@@ -15,6 +14,7 @@ type AnimLike = {
 };
 
 export type RestartLinkButtonAnimationRefs = {
+  idleFace: RefObject<HTMLElement | null>;
   idleChars: RefObject<HTMLElement | null>;
   hoverChars: RefObject<HTMLElement | null>;
   hipoints: RefObject<HTMLElement | null>;
@@ -89,35 +89,33 @@ function animateChars(
   });
 }
 
+function setOpacity(el: HTMLElement | null, opacity: number) {
+  if (!el) return;
+  el.style.opacity = String(opacity);
+}
+
 function setHipoints(el: HTMLElement | null, percent: number) {
   if (!el) return;
   el.style.transform = `translateY(${percent}%)`;
 }
 
-function setFilter(el: HTMLElement | null, opacity: number) {
-  if (!el) return;
-  el.style.opacity = String(opacity);
-}
-
 function setLockup(el: HTMLElement | null, opacity: number) {
-  if (!el) return;
-  el.style.opacity = String(opacity);
-  el.style.transform = "translate(-50%, -50%)";
-}
-
-function setBanner(el: HTMLElement | null, opacity: number) {
   if (!el) return;
   el.style.opacity = String(opacity);
 }
 
 function snap(expanded: boolean, refs: RestartLinkButtonAnimationRefs) {
   const hasRevive = Boolean(refs.reviveLockup.current);
+  if (hasRevive) {
+    setChars(refs.idleChars.current, 0);
+    setOpacity(refs.idleFace.current, expanded ? 0 : 1);
+    setLockup(refs.reviveLockup.current, expanded ? 1 : 0);
+    return;
+  }
+  setOpacity(refs.idleFace.current, 1);
   setChars(refs.idleChars.current, expanded ? 90 : 0);
   setChars(refs.hoverChars.current, expanded ? 0 : -90);
   setHipoints(refs.hipoints.current, expanded ? 0 : 100);
-  setFilter(refs.filterIcon.current, expanded && hasRevive ? 0 : 1);
-  setLockup(refs.reviveLockup.current, expanded ? 1 : 0);
-  setBanner(refs.reviveBanner.current, expanded ? 1 : 0);
 }
 
 function tweenNumber(
@@ -176,49 +174,37 @@ function playHipoints(
 
 function playRevive(
   expanded: boolean,
-  filter: HTMLElement | null,
+  idleFace: HTMLElement | null,
   lockup: HTMLElement | null,
-  banner: HTMLElement | null,
   anims: AnimLike[],
 ) {
-  if (!lockup || !filter) return;
+  if (!lockup || !idleFace) return;
   tweenNumber(
-    readOpacity(filter, expanded ? 1 : 0),
+    readOpacity(idleFace, expanded ? 1 : 0),
     expanded ? 0 : 1,
     EMBLEM_MS,
-    expanded ? 0 : 80,
-    (v) => setFilter(filter, v),
+    0,
+    (v) => setOpacity(idleFace, v),
     anims,
   );
   tweenNumber(
     readOpacity(lockup, expanded ? 0 : 1),
     expanded ? 1 : 0,
     EMBLEM_MS,
-    40,
+    0,
     (v) => setLockup(lockup, v),
-    anims,
-  );
-  tweenNumber(
-    readOpacity(banner, expanded ? 0 : 1),
-    expanded ? 1 : 0,
-    BANNER_MS,
-    expanded ? 120 : 0,
-    (v) => setBanner(banner, v),
     anims,
   );
 }
 
 function play(expanded: boolean, refs: RestartLinkButtonAnimationRefs, anims: AnimLike[]) {
+  if (refs.reviveLockup.current) {
+    playRevive(expanded, refs.idleFace.current, refs.reviveLockup.current, anims);
+    return;
+  }
   animateChars(refs.idleChars.current, expanded ? 90 : 0, expanded ? 0 : 90, anims);
   animateChars(refs.hoverChars.current, expanded ? 0 : -90, expanded ? -90 : 0, anims);
   playHipoints(expanded, refs.hipoints.current, anims);
-  playRevive(
-    expanded,
-    refs.filterIcon.current,
-    refs.reviveLockup.current,
-    refs.reviveBanner.current,
-    anims,
-  );
 }
 
 export function useRestartLinkButtonAnimation(

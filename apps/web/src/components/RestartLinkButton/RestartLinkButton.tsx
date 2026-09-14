@@ -102,6 +102,7 @@ function ReviveLockup({
 function ButtonFace({
   reason,
   showHipoints,
+  idleFace,
   idleChars,
   hoverChars,
   hipoints,
@@ -109,13 +110,17 @@ function ButtonFace({
 }: {
   reason: RestartLinkReason;
   showHipoints: boolean;
+  idleFace: RestartLinkButtonAnimationRefs["idleFace"];
   idleChars: RestartLinkButtonAnimationRefs["idleChars"];
   hoverChars: RestartLinkButtonAnimationRefs["hoverChars"];
   hipoints: RestartLinkButtonAnimationRefs["hipoints"];
   filterIcon: RestartLinkButtonAnimationRefs["filterIcon"];
 }) {
   return (
-    <span className={[styles.row, showHipoints ? styles.rowWithHipoints : ""].filter(Boolean).join(" ")}>
+    <span
+      ref={idleFace}
+      className={[styles.row, showHipoints ? styles.rowWithHipoints : ""].filter(Boolean).join(" ")}
+    >
       <span className={styles.iconCluster}>
         {showHipoints ? <HipointsMark markRef={hipoints} /> : null}
         <span className={styles.iconStage} aria-hidden>
@@ -149,6 +154,7 @@ export function RestartLinkButton({
   reviveTextY = 80,
   reviveTextRotate = -3,
 }: RestartLinkButtonProps) {
+  const idleFace = useRef<HTMLElement | null>(null);
   const idleChars = useRef<HTMLElement | null>(null);
   const hoverChars = useRef<HTMLElement | null>(null);
   const hipoints = useRef<HTMLElement | null>(null);
@@ -160,6 +166,7 @@ export function RestartLinkButton({
 
   const refs = useMemo<RestartLinkButtonAnimationRefs>(
     () => ({
+      idleFace,
       idleChars,
       hoverChars,
       hipoints,
@@ -195,6 +202,7 @@ export function RestartLinkButton({
       <ButtonFace
         reason={reason}
         showHipoints={reason === "limit_reached"}
+        idleFace={idleFace}
         idleChars={idleChars}
         hoverChars={hoverChars}
         hipoints={hipoints}

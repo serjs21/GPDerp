@@ -129,7 +129,6 @@
   border: 2px solid #fff;
   background: #000;
   transform: translate(-50%, -50%) rotate(var(--revive-banner-rotate, -3deg));
-  opacity: 0;
 }
 
 .reviveText {
