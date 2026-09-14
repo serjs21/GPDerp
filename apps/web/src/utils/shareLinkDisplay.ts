@@ -32,16 +32,20 @@ export function formatHms(ms: number): string {
 }
 
 export function formatRelativeTimeLeft(remainingMs: number, locale: string): string {
-  const formatter = new Intl.RelativeTimeFormat(locale, { numeric: "always" });
   const safeMs = Math.max(0, remainingMs);
-
-  if (safeMs >= MS_PER_YEAR) {
-    return formatter.format(Math.round(safeMs / MS_PER_YEAR), "year");
-  }
-  if (safeMs >= MS_PER_MONTH) {
-    return formatter.format(Math.round(safeMs / MS_PER_MONTH), "month");
-  }
-  return formatter.format(Math.max(1, Math.round(safeMs / MS_PER_DAY)), "day");
+  const unit: "year" | "month" | "day" =
+    safeMs >= MS_PER_YEAR ? "year" : safeMs >= MS_PER_MONTH ? "month" : "day";
+  const value =
+    unit === "year"
+      ? Math.round(safeMs / MS_PER_YEAR)
+      : unit === "month"
+        ? Math.round(safeMs / MS_PER_MONTH)
+        : Math.max(1, Math.round(safeMs / MS_PER_DAY));
+  return new Intl.NumberFormat(locale, {
+    style: "unit",
+    unit,
+    unitDisplay: "long",
+  }).format(value);
 }
 
 export function getTimeMeterDisplay(

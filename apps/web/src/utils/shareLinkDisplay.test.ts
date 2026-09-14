@@ -63,11 +63,11 @@ describe("getTimeMeterDisplay", () => {
     expect(getTimeMeterDisplay(justUnder, now, "en").kind).toBe("clock");
   });
 
-  it("uses Intl relative time at or above 100 hours", () => {
+  it("uses remaining duration at or above 100 hours", () => {
     const tenDays = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000).toISOString();
     expect(getTimeMeterDisplay(tenDays, now, "en")).toEqual({
       kind: "relative",
-      text: "in 10 days",
+      text: "10 days",
     });
     const atThreshold = new Date(now.getTime() + SHARE_LINK_CLOCK_THRESHOLD_MS).toISOString();
     expect(getTimeMeterDisplay(atThreshold, now, "en").kind).toBe("relative");

@@ -172,6 +172,44 @@
   max-height: 100%;
 }
 
+.previewStats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.12rem;
+  text-align: start;
+  text-transform: none;
+  pointer-events: none;
+}
+
+.previewStat {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.previewStatIcon {
+  display: block;
+  width: 0.85rem;
+  height: 0.85rem;
+  object-fit: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+.previewStatValue {
+  font-family: var(--font-pixel-display);
+  font-size: 0.58rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--sumi-ink, #2d2d2d);
+  white-space: nowrap;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
 .lanternFrame {
   box-sizing: border-box;
   width: auto !important;

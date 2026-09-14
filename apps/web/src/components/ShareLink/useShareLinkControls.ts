@@ -196,7 +196,8 @@ export function useShareLinkControls({
   const formValid =
     (form.maxViews == null || form.maxViews >= 1) &&
     (form.expiresAt == null ||
-      (form.expiresAt.isValid() && form.expiresAt.isAfter(dayjs())));
+      (form.expiresAt.isValid() &&
+        !form.expiresAt.isBefore(dayjs().add(1, "minute"))));
   const limitsDirty = link != null && payloadDiffersFromLink(link, payload);
   const showUpdate = active && (limitsDirty || updatingLimits);
 
@@ -348,11 +349,9 @@ export function useShareLinkControls({
   const timeLabel =
     time.kind === "unlimited"
       ? "No expiration"
-      : time.kind === "relative"
-        ? `Expires ${time.text}`
-        : time.text
-          ? `Time left ${time.text}`
-          : "Time left";
+      : time.text
+        ? `Time left ${time.text}`
+        : "Time left";
 
   return {
     subject,

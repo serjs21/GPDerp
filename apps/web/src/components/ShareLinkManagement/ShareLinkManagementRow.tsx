@@ -10,7 +10,14 @@ import { SakuraPetalLoader } from "@/components/Loaders";
 import { Sway } from "@/components/Sway";
 import shareStyles from "@/components/ShareLink/ShareLink.module.css";
 import { ShareLinkSettingsControls } from "@/components/ShareLink/ShareLinkSettingsControls";
-import { useShareLinkControls } from "@/components/ShareLink/useShareLinkControls";
+import {
+  CLOCK_SRC,
+  HEART_FILLED_SRC,
+  HEART_SRC,
+  INFINITY_SRC,
+  useShareLinkControls,
+} from "@/components/ShareLink/useShareLinkControls";
+import type { HitsMeterDisplay, TimeMeterDisplay } from "@/utils/shareLinkDisplay";
 import { HAIKU_MAX_LINE_CHARS, parseHaikuBody } from "@/utils/parseHaikuBody";
 import styles from "./ShareLinkManagement.module.css";
 
@@ -26,6 +33,48 @@ function previewLanternBodyStyle(body: string) {
   return {
     "--lantern-body-font-size": `clamp(0.32rem, calc(100cqi / ${fitChars * PREVIEW_CHAR_EM}), 0.85rem)`,
   } as CSSProperties;
+}
+
+function PreviewLanternStats({
+  hits,
+  time,
+  hitsLabel,
+  timeLabel,
+}: {
+  hits: HitsMeterDisplay;
+  time: TimeMeterDisplay;
+  hitsLabel: string;
+  timeLabel: string;
+}) {
+  return (
+    <div className={styles.previewStats} aria-label="Share link stats">
+      <span className={styles.previewStat} aria-label={hitsLabel}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- pixel meter icons */}
+        <img
+          src={hits.kind === "empty" ? HEART_SRC : HEART_FILLED_SRC}
+          alt=""
+          className={styles.previewStatIcon}
+          aria-hidden
+        />
+        {hits.kind === "unlimited" ? (
+          // eslint-disable-next-line @next/next/no-img-element -- pixel meter icons
+          <img src={INFINITY_SRC} alt="" className={styles.previewStatIcon} aria-hidden />
+        ) : (
+          <span className={styles.previewStatValue}>{hits.count}</span>
+        )}
+      </span>
+      <span className={styles.previewStat} aria-label={timeLabel}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- pixel meter icons */}
+        <img src={CLOCK_SRC} alt="" className={styles.previewStatIcon} aria-hidden />
+        {time.kind === "unlimited" ? (
+          // eslint-disable-next-line @next/next/no-img-element -- pixel meter icons
+          <img src={INFINITY_SRC} alt="" className={styles.previewStatIcon} aria-hidden />
+        ) : (
+          <span className={styles.previewStatValue}>{time.text}</span>
+        )}
+      </span>
+    </div>
+  );
 }
 
 export type ShareLinkManagementRowProps = {
@@ -86,6 +135,16 @@ export function ShareLinkManagementRow({
         background="halftone"
         color="sky"
         title={link.haikuSubject}
+        footer={
+          ctrl.active ? (
+            <PreviewLanternStats
+              hits={ctrl.hits}
+              time={ctrl.time}
+              hitsLabel={ctrl.hitsLabel}
+              timeLabel={ctrl.timeLabel}
+            />
+          ) : undefined
+        }
         contentAlign="center"
         className={[
           styles.lanternPanel,

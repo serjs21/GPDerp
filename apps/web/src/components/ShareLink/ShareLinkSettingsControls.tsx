@@ -30,6 +30,49 @@ export type ShareLinkSettingsControlsProps = {
   stopButtonClassName?: string;
 };
 
+function minTimeoutAt() {
+  return dayjs().add(1, "minute");
+}
+
+function rangeInts(end: number) {
+  return Array.from({ length: end }, (_, i) => i);
+}
+
+function disabledTimeoutTime(date: dayjs.Dayjs | null) {
+  const min = minTimeoutAt();
+  if (date == null || !date.isSame(min, "day")) {
+    return {};
+  }
+
+  const minHour = min.hour();
+  const minMinute = min.minute();
+  const minSecond = min.second();
+
+  return {
+    disabledHours: () => rangeInts(minHour),
+    disabledMinutes: (hour: number) => {
+      if (hour < minHour) return rangeInts(60);
+      if (hour === minHour) return rangeInts(minMinute);
+      return [];
+    },
+    disabledSeconds: (hour: number, minute: number) => {
+      if (hour < minHour || (hour === minHour && minute < minMinute)) {
+        return rangeInts(60);
+      }
+      if (hour === minHour && minute === minMinute) {
+        return rangeInts(minSecond);
+      }
+      return [];
+    },
+  };
+}
+
+function clampTimeout(value: dayjs.Dayjs | null) {
+  if (value == null || !value.isValid()) return value;
+  const min = minTimeoutAt();
+  return value.isBefore(min) ? min : value;
+}
+
 // eslint-disable-next-line max-lines-per-function -- mirrors share modal settings chrome
 export function ShareLinkSettingsControls({
   form,
@@ -83,11 +126,15 @@ export function ShareLinkSettingsControls({
                 placeholder="∞"
                 value={form.expiresAt}
                 disabled={limitsLocked}
-                disabledDate={(d) => d != null && d.isBefore(dayjs(), "day")}
+                minDate={minTimeoutAt()}
+                disabledDate={(d) =>
+                  d != null && d.endOf("day").isBefore(minTimeoutAt())
+                }
+                disabledTime={disabledTimeoutTime}
                 onChange={(v) =>
                   setForm((prev) => ({
                     ...prev,
-                    expiresAt: v,
+                    expiresAt: clampTimeout(v),
                   }))
                 }
                 className={styles.limitDate}
