@@ -19,6 +19,13 @@
     "unavailable": "Il checkout non e disponibile in questo momento.",
     "error": "Impossibile avviare il checkout."
   },
+  "LibraryCard": {
+    "title": "Tessera della biblioteca",
+    "belongsTo": "Questa tessera appartiene a",
+    "remaining": "{count} rimanenti",
+    "remainingUnknown": "Le generazioni rimanenti appariranno qui.",
+    "buyMore": "Compra ancora"
+  },
   "ProfileInfo": {
     "firstName": "Nome",
     "lastName": "Cognome",

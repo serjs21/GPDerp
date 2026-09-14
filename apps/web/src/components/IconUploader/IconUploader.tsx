@@ -11,6 +11,8 @@ export type IconUploaderResult = {
   publicUrl: string;
 };
 
+const DEFAULT_SIZE_PX = 44;
+
 type IconUploaderProps = {
   label?: string;
   iconUrl?: string;
@@ -19,6 +21,8 @@ type IconUploaderProps = {
   fallbackChar?: string;
   disabled?: boolean;
   className?: string;
+  /** Intrinsic image size in px. Layout size follows `--icon-uploader-size`. */
+  size?: number;
   onUploaded: (result: IconUploaderResult) => void;
 };
 
@@ -29,6 +33,7 @@ export function IconUploader({
   fallbackChar,
   disabled = false,
   className,
+  size = DEFAULT_SIZE_PX,
   onUploaded,
 }: IconUploaderProps) {
   const inputId = useId();
@@ -53,8 +58,8 @@ export function IconUploader({
           src={displayUrl}
           alt={alt}
           className={styles.iconImage}
-          width={44}
-          height={44}
+          width={size}
+          height={size}
           unoptimized
         />
       ) : showRemoteImage && displayUrl ? (
@@ -62,8 +67,8 @@ export function IconUploader({
           src={displayUrl}
           alt={alt}
           className={styles.iconImage}
-          width={44}
-          height={44}
+          width={size}
+          height={size}
           unoptimized
           referrerPolicy="no-referrer"
           onError={() => setFailedRemoteImageUrl(displayUrl)}

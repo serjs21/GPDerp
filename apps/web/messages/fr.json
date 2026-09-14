@@ -19,6 +19,13 @@
     "unavailable": "Le paiement n'est pas disponible pour le moment.",
     "error": "Impossible de demarrer le paiement."
   },
+  "LibraryCard": {
+    "title": "Carte de bibliotheque",
+    "belongsTo": "Cette carte appartient a",
+    "remaining": "{count} restantes",
+    "remainingUnknown": "Les generations restantes apparaitront ici.",
+    "buyMore": "Acheter plus"
+  },
   "ProfileInfo": {
     "firstName": "Prenom",
     "lastName": "Nom",

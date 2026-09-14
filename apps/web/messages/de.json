@@ -19,6 +19,13 @@
     "unavailable": "Checkout ist gerade nicht verfügbar.",
     "error": "Checkout konnte nicht gestartet werden."
   },
+  "LibraryCard": {
+    "title": "Bibliotheksausweis",
+    "belongsTo": "Dieser Ausweis gehort",
+    "remaining": "{count} ubrig",
+    "remainingUnknown": "Verbleibende Generierungen erscheinen hier.",
+    "buyMore": "Mehr kaufen"
+  },
   "ProfileInfo": {
     "firstName": "Vorname",
     "lastName": "Nachname",

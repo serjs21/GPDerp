@@ -19,6 +19,13 @@
     "unavailable": "O checkout nao esta disponivel agora.",
     "error": "Nao foi possivel iniciar o checkout."
   },
+  "LibraryCard": {
+    "title": "Carteira da biblioteca",
+    "belongsTo": "Este cartao pertence a",
+    "remaining": "{count} restantes",
+    "remainingUnknown": "As geracoes restantes aparecerao aqui.",
+    "buyMore": "Comprar mais"
+  },
   "ProfileInfo": {
     "firstName": "Nome",
     "lastName": "Sobrenome",

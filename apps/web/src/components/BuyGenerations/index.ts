@@ -1,1 +1,1 @@
-export { BuyGenerations } from "./BuyGenerations";
+export { useBuyGenerations } from "./useBuyGenerations";

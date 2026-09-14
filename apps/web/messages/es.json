@@ -19,6 +19,13 @@
     "unavailable": "El pago no está disponible ahora.",
     "error": "No se pudo iniciar el pago."
   },
+  "LibraryCard": {
+    "title": "Carnet de biblioteca",
+    "belongsTo": "Este carnet pertenece a",
+    "remaining": "{count} restantes",
+    "remainingUnknown": "Las generaciones restantes apareceran aqui.",
+    "buyMore": "Comprar mas"
+  },
   "ProfileInfo": {
     "firstName": "Nombre",
     "lastName": "Apellido",

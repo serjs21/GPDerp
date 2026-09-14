@@ -19,6 +19,13 @@
     "unavailable": "ยังไม่สามารถชำระเงินได้ในขณะนี้",
     "error": "ไม่สามารถเริ่มการชำระเงินได้"
   },
+  "LibraryCard": {
+    "title": "บัตรห้องสมุด",
+    "belongsTo": "บัตรนี้เป็นของ",
+    "remaining": "เหลือ {count}",
+    "remainingUnknown": "จำนวนการสร้างที่เหลือจะแสดงที่นี่",
+    "buyMore": "ซื้อเพิ่ม"
+  },
   "ProfileInfo": {
     "firstName": "ชื่อ",
     "lastName": "นามสกุล",

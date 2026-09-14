@@ -34,11 +34,11 @@
 
 .iconHitArea {
   display: block;
-  width: 44px;
-  height: 44px;
+  width: var(--icon-uploader-size, 44px);
+  height: var(--icon-uploader-size, 44px);
   margin: 0;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--icon-uploader-radius, 8px);
   padding: 0;
   background: transparent;
   position: relative;
@@ -68,23 +68,24 @@
 }
 
 .iconImage {
-  width: 44px;
-  height: 44px;
+  width: var(--icon-uploader-size, 44px);
+  height: var(--icon-uploader-size, 44px);
   object-fit: cover;
   display: block;
-  border-radius: 8px;
+  border-radius: var(--icon-uploader-radius, 8px);
   vertical-align: middle;
 }
 
 .placeholder {
-  width: 44px;
-  height: 44px;
+  width: var(--icon-uploader-size, 44px);
+  height: var(--icon-uploader-size, 44px);
   display: grid;
   place-items: center;
   background: var(--ink-wash);
   color: var(--text-muted);
   font-weight: 600;
-  border-radius: 8px;
+  font-size: calc(var(--icon-uploader-size, 44px) * 0.42);
+  border-radius: var(--icon-uploader-radius, 8px);
 }
 
 .overlay {
@@ -96,7 +97,7 @@
   color: var(--surface-glass-strong);
   opacity: 0;
   transition: opacity 140ms ease;
-  border-radius: 8px;
+  border-radius: var(--icon-uploader-radius, 8px);
   pointer-events: none;
 }
 
@@ -125,7 +126,7 @@
 }
 
 .progressTrack {
-  width: 44px;
+  width: var(--icon-uploader-size, 44px);
   height: 8px;
   border-radius: 999px;
   background: var(--profile-surface-border);

@@ -1,15 +1,8 @@
 "use client";
 
-import { useRef } from "react";
 import { Modal, Typography } from "@/components/StyledComponents";
 import { ComicModalInput } from "@/components/ComicModalInput";
-import {
-  ComicPageCtaAction,
-  ComicPagePanel,
-  ComicPageRow,
-} from "@/components/ComicPageLayout";
-import { BuyGenerations } from "@/components/BuyGenerations";
-import { IconUploader } from "@/components/IconUploader";
+import { LibraryCard } from "@/components/LibraryCard";
 import { useProfile } from "../ProfileContext";
 import { useProfileI18n } from "@/hooks/useProfileI18n";
 import { ProfileEmailPanel } from "./ProfileEmailPanel";
@@ -18,75 +11,11 @@ import styles from "./ProfileInfoTab.module.css";
 export const ProfileInfoTab = () => {
   const profile = useProfile();
   const { profileInfo } = useProfileI18n();
-  const nameFormRef = useRef<HTMLFormElement>(null);
 
   return (
     <>
       <div className={styles.root}>
-        <ComicPageRow className={styles.identityRow}>
-          <ComicPagePanel
-            background="sunburst"
-            color="magenta"
-            title="You"
-            contentAlign="start"
-            className={styles.identityPanel}
-            flexWeight={1}
-            sunburstHalftone={false}
-          >
-            <div className={styles.identityBody}>
-              <IconUploader
-                iconUrl={profile.avatarUrl}
-                alt={`${profile.displayName} profile icon`}
-                fallbackChar={profile.displayName.slice(0, 1)}
-                disabled={profile.savingAvatar}
-                onUploaded={profile.onAvatarUploaded}
-              />
-              <p className={styles.displayName}>{profile.displayName}</p>
-              <form
-                ref={nameFormRef}
-                key={profile.email}
-                className={styles.nameForm}
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const data = new FormData(e.currentTarget);
-                  void profile.onSaveProfile({
-                    firstName: String(data.get("firstName") ?? ""),
-                    lastName: String(data.get("lastName") ?? ""),
-                  });
-                }}
-              >
-                <label className={styles.field}>
-                  <span className={styles.fieldLabel}>{profileInfo("firstName")}</span>
-                  <ComicModalInput
-                    name="firstName"
-                    defaultValue={profile.firstName}
-                    aria-label={profileInfo("firstName")}
-                  />
-                </label>
-                <label className={styles.field}>
-                  <span className={styles.fieldLabel}>{profileInfo("lastName")}</span>
-                  <ComicModalInput
-                    name="lastName"
-                    defaultValue={profile.lastName}
-                    aria-label={profileInfo("lastName")}
-                  />
-                </label>
-                <div className={styles.formActions}>
-                  <ComicPageCtaAction
-                    label={profile.saveProfileLabel}
-                    busy={profile.saving}
-                    onClick={() => nameFormRef.current?.requestSubmit()}
-                  />
-                </div>
-              </form>
-            </div>
-          </ComicPagePanel>
-
-          <div className={styles.tokensCol}>
-            <BuyGenerations />
-          </div>
-        </ComicPageRow>
-
+        <LibraryCard />
         <ProfileEmailPanel />
       </div>
 

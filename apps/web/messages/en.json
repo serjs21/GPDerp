@@ -19,6 +19,13 @@
     "unavailable": "Checkout is not available right now.",
     "error": "Could not start checkout."
   },
+  "LibraryCard": {
+    "title": "Library Card",
+    "belongsTo": "This card belongs to",
+    "remaining": "{count} remaining",
+    "remainingUnknown": "Remaining generations will appear here.",
+    "buyMore": "Buy more"
+  },
   "ProfileInfo": {
     "firstName": "First name",
     "lastName": "Last name",
