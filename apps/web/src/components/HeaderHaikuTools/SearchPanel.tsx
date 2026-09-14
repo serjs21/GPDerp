@@ -95,7 +95,6 @@ function LabelFilterExtras({
         <FilterManageLabelsModal
           open={labels.modalOpen}
           accountId={labels.accountId}
-          initialTab="filter"
           selectedIds={labels.selectedLabelIds}
           onApply={labels.setSelectedLabelIds}
           onClose={onModalClose}
@@ -188,7 +187,7 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
               <button
                 type="button"
                 className={styles.panelButton}
-                aria-label="Filter and manage labels"
+                aria-label="Filter haikus by labels"
                 aria-expanded={labels.modalOpen}
                 disabled={!labels.canOpen}
                 onMouseEnter={() => setHoverIfLive("filter")}

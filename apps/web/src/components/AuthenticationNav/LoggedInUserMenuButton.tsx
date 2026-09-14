@@ -30,7 +30,7 @@ export const LoggedInUserMenuButton = ({ user, onLogout }: LoggedInUserMenuButto
     {
       key: "buyGenerations",
       label: (
-        <Link href="/settings?tab=tokens">
+        <Link href="/settings?tab=profile#buy-generations">
           <div className={navStyles.userDropdownItem}>Buy generations</div>
         </Link>
       ),

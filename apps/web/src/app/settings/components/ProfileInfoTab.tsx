@@ -8,6 +8,7 @@ import {
   ComicPagePanel,
   ComicPageRow,
 } from "@/components/ComicPageLayout";
+import { BuyGenerations } from "@/components/BuyGenerations";
 import { IconUploader } from "@/components/IconUploader";
 import { useProfile } from "../ProfileContext";
 import { useProfileI18n } from "@/hooks/useProfileI18n";
@@ -27,7 +28,7 @@ export const ProfileInfoTab = () => {
             background="sunburst"
             color="magenta"
             title="You"
-            contentAlign="center"
+            contentAlign="start"
             className={styles.identityPanel}
             flexWeight={1}
             sunburstHalftone={false}
@@ -41,55 +42,49 @@ export const ProfileInfoTab = () => {
                 onUploaded={profile.onAvatarUploaded}
               />
               <p className={styles.displayName}>{profile.displayName}</p>
+              <form
+                ref={nameFormRef}
+                key={profile.email}
+                className={styles.nameForm}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const data = new FormData(e.currentTarget);
+                  void profile.onSaveProfile({
+                    firstName: String(data.get("firstName") ?? ""),
+                    lastName: String(data.get("lastName") ?? ""),
+                  });
+                }}
+              >
+                <label className={styles.field}>
+                  <span className={styles.fieldLabel}>{profileInfo("firstName")}</span>
+                  <ComicModalInput
+                    name="firstName"
+                    defaultValue={profile.firstName}
+                    aria-label={profileInfo("firstName")}
+                  />
+                </label>
+                <label className={styles.field}>
+                  <span className={styles.fieldLabel}>{profileInfo("lastName")}</span>
+                  <ComicModalInput
+                    name="lastName"
+                    defaultValue={profile.lastName}
+                    aria-label={profileInfo("lastName")}
+                  />
+                </label>
+                <div className={styles.formActions}>
+                  <ComicPageCtaAction
+                    label={profile.saveProfileLabel}
+                    busy={profile.saving}
+                    onClick={() => nameFormRef.current?.requestSubmit()}
+                  />
+                </div>
+              </form>
             </div>
           </ComicPagePanel>
 
-          <ComicPagePanel
-            background="solid"
-            color="white"
-            title="Name"
-            contentAlign="start"
-            className={styles.formPanel}
-            flexWeight={1.35}
-          >
-            <form
-              ref={nameFormRef}
-              key={profile.email}
-              className={styles.nameForm}
-              onSubmit={(e) => {
-                e.preventDefault();
-                const data = new FormData(e.currentTarget);
-                void profile.onSaveProfile({
-                  firstName: String(data.get("firstName") ?? ""),
-                  lastName: String(data.get("lastName") ?? ""),
-                });
-              }}
-            >
-              <label className={styles.field}>
-                <span className={styles.fieldLabel}>{profileInfo("firstName")}</span>
-                <ComicModalInput
-                  name="firstName"
-                  defaultValue={profile.firstName}
-                  aria-label={profileInfo("firstName")}
-                />
-              </label>
-              <label className={styles.field}>
-                <span className={styles.fieldLabel}>{profileInfo("lastName")}</span>
-                <ComicModalInput
-                  name="lastName"
-                  defaultValue={profile.lastName}
-                  aria-label={profileInfo("lastName")}
-                />
-              </label>
-              <div className={styles.formActions}>
-                <ComicPageCtaAction
-                  label={profile.saveProfileLabel}
-                  busy={profile.saving}
-                  onClick={() => nameFormRef.current?.requestSubmit()}
-                />
-              </div>
-            </form>
-          </ComicPagePanel>
+          <div className={styles.tokensCol}>
+            <BuyGenerations />
+          </div>
         </ComicPageRow>
 
         <ProfileEmailPanel />

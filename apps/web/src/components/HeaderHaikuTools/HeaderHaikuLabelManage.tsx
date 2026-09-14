@@ -28,7 +28,7 @@ export function HeaderHaikuLabelManage() {
         <button
           type="button"
           className={styles.iconButton}
-          aria-label="Filter and manage labels"
+          aria-label="Filter haikus by labels"
           aria-expanded={modalOpen}
           onClick={() => setModalOpen(true)}
           disabled={!canOpen}
@@ -78,7 +78,6 @@ export function HeaderHaikuLabelManage() {
         <FilterManageLabelsModal
           open={modalOpen}
           accountId={accountId}
-          initialTab="filter"
           selectedIds={selectedLabelIds}
           onApply={setSelectedLabelIds}
           onClose={() => setModalOpen(false)}

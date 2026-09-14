@@ -29,16 +29,16 @@ import { useTranslations } from "next-intl";
 import { LabelMethodIcon } from "@/components/LabelMethodIcon";
 import { ManageLabelsPanel } from "@/components/ManageLabel";
 import { ShareLinkManagement } from "@/components/ShareLinkManagement";
-import { BuyGenerations } from "@/components/BuyGenerations";
 import { ComicPanelTabs } from "@/components/ComicPanelTabs";
+import { useManageLabelsAccount } from "@/hooks/useAccountLabels";
 import { ProfileProvider, type ProfileContextValue } from "./ProfileContext";
 import { ProfileInfoTab } from "./components/ProfileInfoTab";
 import { shouldApplyServerPreference } from "./tabState";
 import styles from "./profilePage.module.css";
 
-export type ProfilePageTab = "profile" | "tokens" | "share-links" | "labels";
+export type ProfilePageTab = "profile" | "share-links" | "labels";
 
-const PROFILE_TABS: ProfilePageTab[] = ["profile", "tokens", "share-links", "labels"];
+const PROFILE_TABS: ProfilePageTab[] = ["profile", "share-links", "labels"];
 
 function parseProfileTab(value: string | null): ProfilePageTab {
   if (value && PROFILE_TABS.includes(value as ProfilePageTab)) {
@@ -65,14 +65,6 @@ const TAB_META: Record<
     ariaLabel: "Profile information",
     iconSrc: "/profile/profile.svg",
     bubbleStyle: "circle",
-  },
-  tokens: {
-    title: "Tokens",
-    background: "halftone",
-    color: "orange",
-    ariaLabel: "Generation tokens",
-    iconSrc: "/profile/tokens.svg",
-    bubbleStyle: "diamond",
   },
   "share-links": {
     title: "Share Links",
@@ -111,20 +103,25 @@ export default function ProfilePage() {
   const [savingAvatar, setSavingAvatar] = useState(false);
   const { setTheme } = useTheme();
   const { setLocale } = useLocale();
+  const { data: labelsAccountId } = useManageLabelsAccount();
   const t = useTranslations("Profile");
 
   const tab = parseProfileTab(tabParam);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (window.location.hash === "#buy-generations" && tab !== "tokens") {
-      router.replace("/settings?tab=tokens", { scroll: false });
+    if (window.location.hash === "#buy-generations" && tab !== "profile") {
+      router.replace("/settings?tab=profile#buy-generations", { scroll: false });
     }
   }, [router, tab]);
 
   useEffect(() => {
     if (tabParam === "settings") {
       router.replace("/settings?tab=profile", { scroll: false });
+      return;
+    }
+    if (tabParam === "tokens") {
+      router.replace("/settings?tab=profile#buy-generations", { scroll: false });
       return;
     }
     if (tabParam != null && tabParam !== tab) {
@@ -354,11 +351,10 @@ export default function ProfilePage() {
 
             <div className={styles.contentSlot}>
               {tab === "profile" ? <ProfileInfoTab /> : null}
-              {tab === "tokens" ? <BuyGenerations /> : null}
               {tab === "share-links" ? <ShareLinkManagement active /> : null}
-              {tab === "labels" ? (
+              {tab === "labels" && labelsAccountId ? (
                 <ManageLabelsPanel
-                  accountId={profile.id}
+                  accountId={labelsAccountId}
                   active
                   searchVariant="comic"
                   showCreate

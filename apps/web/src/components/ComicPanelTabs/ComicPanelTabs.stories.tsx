@@ -3,13 +3,13 @@ import { useState } from "react";
 import { LabelMethodIcon } from "@/components/LabelMethodIcon";
 import { ComicPanelTabs } from "./ComicPanelTabs";
 
-type DemoTab = "profile" | "tokens" | "share-links" | "labels";
+type DemoTab = "profile" | "share-links" | "labels";
 
 const DEMO_TABS: Array<{
   id: DemoTab;
   title: string;
   background: "sunburst" | "halftone" | "solid";
-  color: "blue" | "orange" | "teal" | "green";
+  color: "blue" | "teal" | "green";
   iconSrc: string;
   bubbleStyle: "circle" | "diamond" | "rectangle" | "thought";
   ariaLabel: string;
@@ -22,15 +22,6 @@ const DEMO_TABS: Array<{
     iconSrc: "/profile/profile.svg",
     bubbleStyle: "circle",
     ariaLabel: "Profile information",
-  },
-  {
-    id: "tokens",
-    title: "Tokens",
-    background: "halftone",
-    color: "orange",
-    iconSrc: "/profile/tokens.svg",
-    bubbleStyle: "diamond",
-    ariaLabel: "Generation tokens",
   },
   {
     id: "share-links",

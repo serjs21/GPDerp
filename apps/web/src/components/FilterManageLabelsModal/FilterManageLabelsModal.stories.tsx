@@ -70,7 +70,6 @@ const meta = {
   args: {
     open: true,
     accountId: STORY_ACCOUNT_ID,
-    initialTab: "filter" as const,
     selectedIds: ["00000000-0000-4000-8000-000000000201"],
     onApply: () => undefined,
     onClose: () => undefined,
@@ -81,23 +80,6 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const FilterDefault: Story = {};
-
-export const ManageList: Story = {
-  args: {
-    initialTab: "manage",
-  },
-};
-
-export const ManageEmpty: Story = {
-  decorators: [
-    withQueryClientSeed((qc) => {
-      seedLabelQueries(qc, []);
-    }),
-  ],
-  args: {
-    initialTab: "manage",
-  },
-};
 
 export const Closed: Story = {
   args: {
