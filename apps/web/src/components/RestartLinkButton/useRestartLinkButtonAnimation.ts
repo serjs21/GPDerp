@@ -94,22 +94,20 @@ function setHipoints(el: HTMLElement | null, percent: number) {
   el.style.transform = `translateY(${percent}%)`;
 }
 
-function setFilter(el: HTMLElement | null, opacity: number, scale: number) {
+function setFilter(el: HTMLElement | null, opacity: number) {
   if (!el) return;
   el.style.opacity = String(opacity);
-  el.style.transform = `scale(${scale})`;
 }
 
-function setLockup(el: HTMLElement | null, opacity: number, scale: number) {
+function setLockup(el: HTMLElement | null, opacity: number) {
   if (!el) return;
   el.style.opacity = String(opacity);
-  el.style.transform = `translate(-50%, -50%) scale(${scale})`;
+  el.style.transform = "translate(-50%, -50%)";
 }
 
-function setBanner(el: HTMLElement | null, opacity: number, scale: number) {
+function setBanner(el: HTMLElement | null, opacity: number) {
   if (!el) return;
   el.style.opacity = String(opacity);
-  el.style.setProperty("--revive-banner-scale", String(scale));
 }
 
 function snap(expanded: boolean, refs: RestartLinkButtonAnimationRefs) {
@@ -117,9 +115,9 @@ function snap(expanded: boolean, refs: RestartLinkButtonAnimationRefs) {
   setChars(refs.idleChars.current, expanded ? 90 : 0);
   setChars(refs.hoverChars.current, expanded ? 0 : -90);
   setHipoints(refs.hipoints.current, expanded ? 0 : 100);
-  setFilter(refs.filterIcon.current, expanded && hasRevive ? 0 : 1, expanded && hasRevive ? 0.6 : 1);
-  setLockup(refs.reviveLockup.current, expanded ? 1 : 0, expanded ? 1 : 0.72);
-  setBanner(refs.reviveBanner.current, expanded ? 1 : 0, expanded ? 1 : 0.86);
+  setFilter(refs.filterIcon.current, expanded && hasRevive ? 0 : 1);
+  setLockup(refs.reviveLockup.current, expanded ? 1 : 0);
+  setBanner(refs.reviveBanner.current, expanded ? 1 : 0);
 }
 
 function tweenNumber(
@@ -189,7 +187,7 @@ function playRevive(
     expanded ? 0 : 1,
     EMBLEM_MS,
     expanded ? 0 : 80,
-    (v) => setFilter(filter, v, 0.6 + 0.4 * v),
+    (v) => setFilter(filter, v),
     anims,
   );
   tweenNumber(
@@ -197,7 +195,7 @@ function playRevive(
     expanded ? 1 : 0,
     EMBLEM_MS,
     40,
-    (v) => setLockup(lockup, v, 0.72 + 0.28 * v),
+    (v) => setLockup(lockup, v),
     anims,
   );
   tweenNumber(
@@ -205,7 +203,7 @@ function playRevive(
     expanded ? 1 : 0,
     BANNER_MS,
     expanded ? 120 : 0,
-    (v) => setBanner(banner, v, 0.86 + 0.14 * v),
+    (v) => setBanner(banner, v),
     anims,
   );
 }

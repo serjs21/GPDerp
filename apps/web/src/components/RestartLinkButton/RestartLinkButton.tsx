@@ -36,7 +36,7 @@ const IDLE_LABEL: Record<RestartLinkReason, string> = {
 
 const HOVER_LABEL: Record<RestartLinkReason, string> = {
   expired: "Revive!",
-  limit_reached: "Resurrect",
+  limit_reached: "Resurrect!",
 };
 
 const HIPOINTS_SRC = "/profile/re-hipoints.svg";
