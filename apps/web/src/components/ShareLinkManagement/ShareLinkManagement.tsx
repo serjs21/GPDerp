@@ -9,6 +9,7 @@ import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { useEndOfContentScroll } from "@/hooks/useEndOfContentScroll";
 import { useShareLinks } from "@/hooks/useShareLinks";
+import { useShareLinkSocket } from "@/hooks/useShareLinkSocket";
 import { ShareLinkFilterPanels } from "./ShareLinkFilterPanels";
 import { ShareLinkManagementRow } from "./ShareLinkManagementRow";
 import { useShareLinkHaikuEnrichment } from "./useShareLinkHaikuEnrichment";
@@ -199,6 +200,8 @@ export function ShareLinkManagement({ active = true }: ShareLinkManagementProps)
     updateSearchParams,
     onEnd,
   } = useShareLinks(active);
+
+  useShareLinkSocket(active);
 
   const { getHaiku, isLoading: haikusLoading } = useShareLinkHaikuEnrichment(items, active);
 

@@ -21,6 +21,7 @@ jest.mock("../shareLink.repository", () => ({
     findByShareHash: jest.fn(),
     create: jest.fn(),
     updateDisabledById: jest.fn(),
+    markDeactivatedById: jest.fn(),
   },
 }));
 
@@ -31,6 +32,7 @@ const { shareLinkRepository } = jest.requireMock("../shareLink.repository") as {
     findByShareHash: jest.Mock;
     create: jest.Mock;
     updateDisabledById: jest.Mock;
+    markDeactivatedById: jest.Mock;
   };
 };
 
@@ -232,5 +234,86 @@ describe("shareLinkService.createShareLink get-or-create", () => {
         maxViews: null,
       }),
     );
+  });
+});
+
+describe("shareLinkService.resolveSharedHaiku snapshots", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("returns a timeout snapshot after auto-deactivate", async () => {
+    shareLinkRepository.findByShareHash.mockResolvedValue({
+      id: "link-1",
+      shareHash: "abc",
+      createdByUserId: "user-1",
+      sharedHaikuId: "haiku-1",
+      haikuSubject: "Mist",
+      createdAt: new Date("2026-01-01T00:00:00.000Z"),
+      expirationDate: new Date("2020-01-01T00:00:00.000Z"),
+      maxViews: null,
+      viewCount: 0,
+      disabled: false,
+      deactivationReason: null,
+      createdBy: { userName: "Ada", firstName: "Ada", lastName: "L", email: "ada@example.com" },
+    });
+    shareLinkRepository.markDeactivatedById.mockResolvedValue({
+      id: "link-1",
+      shareHash: "abc",
+      createdAt: new Date("2026-01-01T00:00:00.000Z"),
+      expirationDate: new Date("2020-01-01T00:00:00.000Z"),
+      maxViews: null,
+      viewCount: 0,
+      disabled: true,
+      deactivationReason: "timeout",
+      sharedHaikuId: "haiku-1",
+      haikuSubject: "Mist",
+    });
+
+    const result = await shareLinkService.resolveSharedHaiku("abc");
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.createdByUserId).toBe("user-1");
+      expect(result.shareLink?.disabled).toBe(true);
+      expect(result.shareLink?.deactivationReason).toBe("timeout");
+    }
+  });
+
+  it("returns a limit-reached snapshot after auto-deactivate", async () => {
+    shareLinkRepository.findByShareHash.mockResolvedValue({
+      id: "link-1",
+      shareHash: "abc",
+      createdByUserId: "user-1",
+      sharedHaikuId: "haiku-1",
+      haikuSubject: "Mist",
+      createdAt: new Date("2026-01-01T00:00:00.000Z"),
+      expirationDate: null,
+      maxViews: 2,
+      viewCount: 2,
+      disabled: false,
+      deactivationReason: null,
+      createdBy: { userName: "Ada", firstName: "Ada", lastName: "L", email: "ada@example.com" },
+    });
+    shareLinkRepository.markDeactivatedById.mockResolvedValue({
+      id: "link-1",
+      shareHash: "abc",
+      createdAt: new Date("2026-01-01T00:00:00.000Z"),
+      expirationDate: null,
+      maxViews: 2,
+      viewCount: 2,
+      disabled: true,
+      deactivationReason: "limit_reached",
+      sharedHaikuId: "haiku-1",
+      haikuSubject: "Mist",
+    });
+
+    const result = await shareLinkService.resolveSharedHaiku("abc");
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.shareLink?.deactivationReason).toBe("limit_reached");
+      expect(result.createdByUserId).toBe("user-1");
+    }
   });
 });

@@ -77,6 +77,13 @@ const resolveDeactivationReason = (
   return null;
 };
 
+export type ShareLinkListItem = ReturnType<typeof shareLinkItemFromRow>;
+
+export type ShareLinkRealtimeSnapshot = {
+  createdByUserId: string;
+  shareLink: ShareLinkListItem;
+};
+
 const shareLinkItemFromRow = (row: ShareLinkListRow) => ({
   id: row.id,
   shareHash: row.shareHash,
@@ -89,6 +96,14 @@ const shareLinkItemFromRow = (row: ShareLinkListRow) => ({
   viewCount: row.viewCount,
   disabled: row.disabled,
   deactivationReason: resolveDeactivationReason(row),
+});
+
+const snapshotFromOwnerRow = (
+  createdByUserId: string,
+  row: ShareLinkListRow,
+): ShareLinkRealtimeSnapshot => ({
+  createdByUserId,
+  shareLink: shareLinkItemFromRow(row),
 });
 
 export const shareLinkService = {
@@ -384,8 +399,10 @@ export const shareLinkService = {
         remainingViews: number | null;
         permanent: boolean;
         sharedByUserName: string;
+        createdByUserId: string;
+        shareLink: ShareLinkListItem;
       }
-    | { ok: false; reason: string }
+    | { ok: false; reason: string; createdByUserId?: string; shareLink?: ShareLinkListItem }
   > {
     const row = await shareLinkRepository.findByShareHash(shareToken);
     if (!row) return { ok: false, reason: "Share link not found" };
@@ -396,19 +413,31 @@ export const shareLinkService = {
 
     const now = new Date();
     if (row.expirationDate && row.expirationDate <= now) {
-      await shareLinkRepository.markDeactivatedById({
+      const deactivated = await shareLinkRepository.markDeactivatedById({
         id: row.id,
         deactivationReason: "timeout",
       });
-      return { ok: false, reason: "This share link has expired" };
+      const snapshot = snapshotFromOwnerRow(row.createdByUserId, deactivated);
+      return {
+        ok: false,
+        reason: "This share link has expired",
+        createdByUserId: snapshot.createdByUserId,
+        shareLink: snapshot.shareLink,
+      };
     }
 
     if (row.maxViews != null && row.viewCount >= row.maxViews) {
-      await shareLinkRepository.markDeactivatedById({
+      const deactivated = await shareLinkRepository.markDeactivatedById({
         id: row.id,
         deactivationReason: "limit_reached",
       });
-      return { ok: false, reason: "This share link has reached its view limit" };
+      const snapshot = snapshotFromOwnerRow(row.createdByUserId, deactivated);
+      return {
+        ok: false,
+        reason: "This share link has reached its view limit",
+        createdByUserId: snapshot.createdByUserId,
+        shareLink: snapshot.shareLink,
+      };
     }
 
     const updated = await prismaClient.$transaction(async (tx) => {
@@ -434,23 +463,37 @@ export const shareLinkService = {
     }
 
     const permanent = row.expirationDate == null && row.maxViews == null;
-    const newCount = updated.viewCount;
+    let liveRow: ShareLinkListRow = {
+      id: updated.id,
+      shareHash: updated.shareHash,
+      createdAt: updated.createdAt,
+      expirationDate: updated.expirationDate,
+      maxViews: updated.maxViews,
+      viewCount: updated.viewCount,
+      disabled: updated.disabled,
+      deactivationReason: updated.deactivationReason,
+      haikuSubject: updated.haikuSubject,
+      sharedHaikuId: updated.sharedHaikuId,
+    };
     const remainingViews =
-      row.maxViews != null ? Math.max(0, row.maxViews - newCount) : null;
+      row.maxViews != null ? Math.max(0, row.maxViews - liveRow.viewCount) : null;
 
-    if (row.maxViews != null && newCount >= row.maxViews) {
-      await shareLinkRepository.markDeactivatedById({
+    if (row.maxViews != null && liveRow.viewCount >= row.maxViews) {
+      liveRow = await shareLinkRepository.markDeactivatedById({
         id: row.id,
         deactivationReason: "limit_reached",
       });
     }
 
+    const snapshot = snapshotFromOwnerRow(row.createdByUserId, liveRow);
     return {
       ok: true,
       haiku: haikuPayload(haikuRow),
       remainingViews,
       permanent,
       sharedByUserName: resolveDisplayName(row.createdBy),
+      createdByUserId: snapshot.createdByUserId,
+      shareLink: snapshot.shareLink,
     };
   },
 };

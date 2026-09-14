@@ -4,18 +4,15 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { env } from "../../env";
 import { AUTH_CODES, AUTH_COOKIE_NAMES, AUTH_HEADER_NAMES, AUTH_MESSAGES } from "./constants";
 import { authService } from "./auth.service";
-import { authRepository } from "./repository";
 import { userService } from "../user/user.service";
 import { tokenService } from "./tokenService";
 import { isAuthError } from "./errors";
 import { safeEqual } from "./utils";
-import { jwtVerify } from "jose";
-import { TextEncoder } from "node:util";
 import { tryDevAutoLogin, tryDevAutoLoginOnRefresh } from "./devAutoLogin";
+import { verifyAccessTokenFromRequest } from "./verifyAccessToken";
 
 const authPluginImpl = async (app: FastifyInstance) => {
   await app.register(cookie);
-  const accessJwtSecret = new TextEncoder().encode(env.JWT_ACCESS_SECRET);
 
   const requestAuthMeta = (request: FastifyRequest) => ({
     route: request.routeOptions.url,
@@ -69,36 +66,9 @@ const authPluginImpl = async (app: FastifyInstance) => {
     reply.code(statusCode).send({ ok: false, error: AUTH_MESSAGES.unauthorized });
   };
 
-  // Shared: verifies access JWT from the `access_token` cookie and checks that the
-  // associated server-side session is still active (not revoked/expired).
-  const verifyAccessTokenForRequest = async (request: FastifyRequest): Promise<boolean> => {
-    const token = request.cookies[AUTH_COOKIE_NAMES.accessToken];
-    if (!token) return false;
-
-    try {
-      const { payload } = await jwtVerify(token, accessJwtSecret, {
-        algorithms: ["HS256"],
-      });
-
-      const sub = payload.sub;
-      const sid = (payload as Record<string, unknown>).sid;
-
-      if (typeof sub !== "string" || typeof sid !== "string") {
-        return false;
-      }
-
-      const session = await authRepository.findActiveAuthSessionById(sid);
-      if (!session || session.userId !== sub) return false;
-      request.user = { sub, sid };
-      return true;
-    } catch {
-      return false;
-    }
-  };
-
   // Route guard for session-style endpoints (401 when not logged in).
   const authenticate = async (request: FastifyRequest, reply: FastifyReply) => {
-    const ok = await verifyAccessTokenForRequest(request);
+    const ok = await verifyAccessTokenFromRequest(request);
     if (ok) return;
     if (await tryDevAutoLogin(request, reply)) return;
     return denyWithAuthCookiesCleared(reply, 401);
@@ -106,7 +76,7 @@ const authPluginImpl = async (app: FastifyInstance) => {
 
   // Stricter guard for resources that must not run without a valid user (403).
   const requireAuthenticated = async (request: FastifyRequest, reply: FastifyReply) => {
-    const ok = await verifyAccessTokenForRequest(request);
+    const ok = await verifyAccessTokenFromRequest(request);
     if (ok) return;
     if (await tryDevAutoLogin(request, reply)) return;
     tokenService.clearAuthCookies(reply);

@@ -60,6 +60,7 @@ export const shareLinkRepository = {
         shareHash: true,
         createdByUserId: true,
         sharedHaikuId: true,
+        haikuSubject: true,
         expirationDate: true,
         maxViews: true,
         viewCount: true,

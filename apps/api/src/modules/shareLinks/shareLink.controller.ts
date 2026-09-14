@@ -1,7 +1,15 @@
 import fp from "fastify-plugin";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { isUuid } from "../../utils/uuid";
-import { shareLinkService } from "./shareLink.service";
+import { shareLinkService, type ShareLinkListItem } from "./shareLink.service";
+
+const broadcastShareLink = (app: FastifyInstance, userId: string, shareLink: ShareLinkListItem) => {
+  app.sendToUser(userId, { kind: "share_link", data: shareLink });
+};
+
+const broadcastShareLinkDeleted = (app: FastifyInstance, userId: string, id: string) => {
+  app.sendToUser(userId, { kind: "share_link_deleted", data: { id } });
+};
 
 const shareLinkPluginImpl = async (app: FastifyInstance) => {
   app.get(
@@ -143,6 +151,7 @@ const shareLinkPluginImpl = async (app: FastifyInstance) => {
       }
 
       res.code(result.created ? 201 : 200).send({ ok: true, data: result.shareLink });
+      broadcastShareLink(app, userId, result.shareLink);
     },
   );
 
@@ -177,6 +186,7 @@ const shareLinkPluginImpl = async (app: FastifyInstance) => {
       }
 
       res.send({ ok: true });
+      broadcastShareLinkDeleted(app, userId, share_link_id);
     },
   );
 
@@ -232,6 +242,7 @@ const shareLinkPluginImpl = async (app: FastifyInstance) => {
       }
 
       res.send({ ok: true, data: result.shareLink });
+      broadcastShareLink(app, userId, result.shareLink);
     },
   );
 
@@ -281,6 +292,7 @@ const shareLinkPluginImpl = async (app: FastifyInstance) => {
       }
 
       res.send({ ok: true, data: result.shareLink });
+      broadcastShareLink(app, userId, result.shareLink);
     },
   );
 
@@ -293,6 +305,9 @@ const shareLinkPluginImpl = async (app: FastifyInstance) => {
     }
 
     const result = await shareLinkService.resolveSharedHaiku(token);
+    if (result.shareLink && result.createdByUserId) {
+      broadcastShareLink(app, result.createdByUserId, result.shareLink);
+    }
     if (!result.ok) {
       res.code(404).send({ ok: false, error: result.reason });
       return;

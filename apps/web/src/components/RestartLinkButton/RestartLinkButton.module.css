@@ -1,0 +1,182 @@
+.root {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 80px;
+  min-height: 2.6rem;
+  padding: 0.4rem 0.75rem;
+  overflow: visible;
+  border: 2px solid #111;
+  border-radius: 0.3rem;
+  background-color: #000;
+  color: #fff;
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  appearance: none;
+}
+
+.root:hover:not(:disabled) {
+  transform: scale(1.01);
+}
+
+.root:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.root:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.rowWithHipoints {
+  padding-left: 1.5rem;
+}
+
+.iconCluster {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+}
+
+.hipointsWell {
+  position: absolute;
+  right: 100%;
+  bottom: 0;
+  box-sizing: border-box;
+  width: 1.9rem;
+  height: 1.9rem;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hipointsIcon {
+  display: block;
+  width: 1.9rem;
+  height: 1.9rem;
+  transform: translateY(100%);
+}
+
+.hipointsGlyph {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.filterIcon {
+  display: block;
+  width: 3rem;
+  height: 3rem;
+}
+
+.filterGlyph {
+  display: block;
+  width: 3rem;
+  height: 3rem;
+  object-fit: contain;
+  filter: invert(1);
+  pointer-events: none;
+}
+
+.iconStage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+}
+
+.reviveLockup {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  width: 5rem;
+  height: 5rem;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.72);
+}
+
+.reviveEmblem {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.reviveBanner {
+  position: absolute;
+  left: var(--revive-banner-x, 50%);
+  top: var(--revive-banner-y, 50%);
+  box-sizing: border-box;
+  padding: 0.08rem 0.28rem 0.12rem;
+  border: 2px solid #fff;
+  background: #000;
+  transform: translate(-50%, -50%) rotate(var(--revive-banner-rotate, -3deg))
+    scale(var(--revive-banner-scale, 0.86));
+  opacity: 0;
+}
+
+.reviveText {
+  display: block;
+  color: #fff;
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: 0.98rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  line-height: 0.9;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.labelSlot {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  perspective: 280px;
+}
+
+.labelLine {
+  grid-area: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+  white-space: nowrap;
+}
+
+.labelLineHover .char {
+  transform: rotateX(-90deg);
+}
+
+.char {
+  display: inline-block;
+  transform-origin: 50% 50%;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root:hover:not(:disabled) {
+    transform: none;
+  }
+}

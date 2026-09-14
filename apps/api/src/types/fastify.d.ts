@@ -15,5 +15,7 @@ declare module "fastify" {
   interface FastifyInstance {
     authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
     requireAuthenticated: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
+    sendToUid: (uid: string, msg: unknown) => void;
+    sendToUser: (userId: string, msg: unknown) => void;
   }
 }
