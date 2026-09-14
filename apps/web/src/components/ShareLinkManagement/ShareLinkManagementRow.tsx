@@ -213,6 +213,7 @@ export function ShareLinkManagementRow({
             onStart={ctrl.onStart}
             onStop={ctrl.onStop}
             stopButtonClassName={shareStyles.stopButton}
+            restartReason={ctrl.restartReason}
           />
         </div>
       </ComicPagePanel>

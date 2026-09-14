@@ -3,6 +3,7 @@
 import dayjs from "dayjs";
 import type { Dispatch, SetStateAction } from "react";
 import { DatePicker, InputNumber } from "@/components/StyledComponents";
+import { RestartLinkButton, type RestartLinkReason } from "@/components/RestartLinkButton";
 import styles from "./ShareLink.module.css";
 import {
   PAUSE_ICON_SRC,
@@ -28,6 +29,7 @@ export type ShareLinkSettingsControlsProps = {
   onStart: () => void | Promise<void>;
   onStop: () => void | Promise<void>;
   stopButtonClassName?: string;
+  restartReason?: RestartLinkReason | null;
 };
 
 function minTimeoutAt() {
@@ -91,6 +93,7 @@ export function ShareLinkSettingsControls({
   onStart,
   onStop,
   stopButtonClassName,
+  restartReason = null,
 }: ShareLinkSettingsControlsProps) {
   return (
     <>
@@ -195,6 +198,13 @@ export function ShareLinkSettingsControls({
             <img src={PAUSE_ICON_SRC} alt="" className={styles.actionIcon} aria-hidden />
             <span className={styles.actionLabel}>Stop</span>
           </button>
+        ) : restartReason ? (
+          <RestartLinkButton
+            reason={restartReason}
+            disabled={!formValid || isUpdating || busy}
+            className={styles.restartButton}
+            onClick={() => void onStart()}
+          />
         ) : (
           <button
             type="button"

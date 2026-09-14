@@ -89,6 +89,7 @@ export function ShareLink({
         onUpdateLimits={ctrl.onUpdateLimits}
         onStart={ctrl.onStart}
         onStop={ctrl.onStop}
+        restartReason={ctrl.restartReason}
       />
     </article>
   );

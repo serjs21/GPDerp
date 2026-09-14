@@ -1,6 +1,7 @@
 import type { ShareLinkListItem } from "@/api/shareLinks";
 import {
   canStartShareLink,
+  getRestartReason,
   getShareLinkStatus,
   isActiveShareLink,
   isExpired,
@@ -49,5 +50,16 @@ describe("shareLinkStatus", () => {
     const limited = baseLink({ maxViews: 3, viewCount: 3 });
     expect(isViewLimitReached(limited)).toBe(true);
     expect(getShareLinkStatus(limited).kind).toBe("view_limit_reached");
+  });
+
+  it("maps expired and zero-hit links to restart reasons", () => {
+    expect(getRestartReason(baseLink({ expirationDate: "2020-01-01T00:00:00.000Z" }))).toBe("expired");
+    expect(getRestartReason(baseLink({ disabled: true, deactivationReason: "timeout" }))).toBe("expired");
+    expect(getRestartReason(baseLink({ maxViews: 3, viewCount: 3 }))).toBe("limit_reached");
+    expect(getRestartReason(baseLink({ disabled: true, deactivationReason: "limit_reached" }))).toBe(
+      "limit_reached",
+    );
+    expect(getRestartReason(baseLink({ disabled: true }))).toBeNull();
+    expect(getRestartReason(baseLink())).toBeNull();
   });
 });

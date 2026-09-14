@@ -218,6 +218,12 @@
   width: 100%;
 }
 
+.restartButton {
+  width: 100%;
+  max-width: none;
+  flex: 1 1 auto;
+}
+
 .actionButton {
   display: inline-flex;
   align-items: center;

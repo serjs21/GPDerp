@@ -15,7 +15,7 @@ import {
   getTimeMeterDisplay,
   shouldTickShareLinkClock,
 } from "@/utils/shareLinkDisplay";
-import { canStartShareLink, isActiveShareLink, isExpired, isViewLimitReached } from "@/utils/shareLinkStatus";
+import { canStartShareLink, getRestartReason, isActiveShareLink, isExpired, isViewLimitReached } from "@/utils/shareLinkStatus";
 
 export const PAPER_PLANE_SRC = "/share_modal/link/paper_plane.svg";
 export const START_ICON_SRC = "/share_modal/link/start.svg";
@@ -173,6 +173,7 @@ export function useShareLinkControls({
 
   const subject = link?.haikuSubject || haikuSubject;
   const active = link != null && isActiveShareLink(link, now ?? undefined);
+  const restartReason = getRestartReason(link, now ?? undefined);
   const busy = activating || deactivating || updatingLimits;
   const limitsLocked = busy;
   const copyEnabled = active && !busy;
@@ -356,6 +357,7 @@ export function useShareLinkControls({
   return {
     subject,
     active,
+    restartReason,
     busy,
     limitsLocked,
     copyEnabled,

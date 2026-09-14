@@ -40,6 +40,19 @@ export function isActiveShareLink(link: ShareLinkListItem, now = new Date()): bo
   return !link.disabled && isWithinShareLinkLimits(link, now);
 }
 
+export type ShareLinkRestartReason = "expired" | "limit_reached";
+
+/** Restart CTA for links that cannot be started until limits are reset. */
+export function getRestartReason(
+  link: ShareLinkListItem | null,
+  now = new Date(),
+): ShareLinkRestartReason | null {
+  if (!link || isActiveShareLink(link, now)) return null;
+  if (isExpired(link, now) || link.deactivationReason === "timeout") return "expired";
+  if (isViewLimitReached(link) || link.deactivationReason === "limit_reached") return "limit_reached";
+  return null;
+}
+
 export function canStartShareLink(link: ShareLinkListItem, now = new Date()): boolean {
   return link.disabled && isWithinShareLinkLimits(link, now);
 }
