@@ -109,8 +109,8 @@
   left: 50%;
   top: 50%;
   z-index: 2;
-  width: 5rem;
-  height: 5rem;
+  width: 4rem;
+  height: 4rem;
   pointer-events: none;
   opacity: 0;
   transform: translate(-50%, -50%) scale(0.72);
