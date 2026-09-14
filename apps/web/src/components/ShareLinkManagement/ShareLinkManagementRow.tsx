@@ -7,6 +7,7 @@ import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { SakuraPetalLoader } from "@/components/Loaders";
+import { OverlayTitle } from "@/components/OverlayTitle";
 import { Sway } from "@/components/Sway";
 import shareStyles from "@/components/ShareLink/ShareLink.module.css";
 import { ShareLinkSettingsControls } from "@/components/ShareLink/ShareLinkSettingsControls";
@@ -129,51 +130,67 @@ export function ShareLinkManagementRow({
     />
   );
 
+  const lanternPanel = (
+    <ComicPagePanel
+      background="halftone"
+      color="sky"
+      title={link.haikuSubject}
+      footer={
+        ctrl.active ? (
+          <PreviewLanternStats
+            hits={ctrl.hits}
+            time={ctrl.time}
+            hitsLabel={ctrl.hitsLabel}
+            timeLabel={ctrl.timeLabel}
+          />
+        ) : undefined
+      }
+      contentAlign="center"
+      className={[
+        styles.lanternPanel,
+        ctrl.grayscale ? shareStyles.panelShellInactive : shareStyles.panelShellActive,
+      ].join(" ")}
+    >
+      <div className={styles.lanternWrap}>
+        <Sway
+          className={styles.lanternSway}
+          disabled={!ctrl.active}
+          speed={4.6}
+          amplitude={3.25}
+        >
+          <LanternFrame
+            ariaLabel={`Haiku lantern: ${ctrl.subject}`}
+            className={styles.lanternFrame}
+            widthRem={9}
+          >
+            {lanternContent}
+          </LanternFrame>
+        </Sway>
+      </div>
+    </ComicPagePanel>
+  );
+
   return (
     <div className={styles.linkRow}>
-      <ComicPagePanel
-        background="halftone"
-        color="sky"
-        title={link.haikuSubject}
-        footer={
-          ctrl.active ? (
-            <PreviewLanternStats
-              hits={ctrl.hits}
-              time={ctrl.time}
-              hitsLabel={ctrl.hitsLabel}
-              timeLabel={ctrl.timeLabel}
-            />
-          ) : undefined
-        }
-        contentAlign="center"
-        className={[
-          styles.lanternPanel,
-          ctrl.grayscale ? shareStyles.panelShellInactive : shareStyles.panelShellActive,
-        ].join(" ")}
-        ariaLabel={`Lantern preview for ${ctrl.subject}`}
-      >
-        <div className={styles.lanternWrap}>
-          <Sway
-            className={styles.lanternSway}
-            disabled={!ctrl.active}
-            speed={4.6}
-            amplitude={3.25}
+      {ctrl.copyEnabled ? (
+        <OverlayTitle title="Copy link!" direction="bottom" className={styles.lanternSlot}>
+          <button
+            type="button"
+            className={styles.lanternCopy}
+            onClick={ctrl.onCopy}
+            aria-label={`Copy share link for ${ctrl.subject}`}
           >
-            <LanternFrame
-              ariaLabel={`Haiku lantern: ${ctrl.subject}`}
-              className={styles.lanternFrame}
-              widthRem={9}
-            >
-              {lanternContent}
-            </LanternFrame>
-          </Sway>
-        </div>
-      </ComicPagePanel>
+            {lanternPanel}
+          </button>
+        </OverlayTitle>
+      ) : (
+        lanternPanel
+      )}
 
       <ComicPagePanel
         background="solid"
         color="white"
-        title="Settings"
+        // title="Settings"
         contentAlign="start"
         className={styles.settingsPanel}
         ariaLabel={`Share link settings for ${ctrl.subject}`}
