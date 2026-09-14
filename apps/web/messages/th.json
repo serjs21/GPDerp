@@ -22,7 +22,7 @@
   "LibraryCard": {
     "title": "บัตรห้องสมุด",
     "belongsTo": "บัตรนี้เป็นของ",
-    "remaining": "เหลือ {count}",
+    "remaining": "เหลือ {count} ครั้ง",
     "remainingUnknown": "จำนวนการสร้างที่เหลือจะแสดงที่นี่",
     "buyMore": "ซื้อเพิ่ม"
   },

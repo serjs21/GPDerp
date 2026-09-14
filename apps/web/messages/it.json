@@ -22,7 +22,7 @@
   "LibraryCard": {
     "title": "Tessera della biblioteca",
     "belongsTo": "Questa tessera appartiene a",
-    "remaining": "{count} rimanenti",
+    "remaining": "{count} generazioni rimaste",
     "remainingUnknown": "Le generazioni rimanenti appariranno qui.",
     "buyMore": "Compra ancora"
   },

@@ -22,7 +22,7 @@
   "LibraryCard": {
     "title": "Carnet de biblioteca",
     "belongsTo": "Este carnet pertenece a",
-    "remaining": "{count} restantes",
+    "remaining": "{count} generaciones restantes",
     "remainingUnknown": "Las generaciones restantes apareceran aqui.",
     "buyMore": "Comprar mas"
   },

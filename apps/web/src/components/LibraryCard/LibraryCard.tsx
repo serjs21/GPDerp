@@ -1,6 +1,5 @@
 "use client";
 
-import { useRef } from "react";
 import { useTranslations } from "next-intl";
 import { ComicModalInput } from "@/components/ComicModalInput";
 import { ComicPageCtaAction, ComicPagePanel } from "@/components/ComicPageLayout";
@@ -12,17 +11,31 @@ import styles from "./LibraryCard.module.css";
 
 const PHOTO_SIZE_PX = 128;
 
+function readNameFields(form: HTMLFormElement) {
+  const data = new FormData(form);
+  return {
+    firstName: String(data.get("firstName") ?? ""),
+    lastName: String(data.get("lastName") ?? ""),
+  };
+}
+
 export function LibraryCard() {
   const profile = useProfile();
   const { profileInfo } = useProfileI18n();
   const t = useTranslations("LibraryCard");
-  const nameFormRef = useRef<HTMLFormElement>(null);
   const { credits, loadingCredits, startingCheckout, initializing, checkoutReady, buy } =
     useBuyGenerations();
 
   const remainingLabel =
     loadingCredits || credits === null ? t("remainingUnknown") : t("remaining", { count: credits });
   const buyDisabled = !checkoutReady || startingCheckout || initializing;
+
+  const saveNamesIfChanged = (form: HTMLFormElement) => {
+    if (profile.saving) return;
+    const { firstName, lastName } = readNameFields(form);
+    if (firstName === profile.firstName && lastName === profile.lastName) return;
+    void profile.onSaveProfile({ firstName, lastName });
+  };
 
   return (
     <div id="buy-generations" className={styles.root}>
@@ -48,16 +61,16 @@ export function LibraryCard() {
             <div className={styles.details}>
               <p className={styles.belongsTo}>{t("belongsTo")}</p>
               <form
-                ref={nameFormRef}
                 key={profile.email}
                 className={styles.nameForm}
                 onSubmit={(e) => {
                   e.preventDefault();
-                  const data = new FormData(e.currentTarget);
-                  void profile.onSaveProfile({
-                    firstName: String(data.get("firstName") ?? ""),
-                    lastName: String(data.get("lastName") ?? ""),
-                  });
+                  saveNamesIfChanged(e.currentTarget);
+                }}
+                onBlur={(e) => {
+                  const next = e.relatedTarget;
+                  if (next instanceof Node && e.currentTarget.contains(next)) return;
+                  saveNamesIfChanged(e.currentTarget);
                 }}
               >
                 <label className={styles.field}>
@@ -68,23 +81,14 @@ export function LibraryCard() {
                     aria-label={profileInfo("firstName")}
                   />
                 </label>
-                <div className={styles.lastNameRow}>
-                  <label className={styles.field}>
-                    <span className={styles.fieldLabel}>{profileInfo("lastName")}</span>
-                    <ComicModalInput
-                      name="lastName"
-                      defaultValue={profile.lastName}
-                      aria-label={profileInfo("lastName")}
-                    />
-                  </label>
-                  <div className={styles.formActions}>
-                    <ComicPageCtaAction
-                      label={profile.saveProfileLabel}
-                      busy={profile.saving}
-                      onClick={() => nameFormRef.current?.requestSubmit()}
-                    />
-                  </div>
-                </div>
+                <label className={styles.field}>
+                  <span className={styles.fieldLabel}>{profileInfo("lastName")}</span>
+                  <ComicModalInput
+                    name="lastName"
+                    defaultValue={profile.lastName}
+                    aria-label={profileInfo("lastName")}
+                  />
+                </label>
               </form>
               <div className={styles.generations}>
                 <p className={styles.remaining} aria-live="polite">

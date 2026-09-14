@@ -22,7 +22,7 @@
   "LibraryCard": {
     "title": "Bibliotheksausweis",
     "belongsTo": "Dieser Ausweis gehort",
-    "remaining": "{count} ubrig",
+    "remaining": "{count} Generierungen ubrig",
     "remainingUnknown": "Verbleibende Generierungen erscheinen hier.",
     "buyMore": "Mehr kaufen"
   },

@@ -22,7 +22,7 @@
   "LibraryCard": {
     "title": "図書館カード",
     "belongsTo": "このカードの持ち主",
-    "remaining": "残り {count}",
+    "remaining": "残り {count} 回",
     "remainingUnknown": "残りの生成回数はここに表示されます。",
     "buyMore": "追加購入"
   },

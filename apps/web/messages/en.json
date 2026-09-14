@@ -22,8 +22,8 @@
   "LibraryCard": {
     "title": "Library Card",
     "belongsTo": "This card belongs to",
-    "remaining": "{count} remaining",
-    "remainingUnknown": "Remaining generations will appear here.",
+    "remaining": "{count} Generations left",
+    "remainingUnknown": "Generations left will appear here.",
     "buyMore": "Buy more"
   },
   "ProfileInfo": {

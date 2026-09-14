@@ -22,7 +22,7 @@
   "LibraryCard": {
     "title": "Carte de bibliotheque",
     "belongsTo": "Cette carte appartient a",
-    "remaining": "{count} restantes",
+    "remaining": "{count} generations restantes",
     "remainingUnknown": "Les generations restantes apparaitront ici.",
     "buyMore": "Acheter plus"
   },
