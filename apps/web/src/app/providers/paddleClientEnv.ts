@@ -13,11 +13,11 @@ const readOptional = (value: string | undefined): string | null => {
 };
 
 export const paddleClientEnvironment = (): PaddleClientEnvironment =>
-  process.env.NEXT_PUBLIC_PADDLE_ENV === "production" ? "production" : "sandbox";
+  process.env.PADDLE_ENV === "production" ? "production" : "sandbox";
 
 export const readPaddleClientEnv = (): PaddleClientEnv => {
-  const token = readOptional(process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN);
-  const priceId = readOptional(process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_100_HAIKUS);
+  const token = readOptional(process.env.PADDLE_CLIENT_TOKEN);
+  const priceId = readOptional(process.env.PADDLE_PRICE_ID_100_HAIKUS);
   return {
     token,
     environment: paddleClientEnvironment(),

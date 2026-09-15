@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { initializePaddle, type Paddle } from "@paddle/paddle-js";
 import { readPaddleClientEnv } from "./paddleClientEnv";
+import { loadPaddleSdk } from "./loadPaddleSdk";
 
 type PaddleContextValue = {
   paddle: Paddle | null;
@@ -22,10 +23,13 @@ export const PaddleProvider = ({ children }: { children: ReactNode }) => {
     if (!configured || !token) return;
 
     let cancelled = false;
-    void initializePaddle({
-      token,
-      environment,
-    })
+    void loadPaddleSdk()
+      .then(() =>
+        initializePaddle({
+          token,
+          environment,
+        }),
+      )
       .then((instance) => {
         if (cancelled) return;
         if (instance) setPaddle(instance);

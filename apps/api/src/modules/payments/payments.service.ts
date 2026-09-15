@@ -49,7 +49,7 @@ export const paymentsService = {
       return { status: "ignored" as const, reason: "missing_reference" as const };
     }
 
-    if (!transactionHasExpectedPrice(transaction, env.PADDLE_PRICE_ID)) {
+    if (!transactionHasExpectedPrice(transaction, env.PADDLE_PRICE_ID_100_HAIKUS)) {
       return { status: "ignored" as const, reason: "price_mismatch" as const };
     }
 
