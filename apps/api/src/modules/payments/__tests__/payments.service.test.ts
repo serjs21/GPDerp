@@ -13,7 +13,12 @@ jest.mock("../payments.repository", () => ({
   },
 }));
 
+jest.mock("../paddleWebhook", () => ({
+  getPaddle: jest.fn(),
+}));
+
 import { EventName } from "@paddle/paddle-node-sdk";
+import { getPaddle } from "../paddleWebhook";
 import { paymentsService } from "../payments.service";
 
 const { paymentsRepository } = jest.requireMock("../payments.repository") as {
@@ -24,6 +29,8 @@ const { paymentsRepository } = jest.requireMock("../payments.repository") as {
     fulfillCompletedPurchase: jest.Mock;
   };
 };
+
+const mockedGetPaddle = getPaddle as jest.MockedFunction<typeof getPaddle>;
 
 const purchaseReference = "11111111-1111-4111-8111-111111111111";
 
@@ -120,16 +127,84 @@ describe("paymentsService.findPurchaseByReference", () => {
 });
 
 describe("paymentsService.createCheckout", () => {
-  it("creates a pending purchase and returns the Paddle price id", async () => {
+  it("creates a pending purchase and a Paddle transaction", async () => {
     paymentsRepository.createPendingPurchase.mockResolvedValue({
       id: purchaseReference,
       credits: 100,
     });
+    mockedGetPaddle.mockReturnValue({
+      transactions: {
+        create: jest.fn().mockResolvedValue({ id: "txn_checkout_1" }),
+      },
+    } as never);
 
     await expect(paymentsService.createCheckout("user-1")).resolves.toEqual({
       purchaseReference,
+      transactionId: "txn_checkout_1",
       priceId: "pri_100_haiku",
       credits: 100,
+      checkoutUrl: null,
     });
+  });
+});
+
+describe("paymentsService.confirmCompletedCheckout", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("verifies the Paddle transaction and grants credits for the session user", async () => {
+    mockedGetPaddle.mockReturnValue({
+      transactions: {
+        get: jest.fn().mockResolvedValue({
+          id: "txn_abc",
+          status: "completed",
+          customData: { purchaseId: purchaseReference },
+          items: [{ price: { id: "pri_100_haiku" } }],
+        }),
+      },
+    } as never);
+    paymentsRepository.findById.mockResolvedValue({
+      id: purchaseReference,
+      userId: "user-1",
+      status: "PENDING",
+    });
+    paymentsRepository.fulfillCompletedPurchase.mockResolvedValue("granted");
+    paymentsRepository.getCredits.mockResolvedValue(140);
+
+    await expect(paymentsService.confirmCompletedCheckout("user-1", "txn_abc")).resolves.toEqual({
+      ok: true,
+      status: "granted",
+      credits: 140,
+    });
+    expect(paymentsRepository.fulfillCompletedPurchase).toHaveBeenCalledWith({
+      purchaseReference,
+      paddleTransactionId: "txn_abc",
+      paddleEventId: "client-confirm:txn_abc",
+    });
+  });
+
+  it("rejects when the purchase belongs to another user", async () => {
+    mockedGetPaddle.mockReturnValue({
+      transactions: {
+        get: jest.fn().mockResolvedValue({
+          id: "txn_abc",
+          status: "completed",
+          customData: { purchaseId: purchaseReference },
+          items: [{ price: { id: "pri_100_haiku" } }],
+        }),
+      },
+    } as never);
+    paymentsRepository.findById.mockResolvedValue({
+      id: purchaseReference,
+      userId: "other-user",
+      status: "PENDING",
+    });
+
+    await expect(paymentsService.confirmCompletedCheckout("user-1", "txn_abc")).resolves.toEqual({
+      ok: false,
+      reason: "not_found",
+    });
+    expect(paymentsRepository.fulfillCompletedPurchase).not.toHaveBeenCalled();
   });
 });

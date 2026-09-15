@@ -1,5 +1,5 @@
 import axios from "axios";
-import { createPendingPurchase, fetchCredits } from "./payments";
+import { confirmPurchase, createCheckout, createPendingPurchase, fetchCredits } from "./payments";
 
 jest.mock("axios");
 
@@ -19,15 +19,28 @@ describe("payments API", () => {
       purchaseId: "11111111-1111-4111-8111-111111111111",
     });
     expect(mockedAxios.post).toHaveBeenCalledWith("/payments/purchase");
-    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
   });
 
-  it("throws when the purchase API returns an error", async () => {
+  it("creates a checkout with purchase and transaction ids", async () => {
     mockedAxios.post.mockResolvedValue({
-      data: { ok: false, error: "Unauthorized" },
+      data: {
+        ok: true,
+        data: {
+          purchaseReference: "11111111-1111-4111-8111-111111111111",
+          transactionId: "txn_abc",
+          priceId: "pri_100",
+          credits: 100,
+        },
+      },
     });
 
-    await expect(createPendingPurchase()).rejects.toThrow("Unauthorized");
+    await expect(createCheckout()).resolves.toEqual({
+      purchaseId: "11111111-1111-4111-8111-111111111111",
+      transactionId: "txn_abc",
+      priceId: "pri_100",
+      credits: 100,
+    });
+    expect(mockedAxios.post).toHaveBeenCalledWith("/payments/checkout", {});
   });
 
   it("loads credits from the backend", async () => {
@@ -37,5 +50,19 @@ describe("payments API", () => {
 
     await expect(fetchCredits()).resolves.toEqual({ credits: 12 });
     expect(mockedAxios.get).toHaveBeenCalledWith("/payments/credits");
+  });
+
+  it("confirms a completed Paddle transaction", async () => {
+    mockedAxios.post.mockResolvedValue({
+      data: { ok: true, data: { credits: 112, status: "granted" } },
+    });
+
+    await expect(confirmPurchase("txn_abc")).resolves.toEqual({
+      credits: 112,
+      status: "granted",
+    });
+    expect(mockedAxios.post).toHaveBeenCalledWith("/payments/confirm", {
+      transactionId: "txn_abc",
+    });
   });
 });

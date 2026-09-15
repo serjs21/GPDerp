@@ -17,7 +17,9 @@
     "product": "100 geracoes de haiku — uma compra adiciona exatamente 100 creditos.",
     "buy": "Comprar 100 geracoes — $3.0",
     "unavailable": "O checkout nao esta disponivel agora.",
-    "error": "Nao foi possivel iniciar o checkout."
+    "error": "Nao foi possivel iniciar o checkout.",
+    "success": "Compra concluída — gerações adicionadas.",
+    "confirmError": "Pagamento concluído, mas ainda não foi possível atualizar o saldo. Atualize em instantes."
   },
   "LibraryCard": {
     "title": "Carteira da biblioteca",

@@ -17,7 +17,9 @@
     "product": "100 Haiku-Generierungen — ein Kauf fügt genau 100 Credits hinzu.",
     "buy": "100 Generierungen kaufen — $3.0",
     "unavailable": "Checkout ist gerade nicht verfügbar.",
-    "error": "Checkout konnte nicht gestartet werden."
+    "error": "Checkout konnte nicht gestartet werden.",
+    "success": "Kauf abgeschlossen — Generierungen hinzugefügt.",
+    "confirmError": "Zahlung erfolgreich, aber das Guthaben konnte noch nicht aktualisiert werden. Bitte gleich aktualisieren."
   },
   "LibraryCard": {
     "title": "Bibliotheksausweis",

@@ -17,7 +17,9 @@
     "product": "100 generations de haiku — un achat ajoute exactement 100 credits.",
     "buy": "Acheter 100 generations — $3.0",
     "unavailable": "Le paiement n'est pas disponible pour le moment.",
-    "error": "Impossible de demarrer le paiement."
+    "error": "Impossible de demarrer le paiement.",
+    "success": "Achat terminé — générations ajoutées.",
+    "confirmError": "Paiement réussi, mais le solde n’a pas encore pu être mis à jour. Actualisez dans un instant."
   },
   "LibraryCard": {
     "title": "Carte de bibliotheque",

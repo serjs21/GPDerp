@@ -17,7 +17,9 @@
     "product": "100 generazioni haiku — un acquisto aggiunge esattamente 100 crediti.",
     "buy": "Compra 100 generazioni — $3.0",
     "unavailable": "Il checkout non e disponibile in questo momento.",
-    "error": "Impossibile avviare il checkout."
+    "error": "Impossibile avviare il checkout.",
+    "success": "Acquisto completato: generazioni aggiunte.",
+    "confirmError": "Pagamento riuscito, ma non siamo riusciti ad aggiornare il saldo. Aggiorna tra poco."
   },
   "LibraryCard": {
     "title": "Tessera della biblioteca",

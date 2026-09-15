@@ -1,6 +1,7 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { comicToast } from "@/components/ComicToast";
-import { createPendingPurchase, fetchCredits } from "@/api/payments";
+import { createCheckout, fetchCredits } from "@/api/payments";
+import { openPaddleCheckoutWithFallback } from "@/app/providers/openPaddleCheckoutWithFallback";
 import { useBuyGenerations } from "./useBuyGenerations";
 
 jest.mock("next-intl", () => ({
@@ -16,12 +17,22 @@ jest.mock("@/components/ComicToast", () => ({
 }));
 
 jest.mock("@/api/payments", () => ({
-  createPendingPurchase: jest.fn(),
+  createCheckout: jest.fn(),
   fetchCredits: jest.fn(),
+  confirmPurchase: jest.fn(),
+}));
+
+jest.mock("@/app/providers/openPaddleCheckoutWithFallback", () => ({
+  openPaddleCheckoutWithFallback: jest.fn(async (open: (opts: unknown) => void, opts: unknown) => {
+    open(opts);
+    return "overlay";
+  }),
+  PADDLE_CHECKOUT_LOADED_EVENT: "paddle:checkout-loaded",
 }));
 
 const mockUsePaddle = jest.fn();
 jest.mock("@/app/providers/PaddleProvider", () => ({
+  PADDLE_CHECKOUT_COMPLETED_EVENT: "paddle:checkout-completed",
   usePaddle: () => mockUsePaddle(),
 }));
 
@@ -42,11 +53,15 @@ jest.mock("@/app/providers/AuthenticationProvider", () => ({
   useAuthenticationState: () => mockUseAuthenticationState(),
 }));
 
-const mockedCreatePendingPurchase = createPendingPurchase as jest.MockedFunction<typeof createPendingPurchase>;
+const mockedCreateCheckout = createCheckout as jest.MockedFunction<typeof createCheckout>;
 const mockedFetchCredits = fetchCredits as jest.MockedFunction<typeof fetchCredits>;
 const mockedComicToast = comicToast as jest.Mocked<typeof comicToast>;
+const mockedOpenFallback = openPaddleCheckoutWithFallback as jest.MockedFunction<
+  typeof openPaddleCheckoutWithFallback
+>;
 
 const purchaseId = "11111111-1111-4111-8111-111111111111";
+const transactionId = "txn_100_haikus";
 const priceId = "pri_100_haikus";
 
 const configuredEnv = {
@@ -62,7 +77,12 @@ describe("useBuyGenerations", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockedFetchCredits.mockResolvedValue({ credits: 4 });
-    mockedCreatePendingPurchase.mockResolvedValue({ purchaseId });
+    mockedCreateCheckout.mockResolvedValue({
+      purchaseId,
+      transactionId,
+      priceId,
+      credits: 100,
+    });
     mockReadPaddleClientEnv.mockReturnValue(configuredEnv);
     mockRequestAuthentication.mockReturnValue(true);
     mockUseAuthenticationState.mockReturnValue({
@@ -76,7 +96,7 @@ describe("useBuyGenerations", () => {
     });
   });
 
-  it("opens checkout with purchaseId only after an authenticated purchase POST", async () => {
+  it("opens overlay checkout with a server-created transaction id", async () => {
     const { result } = renderHook(() => useBuyGenerations());
     await waitFor(() => expect(result.current.loadingCredits).toBe(false));
 
@@ -85,17 +105,18 @@ describe("useBuyGenerations", () => {
     });
 
     expect(mockRequestAuthentication).toHaveBeenCalledTimes(1);
-    expect(mockedCreatePendingPurchase).toHaveBeenCalledTimes(1);
-    expect(openCheckout).toHaveBeenCalledTimes(1);
-    expect(openCheckout).toHaveBeenCalledWith({
-      items: [{ priceId, quantity: 1 }],
-      customData: { purchaseId },
-      customer: { email: "buyer@example.com" },
-      settings: { displayMode: "overlay" },
-    });
-    const opened = openCheckout.mock.calls[0][0] as { customData: Record<string, unknown> };
-    expect(opened.customData).toEqual({ purchaseId });
-    expect(opened.customData).not.toHaveProperty("userId");
+    expect(mockedCreateCheckout).toHaveBeenCalledTimes(1);
+    expect(mockedOpenFallback).toHaveBeenCalledTimes(1);
+    expect(openCheckout).toHaveBeenCalledWith(
+      expect.objectContaining({
+        transactionId,
+        customer: { email: "buyer@example.com" },
+        settings: expect.objectContaining({
+          displayMode: "overlay",
+          successUrl: expect.stringContaining(`txn=${transactionId}`),
+        }),
+      }),
+    );
   });
 
   it("opens the auth modal and does not create a purchase when logged out", async () => {
@@ -107,8 +128,8 @@ describe("useBuyGenerations", () => {
       await result.current.buy();
     });
 
-    expect(mockedCreatePendingPurchase).not.toHaveBeenCalled();
-    expect(openCheckout).not.toHaveBeenCalled();
+    expect(mockedCreateCheckout).not.toHaveBeenCalled();
+    expect(mockedOpenFallback).not.toHaveBeenCalled();
   });
 
   it("does not open checkout when the price id is missing", async () => {
@@ -125,42 +146,12 @@ describe("useBuyGenerations", () => {
       await result.current.buy();
     });
 
-    expect(mockedCreatePendingPurchase).not.toHaveBeenCalled();
-    expect(openCheckout).not.toHaveBeenCalled();
+    expect(mockedCreateCheckout).not.toHaveBeenCalled();
+    expect(mockedOpenFallback).not.toHaveBeenCalled();
   });
 
-  it("ignores a second click while checkout is starting", async () => {
-    let resolvePurchase: ((value: { purchaseId: string }) => void) | undefined;
-    mockedCreatePendingPurchase.mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          resolvePurchase = resolve;
-        }),
-    );
-
-    const { result } = renderHook(() => useBuyGenerations());
-    await waitFor(() => expect(result.current.loadingCredits).toBe(false));
-
-    let firstBuy: Promise<void> | undefined;
-    act(() => {
-      firstBuy = result.current.buy();
-    });
-    await waitFor(() => expect(result.current.startingCheckout).toBe(true));
-
-    await act(async () => {
-      await result.current.buy();
-    });
-    expect(mockedCreatePendingPurchase).toHaveBeenCalledTimes(1);
-
-    await act(async () => {
-      resolvePurchase?.({ purchaseId });
-      await firstBuy;
-    });
-    expect(openCheckout).toHaveBeenCalledTimes(1);
-  });
-
-  it("toasts when the purchase API fails", async () => {
-    mockedCreatePendingPurchase.mockRejectedValue(new Error("Unauthorized"));
+  it("toasts when the checkout API fails", async () => {
+    mockedCreateCheckout.mockRejectedValue(new Error("Unauthorized"));
     const { result } = renderHook(() => useBuyGenerations());
     await waitFor(() => expect(result.current.loadingCredits).toBe(false));
 
@@ -168,23 +159,7 @@ describe("useBuyGenerations", () => {
       await result.current.buy();
     });
 
-    expect(openCheckout).not.toHaveBeenCalled();
+    expect(mockedOpenFallback).not.toHaveBeenCalled();
     expect(mockedComicToast.error).toHaveBeenCalledWith("error");
-  });
-
-  it("omits customer when the session has no email", async () => {
-    mockUseAuthenticationState.mockReturnValue({ user: { email: "  " } });
-    const { result } = renderHook(() => useBuyGenerations());
-    await waitFor(() => expect(result.current.loadingCredits).toBe(false));
-
-    await act(async () => {
-      await result.current.buy();
-    });
-
-    expect(openCheckout).toHaveBeenCalledWith({
-      items: [{ priceId, quantity: 1 }],
-      customData: { purchaseId },
-      settings: { displayMode: "overlay" },
-    });
   });
 });

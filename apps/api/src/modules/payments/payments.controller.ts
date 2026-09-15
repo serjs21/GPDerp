@@ -40,6 +40,27 @@ const paymentsPluginImpl = async (app: FastifyInstance) => {
     },
   );
 
+  app.post(
+    "/payments/confirm",
+    { preHandler: [app.requireAuthenticated] },
+    async (req: FastifyRequest, res: FastifyReply) => {
+      const userId = req.user?.sub;
+      if (!userId) return res.code(403).send({ ok: false, error: "Unauthorized" });
+      const body = (req.body as { transactionId?: string } | undefined) ?? {};
+      const transactionId = typeof body.transactionId === "string" ? body.transactionId : "";
+      const result = await paymentsService.confirmCompletedCheckout(userId, transactionId);
+      if (!result.ok) {
+        const status =
+          result.reason === "not_found" || result.reason === "invalid_transaction" ? 404 : 400;
+        return res.code(status).send({ ok: false, error: result.reason });
+      }
+      return res.send({
+        ok: true,
+        data: { credits: result.credits, status: result.status },
+      });
+    },
+  );
+
   app.get(
     "/payments/credits",
     { preHandler: [app.requireAuthenticated] },
