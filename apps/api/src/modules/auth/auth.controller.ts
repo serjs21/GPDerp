@@ -8,7 +8,6 @@ import { userService } from "../user/user.service";
 import { tokenService } from "./tokenService";
 import { isAuthError } from "./errors";
 import { safeEqual } from "./utils";
-import { tryDevAutoLogin, tryDevAutoLoginOnRefresh } from "./devAutoLogin";
 import { verifyAccessTokenFromRequest } from "./verifyAccessToken";
 
 const authPluginImpl = async (app: FastifyInstance) => {
@@ -70,7 +69,6 @@ const authPluginImpl = async (app: FastifyInstance) => {
   const authenticate = async (request: FastifyRequest, reply: FastifyReply) => {
     const ok = await verifyAccessTokenFromRequest(request);
     if (ok) return;
-    if (await tryDevAutoLogin(request, reply)) return;
     return denyWithAuthCookiesCleared(reply, 401);
   };
 
@@ -78,7 +76,6 @@ const authPluginImpl = async (app: FastifyInstance) => {
   const requireAuthenticated = async (request: FastifyRequest, reply: FastifyReply) => {
     const ok = await verifyAccessTokenFromRequest(request);
     if (ok) return;
-    if (await tryDevAutoLogin(request, reply)) return;
     tokenService.clearAuthCookies(reply);
     return reply.code(403).send({ ok: false, error: AUTH_MESSAGES.unauthorized });
   };
@@ -252,13 +249,7 @@ const authPluginImpl = async (app: FastifyInstance) => {
     }
   });
 
-  app.post("/auth/refresh", async (request: FastifyRequest, reply: FastifyReply) => {
-    // FE cold-start POSTs refresh with no cookies — mint DEV_USER_ID session (see devAutoLogin.ts).
-    if (await tryDevAutoLoginOnRefresh(request, reply)) return;
-
-    await requireCsrf(request, reply);
-    if (reply.sent) return;
-
+  app.post("/auth/refresh", { preHandler: [requireCsrf] }, async (request: FastifyRequest, reply: FastifyReply) => {
     const refreshToken = request.cookies[AUTH_COOKIE_NAMES.refreshToken];
     if (!refreshToken) {
       tokenService.clearAuthCookies(reply);

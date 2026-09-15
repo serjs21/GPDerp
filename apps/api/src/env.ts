@@ -76,9 +76,6 @@ POSTGRES_PORT: process.env.POSTGRES_PORT ?? "5433",
     | "strict"
     | "none",
 
-  /** Dev-only auto-login user id. Ignored in production. See `devAutoLogin.ts`. */
-  DEV_USER_ID: process.env.DEV_USER_ID?.trim() || undefined,
-
   R2_ACCOUNT_ID: requireEnv("R2_ACCOUNT_ID"),
   R2_ACCESS_KEY_ID: requireEnv("R2_ACCESS_KEY_ID"),
   R2_SECRET_ACCESS_KEY: requireEnv("R2_SECRET_ACCESS_KEY"),
