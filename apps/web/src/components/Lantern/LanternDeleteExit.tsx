@@ -1,15 +1,21 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import type { HaikuDto } from "@/api/haikus";
 import { deleteHaiku } from "@/api/haikus";
 import { comicToast } from "@/components/ComicToast";
+import { LanternSteppedFlight } from "./LanternSteppedFlight";
 import type { LanternTransform } from "./lanternTransform";
 import {
   initialFlightCssVars,
-  lanternTransformToFlightInput,
   prefersReducedMotion,
-  runSteppedLanternFlight,
 } from "./simulateFlight";
 
 export type LanternDeleteExitProps = {
@@ -22,6 +28,10 @@ export type LanternDeleteExitProps = {
   /** Called after flight finishes (or immediately when reduced-motion). */
   onExitComplete?: (haiku: HaikuDto) => void;
   onChanged?: () => void;
+  /** Passed through to in-place stepped flight (CreationModal). */
+  widthRem?: number;
+  lanternClassName?: string;
+  excludeLabelIds?: string[];
   children: (args: {
     onDelete: () => Promise<void>;
     flightStyle: CSSProperties;
@@ -35,20 +45,26 @@ export function LanternDeleteExit({
   onDeleted,
   onDeleteFailed,
   onExitComplete,
+  widthRem = 20,
+  lanternClassName,
+  excludeLabelIds,
   children,
 }: LanternDeleteExitProps) {
   const [flightExiting, setFlightExiting] = useState(false);
-  const [flightStyle, setFlightStyle] = useState<CSSProperties>(() =>
+  const [flightActive, setFlightActive] = useState(true);
+  const [flightStyle] = useState<CSSProperties>(() =>
     initialFlightCssVars(transform.positionMode),
   );
   const animatingRef = useRef(false);
-  const flightCancelRef = useRef<(() => void) | null>(null);
   const mountedRef = useRef(true);
+  const flightResolveRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;
+      flightResolveRef.current?.();
+      flightResolveRef.current = null;
     };
   }, []);
 
@@ -57,15 +73,13 @@ export function LanternDeleteExit({
     animatingRef.current = true;
 
     const snapshot = haiku;
-    const flightInput = lanternTransformToFlightInput(transform);
-    const resetStyle = initialFlightCssVars(transform.positionMode);
 
     // Optimistic: close modal / update list before animation or API finish.
     onDeleted?.(snapshot);
 
     const finishExit = (notifyComplete: boolean) => {
       if (notifyComplete) onExitComplete?.(snapshot);
-      flightCancelRef.current = null;
+      flightResolveRef.current = null;
       animatingRef.current = false;
     };
 
@@ -85,8 +99,8 @@ export function LanternDeleteExit({
       return;
     }
 
+    setFlightActive(true);
     setFlightExiting(true);
-    setFlightStyle(resetStyle);
 
     await new Promise<void>((resolve) => {
       requestAnimationFrame(() => {
@@ -102,23 +116,43 @@ export function LanternDeleteExit({
       return;
     }
 
-    const { promise, cancel } = runSteppedLanternFlight(flightInput, setFlightStyle);
-    flightCancelRef.current = cancel;
+    const flightPromise = new Promise<void>((resolve) => {
+      flightResolveRef.current = resolve;
+    });
 
     // API runs in parallel with flight; do not block confirm/modal on animation.
     void (async () => {
       try {
         await deleteHaiku(snapshot.id);
         comicToast.success("Haiku deleted");
-        await promise;
+        await flightPromise;
       } catch {
-        cancel();
+        setFlightActive(false);
+        flightResolveRef.current?.();
+        flightResolveRef.current = null;
         onDeleteFailed?.(snapshot);
       } finally {
         finishExit(true);
       }
     })();
-  }, [haiku, onDeleteFailed, onDeleted, onExitComplete, transform]);
+  }, [haiku, onDeleteFailed, onDeleted, onExitComplete]);
 
-  return <>{children({ onDelete: handleDelete, flightStyle, flightExiting })}</>;
+  if (flightExiting) {
+    return (
+      <LanternSteppedFlight
+        haiku={haiku}
+        transform={transform}
+        excludeLabelIds={excludeLabelIds}
+        className={lanternClassName}
+        widthRem={widthRem}
+        active={flightActive}
+        onComplete={() => {
+          flightResolveRef.current?.();
+          flightResolveRef.current = null;
+        }}
+      />
+    );
+  }
+
+  return <>{children({ onDelete: handleDelete, flightStyle, flightExiting: false })}</>;
 }

@@ -11,11 +11,11 @@ import {
 
 describe("simulateFlight", () => {
   it("exports exit duration constant", () => {
-    expect(LANTERN_FLIGHT_EXIT_MS).toBe(4000);
+    expect(LANTERN_FLIGHT_EXIT_MS).toBe(3000);
   });
 
   it("exports step constant matching LANTERN_FLIGHT_STEP_MS", () => {
-    expect(LANTERN_FLIGHT_STEP_MS).toBe(500);
+    expect(LANTERN_FLIGHT_STEP_MS).toBe(600);
   });
 
   it("scales step delta down by callIndex", () => {

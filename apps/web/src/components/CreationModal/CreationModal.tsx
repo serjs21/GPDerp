@@ -94,6 +94,7 @@ export function CreationModal({
             <LanternDeleteExit
               haiku={activeHaiku}
               transform={CREATION_LANTERN_TRANSFORM}
+              widthRem={CREATION_LANTERN_WIDTH_REM}
               onDeleted={(deleted) => {
                 setExitingHaiku(deleted);
                 onHaikuDeleted?.(deleted);

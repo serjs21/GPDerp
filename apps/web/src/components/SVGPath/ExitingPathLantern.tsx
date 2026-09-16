@@ -1,16 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect } from "react";
 import type { HaikuDto } from "@/api/haikus";
-import { Lantern } from "@/components/Lantern/Lantern";
-import { LanternFrame } from "@/components/Lantern/LanternFrame";
+import { LanternSteppedFlight } from "@/components/Lantern/LanternSteppedFlight";
 import type { LanternTransform } from "@/components/Lantern/lanternTransform";
-import {
-  initialFlightCssVars,
-  lanternTransformToFlightInput,
-  prefersReducedMotion,
-  runSteppedLanternFlight,
-} from "@/components/Lantern/simulateFlight";
+import { prefersReducedMotion } from "@/components/Lantern/simulateFlight";
 import styles from "./SVGPath.module.css";
 
 export type ExitingPathLanternProps = {
@@ -27,62 +21,22 @@ export function ExitingPathLantern({
   excludeLabelIds,
   onComplete,
 }: ExitingPathLanternProps) {
-  const [flightStyle, setFlightStyle] = useState<CSSProperties>(() =>
-    initialFlightCssVars(transform.positionMode),
-  );
-  const [flightExiting, setFlightExiting] = useState(false);
-  const onCompleteRef = useRef(onComplete);
-  onCompleteRef.current = onComplete;
+  const reduced = prefersReducedMotion();
 
   useEffect(() => {
-    let cancelled = false;
-    let cancelFlight: (() => void) | null = null;
+    if (reduced) onComplete(haiku);
+  }, [haiku, onComplete, reduced]);
 
-    if (prefersReducedMotion()) {
-      onCompleteRef.current(haiku);
-      return;
-    }
-
-    setFlightExiting(true);
-    setFlightStyle(initialFlightCssVars(transform.positionMode));
-
-    let raf1 = 0;
-    let raf2 = 0;
-
-    raf1 = requestAnimationFrame(() => {
-      raf2 = requestAnimationFrame(() => {
-        if (cancelled) return;
-        const flightInput = lanternTransformToFlightInput(transform);
-        const { promise, cancel } = runSteppedLanternFlight(flightInput, (style) => {
-          if (!cancelled) setFlightStyle(style);
-        });
-        cancelFlight = cancel;
-        void promise.then(() => {
-          if (!cancelled) onCompleteRef.current(haiku);
-        });
-      });
-    });
-
-    return () => {
-      cancelled = true;
-      cancelAnimationFrame(raf1);
-      cancelAnimationFrame(raf2);
-      cancelFlight?.();
-    };
-  }, [haiku, transform]);
+  if (reduced) return null;
 
   return (
-    <LanternFrame
-      className={styles.lantern}
+    <LanternSteppedFlight
+      haiku={haiku}
       transform={transform}
-      style={flightStyle}
-      flightExiting={flightExiting}
-      widthRem={19}
-      ariaLabel={`Deleting haiku: ${haiku.title ?? ""}`}
-      haikuLabels={haiku.labels}
       excludeLabelIds={excludeLabelIds}
-    >
-      <Lantern haiku={haiku} showActions={false} />
-    </LanternFrame>
+      className={styles.lantern}
+      widthRem={19}
+      onComplete={() => onComplete(haiku)}
+    />
   );
 }

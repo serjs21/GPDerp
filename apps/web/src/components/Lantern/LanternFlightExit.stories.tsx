@@ -1,7 +1,7 @@
 "use client";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { useCallback, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useState } from "react";
 import type { CelestialPresetName } from "@/theme/celestialPresets";
 import { Button } from "@/components/StyledComponents";
 import {
@@ -14,8 +14,8 @@ import {
 } from "@/storybook";
 import { Lantern } from "./Lantern";
 import { LanternFrame } from "./LanternFrame";
+import { LanternSteppedFlight } from "./LanternSteppedFlight";
 import type { LanternTransform } from "./lanternTransform";
-import { initialFlightCssVars, runSteppedLanternFlight } from "./simulateFlight";
 import styles from "./Lantern.stories.module.css";
 import demoStyles from "./LanternFlightExit.stories.module.css";
 
@@ -36,36 +36,22 @@ const DEMO_HAIKU = makeMockHaiku({
 });
 
 function LanternFlightExitDemo() {
-  const [flightStyle, setFlightStyle] = useState<CSSProperties>(() =>
-    initialFlightCssVars("percent"),
-  );
-  const [flightExiting, setFlightExiting] = useState(false);
+  const [flying, setFlying] = useState(false);
   const [runKey, setRunKey] = useState(0);
-  const flightCancelRef = useRef<(() => void) | null>(null);
 
   const resetFlight = useCallback(() => {
-    flightCancelRef.current?.();
-    flightCancelRef.current = null;
-    setFlightExiting(false);
-    setFlightStyle(initialFlightCssVars("percent"));
+    setFlying(false);
   }, []);
 
   const triggerFlight = useCallback(() => {
-    resetFlight();
+    setFlying(false);
     setRunKey((key) => key + 1);
-
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        setFlightExiting(true);
-        const { promise, cancel } = runSteppedLanternFlight(
-          { positionMode: "percent" },
-          setFlightStyle,
-        );
-        flightCancelRef.current = cancel;
-        void promise.then(resetFlight);
+        setFlying(true);
       });
     });
-  }, [resetFlight]);
+  }, []);
 
   return (
     <div className={demoStyles.demo}>
@@ -73,16 +59,23 @@ function LanternFlightExitDemo() {
         Fly away
       </Button>
       <div className={styles.stage}>
-        <LanternFrame
-          key={runKey}
-          ariaLabel="Lantern flight exit demo"
-          widthRem={20}
-          transform={DEMO_TRANSFORM}
-          style={flightStyle}
-          flightExiting={flightExiting}
-        >
-          <Lantern haiku={DEMO_HAIKU} showActions={false} />
-        </LanternFrame>
+        {flying ? (
+          <LanternSteppedFlight
+            key={runKey}
+            haiku={DEMO_HAIKU}
+            transform={DEMO_TRANSFORM}
+            widthRem={20}
+            onComplete={resetFlight}
+          />
+        ) : (
+          <LanternFrame
+            ariaLabel="Lantern flight exit demo"
+            widthRem={20}
+            transform={DEMO_TRANSFORM}
+          >
+            <Lantern haiku={DEMO_HAIKU} showActions={false} />
+          </LanternFrame>
+        )}
       </div>
     </div>
   );

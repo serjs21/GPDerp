@@ -37,10 +37,11 @@
   transform-origin: center bottom;
 }
 
+/* Stepped delete flight owns opacity crossfades; no spatial CSS tween. */
 .flightExiting {
-  transition:
-    transform 600ms linear,
-    opacity 400ms ease-in;
+  transition: none;
+  pointer-events: none;
+  animation: none;
 }
 
 .shell {
