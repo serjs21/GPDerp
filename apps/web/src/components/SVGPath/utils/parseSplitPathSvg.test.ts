@@ -21,6 +21,10 @@ describe("parseSplitPathSvg", () => {
     expect(parsed.stopsById[20]?.cy).toBeCloseTo(650.6);
     expect(parsed.stopsById[21]?.cx).toBeCloseTo(1806.68);
     expect(parsed.stopsById[21]?.cy).toBeCloseTo(943.25);
+    expect(parsed.stopsById[18]?.cx).toBeCloseTo(0.21);
+    expect(parsed.stopsById[19]?.cx).toBeCloseTo(261.09);
+    expect(parsed.stopsById[22]?.cx).toBeCloseTo(2062.56);
+    expect(parsed.stopsById[22]?.cy).toBeCloseTo(828.54);
     expect(parsed.stopsById[22]?.id).toBe(22);
   });
 

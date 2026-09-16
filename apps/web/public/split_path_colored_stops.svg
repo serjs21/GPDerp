@@ -213,11 +213,11 @@
     <path id="segment-14" class="st35" d="M1530.2,540.01c-156.47-16.23-182.72-93.36-329.41-111.47" data-end="stop-15" data-start="stop-14"/>
     <path id="segment-15" class="st24" d="M1200.79,428.54c-100.01-12.35-107.71,21.05-322.06,61.76" data-end="stop-16" data-start="stop-15"/>
     <path id="segment-16" class="st30" d="M878.73,490.3c-210.1,39.91-233.79,13.82-436.76,52.49" data-end="stop-17" data-start="stop-16"/>
-    <path id="segment-17" class="st26" d="M441.97,542.79c-197.61,37.65-349.84,66.66-361.76,135.75" data-end="stop-18" data-start="stop-17"/>
-    <path id="segment-18" class="st39" d="M80.21,678.54c-19.27,111.66,340.38,256.07,380.88,272.06" data-end="stop-19" data-start="stop-18"/>
-    <path id="segment-19" class="st32" d="M461.09,950.6c244.91,-75,454.73,-276,498.94,-300" data-end="stop-20" data-start="stop-19"/>
+    <path id="segment-17" class="st26" d="M441.97,542.79c-241.31,37.65-427.2,66.66-441.76,135.75" data-end="stop-18" data-start="stop-17"/>
+    <path id="segment-18" class="st39" d="M0.21,678.54c-13.2,111.66,233.14,256.07,260.88,272.06" data-end="stop-19" data-start="stop-18"/>
+    <path id="segment-19" class="st32" d="M261.09,950.6c343.08-75,637.01-276,698.94-300" data-end="stop-20" data-start="stop-19"/>
     <path id="segment-20" class="st40" d="M960.03,650.6c159.39,58.53,589.79,263.38,846.65,292.65" data-end="stop-21" data-start="stop-20"/>
-    <path id="segment-21" class="st27" d="M1806.68,943.25c95.13,-187.82,136.39,-386.29,155.88,-514.71" data-end="stop-22" data-start="stop-21"/>
+    <path id="segment-21" class="st27" d="M1806.68,943.25c156.16-41.86,223.89-86.09,255.88-114.71" data-end="stop-22" data-start="stop-21"/>
   </g>
   <g id="stops">
     <circle id="stop-00" class="st2" cx="80.18" cy="0" r="8"/>
@@ -238,8 +238,8 @@
     <circle id="stop-15" class="st20" cx="1200.79" cy="428.54" r="8"/>
     <circle id="stop-16" class="st4" cx="878.73" cy="490.3" r="8"/>
     <circle id="stop-17" class="st9" cx="441.97" cy="542.79" r="8"/>
-    <circle id="stop-18" class="st13" cx="80.21" cy="678.54" r="8"/>
-    <circle id="stop-19" class="st7" cx="461.09" cy="950.6" r="8"/>
+    <circle id="stop-18" class="st13" cx="0.21" cy="678.54" r="8"/>
+    <circle id="stop-19" class="st7" cx="261.09" cy="950.6" r="8"/>
     <circle id="stop-20" class="st18" cx="960.03" cy="650.6" r="8"/>
     <circle id="stop-21" class="st1" cx="1806.68" cy="943.25" r="8"/>
     <circle id="stop-22" class="st21" cx="2062.56" cy="828.54" r="8"/>
