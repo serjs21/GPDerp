@@ -23,10 +23,16 @@
 }
 
 .baseArtStack {
+  /* Below 1100px: keep native scale and crop sides (same idea as lantern flight path). */
+  --background-scene-min-width: 1100px;
   position: relative;
   z-index: 2;
-  width: 100%;
+  box-sizing: border-box;
+  width: max(100%, var(--background-scene-min-width));
+  min-width: var(--background-scene-min-width);
   flex-shrink: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .baseArt {

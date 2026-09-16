@@ -1,4 +1,5 @@
 import {
+  BACKGROUND_SCENE_MIN_DISPLAY_WIDTH,
   BACKGROUND_SCENE_SOURCE_SIZE,
   BACKGROUND_SCENE_SOURCE_WIDTH,
   backgroundSceneMaskLayout,
@@ -21,5 +22,9 @@ describe("backgroundSceneMaskLayout", () => {
     expect(layout.scale).toBe(1);
     expect(layout.maskWidthPx).toBe(BACKGROUND_SCENE_SOURCE_WIDTH);
     expect(layout.maskHeightPx).toBe(BACKGROUND_SCENE_SOURCE_SIZE.maskHeight);
+  });
+
+  it("exports the crop floor used when the viewport is narrower than the art", () => {
+    expect(BACKGROUND_SCENE_MIN_DISPLAY_WIDTH).toBe(1100);
   });
 });

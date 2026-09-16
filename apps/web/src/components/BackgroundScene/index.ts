@@ -17,6 +17,7 @@ export {
 export type { ColorBalanceValues } from "./backgroundSceneColorBalance";
 export { BACKGROUND_SCENE_ASSETS } from "./backgroundSceneAssets";
 export {
+  BACKGROUND_SCENE_MIN_DISPLAY_WIDTH,
   BACKGROUND_SCENE_SOURCE_SIZE,
   BACKGROUND_SCENE_SOURCE_WIDTH,
   backgroundSceneMaskLayout,

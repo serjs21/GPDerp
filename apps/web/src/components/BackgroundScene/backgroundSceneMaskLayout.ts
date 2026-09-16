@@ -1,6 +1,9 @@
 /** Shared source width for base art and luminance masks. */
 export const BACKGROUND_SCENE_SOURCE_WIDTH = 1672;
 
+/** Floor for rendered base-art width; narrower viewports crop sides instead of shrinking. */
+export const BACKGROUND_SCENE_MIN_DISPLAY_WIDTH = 1100;
+
 export const BACKGROUND_SCENE_SOURCE_SIZE = {
   baseWidth: BACKGROUND_SCENE_SOURCE_WIDTH,
   baseHeight: 518,
