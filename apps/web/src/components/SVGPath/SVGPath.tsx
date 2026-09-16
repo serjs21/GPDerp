@@ -33,7 +33,7 @@ import {
 } from "./utils";
 import styles from "./SVGPath.module.css";
 
-const SVG_PATH_SRC = "/split_path_colored_stops.svg";
+const SVG_PATH_SRC = "/path/split_path_colored_stops.svg";
 const SVG_PATH_STEP_MS = 300;
 const SVG_PATH_CATCH_UP_MS = 450;
 const SVG_PATH_DELETE_PACK_MS = 450;

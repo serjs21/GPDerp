@@ -1,4 +1,4 @@
-/** Native stone asset size (matches `public/input_stone_base.png`). */
+/** Native stone asset size (matches `public/input/input_stone_base.png`). */
 export const STONE_INPUT_IMAGE_WIDTH = 1439;
 export const STONE_INPUT_IMAGE_HEIGHT = 920;
 
@@ -23,7 +23,7 @@ export const STONE_INPUT_CONTENT_HEIGHT =
 export const STONE_INPUT_IMAGE_ASPECT =
   STONE_INPUT_CONTENT_WIDTH / STONE_INPUT_CONTENT_HEIGHT;
 
-export const STONE_INPUT_ASSET_SRC = "/input_stone_base.png";
+export const STONE_INPUT_ASSET_SRC = "/input/input_stone_base.png";
 
 /** Default display width in rem (keeps aspect via CSS). */
 export const STONE_INPUT_WIDTH_REM = 28;

@@ -1,12 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { useRef, useState } from "react";
-import { composeDecorators, makeMockHaiku, withFullscreenShell, withQueryClient } from "@/storybook";
-import { SavedHaikusListView } from "@/components/SavedHaikusList/SavedHaikusList";
+import { useState } from "react";
+import { composeDecorators, withFullscreenShell, withQueryClient } from "@/storybook";
 import { HaikuGenerationStickyNote } from "./HaikuGenerationStickyNote";
 import { HaikuGenerationStickyNoteInitial } from "./HaikuGenerationStickyNoteInitial/HaikuGenerationStickyNoteInitial";
 import { HaikuGenerationStickyNoteInput } from "./HaikuGenerationStickyNoteInput/HaikuGenerationStickyNoteInput";
-import { HaikuGenerationStickyNoteCard } from "./HaikuGenerationStickyNoteCard/HaikuGenerationStickyNoteCard";
-import { haikuGenerationStickyNoteListStyles } from "./HaikuGenerationStickyNoteList/HaikuGenerationStickyNoteList";
 import styles from "./HaikuGenerationStickyNote.module.css";
 
 const meta: Meta<typeof HaikuGenerationStickyNote> = {
@@ -43,13 +40,22 @@ function StoryShell({
 
 export const InitialOnly: Story = {
   render: function InitialOnlyStory() {
-    const [subject, setSubject] = useState("");
-
     return (
       <div className={styles.wrapper}>
         <div className={styles.displayArea}>
           <HaikuGenerationStickyNoteInitial />
         </div>
+      </div>
+    );
+  },
+};
+
+export const InputOnly: Story = {
+  render: function InputOnlyStory() {
+    const [subject, setSubject] = useState("");
+
+    return (
+      <div className={styles.wrapper}>
         <StoryShell>
           <HaikuGenerationStickyNoteInput
             subject={subject}
@@ -62,36 +68,12 @@ export const InitialOnly: Story = {
   },
 };
 
-export const FirstGeneration: Story = {
-  render: function FirstGenerationStory() {
-    const [subject, setSubject] = useState("Morning mist");
+export const InputLoading: Story = {
+  render: function InputLoadingStory() {
+    const [subject, setSubject] = useState("Autumn wind");
 
     return (
       <div className={styles.wrapper}>
-        <div className={styles.displayArea}>
-          <div
-            className={haikuGenerationStickyNoteListStyles.scrollArea}
-            style={
-              {
-                "--haiku-grid-columns": 1,
-                "--haiku-card-width": "28rem",
-                "--haiku-grid-gap": "3rem",
-              } as React.CSSProperties
-            }
-          >
-            <div className={haikuGenerationStickyNoteListStyles.haikuGrid}>
-              <HaikuGenerationStickyNoteCard
-                generatingDraft={{
-                  requestId: "demo-1",
-                  subject: "Morning mist",
-                  content: "Dew on the grass —\n",
-                  createdAtLabel: "9:00 AM",
-                }}
-              />
-            </div>
-          </div>
-          <HaikuGenerationStickyNoteInitial />
-        </div>
         <StoryShell>
           <HaikuGenerationStickyNoteInput
             subject={subject}
@@ -103,64 +85,6 @@ export const FirstGeneration: Story = {
       </div>
     );
   },
-};
-
-export const LoggedInWithList: Story = {
-  render: function LoggedInWithListStory() {
-    const [subject, setSubject] = useState("");
-    const scrollRef = useRef<HTMLDivElement>(null);
-    const haikus = [
-      makeMockHaiku({
-        id: "h1",
-        title: "Jean-Paul Sartickle",
-        body: "Shadow questions rise,\na void whispers, \"Who are you?\"\nSelf slips through the cracks.",
-        labels: [{ id: "l1", name: "philosophy", color: "blue", shape: "classic" }],
-      }),
-    ];
-
-    return (
-      <div className={styles.wrapper}>
-        <div ref={scrollRef} className={styles.displayArea}>
-          <div
-            className={haikuGenerationStickyNoteListStyles.scrollArea}
-            style={
-              {
-                "--haiku-grid-columns": 1,
-                "--haiku-card-width": "28rem",
-                "--haiku-grid-gap": "3rem",
-              } as React.CSSProperties
-            }
-          >
-            <SavedHaikusListView
-              haikus={haikus}
-              isInitialLoading={false}
-              isFetchingNextPage={false}
-              isError={false}
-              hasNextPage={false}
-              onLoadMore={() => undefined}
-              onRetry={() => undefined}
-              scrollRootRef={scrollRef}
-              HaikuCardComponent={HaikuGenerationStickyNoteCard}
-              showEmptyMessage={false}
-              embedded
-              embeddedListClassName={haikuGenerationStickyNoteListStyles.haikuGrid}
-            />
-          </div>
-        </div>
-        <StoryShell>
-          <HaikuGenerationStickyNoteInput
-            subject={subject}
-            onSubjectChange={setSubject}
-            onSubmit={(e) => e.preventDefault()}
-          />
-        </StoryShell>
-      </div>
-    );
-  },
-};
-
-export const LoggedInWithExistingHaikus: Story = {
-  ...LoggedInWithList,
 };
 
 export const LiveComponent: Story = {};
@@ -189,56 +113,5 @@ export const NarrowViewportInlineInput: Story = {
   },
   parameters: {
     viewport: { defaultViewport: "mobile1" },
-  },
-};
-
-export const WideGridThreeColumns: Story = {
-  render: function WideGridThreeColumnsStory() {
-    const [subject, setSubject] = useState("");
-    const scrollRef = useRef<HTMLDivElement>(null);
-    const haikus = [
-      makeMockHaiku({ id: "h1", title: "One", body: "First haiku line\nSecond line\nThird line" }),
-      makeMockHaiku({ id: "h2", title: "Two", body: "Another haiku\nMiddle line\nLast line" }),
-      makeMockHaiku({ id: "h3", title: "Three", body: "Third card\nIn the grid\nFor demo" }),
-    ];
-
-    return (
-      <div className={styles.wrapper} style={{ minWidth: 1400 }}>
-        <div ref={scrollRef} className={styles.displayArea}>
-          <div
-            className={haikuGenerationStickyNoteListStyles.scrollArea}
-            style={
-              {
-                "--haiku-grid-columns": 3,
-                "--haiku-card-width": "28rem",
-                "--haiku-grid-gap": "3rem",
-              } as React.CSSProperties
-            }
-          >
-            <SavedHaikusListView
-              haikus={haikus}
-              isInitialLoading={false}
-              isFetchingNextPage={false}
-              isError={false}
-              hasNextPage={false}
-              onLoadMore={() => undefined}
-              onRetry={() => undefined}
-              scrollRootRef={scrollRef}
-              HaikuCardComponent={HaikuGenerationStickyNoteCard}
-              showEmptyMessage={false}
-              embedded
-              embeddedListClassName={haikuGenerationStickyNoteListStyles.haikuGrid}
-            />
-          </div>
-        </div>
-        <StoryShell>
-          <HaikuGenerationStickyNoteInput
-            subject={subject}
-            onSubjectChange={setSubject}
-            onSubmit={(e) => e.preventDefault()}
-          />
-        </StoryShell>
-      </div>
-    );
   },
 };

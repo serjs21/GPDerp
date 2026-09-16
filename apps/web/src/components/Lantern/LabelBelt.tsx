@@ -64,7 +64,7 @@ export type LabelBeltProps = {
   className?: string;
 };
 
-const ARROW_SRC = "/inkbrush-arrow.svg";
+const ARROW_SRC = "/lantern/inkbrush-arrow.svg";
 
 type PortalTransition = {
   delta: 1 | -1;

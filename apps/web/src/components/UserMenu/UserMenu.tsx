@@ -59,7 +59,7 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
         value: "settings",
         label: (
           <OptionIconLabel
-            src="/settings.svg"
+            src="/nav/settings.svg"
             iconLabel="Settings"
             text="Settings"
           />
@@ -70,7 +70,7 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
         value: "logout",
         label: (
           <OptionIconLabel
-            src="/logout.svg"
+            src="/auth/logout.svg"
             iconLabel="Logout"
             text="Logout"
           />

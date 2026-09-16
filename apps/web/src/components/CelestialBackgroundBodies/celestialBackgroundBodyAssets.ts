@@ -1,4 +1,4 @@
 export const CELESTIAL_BACKGROUND_BODY_ASSETS = {
-  moon: "/moon.png",
-  sun: "/sun.png",
+  moon: "/celestial/moon.png",
+  sun: "/celestial/sun.png",
 } as const;

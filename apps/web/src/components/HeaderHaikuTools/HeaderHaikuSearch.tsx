@@ -27,7 +27,7 @@ export function HeaderHaikuSearch() {
         onClick={openSearch}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/search.svg" alt="" className={styles.iconImg} width={28} height={28} />
+        <img src="/nav/search.svg" alt="" className={styles.iconImg} width={28} height={28} />
       </button>
       {expanded ? (
         <input

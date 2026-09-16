@@ -26,7 +26,7 @@ export function SakuraBranch({ className, angle = 0, scale = 1 }: SakuraBranchPr
       {/* eslint-disable-next-line @next/next/no-img-element -- decorative branch art from /public */}
       <img
         className={styles.image}
-        src="/branch-base.png"
+        src="/branch/branch-base.png"
         alt=""
         draggable={false}
       />

@@ -1,10 +1,10 @@
 /** Geographic mask URLs — white (#fff) = region, black = excluded (luminance mask-mode). */
 export const DAYLIGHT_BACKGROUND_MASKS = {
-  sky: "/background-masks/sky-mask.png",
-  horizon: "/background-masks/horizon-mask.png",
-  mountain: "/background-masks/mountain-mask.png",
-  midground: "/background-masks/midground-mask.png",
-  foreground: "/background-masks/foreground-mask.png",
+  sky: "/deprecated/daylight/masks/sky-mask.png",
+  horizon: "/deprecated/daylight/masks/horizon-mask.png",
+  mountain: "/background/masks/mountain-mask.png",
+  midground: "/deprecated/daylight/masks/midground-mask.png",
+  foreground: "/deprecated/daylight/masks/foreground-mask.png",
 } as const;
 
 /** Layer stack: sun/moon above sky/horizon, below geographic masks. */

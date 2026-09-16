@@ -9,7 +9,7 @@ import styles from "./GoHome.module.css";
 /** Match UserMenu / SearchPanel comic frame height. */
 const PANEL_HEIGHT_PX = 36;
 
-const GO_BACK_ICON_SRC = "/go_back.svg";
+const GO_BACK_ICON_SRC = "/nav/go_back.svg";
 
 export type GoHomeProps = {
   className?: string;

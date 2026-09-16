@@ -35,7 +35,7 @@ export function HeaderHaikuLabelManage() {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/tag_white_fill.svg"
+            src="/nav/tag_white_fill.svg"
             alt=""
             className={styles.iconImg}
             width={22}

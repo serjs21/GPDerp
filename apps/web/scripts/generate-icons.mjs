@@ -43,14 +43,18 @@ mkdirSync(publicIcons, { recursive: true });
 
 const trimmedLogo = await loadTrimmedLogoBuffer();
 
-const sizes = [16, 32, 48, 72, 96, 128, 144, 152, 180, 192, 256, 384, 512];
+/** Sizes needed in memory (favicon / apple) plus public PWA icons. */
+const sizes = [16, 32, 48, 180, 192, 512];
+/** Only these are written under public/icons/ (referenced by layout + webmanifest). */
+const publicIconSizes = [192, 512];
 
 /** @type {Record<number, Buffer>} */
 const buffers = {};
 for (const s of sizes) {
-  const buf = await makeSquarePng(s, trimmedLogo);
-  buffers[s] = buf;
-  writeFileSync(join(publicIcons, `icon-${s}.png`), buf);
+  buffers[s] = await makeSquarePng(s, trimmedLogo);
+}
+for (const s of publicIconSizes) {
+  writeFileSync(join(publicIcons, `icon-${s}.png`), buffers[s]);
 }
 
 writeFileSync(join(publicIcons, "apple-touch-icon.png"), buffers[180]);

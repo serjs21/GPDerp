@@ -1,6 +1,6 @@
-/** Brush menu option backgrounds from `/public/ink_brush.svg`. */
+/** Brush menu option backgrounds from `/public/brush/ink_brush.svg`. */
 
-export const BRUSH_MENU_ICON_SRC = "/ink_brush.svg" as const;
+export const BRUSH_MENU_ICON_SRC = "/brush/ink_brush.svg" as const;
 
 export const BRUSH_MENU_ICON_SRCS = [BRUSH_MENU_ICON_SRC] as const;
 

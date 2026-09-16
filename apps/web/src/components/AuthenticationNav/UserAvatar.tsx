@@ -3,7 +3,7 @@ import type { UserObject } from "@/types";
 import styles from "./UserAvatar.module.css";
 
 /** Fallback when the user has no Google/saved avatar URL. */
-export const DEFAULT_USER_AVATAR_SRC = "/default_avatar.svg";
+export const DEFAULT_USER_AVATAR_SRC = "/auth/default_avatar.svg";
 
 export function resolveUserAvatarSrc(avatar?: string | null): string {
   const trimmed = avatar?.trim();

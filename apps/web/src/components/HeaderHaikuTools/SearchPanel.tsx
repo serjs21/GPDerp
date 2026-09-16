@@ -203,7 +203,7 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
                 <SlotFace>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/filter_label_icon.svg"
+                    src="/nav/filter_label_icon.svg"
                     alt=""
                     className={`${styles.iconImg} ${styles.iconImgLight}`}
                     width={22}
@@ -235,7 +235,7 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
                 <SlotFace>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/search-icon.svg"
+                    src="/nav/search-icon.svg"
                     alt=""
                     className={styles.iconImg}
                     width={28}

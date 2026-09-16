@@ -92,7 +92,7 @@ export function AuthGateModal({
               },
               content: (
                 <LabelMethodIcon
-                  src="/login_modal/log-in.svg"
+                  src="/auth/login_modal/log-in.svg"
                   bubbleStyle="rectangle"
                   sourceDirection="none"
                   active={mode === "login"}
@@ -109,7 +109,7 @@ export function AuthGateModal({
               },
               content: (
                 <LabelMethodIcon
-                  src="/login_modal/sign-up.svg"
+                  src="/auth/login_modal/sign-up.svg"
                   bubbleStyle="pointedArcs"
                   sourceDirection="none"
                   active={mode === "register"}

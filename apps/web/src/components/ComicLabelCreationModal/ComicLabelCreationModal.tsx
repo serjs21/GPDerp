@@ -32,7 +32,7 @@ import {
 } from "./comicLabelShapes";
 import styles from "./ComicLabelCreationModal.module.css";
 
-const BRUSH_SRC = "/brush-paint-repair.svg";
+const BRUSH_SRC = "/brush/brush-paint-repair.svg";
 const SAVE_DISABLED_FILL = "#9e9e9e";
 
 export type ComicLabelCreationModalProps = {

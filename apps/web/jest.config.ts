@@ -21,7 +21,11 @@ const config: Config = {
       },
     ],
   },
-  testPathIgnorePatterns: ["/node_modules/", "<rootDir>/tests/playwright/"],
+  testPathIgnorePatterns: [
+    "/node_modules/",
+    "<rootDir>/tests/playwright/",
+    "<rootDir>/archive/",
+  ],
 };
 
 export default config;

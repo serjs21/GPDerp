@@ -38,6 +38,7 @@
     "**/*.stories.tsx",
     "tests",
     "infra-tests",
-    "src/deprecated"
+    "src/deprecated",
+    "archive"
   ]
 }

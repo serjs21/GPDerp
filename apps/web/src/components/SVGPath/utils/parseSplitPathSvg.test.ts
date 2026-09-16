@@ -3,7 +3,7 @@ import { join } from "path";
 import { parseSplitPathSvg, splitPathSvgInnerMarkup } from "./parseSplitPathSvg";
 
 const svgMarkup = readFileSync(
-  join(process.cwd(), "public/split_path_colored_stops.svg"),
+  join(process.cwd(), "public/path/split_path_colored_stops.svg"),
   "utf8",
 );
 
