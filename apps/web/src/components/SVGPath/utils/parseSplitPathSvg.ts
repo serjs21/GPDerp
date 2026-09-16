@@ -23,14 +23,31 @@ export const SPLIT_PATH_MIN_STOP = 0;
 export const SPLIT_PATH_MAX_STOP = 22;
 
 const VIEWBOX_PATTERN = /viewBox="0 0 ([0-9.]+) ([0-9.]+)"/;
-const SEGMENT_PATTERN =
-  /<path\s+id="segment-(\d+)"\s+data-start="stop-(\d+)"\s+data-end="stop-(\d+)"\s+d="([^"]+)"/g;
-const STOP_PATTERN = /<circle\s+id="stop-(\d+)"\s+cx="([^"]+)"\s+cy="([^"]+)"/g;
+/** Attribute order may vary across Illustrator exports. */
+const SEGMENT_TAG_PATTERN = /<path\b([^>]*\bid="segment-\d+"[^>]*)\/?>/g;
+const STOP_TAG_PATTERN = /<circle\b([^>]*\bid="stop-\d+"[^>]*)\/?>/g;
+const ATTR_PATTERN = /([:\w-]+)="([^"]*)"/g;
+
+function readAttrs(tagAttrs: string): Record<string, string> {
+  const attrs: Record<string, string> = {};
+  for (const match of tagAttrs.matchAll(ATTR_PATTERN)) {
+    attrs[match[1]] = match[2];
+  }
+  return attrs;
+}
+
+function parseStopId(value: string | undefined, label: string): number {
+  const match = value?.match(/^stop-(\d+)$/);
+  if (!match) {
+    throw new Error(`split path SVG ${label} must be stop-NN`);
+  }
+  return Number(match[1]);
+}
 
 export function parseSplitPathSvg(svgMarkup: string): ParsedSplitPathSvg {
   const viewBoxMatch = svgMarkup.match(VIEWBOX_PATTERN);
   if (!viewBoxMatch) {
-    throw new Error("split path SVG is missing viewBox=\"0 0 width height\"");
+    throw new Error('split path SVG is missing viewBox="0 0 width height"');
   }
 
   const viewBox = {
@@ -39,13 +56,16 @@ export function parseSplitPathSvg(svgMarkup: string): ParsedSplitPathSvg {
   };
 
   const segmentsById: Record<number, SplitPathSegment> = {};
-  for (const match of svgMarkup.matchAll(SEGMENT_PATTERN)) {
-    const id = Number(match[1]);
+  for (const match of svgMarkup.matchAll(SEGMENT_TAG_PATTERN)) {
+    const attrs = readAttrs(match[1]);
+    const idMatch = attrs.id?.match(/^segment-(\d+)$/);
+    if (!idMatch || !attrs.d) continue;
+    const id = Number(idMatch[1]);
     segmentsById[id] = {
       id,
-      startStopId: Number(match[2]),
-      endStopId: Number(match[3]),
-      d: match[4],
+      startStopId: parseStopId(attrs["data-start"], `segment-${padStopId(id)} data-start`),
+      endStopId: parseStopId(attrs["data-end"], `segment-${padStopId(id)} data-end`),
+      d: attrs.d,
     };
   }
 
@@ -62,12 +82,15 @@ export function parseSplitPathSvg(svgMarkup: string): ParsedSplitPathSvg {
   }
 
   const stopsById: Record<number, SplitPathStop> = {};
-  for (const match of svgMarkup.matchAll(STOP_PATTERN)) {
-    const id = Number(match[1]);
+  for (const match of svgMarkup.matchAll(STOP_TAG_PATTERN)) {
+    const attrs = readAttrs(match[1]);
+    const idMatch = attrs.id?.match(/^stop-(\d+)$/);
+    if (!idMatch || attrs.cx == null || attrs.cy == null) continue;
+    const id = Number(idMatch[1]);
     stopsById[id] = {
       id,
-      cx: Number(match[2]),
-      cy: Number(match[3]),
+      cx: Number(attrs.cx),
+      cy: Number(attrs.cy),
     };
   }
 
