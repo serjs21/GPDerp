@@ -89,13 +89,48 @@
     0 0.75rem 2rem rgb(0 0 0 / 28%);
 }
 
-@media (max-width: 640px) {
-  .dialogPopup {
-    --comic-stack-step: -5px;
-    --comic-stack-rot: -0.3deg;
-    --comic-stack-scale-step: 0.012;
+@media (max-width: 1024px) {
+  .dialogViewport {
+    padding: 0;
+    overflow: hidden;
+    align-items: stretch;
+    justify-content: stretch;
   }
 
+  /* Higher specificity than consumer contentClassName width/max-height. */
+  .dialogViewport .dialogPopup {
+    --comic-stack-step: 0px;
+    --comic-stack-rot: 0deg;
+    --comic-stack-scale-step: 0;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: auto;
+  }
+
+  .dialogPopup .comicPageShell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    height: 100%;
+  }
+
+  .dialogPopup .page {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 100%;
+    height: 100%;
+  }
+
+  .dialogPopup .pageInner {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 640px) {
   .dialogPopup[data-starting-style] {
     transform: translate3d(18px, 8px, 0) rotate(0.7deg) scale(0.99);
   }

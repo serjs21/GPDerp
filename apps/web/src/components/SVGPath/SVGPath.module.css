@@ -1,7 +1,10 @@
 .viewport {
   position: relative;
+  flex: 1 1 auto;
   width: 100%;
+  height: 100%;
   min-height: min(72vh, 38rem);
+  overflow: hidden;
   overscroll-behavior: contain;
   touch-action: none;
 }
@@ -9,19 +12,23 @@
 .stage {
   display: grid;
   place-items: center;
-  width: 100%;
+  box-sizing: border-box;
+  width: max(100%, var(--layout-content-max, 1200px));
+  min-width: var(--layout-content-max, 1200px);
+  height: 100%;
   min-height: min(68vh, 36rem);
-  margin: 0 auto;
   padding: 2rem 1rem 3rem;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
   overflow: visible;
 }
 
 .guideBox {
   position: relative;
   aspect-ratio: 1920 / 1080;
-  width: min(100%, calc(min(68vh, 36rem) * 1920 / 1080));
+  width: 100%;
   height: auto;
-  margin-inline: auto;
 }
 
 .guide {
@@ -42,8 +49,14 @@
 }
 
 .lantern {
-  --lantern-width: clamp(8rem, 14vw, 12rem);
+  --lantern-width: 12rem;
   animation: none;
+}
+
+@media (max-width: 1024px) {
+  .stage {
+    padding: 0;
+  }
 }
 
 .lanternAnimating {

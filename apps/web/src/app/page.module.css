@@ -8,7 +8,7 @@
 .page {
   flex: 1;
   min-height: 0;
-  width: 100vw;
+  width: 100%;
   /* margin-left: calc(50% - 50vw); */
   /* margin-right: calc(50% - 50vw); */
   max-width: none;
