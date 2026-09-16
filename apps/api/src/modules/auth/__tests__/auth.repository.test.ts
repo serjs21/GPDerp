@@ -1,4 +1,4 @@
-jest.mock("../../lib/prisma", () => ({
+jest.mock("../../../lib/prisma", () => ({
   prismaClient: {
     $transaction: jest.fn(),
   },
@@ -6,7 +6,7 @@ jest.mock("../../lib/prisma", () => ({
 
 import { authRepository } from "../repository";
 
-const { prismaClient } = jest.requireMock("../../lib/prisma") as any;
+const { prismaClient } = jest.requireMock("../../../lib/prisma") as any;
 
 describe("authRepository", () => {
   beforeEach(() => {
@@ -46,6 +46,7 @@ describe("authRepository", () => {
       data: expect.objectContaining({
         email: "user@example.com",
         userName: "user_example",
+        generationCredits: 5,
       }),
     });
     expect(tx.account.create).toHaveBeenCalledWith({
@@ -67,10 +68,23 @@ describe("authRepository", () => {
     const refreshUpdateMany = jest
       .fn()
       .mockResolvedValueOnce({ count: 0 })
+      .mockResolvedValueOnce({ count: 1 })
       .mockResolvedValueOnce({ count: 1 });
+
+    const tokenRow = {
+      id: "rt-1",
+      sessionId: "session-affected",
+      expiresAt: new Date(Date.now() + 1000 * 60),
+      session: {
+        id: "session-affected",
+        revokedAt: null,
+        expiresAt: new Date(Date.now() + 1000 * 60),
+      },
+    };
 
     const tx = {
       refreshToken: {
+        findUnique: jest.fn().mockResolvedValue(tokenRow),
         updateMany: refreshUpdateMany,
       },
       authSession: {
@@ -88,7 +102,7 @@ describe("authRepository", () => {
       nextExpiresAt: new Date(Date.now() + 1000 * 60),
     });
 
-    expect(result).toEqual({ reused: true });
+    expect(result).toEqual({ status: "reused" });
     expect(tx.authSession.updateMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({

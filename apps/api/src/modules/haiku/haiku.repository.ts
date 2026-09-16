@@ -1,6 +1,41 @@
 import { prismaClient } from "../../lib/prisma";
+import { HAIKU_GENERATION_CREDIT_COST } from "../payments/constants";
+import { trySpendGenerationCreditWithTx } from "../payments/payments.repository";
 
 const TITLE_MAX_LEN = 200;
+
+const generationHaikuSelect = {
+  id: true,
+  title: true,
+  titleSuffix: true,
+  body: true,
+  createdAt: true,
+  accountId: true,
+  createdById: true,
+  labels: {
+    select: {
+      id: true,
+      name: true,
+      color: true,
+      shape: true,
+    },
+  },
+} as const;
+
+export type GeneratedHaikuRow = {
+  id: string;
+  title: string;
+  titleSuffix: number;
+  body: string;
+  createdAt: Date;
+  accountId: string;
+  createdById: string;
+  labels: Array<{ id: string; name: string; color: string; shape: string }>;
+};
+
+export type CreateFromGenerationResult =
+  | { ok: true; haiku: GeneratedHaikuRow; creditsRemaining: number }
+  | { ok: false; reason: "insufficient" | "not_found" };
 
 export const haikuRepository = {
   async createFromGeneration(params: {
@@ -8,41 +43,36 @@ export const haikuRepository = {
     createdById: string;
     subject: string;
     body: string;
-  }) {
+  }): Promise<CreateFromGenerationResult> {
     const rawTitle = params.subject.trim() || "Haiku";
     const title = rawTitle.length > TITLE_MAX_LEN ? rawTitle.slice(0, TITLE_MAX_LEN) : rawTitle;
 
-    const agg = await prismaClient.haiku.aggregate({
-      where: { accountId: params.accountId, title },
-      _max: { titleSuffix: true },
-    });
-    const titleSuffix = (agg._max.titleSuffix ?? -1) + 1;
+    return prismaClient.$transaction(async (tx) => {
+      const spend = await trySpendGenerationCreditWithTx(
+        tx,
+        params.createdById,
+        HAIKU_GENERATION_CREDIT_COST,
+      );
+      if (!spend.ok) return spend;
 
-    return prismaClient.haiku.create({
-      data: {
-        accountId: params.accountId,
-        createdById: params.createdById,
-        title,
-        titleSuffix,
-        body: params.body.trim(),
-      },
-      select: {
-        id: true,
-        title: true,
-        titleSuffix: true,
-        body: true,
-        createdAt: true,
-        accountId: true,
-        createdById: true,
-        labels: {
-          select: {
-            id: true,
-            name: true,
-            color: true,
-            shape: true,
-          },
+      const agg = await tx.haiku.aggregate({
+        where: { accountId: params.accountId, title },
+        _max: { titleSuffix: true },
+      });
+      const titleSuffix = (agg._max.titleSuffix ?? -1) + 1;
+
+      const haiku = await tx.haiku.create({
+        data: {
+          accountId: params.accountId,
+          createdById: params.createdById,
+          title,
+          titleSuffix,
+          body: params.body.trim(),
         },
-      },
+        select: generationHaikuSelect,
+      });
+
+      return { ok: true as const, haiku, creditsRemaining: spend.creditsRemaining };
     });
   },
 

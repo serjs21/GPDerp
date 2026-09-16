@@ -21,6 +21,7 @@ export type ConfirmPurchaseResponse = {
 };
 
 export const GENERATION_CREDITS_UPDATED_EVENT = "generation-credits-updated";
+export const GENERATION_PURCHASE_CONFIRMED_EVENT = "generation-purchase-confirmed";
 
 export type GenerationCreditsUpdatedDetail = {
   credits: number;
@@ -33,6 +34,11 @@ export function notifyGenerationCreditsUpdated(credits: number) {
       detail: { credits },
     }),
   );
+}
+
+export function notifyGenerationPurchaseConfirmed() {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new Event(GENERATION_PURCHASE_CONFIRMED_EVENT));
 }
 
 type PurchaseApiResponse = { ok: true; data: PendingPurchaseResponse } | { ok: false; error: string };

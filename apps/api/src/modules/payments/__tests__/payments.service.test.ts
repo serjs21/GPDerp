@@ -57,11 +57,15 @@ describe("paymentsService.handleVerifiedEvent", () => {
   });
 
   it("grants credits for a matching transaction.completed event", async () => {
-    paymentsRepository.fulfillCompletedPurchase.mockResolvedValue("granted");
+    paymentsRepository.fulfillCompletedPurchase.mockResolvedValue({
+      status: "granted",
+      userId: "user-1",
+      credits: 140,
+    });
 
     const result = await paymentsService.handleVerifiedEvent(completedEvent());
 
-    expect(result).toEqual({ status: "granted" });
+    expect(result).toEqual({ status: "granted", userId: "user-1", credits: 140 });
     expect(paymentsRepository.fulfillCompletedPurchase).toHaveBeenCalledWith({
       purchaseReference,
       paddleTransactionId: "txn_1",
@@ -70,7 +74,7 @@ describe("paymentsService.handleVerifiedEvent", () => {
   });
 
   it("is a no-op when the same purchase is already fulfilled", async () => {
-    paymentsRepository.fulfillCompletedPurchase.mockResolvedValue("duplicate");
+    paymentsRepository.fulfillCompletedPurchase.mockResolvedValue({ status: "duplicate" });
 
     const result = await paymentsService.handleVerifiedEvent(completedEvent({ eventId: "evt_retry" }));
 
@@ -169,8 +173,11 @@ describe("paymentsService.confirmCompletedCheckout", () => {
       userId: "user-1",
       status: "PENDING",
     });
-    paymentsRepository.fulfillCompletedPurchase.mockResolvedValue("granted");
-    paymentsRepository.getCredits.mockResolvedValue(140);
+    paymentsRepository.fulfillCompletedPurchase.mockResolvedValue({
+      status: "granted",
+      userId: "user-1",
+      credits: 140,
+    });
 
     await expect(paymentsService.confirmCompletedCheckout("user-1", "txn_abc")).resolves.toEqual({
       ok: true,

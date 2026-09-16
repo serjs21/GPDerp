@@ -49,7 +49,7 @@ model User {
   blockedAt         DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
-  generationCredits Int       @default(0)
+  generationCredits Int       @default(5)
 
   memberships                    Membership[]
   createdAccounts                Account[]                       @relation("AccountCreatedBy")

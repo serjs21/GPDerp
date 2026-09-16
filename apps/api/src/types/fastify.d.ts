@@ -17,5 +17,6 @@ declare module "fastify" {
     requireAuthenticated: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
     sendToUid: (uid: string, msg: unknown) => void;
     sendToUser: (userId: string, msg: unknown) => void;
+    broadcastToUser: (userId: string, msg: unknown) => void;
   }
 }

@@ -8,6 +8,7 @@ import {
 import { ACCOUNT_HEADER_KEY, TAB_HEADER_KEY } from "../../consts/ids";
 import { isUuid } from "../../utils/uuid";
 import { authRepository } from "../auth/repository";
+import { GENERATION_CREDITS_SOCKET_KIND, HAIKU_GENERATION_CREDIT_COST } from "../payments/constants";
 import { paymentsService } from "../payments/payments.service";
 import { haikuService, type HaikuStreamYield } from "./haiku.service";
 
@@ -370,12 +371,12 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
         return;
       }
 
-      const spend = await paymentsService.spendHaikuGenerationCredit(userId);
-      if (!spend.ok) {
-        if (spend.reason === "not_found") {
-          res.code(403).send({ ok: false, error: "Unauthorized" });
-          return;
-        }
+      const credits = await paymentsService.getCredits(userId);
+      if (!credits.ok) {
+        res.code(403).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+      if (credits.credits < HAIKU_GENERATION_CREDIT_COST) {
         res.code(402).send({ ok: false, error: "insufficient_credits" });
         return;
       }
@@ -404,9 +405,10 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
 
         if (!uid) app.log.warn("No uid found in headers");
 
-        const sendToUid = (app as any).sendToUid as undefined | ((uid: string, msg: unknown) => void);
+        const sendToUid = app.sendToUid;
+        const broadcastToUser = app.broadcastToUser;
 
-        let savedNotified = false;
+        let savedCreditsRemaining: number | null = null;
         for await (const chunk of stream as AsyncIterable<HaikuStreamYield>) {
           if (typeof chunk === "string") {
             if (uid && sendToUid) {
@@ -418,7 +420,13 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
             }
             process.stdout.write(chunk);
           } else if (chunk.type === "saved") {
-            savedNotified = true;
+            savedCreditsRemaining = chunk.creditsRemaining;
+            if (broadcastToUser) {
+              broadcastToUser(userId, {
+                kind: GENERATION_CREDITS_SOCKET_KIND,
+                data: { credits: chunk.creditsRemaining },
+              });
+            }
             if (uid && sendToUid) {
               sendToUid(uid, {
                 id: req.id,
@@ -429,7 +437,7 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
           }
         }
 
-        if (uid && sendToUid && !savedNotified) {
+        if (uid && sendToUid && savedCreditsRemaining === null) {
           sendToUid(uid, {
             id: req.id,
             kind: "complete",
@@ -437,7 +445,12 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
           });
         }
 
-        res.status(200).send({ ok: true, creditsRemaining: spend.creditsRemaining });
+        let remaining = savedCreditsRemaining;
+        if (remaining === null) {
+          const latest = await paymentsService.getCredits(userId);
+          remaining = latest.ok ? latest.credits : credits.credits;
+        }
+        res.status(200).send({ ok: true, creditsRemaining: remaining });
       } catch (e: any) {
         res.code(500).send({
           ok: false,

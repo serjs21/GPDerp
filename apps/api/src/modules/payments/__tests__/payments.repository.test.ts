@@ -106,6 +106,7 @@ describe("paymentsRepository.fulfillCompletedPurchase", () => {
       },
       user: {
         update: jest.fn().mockResolvedValue({}),
+        findUnique: jest.fn().mockResolvedValue({ generationCredits: 199 }),
       },
     };
     prismaClient.$transaction.mockImplementation(async (cb: (inner: typeof tx) => Promise<unknown>) => cb(tx));
@@ -116,7 +117,7 @@ describe("paymentsRepository.fulfillCompletedPurchase", () => {
       paddleEventId: "evt_1",
     });
 
-    expect(result).toBe("granted");
+    expect(result).toEqual({ status: "granted", userId: "user-1", credits: 199 });
     expect(tx.generationPurchase.updateMany).toHaveBeenCalledWith({
       where: { id: purchaseReference, status: GenerationPurchaseStatus.PENDING },
       data: {
@@ -159,7 +160,7 @@ describe("paymentsRepository.fulfillCompletedPurchase", () => {
       paddleEventId: "evt_2",
     });
 
-    expect(result).toBe("duplicate");
+    expect(result).toEqual({ status: "duplicate" });
     expect(tx.generationPurchase.updateMany).not.toHaveBeenCalled();
     expect(tx.user.update).not.toHaveBeenCalled();
   });
@@ -182,7 +183,7 @@ describe("paymentsRepository.fulfillCompletedPurchase", () => {
       paddleEventId: "evt_1",
     });
 
-    expect(result).toBe("duplicate");
+    expect(result).toEqual({ status: "duplicate" });
     expect(tx.user.update).not.toHaveBeenCalled();
   });
 });

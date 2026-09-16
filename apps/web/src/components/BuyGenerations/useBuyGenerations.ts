@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { comicToast } from "@/components/ComicToast";
-import { confirmPurchase, createCheckout, fetchCredits, GENERATION_CREDITS_UPDATED_EVENT, type GenerationCreditsUpdatedDetail } from "@/api/payments";
+import { confirmPurchase, createCheckout, fetchCredits, GENERATION_CREDITS_UPDATED_EVENT, notifyGenerationCreditsUpdated, notifyGenerationPurchaseConfirmed, type GenerationCreditsUpdatedDetail } from "@/api/payments";
 import {
   PADDLE_CHECKOUT_COMPLETED_EVENT,
   usePaddle,
@@ -38,6 +38,8 @@ export function useBuyGenerations() {
     try {
       const data = await confirmPurchase(transactionId);
       setCredits(data.credits);
+      notifyGenerationCreditsUpdated(data.credits);
+      notifyGenerationPurchaseConfirmed();
       comicToast.success(t("success"));
     } catch {
       comicToast.error(t("confirmError"));

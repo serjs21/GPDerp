@@ -4,7 +4,7 @@ import { TAB_HEADER_KEY } from "../../consts/ids";
 import { runHaikuAgentStream } from "../../agent";
 import { runHaikuAgentStreamMock } from "../../mocks/textStream";
 import { authRepository } from "../auth/repository";
-import { haikuRepository } from "./haiku.repository";
+import { haikuRepository, type GeneratedHaikuRow } from "./haiku.repository";
 import { labelRepository } from "../label/label.repository";
 import { normalizeLabelShape } from "../label/labelShape";
 import { mailService } from "../email/mailService";
@@ -46,11 +46,11 @@ export type HaikuPersistedPayload = {
   labels: Array<{ id: string; name: string; color: string; shape: string }>;
 };
 
-export type HaikuStreamYield = string | { type: "saved"; haiku: HaikuPersistedPayload };
+export type HaikuStreamYield =
+  | string
+  | { type: "saved"; haiku: HaikuPersistedPayload; creditsRemaining: number };
 
-function toPersistedPayload(
-  row: Awaited<ReturnType<typeof haikuRepository.createFromGeneration>>,
-): HaikuPersistedPayload {
+function toPersistedPayload(row: GeneratedHaikuRow): HaikuPersistedPayload {
   return {
     id: row.id,
     title: row.title,
@@ -191,13 +191,19 @@ export const haikuService = {
 
       const body = assembled.join("");
       if (body.trim()) {
-        const row = await haikuRepository.createFromGeneration({
+        const persisted = await haikuRepository.createFromGeneration({
           accountId: streamContext.accountId,
           createdById: streamContext.createdById,
           subject,
           body,
         });
-        yield { type: "saved", haiku: toPersistedPayload(row) };
+        if (persisted.ok) {
+          yield {
+            type: "saved",
+            haiku: toPersistedPayload(persisted.haiku),
+            creditsRemaining: persisted.creditsRemaining,
+          };
+        }
       }
     })();
   },

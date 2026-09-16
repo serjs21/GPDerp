@@ -14,6 +14,9 @@ import { CelestialAppShell } from "./CelestialAppShell";
 import { ComicToastProvider } from "@/components/ComicToast";
 import { HaikuFiltersProvider } from "./HaikuFiltersProvider";
 import { PaddleProvider } from "./PaddleProvider";
+import { NoCreditsLeftHost } from "@/components/NoCreditsLeft/NoCreditsLeftHost";
+import { ContinueGenerationOffer } from "@/components/NoCreditsLeft/ContinueGenerationOffer";
+import { GenerationCreditsSocket } from "@/hooks/useGenerationCreditsSocket";
 
 export interface LayoutProviderProps {
   children: React.ReactNode;
@@ -31,6 +34,9 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
           <HaikuFiltersProvider>
             <>
               <AxiosInit />
+              <GenerationCreditsSocket />
+              <NoCreditsLeftHost />
+              <ContinueGenerationOffer />
               <CelestialAppShell
                 className={layoutStyles.shell}
                 footer={

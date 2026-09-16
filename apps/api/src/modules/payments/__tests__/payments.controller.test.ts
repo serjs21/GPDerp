@@ -38,6 +38,7 @@ describe("payments.controller POST /payments/purchase", () => {
       }
       request.user = { sub: opts.userId, sid: "sid-1" };
     });
+    app.decorate("broadcastToUser", jest.fn());
     await app.register(paymentsPlugin);
     return app;
   };

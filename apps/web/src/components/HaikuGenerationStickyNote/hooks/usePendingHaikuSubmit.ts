@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef } from "react";
 import { isInsufficientCreditsError, runHaikuAgent } from "@/api/agents";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
-import { PENDING_HAIKU_SUBJECT_STORAGE_KEY } from "@/config/userConfiguration";
+import { PENDING_HAIKU_SUBJECT_STORAGE_KEY, RESUME_PENDING_HAIKU_EVENT } from "@/config/userConfiguration";
+import { openNoCreditsLeft } from "@/components/NoCreditsLeft/pendingHaikuAfterPurchase";
 
 type UsePendingHaikuSubmitOptions = {
   setSubject: (value: string) => void;
@@ -44,7 +45,7 @@ export function usePendingHaikuSubmit({
         console.error("Failed to send haiku agent request:", error);
         onError(error);
         if (isInsufficientCreditsError(error)) {
-          // Keep subject so the user can retry after buying credits.
+          openNoCreditsLeft(subject);
           return;
         }
       } finally {
@@ -54,18 +55,27 @@ export function usePendingHaikuSubmit({
     [clearPendingSubject, onError, setIsLoading, setSubject],
   );
 
-  useEffect(() => {
-    if (!initialized || !isLoggedIn || resumeInFlightRef.current) return;
-
+  const resumePending = useCallback(() => {
+    if (resumeInFlightRef.current) return;
     const pending = readPendingSubject();
     if (!pending) return;
-
     resumeInFlightRef.current = true;
     clearPendingSubject();
     void runAgent(pending).finally(() => {
       resumeInFlightRef.current = false;
     });
-  }, [clearPendingSubject, initialized, isLoggedIn, readPendingSubject, runAgent]);
+  }, [clearPendingSubject, readPendingSubject, runAgent]);
+
+  useEffect(() => {
+    if (!initialized || !isLoggedIn) return;
+    resumePending();
+  }, [initialized, isLoggedIn, resumePending]);
+
+  useEffect(() => {
+    const onResume = () => resumePending();
+    window.addEventListener(RESUME_PENDING_HAIKU_EVENT, onResume);
+    return () => window.removeEventListener(RESUME_PENDING_HAIKU_EVENT, onResume);
+  }, [resumePending]);
 
   return {
     savePendingSubject,

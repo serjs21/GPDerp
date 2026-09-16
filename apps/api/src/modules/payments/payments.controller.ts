@@ -1,6 +1,7 @@
 import fp from "fastify-plugin";
 import rawBody from "fastify-raw-body";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { GENERATION_CREDITS_SOCKET_KIND } from "./constants";
 import { verifyPaddleWebhook } from "./paddleWebhook";
 import { paymentsService } from "./payments.service";
 
@@ -54,6 +55,10 @@ const paymentsPluginImpl = async (app: FastifyInstance) => {
           result.reason === "not_found" || result.reason === "invalid_transaction" ? 404 : 400;
         return res.code(status).send({ ok: false, error: result.reason });
       }
+      app.broadcastToUser(userId, {
+        kind: GENERATION_CREDITS_SOCKET_KIND,
+        data: { credits: result.credits },
+      });
       return res.send({
         ok: true,
         data: { credits: result.credits, status: result.status },
@@ -86,7 +91,13 @@ const paymentsPluginImpl = async (app: FastifyInstance) => {
 
       try {
         const event = await verifyPaddleWebhook(raw, signature);
-        await paymentsService.handleVerifiedEvent(event);
+        const result = await paymentsService.handleVerifiedEvent(event);
+        if (result.status === "granted" && "userId" in result && "credits" in result) {
+          app.broadcastToUser(result.userId, {
+            kind: GENERATION_CREDITS_SOCKET_KIND,
+            data: { credits: result.credits },
+          });
+        }
         return res.send({ ok: true });
       } catch (error) {
         req.log.warn({ err: error }, "paddle webhook rejected");

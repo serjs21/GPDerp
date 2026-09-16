@@ -88,14 +88,17 @@ export const paymentsService = {
     const result = await paymentsRepository.fulfillCompletedPurchase({
       purchaseReference,
       paddleTransactionId: transaction.id,
-      // Client confirm has no webhook event id; reuse transaction id for idempotency.
       paddleEventId: `client-confirm:${transaction.id}`,
     });
+
+    if (result.status === "granted") {
+      return { ok: true as const, status: result.status, credits: result.credits };
+    }
 
     const credits = await paymentsRepository.getCredits(userId);
     if (credits === null) return { ok: false as const, reason: "not_found" as const };
 
-    return { ok: true as const, status: result, credits };
+    return { ok: true as const, status: result.status, credits };
   },
 
   async handleVerifiedEvent(event: EventEntity) {
@@ -118,6 +121,9 @@ export const paymentsService = {
       paddleTransactionId: transaction.id,
       paddleEventId: event.eventId,
     });
-    return { status: result };
+    if (result.status === "granted") {
+      return { status: "granted" as const, userId: result.userId, credits: result.credits };
+    }
+    return { status: result.status };
   },
 };

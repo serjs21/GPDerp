@@ -4,6 +4,7 @@ import type { FastifyInstance, FastifyRequest } from "fastify";
 import type WebSocket from "ws";
 import { verifyAccessTokenFromRequest } from "../auth/verifyAccessToken";
 import { createShareLinkSubscriberRegistry, parseShareLinkChannelMessage } from "./shareLinkSubscriptions";
+import { createUserSocketRegistry } from "./userSocketRegistry";
 
 const webSocketPluginImpl = async (app: FastifyInstance) => {
   await app.register(websocket);
@@ -11,6 +12,7 @@ const webSocketPluginImpl = async (app: FastifyInstance) => {
   // Map: uid (tab id) -> connected websocket clients
   const clients = new Map<string, Set<WebSocket>>();
   const shareLinkSubscribers = createShareLinkSubscriberRegistry();
+  const userSockets = createUserSocketRegistry();
 
   const addClient = (uid: string, ws: WebSocket) => {
     const set = clients.get(uid) ?? new Set<WebSocket>();
@@ -21,6 +23,7 @@ const webSocketPluginImpl = async (app: FastifyInstance) => {
       set.delete(ws);
       if (set.size === 0) clients.delete(uid);
       shareLinkSubscribers.unsubscribe(ws);
+      userSockets.unsubscribe(ws);
     });
   };
 
@@ -40,10 +43,15 @@ const webSocketPluginImpl = async (app: FastifyInstance) => {
     shareLinkSubscribers.sendToUser(userId, msg);
   };
 
+  const broadcastToUser = (userId: string, msg: unknown) => {
+    userSockets.sendToUser(userId, msg);
+  };
+
   // Decorate the Fastify instance so other modules (e.g. haiku, share links) can broadcast.
   app.decorate("addClient", addClient);
   app.decorate("sendToUid", sendToUid);
   app.decorate("sendToUser", sendToUser);
+  app.decorate("broadcastToUser", broadcastToUser);
 
   app.get("/ws", { websocket: true }, (connection: unknown, req: FastifyRequest) => {
     const ws: WebSocket = (connection as any).socket ?? (connection as any);
@@ -60,6 +68,12 @@ const webSocketPluginImpl = async (app: FastifyInstance) => {
 
     addClient(tabId, ws);
     app.log.info({ tabId, clients: clients.size }, "WS connected");
+
+    void verifyAccessTokenFromRequest(req).then((ok) => {
+      if (!ok || !req.user?.sub) return;
+      if (ws.readyState !== ws.OPEN) return;
+      userSockets.subscribe(req.user.sub, ws);
+    });
 
     ws.on("message", (payload) => {
       void (async () => {

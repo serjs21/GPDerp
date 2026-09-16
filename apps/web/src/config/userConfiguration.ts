@@ -23,6 +23,9 @@ export const PREFERENCE_THEME_SCALE_STORAGE_KEY = "gpderp.profile.selectedThemeS
 export const PREFERENCE_CELESTIAL_SLOT_STORAGE_KEY = "gpderp.profile.selectedCelestialSlot";
 export const PREFERENCE_LOCALE_STORAGE_KEY = "gpderp.profile.selectedLanguage";
 export const PENDING_HAIKU_SUBJECT_STORAGE_KEY = "gpderp.pendingHaikuSubject";
+export const PENDING_HAIKU_AFTER_PURCHASE_STORAGE_KEY = "gpderp.pendingHaikuAfterPurchase";
+export const RESUME_PENDING_HAIKU_EVENT = "gpderp:resume-pending-haiku";
+export const NO_CREDITS_LEFT_EVENT = "gpderp:no-credits-left";
 
 export const isThemeName = (value: string): value is ThemeName =>
   (Object.values(THEMES) as string[]).includes(value);

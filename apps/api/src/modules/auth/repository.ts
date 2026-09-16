@@ -5,6 +5,7 @@ import type {
   RefreshToken,
 } from "../../generated/prisma";
 import { prismaClient } from "../../lib/prisma";
+import { NEW_USER_FREE_GENERATION_CREDITS } from "../payments/constants";
 
 export const authRepository = {
   findUserByEmail(email: string) {
@@ -68,6 +69,7 @@ export const authRepository = {
           lastName: params.lastName,
           avatar: params.avatar ?? "",
           emailVerifiedAt: params.emailVerifiedAt ?? null,
+          generationCredits: NEW_USER_FREE_GENERATION_CREDITS,
         },
       });
 
