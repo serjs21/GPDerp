@@ -16,6 +16,7 @@ import {
 import { BANGKOK_COORDINATES } from "@/theme/useCelestialScene";
 import { CELESTIAL_TRIGGER_BODY_BADGE } from "./celestialTriggerBodyBadge.config";
 import { CELESTIAL_SELECTOR_PANEL_MOTION } from "./celestialSelectorPanelMotion.config";
+import { styleNavigationStarRimAngleDeg } from "./styleNavigationStarRimAngle";
 import { useCelestialSelectorOpenTransition } from "./useCelestialSelectorOpenTransition";
 import {
   useCelestialSelectorPanelMotion,
@@ -72,6 +73,7 @@ export function CelestialThemeSelector({
 
   const isPanelMounted = panelPhase !== null;
   const isExpanded = panelPhase === "open";
+  const ringStartAngleDeg = styleNavigationStarRimAngleDeg(slot);
 
   const requestClose = useCallback(() => {
     if (panelPhaseRef.current !== "open") return;
@@ -149,8 +151,10 @@ export function CelestialThemeSelector({
                   r="48.5"
                   fill="none"
                   stroke={CELESTIAL_SELECTOR_PANEL_MOTION.ringStroke}
-                  strokeWidth={CELESTIAL_SELECTOR_PANEL_MOTION.ringStrokeWidth}
+                  strokeWidth={CELESTIAL_SELECTOR_PANEL_MOTION.ringStrokeWidthPx}
                   strokeLinecap="round"
+                  vectorEffect="non-scaling-stroke"
+                  transform={`rotate(${ringStartAngleDeg} 50 50)`}
                 />
               </svg>
               <div className={styles.panelContent}>
