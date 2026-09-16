@@ -6,7 +6,7 @@
   padding: 0rem 1.5rem;
   border: none;
   background: transparent;
-  color: var(--sumi-ink, #2d2d2d);
+  color: var(--comic-ink, #2d2d2d);
   font-family: var(--font-lantern-script, cursive);
   font-size: 1.5rem;
   letter-spacing: 0.03em;
@@ -14,5 +14,5 @@
 }
 
 .input::placeholder {
-  color: color-mix(in srgb, var(--sumi-ink, #2d2d2d) 45%, transparent);
+  color: color-mix(in srgb, var(--comic-ink, #2d2d2d) 45%, transparent);
 }

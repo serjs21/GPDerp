@@ -17,7 +17,7 @@
   padding: 0.85rem 0.75rem 0.75rem;
   box-sizing: border-box;
   font-family: var(--font-lantern-script, cursive);
-  color: var(--sumi-ink, #2d2d2d);
+  color: var(--comic-ink, #2d2d2d);
 }
 
 .emailLine {

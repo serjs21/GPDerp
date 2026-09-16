@@ -96,7 +96,7 @@
   width: 2.35rem;
   height: auto;
   flex: 0 0 auto;
-  border: 1px solid color-mix(in srgb, #111111 18%, transparent);
+  border: 1px solid #111111;
 }
 
 .fallbackIcon {

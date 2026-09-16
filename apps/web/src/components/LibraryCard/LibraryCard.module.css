@@ -18,7 +18,7 @@
   border: 2px dashed #111;
   background: #fffef8;
   min-height: 24rem;
-
+  color: var(--comic-ink, #2d2d2d);
 }
 
 .body {
@@ -56,7 +56,7 @@
   font-family: var(--font-lantern-script, cursive);
   font-size: 1.05rem;
   font-style: italic;
-  color: var(--sumi-ink, #2d2d2d);
+  color: var(--comic-ink, #2d2d2d);
 }
 
 .nameForm {
@@ -87,7 +87,7 @@
   font-family: var(--font-lantern-script, cursive);
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--sumi-ink, #2d2d2d);
+  color: var(--comic-ink, #2d2d2d);
 }
 
 .generations {
@@ -107,7 +107,7 @@
   font-weight: 400;
   letter-spacing: 0.04em;
   line-height: 1.1;
-  color: var(--sumi-ink, #2d2d2d);
+  color: var(--comic-ink, #2d2d2d);
 }
 
 .barcode {
