@@ -19,7 +19,9 @@
     "unavailable": "Le paiement n'est pas disponible pour le moment.",
     "error": "Impossible de demarrer le paiement.",
     "success": "Achat terminé — générations ajoutées.",
-    "confirmError": "Paiement réussi, mais le solde n’a pas encore pu être mis à jour. Actualisez dans un instant."
+    "confirmError": "Paiement réussi, mais le solde n’a pas encore pu être mis à jour. Actualisez dans un instant.",
+    "insufficient": "Plus de générations",
+    "insufficientDescription": "Achetez plus de générations dans les Paramètres pour continuer à écrire des haïkus."
   },
   "LibraryCard": {
     "title": "Carte de bibliotheque",

@@ -4,7 +4,7 @@
   flex-direction: column;
   min-height: 100dvh;
   height: auto;
-  overflow-x: hidden;
+  /* Do not clip here — overflow ≠ visible creates a sticky containing block and breaks viewport sticky. */
   background: var(--sky-top, transparent);
   color: var(--ink, var(--text-color));
 }
@@ -16,7 +16,6 @@
   flex: 0 0 auto;
   min-width: 0;
   min-height: 100dvh;
-  overflow-x: hidden;
 }
 
 .stageCanvas {
@@ -34,6 +33,7 @@
   position: absolute;
   inset: 0;
   z-index: 0;
+  overflow: hidden;
   pointer-events: none;
 }
 

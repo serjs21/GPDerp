@@ -24,6 +24,43 @@ export const paymentsRepository = {
     return user?.generationCredits ?? null;
   },
 
+  /**
+   * Atomically debit generation credits when the balance is high enough.
+   * Safe under concurrent `/beer_me_haiku` requests.
+   */
+  async trySpendGenerationCredit(
+    userId: string,
+    amount: number,
+  ): Promise<
+    | { ok: true; creditsRemaining: number }
+    | { ok: false; reason: "insufficient" | "not_found" }
+  > {
+    if (!Number.isInteger(amount) || amount < 1) {
+      throw new Error("Credit spend amount must be a positive integer");
+    }
+
+    return prismaClient.$transaction(async (tx) => {
+      const claimed = await tx.user.updateMany({
+        where: { id: userId, generationCredits: { gte: amount } },
+        data: { generationCredits: { decrement: amount } },
+      });
+      if (claimed.count === 1) {
+        const after = await tx.user.findUnique({
+          where: { id: userId },
+          select: { generationCredits: true },
+        });
+        return { ok: true as const, creditsRemaining: after!.generationCredits };
+      }
+
+      const exists = await tx.user.findUnique({
+        where: { id: userId },
+        select: { id: true },
+      });
+      if (!exists) return { ok: false as const, reason: "not_found" as const };
+      return { ok: false as const, reason: "insufficient" as const };
+    });
+  },
+
   createPendingPurchase(userId: string) {
     return prismaClient.generationPurchase.create({
       data: {

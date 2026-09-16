@@ -19,7 +19,9 @@
     "unavailable": "Checkout is not available right now.",
     "error": "Could not start checkout.",
     "success": "Purchase complete — generations added.",
-    "confirmError": "Payment succeeded, but we could not update your balance yet. Refresh in a moment."
+    "confirmError": "Payment succeeded, but we could not update your balance yet. Refresh in a moment.",
+    "insufficient": "No generations left",
+    "insufficientDescription": "Buy more generations in Settings to keep writing haiku."
   },
   "LibraryCard": {
     "title": "Library Card",

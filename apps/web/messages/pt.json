@@ -19,7 +19,9 @@
     "unavailable": "O checkout nao esta disponivel agora.",
     "error": "Nao foi possivel iniciar o checkout.",
     "success": "Compra concluída — gerações adicionadas.",
-    "confirmError": "Pagamento concluído, mas ainda não foi possível atualizar o saldo. Atualize em instantes."
+    "confirmError": "Pagamento concluído, mas ainda não foi possível atualizar o saldo. Atualize em instantes.",
+    "insufficient": "Sem gerações restantes",
+    "insufficientDescription": "Compre mais gerações em Definições para continuar a escrever haiku."
   },
   "LibraryCard": {
     "title": "Carteira da biblioteca",

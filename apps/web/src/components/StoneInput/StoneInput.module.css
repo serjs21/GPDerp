@@ -2,12 +2,26 @@
   --stone-input-width: 28rem;
   --stone-ink: #2c2924;
   --stone-ink-soft: color-mix(in srgb, var(--stone-ink) 55%, transparent);
+  --stone-sticky-bottom: 0;
+  --stone-sticky-stop-margin: 0;
 
   position: relative;
   display: inline-block;
   width: var(--stone-input-width);
   max-width: 100%;
   aspect-ratio: 1439 / 920;
+}
+
+.rootSticky {
+  position: sticky;
+  bottom: var(--stone-sticky-bottom);
+  z-index: 9992;
+  flex: 0 0 auto;
+  align-self: center;
+  width: min(100%, var(--stone-input-width));
+  margin-inline: auto;
+  margin-bottom: var(--stone-sticky-stop-margin);
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
 .filterDefs {

@@ -19,7 +19,9 @@
     "unavailable": "El pago no está disponible ahora.",
     "error": "No se pudo iniciar el pago.",
     "success": "Compra completada: generaciones añadidas.",
-    "confirmError": "El pago se realizó, pero aún no pudimos actualizar tu saldo. Actualiza en un momento."
+    "confirmError": "El pago se realizó, pero aún no pudimos actualizar tu saldo. Actualiza en un momento.",
+    "insufficient": "No quedan generaciones",
+    "insufficientDescription": "Compra más generaciones en Ajustes para seguir escribiendo haiku."
   },
   "LibraryCard": {
     "title": "Carnet de biblioteca",

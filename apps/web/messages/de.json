@@ -19,7 +19,9 @@
     "unavailable": "Checkout ist gerade nicht verfügbar.",
     "error": "Checkout konnte nicht gestartet werden.",
     "success": "Kauf abgeschlossen — Generierungen hinzugefügt.",
-    "confirmError": "Zahlung erfolgreich, aber das Guthaben konnte noch nicht aktualisiert werden. Bitte gleich aktualisieren."
+    "confirmError": "Zahlung erfolgreich, aber das Guthaben konnte noch nicht aktualisiert werden. Bitte gleich aktualisieren.",
+    "insufficient": "Keine Generierungen übrig",
+    "insufficientDescription": "Kaufe weitere Generierungen in den Einstellungen, um weiter Haiku zu schreiben."
   },
   "LibraryCard": {
     "title": "Bibliotheksausweis",

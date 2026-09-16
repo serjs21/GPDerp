@@ -1,7 +1,7 @@
 import { EventName, type EventEntity, type TransactionNotification } from "@paddle/paddle-node-sdk";
 import { env } from "../../env";
 import { isUuid } from "../../utils/uuid";
-import { PURCHASE_REFERENCE_CUSTOM_DATA_KEY } from "./constants";
+import { HAIKU_GENERATION_CREDIT_COST, PURCHASE_REFERENCE_CUSTOM_DATA_KEY } from "./constants";
 import { getPaddle } from "./paddleWebhook";
 import { paymentsRepository } from "./payments.repository";
 
@@ -50,6 +50,11 @@ export const paymentsService = {
     const credits = await paymentsRepository.getCredits(userId);
     if (credits === null) return { ok: false as const, reason: "not_found" as const };
     return { ok: true as const, credits };
+  },
+
+  /** Debit one generation credit for a successful haiku start (1 haiku = 1 token). */
+  spendHaikuGenerationCredit(userId: string) {
+    return paymentsRepository.trySpendGenerationCredit(userId, HAIKU_GENERATION_CREDIT_COST);
   },
 
   /**

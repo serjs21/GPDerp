@@ -15,7 +15,12 @@ const meta: Meta<typeof StoneInput> = {
   args: {
     subject: "",
     isLoading: false,
+    sticky: false,
     onSubmit: (e) => e.preventDefault(),
+  },
+  argTypes: {
+    stickyBottomPx: { control: { type: "number", min: 0, max: 400, step: 8 } },
+    stickyStopMarginPx: { control: { type: "number", min: 0, max: 400, step: 8 } },
   },
 };
 
@@ -53,5 +58,22 @@ export const BlueNight: Story = {
     initialCelestialPreset: "blueNight" satisfies CelestialPresetName,
   },
   args: { subject: "Night questions" },
+  render: (args) => <Controlled {...args} />,
+};
+
+export const StickyNearBottom: Story = {
+  args: {
+    subject: "Sticky stone",
+    sticky: true,
+  },
+  decorators: [
+    (Story) => (
+      <div style={{ minHeight: "180vh", padding: "2rem 1rem 4rem" }}>
+        <p style={{ marginBottom: "40vh", opacity: 0.7 }}>Scroll down — stone sticks 200px from bottom.</p>
+        <Story />
+        <p style={{ marginTop: "60vh", opacity: 0.7 }}>Page end</p>
+      </div>
+    ),
+  ],
   render: (args) => <Controlled {...args} />,
 };

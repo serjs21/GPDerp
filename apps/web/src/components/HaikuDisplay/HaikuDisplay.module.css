@@ -19,19 +19,8 @@
 }
 
 .inputSection {
-  flex: 0 0 auto;
-  width: 100%;
-  max-width: 28rem;
-  align-self: center;
-  margin-inline: auto;
-}
-
-.inputSectionBottom {
-  position: sticky;
-  bottom: 0;
-  z-index: 2;
-  padding-bottom: env(safe-area-inset-bottom, 0);
-  background: none;
+  /* Flatten so sticky StoneInput is a flex child of the tall .wrapper (sticky travel). */
+  display: contents;
 }
 
 @media (max-width: 768px) {

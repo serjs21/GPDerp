@@ -20,6 +20,21 @@ export type ConfirmPurchaseResponse = {
   status: "granted" | "duplicate" | "not_found";
 };
 
+export const GENERATION_CREDITS_UPDATED_EVENT = "generation-credits-updated";
+
+export type GenerationCreditsUpdatedDetail = {
+  credits: number;
+};
+
+export function notifyGenerationCreditsUpdated(credits: number) {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(
+    new CustomEvent<GenerationCreditsUpdatedDetail>(GENERATION_CREDITS_UPDATED_EVENT, {
+      detail: { credits },
+    }),
+  );
+}
+
 type PurchaseApiResponse = { ok: true; data: PendingPurchaseResponse } | { ok: false; error: string };
 type CheckoutApiResponse =
   | {

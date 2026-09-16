@@ -55,13 +55,14 @@ export function HaikuDisplay() {
           selectedLabelIds={selectedLabelIds}
         />
       </div>
-      <div className={`${styles.inputSection} ${styles.inputSectionBottom}`}>
+      <div className={styles.inputSection}>
         <StoneInput
           subject={subject}
           onSubjectChange={setSubject}
           onSubmit={onSubmit}
           isLoading={isLoading}
           inputRef={inputRef}
+          sticky
         />
       </div>
       <CreationModal

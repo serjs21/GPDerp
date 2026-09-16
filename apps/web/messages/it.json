@@ -19,7 +19,9 @@
     "unavailable": "Il checkout non e disponibile in questo momento.",
     "error": "Impossibile avviare il checkout.",
     "success": "Acquisto completato: generazioni aggiunte.",
-    "confirmError": "Pagamento riuscito, ma non siamo riusciti ad aggiornare il saldo. Aggiorna tra poco."
+    "confirmError": "Pagamento riuscito, ma non siamo riusciti ad aggiornare il saldo. Aggiorna tra poco.",
+    "insufficient": "Nessuna generazione rimasta",
+    "insufficientDescription": "Acquista altre generazioni nelle Impostazioni per continuare a scrivere haiku."
   },
   "LibraryCard": {
     "title": "Tessera della biblioteca",

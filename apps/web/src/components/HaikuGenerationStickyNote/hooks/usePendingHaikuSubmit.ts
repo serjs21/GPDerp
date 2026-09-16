@@ -1,14 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import { runHaikuAgent } from "@/api/agents";
+import { isInsufficientCreditsError, runHaikuAgent } from "@/api/agents";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { PENDING_HAIKU_SUBJECT_STORAGE_KEY } from "@/config/userConfiguration";
 
 type UsePendingHaikuSubmitOptions = {
   setSubject: (value: string) => void;
   setIsLoading: (value: boolean) => void;
-  onError: () => void;
+  onError: (error?: unknown) => void;
   clearPendingOnSuccess?: () => void;
 };
 
@@ -42,7 +42,11 @@ export function usePendingHaikuSubmit({
         clearPendingSubject();
       } catch (error) {
         console.error("Failed to send haiku agent request:", error);
-        onError();
+        onError(error);
+        if (isInsufficientCreditsError(error)) {
+          // Keep subject so the user can retry after buying credits.
+          return;
+        }
       } finally {
         setIsLoading(false);
       }

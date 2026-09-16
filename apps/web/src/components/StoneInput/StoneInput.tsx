@@ -23,6 +23,12 @@ export type StoneInputProps = {
   placeholder?: string;
   submitLabel?: string;
   widthRem?: number;
+  /** Stick to the viewport while scrolling within the page. */
+  sticky?: boolean;
+  /** Viewport offset from the bottom while stuck (CSS `bottom`). Default 200. */
+  stickyBottomPx?: number;
+  /** Extra space below the stone so sticky releases before the page end. Default 200. */
+  stickyStopMarginPx?: number;
 };
 
 export function StoneInput({
@@ -34,6 +40,9 @@ export function StoneInput({
   placeholder = "題 Subject",
   submitLabel = "詠む Compose",
   widthRem = STONE_INPUT_WIDTH_REM,
+  sticky = false,
+  stickyBottomPx = 0,
+  stickyStopMarginPx = 0,
 }: StoneInputProps) {
   const filterId = useId().replace(/:/g, "");
   const { global } = useBackgroundSceneThemeBalance();
@@ -42,10 +51,20 @@ export function StoneInput({
 
   const rootStyle = {
     "--stone-input-width": `${widthRem}rem`,
+    ...(sticky
+      ? {
+          "--stone-sticky-bottom": `${stickyBottomPx}px`,
+          "--stone-sticky-stop-margin": `${stickyStopMarginPx}px`,
+        }
+      : {}),
   } as CSSProperties;
 
   return (
-    <article className={styles.root} style={rootStyle} aria-label="Haiku subject stone">
+    <article
+      className={[styles.root, sticky ? styles.rootSticky : null].filter(Boolean).join(" ")}
+      style={rootStyle}
+      aria-label="Haiku subject stone"
+    >
       <svg className={styles.filterDefs} aria-hidden>
         <defs>
           <filter id={filterId} colorInterpolationFilters="sRGB">

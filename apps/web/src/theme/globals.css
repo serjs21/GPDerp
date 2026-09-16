@@ -80,6 +80,7 @@ body {
   /* Overscroll / rubber-band matches celestial sky (synced onto :root). */
   background: var(--sky-top, var(--background));
   /* overscroll-behavior-y: none; */
+  overflow-x: clip;
 }
 
 body {

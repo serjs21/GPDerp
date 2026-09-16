@@ -1,7 +1,7 @@
 jest.mock("../../../lib/prisma", () => ({
   prismaClient: {
     $transaction: jest.fn(),
-    user: { findUnique: jest.fn() },
+    user: { findUnique: jest.fn(), updateMany: jest.fn() },
     generationPurchase: { create: jest.fn(), findUnique: jest.fn() },
   },
 }));
@@ -13,6 +13,10 @@ import { paymentsRepository } from "../payments.repository";
 const { prismaClient } = jest.requireMock("../../../lib/prisma") as {
   prismaClient: {
     $transaction: jest.Mock;
+    user: {
+      findUnique: jest.Mock;
+      updateMany: jest.Mock;
+    };
     generationPurchase: {
       create: jest.Mock;
       findUnique: jest.Mock;
@@ -180,5 +184,60 @@ describe("paymentsRepository.fulfillCompletedPurchase", () => {
 
     expect(result).toBe("duplicate");
     expect(tx.user.update).not.toHaveBeenCalled();
+  });
+});
+
+describe("paymentsRepository.trySpendGenerationCredit", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("decrements credits when the balance is sufficient", async () => {
+    const tx = {
+      user: {
+        updateMany: jest.fn().mockResolvedValue({ count: 1 }),
+        findUnique: jest.fn().mockResolvedValue({ generationCredits: 99 }),
+      },
+    };
+    prismaClient.$transaction.mockImplementation(async (cb: (inner: typeof tx) => Promise<unknown>) => cb(tx));
+
+    await expect(paymentsRepository.trySpendGenerationCredit("user-1", 1)).resolves.toEqual({
+      ok: true,
+      creditsRemaining: 99,
+    });
+    expect(tx.user.updateMany).toHaveBeenCalledWith({
+      where: { id: "user-1", generationCredits: { gte: 1 } },
+      data: { generationCredits: { decrement: 1 } },
+    });
+  });
+
+  it("returns insufficient when the balance is too low", async () => {
+    const tx = {
+      user: {
+        updateMany: jest.fn().mockResolvedValue({ count: 0 }),
+        findUnique: jest.fn().mockResolvedValue({ id: "user-1" }),
+      },
+    };
+    prismaClient.$transaction.mockImplementation(async (cb: (inner: typeof tx) => Promise<unknown>) => cb(tx));
+
+    await expect(paymentsRepository.trySpendGenerationCredit("user-1", 1)).resolves.toEqual({
+      ok: false,
+      reason: "insufficient",
+    });
+  });
+
+  it("returns not_found when the user does not exist", async () => {
+    const tx = {
+      user: {
+        updateMany: jest.fn().mockResolvedValue({ count: 0 }),
+        findUnique: jest.fn().mockResolvedValue(null),
+      },
+    };
+    prismaClient.$transaction.mockImplementation(async (cb: (inner: typeof tx) => Promise<unknown>) => cb(tx));
+
+    await expect(paymentsRepository.trySpendGenerationCredit("missing", 1)).resolves.toEqual({
+      ok: false,
+      reason: "not_found",
+    });
   });
 });

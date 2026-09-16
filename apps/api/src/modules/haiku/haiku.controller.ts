@@ -8,6 +8,7 @@ import {
 import { ACCOUNT_HEADER_KEY, TAB_HEADER_KEY } from "../../consts/ids";
 import { isUuid } from "../../utils/uuid";
 import { authRepository } from "../auth/repository";
+import { paymentsService } from "../payments/payments.service";
 import { haikuService, type HaikuStreamYield } from "./haiku.service";
 
 const haikuPluginImpl = async (app: FastifyInstance) => {
@@ -369,6 +370,16 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
         return;
       }
 
+      const spend = await paymentsService.spendHaikuGenerationCredit(userId);
+      if (!spend.ok) {
+        if (spend.reason === "not_found") {
+          res.code(403).send({ ok: false, error: "Unauthorized" });
+          return;
+        }
+        res.code(402).send({ ok: false, error: "insufficient_credits" });
+        return;
+      }
+
       try {
         const subject = body?.subject || DEFAULT_HAIKU_SUBJECT;
         app.log.info({ subject }, "Creating haiku");
@@ -426,7 +437,7 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
           });
         }
 
-        res.status(200).send({ ok: true });
+        res.status(200).send({ ok: true, creditsRemaining: spend.creditsRemaining });
       } catch (e: any) {
         res.code(500).send({
           ok: false,

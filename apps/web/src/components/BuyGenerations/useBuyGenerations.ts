@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { comicToast } from "@/components/ComicToast";
-import { confirmPurchase, createCheckout, fetchCredits } from "@/api/payments";
+import { confirmPurchase, createCheckout, fetchCredits, GENERATION_CREDITS_UPDATED_EVENT, type GenerationCreditsUpdatedDetail } from "@/api/payments";
 import {
   PADDLE_CHECKOUT_COMPLETED_EVENT,
   usePaddle,
@@ -82,8 +82,17 @@ export function useBuyGenerations() {
       void applyConfirmedCredits(transactionId);
     };
 
+    const onCreditsUpdated = (event: Event) => {
+      const detail = (event as CustomEvent<GenerationCreditsUpdatedDetail>).detail;
+      if (typeof detail?.credits === "number") setCredits(detail.credits);
+    };
+
     window.addEventListener(PADDLE_CHECKOUT_COMPLETED_EVENT, onCompleted);
-    return () => window.removeEventListener(PADDLE_CHECKOUT_COMPLETED_EVENT, onCompleted);
+    window.addEventListener(GENERATION_CREDITS_UPDATED_EVENT, onCreditsUpdated);
+    return () => {
+      window.removeEventListener(PADDLE_CHECKOUT_COMPLETED_EVENT, onCompleted);
+      window.removeEventListener(GENERATION_CREDITS_UPDATED_EVENT, onCreditsUpdated);
+    };
   }, [t]);
 
   const buy = async () => {

@@ -2,12 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { comicToast } from "@/components/ComicToast";
 import {
   HAIKU_LIST_PAGE_SIZE,
   prependHaikuToInfiniteCache,
 } from "@/api/haikus";
-import { runHaikuAgent } from "@/api/agents";
+import { isInsufficientCreditsError, runHaikuAgent } from "@/api/agents";
 import { SavedHaikusList } from "@/components/SavedHaikusList/SavedHaikusList";
 import { useHaikuSocket } from "@/hooks/useHaikuSocket";
 import { useEndOfContentScroll } from "@/hooks/useEndOfContentScroll";
@@ -18,6 +20,8 @@ import styles from "./style.module.css";
 
 export const HaikuGenerationChat = () => {
   const queryClient = useQueryClient();
+  const router = useRouter();
+  const tBuy = useTranslations("BuyGenerations");
   const streamScrollRef = useRef<HTMLDivElement | null>(null);
   const endOfContentRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -49,7 +53,15 @@ export const HaikuGenerationChat = () => {
     if (!isLoading) inputRef.current?.focus();
   }, [isLoading]);
 
-  const onError = () => {
+  const onError = (error?: unknown) => {
+    if (isInsufficientCreditsError(error)) {
+      comicToast.error(tBuy("insufficient"), {
+        description: tBuy("insufficientDescription"),
+        duration: 4000,
+      });
+      router.push("/settings#buy-generations");
+      return;
+    }
     comicToast.error("Don't panic, but something went wrong", {
       description:
         "Our slaves are working hard on fixing this issue. We will dispatch someone to hit them harder soon.\nPlease try again later.",
@@ -72,7 +84,7 @@ export const HaikuGenerationChat = () => {
       inputRef.current?.focus();
     } catch (error) {
       console.error("Failed to send haiku agent request:", error);
-      onError();
+      onError(error);
     } finally {
       setIsLoading(false);
     }
