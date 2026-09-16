@@ -4,6 +4,9 @@ export { LanternSubmit } from "./LanternSubmit";
 export type { LanternSubmitProps } from "./LanternSubmit";
 export {
   STONE_INPUT_ASSET_SRC,
+  STONE_INPUT_CONTENT_HEIGHT,
+  STONE_INPUT_CONTENT_INSET,
+  STONE_INPUT_CONTENT_WIDTH,
   STONE_INPUT_FORM_INSET,
   STONE_INPUT_IMAGE_ASPECT,
   STONE_INPUT_IMAGE_HEIGHT,

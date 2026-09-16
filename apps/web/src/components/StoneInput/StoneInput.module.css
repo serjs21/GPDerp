@@ -4,12 +4,20 @@
   --stone-ink-soft: color-mix(in srgb, var(--stone-ink) 55%, transparent);
   --stone-sticky-bottom: 0;
   --stone-sticky-stop-margin: 0;
+  /* Opaque PNG crop (fractions of full asset — see STONE_INPUT_CONTENT_INSET). */
+  --stone-crop-top: 0.2533;
+  --stone-crop-right: 0.0014;
+  --stone-crop-bottom: 0.213;
+  --stone-crop-left: 0.0083;
+  --stone-crop-h: 0.5337;
+  --stone-crop-w: 0.9903;
 
   position: relative;
   display: inline-block;
   width: var(--stone-input-width);
   max-width: 100%;
-  aspect-ratio: 1439 / 920;
+  aspect-ratio: 1425 / 491;
+  overflow: hidden;
 }
 
 .rootSticky {
@@ -33,7 +41,11 @@
 
 .shell {
   position: absolute;
-  inset: 0;
+  /* Map full PNG so opaque content fills the cropped root. */
+  top: calc(var(--stone-crop-top) / var(--stone-crop-h) * -100%);
+  left: calc(var(--stone-crop-left) / var(--stone-crop-w) * -100%);
+  width: calc(100% / var(--stone-crop-w));
+  height: calc(100% / var(--stone-crop-h));
   pointer-events: none;
   user-select: none;
 }
@@ -42,7 +54,7 @@
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: fill;
 }
 
 .form {
@@ -53,9 +65,9 @@
 
 .input {
   position: absolute;
-  /* Insets match constants.STONE_INPUT_FORM_INSET */
-  inset: 55% 28% 35%;
-  width: 50%;
+  /* Insets match constants.STONE_INPUT_FORM_INSET (cropped content box) */
+  inset: 55.6% 28.1% 25.7% 27.4%;
+  width: auto;
   height: auto;
   background: transparent;
   border: none;
@@ -84,9 +96,9 @@
 }
 
 .submit {
-  /* Insets match constants.STONE_INPUT_SUBMIT_INSET — adjust manually */
+  /* Insets match constants.STONE_INPUT_SUBMIT_INSET (cropped content box) */
   position: absolute;
-  inset: 40% 13% 24% 78%;
+  inset: 27.5% 13% 5.1% 77.9%;
   width: auto;
   height: auto;
   --lantern-submit-size: auto;
