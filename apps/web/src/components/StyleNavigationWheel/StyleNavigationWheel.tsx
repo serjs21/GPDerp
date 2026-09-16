@@ -44,6 +44,8 @@ export type StyleNavigationWheelProps = {
   faceRef?: Ref<HTMLDivElement>;
   pointerHandlers?: StyleNavigationWheelPointerHandlers;
   interactive?: boolean;
+  /** Hide rim nav star (e.g. when a sibling overlay owns it for fade isolation). */
+  hideNavStar?: boolean;
 };
 
 type MotionLayerProps = {
@@ -301,6 +303,7 @@ export function StyleNavigationWheel({
   faceRef,
   pointerHandlers,
   interactive = false,
+  hideNavStar = false,
 }: StyleNavigationWheelProps) {
   const variantClass = variant === "trigger" ? styles.trigger : styles.panel;
   const interactiveClass = interactive ? styles.interactive : "";
@@ -340,7 +343,7 @@ export function StyleNavigationWheel({
           <EarthIcon />
         </div>
         {/* Sibling of faceClip so half the SVG can render outside the rim. */}
-        <StarsField />
+        {hideNavStar ? null : <StarsField />}
       </div>
     </MotionLayer>
   );

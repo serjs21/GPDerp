@@ -33,23 +33,23 @@ function showFullyDrawn(circle: SVGGeometryElement) {
 }
 
 /**
- * Draws a highlight circle around the panel while fading opacity in;
- * reverse undraw + fade out on close. Keeps the panel mounted until
- * `onCloseComplete` when `phase === "closing"`.
+ * Panel body fades independently from chrome (ring + nav star).
+ * Chrome stays at opacity 1 through open/close draw, then drops to 0 at close end.
  */
 export function useCelestialSelectorPanelMotion(options: {
   phase: CelestialSelectorPanelPhase | null;
   reducedMotion: boolean;
-  panelPopRef: React.RefObject<HTMLElement | null>;
+  panelContentRef: React.RefObject<HTMLElement | null>;
+  panelChromeRef: React.RefObject<HTMLElement | null>;
   ringRef: React.RefObject<SVGCircleElement | null>;
   onCloseComplete?: () => void;
-  /** Re-measure anchor after open layout settles. */
   onOpenLayout?: () => void;
 }) {
   const {
     phase,
     reducedMotion,
-    panelPopRef,
+    panelContentRef,
+    panelChromeRef,
     ringRef,
     onCloseComplete,
     onOpenLayout,
@@ -77,21 +77,31 @@ export function useCelestialSelectorPanelMotion(options: {
     const isClosing = phase === "closing";
     const duration = CELESTIAL_SELECTOR_PANEL_MOTION.durationMs;
 
+    const finishClose = () => {
+      const chrome = panelChromeRef.current;
+      if (chrome) chrome.style.opacity = "0";
+      onCloseCompleteRef.current?.();
+    };
+
     const frame = requestAnimationFrame(() => {
-      const panel = panelPopRef.current;
+      const content = panelContentRef.current;
+      const chrome = panelChromeRef.current;
       const ring = ringRef.current;
-      if (!panel) {
-        if (isClosing) onCloseCompleteRef.current?.();
+
+      if (!content) {
+        if (isClosing) finishClose();
         return;
       }
 
+      if (chrome) chrome.style.opacity = "1";
+
       if (reducedMotion) {
         if (isClosing) {
-          panel.style.opacity = "0";
+          content.style.opacity = "0";
           if (ring) prepareUndrawn(ring);
-          onCloseCompleteRef.current?.();
+          finishClose();
         } else {
-          panel.style.opacity = "1";
+          content.style.opacity = "1";
           if (ring) showFullyDrawn(ring);
           onOpenLayoutRef.current?.();
         }
@@ -99,12 +109,12 @@ export function useCelestialSelectorPanelMotion(options: {
       }
 
       if (isClosing) {
-        if (!panel.style.opacity) panel.style.opacity = "1";
+        if (!content.style.opacity) content.style.opacity = "1";
         if (ring) showFullyDrawn(ring);
 
         const next: Animatable[] = [];
         next.push(
-          animate(panel, {
+          animate(content, {
             opacity: [1, 0],
             duration,
             ease: CELESTIAL_SELECTOR_PANEL_MOTION.ease,
@@ -124,18 +134,18 @@ export function useCelestialSelectorPanelMotion(options: {
 
         closeTimerRef.current = setTimeout(() => {
           closeTimerRef.current = null;
-          onCloseCompleteRef.current?.();
+          finishClose();
         }, duration);
         return;
       }
 
-      panel.style.opacity = "0";
+      content.style.opacity = "0";
       const drawable = ring ? prepareUndrawn(ring) : [];
       onOpenLayoutRef.current?.();
 
       const next: Animatable[] = [];
       next.push(
-        animate(panel, {
+        animate(content, {
           opacity: [0, 1],
           duration,
           ease: CELESTIAL_SELECTOR_PANEL_MOTION.ease,
@@ -164,5 +174,5 @@ export function useCelestialSelectorPanelMotion(options: {
       }
       animationsRef.current = [];
     };
-  }, [phase, reducedMotion, panelPopRef, ringRef]);
+  }, [phase, reducedMotion, panelContentRef, panelChromeRef, ringRef]);
 }

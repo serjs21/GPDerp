@@ -23,6 +23,7 @@ export type CelestialThemeClockProps = {
   motionInstant?: boolean;
   ariaLabel?: string;
   className?: string;
+  hideNavStar?: boolean;
 };
 
 export type CelestialThemeClockHandle = {
@@ -46,6 +47,7 @@ export const CelestialThemeClock = forwardRef<
     motionInstant = false,
     ariaLabel = "Time of day",
     className,
+    hideNavStar = false,
   },
   ref,
 ) {
@@ -95,6 +97,7 @@ export const CelestialThemeClock = forwardRef<
         faceRef={faceRef}
         pointerHandlers={pointerHandlers}
         interactive
+        hideNavStar={hideNavStar}
       />
 
       <input

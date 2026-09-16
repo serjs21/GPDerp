@@ -7,6 +7,7 @@ import {
   CelestialThemeClock,
   type CelestialThemeClockHandle,
 } from "@/components/CelestialThemeClock";
+import { STYLE_NAVIGATION_WHEEL } from "@/components/StyleNavigationWheel/styleNavigationWheel.config";
 import { formatClockLabel } from "@/theme/celestialTime";
 import type { GeoCoordinates } from "@/theme/celestialTheme";
 import {
@@ -25,6 +26,8 @@ import {
 import styles from "./CelestialThemeSelector.module.css";
 
 const ALIEN_TRIGGER_SRC = "/theme-selector/alien-obduction.svg";
+const NAV_STAR_SRC = STYLE_NAVIGATION_WHEEL.stars.src;
+const NAV_STAR_SIZE_PERCENT = STYLE_NAVIGATION_WHEEL.stars.sizePercent;
 
 export type CelestialThemeSelectorProps = {
   slot: number;
@@ -52,6 +55,8 @@ export function CelestialThemeSelector({
   panelPhaseRef.current = panelPhase;
   const clockRef = useRef<CelestialThemeClockHandle>(null);
   const ringRef = useRef<SVGCircleElement>(null);
+  const panelChromeRef = useRef<HTMLDivElement>(null);
+  const panelContentRef = useRef<HTMLDivElement>(null);
   const timeLabel = formatClockLabel(slot);
   const sceneStyle = sceneVars as CSSProperties | undefined;
   const dialHalf = selectorButtonModeFromSunY(selectorViewerSunYPercent(slot));
@@ -74,6 +79,12 @@ export function CelestialThemeSelector({
   const isPanelMounted = panelPhase !== null;
   const isExpanded = panelPhase === "open";
   const ringStartAngleDeg = styleNavigationStarRimAngleDeg(slot);
+  const navStarAngleRad = (ringStartAngleDeg * Math.PI) / 180;
+  const navStarStyle = {
+    left: `${50 + 50 * Math.cos(navStarAngleRad)}%`,
+    top: `${50 + 50 * Math.sin(navStarAngleRad)}%`,
+    width: `${NAV_STAR_SIZE_PERCENT}%`,
+  } as CSSProperties;
 
   const requestClose = useCallback(() => {
     if (panelPhaseRef.current !== "open") return;
@@ -97,7 +108,8 @@ export function CelestialThemeSelector({
   useCelestialSelectorPanelMotion({
     phase: panelPhase,
     reducedMotion: Boolean(reduceMotion),
-    panelPopRef,
+    panelContentRef,
+    panelChromeRef,
     ringRef,
     onCloseComplete: handleCloseComplete,
     onOpenLayout: updateAnchor,
@@ -138,26 +150,35 @@ export function CelestialThemeSelector({
               className={styles.panelPop}
               style={sceneStyle}
             >
-              <svg
-                className={styles.panelRing}
-                viewBox="0 0 100 100"
-                aria-hidden
-              >
-                <circle
-                  ref={ringRef}
-                  className={styles.panelRingPath}
-                  cx="50"
-                  cy="50"
-                  r="48.5"
-                  fill="none"
-                  stroke={CELESTIAL_SELECTOR_PANEL_MOTION.ringStroke}
-                  strokeWidth={CELESTIAL_SELECTOR_PANEL_MOTION.ringStrokeWidthPx}
-                  strokeLinecap="round"
-                  vectorEffect="non-scaling-stroke"
-                  transform={`rotate(${ringStartAngleDeg} 50 50)`}
+              <div ref={panelChromeRef} className={styles.panelChrome} aria-hidden>
+                <svg
+                  className={styles.panelRing}
+                  viewBox="0 0 100 100"
+                >
+                  <circle
+                    ref={ringRef}
+                    className={styles.panelRingPath}
+                    cx="50"
+                    cy="50"
+                    r="48.5"
+                    fill="none"
+                    stroke={CELESTIAL_SELECTOR_PANEL_MOTION.ringStroke}
+                    strokeWidth={CELESTIAL_SELECTOR_PANEL_MOTION.ringStrokeWidthPx}
+                    strokeLinecap="round"
+                    vectorEffect="non-scaling-stroke"
+                    transform={`rotate(${ringStartAngleDeg} 50 50)`}
+                  />
+                </svg>
+                {/* eslint-disable-next-line @next/next/no-img-element -- public SVG nav star */}
+                <img
+                  src={NAV_STAR_SRC}
+                  alt=""
+                  className={styles.panelNavStar}
+                  style={navStarStyle}
+                  draggable={false}
                 />
-              </svg>
-              <div className={styles.panelContent}>
+              </div>
+              <div ref={panelContentRef} className={styles.panelContent}>
                 <CelestialThemeClock
                   ref={clockRef}
                   value={slot}
@@ -165,6 +186,7 @@ export function CelestialThemeSelector({
                   onCommit={handleCommit}
                   coordinates={coordinates}
                   showBodyGlow
+                  hideNavStar
                   ariaLabel={ariaLabel}
                 />
               </div>

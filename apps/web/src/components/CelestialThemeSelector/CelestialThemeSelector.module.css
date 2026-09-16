@@ -37,13 +37,21 @@
 
 .panelPop {
   position: relative;
-  opacity: 0;
   transform-origin: top center;
+}
+
+.panelChrome {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 1;
 }
 
 .panelContent {
   position: relative;
   z-index: 1;
+  opacity: 0;
 }
 
 .panelRing {
@@ -53,7 +61,6 @@
   height: calc(100% + 0.8rem);
   overflow: visible;
   pointer-events: none;
-  z-index: 2;
 }
 
 .panelRingPath {
@@ -61,8 +68,20 @@
   stroke-width: 1px;
 }
 
+.panelNavStar {
+  position: absolute;
+  height: auto;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  z-index: 3;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .panelPop {
+  .panelContent {
     opacity: 1;
   }
 }
