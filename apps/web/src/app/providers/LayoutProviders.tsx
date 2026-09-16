@@ -31,7 +31,14 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
           <HaikuFiltersProvider>
             <>
               <AxiosInit />
-              <CelestialAppShell className={layoutStyles.shell}>
+              <CelestialAppShell
+                className={layoutStyles.shell}
+                footer={
+                  <footer className={layoutStyles.footerSlot}>
+                    <SiteFooter />
+                  </footer>
+                }
+              >
                 <header className={styles.header}>
                   <div className={styles.headerBar}>
                     <AuthNavigation />
@@ -41,9 +48,6 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
                   <CompleteRegistrationRedirect />
                   <div className={layoutStyles.contentStretch}>{children}</div>
                 </main>
-                <footer className={layoutStyles.footerSlot}>
-                  <SiteFooter />
-                </footer>
               </CelestialAppShell>
             </>
           </HaikuFiltersProvider>

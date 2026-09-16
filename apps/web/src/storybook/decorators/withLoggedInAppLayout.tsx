@@ -96,7 +96,14 @@ export const withLoggedInAppLayout: Decorator = (Story, { parameters }) => {
         <AuthenticationVerificationProvider>
           <HaikuFiltersProvider>
             <CelestialThemeProvider initialSlot={initialSlot}>
-              <CelestialAppShell className={layoutStyles.shell}>
+              <CelestialAppShell
+                className={layoutStyles.shell}
+                footer={
+                  <footer className={layoutStyles.footerSlot}>
+                    <SiteFooter />
+                  </footer>
+                }
+              >
                 <header className={headerStyles.header}>
                   <div className={headerStyles.headerBar}>
                     <AuthNavigation />
@@ -107,9 +114,6 @@ export const withLoggedInAppLayout: Decorator = (Story, { parameters }) => {
                     <Story />
                   </div>
                 </main>
-                <footer className={layoutStyles.footerSlot}>
-                  <SiteFooter />
-                </footer>
               </CelestialAppShell>
             </CelestialThemeProvider>
           </HaikuFiltersProvider>

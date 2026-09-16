@@ -11,8 +11,9 @@
   flex-direction: column;
   min-height: 100dvh !important;
   height: auto !important;
-  background: transparent !important;
+  background: var(--sky-top, var(--background)) !important;
 }
+
 .contentMain {
   display: flex !important;
   flex-direction: column !important;
@@ -23,24 +24,35 @@
   margin-inline: auto;
   padding-inline: var(--layout-inline-padding);
   padding-top: 0;
+  align-items: center;
 }
 
 .footerSlot {
   flex: 0 0 auto !important;
+  width: 100%;
   padding: 0 !important;
   margin: 0 !important;
   background: transparent !important;
 }
 
-/* At least one viewport of main area on short pages (footer pins to bottom); grows with taller content */
+/* Scenic stage fills the viewport; footer always sits below (requires scroll). */
 .contentStretch {
   flex: 1 0 auto;
   display: flex;
   flex-direction: column;
+  align-items: center;
   width: 100%;
   min-width: 0;
-  min-height: calc(100dvh - var(--layout-chrome-top) - var(--layout-chrome-bottom));
+  min-height: calc(100dvh - var(--layout-chrome-top));
   gap: clamp(0.85rem, 1.2vw, 1.2rem);
+}
+
+@media (min-width: 1200px) {
+  .contentMain {
+    width: 100%;
+    margin-inline: 0;
+    align-items: center;
+  }
 }
 
 @media (max-width: 768px) {

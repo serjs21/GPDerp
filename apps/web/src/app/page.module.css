@@ -9,8 +9,8 @@
   flex: 1;
   min-height: 0;
   width: 100vw;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
+  /* margin-left: calc(50% - 50vw); */
+  /* margin-right: calc(50% - 50vw); */
   max-width: none;
   display: flex;
   flex-direction: column;

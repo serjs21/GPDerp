@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { ComicModalInput } from "@/components/ComicModalInput";
 import { ComicPageCtaAction, ComicPagePanel } from "@/components/ComicPageLayout";
@@ -20,22 +19,10 @@ function readNameFields(form: HTMLFormElement) {
   };
 }
 
-function sampleColor(el: Element | null) {
-  if (!(el instanceof HTMLElement)) return null;
-  const cs = getComputedStyle(el);
-  return {
-    color: cs.color,
-    backgroundColor: cs.backgroundColor,
-    fontFamily: cs.fontFamily.slice(0, 80),
-    fontSize: cs.fontSize,
-  };
-}
-
 export function LibraryCard() {
   const profile = useProfile();
   const { profileInfo } = useProfileI18n();
   const t = useTranslations("LibraryCard");
-  const rootRef = useRef<HTMLDivElement>(null);
   const { credits, loadingCredits, startingCheckout, initializing, checkoutReady, buy } =
     useBuyGenerations();
 
@@ -50,57 +37,8 @@ export function LibraryCard() {
     void profile.onSaveProfile({ firstName, lastName });
   };
 
-  // #region agent log
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-    const theme = document.documentElement.getAttribute("data-theme");
-    const rootCs = getComputedStyle(document.documentElement);
-    const card = root.querySelector(`.${styles.card}`);
-    const belongsTo = root.querySelector(`.${styles.belongsTo}`);
-    const fieldLabel = root.querySelector(`.${styles.fieldLabel}`);
-    const remaining = root.querySelector(`.${styles.remaining}`);
-    const input = root.querySelector("input");
-    const buyBtn = root.querySelector("button");
-    const cardSumi =
-      card instanceof HTMLElement
-        ? getComputedStyle(card).getPropertyValue("--sumi-ink").trim()
-        : null;
-    const labelsSlot = document.querySelector("[class*='slotLabels']");
-    fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "8e01e4" },
-      body: JSON.stringify({
-        sessionId: "8e01e4",
-        runId: "css-post-fix",
-        hypothesisId: "A",
-        location: "LibraryCard.tsx:computed-styles",
-        message: "LibraryCard computed colors",
-        data: {
-          theme,
-          rootSumiInk: rootCs.getPropertyValue("--sumi-ink").trim(),
-          cardSumiInk: cardSumi,
-          textColor: rootCs.getPropertyValue("--text-color").trim(),
-          card: sampleColor(card),
-          belongsTo: sampleColor(belongsTo),
-          fieldLabel: sampleColor(fieldLabel),
-          remaining: sampleColor(remaining),
-          input: sampleColor(input),
-          inputClass: input instanceof HTMLElement ? input.className : null,
-          buyBtn: sampleColor(buyBtn),
-          labelsSlotBg:
-            labelsSlot instanceof HTMLElement
-              ? getComputedStyle(labelsSlot).backgroundColor
-              : null,
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-  }, [credits, loadingCredits]);
-  // #endregion
-
   return (
-    <div id="buy-generations" ref={rootRef} className={styles.root}>
+    <div id="buy-generations" className={styles.root}>
       <ComicPagePanel
         contentAlign="start"
         className={styles.panel}

@@ -77,11 +77,13 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100%;
+  /* Overscroll / rubber-band matches celestial sky (synced onto :root). */
+  background: var(--sky-top, var(--background));
+  /* overscroll-behavior-y: none; */
 }
 
 body {
   font-family: var(--font-lantern-script);
-  background: transparent;
   color: var(--text-color);
 }
 

@@ -81,6 +81,19 @@ export function CelestialThemeProvider({
     [effectiveSlot, layout, scene.layout.moon.limbAngleDeg],
   );
 
+  useEffect(() => {
+    const root = document.documentElement;
+    const { sceneVars } = scene;
+    root.style.setProperty("--sky-top", sceneVars["--sky-top"] ?? "");
+    root.style.setProperty("--sky-mid", sceneVars["--sky-mid"] ?? "");
+    root.style.setProperty("--sky-horizon", sceneVars["--sky-horizon"] ?? "");
+    return () => {
+      root.style.removeProperty("--sky-top");
+      root.style.removeProperty("--sky-mid");
+      root.style.removeProperty("--sky-horizon");
+    };
+  }, [scene]);
+
   const setPreviewSlot = useCallback((next: number | null) => {
     setPreviewSlotState(next === null ? null : clampSlot(next));
   }, []);

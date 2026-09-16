@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import {
   ComicPagePanel,
   ComicPageRow,
@@ -44,50 +44,6 @@ export function ComicPanelTabs<T extends string>({
   unselectedFlexWeight = DEFAULT_UNSELECTED_FLEX_WEIGHT,
   "aria-label": ariaLabel,
 }: ComicPanelTabsProps<T>) {
-  const wrapRef = useRef<HTMLDivElement>(null);
-
-  // #region agent log
-  useEffect(() => {
-    const root = wrapRef.current;
-    if (!root) return;
-    const titles = [...root.querySelectorAll("[class*='panelTitle']")].map((el) => {
-      const cs = getComputedStyle(el);
-      return { text: el.textContent?.trim(), color: cs.color, backgroundColor: cs.backgroundColor };
-    });
-    const localeTrigger = document.querySelector(
-      "button[class*='TextBubbleDropdown-module'][class*='trigger'], button[class*='trigger']",
-    );
-    let localeTriggerBorder: string | null = null;
-    let localeTriggerBg: string | null = null;
-    if (localeTrigger instanceof HTMLElement) {
-      const cs = getComputedStyle(localeTrigger);
-      localeTriggerBorder = cs.borderColor;
-      localeTriggerBg = cs.backgroundColor;
-    }
-    const rootCs = getComputedStyle(document.documentElement);
-    fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "8e01e4" },
-      body: JSON.stringify({
-        sessionId: "8e01e4",
-        runId: "css-post-fix-2",
-        hypothesisId: "F",
-        location: "ComicPanelTabs.tsx:title-colors",
-        message: "Panel title and locale trigger colors",
-        data: {
-          theme: document.documentElement.getAttribute("data-theme"),
-          comicInk: rootCs.getPropertyValue("--comic-ink").trim(),
-          sumiInk: rootCs.getPropertyValue("--sumi-ink").trim(),
-          titles,
-          localeTriggerBorder,
-          localeTriggerBg,
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-  }, [value, tabs]);
-  // #endregion
-
   const row = (
     <ComicPageRow className={className}>
       {tabs.map((tab) => {
@@ -125,8 +81,10 @@ export function ComicPanelTabs<T extends string>({
     </ComicPageRow>
   );
 
+  if (!ariaLabel) return row;
+
   return (
-    <div ref={wrapRef} role={ariaLabel ? "group" : undefined} aria-label={ariaLabel}>
+    <div role="group" aria-label={ariaLabel}>
       {row}
     </div>
   );
