@@ -15,7 +15,12 @@ import {
 } from "@/theme/celestialSelectorLayout";
 import { BANGKOK_COORDINATES } from "@/theme/useCelestialScene";
 import { CELESTIAL_TRIGGER_BODY_BADGE } from "./celestialTriggerBodyBadge.config";
+import { CELESTIAL_SELECTOR_PANEL_MOTION } from "./celestialSelectorPanelMotion.config";
 import { useCelestialSelectorOpenTransition } from "./useCelestialSelectorOpenTransition";
+import {
+  useCelestialSelectorPanelMotion,
+  type CelestialSelectorPanelPhase,
+} from "./useCelestialSelectorPanelMotion";
 import styles from "./CelestialThemeSelector.module.css";
 
 const ALIEN_TRIGGER_SRC = "/theme-selector/alien-obduction.svg";
@@ -39,8 +44,13 @@ export function CelestialThemeSelector({
   className,
   ariaLabel = "Theme time of day",
 }: CelestialThemeSelectorProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [panelPhase, setPanelPhase] = useState<CelestialSelectorPanelPhase | null>(
+    null,
+  );
+  const panelPhaseRef = useRef(panelPhase);
+  panelPhaseRef.current = panelPhase;
   const clockRef = useRef<CelestialThemeClockHandle>(null);
+  const ringRef = useRef<SVGCircleElement>(null);
   const timeLabel = formatClockLabel(slot);
   const sceneStyle = sceneVars as CSSProperties | undefined;
   const dialHalf = selectorButtonModeFromSunY(selectorViewerSunYPercent(slot));
@@ -60,13 +70,36 @@ export function CelestialThemeSelector({
     width: `${CELESTIAL_TRIGGER_BODY_BADGE.sizePercent}%`,
   } as CSSProperties;
 
-  const handleClose = useCallback(() => {
-    setIsOpen(false);
+  const isPanelMounted = panelPhase !== null;
+  const isExpanded = panelPhase === "open";
+
+  const requestClose = useCallback(() => {
+    if (panelPhaseRef.current !== "open") return;
+    setPanelPhase("closing");
     onChange(slot);
   }, [onChange, slot]);
 
-  const { triggerRef, panelRef, panelAnchor, reduceMotion } =
-    useCelestialSelectorOpenTransition(isOpen, handleClose);
+  const handleCloseComplete = useCallback(() => {
+    setPanelPhase(null);
+  }, []);
+
+  const {
+    triggerRef,
+    panelRef,
+    panelPopRef,
+    panelAnchor,
+    updateAnchor,
+    reduceMotion,
+  } = useCelestialSelectorOpenTransition(isPanelMounted, requestClose);
+
+  useCelestialSelectorPanelMotion({
+    phase: panelPhase,
+    reducedMotion: Boolean(reduceMotion),
+    panelPopRef,
+    ringRef,
+    onCloseComplete: handleCloseComplete,
+    onOpenLayout: updateAnchor,
+  });
 
   const handlePreview = (nextSlot: number) => {
     onPreviewChange?.(nextSlot);
@@ -77,14 +110,14 @@ export function CelestialThemeSelector({
   };
 
   const handleOpen = () => {
-    setIsOpen(true);
+    setPanelPhase("open");
     requestAnimationFrame(() => {
       clockRef.current?.focus();
     });
   };
 
   const panel =
-    typeof document !== "undefined" && isOpen
+    typeof document !== "undefined" && isPanelMounted
       ? createPortal(
           <div
             ref={panelRef}
@@ -99,20 +132,38 @@ export function CelestialThemeSelector({
             aria-label={ariaLabel}
           >
             <div
-              className={`${styles.panelPop}${
-                reduceMotion ? ` ${styles.panelPopInstant}` : ""
-              }`}
+              ref={panelPopRef}
+              className={styles.panelPop}
               style={sceneStyle}
             >
-              <CelestialThemeClock
-                ref={clockRef}
-                value={slot}
-                onChange={handlePreview}
-                onCommit={handleCommit}
-                coordinates={coordinates}
-                showBodyGlow
-                ariaLabel={ariaLabel}
-              />
+              <svg
+                className={styles.panelRing}
+                viewBox="0 0 100 100"
+                aria-hidden
+              >
+                <circle
+                  ref={ringRef}
+                  className={styles.panelRingPath}
+                  cx="50"
+                  cy="50"
+                  r="48.5"
+                  fill="none"
+                  stroke={CELESTIAL_SELECTOR_PANEL_MOTION.ringStroke}
+                  strokeWidth={CELESTIAL_SELECTOR_PANEL_MOTION.ringStrokeWidth}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className={styles.panelContent}>
+                <CelestialThemeClock
+                  ref={clockRef}
+                  value={slot}
+                  onChange={handlePreview}
+                  onCommit={handleCommit}
+                  coordinates={coordinates}
+                  showBodyGlow
+                  ariaLabel={ariaLabel}
+                />
+              </div>
             </div>
           </div>,
           document.body,
@@ -130,9 +181,9 @@ export function CelestialThemeSelector({
             type="button"
             className={styles.trigger}
             aria-label={`${ariaLabel}, ${timeLabel}`}
-            aria-expanded={isOpen}
+            aria-expanded={isExpanded}
             aria-haspopup="dialog"
-            onClick={() => (isOpen ? handleClose() : handleOpen())}
+            onClick={() => (isExpanded ? requestClose() : handleOpen())}
           >
             <span className={styles.triggerFace} aria-hidden>
               <span className={styles.triggerArt}>

@@ -1,6 +1,4 @@
 .wrap {
-  --celestial-panel-motion: 260ms cubic-bezier(0.22, 1, 0.36, 1);
-  /* Punch alien fills relative to the live sky disc behind them. */
   --celestial-trigger-saturate: 1.55;
   /* Shared frame for sky + alien (room for comic shadow). */
   --celestial-trigger-art: 85%;
@@ -31,36 +29,40 @@
   position: fixed;
   top: var(--panel-top, 0);
   left: var(--panel-left, 0);
-  /* Keep centering out of `transform` so the pop-in keyframes can own it. */
+  /* Keep centering out of `transform` so anime opacity owns the element cleanly. */
   translate: -50% 0;
   z-index: 1100;
   pointer-events: auto;
 }
 
 .panelPop {
+  position: relative;
+  opacity: 0;
   transform-origin: top center;
-  animation: celestialPanelIn var(--celestial-panel-motion) forwards;
 }
 
-.panelPopInstant {
-  animation: none;
+.panelContent {
+  position: relative;
+  z-index: 1;
 }
 
-@keyframes celestialPanelIn {
-  from {
-    opacity: 0;
-    transform: translate3d(10px, 8px, 0) rotate(0.7deg) scale(0.985);
-  }
+.panelRing {
+  position: absolute;
+  inset: -0.4rem;
+  width: calc(100% + 0.8rem);
+  height: calc(100% + 0.8rem);
+  overflow: visible;
+  pointer-events: none;
+  z-index: 2;
+}
 
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
-  }
+.panelRingPath {
+  fill: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .panelPop {
-    animation: none;
+    opacity: 1;
   }
 }
 
