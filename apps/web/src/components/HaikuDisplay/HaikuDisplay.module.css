@@ -20,7 +20,7 @@
 }
 
 .inputSection {
-  /* Flatten so sticky StoneInput is a flex child of the tall .wrapper (sticky travel). */
+  /* Flatten so sticky PostSignInput is a flex child of the tall .wrapper (sticky travel). */
   display: contents;
 }
 

@@ -8,7 +8,7 @@ const userPluginImpl = async (app: FastifyInstance) => {
     { preHandler: [app.requireAuthenticated] },
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
-      if (!userId) return res.code(403).send({ ok: false, error: "Unauthorized" });
+      if (!userId) return res.code(401).send({ ok: false, error: "Unauthorized" });
       const profile = await userService.getOwnProfile(userId);
       if (!profile) return res.code(404).send({ ok: false, error: "User not found" });
       return res.send({ ok: true, data: profile });
@@ -20,7 +20,7 @@ const userPluginImpl = async (app: FastifyInstance) => {
     { preHandler: [app.requireAuthenticated] },
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
-      if (!userId) return res.code(403).send({ ok: false, error: "Unauthorized" });
+      if (!userId) return res.code(401).send({ ok: false, error: "Unauthorized" });
       const payload = (req.body as Record<string, unknown> | undefined) ?? {};
       const result = await userService.updateOwnProfile({ userId, payload });
       if (!result.ok) return res.code(404).send({ ok: false, error: "User not found" });
@@ -33,7 +33,7 @@ const userPluginImpl = async (app: FastifyInstance) => {
     { preHandler: [app.requireAuthenticated] },
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
-      if (!userId) return res.code(403).send({ ok: false, error: "Unauthorized" });
+      if (!userId) return res.code(401).send({ ok: false, error: "Unauthorized" });
       const body = (req.body as { avatar?: unknown } | undefined) ?? {};
       const result = await userService.updateOwnAvatar({ userId, avatarRaw: body.avatar });
       if (!result.ok) {
@@ -51,7 +51,7 @@ const userPluginImpl = async (app: FastifyInstance) => {
     { preHandler: [app.requireAuthenticated] },
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
-      if (!userId) return res.code(403).send({ ok: false, error: "Unauthorized" });
+      if (!userId) return res.code(401).send({ ok: false, error: "Unauthorized" });
       const body = (req.body as { newEmail?: string } | undefined) ?? {};
       const result = await userService.createEmailChangeRequest({
         userId,
@@ -72,7 +72,7 @@ const userPluginImpl = async (app: FastifyInstance) => {
     { preHandler: [app.requireAuthenticated] },
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
-      if (!userId) return res.code(403).send({ ok: false, error: "Unauthorized" });
+      if (!userId) return res.code(401).send({ ok: false, error: "Unauthorized" });
       const body = (req.body as { newEmail?: string } | undefined) ?? {};
       const result = await userService.resendEmailChangeRequest({
         userId,
@@ -106,7 +106,7 @@ const userPluginImpl = async (app: FastifyInstance) => {
     { preHandler: [app.requireAuthenticated] },
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
-      if (!userId) return res.code(403).send({ ok: false, error: "Unauthorized" });
+      if (!userId) return res.code(401).send({ ok: false, error: "Unauthorized" });
       const payload = (req.body as Record<string, unknown> | undefined) ?? {};
       const result = await userService.updateOwnConfiguration({ userId, payload });
       if (!result.ok) {

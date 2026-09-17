@@ -18,7 +18,7 @@ const shareLinkPluginImpl = async (app: FastifyInstance) => {
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
       if (!userId) {
-        res.code(403).send({ ok: false, error: "Unauthorized" });
+        res.code(401).send({ ok: false, error: "Unauthorized" });
         return;
       }
       const q = req.query as Record<string, string | undefined>;
@@ -64,7 +64,7 @@ const shareLinkPluginImpl = async (app: FastifyInstance) => {
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
       if (!userId) {
-        res.code(403).send({ ok: false, error: "Unauthorized" });
+        res.code(401).send({ ok: false, error: "Unauthorized" });
         return;
       }
 
@@ -98,7 +98,7 @@ const shareLinkPluginImpl = async (app: FastifyInstance) => {
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
       if (!userId) {
-        res.code(403).send({ ok: false, error: "Unauthorized" });
+        res.code(401).send({ ok: false, error: "Unauthorized" });
         return;
       }
 
@@ -161,7 +161,7 @@ const shareLinkPluginImpl = async (app: FastifyInstance) => {
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
       if (!userId) {
-        res.code(403).send({ ok: false, error: "Unauthorized" });
+        res.code(401).send({ ok: false, error: "Unauthorized" });
         return;
       }
 
@@ -196,7 +196,7 @@ const shareLinkPluginImpl = async (app: FastifyInstance) => {
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
       if (!userId) {
-        res.code(403).send({ ok: false, error: "Unauthorized" });
+        res.code(401).send({ ok: false, error: "Unauthorized" });
         return;
       }
 
@@ -252,7 +252,7 @@ const shareLinkPluginImpl = async (app: FastifyInstance) => {
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
       if (!userId) {
-        res.code(403).send({ ok: false, error: "Unauthorized" });
+        res.code(401).send({ ok: false, error: "Unauthorized" });
         return;
       }
 

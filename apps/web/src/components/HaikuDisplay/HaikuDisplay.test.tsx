@@ -10,8 +10,8 @@ jest.mock("@/components/SavedHaikusLanternPath/SavedHaikusLanternPath", () => ({
   SavedHaikusLanternPath: () => <div data-testid="lantern-path" />,
 }));
 
-jest.mock("@/components/StoneInput", () => ({
-  StoneInput: () => <div data-testid="stone-input" />,
+jest.mock("@/components/PostSignInput", () => ({
+  PostSignInput: () => <div data-testid="post-sign-input" />,
 }));
 
 jest.mock("@/hooks/useHaikuDeleteController", () => ({
@@ -55,10 +55,10 @@ jest.mock("@/app/providers/HaikuFiltersProvider", () => ({
 }));
 
 describe("HaikuDisplay", () => {
-  it("renders the lantern path and stone input shell", () => {
+  it("renders the lantern path and post-sign input shell", () => {
     render(<HaikuDisplay />);
 
     expect(screen.getByTestId("lantern-path")).toBeInTheDocument();
-    expect(screen.getByTestId("stone-input")).toBeInTheDocument();
+    expect(screen.getByTestId("post-sign-input")).toBeInTheDocument();
   });
 });

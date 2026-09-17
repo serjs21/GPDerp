@@ -17,7 +17,7 @@ const iconUploadPluginImpl = async (app: FastifyInstance) => {
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
       if (!userId) {
-        return res.code(403).send({ ok: false, error: "Unauthorized" });
+        return res.code(401).send({ ok: false, error: "Unauthorized" });
       }
 
       try {
@@ -83,7 +83,7 @@ const iconUploadPluginImpl = async (app: FastifyInstance) => {
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
       if (!userId) {
-        return res.code(403).send({ ok: false, error: "Unauthorized" });
+        return res.code(401).send({ ok: false, error: "Unauthorized" });
       }
 
       const body = (req.body as PresignBody | undefined) ?? {};

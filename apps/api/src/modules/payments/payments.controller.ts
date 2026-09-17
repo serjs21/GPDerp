@@ -24,7 +24,7 @@ const paymentsPluginImpl = async (app: FastifyInstance) => {
     { preHandler: [app.requireAuthenticated] },
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
-      if (!userId) return res.code(403).send({ ok: false, error: "Unauthorized" });
+      if (!userId) return res.code(401).send({ ok: false, error: "Unauthorized" });
       const purchase = await paymentsService.createPendingPurchaseForUser(userId);
       return res.send({ ok: true, data: { purchaseId: purchase.id } });
     },
@@ -35,7 +35,7 @@ const paymentsPluginImpl = async (app: FastifyInstance) => {
     { preHandler: [app.requireAuthenticated] },
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
-      if (!userId) return res.code(403).send({ ok: false, error: "Unauthorized" });
+      if (!userId) return res.code(401).send({ ok: false, error: "Unauthorized" });
       const checkout = await paymentsService.createCheckout(userId);
       return res.send({ ok: true, data: checkout });
     },
@@ -46,7 +46,7 @@ const paymentsPluginImpl = async (app: FastifyInstance) => {
     { preHandler: [app.requireAuthenticated] },
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
-      if (!userId) return res.code(403).send({ ok: false, error: "Unauthorized" });
+      if (!userId) return res.code(401).send({ ok: false, error: "Unauthorized" });
       const body = (req.body as { transactionId?: string } | undefined) ?? {};
       const transactionId = typeof body.transactionId === "string" ? body.transactionId : "";
       const result = await paymentsService.confirmCompletedCheckout(userId, transactionId);
@@ -71,7 +71,7 @@ const paymentsPluginImpl = async (app: FastifyInstance) => {
     { preHandler: [app.requireAuthenticated] },
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
-      if (!userId) return res.code(403).send({ ok: false, error: "Unauthorized" });
+      if (!userId) return res.code(401).send({ ok: false, error: "Unauthorized" });
       const result = await paymentsService.getCredits(userId);
       if (!result.ok) return res.code(404).send({ ok: false, error: "User not found" });
       return res.send({ ok: true, data: { credits: result.credits } });

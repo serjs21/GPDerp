@@ -72,12 +72,11 @@ const authPluginImpl = async (app: FastifyInstance) => {
     return denyWithAuthCookiesCleared(reply, 401);
   };
 
-  // Stricter guard for resources that must not run without a valid user (403).
+  // Guard for resources that require a logged-in user (401 when not authenticated).
   const requireAuthenticated = async (request: FastifyRequest, reply: FastifyReply) => {
     const ok = await verifyAccessTokenFromRequest(request);
     if (ok) return;
-    tokenService.clearAuthCookies(reply);
-    return reply.code(403).send({ ok: false, error: AUTH_MESSAGES.unauthorized });
+    return denyWithAuthCookiesCleared(reply, 401);
   };
 
   app.decorate("authenticate", authenticate);
@@ -105,12 +104,12 @@ const authPluginImpl = async (app: FastifyInstance) => {
       request.headers.origin !== expectedWebOrigin
     ) {
       tokenService.clearAuthCookies(reply);
-      return reply.code(403).send({ ok: false, error: AUTH_MESSAGES.unauthorized });
+      return reply.code(401).send({ ok: false, error: AUTH_MESSAGES.unauthorized });
     }
 
     if (!csrfCookie || !csrfHeader || !safeEqual(csrfCookie, csrfHeader)) {
       tokenService.clearAuthCookies(reply);
-      return reply.code(403).send({ ok: false, error: AUTH_MESSAGES.unauthorized });
+      return reply.code(401).send({ ok: false, error: AUTH_MESSAGES.unauthorized });
     }
   };
 

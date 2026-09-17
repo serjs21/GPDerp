@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { CreationModal } from "@/components/CreationModal";
 import { SavedHaikusLanternPath } from "@/components/SavedHaikusLanternPath/SavedHaikusLanternPath";
-import { StoneInput } from "@/components/StoneInput";
+import { PostSignInput } from "@/components/PostSignInput";
 import type { SVGPathHandle } from "@/components/SVGPath";
 import { useHaikuDeleteController } from "@/hooks/useHaikuDeleteController";
 import { useInfiniteHaikusQuery } from "@/hooks/useInfiniteHaikusQuery";
@@ -56,7 +56,7 @@ export function HaikuDisplay() {
         />
       </div>
       <div className={styles.inputSection}>
-        <StoneInput
+        <PostSignInput
           subject={subject}
           onSubjectChange={setSubject}
           onSubmit={onSubmit}

@@ -1,0 +1,106 @@
+.root {
+  --post-sign-input-width: 22rem;
+  --post-sign-ink: #2c2924;
+  --post-sign-ink-soft: color-mix(in srgb, var(--post-sign-ink) 55%, transparent);
+  --post-sign-sticky-bottom: 0;
+  --post-sign-sticky-stop-margin: 0;
+  /* Opaque PNG crop (fractions of full asset — see POST_SIGN_INPUT_CONTENT_INSET). */
+  --post-sign-crop-top: 0.0092;
+  --post-sign-crop-right: 0.105;
+  --post-sign-crop-bottom: 0.0175;
+  --post-sign-crop-left: 0.0739;
+  --post-sign-crop-h: 0.9733;
+  --post-sign-crop-w: 0.8211;
+
+  position: relative;
+  display: inline-block;
+  width: var(--post-sign-input-width);
+  max-width: 100%;
+  aspect-ratio: 1189 / 1057;
+  overflow: hidden;
+}
+
+.rootSticky {
+  position: sticky;
+  bottom: var(--post-sign-sticky-bottom);
+  z-index: 9992;
+  flex: 0 0 auto;
+  align-self: center;
+  width: min(100%, var(--post-sign-input-width));
+  margin-inline: auto;
+  margin-bottom: var(--post-sign-sticky-stop-margin);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.filterDefs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.shell {
+  position: absolute;
+  /* Map full PNG so opaque content fills the cropped root. */
+  top: calc(var(--post-sign-crop-top) / var(--post-sign-crop-h) * -100%);
+  left: calc(var(--post-sign-crop-left) / var(--post-sign-crop-w) * -100%);
+  width: calc(100% / var(--post-sign-crop-w));
+  height: calc(100% / var(--post-sign-crop-h));
+  pointer-events: none;
+  user-select: none;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
+.form {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.input {
+  position: absolute;
+  /* Insets match constants.POST_SIGN_INPUT_FORM_INSET (cropped content box) */
+  inset: 20.5% 20% 66.5% 15.5%;
+  width: auto;
+  height: auto;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid color-mix(in srgb, var(--post-sign-ink) 32%, transparent);
+  padding: 0;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--post-sign-ink);
+  outline: none;
+  transition: border-color 0.2s ease;
+  letter-spacing: 0.02em;
+}
+
+.input::placeholder {
+  color: var(--post-sign-ink-soft);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.input:focus {
+  border-bottom-color: color-mix(in srgb, var(--post-sign-ink) 70%, transparent);
+}
+
+.input:disabled {
+  opacity: 0.55;
+}
+
+.submit {
+  /* Insets match constants.POST_SIGN_INPUT_SUBMIT_INSET (cropped content box) */
+  position: absolute;
+  inset: 17.5% 4.5% 63.5% 79.5%;
+  width: auto;
+  height: auto;
+  --lantern-submit-size: auto;
+  --lantern-submit-ink: var(--post-sign-ink);
+}

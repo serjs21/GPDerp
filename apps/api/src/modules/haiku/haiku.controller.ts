@@ -19,7 +19,7 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
       if (!userId) {
-        res.code(403).send({ ok: false, error: "Unauthorized" });
+        res.code(401).send({ ok: false, error: "Unauthorized" });
         return;
       }
       const accountId = await haikuService.getManageLabelsAccountIdForUser(userId);
@@ -37,7 +37,7 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
       if (!userId) {
-        res.code(403).send({ ok: false, error: "Unauthorized" });
+        res.code(401).send({ ok: false, error: "Unauthorized" });
         return;
       }
       const { accountId } = req.params as { accountId: string };
@@ -78,7 +78,7 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
       if (!userId) {
-        res.code(403).send({ ok: false, error: "Unauthorized" });
+        res.code(401).send({ ok: false, error: "Unauthorized" });
         return;
       }
       const { accountId } = req.params as { accountId: string };
@@ -116,7 +116,7 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
       if (!userId) {
-        res.code(403).send({ ok: false, error: "Unauthorized" });
+        res.code(401).send({ ok: false, error: "Unauthorized" });
         return;
       }
       const { labelId } = req.params as { labelId: string };
@@ -158,7 +158,7 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
       if (!userId) {
-        res.code(403).send({ ok: false, error: "Unauthorized" });
+        res.code(401).send({ ok: false, error: "Unauthorized" });
         return;
       }
       const { labelId } = req.params as { labelId: string };
@@ -185,7 +185,7 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
       if (!userId) {
-        res.code(403).send({ ok: false, error: "Unauthorized" });
+        res.code(401).send({ ok: false, error: "Unauthorized" });
         return;
       }
 
@@ -248,7 +248,7 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
       if (!userId) {
-        res.code(403).send({ ok: false, error: "Unauthorized" });
+        res.code(401).send({ ok: false, error: "Unauthorized" });
         return;
       }
 
@@ -271,7 +271,7 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
       if (!userId) {
-        res.code(403).send({ ok: false, error: "Unauthorized" });
+        res.code(401).send({ ok: false, error: "Unauthorized" });
         return;
       }
 
@@ -302,7 +302,7 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
     async (req: FastifyRequest, res: FastifyReply) => {
       const userId = req.user?.sub;
       if (!userId) {
-        res.code(403).send({ ok: false, error: "Unauthorized" });
+        res.code(401).send({ ok: false, error: "Unauthorized" });
         return;
       }
 
@@ -360,7 +360,7 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
 
       const userId = req.user?.sub;
       if (!userId) {
-        res.code(403).send({ ok: false, error: "Unauthorized" });
+        res.code(401).send({ ok: false, error: "Unauthorized" });
         return;
       }
 

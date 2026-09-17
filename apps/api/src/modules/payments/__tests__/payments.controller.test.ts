@@ -34,7 +34,7 @@ describe("payments.controller POST /payments/purchase", () => {
     const app = Fastify();
     app.decorate("requireAuthenticated", async (request: FastifyRequest, reply: FastifyReply) => {
       if (!opts.userId) {
-        return reply.code(403).send({ ok: false, error: "Unauthorized" });
+        return reply.code(401).send({ ok: false, error: "Unauthorized" });
       }
       request.user = { sub: opts.userId, sid: "sid-1" };
     });
@@ -60,7 +60,7 @@ describe("payments.controller POST /payments/purchase", () => {
     await app.close();
   });
 
-  it("returns 403 when unauthenticated", async () => {
+  it("returns 401 when unauthenticated", async () => {
     const app = await buildApp({});
 
     const response = await app.inject({
@@ -69,7 +69,7 @@ describe("payments.controller POST /payments/purchase", () => {
     });
     const body = response.json();
 
-    expect(response.statusCode).toBe(403);
+    expect(response.statusCode).toBe(401);
     expect(body).toEqual({ ok: false, error: "Unauthorized" });
     expect(paymentsService.createPendingPurchaseForUser).not.toHaveBeenCalled();
     await app.close();
