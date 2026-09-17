@@ -89,7 +89,7 @@
   gap: 0.75rem;
   max-height: inherit;
   padding: 1.35rem 1.4rem 1.25rem;
-  color: var(--sumi-ink, #2d2d2d);
+  color: var(--comic-ink, #2d2d2d);
   font-family: var(--font-lantern-script, cursive);
 }
 

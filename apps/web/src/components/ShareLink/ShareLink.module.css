@@ -6,7 +6,7 @@
   height: 100%;
   min-height: inherit;
   font-family: var(--font-lantern-script, cursive);
-  color: var(--sumi-ink, #2d2d2d);
+  color: var(--comic-ink, #2d2d2d);
 }
 
 .panelShell {
@@ -105,7 +105,7 @@
   font-size: 0.7rem;
   line-height: 1;
   letter-spacing: 0.02em;
-  color: var(--sumi-ink, #2d2d2d);
+  color: var(--comic-ink, #2d2d2d);
   white-space: nowrap;
   -webkit-font-smoothing: none;
   font-smooth: never;
@@ -186,7 +186,7 @@
   border: 2px solid #111;
   border-radius: 0.3rem;
   background: #fff;
-  color: var(--sumi-ink, #2d2d2d);
+  color: var(--comic-ink, #2d2d2d);
   font-family: var(--font-lantern-script, cursive);
   font-size: 1.05rem;
   font-weight: 600;
@@ -237,7 +237,7 @@
   border: 2px solid #111;
   border-radius: 0.3rem;
   background: #fff;
-  color: var(--sumi-ink, #2d2d2d);
+  color: var(--comic-ink, #2d2d2d);
   font-family: var(--font-lantern-script, cursive);
   font-size: 1.05rem;
   font-weight: 600;

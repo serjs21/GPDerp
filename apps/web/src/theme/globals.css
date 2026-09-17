@@ -9,8 +9,9 @@
   --accent-red: #bc002d;
   --hanko-red: #bc002d;
   --sumi-ink: #2d2d2d;
-  /* Fixed ink for light comic paper (panels, bubbles, modals) — themes must not remapped this. */
+  /* Fixed ink for light comic paper (panels, bubbles, modals) — themes must not remap this. */
   --comic-ink: #2d2d2d;
+  /* Seal / danger red — themes must not remap (use --shrine-accent for theme tint). */
   --ink-wash: rgba(45, 45, 45, 0.06);
   --chip-surface: rgba(255, 255, 255, 0.66);
   --form-error-color: #c62828;

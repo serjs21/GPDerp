@@ -45,8 +45,7 @@
 
 .slotLabels {
   border-right: 1.5px solid #111;
-  /* Fixed hanko red — theme --accent-red remaps to gold in night-sky. */
-  background-color: #bc002d;
+  background-color: var(--hanko-red, #bc002d);
 }
 
 .slotSearch {

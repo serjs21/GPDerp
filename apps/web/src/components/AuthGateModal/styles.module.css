@@ -76,7 +76,7 @@
 
 .linkRow a,
 .linkButton {
-  color: var(--sumi-ink, #2d2d2d);
+  color: var(--comic-ink, #2d2d2d);
   text-decoration: underline;
   text-underline-offset: 0.15em;
 }

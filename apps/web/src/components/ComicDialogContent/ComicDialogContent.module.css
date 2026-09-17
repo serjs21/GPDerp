@@ -11,7 +11,7 @@
   padding: 1.2rem 1.75rem;
   border: none;
   background: transparent;
-  color: var(--sumi-ink, #2d2d2d);
+  color: var(--comic-ink, #2d2d2d);
   font-family: var(--font-lantern-script, cursive);
   font-size: 1.35rem;
   font-weight: 600;

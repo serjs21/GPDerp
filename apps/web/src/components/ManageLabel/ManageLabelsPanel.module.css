@@ -52,7 +52,7 @@
 .empty {
   margin: 0;
   padding: 1.5rem 0.75rem;
-  color: var(--sumi-ink, #2d2d2d);
+  color: var(--comic-ink, #2d2d2d);
   font-family: var(--font-lantern-script, cursive);
   font-size: 1rem;
   letter-spacing: 0.03em;

@@ -58,7 +58,7 @@
   border: none;
   border-radius: 0.25rem;
   background: transparent;
-  color: var(--sumi-ink, #2d2d2d);
+  color: var(--comic-ink, #2d2d2d);
   cursor: pointer;
   pointer-events: auto;
   filter: drop-shadow(0 0 0 transparent);
@@ -113,7 +113,7 @@
   z-index: 5;
   transform: translate(-50%, calc(100% + 0.35rem));
   margin: 0;
-  color: var(--sumi-ink, #2d2d2d);
+  color: var(--comic-ink, #2d2d2d);
   font-family: var(--font-lantern-script, cursive);
   font-size: 0.65rem;
   letter-spacing: 0.04em;

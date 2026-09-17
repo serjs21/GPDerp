@@ -125,7 +125,7 @@
   margin: 0;
   padding: 1rem 0.5rem;
   font-family: var(--font-lantern-script, cursive);
-  color: var(--sumi-ink, #2d2d2d);
+  color: var(--comic-ink, #2d2d2d);
 }
 
 .sentinel {
@@ -238,7 +238,7 @@
   font-size: 0.58rem;
   line-height: 1;
   letter-spacing: 0.02em;
-  color: var(--sumi-ink, #2d2d2d);
+  color: var(--comic-ink, #2d2d2d);
   white-space: nowrap;
   -webkit-font-smoothing: none;
   font-smooth: never;
