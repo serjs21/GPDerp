@@ -70,7 +70,7 @@ export function PostSignInput({
   submitLabel = "詠む Compose",
   widthRem = POST_SIGN_INPUT_WIDTH_REM,
   sticky = false,
-  stickyBottomPx = 0,
+  stickyBottomPx = 20,
   stickyStopMarginPx = 0,
 }: PostSignInputProps) {
   const filterId = useId().replace(/:/g, "");

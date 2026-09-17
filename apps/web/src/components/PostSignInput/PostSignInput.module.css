@@ -16,7 +16,7 @@
 .rootSticky {
   position: fixed;
   bottom: calc(var(--post-sign-sticky-bottom) + env(safe-area-inset-bottom, 0px));
-  left: 30%;
+  left: 34%;
   transform: translateX(-50%);
   z-index: 9992;
   width: min(100%, var(--post-sign-input-width));
@@ -41,6 +41,7 @@
   display: block;
   width: 100%;
   height: auto;
+  opacity: 0.85;
 }
 
 .form {
