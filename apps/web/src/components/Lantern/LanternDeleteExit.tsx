@@ -11,6 +11,7 @@ import {
 import type { HaikuDto } from "@/api/haikus";
 import { deleteHaiku } from "@/api/haikus";
 import { comicToast } from "@/components/ComicToast";
+import axios from "axios";
 import { LanternSteppedFlight } from "./LanternSteppedFlight";
 import type { LanternTransform } from "./lanternTransform";
 import {
@@ -21,12 +22,14 @@ import {
 export type LanternDeleteExitProps = {
   haiku: HaikuDto;
   transform: LanternTransform;
-  /** Called immediately for optimistic UI (close modal / remove from list). */
+  /** Called after successful delete (remove from list / mount path exit flyer). */
   onDeleted?: (haiku: HaikuDto) => void;
-  /** Called when the delete API fails after optimistic removal. */
+  /** Called when delete fails after the haiku was already removed (legacy / restore). */
   onDeleteFailed?: (haiku: HaikuDto) => void;
   /** Called after flight finishes (or immediately when reduced-motion). */
   onExitComplete?: (haiku: HaikuDto) => void;
+  /** Fired when stepped flight first holds a pose (path pack cue). */
+  onPoseHold?: (poseIndex: number) => void;
   onChanged?: () => void;
   /** Passed through to in-place stepped flight (CreationModal). */
   widthRem?: number;
@@ -43,8 +46,8 @@ export function LanternDeleteExit({
   haiku,
   transform,
   onDeleted,
-  onDeleteFailed,
   onExitComplete,
+  onPoseHold,
   widthRem = 20,
   lanternClassName,
   excludeLabelIds,
@@ -74,34 +77,29 @@ export function LanternDeleteExit({
 
     const snapshot = haiku;
 
-    // Optimistic: close modal / update list before animation or API finish.
+    try {
+      await deleteHaiku(snapshot.id);
+      comicToast.success("Haiku deleted");
+    } catch (error) {
+      animatingRef.current = false;
+      if (axios.isAxiosError(error) && error.response?.status === 403) {
+        comicToast.error("You are not allowed to delete this haiku.");
+      } else {
+        comicToast.error("Could not delete haiku.");
+      }
+      throw error;
+    }
+
+    // Path remove unmounts this instance; parent ExitingPathLantern owns the flyer.
     onDeleted?.(snapshot);
 
-    const finishExit = (notifyComplete: boolean) => {
-      if (notifyComplete) onExitComplete?.(snapshot);
-      flightResolveRef.current = null;
-      animatingRef.current = false;
-    };
-
-    const commitDelete = async (notifyComplete: boolean) => {
-      try {
-        await deleteHaiku(snapshot.id);
-        comicToast.success("Haiku deleted");
-      } catch {
-        onDeleteFailed?.(snapshot);
-      } finally {
-        finishExit(notifyComplete);
-      }
-    };
-
     if (prefersReducedMotion()) {
-      await commitDelete(true);
+      onExitComplete?.(snapshot);
+      animatingRef.current = false;
       return;
     }
 
-    setFlightActive(true);
-    setFlightExiting(true);
-
+    // Let React commit list removal / unmount before choosing in-place vs path flyer.
     await new Promise<void>((resolve) => {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -110,32 +108,25 @@ export function LanternDeleteExit({
       });
     });
 
-    // Path optimistic remove unmounts this instance; parent ExitingPathLantern owns the flyer.
     if (!mountedRef.current) {
-      void commitDelete(false);
+      animatingRef.current = false;
       return;
     }
 
-    const flightPromise = new Promise<void>((resolve) => {
-      flightResolveRef.current = resolve;
-    });
+    // In-place flight (CreationModal): start flyer and return so the confirm modal can close.
+    setFlightActive(true);
+    setFlightExiting(true);
 
-    // API runs in parallel with flight; do not block confirm/modal on animation.
     void (async () => {
-      try {
-        await deleteHaiku(snapshot.id);
-        comicToast.success("Haiku deleted");
-        await flightPromise;
-      } catch {
-        setFlightActive(false);
-        flightResolveRef.current?.();
-        flightResolveRef.current = null;
-        onDeleteFailed?.(snapshot);
-      } finally {
-        finishExit(true);
-      }
+      await new Promise<void>((resolve) => {
+        flightResolveRef.current = resolve;
+      });
+
+      onExitComplete?.(snapshot);
+      flightResolveRef.current = null;
+      animatingRef.current = false;
     })();
-  }, [haiku, onDeleteFailed, onDeleted, onExitComplete]);
+  }, [haiku, onDeleted, onExitComplete]);
 
   if (flightExiting) {
     return (
@@ -146,6 +137,7 @@ export function LanternDeleteExit({
         className={lanternClassName}
         widthRem={widthRem}
         active={flightActive}
+        onPoseHold={onPoseHold}
         onComplete={() => {
           flightResolveRef.current?.();
           flightResolveRef.current = null;

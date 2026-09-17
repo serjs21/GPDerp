@@ -58,4 +58,41 @@ describe("useSteppedTransition", () => {
     });
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
+
+  it("fires onPoseHold for each discrete pose hold", async () => {
+    const onPoseHold = jest.fn();
+    const onComplete = jest.fn();
+    renderHook(() =>
+      useSteppedTransition({
+        poses,
+        active: true,
+        holdMs: 50,
+        crossfadeMs: 40,
+        onPoseHold,
+        onComplete,
+      }),
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(0);
+    });
+    expect(onPoseHold.mock.calls.map((call) => call[0])).toEqual([0]);
+
+    await act(async () => {
+      jest.advanceTimersByTime(50);
+    });
+    await act(async () => {
+      jest.advanceTimersByTime(40);
+    });
+    expect(onPoseHold.mock.calls.map((call) => call[0])).toEqual([0, 1]);
+
+    await act(async () => {
+      jest.advanceTimersByTime(50);
+    });
+    await act(async () => {
+      jest.advanceTimersByTime(40);
+    });
+    expect(onPoseHold.mock.calls.map((call) => call[0])).toEqual([0, 1, 2]);
+    expect(onComplete).toHaveBeenCalledTimes(1);
+  });
 });

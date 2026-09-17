@@ -31,12 +31,15 @@ import {
   stopForHaikuIndex,
   type ParsedSplitPathSvg,
 } from "./utils";
+import { prefersReducedMotion } from "@/components/Lantern/simulateFlight";
 import styles from "./SVGPath.module.css";
 
 const SVG_PATH_SRC = "/path/split_path_colored_stops.svg";
 const SVG_PATH_STEP_MS = 300;
 const SVG_PATH_CATCH_UP_MS = 450;
 const SVG_PATH_DELETE_PACK_MS = 450;
+/** Start neighbor pack when exit flight first holds this pose (0-based; 3 = 4th frame). */
+const DELETE_PACK_CUE_POSE_INDEX = 3;
 
 type ExitingLantern = {
   haiku: HaikuDto;
@@ -133,8 +136,25 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
   const [deletePack, setDeletePack] = useState<DeletePack | null>(null);
   const [deletePackT, setDeletePackT] = useState(1);
   const deletePackAnimationRef = useRef<ReturnType<typeof animate> | null>(null);
+  const deletePackStartedRef = useRef(false);
   const haikusRef = useRef(haikus);
   haikusRef.current = haikus;
+
+  const startDeletePackAnimation = useCallback(() => {
+    if (deletePackStartedRef.current) return;
+    deletePackStartedRef.current = true;
+    deletePackAnimationRef.current?.stop();
+    deletePackAnimationRef.current = animate(0, 1, {
+      duration: SVG_PATH_DELETE_PACK_MS / 1000,
+      ease: "easeOut",
+      onUpdate: (value) => setDeletePackT(value),
+      onComplete: () => {
+        setDeletePack(null);
+        setDeletePackT(1);
+        deletePackAnimationRef.current = null;
+      },
+    });
+  }, []);
 
   const handleLanternDeleted = useCallback(
     (haiku: HaikuDto, transform: LanternTransform) => {
@@ -146,25 +166,32 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
       );
       setDeletePack({ prevIndexById });
       setDeletePackT(0);
+      deletePackStartedRef.current = false;
       deletePackAnimationRef.current?.stop();
-      deletePackAnimationRef.current = animate(0, 1, {
-        duration: SVG_PATH_DELETE_PACK_MS / 1000,
-        ease: "easeOut",
-        onUpdate: (value) => setDeletePackT(value),
-        onComplete: () => {
-          setDeletePack(null);
-          setDeletePackT(1);
-          deletePackAnimationRef.current = null;
-        },
-      });
+      deletePackAnimationRef.current = null;
       onHaikuDeleted?.(haiku);
+      // Reduced-motion skips stepped flight cues — pack immediately.
+      if (prefersReducedMotion()) {
+        startDeletePackAnimation();
+      }
     },
-    [onHaikuDeleted],
+    [onHaikuDeleted, startDeletePackAnimation],
+  );
+
+  const handleExitPoseHold = useCallback(
+    (poseIndex: number) => {
+      if (poseIndex >= DELETE_PACK_CUE_POSE_INDEX) {
+        startDeletePackAnimation();
+      }
+    },
+    [startDeletePackAnimation],
   );
 
   const handleLanternExitComplete = useCallback((haiku: HaikuDto) => {
+    // Safety: if the flyer finished before the pack cue, still pack neighbors.
+    startDeletePackAnimation();
     setExitingLanterns((prev) => prev.filter((entry) => entry.haiku.id !== haiku.id));
-  }, []);
+  }, [startDeletePackAnimation]);
 
   useEffect(() => {
     return () => {
@@ -383,6 +410,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
               haiku={haiku}
               transform={transform}
               excludeLabelIds={excludeLabelIds}
+              onPoseHold={handleExitPoseHold}
               onComplete={handleLanternExitComplete}
             />
           ))}

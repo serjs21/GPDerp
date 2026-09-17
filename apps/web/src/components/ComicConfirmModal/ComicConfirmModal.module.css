@@ -96,6 +96,17 @@
   min-height: 3.5rem;
 }
 
+.confirmingLabel {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.confirmingDots {
+  display: inline-block;
+  min-width: 1.5em;
+  text-align: left;
+}
+
 .visuallyHidden {
   position: absolute;
   width: 1px;

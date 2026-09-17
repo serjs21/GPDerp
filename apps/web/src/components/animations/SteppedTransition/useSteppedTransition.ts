@@ -125,6 +125,8 @@ export type UseSteppedTransitionOptions = {
   crossfadeMs?: number;
   reducedMotion?: boolean;
   onComplete?: () => void;
+  /** Fired when a discrete pose hold begins (not during crossfade). */
+  onPoseHold?: (poseIndex: number) => void;
 };
 
 /**
@@ -141,11 +143,14 @@ export function useSteppedTransition(options: UseSteppedTransitionOptions): {
     crossfadeMs = STEPPED_TRANSITION.crossfadeMs,
     reducedMotion = false,
     onComplete,
+    onPoseHold,
   } = options;
 
   const [layers, setLayers] = useState<SteppedTransitionLayer[]>([]);
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
+  const onPoseHoldRef = useRef(onPoseHold);
+  onPoseHoldRef.current = onPoseHold;
   const completedRef = useRef(false);
 
   useEffect(() => {
@@ -207,6 +212,7 @@ export function useSteppedTransition(options: UseSteppedTransitionOptions): {
         setLayers([
           { pose: current, opacity: 1, role: "solo", key: `hold-${i}` },
         ]);
+        onPoseHoldRef.current?.(i);
 
         if (i === poses.length - 1) {
           finish();

@@ -52,7 +52,7 @@ export const HaikuActions = (props: HaikuActionsProps) => {
       setDeleteOpen(false);
     } catch (e) {
       if (onDelete) {
-        setDeleteOpen(false);
+        // LanternDeleteExit already toasted / reported failure; keep modal open.
         return;
       }
       if (axios.isAxiosError(e) && e.response?.status === 403) {

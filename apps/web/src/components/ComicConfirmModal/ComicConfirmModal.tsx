@@ -1,9 +1,14 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
+import { useEffect, useState } from "react";
 import { ComicButton } from "@/components/ComicButton/ComicButton";
 import { ComicDialogContent } from "@/components/ComicDialogContent/ComicDialogContent";
 import { COMIC_PANEL_COLORS } from "@/components/ComicPageLayout/comicPagePresets";
+import {
+  ACTIVATING_DOT_CYCLE,
+  ACTIVATING_DOT_MS,
+} from "@/components/ShareLink/useShareLinkControls";
 import { ComicBubbleStage } from "./ComicBubbleStage";
 import type { ComicBubbleStyle } from "./comicBubblePresets";
 import stageStyles from "./comicBubbleStage.module.css";
@@ -65,6 +70,7 @@ export function ComicConfirmModal({
   className,
 }: ComicConfirmModalProps) {
   const allowOutsideDismiss = closeOnOverlayClick && !confirming;
+  const [busyDots, setBusyDots] = useState<(typeof ACTIVATING_DOT_CYCLE)[number]>("");
   const { questionRef, cancelRef, confirmRef, getTargets, targetsKey } = useComicConfirmStage({
     question,
     cancelLabel,
@@ -76,6 +82,20 @@ export function ComicConfirmModal({
     cancelFill,
     confirmFill,
   });
+
+  useEffect(() => {
+    if (!confirming) {
+      setBusyDots("");
+      return;
+    }
+    setBusyDots("");
+    let step = 0;
+    const id = window.setInterval(() => {
+      step = (step + 1) % ACTIVATING_DOT_CYCLE.length;
+      setBusyDots(ACTIVATING_DOT_CYCLE[step]!);
+    }, ACTIVATING_DOT_MS);
+    return () => window.clearInterval(id);
+  }, [confirming]);
 
   const handleCancel = () => {
     if (confirming) return;
@@ -159,7 +179,14 @@ export function ComicConfirmModal({
                 disabled={confirming}
                 onClick={handleConfirm}
               >
-                {confirmLabel}
+                {confirming ? (
+                  <span className={styles.confirmingLabel} aria-live="polite">
+                    {confirmLabel}
+                    <span className={styles.confirmingDots}>{busyDots}</span>
+                  </span>
+                ) : (
+                  confirmLabel
+                )}
               </ComicButton>
             </ComicBubbleStage>
           </div>

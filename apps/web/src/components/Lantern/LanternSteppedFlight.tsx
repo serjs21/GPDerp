@@ -28,6 +28,7 @@ export type LanternSteppedFlightProps = {
   active?: boolean;
   reducedMotion?: boolean;
   onComplete: () => void;
+  onPoseHold?: (poseIndex: number) => void;
 };
 
 /**
@@ -43,6 +44,7 @@ export function LanternSteppedFlight({
   active = true,
   reducedMotion: reducedMotionProp,
   onComplete,
+  onPoseHold,
 }: LanternSteppedFlightProps) {
   const reducedMotion = reducedMotionProp ?? prefersReducedMotion();
   const flightInput = useMemo(
@@ -64,6 +66,7 @@ export function LanternSteppedFlight({
       active={active}
       reducedMotion={reducedMotion}
       onComplete={onComplete}
+      onPoseHold={onPoseHold}
       renderPose={(pose, layerOpacity) => {
         const poseOpacity = (pose.opacity ?? 1) * layerOpacity;
         const flightStyle = {

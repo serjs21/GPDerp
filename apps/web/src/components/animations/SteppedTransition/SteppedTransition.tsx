@@ -15,6 +15,7 @@ export type SteppedTransitionProps = {
   crossfadeMs?: number;
   reducedMotion?: boolean;
   onComplete?: () => void;
+  onPoseHold?: (poseIndex: number) => void;
   renderPose: (
     pose: TransitionPose,
     opacity: number,
@@ -34,6 +35,7 @@ export function SteppedTransition({
   crossfadeMs = STEPPED_TRANSITION.crossfadeMs,
   reducedMotion = false,
   onComplete,
+  onPoseHold,
   renderPose,
 }: SteppedTransitionProps) {
   const { layers } = useSteppedTransition({
@@ -43,6 +45,7 @@ export function SteppedTransition({
     crossfadeMs,
     reducedMotion,
     onComplete,
+    onPoseHold,
   });
 
   if (!active || layers.length === 0) return null;

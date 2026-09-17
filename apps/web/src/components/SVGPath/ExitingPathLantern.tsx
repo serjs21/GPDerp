@@ -12,14 +12,16 @@ export type ExitingPathLanternProps = {
   transform: LanternTransform;
   excludeLabelIds?: string[];
   onComplete: (haiku: HaikuDto) => void;
+  onPoseHold?: (poseIndex: number) => void;
 };
 
-/** Owns fly-away after the path lantern unmounts from the optimistic list update. */
+/** Owns fly-away after the path lantern unmounts from the successful delete list update. */
 export function ExitingPathLantern({
   haiku,
   transform,
   excludeLabelIds,
   onComplete,
+  onPoseHold,
 }: ExitingPathLanternProps) {
   const reduced = prefersReducedMotion();
 
@@ -36,6 +38,7 @@ export function ExitingPathLantern({
       excludeLabelIds={excludeLabelIds}
       className={styles.lantern}
       widthRem={19}
+      onPoseHold={onPoseHold}
       onComplete={() => onComplete(haiku)}
     />
   );
