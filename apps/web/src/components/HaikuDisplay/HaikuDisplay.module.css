@@ -1,4 +1,5 @@
 .wrapper {
+  position: relative;
   width: 100%;
   min-height: min(100dvh, 100%);
   display: flex;
@@ -20,7 +21,7 @@
 }
 
 .inputSection {
-  /* Flatten so sticky PostSignInput is a flex child of the tall .wrapper (sticky travel). */
+  /* Flatten so overlay PostSignInput positions against .wrapper without taking flex space. */
   display: contents;
 }
 

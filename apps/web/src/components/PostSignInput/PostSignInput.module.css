@@ -1,33 +1,26 @@
 .root {
-  --post-sign-input-width: 22rem;
+  --post-sign-input-width: 20rem;
   --post-sign-ink: #2c2924;
   --post-sign-ink-soft: color-mix(in srgb, var(--post-sign-ink) 55%, transparent);
   --post-sign-sticky-bottom: 0;
   --post-sign-sticky-stop-margin: 0;
-  /* Opaque PNG crop (fractions of full asset — see POST_SIGN_INPUT_CONTENT_INSET). */
-  --post-sign-crop-top: 0.0092;
-  --post-sign-crop-right: 0.105;
-  --post-sign-crop-bottom: 0.0175;
-  --post-sign-crop-left: 0.0739;
-  --post-sign-crop-h: 0.9733;
-  --post-sign-crop-w: 0.8211;
 
   position: relative;
   display: inline-block;
   width: var(--post-sign-input-width);
   max-width: 100%;
-  aspect-ratio: 1189 / 1057;
-  overflow: hidden;
+  overflow: visible;
+  pointer-events: none;
 }
 
 .rootSticky {
-  position: sticky;
+  position: absolute;
   bottom: var(--post-sign-sticky-bottom);
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 9992;
-  flex: 0 0 auto;
-  align-self: center;
   width: min(100%, var(--post-sign-input-width));
-  margin-inline: auto;
+  margin: 0;
   margin-bottom: var(--post-sign-sticky-stop-margin);
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
@@ -40,12 +33,8 @@
 }
 
 .shell {
-  position: absolute;
-  /* Map full PNG so opaque content fills the cropped root. */
-  top: calc(var(--post-sign-crop-top) / var(--post-sign-crop-h) * -100%);
-  left: calc(var(--post-sign-crop-left) / var(--post-sign-crop-w) * -100%);
-  width: calc(100% / var(--post-sign-crop-w));
-  height: calc(100% / var(--post-sign-crop-h));
+  display: block;
+  width: 100%;
   pointer-events: none;
   user-select: none;
 }
@@ -53,20 +42,20 @@
 .image {
   display: block;
   width: 100%;
-  height: 100%;
-  object-fit: fill;
+  height: auto;
 }
 
 .form {
   position: absolute;
   inset: 0;
   z-index: 1;
+  pointer-events: none;
 }
 
 .input {
   position: absolute;
-  /* Insets match constants.POST_SIGN_INPUT_FORM_INSET (cropped content box) */
-  inset: 20.5% 20% 66.5% 15.5%;
+  /* Insets match constants.POST_SIGN_INPUT_FORM_INSET (full asset box) */
+  inset: 21.85% 30.2% 65.5% 30.4%;
   width: auto;
   height: auto;
   background: transparent;
@@ -79,6 +68,7 @@
   outline: none;
   transition: border-color 0.2s ease;
   letter-spacing: 0.02em;
+  pointer-events: auto;
 }
 
 .input::placeholder {
@@ -96,11 +86,12 @@
 }
 
 .submit {
-  /* Insets match constants.POST_SIGN_INPUT_SUBMIT_INSET (cropped content box) */
+  /* Insets match constants.POST_SIGN_INPUT_SUBMIT_INSET (full asset box) */
   position: absolute;
-  inset: 17.5% 4.5% 63.5% 79.5%;
+  inset: 18.4% 13.8% 63.1% 73.9%;
   width: auto;
   height: auto;
   --lantern-submit-size: auto;
   --lantern-submit-ink: var(--post-sign-ink);
+  pointer-events: auto;
 }

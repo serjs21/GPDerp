@@ -4,7 +4,7 @@ export const POST_SIGN_INPUT_IMAGE_HEIGHT = 1086;
 
 /**
  * Opaque content bbox inside the PNG (alpha > 8), as fractions of the full asset.
- * Used to crop layout height so transparent padding does not reserve space.
+ * The control paints the full image (no crop clip); these remain for measurement.
  */
 export const POST_SIGN_INPUT_CONTENT_INSET = {
   top: 0.0092,
@@ -26,26 +26,26 @@ export const POST_SIGN_INPUT_IMAGE_ASPECT =
 export const POST_SIGN_INPUT_ASSET_SRC = "/input/input_base_post_sign.png";
 
 /** Default display width in rem (keeps aspect via CSS). */
-export const POST_SIGN_INPUT_WIDTH_REM = 22;
+export const POST_SIGN_INPUT_WIDTH_REM = 20;
 
 /**
- * Subject field inset as fractions of the cropped sign content box.
- * Sits on the horizontal wooden plank. Matches `.input` inset in PostSignInput.module.css.
+ * Subject field inset as fractions of the full asset box.
+ * Sits on the open wooden plank, clear of the post blossoms. Matches `.input`.
  */
 export const POST_SIGN_INPUT_FORM_INSET = {
-  top: 0.205,
-  right: 0.2,
-  bottom: 0.665,
-  left: 0.155,
+  top: 0.2185,
+  right: 0.302,
+  bottom: 0.655,
+  left: 0.304,
 } as const;
 
 /**
- * Submit button inset as fractions of the cropped sign content box.
- * Right end of the plank, before the arrow tip. Matches `.submit` inset.
+ * Submit button inset as fractions of the full asset box.
+ * Right end of the plank, before the arrow tip. Matches `.submit`.
  */
 export const POST_SIGN_INPUT_SUBMIT_INSET = {
-  top: 0.175,
-  right: 0.045,
-  bottom: 0.635,
-  left: 0.795,
+  top: 0.184,
+  right: 0.138,
+  bottom: 0.631,
+  left: 0.739,
 } as const;

@@ -68,7 +68,7 @@ export const StickyNearBottom: Story = {
   },
   decorators: [
     (Story) => (
-      <div style={{ minHeight: "180vh", padding: "2rem 1rem 4rem" }}>
+      <div style={{ position: "relative", minHeight: "180vh", padding: "2rem 1rem 4rem" }}>
         <p style={{ marginBottom: "40vh", opacity: 0.7 }}>Scroll down — sign sticks from the bottom.</p>
         <Story />
         <p style={{ marginTop: "60vh", opacity: 0.7 }}>Page end</p>
