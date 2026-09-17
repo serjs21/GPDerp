@@ -1,5 +1,5 @@
 .root {
-  --post-sign-input-width: 20rem;
+  --post-sign-input-width: 22rem;
   --post-sign-ink: #2c2924;
   --post-sign-ink-soft: color-mix(in srgb, var(--post-sign-ink) 55%, transparent);
   --post-sign-sticky-bottom: 0;
@@ -14,15 +14,13 @@
 }
 
 .rootSticky {
-  position: absolute;
-  bottom: var(--post-sign-sticky-bottom);
-  left: 50%;
+  position: fixed;
+  bottom: calc(var(--post-sign-sticky-bottom) + env(safe-area-inset-bottom, 0px));
+  left: 30%;
   transform: translateX(-50%);
   z-index: 9992;
   width: min(100%, var(--post-sign-input-width));
   margin: 0;
-  margin-bottom: var(--post-sign-sticky-stop-margin);
-  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
 .filterDefs {
@@ -55,7 +53,7 @@
 .input {
   position: absolute;
   /* Insets match constants.POST_SIGN_INPUT_FORM_INSET (full asset box) */
-  inset: 21.85% 30.2% 65.5% 30.4%;
+  inset: 34.85% 25.2% 49.5% 34.4%;
   width: auto;
   height: auto;
   background: transparent;
@@ -88,7 +86,7 @@
 .submit {
   /* Insets match constants.POST_SIGN_INPUT_SUBMIT_INSET (full asset box) */
   position: absolute;
-  inset: 18.4% 13.8% 63.1% 73.9%;
+  inset: 24.4% 9.8% 42.1% 77.9%;
   width: auto;
   height: auto;
   --lantern-submit-size: auto;

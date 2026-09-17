@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, type CSSProperties } from "react";
+import { useEffect, useId, useState, type CSSProperties } from "react";
+import { createPortal } from "react-dom";
 import {
   colorBalanceToMatrix,
   useBackgroundSceneThemeBalance,
@@ -23,13 +24,41 @@ export type PostSignInputProps = {
   placeholder?: string;
   submitLabel?: string;
   widthRem?: number;
-  /** Stick to the viewport while scrolling within the page. */
+  /** Pin to the viewport; rides up to stay above `footer`. */
   sticky?: boolean;
-  /** Viewport offset from the bottom while stuck (CSS `bottom`). Default 0. */
+  /** Extra offset from the bottom while pinned (CSS `bottom`). Default 0. */
   stickyBottomPx?: number;
-  /** Extra space below the sign so sticky releases before the page end. Default 0. */
+  /** Extra gap above the footer when the pin releases. Default 0. */
   stickyStopMarginPx?: number;
 };
+
+function useFooterClearance(enabled: boolean) {
+  const [clearancePx, setClearancePx] = useState(0);
+
+  useEffect(() => {
+    if (!enabled) return;
+    const footer = document.querySelector("footer");
+    if (!footer) return;
+
+    const update = () => {
+      const top = footer.getBoundingClientRect().top;
+      setClearancePx(Math.max(0, window.innerHeight - top));
+    };
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    const observer = new ResizeObserver(update);
+    observer.observe(footer);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+      observer.disconnect();
+    };
+  }, [enabled]);
+
+  return clearancePx;
+}
 
 export function PostSignInput({
   subject,
@@ -48,18 +77,24 @@ export function PostSignInput({
   const { global } = useBackgroundSceneThemeBalance();
   const colorMatrix = colorBalanceToMatrix(global);
   const canSubmit = Boolean(subject.trim()) && !isLoading;
+  const footerClearancePx = useFooterClearance(sticky);
+  const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!sticky) return;
+    setPortalRoot(document.body);
+  }, [sticky]);
 
   const rootStyle = {
     "--post-sign-input-width": `${widthRem}rem`,
     ...(sticky
       ? {
-          "--post-sign-sticky-bottom": `${stickyBottomPx}px`,
-          "--post-sign-sticky-stop-margin": `${stickyStopMarginPx}px`,
+          "--post-sign-sticky-bottom": `${stickyBottomPx + stickyStopMarginPx + footerClearancePx}px`,
         }
       : {}),
   } as CSSProperties;
 
-  return (
+  const article = (
     <article
       className={[styles.root, sticky ? styles.rootSticky : null].filter(Boolean).join(" ")}
       style={rootStyle}
@@ -108,4 +143,9 @@ export function PostSignInput({
       </form>
     </article>
   );
+
+  if (sticky) {
+    return portalRoot ? createPortal(article, portalRoot) : null;
+  }
+  return article;
 }

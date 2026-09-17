@@ -7,7 +7,7 @@ export const POST_SIGN_INPUT_IMAGE_HEIGHT = 1086;
  * The control paints the full image (no crop clip); these remain for measurement.
  */
 export const POST_SIGN_INPUT_CONTENT_INSET = {
-  top: 0.0092,
+  top: 0.5292,
   right: 0.105,
   bottom: 0.0175,
   left: 0.0739,
@@ -44,7 +44,7 @@ export const POST_SIGN_INPUT_FORM_INSET = {
  * Right end of the plank, before the arrow tip. Matches `.submit`.
  */
 export const POST_SIGN_INPUT_SUBMIT_INSET = {
-  top: 0.184,
+  top: 0.584,
   right: 0.138,
   bottom: 0.631,
   left: 0.739,
