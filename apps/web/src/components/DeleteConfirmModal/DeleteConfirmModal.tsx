@@ -12,9 +12,9 @@ export type DeleteConfirmModalProps = {
   confirmLabel?: string;
 };
 
-const DEFAULT_QUESTION = "Send this lantern away?";
-const DEFAULT_CANCEL = "Not yet";
-const DEFAULT_CONFIRM = "Let it fly";
+const DEFAULT_QUESTION = "Did you mean to do that?";
+const DEFAULT_CANCEL = "Nope";
+const DEFAULT_CONFIRM = "Yep";
 
 export function DeleteConfirmModal({
   open,

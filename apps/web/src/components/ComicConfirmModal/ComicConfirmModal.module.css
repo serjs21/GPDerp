@@ -86,14 +86,14 @@
   grid-area: cancel;
   justify-self: start;
   align-self: center;
-  min-height: 5.5rem;
+  min-height: 3.5rem;
 }
 
 .ctaConfirm {
   grid-area: confirm;
   justify-self: end;
   align-self: center;
-  min-height: 5.5rem;
+  min-height: 3.5rem;
 }
 
 .visuallyHidden {

@@ -18,7 +18,7 @@
   bottom: calc(var(--post-sign-sticky-bottom) + env(safe-area-inset-bottom, 0px));
   left: 34%;
   transform: translateX(-50%);
-  z-index: 9992;
+  z-index: 900;
   width: min(100%, var(--post-sign-input-width));
   margin: 0;
 }
