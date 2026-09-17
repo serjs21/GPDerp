@@ -32,7 +32,7 @@ const meta: Meta<typeof LanternRotated> = {
   args: {
     haiku: DEMO_HAIKU,
     showActions: true,
-    widthRem: 17.5,
+    widthRem: 14,
   },
 };
 

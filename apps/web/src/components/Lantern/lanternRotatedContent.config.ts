@@ -39,7 +39,7 @@ export const LANTERN_ROTATED_CONTENT_WIDTH_PCT =
 export const LANTERN_ROTATED_CONTENT_HEIGHT_PCT =
   (1 - LANTERN_TEXT_INSET.top - LANTERN_TEXT_INSET.bottom) * 100;
 
-export const LANTERN_ROTATED_WIDTH_REM = 17.5;
+export const LANTERN_ROTATED_WIDTH_REM = 14;
 
 /**
  * `lantern_base_rotated.png` — shared with AuthLanterns.
@@ -51,12 +51,12 @@ const ROTATED: LanternRotatedContentTransform = {
   imageHeight: 383,
   contentLeftPct: 68,
   contentTopPct: 45,
-  contentWidthPct: 82,
-  contentHeightPct: 87,
-  contentScale: 0.72,
-  rotateDeg: 14,
-  skewXDeg: 15,
-  skewYDeg: 0,
+  contentWidthPct: 92,
+  contentHeightPct: 88,
+  contentScale: 0.65,
+  rotateDeg: 22,
+  skewXDeg: 24,
+  skewYDeg: -6,
 };
 
 /**
@@ -67,13 +67,13 @@ const ROTATED_2: LanternRotatedContentTransform = {
   imageWidth: 300,
   imageHeight: 380,
   contentLeftPct: 68,
-  contentTopPct: 53,
-  contentWidthPct: 85,
-  contentHeightPct: 61,
-  contentScale: 0.7,
-  rotateDeg: 24,
-  skewXDeg: 26,
-  skewYDeg: 0,
+  contentTopPct: 52,
+  contentWidthPct: 106,
+  contentHeightPct: 69,
+  contentScale: 0.63,
+  rotateDeg: 28,
+  skewXDeg: 30,
+  skewYDeg: -7,
 };
 
 export const LANTERN_ROTATED_CONTENT = {
