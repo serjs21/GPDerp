@@ -1,7 +1,7 @@
 /**
  * Content-face transforms for rotated lantern base assets.
- * Panel size matches default lantern text insets ([`LANTERN_TEXT_INSET`](./constants.ts));
- * only `contentScale` changes size. Angles match the painted paper face
+ * Default panel size follows upright lantern text insets; variants may override
+ * width/height % and `contentScale`. Angles match the painted paper face
  * (same approach as AuthLanterns Login/Register lettering).
  */
 
@@ -16,11 +16,15 @@ export type LanternRotatedContentTransform = {
   /** Content panel anchor as % of frame (transform origin center). */
   contentLeftPct: number;
   contentTopPct: number;
-  /** Uniform scale of the default-ratio content panel. */
+  /** Content box size as % of frame (default = upright lantern text panel). */
+  contentWidthPct: number;
+  contentHeightPct: number;
+  /** Uniform scale applied after rotate/skew. */
   contentScale: number;
-  /** Face match — applied as rotate() then skewX() then scale(). */
+  /** Face match — applied as rotate() then skewX() skewY() then scale(). */
   rotateDeg: number;
   skewXDeg: number;
+  skewYDeg: number;
   /** Optional CSS flame glow; omit when the PNG already paints the light. */
   flameBottom?: number;
   flameHeight?: number;
@@ -29,7 +33,8 @@ export type LanternRotatedContentTransform = {
 /** Same inset fractions as upright lantern `.content` (Lantern.module.css). */
 export const LANTERN_ROTATED_CONTENT_INSET = LANTERN_TEXT_INSET;
 
-export const LANTERN_ROTATED_CONTENT_WIDTH_PCT = 100;
+export const LANTERN_ROTATED_CONTENT_WIDTH_PCT =
+  (1 - LANTERN_TEXT_INSET.left - LANTERN_TEXT_INSET.right) * 100;
 
 export const LANTERN_ROTATED_CONTENT_HEIGHT_PCT =
   (1 - LANTERN_TEXT_INSET.top - LANTERN_TEXT_INSET.bottom) * 100;
@@ -44,25 +49,31 @@ const ROTATED: LanternRotatedContentTransform = {
   assetSrc: "/lantern/lantern_base_rotated.png",
   imageWidth: 350,
   imageHeight: 383,
-  contentLeftPct: 58,
-  contentTopPct: 42,
+  contentLeftPct: 68,
+  contentTopPct: 45,
+  contentWidthPct: 82,
+  contentHeightPct: 87,
   contentScale: 0.72,
-  rotateDeg: 17,
-  skewXDeg: 25,
+  rotateDeg: 14,
+  skewXDeg: 15,
+  skewYDeg: 0,
 };
 
 /**
- * `lanter-base-rotated-2.png` — worm’s-eye base; primary readable face is the wider right panel.
+ * `lanter-base-rotated-2.png` — worm’s-eye base; tuned to face panel in Storybook.
  */
 const ROTATED_2: LanternRotatedContentTransform = {
   assetSrc: "/lantern/lanter-base-rotated-2.png",
   imageWidth: 300,
   imageHeight: 380,
-  contentLeftPct: 63,
-  contentTopPct: 50,
-  contentScale: 0.62,
+  contentLeftPct: 68,
+  contentTopPct: 53,
+  contentWidthPct: 85,
+  contentHeightPct: 61,
+  contentScale: 0.7,
   rotateDeg: 24,
-  skewXDeg: 34,
+  skewXDeg: 26,
+  skewYDeg: 0,
 };
 
 export const LANTERN_ROTATED_CONTENT = {

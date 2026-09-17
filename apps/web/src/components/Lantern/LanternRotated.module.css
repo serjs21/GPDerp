@@ -8,7 +8,8 @@
   --lantern-rotated-content-height: 71%;
   --lantern-rotated-content-scale: 0.72;
   --lantern-rotated-tilt: 17deg;
-  --lantern-rotated-skew: 25deg;
+  --lantern-rotated-skew-x: 25deg;
+  --lantern-rotated-skew-y: 0deg;
 
   position: relative;
   display: inline-block;
@@ -70,7 +71,8 @@
   color: var(--lantern-ink);
   font-family: var(--font-lantern-script, "Zen Kurenaido", cursive);
   transform: translate(-50%, -50%) rotate(var(--lantern-rotated-tilt))
-    skewX(var(--lantern-rotated-skew)) scale(var(--lantern-rotated-content-scale));
+    skewX(var(--lantern-rotated-skew-x)) skewY(var(--lantern-rotated-skew-y))
+    scale(var(--lantern-rotated-content-scale));
   transform-origin: center center;
 }
 

@@ -4,8 +4,6 @@ import type { CSSProperties } from "react";
 import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
 import { Lantern } from "./Lantern";
 import {
-  LANTERN_ROTATED_CONTENT_HEIGHT_PCT,
-  LANTERN_ROTATED_CONTENT_WIDTH_PCT,
   LANTERN_ROTATED_WIDTH_REM,
   lanternRotatedContentTransform,
   type LanternRotatedVariantId,
@@ -54,11 +52,12 @@ export function LanternRotated(props: LanternRotatedProps) {
     "--lantern-rotated-aspect": `${transform.imageWidth} / ${transform.imageHeight}`,
     "--lantern-rotated-content-left": `${transform.contentLeftPct}%`,
     "--lantern-rotated-content-top": `${transform.contentTopPct}%`,
-    "--lantern-rotated-content-width": `${LANTERN_ROTATED_CONTENT_WIDTH_PCT}%`,
-    "--lantern-rotated-content-height": `${LANTERN_ROTATED_CONTENT_HEIGHT_PCT}%`,
+    "--lantern-rotated-content-width": `${transform.contentWidthPct}%`,
+    "--lantern-rotated-content-height": `${transform.contentHeightPct}%`,
     "--lantern-rotated-content-scale": String(transform.contentScale),
     "--lantern-rotated-tilt": `${transform.rotateDeg}deg`,
-    "--lantern-rotated-skew": `${transform.skewXDeg}deg`,
+    "--lantern-rotated-skew-x": `${transform.skewXDeg}deg`,
+    "--lantern-rotated-skew-y": `${transform.skewYDeg}deg`,
     ...(transform.flameBottom != null
       ? { "--lantern-rotated-flame-bottom": String(transform.flameBottom) }
       : {}),
