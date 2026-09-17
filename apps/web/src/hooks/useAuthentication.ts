@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { AccountToUserObject, UserObject } from "@/types";
 import Cookies from "js-cookie";
 import { decodeJwt } from "jose";
+import { AUTH_REQUIRED_EVENT } from "@/axios.setup";
 
 type AuthMeResponse = {
   ok: boolean;
@@ -183,6 +184,18 @@ export const useAuthentication = (): AuthenticationResult => {
   // Intentionally run auth check once on mount; checkAuthentication has unstable references by design.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(checkAuthentication, []);
+
+  // Stale session: 401 path clears client auth so UI matches the login modal.
+  useEffect(() => {
+    const onAuthRequired = () => {
+      clearClientAuthCookies();
+      setLoggedOut();
+    };
+    window.addEventListener(AUTH_REQUIRED_EVENT, onAuthRequired);
+    return () => {
+      window.removeEventListener(AUTH_REQUIRED_EVENT, onAuthRequired);
+    };
+  }, []);
 
   return { ...authenticationState, isLoggedIn: !!authenticationState?.user?.id, logout, checkAuthentication };
 };

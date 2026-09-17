@@ -2,13 +2,38 @@ import axios from "axios";
 import type { AxiosRequestConfig } from "axios";
 import { getTabId } from "./utils/tabId";
 import Cookies from "js-cookie";
+import {
+  enqueueAuthRequest,
+  shouldEnqueueAuthRequest,
+  type AuthQueuedRequestConfig,
+} from "./authRequestQueue";
 
 export const TAB_HEADER_KEY = "x-tab-id";
 export const AUTH_REQUIRED_EVENT = "gpderp:auth-required";
 
+export {
+  AuthRequiredError,
+  cancelAuthRequestQueue,
+  enqueueAuthRequest,
+  flushAuthRequestQueue,
+  shouldEnqueueAuthRequest,
+} from "./authRequestQueue";
+
 const notifyAuthRequired = () => {
   if (typeof window === "undefined") return;
   window.dispatchEvent(new Event(AUTH_REQUIRED_EVENT));
+};
+
+/** Final 401 after refresh is exhausted: open login; hold non-GET mutations. */
+const handleAuthRequired = (
+  err: unknown,
+  originalConfig: AuthQueuedRequestConfig,
+) => {
+  notifyAuthRequired();
+  if (shouldEnqueueAuthRequest(originalConfig)) {
+    return enqueueAuthRequest(originalConfig);
+  }
+  return Promise.reject(err);
 };
 
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -62,6 +87,7 @@ axios.interceptors.response.use(
     const status = err?.response?.status;
     const originalConfig = err?.config as AxiosRequestConfig & {
       _retry?: boolean;
+      _authReplay?: boolean;
     };
 
     if (!status || status !== 401) return Promise.reject(err);
@@ -72,13 +98,16 @@ axios.interceptors.response.use(
 
     // Don't attempt refresh for the refresh/logout endpoint itself.
     if (url.startsWith("/auth/refresh") || url.startsWith("/auth/logout")) {
-      notifyAuthRequired();
-      return Promise.reject(err);
+      return handleAuthRequired(err, originalConfig);
+    }
+
+    // Replayed requests that still 401 should not re-enter the queue.
+    if (originalConfig._authReplay) {
+      return handleAuthRequired(err, originalConfig);
     }
 
     if (originalConfig._retry) {
-      notifyAuthRequired();
-      return Promise.reject(err);
+      return handleAuthRequired(err, originalConfig);
     }
     originalConfig._retry = true;
 
@@ -93,8 +122,7 @@ axios.interceptors.response.use(
       return axios(originalConfig);
     } catch (refreshErr) {
       refreshInFlight = null;
-      notifyAuthRequired();
-      return Promise.reject(refreshErr);
+      return handleAuthRequired(refreshErr, originalConfig);
     }
   },
 );

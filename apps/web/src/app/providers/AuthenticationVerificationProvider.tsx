@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -15,7 +16,12 @@ import {
   ResetPasswordModal,
   type ResetPasswordMode,
 } from "@/components/ResetPasswordModal";
-import { AUTH_REQUIRED_EVENT } from "@/axios.setup";
+import axios from "axios";
+import {
+  AUTH_REQUIRED_EVENT,
+  cancelAuthRequestQueue,
+  flushAuthRequestQueue,
+} from "@/axios.setup";
 import { useAuthenticationState } from "./AuthenticationProvider";
 
 type AuthModalMode = "login" | "register";
@@ -39,8 +45,11 @@ const AuthenticationVerificationContext = createContext<
 >(undefined);
 
 export function AuthenticationVerificationProvider({ children }: { children: ReactNode }) {
-  const { initialized, isLoggedIn, checkAuthentication } = useAuthenticationState();
+  const { isLoggedIn, checkAuthentication } = useAuthenticationState();
   const router = useRouter();
+  const isLoggedInRef = useRef(isLoggedIn);
+  isLoggedInRef.current = isLoggedIn;
+  const skipCancelOnCloseRef = useRef(false);
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<AuthModalMode>("login");
@@ -53,6 +62,15 @@ export function AuthenticationVerificationProvider({ children }: { children: Rea
   const closeAuthenticationModal = useCallback(() => {
     setIsAuthModalOpen(false);
     setAuthModalCloseToken((previous) => previous + 1);
+
+    if (skipCancelOnCloseRef.current) {
+      skipCancelOnCloseRef.current = false;
+      return;
+    }
+    // Dismiss without login: fail held mutations instead of hanging forever.
+    if (!isLoggedInRef.current) {
+      cancelAuthRequestQueue();
+    }
   }, []);
 
   const openAuthenticationModal = useCallback((initialMode: AuthModalMode = "login") => {
@@ -86,16 +104,14 @@ export function AuthenticationVerificationProvider({ children }: { children: Rea
 
   useEffect(() => {
     const onUnauthorized = () => {
-      if (initialized && !isLoggedIn) {
-        openAuthenticationModal("login");
-      }
+      openAuthenticationModal("login");
     };
 
     window.addEventListener(AUTH_REQUIRED_EVENT, onUnauthorized);
     return () => {
       window.removeEventListener(AUTH_REQUIRED_EVENT, onUnauthorized);
     };
-  }, [initialized, isLoggedIn, openAuthenticationModal]);
+  }, [openAuthenticationModal]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -138,8 +154,10 @@ export function AuthenticationVerificationProvider({ children }: { children: Rea
         initialMode={authModalMode}
         onClose={closeAuthenticationModal}
         onAuthenticated={() => {
-          closeAuthenticationModal();
+          // AuthGateModal also calls onClose; skip cancel so flush can replay.
+          skipCancelOnCloseRef.current = true;
           checkAuthentication();
+          void flushAuthRequestQueue((config) => axios(config));
         }}
       />
       <ResetPasswordModal
@@ -157,8 +175,8 @@ export function AuthenticationVerificationProvider({ children }: { children: Rea
 
 export const useAuthenticationVerification = (): AuthenticationVerificationContextValue => {
   const context = useContext(AuthenticationVerificationContext);
-  if (!context) {
-    throw new Error("useAuthenticationVerification must be used within AuthenticationVerificationProvider");
+  if (context) {
+    return context;
   }
-  return context;
+  throw new Error("useAuthenticationVerification must be used within AuthenticationVerificationProvider");
 };
