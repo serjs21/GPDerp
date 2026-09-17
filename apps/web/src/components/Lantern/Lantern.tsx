@@ -110,9 +110,9 @@ export function Lantern(props: LanternProps) {
           bodyOnly={bodyOnly}
           actions={
             includeActions ? (
-              <div className={styles.actions}>
-                <HaikuActions variant="generating" />
-              </div>
+            <div className={styles.actions} data-lantern-actions>
+              <HaikuActions variant="generating" />
+            </div>
             ) : undefined
           }
         />
@@ -136,7 +136,7 @@ export function Lantern(props: LanternProps) {
         bodyOnly={bodyOnly}
         actions={
           includeActions ? (
-            <div className={styles.actions}>
+            <div className={styles.actions} data-lantern-actions>
               <HaikuActions
                 variant="saved"
                 haiku={haiku}

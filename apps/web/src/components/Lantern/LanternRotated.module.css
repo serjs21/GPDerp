@@ -1,0 +1,116 @@
+.root {
+  --lantern-rotated-width: 17.5rem;
+  --lantern-rotated-aspect: 350 / 383;
+  --lantern-rotated-content-left: 58%;
+  --lantern-rotated-content-top: 42%;
+  /* Default lantern text-panel ratios (LANTERN_TEXT_INSET). */
+  --lantern-rotated-content-width: 100%;
+  --lantern-rotated-content-height: 71%;
+  --lantern-rotated-content-scale: 0.72;
+  --lantern-rotated-tilt: 17deg;
+  --lantern-rotated-skew: 25deg;
+
+  position: relative;
+  display: inline-block;
+  width: var(--lantern-rotated-width);
+  aspect-ratio: var(--lantern-rotated-aspect);
+  animation: lanternRotatedReveal 280ms ease both;
+}
+
+.shell {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 0.55rem color-mix(in srgb, #f5ebe0 38%, transparent))
+    drop-shadow(0 0.35rem 0.9rem color-mix(in srgb, var(--sumi-ink, #1a1814) 28%, transparent));
+}
+
+.flame {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--lantern-rotated-flame-bottom, 0.08) * 100%);
+  width: 18%;
+  height: calc(var(--lantern-rotated-flame-height, 0.1) * 100%);
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 248, 230, 0.55) 0%,
+    rgba(255, 220, 160, 0.22) 42%,
+    transparent 72%
+  );
+  pointer-events: none;
+  animation: lanternRotatedFlameFlicker 2.4s ease-in-out infinite;
+  mix-blend-mode: soft-light;
+}
+
+.content {
+  --lantern-ink: #2c2924;
+  --lantern-ink-soft: color-mix(in srgb, var(--lantern-ink) 62%, transparent);
+
+  position: absolute;
+  left: var(--lantern-rotated-content-left);
+  top: var(--lantern-rotated-content-top);
+  z-index: 1;
+  box-sizing: border-box;
+  width: var(--lantern-rotated-content-width);
+  height: var(--lantern-rotated-content-height);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--lantern-ink);
+  font-family: var(--font-lantern-script, "Zen Kurenaido", cursive);
+  transform: translate(-50%, -50%) rotate(var(--lantern-rotated-tilt))
+    skewX(var(--lantern-rotated-skew)) scale(var(--lantern-rotated-content-scale));
+  transform-origin: center center;
+}
+
+.content:hover [data-lantern-actions],
+.content:focus-within [data-lantern-actions] {
+  opacity: 1;
+}
+
+@keyframes lanternRotatedReveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes lanternRotatedFlameFlicker {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: translateX(-50%) scale(1);
+  }
+  35% {
+    opacity: 0.95;
+    transform: translateX(-50%) scale(1.08, 1.12);
+  }
+  70% {
+    opacity: 0.8;
+    transform: translateX(-48%) scale(0.94, 1.02);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    animation: none;
+  }
+
+  .flame {
+    animation: none;
+    opacity: 0.85;
+  }
+}
