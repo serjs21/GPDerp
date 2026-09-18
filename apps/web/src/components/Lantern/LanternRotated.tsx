@@ -15,6 +15,8 @@ export type LanternRotatedProps = HaikuContainerProps & {
   className?: string;
   style?: CSSProperties;
   widthRem?: number;
+  /** Flip horizontally so the painted face follows path direction. */
+  mirrored?: boolean;
   bodyOnly?: boolean;
   showActions?: boolean;
   onDelete?: () => Promise<void>;
@@ -31,6 +33,7 @@ export function LanternRotated(props: LanternRotatedProps) {
     className,
     style,
     widthRem = LANTERN_ROTATED_WIDTH_REM,
+    mirrored = false,
     bodyOnly,
     showActions = true,
     onDelete,
@@ -67,7 +70,9 @@ export function LanternRotated(props: LanternRotatedProps) {
     ...style,
   } as CSSProperties;
 
-  const rootClass = [styles.root, className].filter(Boolean).join(" ");
+  const rootClass = [styles.root, mirrored ? styles.mirrored : null, className]
+    .filter(Boolean)
+    .join(" ");
   const showFlame = transform.flameBottom != null || transform.flameHeight != null;
 
   return (

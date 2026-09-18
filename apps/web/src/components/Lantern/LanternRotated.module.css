@@ -18,6 +18,10 @@
   animation: lanternRotatedReveal 280ms ease both;
 }
 
+.mirrored {
+  transform: scaleX(-1);
+}
+
 .shell {
   position: absolute;
   inset: 0;
@@ -109,6 +113,10 @@
 @media (prefers-reduced-motion: reduce) {
   .root {
     animation: none;
+  }
+
+  .mirrored {
+    transform: scaleX(-1);
   }
 
   .flame {
