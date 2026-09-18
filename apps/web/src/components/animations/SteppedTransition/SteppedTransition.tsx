@@ -3,6 +3,7 @@
 import { Fragment, type ReactNode } from "react";
 import { STEPPED_TRANSITION } from "./steppedTransition.config";
 import type {
+  SteppedFadeMode,
   SteppedPoseRole,
   TransitionPose,
 } from "./steppedTransitionTypes";
@@ -13,6 +14,7 @@ export type SteppedTransitionProps = {
   active?: boolean;
   holdMs?: number;
   crossfadeMs?: number;
+  fadeMode?: SteppedFadeMode;
   reducedMotion?: boolean;
   onComplete?: () => void;
   onPoseHold?: (poseIndex: number) => void;
@@ -33,6 +35,7 @@ export function SteppedTransition({
   active = true,
   holdMs = STEPPED_TRANSITION.holdMs,
   crossfadeMs = STEPPED_TRANSITION.crossfadeMs,
+  fadeMode = "crossfade",
   reducedMotion = false,
   onComplete,
   onPoseHold,
@@ -43,6 +46,7 @@ export function SteppedTransition({
     active,
     holdMs,
     crossfadeMs,
+    fadeMode,
     reducedMotion,
     onComplete,
     onPoseHold,

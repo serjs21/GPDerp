@@ -10,6 +10,13 @@ export type TransitionPose = {
 
 export type SteppedPoseRole = "outgoing" | "incoming" | "smear" | "solo";
 
+/** How pose intervals blend when crossfadeMs > 0. */
+export type SteppedFadeMode =
+  /** Overlap outgoing 1→0 with incoming 0→1 (delete flight ghosting). */
+  | "crossfade"
+  /** Fade outgoing 1→0, then hard-cut to the next pose at full opacity. */
+  | "outThenCut";
+
 export type SteppedTransitionLayer = {
   pose: TransitionPose;
   opacity: number;

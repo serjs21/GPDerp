@@ -4,6 +4,7 @@ import { animate } from "animejs";
 import { useEffect, useRef, useState } from "react";
 import { STEPPED_TRANSITION } from "./steppedTransition.config";
 import type {
+  SteppedFadeMode,
   SteppedTransitionLayer,
   TransitionPose,
 } from "./steppedTransitionTypes";
@@ -123,6 +124,8 @@ export type UseSteppedTransitionOptions = {
   active: boolean;
   holdMs?: number;
   crossfadeMs?: number;
+  /** Default `crossfade`. Use `outThenCut` for stop-motion (fade out, then snap). */
+  fadeMode?: SteppedFadeMode;
   reducedMotion?: boolean;
   onComplete?: () => void;
   /** Fired when a discrete pose hold begins (not during crossfade). */
@@ -141,6 +144,7 @@ export function useSteppedTransition(options: UseSteppedTransitionOptions): {
     active,
     holdMs = STEPPED_TRANSITION.holdMs,
     crossfadeMs = STEPPED_TRANSITION.crossfadeMs,
+    fadeMode = "crossfade",
     reducedMotion = false,
     onComplete,
     onPoseHold,
@@ -222,6 +226,34 @@ export function useSteppedTransition(options: UseSteppedTransitionOptions): {
         await waitMs(holdMs, signal);
         if (signal.cancelled) return;
 
+        // Hard cut: skip opacity fade for instantaneous stop-motion.
+        if (crossfadeMs <= 0) {
+          continue;
+        }
+
+        // Fade out current pose fully, then snap to next on the following hold.
+        if (fadeMode === "outThenCut") {
+          setLayers([
+            { pose: current, opacity: 1, role: "outgoing", key: `out-${i}` },
+          ]);
+          const fadeOut = animateOpacity(0, 1, crossfadeMs, (t) => {
+            if (signal.cancelled) return;
+            setLayers([
+              {
+                pose: current,
+                opacity: 1 - t,
+                role: "outgoing",
+                key: `out-${i}`,
+              },
+            ]);
+          }, signal);
+          opacityCancel = fadeOut.cancel;
+          await fadeOut.promise;
+          opacityCancel = null;
+          if (signal.cancelled) return;
+          continue;
+        }
+
         const next = poses[i + 1]!;
         const smear =
           poseDistance(current, next) >= STEPPED_TRANSITION.smearDistancePx
@@ -276,7 +308,7 @@ export function useSteppedTransition(options: UseSteppedTransitionOptions): {
       signal.cancelled = true;
       opacityCancel?.();
     };
-  }, [active, poses, holdMs, crossfadeMs, reducedMotion]);
+  }, [active, poses, holdMs, crossfadeMs, fadeMode, reducedMotion]);
 
   return { layers };
 }

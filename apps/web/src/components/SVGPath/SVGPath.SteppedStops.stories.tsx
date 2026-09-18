@@ -47,14 +47,14 @@ import demoStyles from "@/components/Lantern/LanternFlightExit.stories.module.cs
 const LANTERN_COUNT = 12;
 const SVG_PATH_SRC = "/path/split_path_colored_stops.svg";
 const WIDTH_REM = 19;
-/** Discrete holds from one path stop to the next (start → mid → end). */
-const STOP_STEP_POSE_COUNT = 3;
-/** Total stop→stop stepped duration (hold + crossfade across pose intervals). */
+/** Discrete holds from one path stop to the next. */
+const STOP_STEP_POSE_COUNT = 4;
+/** Total stop→stop duration spent on discrete holds (hard cuts, no fade). */
 const STOP_STEP_TOTAL_MS = 1000;
 const STOP_STEP_INTERVALS = STOP_STEP_POSE_COUNT - 1;
-const STOP_STEP_HOLD_MS = Math.round((STOP_STEP_TOTAL_MS / STOP_STEP_INTERVALS) * 0.42);
-const STOP_STEP_CROSSFADE_MS =
-  Math.round(STOP_STEP_TOTAL_MS / STOP_STEP_INTERVALS) - STOP_STEP_HOLD_MS;
+const STOP_STEP_HOLD_MS = Math.round(STOP_STEP_TOTAL_MS / STOP_STEP_INTERVALS);
+/** No opacity fade between poses — stop-motion hard cuts (reveal CSS disabled while animating). */
+const STOP_STEP_CROSSFADE_MS = 0;
 
 const DEMO_HAIKUS: HaikuDto[] = Array.from({ length: LANTERN_COUNT }, (_, i) =>
   makeMockHaiku({
@@ -170,19 +170,23 @@ function targetFaceForStop(parsed: ParsedSplitPathSvg, stopId: number): StopFace
 }
 
 /**
- * Walk the rotation chain without skipping: pose i advances at most i steps
- * toward the end state (may stay put when already there).
+ * Walk the rotation chain without skipping: advance face by progress along the
+ * pose sequence so denser spatial samples don't front-load the turn. Adjacent
+ * poses still differ by at most one chain step.
  */
 function rotationFaceForPose(
   startId: RotationChainId,
   endId: RotationChainId,
   poseIndex: number,
+  poseCount: number,
 ): StopFace {
   const start = chainIndex(startId);
   const end = chainIndex(endId);
   const delta = end - start;
   const sign = delta === 0 ? 0 : delta > 0 ? 1 : -1;
-  const steps = Math.min(poseIndex, Math.abs(delta));
+  const distance = Math.abs(delta);
+  const span = Math.max(1, poseCount - 1);
+  const steps = Math.min(distance, Math.round((poseIndex / span) * distance));
   const faceIdx = start + sign * steps;
   return faceFromChainId(ROTATION_CHAIN[faceIdx]!);
 }
@@ -214,10 +218,15 @@ function buildPathStopStepPoses(
       y: transform.y,
       rotation: transform.rotate,
       scale: transform.scale,
-      opacity: transform.opacity ?? 1,
+      opacity: 1,
       stackOrder: transform.stackOrder ?? Math.round(pathStop * 10),
       pathStop,
-      face: rotationFaceForPose(startRotation, endRotation, poseIndex),
+      face: rotationFaceForPose(
+        startRotation,
+        endRotation,
+        poseIndex,
+        STOP_STEP_POSE_COUNT,
+      ),
     });
   });
   return poses;
@@ -258,6 +267,7 @@ function PathStopLanternView({
         widthRem={WIDTH_REM}
         transform={transform}
         haikuLabels={haiku.labels}
+        flightExiting={animating}
       >
         <Lantern haiku={haiku} showActions={false} />
       </LanternFrame>
@@ -290,7 +300,7 @@ function PathStopLanternView({
         mirrored={face.mirrored}
         showActions={false}
         widthRem={WIDTH_REM}
-        style={{ width: "100%", height: "100%" }}
+        style={{ width: "100%", height: "100%", animation: "none" }}
       />
     </div>
   );

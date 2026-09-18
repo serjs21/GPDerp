@@ -95,4 +95,86 @@ describe("useSteppedTransition", () => {
     expect(onPoseHold.mock.calls.map((call) => call[0])).toEqual([0, 1, 2]);
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
+
+  it("hard-cuts between poses when crossfadeMs is 0", async () => {
+    const onPoseHold = jest.fn();
+    const onComplete = jest.fn();
+    const { result } = renderHook(() =>
+      useSteppedTransition({
+        poses,
+        active: true,
+        holdMs: 50,
+        crossfadeMs: 0,
+        onPoseHold,
+        onComplete,
+      }),
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(0);
+    });
+    expect(result.current.layers).toHaveLength(1);
+    expect(result.current.layers[0]?.role).toBe("solo");
+    expect(onPoseHold.mock.calls.map((call) => call[0])).toEqual([0]);
+
+    await act(async () => {
+      jest.advanceTimersByTime(50);
+    });
+    expect(result.current.layers).toHaveLength(1);
+    expect(result.current.layers[0]?.role).toBe("solo");
+    expect(onPoseHold.mock.calls.map((call) => call[0])).toEqual([0, 1]);
+
+    await act(async () => {
+      jest.advanceTimersByTime(50);
+    });
+    expect(onPoseHold.mock.calls.map((call) => call[0])).toEqual([0, 1, 2]);
+    expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it("fades out then cuts with fadeMode outThenCut", async () => {
+    const onPoseHold = jest.fn();
+    const onComplete = jest.fn();
+    const { result } = renderHook(() =>
+      useSteppedTransition({
+        poses,
+        active: true,
+        holdMs: 50,
+        crossfadeMs: 40,
+        fadeMode: "outThenCut",
+        onPoseHold,
+        onComplete,
+      }),
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(0);
+    });
+    expect(onPoseHold.mock.calls.map((call) => call[0])).toEqual([0]);
+
+    await act(async () => {
+      jest.advanceTimersByTime(50);
+    });
+    expect(result.current.layers).toHaveLength(1);
+    expect(result.current.layers[0]?.role).toBe("outgoing");
+
+    await act(async () => {
+      jest.advanceTimersByTime(40);
+    });
+    expect(onPoseHold.mock.calls.map((call) => call[0])).toEqual([0, 1]);
+    expect(result.current.layers[0]?.role).toBe("solo");
+    expect(result.current.layers[0]?.opacity).toBe(1);
+
+    await act(async () => {
+      jest.advanceTimersByTime(50);
+    });
+    await act(async () => {
+      jest.advanceTimersByTime(40);
+    });
+    expect(onPoseHold.mock.calls.map((call) => call[0])).toEqual([0, 1, 2]);
+
+    await act(async () => {
+      jest.advanceTimersByTime(50);
+    });
+    expect(onComplete).toHaveBeenCalledTimes(1);
+  });
 });

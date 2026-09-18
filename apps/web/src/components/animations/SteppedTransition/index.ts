@@ -2,6 +2,7 @@ export { STEPPED_TRANSITION, STEPPED_IRREGULAR_PROGRESSES } from "./steppedTrans
 export type {
   TransitionPose,
   SteppedPoseRole,
+  SteppedFadeMode,
   SteppedTransitionLayer,
 } from "./steppedTransitionTypes";
 export { sampleSteppedProgresses, evenSteppedProgresses } from "./sampleSteppedProgresses";
