@@ -8,6 +8,7 @@ import {
   type FocusEvent,
   type ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
 import type { HaikuDto } from "@/api/haikus";
 import { deleteHaiku } from "@/api/haikus";
 import { comicToast } from "@/components/ComicToast";
@@ -16,6 +17,7 @@ import { SakuraPetalLoader } from "@/components/Loaders";
 import { CreateAddLabelsModal } from "@/components/CreateAddLabelsModal";
 import { ShareModal } from "@/components/ShareModal/ShareModal";
 import { Tooltip } from "@/components/StyledComponents";
+import { useLanternActionsDock } from "@/components/Lantern/LanternActionsDockContext";
 import { useCopy } from "@/hooks/useCopy";
 import { formatHaikuPlainToText, formatHaikuTitle } from "@/utils/strings";
 import styles from "./HaikuActions.module.css";
@@ -31,6 +33,8 @@ export type HaikuActionsProps =
       onDelete?: () => Promise<void>;
       /** Force hover state (Storybook / tests). */
       forcedHover?: HoverTarget;
+      /** Force open state (Storybook / tests). */
+      forcedOpen?: boolean;
     };
 
 type HoverTarget = "delete" | "share" | "label" | "copy" | null;
@@ -116,10 +120,14 @@ export const HaikuActions = (props: HaikuActionsProps) => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [hover, setHover] = useState<HoverTarget>(null);
+  const [open, setOpen] = useState(false);
   const { copy } = useCopy();
+  const dock = useLanternActionsDock();
 
   const forcedHover = props.variant === "saved" ? props.forcedHover : undefined;
+  const forcedOpen = props.variant === "saved" ? props.forcedOpen : undefined;
   const activeHover = forcedHover !== undefined ? forcedHover : hover;
+  const isOpen = forcedOpen !== undefined ? forcedOpen : open;
 
   const haiku = props.variant === "saved" ? props.haiku : null;
   const onDeleted = props.variant === "saved" ? props.onDeleted : undefined;
@@ -131,8 +139,15 @@ export const HaikuActions = (props: HaikuActionsProps) => {
 
   const clearHover = () => setHoverIfLive(null);
 
+  const setOpenIfLive = (next: boolean) => {
+    if (forcedOpen === undefined) setOpen(next);
+  };
+
   useEffect(() => {
-    if (shareOpen || labelsOpen || deleteOpen) setHoverIfLive(null);
+    if (shareOpen || labelsOpen || deleteOpen) {
+      setHoverIfLive(null);
+      setOpenIfLive(false);
+    }
     // Intentionally only depend on modal visibility.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shareOpen, labelsOpen, deleteOpen]);
@@ -142,7 +157,7 @@ export const HaikuActions = (props: HaikuActionsProps) => {
   };
 
   const clearHoverFromBlur = (event: FocusEvent<HTMLButtonElement>) => {
-    const root = event.currentTarget.closest("[data-haiku-actions-anchor]");
+    const root = event.currentTarget.closest("[data-haiku-actions-panel]");
     const related = event.relatedTarget;
     if (related instanceof Node && root?.contains(related)) return;
     clearHover();
@@ -206,57 +221,86 @@ export const HaikuActions = (props: HaikuActionsProps) => {
     }
   };
 
-  return (
-    <>
-      <div
-        className={styles.anchor}
-        data-haiku-actions-anchor=""
-        onMouseLeave={clearHover}
-      >
-        <div className={styles.shell}>
-          <div
-            className={[styles.panel, panelHoverClass(activeHover)].filter(Boolean).join(" ")}
-            role="group"
-            aria-label="Haiku actions"
-          >
-            {ACTIONS.map((action) => (
-              <div
-                key={action.id}
-                className={`${styles.slot} ${action.slotClass}`}
+  const panel = (
+    <div
+      className={styles.anchor}
+      data-haiku-actions-panel=""
+      onMouseLeave={clearHover}
+    >
+      <div className={styles.shell}>
+        <div
+          className={[styles.panel, panelHoverClass(activeHover)].filter(Boolean).join(" ")}
+          role="group"
+          aria-label="Haiku actions"
+        >
+          {ACTIONS.map((action) => (
+            <div key={action.id} className={`${styles.slot} ${action.slotClass}`}>
+              <button
+                type="button"
+                className={styles.panelButton}
+                aria-label={action.ariaLabel}
+                onMouseEnter={() => setHoverIfLive(action.id)}
+                onFocus={(event) =>
+                  setHoverFromFocus(action.id, event.currentTarget)
+                }
+                onBlur={clearHoverFromBlur}
+                onClick={() => onActionClick(action.id)}
               >
-                <button
-                  type="button"
-                  className={styles.panelButton}
-                  aria-label={action.ariaLabel}
-                  onMouseEnter={() => setHoverIfLive(action.id)}
-                  onFocus={(event) =>
-                    setHoverFromFocus(action.id, event.currentTarget)
-                  }
-                  onBlur={clearHoverFromBlur}
-                  onClick={() => onActionClick(action.id)}
+                <SlotFace>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={action.iconSrc}
+                    alt=""
+                    className={styles.iconImg}
+                    width={18}
+                    height={18}
+                  />
+                </SlotFace>
+                <SlotFace
+                  enterFrom={action.enterFrom}
+                  hidden={activeHover !== action.id}
                 >
-                  <SlotFace>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={action.iconSrc}
-                      alt=""
-                      className={styles.iconImg}
-                      width={18}
-                      height={18}
-                    />
-                  </SlotFace>
-                  <SlotFace
-                    enterFrom={action.enterFrom}
-                    hidden={activeHover !== action.id}
-                  >
-                    <span className={styles.actionName}>{action.label}</span>
-                  </SlotFace>
-                </button>
-              </div>
-            ))}
-          </div>
+                  <span className={styles.actionName}>{action.label}</span>
+                </SlotFace>
+              </button>
+            </div>
+          ))}
         </div>
       </div>
+    </div>
+  );
+
+  const panelNode = isOpen ? (
+    dock ? (
+      createPortal(panel, dock)
+    ) : (
+      <div className={styles.inlinePanel}>{panel}</div>
+    )
+  ) : null;
+
+  return (
+    <>
+      <button
+        type="button"
+        className={styles.toggle}
+        aria-label={isOpen ? "Hide haiku actions" : "Show haiku actions"}
+        aria-expanded={isOpen}
+        onClick={() => setOpenIfLive(!isOpen)}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={
+            isOpen
+              ? "/lantern_actions/actions_open.svg"
+              : "/lantern_actions/actions_closed.svg"
+          }
+          alt=""
+          className={styles.toggleIcon}
+          width={28}
+          height={28}
+        />
+      </button>
+      {panelNode}
       <ShareModal
         haikuId={savedHaiku.id}
         haikuSubject={formatHaikuTitle(savedHaiku)}

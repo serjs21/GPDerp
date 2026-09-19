@@ -14,6 +14,8 @@
   --lantern-flame-anchor-y: 0.125;
   --lantern-flight-x: 0px;
   --lantern-flight-y: 0px;
+  --lantern-actions-bar-offset-x: 0px;
+  --lantern-actions-bar-offset-y: 0.5rem;
 
   position: relative;
   display: inline-block;
@@ -116,7 +118,6 @@
   top: auto;
   bottom: 0.25rem;
   right: 0.25rem;
-  left: 0.25rem;
   display: flex;
   justify-content: flex-end;
   opacity: 0;
@@ -129,10 +130,19 @@
   opacity: 1;
 }
 
-@media (max-width: 768px) {
-  .actionsAlwaysVisible {
+@media (max-width: 1024px) {
+  .actions {
     opacity: 1;
   }
+}
+
+.actionsBarHost {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + var(--lantern-actions-bar-offset-y, 0.5rem));
+  transform: translateX(calc(-50% + var(--lantern-actions-bar-offset-x, 0px)));
+  z-index: 5;
+  pointer-events: none;
 }
 
 .title {

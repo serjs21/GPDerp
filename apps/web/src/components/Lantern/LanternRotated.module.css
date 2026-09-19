@@ -10,6 +10,8 @@
   --lantern-rotated-tilt: 17deg;
   --lantern-rotated-skew-x: 25deg;
   --lantern-rotated-skew-y: 0deg;
+  --lantern-actions-bar-offset-x: 0px;
+  --lantern-actions-bar-offset-y: 0.5rem;
 
   position: relative;
   display: inline-block;
@@ -85,10 +87,19 @@
   opacity: 1;
 }
 
-@media (max-width: 768px) {
-  .content [data-lantern-actions][data-actions-pinned] {
+@media (max-width: 1024px) {
+  .content [data-lantern-actions] {
     opacity: 1;
   }
+}
+
+.actionsBarHost {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + var(--lantern-actions-bar-offset-y, 0.5rem));
+  transform: translateX(calc(-50% + var(--lantern-actions-bar-offset-x, 0px)));
+  z-index: 5;
+  pointer-events: none;
 }
 
 @keyframes lanternRotatedReveal {

@@ -17,8 +17,8 @@ export type LanternProps = HaikuContainerProps & {
   /** Hover actions; omit during path tween so content stays cheap. */
   showActions?: boolean;
   /**
-   * On mobile (no hover), keep the actions bar visible.
-   * Used for the focus / default-stop lantern on the path.
+   * @deprecated Toggle visibility is CSS-driven (hover desktop / always ≤1024).
+   * Kept for call-site compatibility.
    */
   actionsAlwaysVisible?: boolean;
   onDelete?: () => Promise<void>;
@@ -95,7 +95,7 @@ export function Lantern(props: LanternProps) {
     style,
     bodyOnly = false,
     showActions = true,
-    actionsAlwaysVisible = false,
+    actionsAlwaysVisible: _actionsAlwaysVisible = false,
     onDelete,
     onDeleted,
     onChanged,
@@ -104,12 +104,6 @@ export function Lantern(props: LanternProps) {
 
   const stackClass = [styles.haikuStack, className].filter(Boolean).join(" ");
   const includeActions = !bodyOnly && showActions;
-  const actionsClass = [
-    styles.actions,
-    actionsAlwaysVisible ? styles.actionsAlwaysVisible : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
 
   if ("generatingDraft" in noteProps && noteProps.generatingDraft) {
     const { title, body, meta } = resolveGeneratingContent(noteProps.generatingDraft);
@@ -122,13 +116,9 @@ export function Lantern(props: LanternProps) {
           bodyOnly={bodyOnly}
           actions={
             includeActions ? (
-            <div
-              className={actionsClass}
-              data-lantern-actions
-              {...(actionsAlwaysVisible ? { "data-actions-pinned": "" } : {})}
-            >
-              <HaikuActions variant="generating" />
-            </div>
+              <div className={styles.actions} data-lantern-actions>
+                <HaikuActions variant="generating" />
+              </div>
             ) : undefined
           }
         />
@@ -152,11 +142,7 @@ export function Lantern(props: LanternProps) {
         bodyOnly={bodyOnly}
         actions={
           includeActions ? (
-            <div
-              className={actionsClass}
-              data-lantern-actions
-              {...(actionsAlwaysVisible ? { "data-actions-pinned": "" } : {})}
-            >
+            <div className={styles.actions} data-lantern-actions>
               <HaikuActions
                 variant="saved"
                 haiku={haiku}

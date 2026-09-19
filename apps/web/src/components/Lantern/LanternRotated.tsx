@@ -3,6 +3,7 @@
 import type { CSSProperties } from "react";
 import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
 import { Lantern } from "./Lantern";
+import { LanternActionsDockProvider } from "./LanternActionsDockContext";
 import {
   LANTERN_ROTATED_WIDTH_REM,
   lanternRotatedContentTransform,
@@ -20,6 +21,10 @@ export type LanternRotatedProps = HaikuContainerProps & {
   bodyOnly?: boolean;
   showActions?: boolean;
   actionsAlwaysVisible?: boolean;
+  /** Horizontal offset of the actions bar relative to lantern center. */
+  actionsBarOffsetX?: string;
+  /** Vertical gap between lantern bottom and actions bar. */
+  actionsBarOffsetY?: string;
   onDelete?: () => Promise<void>;
   ariaLabel?: string;
 };
@@ -38,6 +43,8 @@ export function LanternRotated(props: LanternRotatedProps) {
     bodyOnly,
     showActions = true,
     actionsAlwaysVisible = false,
+    actionsBarOffsetX,
+    actionsBarOffsetY,
     onDelete,
     ariaLabel,
     ...lanternProps
@@ -69,6 +76,12 @@ export function LanternRotated(props: LanternRotatedProps) {
     ...(transform.flameHeight != null
       ? { "--lantern-rotated-flame-height": String(transform.flameHeight) }
       : {}),
+    ...(actionsBarOffsetX != null
+      ? { "--lantern-actions-bar-offset-x": actionsBarOffsetX }
+      : {}),
+    ...(actionsBarOffsetY != null
+      ? { "--lantern-actions-bar-offset-y": actionsBarOffsetY }
+      : {}),
     ...style,
   } as CSSProperties;
 
@@ -78,40 +91,49 @@ export function LanternRotated(props: LanternRotatedProps) {
   const showFlame = transform.flameBottom != null || transform.flameHeight != null;
 
   return (
-    <article className={rootClass} style={rootStyle} aria-label={title}>
-      <div className={styles.shell} aria-hidden>
-        {/* eslint-disable-next-line @next/next/no-img-element -- decorative lantern art from /public */}
-        <img
-          className={styles.image}
-          src={transform.assetSrc}
-          alt=""
-          width={transform.imageWidth}
-          height={transform.imageHeight}
-          draggable={false}
-          decoding="async"
-        />
-        {showFlame ? <span className={styles.flame} /> : null}
-      </div>
-      <div className={styles.content}>
-        {"generatingDraft" in lanternProps && lanternProps.generatingDraft ? (
-          <Lantern
-            generatingDraft={lanternProps.generatingDraft}
-            bodyOnly={bodyOnly}
-            showActions={showActions}
-            actionsAlwaysVisible={actionsAlwaysVisible}
+    <LanternActionsDockProvider>
+      {(dockRef) => (
+        <article className={rootClass} style={rootStyle} aria-label={title}>
+          <div className={styles.shell} aria-hidden>
+            {/* eslint-disable-next-line @next/next/no-img-element -- decorative lantern art from /public */}
+            <img
+              className={styles.image}
+              src={transform.assetSrc}
+              alt=""
+              width={transform.imageWidth}
+              height={transform.imageHeight}
+              draggable={false}
+              decoding="async"
+            />
+            {showFlame ? <span className={styles.flame} /> : null}
+          </div>
+          <div className={styles.content}>
+            {"generatingDraft" in lanternProps && lanternProps.generatingDraft ? (
+              <Lantern
+                generatingDraft={lanternProps.generatingDraft}
+                bodyOnly={bodyOnly}
+                showActions={showActions}
+                actionsAlwaysVisible={actionsAlwaysVisible}
+              />
+            ) : "haiku" in lanternProps && lanternProps.haiku ? (
+              <Lantern
+                haiku={lanternProps.haiku}
+                bodyOnly={bodyOnly}
+                showActions={showActions}
+                actionsAlwaysVisible={actionsAlwaysVisible}
+                onDelete={onDelete}
+                onDeleted={lanternProps.onDeleted}
+                onChanged={lanternProps.onChanged}
+              />
+            ) : null}
+          </div>
+          <div
+            ref={dockRef}
+            className={styles.actionsBarHost}
+            data-lantern-actions-dock=""
           />
-        ) : "haiku" in lanternProps && lanternProps.haiku ? (
-          <Lantern
-            haiku={lanternProps.haiku}
-            bodyOnly={bodyOnly}
-            showActions={showActions}
-            actionsAlwaysVisible={actionsAlwaysVisible}
-            onDelete={onDelete}
-            onDeleted={lanternProps.onDeleted}
-            onChanged={lanternProps.onChanged}
-          />
-        ) : null}
-      </div>
-    </article>
+        </article>
+      )}
+    </LanternActionsDockProvider>
   );
 }

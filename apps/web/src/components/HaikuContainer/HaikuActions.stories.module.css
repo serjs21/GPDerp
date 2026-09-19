@@ -1,0 +1,42 @@
+.sample {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.caption {
+  margin: 0;
+  color: var(--comic-ink, #f7f4ef);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+  text-align: center;
+}
+
+.compareStage {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3rem 4rem;
+  width: 100%;
+  min-height: min(70vh, 36rem);
+  padding: 2rem 1.5rem 4rem;
+}
+
+/* Story: keep toggle visible without relying on hover. */
+.lanternForceActions [data-lantern-actions] {
+  opacity: 1 !important;
+}
+
+.actionsSlot {
+  position: absolute;
+  right: 0.25rem;
+  bottom: 0.25rem;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  opacity: 1;
+  pointer-events: auto;
+}

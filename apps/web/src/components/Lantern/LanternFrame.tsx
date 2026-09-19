@@ -11,6 +11,7 @@ import {
   LANTERN_WIDTH_REM,
 } from "./constants";
 import { LabelBelt, toLabelBeltItems, type LabelBeltItem } from "./LabelBelt";
+import { LanternActionsDockProvider } from "./LanternActionsDockContext";
 import {
   lanternTransformToCssVars,
   resolveLanternTransform,
@@ -33,6 +34,10 @@ export type LanternFrameProps = LanternTransformInput & {
   widthRem?: number;
   generating?: boolean;
   flightExiting?: boolean;
+  /** Horizontal offset of the actions bar relative to lantern center. */
+  actionsBarOffsetX?: string;
+  /** Vertical gap between lantern bottom and actions bar. */
+  actionsBarOffsetY?: string;
   /** Prebuilt belt items (stories). Prefer `haikuLabels` on the path hot path. */
   labels?: LabelBeltItem[];
   /** Raw haiku labels; converted inside a memo boundary so tween frames skip the belt. */
@@ -84,6 +89,8 @@ export function LanternFrame({
   widthRem = LANTERN_WIDTH_REM,
   generating = false,
   flightExiting = false,
+  actionsBarOffsetX,
+  actionsBarOffsetY,
   labels,
   haikuLabels,
   excludeLabelIds,
@@ -108,6 +115,12 @@ export function LanternFrame({
     "--lantern-flame-bottom": String(LANTERN_FLAME_BOTTOM),
     "--lantern-flame-height": String(LANTERN_FLAME_HEIGHT),
     "--lantern-flame-anchor-y": String(LANTERN_FLAME_ANCHOR_Y),
+    ...(actionsBarOffsetX != null
+      ? { "--lantern-actions-bar-offset-x": actionsBarOffsetX }
+      : {}),
+    ...(actionsBarOffsetY != null
+      ? { "--lantern-actions-bar-offset-y": actionsBarOffsetY }
+      : {}),
     ...style,
   } as CSSProperties;
 
@@ -121,20 +134,29 @@ export function LanternFrame({
     .join(" ");
 
   return (
-    <article
-      className={rootClass}
-      style={rootStyle}
-      aria-label={ariaLabel}
-      {...(generating ? { "data-haiku-generating": true } : {})}
-    >
-      <LanternFrameShell />
-      <div className={styles.content}>{children}</div>
-      <LanternFrameBelt
-        labels={labels}
-        haikuLabels={haikuLabels}
-        excludeLabelIds={excludeLabelIds}
-      />
-    </article>
+    <LanternActionsDockProvider>
+      {(dockRef) => (
+        <article
+          className={rootClass}
+          style={rootStyle}
+          aria-label={ariaLabel}
+          {...(generating ? { "data-haiku-generating": true } : {})}
+        >
+          <LanternFrameShell />
+          <div className={styles.content}>{children}</div>
+          <LanternFrameBelt
+            labels={labels}
+            haikuLabels={haikuLabels}
+            excludeLabelIds={excludeLabelIds}
+          />
+          <div
+            ref={dockRef}
+            className={styles.actionsBarHost}
+            data-lantern-actions-dock=""
+          />
+        </article>
+      )}
+    </LanternActionsDockProvider>
   );
 }
 

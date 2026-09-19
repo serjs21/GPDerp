@@ -6,6 +6,45 @@
   pointer-events: auto;
 }
 
+.toggle {
+  appearance: none;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin: 0;
+  padding: 0.15rem;
+  border: 1.5px solid #111;
+  border-radius: 0;
+  background: #f7f4ef;
+  box-shadow: 3px 3px 0 #111;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.toggle:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent-red, #c44) 65%, #f7f4ef 30%);
+  outline-offset: 1px;
+}
+
+.toggleIcon {
+  display: block;
+  width: 1.35rem;
+  height: 1.35rem;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.inlinePanel {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.35rem);
+  z-index: 2;
+  pointer-events: auto;
+}
+
 .anchor {
   position: relative;
   display: inline-flex;
@@ -41,6 +80,8 @@
   pointer-events: auto;
   border: 1.5px solid #111;
   background: #f7f4ef;
+  /* Hard comic offset — same idea as CelestialThemeSelector / BrushMenu */
+  box-shadow: 4px 4px 0 #111;
   overflow: hidden;
 }
 

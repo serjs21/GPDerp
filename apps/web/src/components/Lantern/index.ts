@@ -5,6 +5,10 @@ export {
   type LanternRotatedProps,
 } from "./LanternRotated";
 export {
+  LanternActionsDockProvider,
+  useLanternActionsDock,
+} from "./LanternActionsDockContext";
+export {
   LANTERN_ROTATED_CONTENT,
   LANTERN_ROTATED_CONTENT_HEIGHT_PCT,
   LANTERN_ROTATED_CONTENT_INSET,
