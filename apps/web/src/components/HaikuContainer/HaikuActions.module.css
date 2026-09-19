@@ -23,10 +23,9 @@
   height: 2rem;
   margin: 0;
   padding: 0.15rem;
-  border: 1.5px solid #111;
+  border: none;
   border-radius: 0;
-  background: #f7f4ef;
-  box-shadow: 3px 3px 0 #111;
+  background: none;
   cursor: pointer;
   pointer-events: auto;
 }
@@ -87,14 +86,14 @@
   position: relative;
   display: inline-block;
   box-sizing: border-box;
-  width: 9.5rem;
-  height: 28px;
+  width: 11.5rem;
+  height: 2.5rem;
   line-height: 0;
   vertical-align: middle;
 }
 
 .panel {
-  --haiku-actions-motion: 200ms ease;
+  --haiku-actions-motion: 400ms ease;
 
   position: absolute;
   inset: 0;
@@ -226,7 +225,7 @@
   background: #111;
   color: #fff;
   font-family: var(--font-comic-label), "Bangers", sans-serif;
-  font-size: 0.72rem;
+  font-size: 1rem;
   font-weight: 400;
   letter-spacing: 0.02em;
   line-height: 1;
@@ -239,8 +238,8 @@
 .iconImg {
   display: block;
   flex-shrink: 0;
-  width: 1.15rem;
-  height: 1.15rem;
+  width: 2rem;
+  height: 2rem;
   max-width: none;
   object-fit: contain;
   pointer-events: none;

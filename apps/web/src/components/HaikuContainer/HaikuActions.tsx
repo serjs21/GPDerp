@@ -176,8 +176,8 @@ export const HaikuActions = (props: HaikuActionsProps) => {
     if (!wrap) return;
     const wrapRect = wrap.getBoundingClientRect();
     setClapFixedPos({
-      top: wrapRect.top - 20,
-      left: wrapRect.right - 8,
+      top: wrapRect.top - 16,
+      left: wrapRect.right - 16,
     });
   }, [clapBurst]);
 
