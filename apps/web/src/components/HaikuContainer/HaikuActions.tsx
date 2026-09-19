@@ -4,6 +4,7 @@ import axios from "axios";
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type FocusEvent,
@@ -122,9 +123,13 @@ export const HaikuActions = (props: HaikuActionsProps) => {
   const [deleting, setDeleting] = useState(false);
   const [hover, setHover] = useState<HoverTarget>(null);
   const [open, setOpen] = useState(false);
-  const [clapBurst, setClapBurst] = useState<"idle" | "hold" | "fade">("hold");
+  const [clapBurst, setClapBurst] = useState<"idle" | "hold" | "fade">("idle");
+  const [clapFixedPos, setClapFixedPos] = useState<{ top: number; left: number } | null>(
+    null,
+  );
   const wasOpenRef = useRef(false);
   const clapTimersRef = useRef<number[]>([]);
+  const toggleWrapRef = useRef<HTMLSpanElement | null>(null);
   const { copy } = useCopy();
   const dock = useLanternActionsDock();
 
@@ -161,6 +166,20 @@ export const HaikuActions = (props: HaikuActionsProps) => {
   }, [clearClapTimers, isOpen, playClapBurst]);
 
   useEffect(() => () => clearClapTimers(), [clearClapTimers]);
+
+  useLayoutEffect(() => {
+    if (clapBurst === "idle") {
+      setClapFixedPos(null);
+      return;
+    }
+    const wrap = toggleWrapRef.current;
+    if (!wrap) return;
+    const wrapRect = wrap.getBoundingClientRect();
+    setClapFixedPos({
+      top: wrapRect.top - 20,
+      left: wrapRect.right - 8,
+    });
+  }, [clapBurst]);
 
   const setHoverIfLive = (next: HoverTarget) => {
     if (forcedHover === undefined) setHover(next);
@@ -307,9 +326,28 @@ export const HaikuActions = (props: HaikuActionsProps) => {
     )
   ) : null;
 
+  const clapBurstNode =
+    clapBurst !== "idle" && clapFixedPos ? (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src="/lantern_actions/clap_sound.svg"
+        alt=""
+        className={[
+          styles.clapBurst,
+          clapBurst === "fade" ? styles.clapBurstFade : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        style={{ top: clapFixedPos.top, left: clapFixedPos.left }}
+        width={28}
+        height={28}
+        aria-hidden
+      />
+    ) : null;
+
   return (
     <>
-      <span className={styles.toggleWrap}>
+      <span ref={toggleWrapRef} className={styles.toggleWrap}>
         <button
           type="button"
           className={styles.toggle}
@@ -330,23 +368,10 @@ export const HaikuActions = (props: HaikuActionsProps) => {
             height={28}
           />
         </button>
-        {clapBurst !== "idle" ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src="/lantern_actions/clap_sound.svg"
-            alt=""
-            className={[
-              styles.clapBurst,
-              clapBurst === "fade" ? styles.clapBurstFade : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-            width={28}
-            height={28}
-            aria-hidden
-          />
-        ) : null}
       </span>
+      {typeof document !== "undefined" && clapBurstNode
+        ? createPortal(clapBurstNode, document.body)
+        : null}
       {panelNode}
       <ShareModal
         haikuId={savedHaiku.id}
