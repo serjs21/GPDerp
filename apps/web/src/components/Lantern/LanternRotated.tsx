@@ -19,6 +19,7 @@ export type LanternRotatedProps = HaikuContainerProps & {
   mirrored?: boolean;
   bodyOnly?: boolean;
   showActions?: boolean;
+  actionsAlwaysVisible?: boolean;
   onDelete?: () => Promise<void>;
   ariaLabel?: string;
 };
@@ -36,6 +37,7 @@ export function LanternRotated(props: LanternRotatedProps) {
     mirrored = false,
     bodyOnly,
     showActions = true,
+    actionsAlwaysVisible = false,
     onDelete,
     ariaLabel,
     ...lanternProps
@@ -96,12 +98,14 @@ export function LanternRotated(props: LanternRotatedProps) {
             generatingDraft={lanternProps.generatingDraft}
             bodyOnly={bodyOnly}
             showActions={showActions}
+            actionsAlwaysVisible={actionsAlwaysVisible}
           />
         ) : "haiku" in lanternProps && lanternProps.haiku ? (
           <Lantern
             haiku={lanternProps.haiku}
             bodyOnly={bodyOnly}
             showActions={showActions}
+            actionsAlwaysVisible={actionsAlwaysVisible}
             onDelete={onDelete}
             onDeleted={lanternProps.onDeleted}
             onChanged={lanternProps.onChanged}

@@ -15,6 +15,7 @@ export type SVGPathSteppedLanternProps = {
   loading?: boolean;
   poses: PathStepPose[];
   runKey: number;
+  actionsAlwaysVisible?: boolean;
   excludeLabelIds?: string[];
   onDeleted?: (haiku: HaikuDto) => void;
   onDeleteFailed?: (haiku: HaikuDto) => void;
@@ -27,6 +28,7 @@ export function SVGPathSteppedLantern({
   loading = false,
   poses,
   runKey,
+  actionsAlwaysVisible = false,
   excludeLabelIds,
   onDeleted,
   onDeleteFailed,
@@ -43,6 +45,7 @@ export function SVGPathSteppedLantern({
         transform={pathStepPoseToTransform(pose, 1)}
         face={pose.face}
         suppressReveal
+        actionsAlwaysVisible={actionsAlwaysVisible}
         excludeLabelIds={excludeLabelIds}
         onDeleted={onDeleted}
         onDeleteFailed={onDeleteFailed}
@@ -68,6 +71,7 @@ export function SVGPathSteppedLantern({
             face={pathPose.face}
             isAnimating
             suppressReveal
+            actionsAlwaysVisible={actionsAlwaysVisible}
             excludeLabelIds={excludeLabelIds}
             onDeleted={onDeleted}
             onDeleteFailed={onDeleteFailed}

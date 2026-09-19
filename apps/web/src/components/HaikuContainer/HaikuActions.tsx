@@ -1,9 +1,13 @@
 "use client";
 
-import { CopyOutlined, DeleteOutlined, ShareAltOutlined, TagOutlined } from "@ant-design/icons";
-import { Button, Tooltip } from "@/components/StyledComponents";
 import axios from "axios";
-import { useCallback, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type FocusEvent,
+  type ReactNode,
+} from "react";
 import type { HaikuDto } from "@/api/haikus";
 import { deleteHaiku } from "@/api/haikus";
 import { comicToast } from "@/components/ComicToast";
@@ -11,9 +15,10 @@ import { DeleteConfirmModal } from "@/components/DeleteConfirmModal";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { CreateAddLabelsModal } from "@/components/CreateAddLabelsModal";
 import { ShareModal } from "@/components/ShareModal/ShareModal";
+import { Tooltip } from "@/components/StyledComponents";
 import { useCopy } from "@/hooks/useCopy";
-import styles from "./HaikuActions.module.css";
 import { formatHaikuPlainToText, formatHaikuTitle } from "@/utils/strings";
+import styles from "./HaikuActions.module.css";
 
 export type HaikuActionsProps =
   | { variant: "generating" }
@@ -24,18 +29,124 @@ export type HaikuActionsProps =
       onChanged?: () => void;
       /** When set, confirm delegates delete to this handler (animation + API orchestration). */
       onDelete?: () => Promise<void>;
+      /** Force hover state (Storybook / tests). */
+      forcedHover?: HoverTarget;
     };
+
+type HoverTarget = "delete" | "share" | "label" | "copy" | null;
+
+const ACTIONS = [
+  {
+    id: "delete" as const,
+    label: "Delete",
+    ariaLabel: "Delete haiku",
+    iconSrc: "/lantern_actions/delete.svg",
+    slotClass: styles.slotDelete,
+    enterFrom: "left" as const,
+  },
+  {
+    id: "share" as const,
+    label: "Share",
+    ariaLabel: "Share haiku",
+    iconSrc: "/lantern_actions/share.svg",
+    slotClass: styles.slotShare,
+    enterFrom: "left" as const,
+  },
+  {
+    id: "label" as const,
+    label: "Label",
+    ariaLabel: "Add label",
+    iconSrc: "/lantern_actions/label.svg",
+    slotClass: styles.slotLabel,
+    enterFrom: "right" as const,
+  },
+  {
+    id: "copy" as const,
+    label: "Copy",
+    ariaLabel: "Copy to clipboard",
+    iconSrc: "/lantern_actions/copy.svg",
+    slotClass: styles.slotCopy,
+    enterFrom: "right" as const,
+  },
+];
+
+function SlotFace({
+  hidden,
+  enterFrom,
+  children,
+}: {
+  hidden?: boolean;
+  enterFrom?: "left" | "right";
+  children: ReactNode;
+}) {
+  const className = [
+    styles.slotFace,
+    enterFrom === "left" ? styles.slotFaceFromLeft : "",
+    enterFrom === "right" ? styles.slotFaceFromRight : "",
+    hidden ? styles.slotFaceHidden : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <span className={className} aria-hidden={hidden || undefined}>
+      {children}
+    </span>
+  );
+}
+
+function panelHoverClass(hover: HoverTarget): string {
+  switch (hover) {
+    case "delete":
+      return styles.panelHoverDelete;
+    case "share":
+      return styles.panelHoverShare;
+    case "label":
+      return styles.panelHoverLabel;
+    case "copy":
+      return styles.panelHoverCopy;
+    default:
+      return "";
+  }
+}
 
 export const HaikuActions = (props: HaikuActionsProps) => {
   const [shareOpen, setShareOpen] = useState(false);
   const [labelsOpen, setLabelsOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [hover, setHover] = useState<HoverTarget>(null);
   const { copy } = useCopy();
+
+  const forcedHover = props.variant === "saved" ? props.forcedHover : undefined;
+  const activeHover = forcedHover !== undefined ? forcedHover : hover;
 
   const haiku = props.variant === "saved" ? props.haiku : null;
   const onDeleted = props.variant === "saved" ? props.onDeleted : undefined;
   const onDelete = props.variant === "saved" ? props.onDelete : undefined;
+
+  const setHoverIfLive = (next: HoverTarget) => {
+    if (forcedHover === undefined) setHover(next);
+  };
+
+  const clearHover = () => setHoverIfLive(null);
+
+  useEffect(() => {
+    if (shareOpen || labelsOpen || deleteOpen) setHoverIfLive(null);
+    // Intentionally only depend on modal visibility.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shareOpen, labelsOpen, deleteOpen]);
+
+  const setHoverFromFocus = (next: HoverTarget, target: HTMLElement) => {
+    if (target.matches(":focus-visible")) setHoverIfLive(next);
+  };
+
+  const clearHoverFromBlur = (event: FocusEvent<HTMLButtonElement>) => {
+    const root = event.currentTarget.closest("[data-haiku-actions-anchor]");
+    const related = event.relatedTarget;
+    if (related instanceof Node && root?.contains(related)) return;
+    clearHover();
+  };
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!haiku) return;
@@ -77,45 +188,75 @@ export const HaikuActions = (props: HaikuActionsProps) => {
 
   const { haiku: savedHaiku, onChanged } = props;
 
+  const onActionClick = (id: NonNullable<HoverTarget>) => {
+    clearHover();
+    switch (id) {
+      case "delete":
+        setDeleteOpen(true);
+        break;
+      case "share":
+        setShareOpen(true);
+        break;
+      case "label":
+        setLabelsOpen(true);
+        break;
+      case "copy":
+        void copy(formatHaikuPlainToText(savedHaiku));
+        break;
+    }
+  };
+
   return (
     <>
-      <Tooltip title="Delete">
-        <Button
-          type="text"
-          size="small"
-          icon={<DeleteOutlined />}
-          aria-label="Delete haiku"
-          onClick={() => setDeleteOpen(true)}
-        />
-      </Tooltip>
-    <Tooltip title="Copy to clipboard">
-      <Button
-        type="text"
-        size="small"
-        className={styles.copyButton}
-        icon={<CopyOutlined />}
-        aria-label="Copy to clipboard"
-        onClick={() => void copy(formatHaikuPlainToText(savedHaiku))}
-      />
-      </Tooltip>
-      <Tooltip title="Add label">
-        <Button
-          type="text"
-          size="small"
-          icon={<TagOutlined />}
-          aria-label="Add label"
-          onClick={() => setLabelsOpen(true)}
-        />
-      </Tooltip>
-      <Tooltip title="Share">
-        <Button
-          type="text"
-          size="small"
-          icon={<ShareAltOutlined />}
-          aria-label="Share haiku"
-          onClick={() => setShareOpen(true)}
-        />
-      </Tooltip>
+      <div
+        className={styles.anchor}
+        data-haiku-actions-anchor=""
+        onMouseLeave={clearHover}
+      >
+        <div className={styles.shell}>
+          <div
+            className={[styles.panel, panelHoverClass(activeHover)].filter(Boolean).join(" ")}
+            role="group"
+            aria-label="Haiku actions"
+          >
+            {ACTIONS.map((action) => (
+              <div
+                key={action.id}
+                className={`${styles.slot} ${action.slotClass}`}
+              >
+                <button
+                  type="button"
+                  className={styles.panelButton}
+                  aria-label={action.ariaLabel}
+                  onMouseEnter={() => setHoverIfLive(action.id)}
+                  onFocus={(event) =>
+                    setHoverFromFocus(action.id, event.currentTarget)
+                  }
+                  onBlur={clearHoverFromBlur}
+                  onClick={() => onActionClick(action.id)}
+                >
+                  <SlotFace>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={action.iconSrc}
+                      alt=""
+                      className={styles.iconImg}
+                      width={18}
+                      height={18}
+                    />
+                  </SlotFace>
+                  <SlotFace
+                    enterFrom={action.enterFrom}
+                    hidden={activeHover !== action.id}
+                  >
+                    <span className={styles.actionName}>{action.label}</span>
+                  </SlotFace>
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
       <ShareModal
         haikuId={savedHaiku.id}
         haikuSubject={formatHaikuTitle(savedHaiku)}

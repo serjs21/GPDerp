@@ -27,6 +27,8 @@ export type SVGPathLanternProps = {
   isAnimating?: boolean;
   /** Suppress lanternReveal (stepped hard cuts / idle remount after stepped). */
   suppressReveal?: boolean;
+  /** Pin actions visible on mobile for the focus / default-stop lantern. */
+  actionsAlwaysVisible?: boolean;
   excludeLabelIds?: string[];
   onDeleted?: (haiku: HaikuDto) => void;
   onDeleteFailed?: (haiku: HaikuDto) => void;
@@ -39,6 +41,7 @@ const SVGPathLanternBody = memo(function SVGPathLanternBody({
   generatingDraft,
   loading,
   showActions,
+  actionsAlwaysVisible,
   onDelete,
   onChanged,
 }: {
@@ -46,6 +49,7 @@ const SVGPathLanternBody = memo(function SVGPathLanternBody({
   generatingDraft?: GeneratingDraft | null;
   loading?: boolean;
   showActions: boolean;
+  actionsAlwaysVisible?: boolean;
   onDelete?: () => Promise<void>;
   onChanged?: () => void;
 }) {
@@ -57,13 +61,20 @@ const SVGPathLanternBody = memo(function SVGPathLanternBody({
     );
   }
   if (generatingDraft) {
-    return <Lantern generatingDraft={generatingDraft} showActions={showActions} />;
+    return (
+      <Lantern
+        generatingDraft={generatingDraft}
+        showActions={showActions}
+        actionsAlwaysVisible={actionsAlwaysVisible}
+      />
+    );
   }
   if (!haiku) return null;
   return (
     <Lantern
       haiku={haiku}
       showActions={showActions}
+      actionsAlwaysVisible={actionsAlwaysVisible}
       onDelete={onDelete}
       onChanged={onChanged}
     />
@@ -119,6 +130,7 @@ export function SVGPathLantern({
   face = { kind: "upright" },
   isAnimating = false,
   suppressReveal = false,
+  actionsAlwaysVisible = false,
   excludeLabelIds,
   onDeleted,
   onDeleteFailed,
@@ -166,6 +178,7 @@ export function SVGPathLantern({
                   variant={face.variant}
                   mirrored={face.mirrored}
                   showActions={showActions}
+                  actionsAlwaysVisible={actionsAlwaysVisible}
                   onDelete={onDelete}
                   onChanged={onChanged}
                   widthRem={WIDTH_REM}
@@ -190,6 +203,7 @@ export function SVGPathLantern({
                 haiku={haiku}
                 loading={loading}
                 showActions={showActions}
+                actionsAlwaysVisible={actionsAlwaysVisible}
                 onDelete={onDelete}
                 onChanged={onChanged}
               />
@@ -213,6 +227,7 @@ export function SVGPathLantern({
           variant={face.variant}
           mirrored={face.mirrored}
           showActions={showActions}
+          actionsAlwaysVisible={actionsAlwaysVisible}
           widthRem={WIDTH_REM}
           style={{ width: "100%", height: "100%", animation: "none" }}
         />
@@ -233,6 +248,7 @@ export function SVGPathLantern({
         generatingDraft={generatingDraft}
         loading={loading}
         showActions={showActions}
+        actionsAlwaysVisible={actionsAlwaysVisible}
       />
     </LanternFrame>
   );

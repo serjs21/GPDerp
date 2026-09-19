@@ -116,6 +116,9 @@
   top: auto;
   bottom: 0.25rem;
   right: 0.25rem;
+  left: 0.25rem;
+  display: flex;
+  justify-content: flex-end;
   opacity: 0;
   pointer-events: auto;
   transition: opacity 0.15s ease;
@@ -124,6 +127,12 @@
 .content:hover .actions,
 .content:focus-within .actions {
   opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .actionsAlwaysVisible {
+    opacity: 1;
+  }
 }
 
 .title {

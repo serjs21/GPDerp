@@ -85,6 +85,12 @@
   opacity: 1;
 }
 
+@media (max-width: 768px) {
+  .content [data-lantern-actions][data-actions-pinned] {
+    opacity: 1;
+  }
+}
+
 @keyframes lanternRotatedReveal {
   from {
     opacity: 0;

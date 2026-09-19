@@ -492,6 +492,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
                     loading={loading}
                     poses={poses}
                     runKey={stepRunKey}
+                    actionsAlwaysVisible={haikuIndex === focusIndex}
                     excludeLabelIds={excludeLabelIds}
                     onDeleted={onDeleted}
                     onDeleteFailed={onHaikuDeleteFailed}
@@ -509,6 +510,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
                   face={face}
                   isAnimating={isAnimating || packing}
                   suppressReveal
+                  actionsAlwaysVisible={haikuIndex === focusIndex}
                   excludeLabelIds={excludeLabelIds}
                   onDeleted={onDeleted}
                   onDeleteFailed={onHaikuDeleteFailed}

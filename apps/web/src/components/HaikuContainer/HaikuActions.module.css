@@ -5,3 +5,183 @@
   height: 1.5rem;
   pointer-events: auto;
 }
+
+.anchor {
+  position: relative;
+  display: inline-flex;
+  align-items: flex-start;
+  height: 28px;
+  line-height: 0;
+  pointer-events: auto;
+}
+
+.shell {
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  width: 9.5rem;
+  height: 28px;
+  line-height: 0;
+  vertical-align: middle;
+}
+
+.panel {
+  --haiku-actions-motion: 200ms ease;
+
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  pointer-events: auto;
+  border: 1.5px solid #111;
+  background: #f7f4ef;
+  overflow: hidden;
+}
+
+.slot {
+  position: relative;
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+  transition: flex-grow var(--haiku-actions-motion);
+  border-right: 1.5px solid #111;
+  background-color: #f7f4ef;
+}
+
+.slot:last-child {
+  border-right: none;
+}
+
+.slotDelete {
+  background-color: color-mix(in srgb, var(--hanko-red, #bc002d) 18%, #f7f4ef);
+}
+
+.slotShare {
+  background-color: color-mix(in srgb, #1a5fb4 16%, #f7f4ef);
+}
+
+.slotLabel {
+  background-color: color-mix(in srgb, #c4782a 14%, #f7f4ef);
+}
+
+.slotCopy {
+  background-color: color-mix(in srgb, #2f6b4f 14%, #f7f4ef);
+}
+
+.panelHoverDelete .slotDelete,
+.panelHoverShare .slotShare,
+.panelHoverLabel .slotLabel,
+.panelHoverCopy .slotCopy {
+  flex-grow: 5;
+}
+
+.panelHoverDelete .slot:not(.slotDelete),
+.panelHoverShare .slot:not(.slotShare),
+.panelHoverLabel .slot:not(.slotLabel),
+.panelHoverCopy .slot:not(.slotCopy) {
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.panelButton {
+  appearance: none;
+  position: relative;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: #221e1f;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.panelButton:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent-red, #c44) 65%, #f7f4ef 30%);
+  outline-offset: 1px;
+}
+
+.slotFace {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform var(--haiku-actions-motion),
+    opacity var(--haiku-actions-motion);
+}
+
+.slotFaceFromLeft,
+.slotFaceFromRight {
+  z-index: 1;
+}
+
+.slotFaceHidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.slotFaceFromLeft.slotFaceHidden {
+  transform: translateX(-110%);
+}
+
+.slotFaceFromRight.slotFaceHidden {
+  transform: translateX(110%);
+}
+
+.actionName {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  padding: 0 0.15rem;
+  overflow: hidden;
+  background: #111;
+  color: #fff;
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.iconImg {
+  display: block;
+  flex-shrink: 0;
+  width: 1.15rem;
+  height: 1.15rem;
+  max-width: none;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    --haiku-actions-motion: 0ms;
+  }
+
+  .slotFaceHidden {
+    transform: none;
+  }
+}
