@@ -1,5 +1,5 @@
 .root {
-  --post-sign-input-width: 22rem;
+  --post-sign-input-width: 26rem;
   --post-sign-ink: #2c2924;
   --post-sign-ink-soft: color-mix(in srgb, var(--post-sign-ink) 55%, transparent);
   --post-sign-sticky-bottom: 0;
@@ -16,7 +16,7 @@
 .rootSticky {
   position: fixed;
   bottom: calc(var(--post-sign-sticky-bottom) + env(safe-area-inset-bottom, 0px));
-  left: 34%;
+  left: 41%;
   transform: translateX(-50%);
   z-index: 900;
   width: min(100%, var(--post-sign-input-width));
@@ -54,25 +54,26 @@
 .input {
   position: absolute;
   /* Insets match constants.POST_SIGN_INPUT_FORM_INSET (full asset box) */
-  inset: 34.85% 25.2% 49.5% 34.4%;
+  inset: 36.85% 21.2% 48.5% 29.4%;
   width: auto;
   height: auto;
   background: transparent;
   border: none;
   border-bottom: 2px solid color-mix(in srgb, var(--post-sign-ink) 32%, transparent);
   padding: 0;
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   font-weight: 500;
   color: var(--post-sign-ink);
   outline: none;
   transition: border-color 0.2s ease;
   letter-spacing: 0.02em;
   pointer-events: auto;
+  font-style: normal;
 }
 
 .input::placeholder {
   color: var(--post-sign-ink-soft);
-  font-style: italic;
+  font-style: normal;
   font-weight: 400;
 }
 

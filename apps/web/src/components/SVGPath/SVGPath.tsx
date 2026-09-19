@@ -14,9 +14,23 @@ import { animate } from "motion/react";
 import type { HaikuDto } from "@/api/haikus";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import type { LanternTransform } from "@/components/Lantern/lanternTransform";
+import { prefersReducedMotion } from "@/components/Lantern/simulateFlight";
 import { useScrollBlocking } from "@/hooks/useScrollBlocking";
-import { SVGPathLantern } from "./SVGPathLantern";
 import { ExitingPathLantern } from "./ExitingPathLantern";
+import {
+  rotationFaceAtProgress,
+  targetFaceForStop,
+  targetRotationForStop,
+  type StopFace,
+} from "./pathStopRotation";
+import {
+  buildPathStopStepPoses,
+  PATH_STOP_STEP_TOTAL_MS,
+  pathStepPoseToTransform,
+  type PathStepPose,
+} from "./pathStopSteppedMotion";
+import { SVGPathLantern } from "./SVGPathLantern";
+import { SVGPathSteppedLantern } from "./SVGPathSteppedLantern";
 import { useSvgPathInput } from "./useSvgPathInput";
 import { useSvgPathScroll } from "./useSvgPathScroll";
 import {
@@ -31,15 +45,19 @@ import {
   stopForHaikuIndex,
   type ParsedSplitPathSvg,
 } from "./utils";
-import { prefersReducedMotion } from "@/components/Lantern/simulateFlight";
 import styles from "./SVGPath.module.css";
 
 const SVG_PATH_SRC = "/path/split_path_colored_stops.svg";
-const SVG_PATH_STEP_MS = 300;
+/** Adjacent focus steps use SteppedTransition (matches SteppedStops story). */
+const SVG_PATH_STEP_MS = PATH_STOP_STEP_TOTAL_MS;
 const SVG_PATH_CATCH_UP_MS = 450;
 const SVG_PATH_DELETE_PACK_MS = 450;
 /** Start neighbor pack when exit flight first holds this pose (0-based; 3 = 4th frame). */
 const DELETE_PACK_CUE_POSE_INDEX = 3;
+
+function pathStepPoseAsTransform(pose: PathStepPose): LanternTransform {
+  return pathStepPoseToTransform(pose, 1);
+}
 
 type ExitingLantern = {
   haiku: HaikuDto;
@@ -283,26 +301,38 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
     };
   }, []);
 
+  const packingActive = deletePack != null && deletePackT < 1;
+  const adjacentFocusStep =
+    isAnimating && Math.abs(focusIndex - fromFocusIndex) === 1 && !packingActive;
+
   const visibleLanterns = useMemo(() => {
     if (!parsed) return [];
 
     const catchUpStart = catchUpStartRef.current;
     const catchingUp = catchUpStart !== null && displayCatchUpT < 1;
-    const packing = deletePack != null && deletePackT < 1;
+    const packing = packingActive;
+    const stepRunKey = fromFocusIndex * 1_000_003 + focusIndex;
 
-    const lanterns: {
+    type VisibleLantern = {
       haiku?: HaikuDto;
       haikuIndex: number;
       loading: boolean;
       transform: NonNullable<ReturnType<typeof lanternTransformAtStops>>;
-    }[] = haikus.flatMap((haiku, haikuIndex) => {
+      face: StopFace;
+      poses?: PathStepPose[];
+      stepRunKey?: number;
+    };
+
+    const lanterns: VisibleLantern[] = haikus.flatMap((haiku, haikuIndex) => {
       let fromStop = stopForHaikuIndex(haikuIndex, fromFocusIndex);
       let toStop = stopForHaikuIndex(haikuIndex, focusIndex);
       let localT = tweenProgress;
+      let useStepped = adjacentFocusStep;
 
       if (catchingUp && haikuIndex >= catchUpStart) {
         fromStop = catchUpStopForHaiku(haikuIndex, catchUpStart, fromFocusIndex, displayCatchUpT);
         toStop = catchUpStopForHaiku(haikuIndex, catchUpStart, focusIndex, displayCatchUpT);
+        useStepped = false;
       } else if (packing) {
         const prevIndex = deletePack.prevIndexById.get(haiku.id);
         if (prevIndex != null && prevIndex !== haikuIndex) {
@@ -310,13 +340,40 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
           fromStop = stopForHaikuIndex(prevIndex, focusIndex);
           toStop = stopForHaikuIndex(haikuIndex, focusIndex);
           localT = deletePackT;
+          useStepped = false;
         }
       }
 
       if (!isStopOnPath(fromStop) && !isStopOnPath(toStop)) return [];
 
+      if (useStepped) {
+        const poses = buildPathStopStepPoses(parsed, fromStop, toStop);
+        if (poses.length === 0) return [];
+        const last = poses[poses.length - 1]!;
+        return [
+          {
+            haiku,
+            haikuIndex,
+            loading: false,
+            transform: pathStepPoseAsTransform(last),
+            face: last.face,
+            poses,
+            stepRunKey,
+          },
+        ];
+      }
+
       const transform = lanternTransformAtStops(parsed, fromStop, toStop, localT);
       if (!transform) return [];
+
+      const face =
+        fromStop === toStop || localT >= 1
+          ? targetFaceForStop(parsed, toStop)
+          : rotationFaceAtProgress(
+              targetRotationForStop(parsed, fromStop),
+              targetRotationForStop(parsed, toStop),
+              localT,
+            );
 
       return [
         {
@@ -324,6 +381,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
           haikuIndex,
           loading: false,
           transform,
+          face,
         },
       ];
     });
@@ -332,29 +390,59 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
       const fromStop = stopForHaikuIndex(haikus.length, fromFocusIndex);
       const toStop = stopForHaikuIndex(haikus.length, focusIndex);
       if (isStopOnPath(fromStop) || isStopOnPath(toStop)) {
-        const transform = lanternTransformAtStops(parsed, fromStop, toStop, tweenProgress);
-        if (transform) {
-          lanterns.push({
-            haiku: undefined,
-            haikuIndex: haikus.length,
-            loading: true,
-            transform,
-          });
+        if (adjacentFocusStep) {
+          const poses = buildPathStopStepPoses(parsed, fromStop, toStop);
+          if (poses.length > 0) {
+            const last = poses[poses.length - 1]!;
+            lanterns.push({
+              haiku: undefined,
+              haikuIndex: haikus.length,
+              loading: true,
+              transform: pathStepPoseAsTransform(last),
+              face: last.face,
+              poses,
+              stepRunKey,
+            });
+          }
+        } else {
+          const transform = lanternTransformAtStops(parsed, fromStop, toStop, tweenProgress);
+          if (transform) {
+            const face =
+              fromStop === toStop || tweenProgress >= 1
+                ? targetFaceForStop(parsed, toStop)
+                : rotationFaceAtProgress(
+                    targetRotationForStop(parsed, fromStop),
+                    targetRotationForStop(parsed, toStop),
+                    tweenProgress,
+                  );
+            lanterns.push({
+              haiku: undefined,
+              haikuIndex: haikus.length,
+              loading: true,
+              transform,
+              face,
+            });
+          }
         }
       }
     }
 
     return lanterns;
+    // During adjacent stepped focus motion, ignore tweenProgress so SteppedTransition
+    // poses stay referentially stable (avoids effect restart storms / max update depth).
   }, [
+    adjacentFocusStep,
     deletePack,
     deletePackT,
     displayCatchUpT,
     focusIndex,
     fromFocusIndex,
     haikus,
+    isAnimating,
     loaderShown,
+    packingActive,
     parsed,
-    tweenProgress,
+    adjacentFocusStep ? 0 : tweenProgress,
   ]);
 
   const generatingFlyT = generatingDraft
@@ -387,23 +475,47 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
           ) : null}
           {visibleLanterns
             .filter(({ haiku }) => !haiku || !exitingIds.has(haiku.id))
-            .map(({ haiku, haikuIndex, loading, transform }) => (
-              <SVGPathLantern
-                key={loading ? "pagination-loader" : (haiku?.id ?? `svg-path-${haikuIndex}`)}
-                haiku={haiku}
-                loading={loading}
-                transform={transform}
-                isAnimating={isAnimating || (deletePack != null && deletePackT < 1)}
-                excludeLabelIds={excludeLabelIds}
-                onDeleted={
-                  haiku
-                    ? (deleted) => handleLanternDeleted(deleted, transform)
-                    : undefined
-                }
-                onDeleteFailed={onHaikuDeleteFailed}
-                onChanged={onHaikuChanged}
-              />
-            ))}
+            .map(({ haiku, haikuIndex, loading, transform, face, poses, stepRunKey }) => {
+              const key = loading
+                ? "pagination-loader"
+                : (haiku?.id ?? `svg-path-${haikuIndex}`);
+              const onDeleted = haiku
+                ? (deleted: HaikuDto) => handleLanternDeleted(deleted, transform)
+                : undefined;
+              const packing = deletePack != null && deletePackT < 1;
+
+              if (poses && stepRunKey != null) {
+                return (
+                  <SVGPathSteppedLantern
+                    key={key}
+                    haiku={haiku}
+                    loading={loading}
+                    poses={poses}
+                    runKey={stepRunKey}
+                    excludeLabelIds={excludeLabelIds}
+                    onDeleted={onDeleted}
+                    onDeleteFailed={onHaikuDeleteFailed}
+                    onChanged={onHaikuChanged}
+                  />
+                );
+              }
+
+              return (
+                <SVGPathLantern
+                  key={key}
+                  haiku={haiku}
+                  loading={loading}
+                  transform={transform}
+                  face={face}
+                  isAnimating={isAnimating || packing}
+                  suppressReveal
+                  excludeLabelIds={excludeLabelIds}
+                  onDeleted={onDeleted}
+                  onDeleteFailed={onHaikuDeleteFailed}
+                  onChanged={onHaikuChanged}
+                />
+              );
+            })}
           {exitingLanterns.map(({ haiku, transform }) => (
             <ExitingPathLantern
               key={`exiting-${haiku.id}`}

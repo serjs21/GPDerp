@@ -3,11 +3,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import type { HaikuDto } from "@/api/haikus";
-import {
-  sampleSteppedProgresses,
-  SteppedTransition,
-  type TransitionPose,
-} from "@/components/animations/SteppedTransition";
+import { SteppedTransition } from "@/components/animations/SteppedTransition";
 import { Button } from "@/components/StyledComponents";
 import pathStyles from "@/components/SVGPath/SVGPath.module.css";
 import {
@@ -42,24 +38,18 @@ import {
   type LanternTransform,
 } from "@/components/Lantern/lanternTransform";
 import demoStyles from "@/components/Lantern/LanternFlightExit.stories.module.css";
+import { targetFaceForStop, type StopFace } from "@/components/SVGPath/pathStopRotation";
 import {
-  rotationFaceForPose,
-  targetFaceForStop,
-  targetRotationForStop,
-  type StopFace,
-} from "@/components/SVGPath/pathStopRotation";
+  buildPathStopStepPoses,
+  PATH_STOP_STEP_CROSSFADE_MS,
+  PATH_STOP_STEP_HOLD_MS,
+  pathStepPoseToTransform,
+  type PathStepPose,
+} from "@/components/SVGPath/pathStopSteppedMotion";
 
 const LANTERN_COUNT = 12;
 const SVG_PATH_SRC = "/path/split_path_colored_stops.svg";
 const WIDTH_REM = 19;
-/** Discrete holds from one path stop to the next. */
-const STOP_STEP_POSE_COUNT = 5;
-/** Total stop→stop duration spent on discrete holds (hard cuts, no fade). */
-const STOP_STEP_TOTAL_MS = 1000;
-const STOP_STEP_INTERVALS = STOP_STEP_POSE_COUNT - 1;
-const STOP_STEP_HOLD_MS = Math.round(STOP_STEP_TOTAL_MS / STOP_STEP_INTERVALS);
-/** No opacity fade between poses — stop-motion hard cuts (reveal CSS disabled while animating). */
-const STOP_STEP_CROSSFADE_MS = 0;
 
 const DEMO_HAIKUS: HaikuDto[] = Array.from({ length: LANTERN_COUNT }, (_, i) =>
   makeMockHaiku({
@@ -105,59 +95,6 @@ function useSplitPathSvg() {
   }, []);
 
   return splitPath;
-}
-
-type PathStepPose = TransitionPose & {
-  /** Same as SVGPath: `Math.round(pathStop * 10)` — higher stop (closer to focus) paints on top. */
-  stackOrder: number;
-  pathStop: number;
-  face: StopFace;
-};
-
-/** Discrete path poses between two authored stops (no live spatial tween). */
-function buildPathStopStepPoses(
-  parsed: ParsedSplitPathSvg,
-  fromStop: number,
-  toStop: number,
-): PathStepPose[] {
-  const progresses = sampleSteppedProgresses(STOP_STEP_POSE_COUNT, false);
-  const startRotation = targetRotationForStop(parsed, fromStop);
-  const endRotation = targetRotationForStop(parsed, toStop);
-  const poses: PathStepPose[] = [];
-  progresses.forEach((progress, poseIndex) => {
-    const transform = lanternTransformAtStops(parsed, fromStop, toStop, progress);
-    if (!transform) return;
-    const pathStop = fromStop + (toStop - fromStop) * progress;
-    poses.push({
-      progress,
-      x: transform.x,
-      y: transform.y,
-      rotation: transform.rotate,
-      scale: transform.scale,
-      opacity: transform.opacity ?? 1,
-      stackOrder: transform.stackOrder ?? Math.round(pathStop * 10),
-      pathStop,
-      face: rotationFaceForPose(
-        startRotation,
-        endRotation,
-        poseIndex,
-        STOP_STEP_POSE_COUNT,
-      ),
-    });
-  });
-  return poses;
-}
-
-function poseToLanternTransform(pose: PathStepPose, layerOpacity: number): LanternTransform {
-  return {
-    positionMode: "percent",
-    x: pose.x,
-    y: pose.y,
-    scale: pose.scale ?? 1,
-    rotate: pose.rotation,
-    opacity: (pose.opacity ?? 1) * layerOpacity,
-    stackOrder: pose.stackOrder,
-  };
 }
 
 function PathStopLanternView({
@@ -242,7 +179,7 @@ function SteppedPathLantern({
     return (
       <PathStopLanternView
         haiku={haiku}
-        transform={poseToLanternTransform(pose, 1)}
+        transform={pathStepPoseToTransform(pose, 1)}
         face={pose.face}
       />
     );
@@ -253,15 +190,15 @@ function SteppedPathLantern({
       key={runKey}
       poses={poses}
       active
-      holdMs={STOP_STEP_HOLD_MS}
-      crossfadeMs={STOP_STEP_CROSSFADE_MS}
+      holdMs={PATH_STOP_STEP_HOLD_MS}
+      crossfadeMs={PATH_STOP_STEP_CROSSFADE_MS}
       onComplete={onComplete}
       renderPose={(pose, layerOpacity) => {
         const pathPose = pose as PathStepPose;
         return (
           <PathStopLanternView
             haiku={haiku}
-            transform={poseToLanternTransform(pathPose, layerOpacity)}
+            transform={pathStepPoseToTransform(pathPose, layerOpacity)}
             face={pathPose.face}
             animating
           />

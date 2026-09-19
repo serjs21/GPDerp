@@ -95,7 +95,6 @@ export const SavedHaikusLanternPath = forwardRef<
         onHaikuDeleteFailed={onHaikuDeleteFailed}
         onHaikuChanged={handleHaikuChanged}
         excludeLabelIds={selectedLabelIds}
-        showGuides
       />
       {deleteFailedModal}
     </>
