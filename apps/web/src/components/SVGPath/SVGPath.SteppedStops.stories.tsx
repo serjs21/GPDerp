@@ -37,18 +37,23 @@ import { Lantern } from "@/components/Lantern/Lantern";
 import lanternStyles from "@/components/Lantern/Lantern.module.css";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { LanternRotated } from "@/components/Lantern/LanternRotated";
-import type { LanternRotatedVariantId } from "@/components/Lantern/lanternRotatedContent.config";
 import {
   lanternTransformToCssVars,
   type LanternTransform,
 } from "@/components/Lantern/lanternTransform";
 import demoStyles from "@/components/Lantern/LanternFlightExit.stories.module.css";
+import {
+  rotationFaceForPose,
+  targetFaceForStop,
+  targetRotationForStop,
+  type StopFace,
+} from "@/components/SVGPath/pathStopRotation";
 
 const LANTERN_COUNT = 12;
 const SVG_PATH_SRC = "/path/split_path_colored_stops.svg";
 const WIDTH_REM = 19;
 /** Discrete holds from one path stop to the next. */
-const STOP_STEP_POSE_COUNT = 4;
+const STOP_STEP_POSE_COUNT = 5;
 /** Total stop→stop duration spent on discrete holds (hard cuts, no fade). */
 const STOP_STEP_TOTAL_MS = 1000;
 const STOP_STEP_INTERVALS = STOP_STEP_POSE_COUNT - 1;
@@ -70,43 +75,6 @@ type FocusStep = {
   to: number;
   runKey: number;
 };
-
-type StopFace =
-  | { kind: "upright" }
-  | { kind: "rotated"; variant: LanternRotatedVariantId; mirrored: boolean };
-
-/**
- * Rotation chain (no skips between adjacent frames):
- * rotated-2-left ↔ rotated-1-left ↔ default ↔ rotated-1-right ↔ rotated-2-right
- */
-const ROTATION_CHAIN = [
-  "rotated-2-left",
-  "rotated-1-left",
-  "default",
-  "rotated-1-right",
-  "rotated-2-right",
-] as const;
-
-type RotationChainId = (typeof ROTATION_CHAIN)[number];
-
-function faceFromChainId(id: RotationChainId): StopFace {
-  switch (id) {
-    case "default":
-      return { kind: "upright" };
-    case "rotated-1-left":
-      return { kind: "rotated", variant: "rotated", mirrored: true };
-    case "rotated-1-right":
-      return { kind: "rotated", variant: "rotated", mirrored: false };
-    case "rotated-2-left":
-      return { kind: "rotated", variant: "rotated2", mirrored: true };
-    case "rotated-2-right":
-      return { kind: "rotated", variant: "rotated2", mirrored: false };
-  }
-}
-
-function chainIndex(id: RotationChainId): number {
-  return ROTATION_CHAIN.indexOf(id);
-}
 
 function useSplitPathSvg() {
   const [splitPath, setSplitPath] = useState<{
@@ -137,58 +105,6 @@ function useSplitPathSvg() {
   }, []);
 
   return splitPath;
-}
-
-/**
- * Path faces right when stop i.x >= stop (i-1).x — use unmirrored rotated bases.
- * Otherwise mirror so the painted face follows the path.
- */
-function pathStopFacesRight(parsed: ParsedSplitPathSvg, stopId: number): boolean {
-  const curr = parsed.stopsById[stopId];
-  if (!curr) return true;
-  const prev = parsed.stopsById[stopId - 1];
-  if (prev) return curr.cx >= prev.cx;
-  const next = parsed.stopsById[stopId + 1];
-  if (next) return curr.cx <= next.cx;
-  return true;
-}
-
-/** Target rotation state for an authored path stop (idle + transition endpoints). */
-function targetRotationForStop(
-  parsed: ParsedSplitPathSvg,
-  stopId: number,
-): RotationChainId {
-  const dist = Math.abs(stopId - SVG_PATH_FOCUS_STOP);
-  if (dist === 0) return "default";
-  const right = pathStopFacesRight(parsed, stopId);
-  if (dist === 1) return right ? "rotated-1-right" : "rotated-1-left";
-  return right ? "rotated-2-right" : "rotated-2-left";
-}
-
-function targetFaceForStop(parsed: ParsedSplitPathSvg, stopId: number): StopFace {
-  return faceFromChainId(targetRotationForStop(parsed, stopId));
-}
-
-/**
- * Walk the rotation chain without skipping: advance face by progress along the
- * pose sequence so denser spatial samples don't front-load the turn. Adjacent
- * poses still differ by at most one chain step.
- */
-function rotationFaceForPose(
-  startId: RotationChainId,
-  endId: RotationChainId,
-  poseIndex: number,
-  poseCount: number,
-): StopFace {
-  const start = chainIndex(startId);
-  const end = chainIndex(endId);
-  const delta = end - start;
-  const sign = delta === 0 ? 0 : delta > 0 ? 1 : -1;
-  const distance = Math.abs(delta);
-  const span = Math.max(1, poseCount - 1);
-  const steps = Math.min(distance, Math.round((poseIndex / span) * distance));
-  const faceIdx = start + sign * steps;
-  return faceFromChainId(ROTATION_CHAIN[faceIdx]!);
 }
 
 type PathStepPose = TransitionPose & {
