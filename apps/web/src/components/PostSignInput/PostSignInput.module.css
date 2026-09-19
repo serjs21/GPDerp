@@ -53,6 +53,7 @@
 
 .input {
   position: absolute;
+  font-family: "Bangers";
   /* Insets match constants.POST_SIGN_INPUT_FORM_INSET (full asset box) */
   inset: 36.85% 21.2% 48.5% 29.4%;
   width: auto;
