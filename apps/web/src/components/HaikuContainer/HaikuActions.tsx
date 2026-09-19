@@ -4,6 +4,7 @@ import axios from "axios";
 import {
   useCallback,
   useEffect,
+  useRef,
   useState,
   type FocusEvent,
   type ReactNode,
@@ -121,6 +122,9 @@ export const HaikuActions = (props: HaikuActionsProps) => {
   const [deleting, setDeleting] = useState(false);
   const [hover, setHover] = useState<HoverTarget>(null);
   const [open, setOpen] = useState(false);
+  const [clapBurst, setClapBurst] = useState<"idle" | "hold" | "fade">("hold");
+  const wasOpenRef = useRef(false);
+  const clapTimersRef = useRef<number[]>([]);
   const { copy } = useCopy();
   const dock = useLanternActionsDock();
 
@@ -132,6 +136,31 @@ export const HaikuActions = (props: HaikuActionsProps) => {
   const haiku = props.variant === "saved" ? props.haiku : null;
   const onDeleted = props.variant === "saved" ? props.onDeleted : undefined;
   const onDelete = props.variant === "saved" ? props.onDelete : undefined;
+
+  const clearClapTimers = useCallback(() => {
+    for (const id of clapTimersRef.current) window.clearTimeout(id);
+    clapTimersRef.current = [];
+  }, []);
+
+  const playClapBurst = useCallback(() => {
+    clearClapTimers();
+    setClapBurst("hold");
+    // const fadeId = window.setTimeout(() => setClapBurst("fade"), 1000);
+    // const doneId = window.setTimeout(() => setClapBurst("idle"), 1200);
+    // clapTimersRef.current = [fadeId, doneId];
+  }, [clearClapTimers]);
+
+  useEffect(() => {
+    const wasOpen = wasOpenRef.current;
+    wasOpenRef.current = isOpen;
+    if (isOpen && !wasOpen) playClapBurst();
+    if (!isOpen) {
+      clearClapTimers();
+      setClapBurst("idle");
+    }
+  }, [clearClapTimers, isOpen, playClapBurst]);
+
+  useEffect(() => () => clearClapTimers(), [clearClapTimers]);
 
   const setHoverIfLive = (next: HoverTarget) => {
     if (forcedHover === undefined) setHover(next);
@@ -280,26 +309,44 @@ export const HaikuActions = (props: HaikuActionsProps) => {
 
   return (
     <>
-      <button
-        type="button"
-        className={styles.toggle}
-        aria-label={isOpen ? "Hide haiku actions" : "Show haiku actions"}
-        aria-expanded={isOpen}
-        onClick={() => setOpenIfLive(!isOpen)}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={
-            isOpen
-              ? "/lantern_actions/actions_open.svg"
-              : "/lantern_actions/actions_closed.svg"
-          }
-          alt=""
-          className={styles.toggleIcon}
-          width={28}
-          height={28}
-        />
-      </button>
+      <span className={styles.toggleWrap}>
+        <button
+          type="button"
+          className={styles.toggle}
+          aria-label={isOpen ? "Hide haiku actions" : "Show haiku actions"}
+          aria-expanded={isOpen}
+          onClick={() => setOpenIfLive(!isOpen)}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={
+              isOpen
+                ? "/lantern_actions/actions_open.svg"
+                : "/lantern_actions/actions_closed.svg"
+            }
+            alt=""
+            className={styles.toggleIcon}
+            width={28}
+            height={28}
+          />
+        </button>
+        {clapBurst !== "idle" ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src="/lantern_actions/clap_sound.svg"
+            alt=""
+            className={[
+              styles.clapBurst,
+              clapBurst === "fade" ? styles.clapBurstFade : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            width={28}
+            height={28}
+            aria-hidden
+          />
+        ) : null}
+      </span>
       {panelNode}
       <ShareModal
         haikuId={savedHaiku.id}
