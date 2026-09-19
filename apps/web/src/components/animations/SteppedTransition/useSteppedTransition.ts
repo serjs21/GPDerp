@@ -132,6 +132,22 @@ export type UseSteppedTransitionOptions = {
   onPoseHold?: (poseIndex: number) => void;
 };
 
+function initialSoloLayers(
+  poses: TransitionPose[],
+  active: boolean,
+): SteppedTransitionLayer[] {
+  if (!active || poses.length === 0) return [];
+  const solo = poses.length === 1;
+  return [
+    {
+      pose: poses[0]!,
+      opacity: 1,
+      role: "solo",
+      key: solo ? "solo-0" : "hold-0",
+    },
+  ];
+}
+
 /**
  * HOLD → CROSSFADE (opacity only) → COMMIT state machine.
  * Never spatially tweens between poses.
@@ -150,7 +166,11 @@ export function useSteppedTransition(options: UseSteppedTransitionOptions): {
     onPoseHold,
   } = options;
 
-  const [layers, setLayers] = useState<SteppedTransitionLayer[]>([]);
+  // Seed first pose synchronously so mount does not paint an empty frame
+  // (idle→stepping swap would otherwise flash opacity 1→0→1).
+  const [layers, setLayers] = useState<SteppedTransitionLayer[]>(() =>
+    initialSoloLayers(poses, active),
+  );
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
   const onPoseHoldRef = useRef(onPoseHold);

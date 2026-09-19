@@ -134,7 +134,7 @@ function buildPathStopStepPoses(
       y: transform.y,
       rotation: transform.rotate,
       scale: transform.scale,
-      opacity: 1,
+      opacity: transform.opacity ?? 1,
       stackOrder: transform.stackOrder ?? Math.round(pathStop * 10),
       pathStop,
       face: rotationFaceForPose(
@@ -183,7 +183,7 @@ function PathStopLanternView({
         widthRem={WIDTH_REM}
         transform={transform}
         haikuLabels={haiku.labels}
-        flightExiting={animating}
+        flightExiting
       >
         <Lantern haiku={haiku} showActions={false} />
       </LanternFrame>
@@ -202,8 +202,8 @@ function PathStopLanternView({
         lanternStyles.root,
         lanternStyles.pathPositioned,
         pathStyles.lantern,
+        lanternStyles.flightExiting,
         animating ? pathStyles.lanternAnimating : null,
-        animating ? lanternStyles.flightExiting : null,
       ]
         .filter(Boolean)
         .join(" ")}
