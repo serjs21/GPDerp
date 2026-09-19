@@ -145,9 +145,9 @@ export const HaikuActions = (props: HaikuActionsProps) => {
   const playClapBurst = useCallback(() => {
     clearClapTimers();
     setClapBurst("hold");
-    // const fadeId = window.setTimeout(() => setClapBurst("fade"), 1000);
-    // const doneId = window.setTimeout(() => setClapBurst("idle"), 1200);
-    // clapTimersRef.current = [fadeId, doneId];
+    const fadeId = window.setTimeout(() => setClapBurst("fade"), 1000);
+    const doneId = window.setTimeout(() => setClapBurst("idle"), 1200);
+    clapTimersRef.current = [fadeId, doneId];
   }, [clearClapTimers]);
 
   useEffect(() => {
