@@ -15,9 +15,8 @@
   width: auto;
   height: 100%;
   margin: 0;
-  transition: transform 0.28s cubic-bezier(0.45, 0.05, 0.55, 0.95);
-  will-change: transform;
 }
+
 
 .lanternFrame {
   box-sizing: border-box;
@@ -39,10 +38,4 @@
   letter-spacing: 0.01em;
   overflow: visible;
   text-overflow: clip;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .lanternStackItem {
-    transition: none;
-  }
 }
