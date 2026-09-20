@@ -6,6 +6,7 @@ import type { HaikuDto } from "@/api/haikus";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
+import { buildPreviewLanternTypographyStyle } from "@/components/Lantern/utils/previewLanternTypography";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { OverlayTitle } from "@/components/OverlayTitle";
 import { Sway } from "@/components/Sway";
@@ -19,21 +20,16 @@ import {
   useShareLinkControls,
 } from "@/components/ShareLink/useShareLinkControls";
 import type { HitsMeterDisplay, TimeMeterDisplay } from "@/utils/shareLinkDisplay";
-import { HAIKU_MAX_LINE_CHARS, parseHaikuBody } from "@/utils/parseHaikuBody";
 import styles from "./ShareLinkManagement.module.css";
 
-/** Cursive em-width so a max-length line stays on one row in the 9rem preview. */
-const PREVIEW_CHAR_EM = 0.58;
-
-function previewLanternBodyStyle(body: string) {
-  const longest = Math.max(
-    ...parseHaikuBody(body).lines.map((line) => line.length),
-    1,
-  );
-  const fitChars = Math.min(HAIKU_MAX_LINE_CHARS, Math.max(longest, 8));
-  return {
-    "--lantern-body-font-size": `clamp(0.32rem, calc(100cqi / ${fitChars * PREVIEW_CHAR_EM}), 0.85rem)`,
-  } as CSSProperties;
+function previewLanternBodyStyle(body: string, title?: string): CSSProperties {
+  return buildPreviewLanternTypographyStyle(body, {
+    title,
+    minBodyRem: 0.3,
+    maxBodyRem: 0.72,
+    maxTitleRem: 0.68,
+    maxAuthorRem: 0.48,
+  });
 }
 
 function PreviewLanternStats({
@@ -106,7 +102,7 @@ export function ShareLinkManagementRow({
       showActions={false}
       bodyOnly
       className={styles.previewLantern}
-      style={previewLanternBodyStyle(previewBody)}
+      style={previewLanternBodyStyle(previewBody, haiku.title)}
     />
   ) : showLoader ? (
     <div className={styles.lanternLoader}>
@@ -147,7 +143,7 @@ export function ShareLinkManagementRow({
       contentAlign="center"
       className={[
         styles.lanternPanel,
-        ctrl.grayscale ? shareStyles.panelShelålInactive : shareStyles.panelShellActive,
+        ctrl.grayscale ? shareStyles.panelShellInactive : shareStyles.panelShellActive,
       ].join(" ")}
     >
       <div className={styles.lanternWrap}>

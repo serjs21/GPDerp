@@ -5,22 +5,19 @@ import type { LabelConnectedHaikuPreview } from "@/api/labels";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import type { LanternRotatedVariantId } from "@/components/Lantern/consts/rotationBaseConsts";
-import { HAIKU_MAX_LINE_CHARS, parseHaikuBody } from "@/utils/parseHaikuBody";
+import { buildPreviewLanternTypographyStyle } from "@/components/Lantern/utils/previewLanternTypography";
 import styles from "./ConnectedLanternStack.module.css";
 
 const LANTERN_WIDTH_REM = 6.6;
-/** Cursive em-width so a max-length line stays on one row in the preview. */
-const PREVIEW_CHAR_EM = 0.58;
 
-function previewLanternBodyStyle(body: string) {
-  const longest = Math.max(
-    ...parseHaikuBody(body).lines.map((line) => line.length),
-    1,
-  );
-  const fitChars = Math.min(HAIKU_MAX_LINE_CHARS, Math.max(longest, 8));
-  return {
-    "--lantern-body-font-size": `clamp(0.28rem, calc(100cqi / ${fitChars * PREVIEW_CHAR_EM}), 0.72rem)`,
-  } as CSSProperties;
+function previewLanternBodyStyle(body: string, title?: string): CSSProperties {
+  return buildPreviewLanternTypographyStyle(body, {
+    title,
+    minBodyRem: 0.26,
+    maxBodyRem: 0.62,
+    maxTitleRem: 0.58,
+    maxAuthorRem: 0.42,
+  });
 }
 
 const transformsMap = {
@@ -65,7 +62,7 @@ export function ConnectedLanternStack({ accountId, items }: ConnectedLanternStac
             bodyOnly
             mirrored={index === 2}
             className={styles.previewLantern}
-            style={previewLanternBodyStyle(haiku.body)}
+            style={previewLanternBodyStyle(haiku.body, haiku.title)}
             widthRem={LANTERN_WIDTH_REM}
             ariaLabel={`Haiku lantern: ${haiku.title}`}
           />

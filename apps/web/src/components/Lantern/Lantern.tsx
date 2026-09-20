@@ -17,7 +17,7 @@ import { LanternRotatedShell } from "./LanternRotatedShell";
 export type LanternProps = HaikuContainerProps & {
   className?: string;
   style?: CSSProperties;
-  /** Show only the haiku body (handwritten-on-paper presentation). */
+  /** Show title, body, and author without meta/actions (handwritten-on-paper). */
   bodyOnly?: boolean;
   /** Hover actions; omit during path tween so content stays cheap. */
   showActions?: boolean;
@@ -94,7 +94,13 @@ function LanternContent({
   const { author } = parseHaikuBody(body);
 
   if (bodyOnly) {
-    return <LanternBodyLines body={body} />;
+    return (
+      <>
+        {title ? <p className={styles.title}>{title}</p> : null}
+        <LanternBodyLines body={body} />
+        {author ? <p className={styles.author}>—{author}</p> : null}
+      </>
+    );
   }
 
   return (
@@ -155,6 +161,7 @@ function resolveHaikuStack(
   // Shell owns className/style on the article; content stack stays unstyled.
   const stackClass = [
     styles.haikuStack,
+    bodyOnly ? styles.bodyOnly : null,
     options.forShell ? undefined : className,
   ]
     .filter(Boolean)
