@@ -36,7 +36,16 @@ function parseShareLinkSocketMessage(
   }
 }
 
-export function useShareLinkSocket(enabled: boolean) {
+export type UseShareLinkSocketOptions = {
+  /** Extra handler after the share-links query cache is patched (e.g. modal local state). */
+  onShareLink?: (link: ShareLinkListItem) => void;
+  onShareLinkDeleted?: (id: string) => void;
+};
+
+export function useShareLinkSocket(
+  enabled: boolean,
+  { onShareLink, onShareLinkDeleted }: UseShareLinkSocketOptions = {},
+) {
   const queryClient = useQueryClient();
   const { isLoggedIn } = useAuthenticationState();
   const active = Boolean(enabled && isLoggedIn);
@@ -51,6 +60,7 @@ export function useShareLinkSocket(enabled: boolean) {
           { queryKey: SHARE_LINKS_QUERY_KEY },
           (old) => removeShareLinkFromCache(old, msg.data.id),
         );
+        onShareLinkDeleted?.(msg.data.id);
         return;
       }
 
@@ -58,8 +68,9 @@ export function useShareLinkSocket(enabled: boolean) {
         { queryKey: SHARE_LINKS_QUERY_KEY },
         (old) => patchShareLinksCache(old, msg.data),
       );
+      onShareLink?.(msg.data);
     },
-    [queryClient],
+    [onShareLink, onShareLinkDeleted, queryClient],
   );
 
   useWebSocket({

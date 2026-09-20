@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { Button, Typography } from "@/components/StyledComponents";
 import {
   ComicPageDialog,
@@ -9,6 +10,7 @@ import { ComicPanelTabs } from "@/components/ComicPanelTabs";
 import type { HaikuDto } from "@/api/haikus";
 import type { ShareLinkListItem } from "@/api/shareLinks";
 import { ShareLink } from "@/components/ShareLink/ShareLink";
+import { useShareLinkSocket } from "@/hooks/useShareLinkSocket";
 import { SendShareEmailContent } from "./SendShareEmailContent";
 import { ShareEmailSendPanel } from "./ShareEmailSendPanel";
 import { ShareMethodIcon } from "./ShareMethodIcon";
@@ -77,6 +79,29 @@ export function ShareModal({
     initialEmptyLink,
     initialMethod,
     initialEmailRecipients,
+  });
+
+  const onShareLinkSocketUpdate = useCallback(
+    (updated: ShareLinkListItem) => {
+      setShareLink((prev) => {
+        if (updated.sharedHaikuId === haikuId) return { ...prev, ...updated };
+        if (prev?.id === updated.id) return { ...prev, ...updated };
+        return prev;
+      });
+    },
+    [haikuId, setShareLink],
+  );
+
+  const onShareLinkSocketDeleted = useCallback(
+    (id: string) => {
+      setShareLink((prev) => (prev?.id === id ? null : prev));
+    },
+    [setShareLink],
+  );
+
+  useShareLinkSocket(open, {
+    onShareLink: onShareLinkSocketUpdate,
+    onShareLinkDeleted: onShareLinkSocketDeleted,
   });
 
   const showMethodRow = !emailSent;
