@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { ReactNode } from "react";
 import type { LabelConnectedHaikuPreview } from "@/api/labels";
+import { ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
 import { ConnectedHaikusPanel } from "./ConnectedHaikusPanel";
+import manageStyles from "./ManageLabel.module.css";
 
 const ACCOUNT_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 
@@ -22,6 +25,46 @@ const DEMO_ITEMS: LabelConnectedHaikuPreview[] = [
   },
 ];
 
+function SettingsLabelsStripStage({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return (
+    <div
+      style={{
+        boxSizing: "border-box",
+        width: "min(42rem, 96vw)",
+        padding: "1.5rem",
+        background: "#d8d2c8",
+      }}
+    >
+      <ComicPageRow className={manageStyles.strip}>
+        <ComicPagePanel
+          background="solid"
+          color="white"
+          overflowVisible
+          flexWeight={1}
+          className={manageStyles.labelPanel}
+          ariaLabel="Label preview"
+        >
+          <div className={manageStyles.labelPreview} />
+        </ComicPagePanel>
+        <div className={[manageStyles.overlaySlot, manageStyles.overlaySlotFan].join(" ")}>
+          {children}
+        </div>
+        <ComicPagePanel
+          background="solid"
+          color="white"
+          flexWeight={1}
+          className={manageStyles.actionSlot}
+          ariaLabel="Delete action"
+        />
+      </ComicPageRow>
+    </div>
+  );
+}
+
 const meta = {
   title: "Haiku/ConnectedHaikusPanel",
   component: ConnectedHaikusPanel,
@@ -31,15 +74,9 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <div
-        style={{
-          width: "14rem",
-          height: "12rem",
-          boxSizing: "border-box",
-        }}
-      >
+      <SettingsLabelsStripStage>
         <Story />
-      </div>
+      </SettingsLabelsStripStage>
     ),
   ],
 } satisfies Meta<typeof ConnectedHaikusPanel>;

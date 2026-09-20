@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { ReactNode } from "react";
 import type { LabelConnectedHaikuPreview } from "@/api/labels";
+import { ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
+import { ConnectedHaikusPanel } from "./ConnectedHaikusPanel";
 import { ConnectedLanternStack } from "./ConnectedLanternStack";
+import manageStyles from "./ManageLabel.module.css";
 
 const ACCOUNT_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 
@@ -22,6 +26,50 @@ const DEMO_ITEMS: LabelConnectedHaikuPreview[] = [
   },
 ];
 
+/**
+ * Same strip flex context as ManageLabel on /settings?tab=labels:
+ * label | connected haikus | delete — so the connected panel gets production width.
+ */
+function SettingsLabelsStripStage({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return (
+    <div
+      style={{
+        boxSizing: "border-box",
+        width: "min(42rem, 96vw)",
+        padding: "1.5rem",
+        background: "#d8d2c8",
+      }}
+    >
+      <ComicPageRow className={manageStyles.strip}>
+        <ComicPagePanel
+          background="solid"
+          color="white"
+          overflowVisible
+          flexWeight={1}
+          className={manageStyles.labelPanel}
+          ariaLabel="Label preview"
+        >
+          <div className={manageStyles.labelPreview} />
+        </ComicPagePanel>
+        <div className={[manageStyles.overlaySlot, manageStyles.overlaySlotFan].join(" ")}>
+          {children}
+        </div>
+        <ComicPagePanel
+          background="solid"
+          color="white"
+          flexWeight={1}
+          className={manageStyles.actionSlot}
+          ariaLabel="Delete action"
+        />
+      </ComicPageRow>
+    </div>
+  );
+}
+
 const meta = {
   title: "Haiku/ConnectedLanternStack",
   component: ConnectedLanternStack,
@@ -31,17 +79,9 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <div
-        style={{
-          width: "14rem",
-          height: "10rem",
-          padding: "1rem",
-          background: "#818181",
-          boxSizing: "border-box",
-        }}
-      >
+      <SettingsLabelsStripStage>
         <Story />
-      </div>
+      </SettingsLabelsStripStage>
     ),
   ],
 } satisfies Meta<typeof ConnectedLanternStack>;
@@ -49,7 +89,23 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof ConnectedLanternStack>;
 
+function renderInConnectedPanel(
+  args: { accountId: string; items: LabelConnectedHaikuPreview[] },
+  total = args.items.length,
+) {
+  return (
+    <ConnectedHaikusPanel
+      accountId={args.accountId}
+      labelName="Zen"
+      items={args.items}
+      total={total}
+      isPending={false}
+    />
+  );
+}
+
 export const Single: Story = {
+  render: (args) => renderInConnectedPanel(args),
   args: {
     accountId: ACCOUNT_ID,
     items: DEMO_ITEMS.slice(0, 1),
@@ -57,6 +113,7 @@ export const Single: Story = {
 };
 
 export const Pair: Story = {
+  render: (args) => renderInConnectedPanel(args),
   args: {
     accountId: ACCOUNT_ID,
     items: DEMO_ITEMS.slice(0, 2),
@@ -64,6 +121,7 @@ export const Pair: Story = {
 };
 
 export const Triple: Story = {
+  render: (args) => renderInConnectedPanel(args),
   args: {
     accountId: ACCOUNT_ID,
     items: DEMO_ITEMS,
