@@ -161,6 +161,31 @@ export const haikuService = {
     return { ok: true };
   },
 
+  async listConnectedHaikusForUser(params: {
+    userId: string;
+    labelId: string;
+    limit?: number;
+  }): Promise<
+    | {
+        ok: true;
+        total: number;
+        items: Array<{ id: string; title: string; body: string }>;
+      }
+    | { ok: false; reason: "not_found" | "forbidden" }
+  > {
+    const { userId, labelId } = params;
+    const limit = Math.min(10, Math.max(1, Math.floor(params.limit ?? 3)));
+    const row = await labelRepository.listConnectedHaikus(labelId, limit);
+    if (!row) return { ok: false, reason: "not_found" };
+    const allowed = await authRepository.findAccountIdForUser(userId, row.accountId);
+    if (!allowed) return { ok: false, reason: "forbidden" };
+    return {
+      ok: true,
+      total: row._count.haikus,
+      items: row.haikus,
+    };
+  },
+
   async createHaikuStream(
     subject: string,
     request: FastifyRequest,

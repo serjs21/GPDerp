@@ -180,6 +180,47 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
   );
 
   app.get(
+    "/haiku/label/:labelId/haikus",
+    { preHandler: [app.requireAuthenticated] },
+    async (req: FastifyRequest, res: FastifyReply) => {
+      const userId = req.user?.sub;
+      if (!userId) {
+        res.code(401).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+      const { labelId } = req.params as { labelId: string };
+      if (!isUuid(labelId)) {
+        res.code(400).send({ ok: false, error: "Invalid labelId" });
+        return;
+      }
+      const rawLimit = (req.query as { limit?: unknown } | undefined)?.limit;
+      const parsedLimit =
+        typeof rawLimit === "string" && rawLimit.trim() !== ""
+          ? Number(rawLimit)
+          : typeof rawLimit === "number"
+            ? rawLimit
+            : undefined;
+      const limit =
+        parsedLimit != null && Number.isFinite(parsedLimit) ? Math.floor(parsedLimit) : undefined;
+
+      const result = await haikuService.listConnectedHaikusForUser({
+        userId,
+        labelId,
+        limit,
+      });
+      if (!result.ok) {
+        if (result.reason === "not_found") {
+          res.code(404).send({ ok: false, error: "Not found" });
+          return;
+        }
+        res.code(403).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+      res.send({ ok: true, data: { total: result.total, items: result.items } });
+    },
+  );
+
+  app.get(
     "/haiku",
     { preHandler: [app.requireAuthenticated] },
     async (req: FastifyRequest, res: FastifyReply) => {

@@ -6,13 +6,16 @@
 .strip {
   flex: 0 0 auto;
   gap: 0.15rem !important;
-  min-height: 4.75rem;
+  min-height: 6.5rem;
+  align-items: stretch;
 }
 
 .labelPanel,
-.actionSlot {
+.connectedPanel,
+.actionSlot,
+.overlaySlot {
   flex: 1 1 0 !important;
-  min-height: 4.75rem;
+  min-height: 6.5rem;
   min-width: 0;
   width: 0;
   border-radius: 0;
@@ -22,6 +25,35 @@
   margin-top: calc(-1 * var(--comic-page-border, 4px));
 }
 
+.overlaySlot {
+  display: flex;
+  height: auto;
+}
+
+.panelButton {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 6.5rem;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+}
+
+.panelButton > * {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 6.5rem;
+}
+
 .labelPreview {
   display: flex;
   align-items: center;
@@ -29,4 +61,79 @@
   width: 100%;
   padding: 0.4rem 0.35rem;
   line-height: 0;
+}
+
+.connectedBody {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.35rem;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: 5.5rem;
+  padding: 0.45rem 0.55rem;
+}
+
+.connectedQuiet {
+  margin: 0;
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 0.85rem;
+  line-height: 1.2;
+  color: color-mix(in srgb, var(--comic-ink, #2d2d2d) 55%, transparent);
+  text-align: center;
+}
+
+.connectedList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.connectedItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  min-width: 0;
+}
+
+.connectedTitle {
+  overflow: hidden;
+  font-family: var(--font-pixel-display, monospace);
+  font-size: 0.58rem;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  color: var(--comic-ink, #2d2d2d);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.connectedText {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 0.72rem;
+  line-height: 1.15;
+  color: color-mix(in srgb, var(--comic-ink, #2d2d2d) 72%, transparent);
+  white-space: pre-line;
+}
+
+.connectedMore {
+  margin: 0;
+  padding-top: 0.1rem;
+  font-family: var(--font-pixel-display, monospace);
+  font-size: 0.52rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--comic-ink, #2d2d2d) 65%, transparent);
+  text-align: center;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
 }

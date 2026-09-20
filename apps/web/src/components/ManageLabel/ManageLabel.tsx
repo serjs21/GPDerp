@@ -1,15 +1,22 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import type { LabelDto } from "@/api/labels";
+import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import {
+  fetchLabelConnectedHaikus,
+  labelQueryKeys,
+  type LabelDto,
+} from "@/api/labels";
+import { useHaikuFilters } from "@/app/providers/HaikuFiltersProvider";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { ComicLabelCreationModal } from "@/components/ComicLabelCreationModal";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import { ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
-import { COMIC_PANEL_COLORS } from "@/components/ComicPageLayout/comicPagePresets";
 import { comicToast } from "@/components/ComicToast";
 import { DeleteConfirmModal } from "@/components/DeleteConfirmModal";
+import { OverlayTitle } from "@/components/OverlayTitle";
 import { SVGPanelActionButton } from "@/components/SVGPanelActionButton";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
 import styles from "./ManageLabel.module.css";
@@ -20,15 +27,74 @@ export type ManageLabelProps = {
   onChanged?: () => void;
 };
 
-const EDIT_HOVER = COMIC_PANEL_COLORS.info.base;
+const CONNECTED_PREVIEW_LIMIT = 3;
 const DELETE_HOVER = "var(--accent-red, #aa1f3f)";
 
+function ConnectedHaikusPanel({
+  labelName,
+  items,
+  total,
+  isPending,
+}: {
+  labelName: string;
+  items: Array<{ id: string; title: string; body: string }>;
+  total: number;
+  isPending: boolean;
+}) {
+  const moreCount = Math.max(0, total - CONNECTED_PREVIEW_LIMIT);
+
+  return (
+    <ComicPagePanel
+      background="solid"
+      color="white"
+      overflowVisible
+      flexWeight={1}
+      className={styles.connectedPanel}
+      ariaLabel={`Haikus labeled ${labelName}`}
+    >
+      <div className={styles.connectedBody}>
+        {isPending ? (
+          <p className={styles.connectedQuiet}>Loading…</p>
+        ) : items.length === 0 ? (
+          <p className={styles.connectedQuiet}>No lanterns yet</p>
+        ) : (
+          <>
+            <ul className={styles.connectedList}>
+              {items.map((haiku) => (
+                <li key={haiku.id} className={styles.connectedItem}>
+                  <span className={styles.connectedTitle}>{haiku.title}</span>
+                  <span className={styles.connectedText}>{haiku.body}</span>
+                </li>
+              ))}
+            </ul>
+            {moreCount > 0 ? (
+              <p className={styles.connectedMore}>{`+${moreCount} more`}</p>
+            ) : null}
+          </>
+        )}
+      </div>
+    </ComicPagePanel>
+  );
+}
+
 export function ManageLabel({ accountId, label, onChanged }: ManageLabelProps) {
+  const router = useRouter();
+  const { setSelectedLabelIds } = useHaikuFilters();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const { deleteLabel } = useAccountLabels({ accountId, autofetch: false });
   const shape = resolveComicLabelShapePreset(label.shape);
+
+  const connectedQuery = useQuery({
+    queryKey: labelQueryKeys.connectedHaikus(label.id, CONNECTED_PREVIEW_LIMIT),
+    queryFn: () =>
+      fetchLabelConnectedHaikus(label.id, { limit: CONNECTED_PREVIEW_LIMIT }),
+  });
+
+  const connectedTotal = connectedQuery.data?.total ?? 0;
+  const connectedItems = connectedQuery.data?.items ?? [];
+  const hasConnections = connectedTotal > 0;
 
   const handleDeleteConfirm = useCallback(async () => {
     setDeleting(true);
@@ -49,38 +115,75 @@ export function ManageLabel({ accountId, label, onChanged }: ManageLabelProps) {
     }
   }, [deleteLabel, label.id, onChanged]);
 
+  const handleCheckThemOut = useCallback(() => {
+    setSelectedLabelIds([label.id]);
+    router.push("/");
+  }, [label.id, router, setSelectedLabelIds]);
+
+  const labelPreview = (
+    <ComicPagePanel
+      background="solid"
+      color="white"
+      overflowVisible
+      flexWeight={1}
+      className={styles.labelPanel}
+      ariaLabel={label.name}
+    >
+      <div className={styles.labelPreview}>
+        <ComicBurstLabel
+          text={formatComicLabelText(label.name)}
+          fill={label.color || "#888888"}
+          shapeKind={shape.kind}
+          spikeCount={shape.spikeCount}
+          randomness={shape.randomness}
+          seed={shape.id}
+          fontSize={20}
+        />
+      </div>
+    </ComicPagePanel>
+  );
+
+  const connectedPanel = (
+    <ConnectedHaikusPanel
+      labelName={label.name}
+      items={connectedItems}
+      total={connectedTotal}
+      isPending={connectedQuery.isPending}
+    />
+  );
+
   return (
     <article className={styles.root}>
       <ComicPageRow className={styles.strip}>
-        <ComicPagePanel
-          background="solid"
-          color="white"
-          overflowVisible
-          flexWeight={1}
-          className={styles.labelPanel}
-          ariaLabel={label.name}
-        >
-          <div className={styles.labelPreview}>
-            <ComicBurstLabel
-              text={formatComicLabelText(label.name)}
-              fill={label.color || "#888888"}
-              shapeKind={shape.kind}
-              spikeCount={shape.spikeCount}
-              randomness={shape.randomness}
-              seed={shape.id}
-              fontSize={20}
-            />
-          </div>
-        </ComicPagePanel>
+        <OverlayTitle title="Edit" direction="bottom" className={styles.overlaySlot}>
+          <button
+            type="button"
+            className={styles.panelButton}
+            onClick={() => setEditOpen(true)}
+            aria-label={`Edit ${label.name}`}
+          >
+            {labelPreview}
+          </button>
+        </OverlayTitle>
 
-        <SVGPanelActionButton
-          src="/panel_actions/edit.svg"
-          label="Edit"
-          ariaLabel={`Edit ${label.name}`}
-          hoverFill={EDIT_HOVER}
-          onSelect={() => setEditOpen(true)}
-          className={styles.actionSlot}
-        />
+        {hasConnections ? (
+          <OverlayTitle
+            title="Check them out"
+            direction="bottom"
+            className={styles.overlaySlot}
+          >
+            <button
+              type="button"
+              className={styles.panelButton}
+              onClick={handleCheckThemOut}
+              aria-label={`View haikus labeled ${label.name}`}
+            >
+              {connectedPanel}
+            </button>
+          </OverlayTitle>
+        ) : (
+          <div className={styles.overlaySlot}>{connectedPanel}</div>
+        )}
 
         <SVGPanelActionButton
           src="/panel_actions/delete.svg"

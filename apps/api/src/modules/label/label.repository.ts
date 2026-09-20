@@ -62,6 +62,21 @@ export const labelRepository = {
     });
   },
 
+  listConnectedHaikus(labelId: string, take: number) {
+    return prismaClient.label.findUnique({
+      where: { id: labelId },
+      select: {
+        accountId: true,
+        _count: { select: { haikus: true } },
+        haikus: {
+          take,
+          orderBy: { createdAt: "desc" },
+          select: { id: true, title: true, body: true },
+        },
+      },
+    });
+  },
+
   updateById(id: string, data: { name: string; color: string; shape: string }) {
     return prismaClient.label.update({
       where: { id },

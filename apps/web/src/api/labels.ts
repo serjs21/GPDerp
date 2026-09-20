@@ -15,6 +15,8 @@ export const labelQueryKeys = {
   pagedByAccount: (accountId: string, pageSize: number, q = "") =>
     [...labelQueryKeys.all, "account", accountId, "paged", pageSize, q] as const,
   manageAccount: ["labels", "manage-account"] as const,
+  connectedHaikus: (labelId: string, limit = 3) =>
+    [...labelQueryKeys.all, "connected-haikus", labelId, limit] as const,
 };
 
 type ListLabelsResponse =
@@ -111,4 +113,32 @@ export async function deleteLabel(labelId: string): Promise<void> {
     `/haiku/label/${encodeURIComponent(labelId)}`,
   );
   if (!data.ok) throw new Error("error" in data ? data.error : "Failed to delete label");
+}
+
+export type LabelConnectedHaikuPreview = {
+  id: string;
+  title: string;
+  body: string;
+};
+
+export type LabelConnectedHaikus = {
+  total: number;
+  items: LabelConnectedHaikuPreview[];
+};
+
+type ConnectedHaikusResponse =
+  | { ok: true; data: LabelConnectedHaikus }
+  | { ok: false; error: string };
+
+export async function fetchLabelConnectedHaikus(
+  labelId: string,
+  options: { limit?: number } = {},
+): Promise<LabelConnectedHaikus> {
+  const limit = options.limit ?? 3;
+  const { data } = await axios.get<ConnectedHaikusResponse>(
+    `/haiku/label/${encodeURIComponent(labelId)}/haikus`,
+    { params: { limit } },
+  );
+  if (!data.ok) throw new Error(data.error ?? "Failed to fetch connected haikus");
+  return data.data;
 }
