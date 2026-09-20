@@ -190,7 +190,6 @@ export function ShareLinkManagementRow({
       <ComicPagePanel
         background="solid"
         color="white"
-        // title="Settings"
         contentAlign="start"
         className={styles.settingsPanel}
         ariaLabel={`Share link settings for ${ctrl.subject}`}

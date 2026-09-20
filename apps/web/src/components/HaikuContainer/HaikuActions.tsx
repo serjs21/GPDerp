@@ -376,6 +376,7 @@ export const HaikuActions = (props: HaikuActionsProps) => {
       <ShareModal
         haikuId={savedHaiku.id}
         haikuSubject={formatHaikuTitle(savedHaiku)}
+        haiku={savedHaiku}
         open={shareOpen}
         onClose={() => setShareOpen(false)}
       />

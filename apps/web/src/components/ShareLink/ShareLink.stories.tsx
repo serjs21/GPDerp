@@ -1,10 +1,22 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useEffect, useState } from "react";
+import type { HaikuDto } from "@/api/haikus";
 import type { CreateShareLinkBody, ShareLinkListItem } from "@/api/shareLinks";
 import { ShareLink } from "./ShareLink";
 
 const HAIKU_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const SUBJECT = "Morning mist on the mountain path";
+
+const DEMO_HAIKU: HaikuDto = {
+  id: HAIKU_ID,
+  title: SUBJECT,
+  titleSuffix: 0,
+  body: "Morning mist softens\nthe mountain path underfoot\nbirdsong finds the pines",
+  createdAt: "2026-01-15T10:00:00.000Z",
+  accountId: "acct",
+  createdById: "user",
+  labels: [],
+};
 
 const baseLink: ShareLinkListItem = {
   id: "11111111-1111-4111-8111-111111111111",
@@ -35,6 +47,7 @@ function ShareLinkStory({
       link={current}
       haikuId={HAIKU_ID}
       haikuSubject={SUBJECT}
+      haiku={DEMO_HAIKU}
       onChanged={() => undefined}
       onLinkUpdate={setCurrent}
       refreshShareLinkFn={async (_id, body) => {
@@ -68,6 +81,7 @@ function ActivatingShareLinkStory() {
       link={link}
       haikuId={HAIKU_ID}
       haikuSubject={SUBJECT}
+      haiku={DEMO_HAIKU}
       onChanged={() => undefined}
       onLinkUpdate={setLink}
       createShareLinkFn={delayedCreateShareLink}

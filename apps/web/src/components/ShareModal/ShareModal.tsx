@@ -6,6 +6,7 @@ import {
   ComicPagePanel,
 } from "@/components/ComicPageLayout";
 import { ComicPanelTabs } from "@/components/ComicPanelTabs";
+import type { HaikuDto } from "@/api/haikus";
 import type { ShareLinkListItem } from "@/api/shareLinks";
 import { ShareLink } from "@/components/ShareLink/ShareLink";
 import { SendShareEmailContent } from "./SendShareEmailContent";
@@ -23,6 +24,8 @@ export type ShareModalProps = {
   haikuId: string;
   /** Display title for the ShareLink row. */
   haikuSubject?: string;
+  /** Full haiku when already loaded (lantern actions); used for share preview. */
+  haiku?: HaikuDto | null;
   /** When the modal opens, start with a created link (for Storybook). */
   initialCreatedUrl?: string | null;
   /** Prefer full link object when available (Storybook / resume). */
@@ -42,6 +45,7 @@ export function ShareModal({
   onClose,
   haikuId,
   haikuSubject = "Haiku",
+  haiku = null,
   initialCreatedUrl = null,
   initialCreatedLink = null,
   initialEmptyLink = false,
@@ -155,6 +159,7 @@ export function ShareModal({
                 link={shareLink}
                 haikuId={haikuId}
                 haikuSubject={haikuSubject}
+                haiku={haiku}
                 onChanged={() => undefined}
                 onLinkUpdate={setShareLink}
               />
