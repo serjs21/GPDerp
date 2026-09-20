@@ -7,6 +7,7 @@ export {
 } from "./ThemedHaikuStoryStage";
 export { withThemedStoryStage } from "./decorators/withThemedStoryStage";
 export { withAuthProviders } from "./decorators/withAuthProviders";
+export { withMockAuthentication } from "./decorators/withMockAuthentication";
 export { withLoggedInAppLayout } from "./decorators/withLoggedInAppLayout";
 export { composeDecorators } from "./decorators/composeDecorators";
 export { withFullscreenShell } from "./decorators/withFullscreenShell";

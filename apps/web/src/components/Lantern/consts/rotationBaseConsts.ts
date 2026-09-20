@@ -5,7 +5,7 @@
  * (same approach as AuthLanterns Login/Register lettering).
  */
 
-import { LANTERN_TEXT_INSET } from "./constants";
+import { LANTERN_TEXT_INSET } from "../constants";
 
 export type LanternRotatedVariantId = "rotated" | "rotated2";
 
@@ -81,8 +81,11 @@ export const LANTERN_ROTATED_CONTENT = {
   rotated2: ROTATED_2,
 } as const satisfies Record<LanternRotatedVariantId, LanternRotatedContentTransform>;
 
-export function lanternRotatedContentTransform(
+export function getRotationBaseTransform(
   variant: LanternRotatedVariantId,
 ): LanternRotatedContentTransform {
   return LANTERN_ROTATED_CONTENT[variant];
 }
+
+/** @deprecated Prefer `getRotationBaseTransform`. */
+export const lanternRotatedContentTransform = getRotationBaseTransform;

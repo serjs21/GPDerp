@@ -7,7 +7,12 @@ import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { formatCreatedAt } from "@/utils/date";
 import { parseHaikuBody } from "@/utils/parseHaikuBody";
 import { formatHaikuTitle } from "@/utils/strings";
+import {
+  LANTERN_ROTATED_WIDTH_REM,
+  type LanternRotatedVariantId,
+} from "./consts/rotationBaseConsts";
 import styles from "./Lantern.module.css";
+import { LanternRotatedShell } from "./LanternRotatedShell";
 
 export type LanternProps = HaikuContainerProps & {
   className?: string;
@@ -24,6 +29,20 @@ export type LanternProps = HaikuContainerProps & {
   onDelete?: () => Promise<void>;
   onDeleted?: () => void;
   onChanged?: () => void;
+  /**
+   * When set, renders the rotated base PNG shell with haiku content
+   * transformed onto the painted paper face.
+   */
+  rotationBase?: LanternRotatedVariantId;
+  /** Flip horizontally so the painted face follows path direction. */
+  mirrored?: boolean;
+  /** Shell width when `rotationBase` is set. */
+  widthRem?: number;
+  /** Horizontal offset of the actions bar relative to lantern center. */
+  actionsBarOffsetX?: string;
+  /** Vertical gap between lantern bottom and actions bar. */
+  actionsBarOffsetY?: string;
+  ariaLabel?: string;
 };
 
 function resolveGeneratingContent(draft: GeneratingDraft) {
@@ -89,38 +108,72 @@ function LanternContent({
   );
 }
 
-export function Lantern(props: LanternProps) {
+function buildLanternActions(
+  props: Pick<
+    LanternProps,
+    "showActions" | "bodyOnly" | "onDelete" | "onDeleted" | "onChanged" | "haiku" | "generatingDraft"
+  >,
+  mode: "generating" | "saved",
+): ReactNode {
+  const bodyOnly = props.bodyOnly ?? false;
+  const showActions = props.showActions ?? true;
+  if (bodyOnly || !showActions) return undefined;
+
+  return (
+    <div className={styles.actions} data-lantern-actions>
+      {mode === "generating" ? (
+        <HaikuActions variant="generating" />
+      ) : "haiku" in props && props.haiku ? (
+        <HaikuActions
+          variant="saved"
+          haiku={props.haiku}
+          onDeleted={props.onDeleted}
+          onChanged={props.onChanged}
+          onDelete={props.onDelete}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function resolveHaikuStack(
+  props: LanternProps,
+  options: { forShell?: boolean } = {},
+) {
   const {
     className,
     style,
     bodyOnly = false,
     showActions = true,
-    actionsAlwaysVisible: _actionsAlwaysVisible = false,
     onDelete,
     onDeleted,
     onChanged,
-    ...noteProps
+    ...rest
   } = props;
+  const noteProps = rest as HaikuContainerProps;
 
-  const stackClass = [styles.haikuStack, className].filter(Boolean).join(" ");
-  const includeActions = !bodyOnly && showActions;
+  // Shell owns className/style on the article; content stack stays unstyled.
+  const stackClass = [
+    styles.haikuStack,
+    options.forShell ? undefined : className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const stackStyle = options.forShell ? undefined : style;
 
   if ("generatingDraft" in noteProps && noteProps.generatingDraft) {
     const { title, body, meta } = resolveGeneratingContent(noteProps.generatingDraft);
     return (
-      <div className={stackClass} style={style}>
+      <div className={stackClass} style={stackStyle}>
         <LanternContent
           title={title}
           body={body}
           meta={meta}
           bodyOnly={bodyOnly}
-          actions={
-            includeActions ? (
-              <div className={styles.actions} data-lantern-actions>
-                <HaikuActions variant="generating" />
-              </div>
-            ) : undefined
-          }
+          actions={buildLanternActions(
+            { bodyOnly, showActions, generatingDraft: noteProps.generatingDraft },
+            "generating",
+          )}
         />
       </div>
     );
@@ -134,28 +187,54 @@ export function Lantern(props: LanternProps) {
   const { title, body, meta } = resolveSavedContent(haiku);
 
   return (
-    <div className={stackClass} style={style}>
+    <div className={stackClass} style={stackStyle}>
       <LanternContent
         title={title}
         body={body}
         meta={meta}
         bodyOnly={bodyOnly}
-        actions={
-          includeActions ? (
-            <div className={styles.actions} data-lantern-actions>
-              <HaikuActions
-                variant="saved"
-                haiku={haiku}
-                onDeleted={onDeleted}
-                onChanged={onChanged}
-                onDelete={onDelete}
-              />
-            </div>
-          ) : undefined
-        }
+        actions={buildLanternActions(
+          { bodyOnly, showActions, haiku, onDelete, onDeleted, onChanged },
+          "saved",
+        )}
       />
     </div>
   );
+}
+
+function resolveRotatedAriaLabel(props: LanternProps): string {
+  if (props.ariaLabel) return props.ariaLabel;
+  if ("haiku" in props && props.haiku) {
+    return `Haiku lantern: ${props.haiku.title ?? ""}`;
+  }
+  if ("generatingDraft" in props && props.generatingDraft) {
+    return `Generating haiku: ${props.generatingDraft.subject}`;
+  }
+  return "Rotated haiku lantern";
+}
+
+export function Lantern(props: LanternProps) {
+  if (props.rotationBase) {
+    const content = resolveHaikuStack(props, { forShell: true });
+    if (!content) return null;
+
+    return (
+      <LanternRotatedShell
+        rotationBase={props.rotationBase}
+        className={props.className}
+        style={props.style}
+        widthRem={props.widthRem ?? LANTERN_ROTATED_WIDTH_REM}
+        mirrored={props.mirrored}
+        actionsBarOffsetX={props.actionsBarOffsetX}
+        actionsBarOffsetY={props.actionsBarOffsetY}
+        ariaLabel={resolveRotatedAriaLabel(props)}
+      >
+        {content}
+      </LanternRotatedShell>
+    );
+  }
+
+  return resolveHaikuStack(props);
 }
 
 export type { LanternTransform } from "./lanternTransform";

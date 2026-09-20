@@ -1,4 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import {
+  composeDecorators,
+  withMockAuthentication,
+  withQueryClient,
+} from "@/storybook";
 
 import { ShareModal } from "./ShareModal";
 
@@ -9,6 +14,7 @@ const meta = {
   parameters: {
     layout: "fullscreen",
   },
+  decorators: [composeDecorators(withQueryClient, withMockAuthentication)],
   args: {
     open: true,
     haikuId: "00000000-0000-4000-8000-000000000099",

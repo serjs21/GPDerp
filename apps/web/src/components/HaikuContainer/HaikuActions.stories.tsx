@@ -7,6 +7,7 @@ import {
   EXAMPLE_HAIKU_BODY,
   makeMockHaiku,
   STORY_CREATED_AT,
+  withMockAuthentication,
   withQueryClient,
   withThemedStoryStage,
 } from "@/storybook";
@@ -30,7 +31,9 @@ const meta: Meta<typeof HaikuActions> = {
     layout: "fullscreen",
     initialCelestialPreset: "blueNight" satisfies CelestialPresetName,
   },
-  decorators: [composeDecorators(withQueryClient, withThemedStoryStage)],
+  decorators: [
+    composeDecorators(withQueryClient, withMockAuthentication, withThemedStoryStage),
+  ],
 };
 
 export default meta;

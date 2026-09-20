@@ -58,9 +58,6 @@ const storybookFontVariableClass = [
 const preview: Preview = {
   decorators: [
     (Story, context) => {
-      // #region agent log
-      fetch('http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'ab780c'},body:JSON.stringify({sessionId:'ab780c',runId:'pre-fix',hypothesisId:'B',location:'preview.ts:decorator',message:'global storybook decorator (no auth/query)',data:{title:context.title,storyId:context.id,hasAuthInPreview:false},timestamp:Date.now()})}).catch(()=>{});
-      // #endregion
       const fullscreen = context.parameters.layout === 'fullscreen';
       if (typeof document !== 'undefined') {
         document.documentElement.classList.add(

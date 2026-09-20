@@ -54,9 +54,6 @@ export function ShareModal({
   initialMethod = "link",
   initialEmailRecipients = EMPTY_EMAIL_RECIPIENTS,
 }: ShareModalProps) {
-  // #region agent log
-  fetch('http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'ab780c'},body:JSON.stringify({sessionId:'ab780c',runId:'pre-fix',hypothesisId:'B',location:'ShareModal.tsx:render',message:'ShareModal rendering before socket hook',data:{open,haikuId},timestamp:Date.now()})}).catch(()=>{});
-  // #endregion
   const {
     method,
     setMethod,

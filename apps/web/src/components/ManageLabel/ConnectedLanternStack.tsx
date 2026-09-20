@@ -4,6 +4,7 @@ import { useState, type CSSProperties } from "react";
 import type { LabelConnectedHaikuPreview } from "@/api/labels";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
+import type { LanternRotatedVariantId } from "@/components/Lantern/consts/rotationBaseConsts";
 import { HAIKU_MAX_LINE_CHARS, parseHaikuBody } from "@/utils/parseHaikuBody";
 import styles from "./ConnectedLanternStack.module.css";
 
@@ -23,12 +24,17 @@ function previewLanternBodyStyle(body: string) {
   } as CSSProperties;
 }
 
-
 const transformsMap = {
   0: `translate(-50%, -60%) `,
   1: `translate(-125%, -65%) scale(0.5)`,
   2: `translate(10%, -75%) scale(0.2)`,
-}
+};
+
+const rotationMap: Record<number, LanternRotatedVariantId | undefined> = {
+  0: undefined,
+  1: "rotated",
+  2: "rotated2",
+};
 
 function fanOffsetRem(index: number, hovered: number | null, count: number): number {
   if (hovered == null || index === hovered || count < 2) return 0;
@@ -77,38 +83,56 @@ export function ConnectedLanternStack({ accountId, items }: ConnectedLanternStac
           }
         }
         const isHovered = hovered === index;
+        const rotationBase = rotationMap[index];
+        const baseTransform =
+          transformsMap[index as keyof typeof transformsMap] ?? "translate(-50%, -60%)";
+        const lanternHaiku = {
+          id: haiku.id,
+          title: haiku.title,
+          titleSuffix: 0,
+          body: haiku.body,
+          createdAt: "",
+          accountId,
+          createdById: "",
+          labels: [],
+        };
+        const lantern = (
+          <Lantern
+            haiku={lanternHaiku}
+            rotationBase={rotationBase}
+            showActions={false}
+            bodyOnly
+            className={styles.previewLantern}
+            style={previewLanternBodyStyle(haiku.body)}
+            widthRem={LANTERN_WIDTH_REM}
+            ariaLabel={`Haiku lantern: ${haiku.title}`}
+          />
+        );
+
         return (
           <div
             key={haiku.id}
             className={styles.lanternStackItem}
             style={{
               zIndex: isHovered ? 20 : items.length - index,
-              transform: transformsMap[index as keyof typeof transformsMap]
+              transform:
+                offsetRem === 0
+                  ? baseTransform
+                  : `${baseTransform} translateX(${offsetRem}rem)`,
             }}
             onMouseEnter={() => setHovered(index)}
           >
-            <LanternFrame
-              ariaLabel={`Haiku lantern: ${haiku.title}`}
-              className={styles.lanternFrame}
-              widthRem={LANTERN_WIDTH_REM}
-            >
-              <Lantern
-                haiku={{
-                  id: haiku.id,
-                  title: haiku.title,
-                  titleSuffix: 0,
-                  body: haiku.body,
-                  createdAt: "",
-                  accountId,
-                  createdById: "",
-                  labels: [],
-                }}
-                showActions={false}
-                bodyOnly
-                className={styles.previewLantern}
-                style={previewLanternBodyStyle(haiku.body)}
-              />
-            </LanternFrame>
+            {rotationBase ? (
+              lantern
+            ) : (
+              <LanternFrame
+                ariaLabel={`Haiku lantern: ${haiku.title}`}
+                className={styles.lanternFrame}
+                widthRem={LANTERN_WIDTH_REM}
+              >
+                {lantern}
+              </LanternFrame>
+            )}
           </div>
         );
       })}

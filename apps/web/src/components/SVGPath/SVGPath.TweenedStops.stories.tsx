@@ -31,13 +31,13 @@ import {
   makeMockHaiku,
   STORY_CREATED_AT,
   WISDOM_FOREST_BODIES,
+  withMockAuthentication,
   withQueryClient,
   withThemedStoryStage,
 } from "@/storybook";
 import { Lantern } from "@/components/Lantern/Lantern";
 import lanternStyles from "@/components/Lantern/Lantern.module.css";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
-import { LanternRotated } from "@/components/Lantern/LanternRotated";
 import {
   lanternTransformToCssVars,
   type LanternTransform,
@@ -140,9 +140,9 @@ function PathStopLanternView({
       style={anchorStyle}
       aria-label={`Haiku lantern: ${haiku.title}`}
     >
-      <LanternRotated
+      <Lantern
         haiku={haiku}
-        variant={face.variant}
+        rotationBase={face.variant}
         mirrored={face.mirrored}
         showActions={false}
         widthRem={WIDTH_REM}
@@ -378,7 +378,9 @@ const meta: Meta = {
     layout: "fullscreen",
     initialCelestialPreset: "blueNight" satisfies CelestialPresetName,
   },
-  decorators: [composeDecorators(withQueryClient, withThemedStoryStage)],
+  decorators: [
+    composeDecorators(withQueryClient, withMockAuthentication, withThemedStoryStage),
+  ],
 };
 
 export default meta;

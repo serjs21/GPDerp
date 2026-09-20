@@ -1,4 +1,4 @@
-import type { LanternRotatedVariantId } from "@/components/Lantern/lanternRotatedContent.config";
+import type { LanternRotatedVariantId } from "@/components/Lantern/consts/rotationBaseConsts";
 import { SVG_PATH_FOCUS_STOP, type ParsedSplitPathSvg } from "@/components/SVGPath/utils";
 
 export type StopFace =

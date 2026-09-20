@@ -7,6 +7,7 @@ import {
   EXAMPLE_HAIKU_BODY,
   makeMockHaiku,
   STORY_CREATED_AT,
+  withMockAuthentication,
   withQueryClient,
   withThemedStoryStage,
 } from "@/storybook";
@@ -27,7 +28,9 @@ const meta: Meta<typeof Lantern> = {
     layout: "fullscreen",
     initialCelestialPreset: "blueNight" satisfies CelestialPresetName,
   },
-  decorators: [composeDecorators(withQueryClient, withThemedStoryStage)],
+  decorators: [
+    composeDecorators(withQueryClient, withMockAuthentication, withThemedStoryStage),
+  ],
 };
 
 export default meta;
@@ -281,5 +284,64 @@ export const FlightPathStops: StoryObj<LanternPathStoryArgs> = {
       haikus={fixtureHaikus.concat(fixtureHaikus).slice(0, haikuCount)}
       showGuides
     />
+  ),
+};
+
+const ROTATED_DEMO_HAIKU = makeMockHaiku({
+  id: "lantern-rotated-demo",
+  title: "Night questions",
+  body: EXAMPLE_HAIKU_BODY,
+  createdAt: STORY_CREATED_AT,
+});
+
+export const RotatedBase: Story = {
+  name: "Rotated base (lantern_base_rotated)",
+  render: () => (
+    <div className={styles.stage}>
+      <Lantern
+        rotationBase="rotated"
+        haiku={ROTATED_DEMO_HAIKU}
+        showActions
+      />
+    </div>
+  ),
+};
+
+export const RotatedBase2: Story = {
+  name: "Rotated base 2 (lanter-base-rotated-2)",
+  render: () => (
+    <div className={styles.stage}>
+      <Lantern
+        rotationBase="rotated2"
+        haiku={ROTATED_DEMO_HAIKU}
+        showActions
+      />
+    </div>
+  ),
+};
+
+export const RotatedBoth: Story = {
+  name: "Rotated bases side by side",
+  render: () => (
+    <div className={styles.labelsStage}>
+      <div className={styles.labelsSample}>
+        <Lantern
+          rotationBase="rotated"
+          haiku={ROTATED_DEMO_HAIKU}
+          showActions
+          widthRem={14}
+        />
+        <p className={styles.labelsCaption}>lantern_base_rotated</p>
+      </div>
+      <div className={styles.labelsSample}>
+        <Lantern
+          rotationBase="rotated2"
+          haiku={ROTATED_DEMO_HAIKU}
+          showActions
+          widthRem={14}
+        />
+        <p className={styles.labelsCaption}>lanter-base-rotated-2</p>
+      </div>
+    </div>
   ),
 };

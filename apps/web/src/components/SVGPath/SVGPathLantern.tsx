@@ -5,7 +5,6 @@ import type { HaikuDto } from "@/api/haikus";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternDeleteExit } from "@/components/Lantern/LanternDeleteExit";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
-import { LanternRotated } from "@/components/Lantern/LanternRotated";
 import lanternStyles from "@/components/Lantern/Lantern.module.css";
 import {
   lanternTransformToCssVars,
@@ -173,9 +172,9 @@ export function SVGPathLantern({
                 isAnimating={isAnimating}
                 ariaLabel={ariaLabel}
               >
-                <LanternRotated
+                <Lantern
                   haiku={haiku}
-                  variant={face.variant}
+                  rotationBase={face.variant}
                   mirrored={face.mirrored}
                   showActions={showActions}
                   actionsAlwaysVisible={actionsAlwaysVisible}
@@ -222,9 +221,9 @@ export function SVGPathLantern({
         isAnimating={isAnimating}
         ariaLabel={ariaLabel}
       >
-        <LanternRotated
+        <Lantern
           generatingDraft={generatingDraft}
-          variant={face.variant}
+          rotationBase={face.variant}
           mirrored={face.mirrored}
           showActions={showActions}
           actionsAlwaysVisible={actionsAlwaysVisible}

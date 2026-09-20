@@ -1,14 +1,11 @@
 export { Lantern, type LanternProps, type LanternTransform } from "./Lantern";
 export { LanternFrame, type LanternFrameProps } from "./LanternFrame";
 export {
-  LanternRotated,
-  type LanternRotatedProps,
-} from "./LanternRotated";
-export {
   LanternActionsDockProvider,
   useLanternActionsDock,
 } from "./LanternActionsDockContext";
 export {
+  getRotationBaseTransform,
   LANTERN_ROTATED_CONTENT,
   LANTERN_ROTATED_CONTENT_HEIGHT_PCT,
   LANTERN_ROTATED_CONTENT_INSET,
@@ -17,7 +14,7 @@ export {
   lanternRotatedContentTransform,
   type LanternRotatedContentTransform,
   type LanternRotatedVariantId,
-} from "./lanternRotatedContent.config";
+} from "./consts/rotationBaseConsts";
 export { LabelBelt, toLabelBeltItems, type LabelBeltItem, type LabelBeltProps } from "./LabelBelt";
 export {
   LanternPath,
