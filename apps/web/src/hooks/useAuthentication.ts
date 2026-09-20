@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { AccountToUserObject, UserObject } from "@/types";
 import Cookies from "js-cookie";
 import { decodeJwt } from "jose";
+import { refreshAuthSession } from "@/authRefresh";
 import { AUTH_REQUIRED_EVENT } from "@/axios.setup";
 
 type AuthMeResponse = {
@@ -164,8 +165,7 @@ export const useAuthentication = (): AuthenticationResult => {
     const jwtState = checkJWTAuthentication();
     if (!jwtState.valid) {
       if (jwtState.shouldAttemptRefresh) {
-        axios
-          .post("/auth/refresh")
+        refreshAuthSession()
           .then(fetchAuthUser)
           .catch(() => setLoggedOut());
       } else {
@@ -175,7 +175,9 @@ export const useAuthentication = (): AuthenticationResult => {
     }
 
     if (jwtState.shouldRefreshForMissingClaims) {
-      axios.post("/auth/refresh").then(fetchAuthUser).catch(() => fetchAuthUser());
+      refreshAuthSession({ force: true })
+        .then(fetchAuthUser)
+        .catch(() => fetchAuthUser());
       return;
     }
     fetchAuthUser();
@@ -199,4 +201,3 @@ export const useAuthentication = (): AuthenticationResult => {
 
   return { ...authenticationState, isLoggedIn: !!authenticationState?.user?.id, logout, checkAuthentication };
 };
-

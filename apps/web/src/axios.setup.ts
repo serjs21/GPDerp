@@ -2,6 +2,7 @@ import axios from "axios";
 import type { AxiosRequestConfig } from "axios";
 import { getTabId } from "./utils/tabId";
 import Cookies from "js-cookie";
+import { refreshAuthSession } from "./authRefresh";
 import {
   enqueueAuthRequest,
   shouldEnqueueAuthRequest,
@@ -79,8 +80,6 @@ axios.interceptors.request.use((config) => {
 });
 
 // Ensure consecutive requests stay authenticated by transparently refreshing once on 401.
-let refreshInFlight: Promise<void> | null = null;
-
 axios.interceptors.response.use(
   (response) => response,
   async (err) => {
@@ -112,16 +111,9 @@ axios.interceptors.response.use(
     originalConfig._retry = true;
 
     try {
-      if (!refreshInFlight) {
-        refreshInFlight = axios.post("/auth/refresh").then(() => undefined).finally(() => {
-          refreshInFlight = null;
-        });
-      }
-
-      await refreshInFlight;
+      await refreshAuthSession();
       return axios(originalConfig);
     } catch (refreshErr) {
-      refreshInFlight = null;
       return handleAuthRequired(refreshErr, originalConfig);
     }
   },
