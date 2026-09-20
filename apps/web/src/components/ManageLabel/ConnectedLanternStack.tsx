@@ -25,9 +25,9 @@ function previewLanternBodyStyle(body: string) {
 
 
 const transformsMap = {
-  0: `translate(-90%, -65%) `,
-  1: `translate(-15%, -70%) scale(0.5)`,
-  2: `translate(-5%, -25%) scale(0.2)`,
+  0: `translate(-50%, -60%) `,
+  1: `translate(-125%, -65%) scale(0.5)`,
+  2: `translate(10%, -75%) scale(0.2)`,
 }
 
 function fanOffsetRem(index: number, hovered: number | null, count: number): number {

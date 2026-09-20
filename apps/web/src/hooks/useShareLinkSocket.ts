@@ -46,6 +46,9 @@ export function useShareLinkSocket(
   enabled: boolean,
   { onShareLink, onShareLinkDeleted }: UseShareLinkSocketOptions = {},
 ) {
+  // #region agent log
+  fetch('http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'ab780c'},body:JSON.stringify({sessionId:'ab780c',runId:'pre-fix',hypothesisId:'A',location:'useShareLinkSocket.ts:entry',message:'useShareLinkSocket called',data:{enabled},timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
   const queryClient = useQueryClient();
   const { isLoggedIn } = useAuthenticationState();
   const active = Boolean(enabled && isLoggedIn);
