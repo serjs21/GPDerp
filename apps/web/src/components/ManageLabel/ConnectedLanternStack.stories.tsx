@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import type { ReactNode } from "react";
 import type { LabelConnectedHaikuPreview } from "@/api/labels";
-import { ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
 import { ConnectedHaikusPanel } from "./ConnectedHaikusPanel";
 import { ConnectedLanternStack } from "./ConnectedLanternStack";
 import manageStyles from "./ManageLabel.module.css";
@@ -27,45 +26,29 @@ const DEMO_ITEMS: LabelConnectedHaikuPreview[] = [
 ];
 
 /**
- * Same strip flex context as ManageLabel on /settings?tab=labels:
- * label | connected haikus | delete — so the connected panel gets production width.
+ * Wide/tall enough for the triple fan (center + left rotated + right mini)
+ * to stay inside the connected comic panel border with padding.
  */
-function SettingsLabelsStripStage({
-  children,
-}: {
-  children: ReactNode;
-}) {
+function ConnectedPanelStage({ children }: { children: ReactNode }) {
   return (
     <div
       style={{
         boxSizing: "border-box",
-        width: "min(42rem, 96vw)",
-        padding: "1.5rem",
+        width: "42rem",
+        padding: "2rem",
         background: "#d8d2c8",
       }}
     >
-      <ComicPageRow className={manageStyles.strip}>
-        <ComicPagePanel
-          background="solid"
-          color="white"
-          overflowVisible
-          flexWeight={1}
-          className={manageStyles.labelPanel}
-          ariaLabel="Label preview"
-        >
-          <div className={manageStyles.labelPreview} />
-        </ComicPagePanel>
-        <div className={[manageStyles.overlaySlot, manageStyles.overlaySlotFan].join(" ")}>
-          {children}
-        </div>
-        <ComicPagePanel
-          background="solid"
-          color="white"
-          flexWeight={1}
-          className={manageStyles.actionSlot}
-          ariaLabel="Delete action"
-        />
-      </ComicPageRow>
+      <div
+        style={{
+          display: "flex",
+          width: "100%",
+          minHeight: "22rem",
+        }}
+        className={manageStyles.strip}
+      >
+        {children}
+      </div>
     </div>
   );
 }
@@ -79,9 +62,9 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <SettingsLabelsStripStage>
+      <ConnectedPanelStage>
         <Story />
-      </SettingsLabelsStripStage>
+      </ConnectedPanelStage>
     ),
   ],
 } satisfies Meta<typeof ConnectedLanternStack>;
@@ -122,6 +105,16 @@ export const Pair: Story = {
 
 export const Triple: Story = {
   render: (args) => renderInConnectedPanel(args),
+  args: {
+    accountId: ACCOUNT_ID,
+    items: DEMO_ITEMS,
+  },
+};
+
+/** Three preview lanterns + overflow caption for a 10-haiku label. */
+export const TenWithMore: Story = {
+  name: "10 lanterns (+7 more)",
+  render: (args) => renderInConnectedPanel(args, 10),
   args: {
     accountId: ACCOUNT_ID,
     items: DEMO_ITEMS,

@@ -129,26 +129,25 @@ export function ShareLinkManagementRow({
       className={styles.previewLantern}
     />
   );
+  
+  const lanternStats = ctrl.active ? (
+    <PreviewLanternStats
+      hits={ctrl.hits}
+      time={ctrl.time}
+      hitsLabel={ctrl.hitsLabel}
+      timeLabel={ctrl.timeLabel}
+    />
+  ) : undefined;
 
   const lanternPanel = (
     <ComicPagePanel
       background="halftone"
       color="sky"
-      title={link.haikuSubject}
-      footer={
-        ctrl.active ? (
-          <PreviewLanternStats
-            hits={ctrl.hits}
-            time={ctrl.time}
-            hitsLabel={ctrl.hitsLabel}
-            timeLabel={ctrl.timeLabel}
-          />
-        ) : undefined
-      }
+      title={lanternStats}
       contentAlign="center"
       className={[
         styles.lanternPanel,
-        ctrl.grayscale ? shareStyles.panelShellInactive : shareStyles.panelShellActive,
+        ctrl.grayscale ? shareStyles.panelShelålInactive : shareStyles.panelShellActive,
       ].join(" ")}
     >
       <div className={styles.lanternWrap}>

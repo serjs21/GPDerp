@@ -24,9 +24,9 @@ function previewLanternBodyStyle(body: string) {
 }
 
 const transformsMap = {
-  0: `translate(-50%, -60%) `,
-  1: `translate(-175%, -65%) scale(0.5)`,
-  2: `translate(75%, -75%) scale(0.2)`,
+  0: `translate(-50%, -50%)`,
+  1: `translate(-175%, -55%) scale(0.5)`,
+  2: `translate(75%, -65%) scale(0.2)`,
 };
 
 const rotationMap: Record<number, LanternRotatedVariantId | undefined> = {
