@@ -23,6 +23,13 @@ function previewLanternBodyStyle(body: string) {
   } as CSSProperties;
 }
 
+
+const transformsMap = {
+  0: `translate(-90%, -65%) `,
+  1: `translate(-15%, -70%) scale(0.5)`,
+  2: `translate(-5%, -25%) scale(0.2)`,
+}
+
 function fanOffsetRem(index: number, hovered: number | null, count: number): number {
   if (hovered == null || index === hovered || count < 2) return 0;
   const others = Array.from({ length: count }, (_, i) => i).filter((i) => i !== hovered);
@@ -76,7 +83,7 @@ export function ConnectedLanternStack({ accountId, items }: ConnectedLanternStac
             className={styles.lanternStackItem}
             style={{
               zIndex: isHovered ? 20 : items.length - index,
-              transform: `translate(-50%, -50%) translateX(${offsetRem}rem)`,
+              transform: transformsMap[index as keyof typeof transformsMap]
             }}
             onMouseEnter={() => setHovered(index)}
           >

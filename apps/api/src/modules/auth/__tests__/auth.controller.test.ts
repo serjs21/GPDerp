@@ -36,11 +36,25 @@ jest.mock("../repository", () => ({
   },
 }));
 
+jest.mock("../debugAuthLog", () => ({
+  isDebugAuthLoggingEnabled: jest.fn(() => true),
+  recordDebugAuthLog: jest.fn(async () => undefined),
+}));
+
 const { authService } = jest.requireMock("../auth.service") as {
   authService: {
     verifyEmail: jest.Mock;
     loginGoogleForLoginFlow: jest.Mock;
+    refresh: jest.Mock;
   };
+};
+
+const { recordDebugAuthLog } = jest.requireMock("../debugAuthLog") as {
+  recordDebugAuthLog: jest.Mock;
+};
+
+const { tokenService } = jest.requireMock("../tokenService") as {
+  tokenService: { clearAuthCookies: jest.Mock; setAuthCookies: jest.Mock };
 };
 
 describe("auth.controller", () => {
@@ -120,6 +134,57 @@ describe("auth.controller", () => {
       lastName: "User",
       avatar: "https://avatar.example/new-user.png",
     });
+    await app.close();
+  });
+
+  it("records a debug auth log when refresh cookie is missing", async () => {
+    const app = await buildApp();
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/auth/refresh",
+      headers: {
+        cookie: "csrf_token=test-csrf",
+        "x-csrf-token": "test-csrf",
+      },
+    });
+
+    expect(response.statusCode).toBe(401);
+    expect(tokenService.clearAuthCookies).toHaveBeenCalled();
+    expect(recordDebugAuthLog).toHaveBeenCalledWith(
+      expect.objectContaining({
+        source: "api",
+        event: "cookies_cleared",
+        reason: "refresh_cookie_missing",
+      }),
+      expect.anything(),
+    );
+    await app.close();
+  });
+
+  it("accepts client debug auth log posts when enabled", async () => {
+    const app = await buildApp();
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/auth/debug-auth-log",
+      payload: {
+        reason: "refresh_failed",
+        message: "auth: refreshAuthSession failed after API 401",
+        event: "client_auth_required",
+        detail: { originalUrl: "/haiku" },
+      },
+    });
+
+    expect(response.statusCode).toBe(204);
+    expect(recordDebugAuthLog).toHaveBeenCalledWith(
+      expect.objectContaining({
+        source: "web",
+        reason: "refresh_failed",
+        event: "client_auth_required",
+      }),
+      expect.anything(),
+    );
     await app.close();
   });
 });

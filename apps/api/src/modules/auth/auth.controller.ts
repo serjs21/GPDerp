@@ -8,7 +8,12 @@ import { userService } from "../user/user.service";
 import { tokenService } from "./tokenService";
 import { isAuthError } from "./errors";
 import { safeEqual } from "./utils";
-import { verifyAccessTokenFromRequest } from "./verifyAccessToken";
+import { diagnoseAccessTokenFromRequest } from "./verifyAccessToken";
+import {
+  isDebugAuthLoggingEnabled,
+  recordDebugAuthLog,
+  type DebugAuthLogInput,
+} from "./debugAuthLog";
 
 const authPluginImpl = async (app: FastifyInstance) => {
   await app.register(cookie);
@@ -60,23 +65,64 @@ const authPluginImpl = async (app: FastifyInstance) => {
     return reply.code(400).send({ ok: false, error: AUTH_MESSAGES.invalidAuthRequest });
   };
 
-  const denyWithAuthCookiesCleared = (reply: FastifyReply, statusCode = 401) => {
+  const denyWithAuthCookiesCleared = (
+    request: FastifyRequest,
+    reply: FastifyReply,
+    meta: {
+      reason: string;
+      message: string;
+      userId?: string | null;
+      sessionId?: string | null;
+      detail?: DebugAuthLogInput["detail"];
+    },
+    statusCode = 401,
+  ) => {
+    void recordDebugAuthLog(
+      {
+        source: "api",
+        event: "cookies_cleared",
+        reason: meta.reason,
+        message: meta.message,
+        userId: meta.userId,
+        sessionId: meta.sessionId,
+        requestPath: request.routeOptions.url,
+        method: request.method,
+        ip: request.ip,
+        userAgent: typeof request.headers["user-agent"] === "string"
+          ? request.headers["user-agent"]
+          : null,
+        tabId:
+          typeof request.headers["x-tab-id"] === "string" ? request.headers["x-tab-id"] : null,
+        detail: meta.detail,
+      },
+      app.log,
+    );
     tokenService.clearAuthCookies(reply);
     reply.code(statusCode).send({ ok: false, error: AUTH_MESSAGES.unauthorized });
   };
 
   // Route guard for session-style endpoints (401 when not logged in).
   const authenticate = async (request: FastifyRequest, reply: FastifyReply) => {
-    const ok = await verifyAccessTokenFromRequest(request);
-    if (ok) return;
-    return denyWithAuthCookiesCleared(reply, 401);
+    const result = await diagnoseAccessTokenFromRequest(request);
+    if (result.ok) return;
+    return denyWithAuthCookiesCleared(request, reply, {
+      reason: result.reason,
+      message: `auth: access denied — ${result.reason}`,
+      userId: result.userId,
+      sessionId: result.sessionId,
+    });
   };
 
   // Guard for resources that require a logged-in user (401 when not authenticated).
   const requireAuthenticated = async (request: FastifyRequest, reply: FastifyReply) => {
-    const ok = await verifyAccessTokenFromRequest(request);
-    if (ok) return;
-    return denyWithAuthCookiesCleared(reply, 401);
+    const result = await diagnoseAccessTokenFromRequest(request);
+    if (result.ok) return;
+    return denyWithAuthCookiesCleared(request, reply, {
+      reason: result.reason,
+      message: `auth: access denied — ${result.reason}`,
+      userId: result.userId,
+      sessionId: result.sessionId,
+    });
   };
 
   app.decorate("authenticate", authenticate);
@@ -103,13 +149,22 @@ const authPluginImpl = async (app: FastifyInstance) => {
       request.headers.origin &&
       request.headers.origin !== expectedWebOrigin
     ) {
-      tokenService.clearAuthCookies(reply);
-      return reply.code(401).send({ ok: false, error: AUTH_MESSAGES.unauthorized });
+      return denyWithAuthCookiesCleared(request, reply, {
+        reason: "csrf_origin",
+        message: "auth: cookies cleared — Origin mismatch on CSRF-protected route",
+        detail: { origin: request.headers.origin, expectedWebOrigin },
+      });
     }
 
     if (!csrfCookie || !csrfHeader || !safeEqual(csrfCookie, csrfHeader)) {
-      tokenService.clearAuthCookies(reply);
-      return reply.code(401).send({ ok: false, error: AUTH_MESSAGES.unauthorized });
+      return denyWithAuthCookiesCleared(request, reply, {
+        reason: "csrf_mismatch",
+        message: "auth: cookies cleared — CSRF cookie/header mismatch",
+        detail: {
+          hasCsrfCookie: Boolean(csrfCookie),
+          hasCsrfHeader: Boolean(csrfHeader),
+        },
+      });
     }
   };
 
@@ -251,8 +306,10 @@ const authPluginImpl = async (app: FastifyInstance) => {
   app.post("/auth/refresh", { preHandler: [requireCsrf] }, async (request: FastifyRequest, reply: FastifyReply) => {
     const refreshToken = request.cookies[AUTH_COOKIE_NAMES.refreshToken];
     if (!refreshToken) {
-      tokenService.clearAuthCookies(reply);
-      return reply.code(401).send({ ok: false, error: AUTH_MESSAGES.unauthorized });
+      return denyWithAuthCookiesCleared(request, reply, {
+        reason: "refresh_cookie_missing",
+        message: "auth: refresh rejected — refresh_token cookie missing",
+      });
     }
     try {
       const tokens = await authService.refresh(app, refreshToken);
@@ -263,6 +320,7 @@ const authPluginImpl = async (app: FastifyInstance) => {
       });
       return reply.send({ ok: true });
     } catch {
+      // Service already wrote debug_auth_logs for the rejection reason.
       tokenService.clearAuthCookies(reply);
       return reply.code(401).send({ ok: false, error: AUTH_MESSAGES.unauthorized });
     }
@@ -274,9 +332,51 @@ const authPluginImpl = async (app: FastifyInstance) => {
     return reply.send({ ok: true });
   });
 
+  app.post("/auth/debug-auth-log", async (request: FastifyRequest, reply: FastifyReply) => {
+    if (!isDebugAuthLoggingEnabled()) {
+      return reply.code(204).send();
+    }
+    const body = (request.body as Partial<DebugAuthLogInput> | undefined) ?? {};
+    const reason = typeof body.reason === "string" ? body.reason.trim() : "";
+    const message = typeof body.message === "string" ? body.message.trim() : "";
+    const event = typeof body.event === "string" ? body.event.trim() : "client_auth_required";
+    if (!reason || !message) {
+      return reply.code(400).send({ ok: false, error: "reason and message are required" });
+    }
+    await recordDebugAuthLog(
+      {
+        source: "web",
+        event,
+        reason,
+        message,
+        userId: typeof body.userId === "string" ? body.userId : null,
+        sessionId: typeof body.sessionId === "string" ? body.sessionId : null,
+        requestPath: typeof body.requestPath === "string" ? body.requestPath : null,
+        method: typeof body.method === "string" ? body.method : null,
+        ip: request.ip,
+        userAgent:
+          typeof request.headers["user-agent"] === "string" ? request.headers["user-agent"] : null,
+        tabId:
+          typeof body.tabId === "string"
+            ? body.tabId
+            : typeof request.headers["x-tab-id"] === "string"
+              ? request.headers["x-tab-id"]
+              : null,
+        detail: (body.detail as DebugAuthLogInput["detail"]) ?? null,
+      },
+      app.log,
+    );
+    return reply.code(204).send();
+  });
+
   app.get("/auth/me", { preHandler: [app.authenticate] }, async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      if (!request.user) return denyWithAuthCookiesCleared(reply, 401);
+      if (!request.user) {
+        return denyWithAuthCookiesCleared(request, reply, {
+          reason: "unauthenticated_me",
+          message: "auth: /auth/me denied — request.user missing after authenticate",
+        });
+      }
       const me = await authService.me(app, request.user.sub);
       return reply.send({ ok: true, data: me });
     } catch {

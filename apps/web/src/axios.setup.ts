@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { AxiosRequestConfig } from "axios";
+import type { AxiosError, AxiosRequestConfig } from "axios";
 import { getTabId } from "./utils/tabId";
 import Cookies from "js-cookie";
 import { refreshAuthSession } from "./authRefresh";
@@ -12,6 +12,17 @@ import {
 export const TAB_HEADER_KEY = "x-tab-id";
 export const AUTH_REQUIRED_EVENT = "gpderp:auth-required";
 
+export type AuthRequiredDetail = {
+  reason: string;
+  message: string;
+  originalUrl?: string;
+  method?: string;
+  status?: number;
+  refreshFailed?: boolean;
+  tabId?: string;
+  detail?: Record<string, unknown>;
+};
+
 export {
   AuthRequiredError,
   cancelAuthRequestQueue,
@@ -20,17 +31,32 @@ export {
   shouldEnqueueAuthRequest,
 } from "./authRequestQueue";
 
-const notifyAuthRequired = () => {
+export const notifyAuthRequired = (detail: AuthRequiredDetail) => {
   if (typeof window === "undefined") return;
-  window.dispatchEvent(new Event(AUTH_REQUIRED_EVENT));
+  window.dispatchEvent(
+    new CustomEvent<AuthRequiredDetail>(AUTH_REQUIRED_EVENT, {
+      detail: {
+        ...detail,
+        tabId: detail.tabId ?? getTabId(),
+      },
+    }),
+  );
 };
 
 /** Final 401 after refresh is exhausted: open login; hold non-GET mutations. */
 const handleAuthRequired = (
   err: unknown,
   originalConfig: AuthQueuedRequestConfig,
+  meta: Omit<AuthRequiredDetail, "originalUrl" | "method" | "status" | "tabId">,
 ) => {
-  notifyAuthRequired();
+  const axiosErr = err as AxiosError | undefined;
+  notifyAuthRequired({
+    ...meta,
+    originalUrl: String(originalConfig.url ?? ""),
+    method: originalConfig.method,
+    status: axiosErr?.response?.status,
+    tabId: getTabId(),
+  });
   if (shouldEnqueueAuthRequest(originalConfig)) {
     return enqueueAuthRequest(originalConfig);
   }
@@ -97,16 +123,26 @@ axios.interceptors.response.use(
 
     // Don't attempt refresh for the refresh/logout endpoint itself.
     if (url.startsWith("/auth/refresh") || url.startsWith("/auth/logout")) {
-      return handleAuthRequired(err, originalConfig);
+      return handleAuthRequired(err, originalConfig, {
+        reason: url.startsWith("/auth/refresh") ? "refresh_endpoint_401" : "logout_endpoint_401",
+        message: `auth: 401 on ${url} without retry`,
+        refreshFailed: url.startsWith("/auth/refresh"),
+      });
     }
 
     // Replayed requests that still 401 should not re-enter the queue.
     if (originalConfig._authReplay) {
-      return handleAuthRequired(err, originalConfig);
+      return handleAuthRequired(err, originalConfig, {
+        reason: "auth_replay_still_401",
+        message: "auth: replayed request still returned 401 after login",
+      });
     }
 
     if (originalConfig._retry) {
-      return handleAuthRequired(err, originalConfig);
+      return handleAuthRequired(err, originalConfig, {
+        reason: "retry_still_401",
+        message: "auth: request still 401 after refresh retry",
+      });
     }
     originalConfig._retry = true;
 
@@ -114,7 +150,14 @@ axios.interceptors.response.use(
       await refreshAuthSession();
       return axios(originalConfig);
     } catch (refreshErr) {
-      return handleAuthRequired(refreshErr, originalConfig);
+      return handleAuthRequired(refreshErr, originalConfig, {
+        reason: "refresh_failed",
+        message: "auth: refreshAuthSession failed after API 401; clearing client session",
+        refreshFailed: true,
+        detail: {
+          failedRefreshUrl: "/auth/refresh",
+        },
+      });
     }
   },
 );

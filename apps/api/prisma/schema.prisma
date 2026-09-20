@@ -274,6 +274,29 @@ model RefreshToken {
   @@index([expiresAt])
 }
 
+/// Dev/staging auth-drop diagnostics. Inserts are gated off in production.
+model DebugAuthLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  createdAt   DateTime @default(now())
+  source      String
+  event       String
+  reason      String
+  message     String
+  userId      String?  @db.Uuid
+  sessionId   String?  @db.Uuid
+  requestPath String?
+  method      String?
+  ip          String?
+  userAgent   String?
+  tabId       String?
+  detail      Json?
+
+  @@index([createdAt])
+  @@index([reason])
+  @@index([userId])
+  @@map("debug_auth_logs")
+}
+
 model EmailActionToken {
   id            String          @id @default(uuid()) @db.Uuid
   userId        String          @db.Uuid

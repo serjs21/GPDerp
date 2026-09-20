@@ -27,15 +27,26 @@ export function readCookieValue(
   return undefined;
 }
 
+export type AccessTokenDiagnoseResult =
+  | { ok: true; userId: string; sessionId: string }
+  | {
+      ok: false;
+      reason: "access_token_missing" | "access_token_invalid" | "session_inactive";
+      userId?: string;
+      sessionId?: string;
+    };
+
 /**
  * Verifies the access JWT from cookies and checks the session is still active.
  * Safe to call from HTTP and WebSocket handshake requests.
  */
-export async function verifyAccessTokenFromRequest(request: FastifyRequest): Promise<boolean> {
+export async function diagnoseAccessTokenFromRequest(
+  request: FastifyRequest,
+): Promise<AccessTokenDiagnoseResult> {
   const token =
     request.cookies?.[AUTH_COOKIE_NAMES.accessToken] ??
     readCookieValue(request.headers.cookie, AUTH_COOKIE_NAMES.accessToken);
-  if (!token) return false;
+  if (!token) return { ok: false, reason: "access_token_missing" };
 
   try {
     const { payload } = await jwtVerify(token, accessJwtSecret, {
@@ -46,14 +57,26 @@ export async function verifyAccessTokenFromRequest(request: FastifyRequest): Pro
     const sid = (payload as Record<string, unknown>).sid;
 
     if (typeof sub !== "string" || typeof sid !== "string") {
-      return false;
+      return { ok: false, reason: "access_token_invalid" };
     }
 
     const session = await authRepository.findActiveAuthSessionById(sid);
-    if (!session || session.userId !== sub) return false;
+    if (!session || session.userId !== sub) {
+      return {
+        ok: false,
+        reason: "session_inactive",
+        userId: sub,
+        sessionId: sid,
+      };
+    }
     request.user = { sub, sid };
-    return true;
+    return { ok: true, userId: sub, sessionId: sid };
   } catch {
-    return false;
+    return { ok: false, reason: "access_token_invalid" };
   }
+}
+
+export async function verifyAccessTokenFromRequest(request: FastifyRequest): Promise<boolean> {
+  const result = await diagnoseAccessTokenFromRequest(request);
+  return result.ok;
 }

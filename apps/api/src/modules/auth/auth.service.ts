@@ -22,6 +22,7 @@ import { sendVerificationEmail } from "./verificationEmail";
 import { resolveRequestCountryCode } from "../../utils/requestCountry";
 import { validateUsername } from "../../utils/usernameValidation";
 import { stripDangerousControlChars } from "../../utils/sqlSafeInput";
+import { recordDebugAuthLog } from "./debugAuthLog";
 
 type SessionMeta = {
   ip?: string;
@@ -480,13 +481,30 @@ export const authService = {
       currentToken.session.expiresAt <= now ||
       currentToken.expiresAt <= now
     ) {
-      logAuthFailure(app.log, "auth: refresh rejected — invalid, revoked, or expired session", {
-        reason: "refresh_token_invalid",
+      const detail = {
         found: Boolean(currentToken),
         revoked: currentToken?.session.revokedAt != null,
-        expired:
-          currentToken != null ? currentToken.session.expiresAt <= new Date() : undefined,
+        sessionExpired:
+          currentToken != null ? currentToken.session.expiresAt <= now : undefined,
+        refreshExpired: currentToken != null ? currentToken.expiresAt <= now : undefined,
+        revokeReason: currentToken?.session.revokeReason ?? null,
+      };
+      logAuthFailure(app.log, "auth: refresh rejected — invalid, revoked, or expired session", {
+        reason: "refresh_token_invalid",
+        ...detail,
       });
+      void recordDebugAuthLog(
+        {
+          source: "api",
+          event: "refresh_rejected",
+          reason: "refresh_token_invalid",
+          message: "auth: refresh rejected — invalid, revoked, or expired session",
+          userId: currentToken?.session.userId ?? null,
+          sessionId: currentToken?.sessionId ?? null,
+          detail,
+        },
+        app.log,
+      );
       throw unauthorizedError();
     }
 
@@ -503,11 +521,39 @@ export const authService = {
         sessionId: currentToken.sessionId,
         userId: currentToken.session.userId,
       });
+      void recordDebugAuthLog(
+        {
+          source: "api",
+          event: "refresh_rejected",
+          reason:
+            rotateResult.status === "reused"
+              ? "refresh_token_reuse"
+              : `refresh_rotate_${rotateResult.status}`,
+          message: `auth: refresh rejected — rotate status ${rotateResult.status}`,
+          userId: currentToken.session.userId,
+          sessionId: currentToken.sessionId,
+          detail: { rotateStatus: rotateResult.status },
+        },
+        app.log,
+      );
       throw unauthorizedError();
     }
 
     const user = await authRepository.findUserById(currentToken.session.userId);
-    if (!user) throw unauthorizedError();
+    if (!user) {
+      void recordDebugAuthLog(
+        {
+          source: "api",
+          event: "refresh_rejected",
+          reason: "user_not_found",
+          message: "auth: refresh rejected — user missing after rotate",
+          userId: currentToken.session.userId,
+          sessionId: currentToken.sessionId,
+        },
+        app.log,
+      );
+      throw unauthorizedError();
+    }
 
     const accessToken = await tokenService.createAccessToken({
       sub: currentToken.session.userId,
@@ -693,6 +739,17 @@ export const authService = {
 
     // Security-first default: force re-authentication across devices after password change.
     await authRepository.revokeAllSessionsForUser(token.userId, "password_reset");
+    void recordDebugAuthLog(
+      {
+        source: "api",
+        event: "sessions_revoked",
+        reason: "password_reset",
+        message: "auth: all sessions revoked after password reset confirm",
+        userId: token.userId,
+        detail: { revokeReason: "password_reset" },
+      },
+      app.log,
+    );
   },
 };
 

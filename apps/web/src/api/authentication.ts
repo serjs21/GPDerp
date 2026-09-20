@@ -26,3 +26,24 @@ export async function completeRegistrationUsername(body: { userName: string }): 
 export async function loginWithGoogleCredential(credential: string): Promise<void> {
   await axios.post("/auth/google/login", { token: credential });
 }
+
+export type PostDebugAuthLogBody = {
+  event?: string;
+  reason: string;
+  message: string;
+  userId?: string | null;
+  sessionId?: string | null;
+  requestPath?: string | null;
+  method?: string | null;
+  tabId?: string | null;
+  detail?: Record<string, unknown> | null;
+};
+
+/** Best-effort report of an involuntary client auth drop (no-ops / ignores errors). */
+export async function postDebugAuthLog(body: PostDebugAuthLogBody): Promise<void> {
+  try {
+    await axios.post("/auth/debug-auth-log", body);
+  } catch {
+    // Never block logout UX on diagnostics.
+  }
+}

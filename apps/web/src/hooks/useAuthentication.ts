@@ -1,12 +1,17 @@
 "use client";
 
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { AccountToUserObject, UserObject } from "@/types";
 import Cookies from "js-cookie";
 import { decodeJwt } from "jose";
+import { postDebugAuthLog } from "@/api/authentication";
 import { refreshAuthSession } from "@/authRefresh";
-import { AUTH_REQUIRED_EVENT } from "@/axios.setup";
+import {
+  AUTH_REQUIRED_EVENT,
+  type AuthRequiredDetail,
+} from "@/axios.setup";
+import { getTabId } from "@/utils/tabId";
 
 type AuthMeResponse = {
   ok: boolean;
@@ -61,7 +66,28 @@ const clearClientAuthCookies = () => {
   }
 };
 
+const reportInvoluntaryAuthDrop = (payload: {
+  reason: string;
+  message: string;
+  event?: string;
+  requestPath?: string | null;
+  method?: string | null;
+  detail?: Record<string, unknown> | null;
+}) => {
+  void postDebugAuthLog({
+    event: payload.event ?? "client_auth_required",
+    reason: payload.reason,
+    message: payload.message,
+    requestPath: payload.requestPath,
+    method: payload.method,
+    tabId: getTabId(),
+    detail: payload.detail,
+  });
+};
+
 export const useAuthentication = (): AuthenticationResult => {
+  const manualLogoutRef = useRef(false);
+
   const setLoggedOut = () => {
     setAuthenticationState(getUnauthenticatedState());
   };
@@ -137,6 +163,7 @@ export const useAuthentication = (): AuthenticationResult => {
   );
 
   const logout = async () => {
+    manualLogoutRef.current = true;
     try {
       await axios.post("/auth/logout");
     } catch {
@@ -144,19 +171,42 @@ export const useAuthentication = (): AuthenticationResult => {
     } finally {
       clearClientAuthCookies();
       setLoggedOut();
+      // Allow future involuntary drops to report again after a real logout.
+      window.setTimeout(() => {
+        manualLogoutRef.current = false;
+      }, 0);
     }
   };
 
   const fetchAuthUser = async () => {
     try {
       const result = await axios.get<AuthMeResponse>("/auth/me");
-      if (!result.data.ok) return setLoggedOut();
+      if (!result.data.ok) {
+        reportInvoluntaryAuthDrop({
+          reason: "auth_me_not_ok",
+          message: "auth: /auth/me returned ok:false; clearing client login state",
+          requestPath: "/auth/me",
+          method: "get",
+        });
+        return setLoggedOut();
+      }
       setAuthenticationState({
         initialized: true,
         user: result.data.data.user,
         account: result.data.data.account,
       });
-    } catch {
+    } catch (error) {
+      const status = axios.isAxiosError(error) ? error.response?.status : undefined;
+      // 401 already emits AUTH_REQUIRED_EVENT with a full payload.
+      if (status !== 401) {
+        reportInvoluntaryAuthDrop({
+          reason: "auth_me_failed",
+          message: "auth: /auth/me request failed; clearing client login state",
+          requestPath: "/auth/me",
+          method: "get",
+          detail: { status: status ?? null },
+        });
+      }
       setLoggedOut();
     }
   };
@@ -167,7 +217,10 @@ export const useAuthentication = (): AuthenticationResult => {
       if (jwtState.shouldAttemptRefresh) {
         refreshAuthSession()
           .then(fetchAuthUser)
-          .catch(() => setLoggedOut());
+          .catch(() => {
+            // Refresh 401 already emits AUTH_REQUIRED_EVENT.
+            setLoggedOut();
+          });
       } else {
         setLoggedOut();
       }
@@ -189,7 +242,22 @@ export const useAuthentication = (): AuthenticationResult => {
 
   // Stale session: 401 path clears client auth so UI matches the login modal.
   useEffect(() => {
-    const onAuthRequired = () => {
+    const onAuthRequired = (event: Event) => {
+      if (manualLogoutRef.current) return;
+      const detail = (event as CustomEvent<AuthRequiredDetail>).detail;
+      reportInvoluntaryAuthDrop({
+        reason: detail?.reason ?? "auth_required_event",
+        message:
+          detail?.message ??
+          "auth: AUTH_REQUIRED_EVENT received; clearing client cookies and login state",
+        requestPath: detail?.originalUrl,
+        method: detail?.method,
+        detail: {
+          status: detail?.status,
+          refreshFailed: detail?.refreshFailed,
+          ...(detail?.detail ?? {}),
+        },
+      });
       clearClientAuthCookies();
       setLoggedOut();
     };
