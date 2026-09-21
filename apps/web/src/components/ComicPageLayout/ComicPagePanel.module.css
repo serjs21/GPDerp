@@ -197,25 +197,25 @@
 
 .fineCloudBand {
   top: 0;
-  clip-path: inset(0 0 100% 0);
-  animation: fineCloudReveal 1s ease forwards;
+  transform: translateY(-100%);
+  animation: fineCloudSlideIn 1s ease forwards;
 }
 
 .fineFlameBand {
   bottom: 0;
-  clip-path: inset(100% 0 0 0);
-  animation: fineFlameReveal 1s ease forwards;
+  transform: translateY(100%);
+  animation: fineFlameSlideIn 1s ease forwards;
 }
 
-@keyframes fineCloudReveal {
+@keyframes fineCloudSlideIn {
   to {
-    clip-path: inset(0);
+    transform: translateY(0);
   }
 }
 
-@keyframes fineFlameReveal {
+@keyframes fineFlameSlideIn {
   to {
-    clip-path: inset(0);
+    transform: translateY(0);
   }
 }
 
@@ -403,6 +403,6 @@
   .fineCloudBand,
   .fineFlameBand {
     animation: none;
-    clip-path: inset(0);
+    transform: translateY(0);
   }
 }
