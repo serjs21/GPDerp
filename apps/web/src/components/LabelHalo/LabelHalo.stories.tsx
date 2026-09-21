@@ -1,11 +1,26 @@
+"use client";
+
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
+import type { CelestialPresetName } from "@/theme/celestialPresets";
+import {
+  composeDecorators,
+  EXAMPLE_HAIKU_BODY,
+  makeMockHaiku,
+  STORY_CREATED_AT,
+  withMockAuthentication,
+  withQueryClient,
+  withThemedStoryStage,
+} from "@/storybook";
+import { Lantern } from "@/components/Lantern/Lantern";
+import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { LabelHalo } from "./LabelHalo";
 import {
   DEFAULT_LABEL_HALO_CONNECTION_POINTS,
   type LabelHaloLabelItem,
   type LabelPlacement,
 } from "./consts/labelHaloConsts";
+import styles from "./LabelHalo.stories.module.css";
 
 const SAMPLE_LABELS: LabelHaloLabelItem[] = [
   {
@@ -39,14 +54,18 @@ const meta = {
   component: LabelHalo,
   tags: ["autodocs"],
   parameters: {
-    layout: "centered",
+    layout: "fullscreen",
+    initialCelestialPreset: "blueNight" satisfies CelestialPresetName,
   },
+  decorators: [
+    composeDecorators(withQueryClient, withMockAuthentication, withThemedStoryStage),
+  ],
 } satisfies Meta<typeof LabelHalo>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function HaloHost({
+function HaloLanternHost({
   initialLabels,
 }: {
   initialLabels: LabelHaloLabelItem[];
@@ -68,53 +87,44 @@ function HaloHost({
   };
 
   return (
-    <div
-      style={{
-        position: "relative",
-        width: "22rem",
-        height: "22rem",
-        background:
-          "radial-gradient(circle at 50% 45%, #3d5a80 0%, #1a2744 70%)",
-        borderRadius: "0.75rem",
-        border: "4px solid #111",
-      }}
-    >
-      <div
-        style={{
-          position: "absolute",
-          left: "50%",
-          top: "50%",
-          width: "4.5rem",
-          height: "7rem",
-          transform: "translate(-50%, -50%)",
-          borderRadius: "2rem 2rem 0.5rem 0.5rem",
-          background: "#c9a227",
-          border: "3px solid #111",
-          opacity: 0.85,
-        }}
-        aria-hidden
-      />
-      <LabelHalo
-        labels={labels}
-        connectionPoints={DEFAULT_LABEL_HALO_CONNECTION_POINTS}
-        onPlacementCommit={onPlacementCommit}
-        style={{ position: "absolute", inset: 0 }}
-      />
+    <div className={styles.stage}>
+      <div className={styles.host}>
+        <LanternFrame ariaLabel="Haiku lantern with label halo">
+          <Lantern
+            haiku={makeMockHaiku({
+              id: "lantern-label-halo",
+              title: "Night questions",
+              titleSuffix: 0,
+              body: EXAMPLE_HAIKU_BODY,
+              createdAt: STORY_CREATED_AT,
+              labels: [],
+            })}
+          />
+        </LanternFrame>
+        <div className={styles.haloOverlay}>
+          <LabelHalo
+            labels={labels}
+            connectionPoints={DEFAULT_LABEL_HALO_CONNECTION_POINTS}
+            onPlacementCommit={onPlacementCommit}
+            style={{ position: "absolute", inset: 0 }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
 
 export const Default: Story = {
-  render: () => <HaloHost initialLabels={SAMPLE_LABELS} />,
+  render: () => <HaloLanternHost initialLabels={SAMPLE_LABELS} />,
 };
 
 export const EmptyRing: Story = {
-  render: () => <HaloHost initialLabels={[]} />,
+  render: () => <HaloLanternHost initialLabels={[]} />,
 };
 
 export const SingleLabel: Story = {
   render: () => (
-    <HaloHost
+    <HaloLanternHost
       initialLabels={[
         {
           id: "solo",

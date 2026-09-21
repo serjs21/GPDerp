@@ -58,8 +58,10 @@
   color: #111;
   font-size: 0.85rem;
   line-height: 1;
-  cursor: pointer;
+  cursor: ew-resize;
+  touch-action: none;
   appearance: none;
+  user-select: none;
 }
 
 .arrowButton:hover,
@@ -71,6 +73,11 @@
 .arrowButton:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+.slotRotateDragging .arrowButton {
+  background: #ffe8a3;
+  cursor: ew-resize;
 }
 
 @media (prefers-reduced-motion: reduce) {

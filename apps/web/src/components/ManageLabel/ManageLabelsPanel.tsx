@@ -123,7 +123,6 @@ export function ManageLabelsPanel({
                 <p className={styles.empty}>
                   {debouncedQ ? "No labels found" : "No labels yet."}
                 </p>
-                {createPanel ? <div className={styles.createDock}>{createPanel}</div> : null}
               </div>
             ) : (
               <>

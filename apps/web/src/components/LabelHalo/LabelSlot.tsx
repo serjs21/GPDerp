@@ -20,6 +20,10 @@ import {
 } from "./consts/labelHaloConsts";
 import styles from "./LabelSlot.module.css";
 
+/** Horizontal pixels → degrees while dragging a rotation arrow. */
+const ROTATE_DRAG_DEG_PER_PX = 0.5;
+const ROTATE_DRAG_MOVE_THRESHOLD_PX = 3;
+
 export type LabelSlotProps = {
   id: string;
   name: string;
@@ -50,6 +54,15 @@ function mergeRefs<T>(...refs: Array<Ref<T> | undefined>) {
   };
 }
 
+type RotateDragSession = {
+  pointerId: number;
+  startX: number;
+  startDeg: number;
+  /** Click nudge direction when the pointer barely moves. */
+  clickDelta: number;
+  moved: boolean;
+};
+
 export function LabelSlot({
   id,
   name,
@@ -68,36 +81,46 @@ export function LabelSlot({
   dragAttributes,
 }: LabelSlotProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const draftRotateRef = useRef(rotateDeg);
+  const rotateDragRef = useRef<RotateDragSession | null>(null);
   const [draftRotateDeg, setDraftRotateDeg] = useState(rotateDeg);
   const [selected, setSelected] = useState(false);
+  const [isRotateDragging, setIsRotateDragging] = useState(false);
   const committedRef = useRef({ connectionPointId, rotateDeg });
 
   useEffect(() => {
+    draftRotateRef.current = rotateDeg;
     setDraftRotateDeg(rotateDeg);
     committedRef.current = { connectionPointId, rotateDeg };
   }, [connectionPointId, rotateDeg]);
 
   const preset = resolveComicLabelShapePreset(shape);
-  const showArrows = Boolean(activeProp) || selected || isDragging;
-  const placement: LabelPlacement = {
-    connectionPointId,
-    rotateDeg: draftRotateDeg,
-  };
+  const showArrows =
+    Boolean(activeProp) || selected || isDragging || isRotateDragging;
 
   const commitIfChanged = () => {
+    const next = {
+      connectionPointId,
+      rotateDeg: draftRotateRef.current,
+    };
     const prev = committedRef.current;
     if (
-      prev.connectionPointId === placement.connectionPointId &&
-      prev.rotateDeg === placement.rotateDeg
+      prev.connectionPointId === next.connectionPointId &&
+      prev.rotateDeg === next.rotateDeg
     ) {
       return;
     }
-    committedRef.current = placement;
-    onPlacementCommit?.(placement);
+    committedRef.current = next;
+    onPlacementCommit?.(next);
+  };
+
+  const setDraft = (next: number) => {
+    draftRotateRef.current = next;
+    setDraftRotateDeg(next);
   };
 
   const nudge = (delta: number) => {
-    setDraftRotateDeg((current) => current + delta);
+    setDraft(draftRotateRef.current + delta);
     setSelected(true);
   };
 
@@ -122,8 +145,44 @@ export function LabelSlot({
     }
   };
 
-  const stopDragStart = (event: PointerEvent) => {
-    event.stopPropagation();
+  const onArrowPointerDown =
+    (clickDelta: number) => (event: PointerEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      event.preventDefault();
+      if (disabled) return;
+      event.currentTarget.setPointerCapture(event.pointerId);
+      rotateDragRef.current = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startDeg: draftRotateRef.current,
+        clickDelta,
+        moved: false,
+      };
+      setSelected(true);
+      setIsRotateDragging(true);
+    };
+
+  const onArrowPointerMove = (event: PointerEvent<HTMLButtonElement>) => {
+    const drag = rotateDragRef.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    const dx = event.clientX - drag.startX;
+    if (Math.abs(dx) >= ROTATE_DRAG_MOVE_THRESHOLD_PX) {
+      drag.moved = true;
+    }
+    setDraft(drag.startDeg + dx * ROTATE_DRAG_DEG_PER_PX);
+  };
+
+  const endArrowPointer = (event: PointerEvent<HTMLButtonElement>) => {
+    const drag = rotateDragRef.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    if (!drag.moved) {
+      nudge(drag.clickDelta);
+    }
+    rotateDragRef.current = null;
+    setIsRotateDragging(false);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
   };
 
   return (
@@ -134,6 +193,7 @@ export function LabelSlot({
         styles.slot,
         showArrows ? styles.slotActive : "",
         isDragging ? styles.slotDragging : "",
+        isRotateDragging ? styles.slotRotateDragging : "",
         className,
       ]
         .filter(Boolean)
@@ -172,13 +232,12 @@ export function LabelSlot({
           type="button"
           className={styles.arrowButton}
           tabIndex={showArrows && !disabled ? 0 : -1}
-          aria-label="Rotate left"
+          aria-label="Rotate left — drag horizontally to adjust"
           disabled={disabled}
-          onPointerDown={stopDragStart}
-          onClick={(event) => {
-            event.stopPropagation();
-            nudge(-LABEL_SLOT_ROTATE_STEP_DEG);
-          }}
+          onPointerDown={onArrowPointerDown(-LABEL_SLOT_ROTATE_STEP_DEG)}
+          onPointerMove={onArrowPointerMove}
+          onPointerUp={endArrowPointer}
+          onPointerCancel={endArrowPointer}
         >
           ↺
         </button>
@@ -186,13 +245,12 @@ export function LabelSlot({
           type="button"
           className={styles.arrowButton}
           tabIndex={showArrows && !disabled ? 0 : -1}
-          aria-label="Rotate right"
+          aria-label="Rotate right — drag horizontally to adjust"
           disabled={disabled}
-          onPointerDown={stopDragStart}
-          onClick={(event) => {
-            event.stopPropagation();
-            nudge(LABEL_SLOT_ROTATE_STEP_DEG);
-          }}
+          onPointerDown={onArrowPointerDown(LABEL_SLOT_ROTATE_STEP_DEG)}
+          onPointerMove={onArrowPointerMove}
+          onPointerUp={endArrowPointer}
+          onPointerCancel={endArrowPointer}
         >
           ↻
         </button>
