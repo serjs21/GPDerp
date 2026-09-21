@@ -201,6 +201,71 @@ function LanternWithHalo({
   );
 }
 
+function RotatedLanternWithHalo({
+  haiku,
+  transform,
+  flightStyle,
+  suppressReveal,
+  isAnimating,
+  ariaLabel,
+  face,
+  excludeLabelIds,
+  interactive,
+  showActions,
+  actionsAlwaysVisible,
+  onDelete,
+  onChanged,
+}: {
+  haiku: HaikuDto;
+  transform: LanternTransform;
+  flightStyle?: CSSProperties;
+  suppressReveal: boolean;
+  isAnimating: boolean;
+  ariaLabel: string;
+  face: Extract<StopFace, { kind: "rotated" }>;
+  excludeLabelIds?: string[];
+  interactive: boolean;
+  showActions: boolean;
+  actionsAlwaysVisible?: boolean;
+  onDelete?: () => Promise<void>;
+  onChanged?: () => void;
+}) {
+  const { onPlacementCommit } = useHaikuLabelPlacement({
+    haikuId: haiku.id,
+    enabled: interactive,
+    onChanged,
+  });
+  const haloLabels = toLabelHaloItems(haiku.labels, excludeLabelIds);
+
+  return (
+    <RotatedPathAnchor
+      transform={transform}
+      flightStyle={flightStyle}
+      suppressReveal={suppressReveal}
+      isAnimating={isAnimating}
+      ariaLabel={ariaLabel}
+    >
+      <Lantern
+        haiku={haiku}
+        rotationBase={face.variant}
+        mirrored={face.mirrored}
+        showActions={showActions}
+        actionsAlwaysVisible={actionsAlwaysVisible}
+        onDelete={onDelete}
+        onChanged={onChanged}
+        widthRem={WIDTH_REM}
+        style={{ width: "100%", height: "100%", animation: "none" }}
+        faceHalo={{
+          labels: haloLabels,
+          interactive,
+          onPlacementCommit: interactive ? onPlacementCommit : undefined,
+          ariaLabel: `${ariaLabel} labels`,
+        }}
+      />
+    </RotatedPathAnchor>
+  );
+}
+
 export function SVGPathLantern({
   haiku,
   generatingDraft,
@@ -245,25 +310,21 @@ export function SVGPathLantern({
           const exiting = flightExiting || suppressReveal;
           if (face.kind === "rotated") {
             return (
-              <RotatedPathAnchor
+              <RotatedLanternWithHalo
+                haiku={haiku}
                 transform={transform}
                 flightStyle={flightStyle}
                 suppressReveal={exiting}
                 isAnimating={isAnimating}
                 ariaLabel={ariaLabel}
-              >
-                <Lantern
-                  haiku={haiku}
-                  rotationBase={face.variant}
-                  mirrored={face.mirrored}
-                  showActions={showActions}
-                  actionsAlwaysVisible={actionsAlwaysVisible}
-                  onDelete={onDelete}
-                  onChanged={onChanged}
-                  widthRem={WIDTH_REM}
-                  style={{ width: "100%", height: "100%", animation: "none" }}
-                />
-              </RotatedPathAnchor>
+                face={face}
+                excludeLabelIds={excludeLabelIds}
+                interactive={!isAnimating}
+                showActions={showActions}
+                actionsAlwaysVisible={actionsAlwaysVisible}
+                onDelete={onDelete}
+                onChanged={onChanged}
+              />
             );
           }
 

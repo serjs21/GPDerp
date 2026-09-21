@@ -60,10 +60,8 @@
   mix-blend-mode: soft-light;
 }
 
-.content {
-  --lantern-ink: #2c2924;
-  --lantern-ink-soft: color-mix(in srgb, var(--lantern-ink) 62%, transparent);
-
+/* Paper-face plane — LabelHalo grid + haiku share this transform. */
+.face {
   position: absolute;
   left: var(--lantern-rotated-content-left);
   top: var(--lantern-rotated-content-top);
@@ -71,15 +69,27 @@
   box-sizing: border-box;
   width: var(--lantern-rotated-content-width);
   height: var(--lantern-rotated-content-height);
+  overflow: visible;
+  transform: translate(-50%, -50%) rotate(var(--lantern-rotated-tilt))
+    skewX(var(--lantern-rotated-skew-x)) skewY(var(--lantern-rotated-skew-y))
+    scale(var(--lantern-rotated-content-scale));
+  transform-origin: center center;
+}
+
+.content {
+  --lantern-ink: #2c2924;
+  --lantern-ink-soft: color-mix(in srgb, var(--lantern-ink) 62%, transparent);
+
+  position: relative;
+  z-index: 0;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   color: var(--lantern-ink);
   font-family: var(--font-lantern-script, "Zen Kurenaido", cursive);
-  transform: translate(-50%, -50%) rotate(var(--lantern-rotated-tilt))
-    skewX(var(--lantern-rotated-skew-x)) skewY(var(--lantern-rotated-skew-y))
-    scale(var(--lantern-rotated-content-scale));
-  transform-origin: center center;
 }
 
 .content:hover [data-lantern-actions],

@@ -12,7 +12,10 @@ import {
   type LanternRotatedVariantId,
 } from "./consts/rotationBaseConsts";
 import styles from "./Lantern.module.css";
-import { LanternRotatedShell } from "./LanternRotatedShell";
+import {
+  LanternRotatedShell,
+  type LanternRotatedFaceHalo,
+} from "./LanternRotatedShell";
 
 export type LanternProps = HaikuContainerProps & {
   className?: string;
@@ -43,6 +46,8 @@ export type LanternProps = HaikuContainerProps & {
   /** Vertical gap between lantern bottom and actions bar. */
   actionsBarOffsetY?: string;
   ariaLabel?: string;
+  /** LabelHalo on the rotated paper-face plane (same transform as content). */
+  faceHalo?: LanternRotatedFaceHalo | null;
 };
 
 function resolveGeneratingContent(draft: GeneratingDraft) {
@@ -235,6 +240,7 @@ export function Lantern(props: LanternProps) {
         actionsBarOffsetX={props.actionsBarOffsetX}
         actionsBarOffsetY={props.actionsBarOffsetY}
         ariaLabel={resolveRotatedAriaLabel(props)}
+        faceHalo={props.faceHalo}
       >
         {content}
       </LanternRotatedShell>

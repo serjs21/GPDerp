@@ -5,6 +5,11 @@ export {
   useLanternActionsDock,
 } from "./LanternActionsDockContext";
 export {
+  LanternRotatedShell,
+  type LanternRotatedFaceHalo,
+  type LanternRotatedShellProps,
+} from "./LanternRotatedShell";
+export {
   getRotationBaseTransform,
   LANTERN_ROTATED_CONTENT,
   LANTERN_ROTATED_CONTENT_HEIGHT_PCT,
