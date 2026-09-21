@@ -40,6 +40,7 @@ const BACKGROUND_SAMPLES: Array<{
   { background: "solid", color: "blue", label: "Solid" },
   { background: "solid", color: "sky", label: "Solid sky" },
   { background: "sunburst", color: "sky", label: "Sunburst sky" },
+  { background: "fine", color: "cream", label: "Fine" },
 ];
 
 export const BlankTemplate: Story = {
@@ -99,7 +100,7 @@ export const BackgroundGallery: Story = {
           ))}
         </ComicPageRow>
         <ComicPageRow columns="1fr-1fr">
-          {BACKGROUND_SAMPLES.slice(6).map((sample) => (
+          {BACKGROUND_SAMPLES.slice(6, 8).map((sample) => (
             <ComicPagePanel
               key={sample.label}
               background={sample.background}
@@ -109,9 +110,74 @@ export const BackgroundGallery: Story = {
             </ComicPagePanel>
           ))}
         </ComicPageRow>
+        <ComicPageRow>
+          {BACKGROUND_SAMPLES.slice(8).map((sample) => (
+            <ComicPagePanel
+              key={sample.label}
+              background={sample.background}
+              color={sample.color}
+              span="full"
+            >
+              {sample.label}
+            </ComicPagePanel>
+          ))}
+        </ComicPageRow>
       </ComicPageLayout>
     </div>
   ),
+};
+
+function FineBackgroundDemo() {
+  const [fine, setFine] = useState(false);
+
+  return (
+    <div style={{ padding: "2rem", background: "#222", minHeight: "100vh" }}>
+      <ComicPageLayout title="Fine background">
+        <ComicPageRow>
+          <ComicPagePanel
+            key={fine ? "fine-on" : "fine-off"}
+            background={fine ? "fine" : "solid"}
+            color="cream"
+            span="full"
+            title="This is"
+            style={{ minHeight: "18rem" }}
+          >
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "0.75rem",
+                padding: "1rem",
+              }}
+            >
+              <p style={{ margin: 0, fontWeight: 700, letterSpacing: "0.04em" }}>
+                {fine ? "FINE!" : "Solid cream"}
+              </p>
+              <button
+                type="button"
+                onClick={() => setFine((value) => !value)}
+                style={{
+                  padding: "0.45rem 0.9rem",
+                  border: "3px solid #111",
+                  background: "#fff",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                {fine ? "Turn fine off" : "Turn fine on"}
+              </button>
+            </div>
+          </ComicPagePanel>
+        </ComicPageRow>
+      </ComicPageLayout>
+    </div>
+  );
+}
+
+export const FineBackground: Story = {
+  name: "Fine background",
+  render: () => <FineBackgroundDemo />,
 };
 
 function SelectableRowDemo() {

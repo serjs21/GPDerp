@@ -7,6 +7,10 @@ import {
   type ComicPanelColor,
 } from "./comicPagePresets";
 import panelStyles from "./ComicPagePanel.module.css";
+import { FinePatternTiles } from "./FinePatternTiles";
+
+const FINE_CLOUD_SRC = "/fine_panel/fine_cloud_pattern.svg";
+const FINE_FLAME_SRC = "/fine_panel/fine_flame_pattern.svg";
 
 export type ComicPagePanelProps = {
   children?: ReactNode;
@@ -56,6 +60,7 @@ function panelStyleVars(color: ComicPanelColor): CSSProperties {
 function staticBgClass(background: ComicPanelBackground): string {
   if (background === "sunburst") return panelStyles.bgSunburst;
   if (background === "halftone") return panelStyles.bgHalftone;
+  if (background === "fine") return panelStyles.bgFine;
   return panelStyles.bgSolid;
 }
 
@@ -84,6 +89,7 @@ export function ComicPagePanel({
 }: ComicPagePanelProps) {
   const isMotionBackground = isMotionBackgroundProp ?? background === "motion";
   const showMotionOverlay = loading && !isMotionBackground;
+  const isFineBackground = background === "fine" && !isMotionBackground;
   const hasTitle = title != null && title !== "";
   const hasFooter = footer != null && footer !== "";
   const staticBackground =
@@ -137,6 +143,16 @@ export function ComicPagePanel({
       ) : null}
       {showMotionOverlay ? (
         <div className={[panelStyles.bgLayer, panelStyles.bgMotionOverlay].join(" ")} aria-hidden />
+      ) : null}
+      {isFineBackground ? (
+        <>
+          <div className={panelStyles.fineCloudBand} aria-hidden>
+            <FinePatternTiles src={FINE_CLOUD_SRC} />
+          </div>
+          <div className={panelStyles.fineFlameBand} aria-hidden>
+            <FinePatternTiles src={FINE_FLAME_SRC} />
+          </div>
+        </>
       ) : null}
       {hasTitle ? (
         <div className={panelStyles.panelTitle}>{titleLabel ?? title}</div>
