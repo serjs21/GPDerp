@@ -77,6 +77,31 @@ export const labelRepository = {
     });
   },
 
+  /** Preview haikus + totals for many labels in one query (manage-labels strip). */
+  listConnectedHaikusForLabels(labelIds: string[], take: number) {
+    if (labelIds.length === 0) {
+      return Promise.resolve(
+        [] as Array<{
+          id: string;
+          _count: { haikus: number };
+          haikus: Array<{ id: string; title: string; body: string }>;
+        }>,
+      );
+    }
+    return prismaClient.label.findMany({
+      where: { id: { in: labelIds } },
+      select: {
+        id: true,
+        _count: { select: { haikus: true } },
+        haikus: {
+          take,
+          orderBy: { createdAt: "desc" },
+          select: { id: true, title: true, body: true },
+        },
+      },
+    });
+  },
+
   updateById(id: string, data: { name: string; color: string; shape: string }) {
     return prismaClient.label.update({
       where: { id },

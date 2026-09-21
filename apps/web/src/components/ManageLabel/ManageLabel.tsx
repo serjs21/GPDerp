@@ -1,13 +1,8 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import {
-  fetchLabelConnectedHaikus,
-  labelQueryKeys,
-  type LabelDto,
-} from "@/api/labels";
+import type { LabelDto } from "@/api/labels";
 import { useHaikuFilters } from "@/app/providers/HaikuFiltersProvider";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
@@ -28,7 +23,6 @@ export type ManageLabelProps = {
   onChanged?: () => void;
 };
 
-const CONNECTED_PREVIEW_LIMIT = 3;
 const DELETE_HOVER = "var(--accent-red, #aa1f3f)";
 
 export function ManageLabel({ accountId, label, onChanged }: ManageLabelProps) {
@@ -40,14 +34,8 @@ export function ManageLabel({ accountId, label, onChanged }: ManageLabelProps) {
   const { deleteLabel } = useAccountLabels({ accountId, autofetch: false });
   const shape = resolveComicLabelShapePreset(label.shape);
 
-  const connectedQuery = useQuery({
-    queryKey: labelQueryKeys.connectedHaikus(label.id, CONNECTED_PREVIEW_LIMIT),
-    queryFn: () =>
-      fetchLabelConnectedHaikus(label.id, { limit: CONNECTED_PREVIEW_LIMIT }),
-  });
-
-  const connectedTotal = connectedQuery.data?.total ?? 0;
-  const connectedItems = connectedQuery.data?.items ?? [];
+  const connectedTotal = label.connectedHaikus?.total ?? 0;
+  const connectedItems = label.connectedHaikus?.items ?? [];
   const hasConnections = connectedTotal > 0;
 
   const handleDeleteConfirm = useCallback(async () => {
@@ -103,7 +91,6 @@ export function ManageLabel({ accountId, label, onChanged }: ManageLabelProps) {
       labelName={label.name}
       items={connectedItems}
       total={connectedTotal}
-      isPending={connectedQuery.isPending}
     />
   );
 

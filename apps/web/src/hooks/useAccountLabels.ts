@@ -20,6 +20,10 @@ export type UseAccountLabelsOptions = {
   pageSize?: number;
   /** Optional name substring filter for paged query. */
   q?: string;
+  /** Embed connected haiku previews on each paged label (manage-labels strip). */
+  includeConnectedHaikus?: boolean;
+  /** Preview limit when `includeConnectedHaikus` is set (default 3). */
+  connectedHaikuLimit?: number;
 };
 
 export type UseAccountLabelsResult = {
@@ -86,7 +90,14 @@ export function useManageLabelsAccount() {
 }
 
 export function useAccountLabels(options: UseAccountLabelsOptions): UseAccountLabelsResult {
-  const { accountId, autofetch = true, pageSize = 50, q = "" } = options;
+  const {
+    accountId,
+    autofetch = true,
+    pageSize = 50,
+    q = "",
+    includeConnectedHaikus = false,
+    connectedHaikuLimit = 3,
+  } = options;
   const queryClient = useQueryClient();
   const searchQ = q.trim();
 
@@ -204,12 +215,19 @@ export function useAccountLabels(options: UseAccountLabelsOptions): UseAccountLa
   };
 
   const pagedQuery = useInfiniteQuery({
-    queryKey: labelQueryKeys.pagedByAccount(accountId, pageSize, searchQ),
+    queryKey: labelQueryKeys.pagedByAccount(
+      accountId,
+      pageSize,
+      searchQ,
+      includeConnectedHaikus,
+    ),
     queryFn: ({ pageParam }) =>
       fetchLabelsForAccountPaged(accountId, {
         pageSize,
         offset: pageParam as number,
         q: searchQ || undefined,
+        includeConnectedHaikus,
+        connectedHaikuLimit: includeConnectedHaikus ? connectedHaikuLimit : undefined,
       }),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => {

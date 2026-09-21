@@ -1,5 +1,16 @@
 import axios from "axios";
 
+export type LabelConnectedHaikuPreview = {
+  id: string;
+  title: string;
+  body: string;
+};
+
+export type LabelConnectedHaikus = {
+  total: number;
+  items: LabelConnectedHaikuPreview[];
+};
+
 export type LabelDto = {
   id: string;
   name: string;
@@ -7,13 +18,28 @@ export type LabelDto = {
   shape: string;
   accountId: string;
   createdAt: string;
+  /** Present when paged list is fetched with `includeConnectedHaikus`. */
+  connectedHaikus?: LabelConnectedHaikus;
 };
 
 export const labelQueryKeys = {
   all: ["labels"] as const,
   byAccount: (accountId: string) => [...labelQueryKeys.all, "account", accountId] as const,
-  pagedByAccount: (accountId: string, pageSize: number, q = "") =>
-    [...labelQueryKeys.all, "account", accountId, "paged", pageSize, q] as const,
+  pagedByAccount: (
+    accountId: string,
+    pageSize: number,
+    q = "",
+    includeConnectedHaikus = false,
+  ) =>
+    [
+      ...labelQueryKeys.all,
+      "account",
+      accountId,
+      "paged",
+      pageSize,
+      q,
+      includeConnectedHaikus ? "with-connected" : "labels-only",
+    ] as const,
   manageAccount: ["labels", "manage-account"] as const,
   connectedHaikus: (labelId: string, limit = 3) =>
     [...labelQueryKeys.all, "connected-haikus", labelId, limit] as const,
@@ -45,7 +71,7 @@ export async function fetchLabelsForAccount(accountId: string): Promise<LabelDto
   return data.data.labels;
 }
 
-export type CreateLabelForAccountOptions = Omit<LabelDto, "id">;
+export type CreateLabelForAccountOptions = Omit<LabelDto, "id" | "connectedHaikus">;
 
 export async function createLabelForAccount(options: CreateLabelForAccountOptions): Promise<LabelDto> {
   const { accountId, name, color, shape } = options;
@@ -80,14 +106,24 @@ export async function resolveManageLabelsAccountId(): Promise<string> {
 
 export async function fetchLabelsForAccountPaged(
   accountId: string,
-  params: { pageSize: number; offset: number; q?: string },
+  params: {
+    pageSize: number;
+    offset: number;
+    q?: string;
+    includeConnectedHaikus?: boolean;
+    connectedHaikuLimit?: number;
+  },
 ): Promise<{ labels: LabelDto[]; total: number; pageSize: number; offset: number }> {
-  const { pageSize, offset, q } = params;
+  const { pageSize, offset, q, includeConnectedHaikus, connectedHaikuLimit } = params;
   const { data } = await axios.get<PagedLabelsResponse>(`/haiku/labels/${encodeURIComponent(accountId)}`, {
     params: {
       pageSize,
       offset,
       ...(q?.trim() ? { q: q.trim() } : null),
+      ...(includeConnectedHaikus ? { includeConnectedHaikus: "1" } : null),
+      ...(includeConnectedHaikus && connectedHaikuLimit != null
+        ? { connectedHaikuLimit }
+        : null),
     },
   });
   if (!data.ok) throw new Error(data.error ?? "Failed to fetch paged labels");
@@ -114,17 +150,6 @@ export async function deleteLabel(labelId: string): Promise<void> {
   );
   if (!data.ok) throw new Error("error" in data ? data.error : "Failed to delete label");
 }
-
-export type LabelConnectedHaikuPreview = {
-  id: string;
-  title: string;
-  body: string;
-};
-
-export type LabelConnectedHaikus = {
-  total: number;
-  items: LabelConnectedHaikuPreview[];
-};
 
 type ConnectedHaikusResponse =
   | { ok: true; data: LabelConnectedHaikus }

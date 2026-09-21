@@ -82,7 +82,6 @@ function renderInConnectedPanel(
       labelName="Zen"
       items={args.items}
       total={total}
-      isPending={false}
     />
   );
 }

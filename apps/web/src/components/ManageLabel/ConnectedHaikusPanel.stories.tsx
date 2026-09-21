@@ -90,7 +90,6 @@ export const Triple: Story = {
     labelName: "Zen",
     items: DEMO_ITEMS,
     total: 3,
-    isPending: false,
   },
 };
 
@@ -102,7 +101,6 @@ export const MoreThanThree: Story = {
     labelName: "Zen",
     items: DEMO_ITEMS,
     total: 7,
-    isPending: false,
   },
 };
 
@@ -112,16 +110,5 @@ export const Empty: Story = {
     labelName: "Zen",
     items: [],
     total: 0,
-    isPending: false,
-  },
-};
-
-export const Loading: Story = {
-  args: {
-    accountId: ACCOUNT_ID,
-    labelName: "Zen",
-    items: [],
-    total: 0,
-    isPending: true,
   },
 };

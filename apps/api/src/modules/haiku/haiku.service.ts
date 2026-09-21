@@ -74,11 +74,20 @@ export const haikuService = {
     pageSize: number;
     offset: number;
     q?: string;
+    includeConnectedHaikus?: boolean;
+    connectedHaikuLimit?: number;
   }): Promise<
     | { ok: false; reason: "forbidden" }
     | {
         ok: true;
-        labels: Awaited<ReturnType<typeof labelRepository.listForAccountPaged>>;
+        labels: Array<
+          Awaited<ReturnType<typeof labelRepository.listForAccountPaged>>[number] & {
+            connectedHaikus?: {
+              total: number;
+              items: Array<{ id: string; title: string; body: string }>;
+            };
+          }
+        >;
         total: number;
         pageSize: number;
         offset: number;
@@ -91,7 +100,32 @@ export const haikuService = {
       labelRepository.listForAccountPaged(accountId, pageSize, offset, q),
       labelRepository.countForAccount(accountId, q),
     ]);
-    return { ok: true, labels, total, pageSize, offset };
+
+    if (!params.includeConnectedHaikus || labels.length === 0) {
+      return { ok: true, labels, total, pageSize, offset };
+    }
+
+    const connectedLimit = Math.min(
+      10,
+      Math.max(1, Math.floor(params.connectedHaikuLimit ?? 3)),
+    );
+    const connectedRows = await labelRepository.listConnectedHaikusForLabels(
+      labels.map((label) => label.id),
+      connectedLimit,
+    );
+    const byId = new Map(connectedRows.map((row) => [row.id, row]));
+    const labelsWithConnected = labels.map((label) => {
+      const row = byId.get(label.id);
+      return {
+        ...label,
+        connectedHaikus: {
+          total: row?._count.haikus ?? 0,
+          items: row?.haikus ?? [],
+        },
+      };
+    });
+
+    return { ok: true, labels: labelsWithConnected, total, pageSize, offset };
   },
 
   async createLabelForUser(params: {

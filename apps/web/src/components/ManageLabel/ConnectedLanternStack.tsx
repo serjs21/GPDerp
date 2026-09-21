@@ -22,8 +22,8 @@ function previewLanternBodyStyle(body: string, title?: string): CSSProperties {
 
 const transformsMap = {
   0: `translate(-50%, -50%)`,
-  1: `translate(-175%, -55%) scale(0.5)`,
-  2: `translate(75%, -65%) scale(0.2)`,
+  1: `translate(-155%, -55%) scale(0.5)`,
+  2: `translate(35%, -65%) scale(0.2)`,
 };
 
 const rotationMap: Record<number, LanternRotatedVariantId | undefined> = {

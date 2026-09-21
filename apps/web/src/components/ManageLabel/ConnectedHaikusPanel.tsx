@@ -12,7 +12,6 @@ export type ConnectedHaikusPanelProps = {
   labelName: string;
   items: LabelConnectedHaikuPreview[];
   total: number;
-  isPending: boolean;
 };
 
 export function ConnectedHaikusPanel({
@@ -20,9 +19,14 @@ export function ConnectedHaikusPanel({
   labelName,
   items,
   total,
-  isPending,
 }: ConnectedHaikusPanelProps) {
   const moreCount = Math.max(0, total - CONNECTED_PREVIEW_LIMIT);
+  const footer =
+    moreCount > 0 ? (
+      <div className={styles.connectedBody}>
+        <p className={styles.connectedMore}>{`+${moreCount} more`}</p>
+      </div>
+    ) : undefined;
 
   return (
     <ComicPagePanel
@@ -31,23 +35,11 @@ export function ConnectedHaikusPanel({
       overflowVisible
       flexWeight={1}
       contentAlign="center"
+      footer={footer}
       className={styles.connectedPanel}
       ariaLabel={`Haikus labeled ${labelName}`}
     >
-      <div className={styles.connectedBody}>
-        {isPending ? (
-          <p className={styles.connectedQuiet}>Loading…</p>
-        ) : items.length === 0 ? (
-          <p className={styles.connectedQuiet}>No lanterns yet</p>
-        ) : (
-          <>
-            <ConnectedLanternStack accountId={accountId} items={items} />
-            {moreCount > 0 ? (
-              <p className={styles.connectedMore}>{`+${moreCount} more`}</p>
-            ) : null}
-          </>
-        )}
-      </div>
+      <ConnectedLanternStack accountId={accountId} items={items} />
     </ComicPagePanel>
   );
 }

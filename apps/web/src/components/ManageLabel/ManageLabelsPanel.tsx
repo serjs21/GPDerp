@@ -65,6 +65,7 @@ export function ManageLabelsPanel({
     autofetch: active && Boolean(accountId),
     pageSize: PAGE_SIZE,
     q: debouncedQ,
+    includeConnectedHaikus: true,
   });
 
   const refresh = useCallback(() => {
