@@ -34,23 +34,20 @@ export function ManageLabelCreatePanel({ accountId, onCreated }: ManageLabelCrea
           flexWeight={1}
           className={styles.createPanel}
           style={hoverStyle}
-          ariaLabel="Create a new label"
+          ariaLabel="Create a new one"
           onSelect={() => setOpen(true)}
         >
           <div className={styles.createContent}>
-            {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG asset */}
-            <img
-              className={styles.createIcon}
-              src="/label_modal/create.svg"
-              alt=""
-              draggable={false}
-            />
             <ComicBurstLabel
               className={styles.createBurst}
-              text={formatComicLabelText("Create a new label")}
+              text={formatComicLabelText("Create a new one")}
               fill="#17131A"
               shapeKind="rect"
               fontSize={18}
+              leading={
+                // eslint-disable-next-line @next/next/no-img-element -- static public SVG asset
+                <img src="/label_modal/create.svg" alt="" draggable={false} />
+              }
             />
           </div>
         </ComicPagePanel>

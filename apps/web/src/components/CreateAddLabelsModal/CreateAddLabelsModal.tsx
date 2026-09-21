@@ -146,7 +146,7 @@ export function CreateAddLabelsModal({
                 background: "sunburst",
                 color: "purple",
                 title: "Create",
-                ariaLabel: "Create a new label",
+                ariaLabel: "Create a new one",
               },
               content: (
                 <LabelMethodIcon

@@ -98,7 +98,7 @@ export function ManageLabelsModal({
             <LabelCreateAction
               accountId={haiku.accountId}
               className={styles.createBtn}
-              buttonText="Create a new label"
+              buttonText="Create a new one"
               onCreated={async (label) => {
                 setSelectedIds((ids) => [...new Set([...ids, label.id])]);
                 await fetch(true);

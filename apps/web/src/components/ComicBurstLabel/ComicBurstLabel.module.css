@@ -13,12 +13,12 @@
 }
 
 /* HTML overlay — KA-BLAM lettering; transforms stay on this node only */
-.labelText {
+.labelText,
+.labelWithLeading {
   position: absolute;
   left: 50%;
   top: 50%;
   z-index: 1;
-  display: inline-block;
   box-sizing: border-box;
   max-width: 90%;
   margin: 0;
@@ -48,6 +48,38 @@
   transform-origin: center center;
   user-select: none;
   pointer-events: none;
+}
+
+.labelText {
+  display: inline-block;
+}
+
+.labelWithLeading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.labelLeading {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  /* Undo lettering skew so icons stay upright. */
+  transform: skewX(4deg) scaleY(0.926);
+}
+
+.labelLeading > :is(img, svg) {
+  display: block;
+  height: 1.05em;
+  width: auto;
+  object-fit: contain;
+}
+
+.labelLettering {
+  display: inline-block;
+  line-height: inherit;
 }
 
 /* Centered custom content (icons/avatars) inside the silhouette. */

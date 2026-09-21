@@ -15,7 +15,7 @@ export type LabelCreateActionProps = {
 
 export function LabelCreateAction({
   accountId,
-  buttonText = "Create a new label",
+  buttonText = "Create a new one",
   className,
   onCreated,
 }: LabelCreateActionProps) {

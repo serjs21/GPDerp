@@ -28,6 +28,8 @@ export type ComicBurstLabelProps = {
   /** Optional fixed size; when omitted, uses short/long display size from text length. */
   fontSize?: number;
   className?: string;
+  /** Optional content before lettering (e.g. an icon). Ignored when `children` replaces text. */
+  leading?: ReactNode;
   /** When set, replaces lettering with custom content (e.g. an avatar icon). */
   children?: ReactNode;
 };
@@ -46,6 +48,7 @@ function resolveBurstLayout(params: {
   seedKey: string | number;
   shapeKind: ComicBurstShapeKind;
   hasChildren: boolean;
+  hasLeading: boolean;
 }) {
   const {
     text,
@@ -57,12 +60,14 @@ function resolveBurstLayout(params: {
     seedKey,
     shapeKind,
     hasChildren,
+    hasLeading,
   } = params;
   const fontSize = fontSizeProp ?? burstDisplayFontSize(text);
   // Icon/custom content: size from fontSize box, not lettering width.
+  const leadingExtra = hasLeading ? fontSize * 1.2 : 0;
   const textWidth = hasChildren
     ? fontSize
-    : measureComicBurstTextWidth(text, fontSize);
+    : measureComicBurstTextWidth(text, fontSize) + leadingExtra;
   const layout = layoutComicBurstLabel({
     textWidth,
     fontSize,
@@ -82,16 +87,26 @@ function resolveBurstLayout(params: {
 function BurstOverlay({
   text,
   textColor,
+  leading,
   children,
 }: {
   text: string;
   textColor: string;
+  leading?: ReactNode;
   children?: ReactNode;
 }) {
   if (children) {
     return (
       <span className={styles.labelContent} aria-hidden>
         {children}
+      </span>
+    );
+  }
+  if (leading) {
+    return (
+      <span className={styles.labelWithLeading} style={{ color: textColor }} aria-hidden>
+        <span className={styles.labelLeading}>{leading}</span>
+        <span className={styles.labelLettering}>{text}</span>
       </span>
     );
   }
@@ -129,6 +144,7 @@ export const ComicBurstLabel = memo(function ComicBurstLabel(props: ComicBurstLa
   const paddingY = props.paddingY ?? 14;
   const strokeWidth = props.strokeWidth ?? 4;
   const className = props.className;
+  const leading = props.leading;
   const children = props.children;
   const seedKey = props.seed ?? text;
   const { strokeLinejoin, strokeLinecap } = strokeCapsForShape(shapeKind);
@@ -145,6 +161,7 @@ export const ComicBurstLabel = memo(function ComicBurstLabel(props: ComicBurstLa
         seedKey,
         shapeKind,
         hasChildren: Boolean(children),
+        hasLeading: Boolean(leading),
       }),
     [
       text,
@@ -156,6 +173,7 @@ export const ComicBurstLabel = memo(function ComicBurstLabel(props: ComicBurstLa
       seedKey,
       shapeKind,
       children,
+      leading,
     ],
   );
 
@@ -189,7 +207,7 @@ export const ComicBurstLabel = memo(function ComicBurstLabel(props: ComicBurstLa
           strokeLinecap={strokeLinecap}
         />
       </svg>
-      <BurstOverlay text={text} textColor={textColor}>
+      <BurstOverlay text={text} textColor={textColor} leading={leading}>
         {children}
       </BurstOverlay>
     </div>
