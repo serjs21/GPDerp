@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
+import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import {
   COMIC_PANEL_COLORS,
   type ComicPanelBackground,
@@ -11,6 +11,7 @@ import { FinePatternTiles } from "./FinePatternTiles";
 
 const FINE_CLOUD_SRC = "/fine_panel/fine_cloud_pattern.svg";
 const FINE_FLAME_SRC = "/fine_panel/fine_flame_pattern.svg";
+const FINE_BAND_EXIT_MS = 1000;
 
 export type ComicPagePanelProps = {
   children?: ReactNode;
@@ -90,14 +91,42 @@ export function ComicPagePanel({
   const isMotionBackground = isMotionBackgroundProp ?? background === "motion";
   const showMotionOverlay = loading && !isMotionBackground;
   const isFineBackground = background === "fine" && !isMotionBackground;
+  const [fineBandsVisible, setFineBandsVisible] = useState(isFineBackground);
+  const [fineBandsExiting, setFineBandsExiting] = useState(false);
+
+  useEffect(() => {
+    if (isFineBackground) {
+      setFineBandsVisible(true);
+      setFineBandsExiting(false);
+      return;
+    }
+    if (!fineBandsVisible) return;
+
+    setFineBandsExiting(true);
+    const timer = window.setTimeout(() => {
+      setFineBandsVisible(false);
+      setFineBandsExiting(false);
+    }, FINE_BAND_EXIT_MS);
+    return () => window.clearTimeout(timer);
+  }, [isFineBackground, fineBandsVisible]);
+
   const hasTitle = title != null && title !== "";
   const hasFooter = footer != null && footer !== "";
-  const staticBackground =
-    isMotionBackground || background === "motion" ? "solid" : background;
+  const resolvedBackground =
+    isMotionBackground || background === "motion"
+      ? "solid"
+      : background === "fine" && !isFineBackground
+        ? "solid"
+        : background;
+  const fillClass = isFineBackground
+    ? panelStyles.bgFine
+    : fineBandsVisible
+      ? panelStyles.bgFineExit
+      : staticBgClass(resolvedBackground === "fine" ? "solid" : resolvedBackground);
   const bgClass = [
-    staticBgClass(staticBackground),
-    staticBackground === "sunburst" && !shine && panelStyles.bgSunburstPaused,
-    staticBackground === "sunburst" && !sunburstHalftone && panelStyles.bgSunburstNoHalftone,
+    fillClass,
+    resolvedBackground === "sunburst" && !shine && panelStyles.bgSunburstPaused,
+    resolvedBackground === "sunburst" && !sunburstHalftone && panelStyles.bgSunburstNoHalftone,
   ]
     .filter(Boolean)
     .join(" ");
@@ -144,12 +173,28 @@ export function ComicPagePanel({
       {showMotionOverlay ? (
         <div className={[panelStyles.bgLayer, panelStyles.bgMotionOverlay].join(" ")} aria-hidden />
       ) : null}
-      {isFineBackground ? (
+      {fineBandsVisible ? (
         <>
-          <div className={panelStyles.fineCloudBand} aria-hidden>
+          <div
+            className={[
+              panelStyles.fineCloudBand,
+              fineBandsExiting ? panelStyles.fineCloudBandExit : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            aria-hidden
+          >
             <FinePatternTiles src={FINE_CLOUD_SRC} />
           </div>
-          <div className={panelStyles.fineFlameBand} aria-hidden>
+          <div
+            className={[
+              panelStyles.fineFlameBand,
+              fineBandsExiting ? panelStyles.fineFlameBandExit : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            aria-hidden
+          >
             <FinePatternTiles src={FINE_FLAME_SRC} />
           </div>
         </>

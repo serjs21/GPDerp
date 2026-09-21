@@ -135,7 +135,6 @@ function FineBackgroundDemo() {
       <ComicPageLayout title="Fine background">
         <ComicPageRow>
           <ComicPagePanel
-            key={fine ? "fine-on" : "fine-off"}
             background={fine ? "fine" : "solid"}
             color="cream"
             span="full"

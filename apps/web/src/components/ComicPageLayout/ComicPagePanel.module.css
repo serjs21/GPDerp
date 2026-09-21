@@ -207,6 +207,16 @@
   animation: fineFlameSlideIn 1s ease forwards;
 }
 
+.fineCloudBandExit {
+  transform: translateY(0);
+  animation: fineCloudSlideOut 1s ease forwards;
+}
+
+.fineFlameBandExit {
+  transform: translateY(0);
+  animation: fineFlameSlideOut 1s ease forwards;
+}
+
 @keyframes fineCloudSlideIn {
   to {
     transform: translateY(0);
@@ -216,6 +226,29 @@
 @keyframes fineFlameSlideIn {
   to {
     transform: translateY(0);
+  }
+}
+
+@keyframes fineCloudSlideOut {
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes fineFlameSlideOut {
+  to {
+    transform: translateY(100%);
+  }
+}
+
+.bgFineExit {
+  background-color: #94910a;
+  animation: finePanelFillExit 0.4s ease forwards;
+}
+
+@keyframes finePanelFillExit {
+  to {
+    background-color: var(--comic-panel-base, #fff);
   }
 }
 
@@ -400,9 +433,24 @@
     background-color: #94910a;
   }
 
+  .bgFineExit {
+    animation: none;
+    background-color: var(--comic-panel-base, #fff);
+  }
+
   .fineCloudBand,
   .fineFlameBand {
     animation: none;
     transform: translateY(0);
+  }
+
+  .fineCloudBandExit {
+    animation: none;
+    transform: translateY(-100%);
+  }
+
+  .fineFlameBandExit {
+    animation: none;
+    transform: translateY(100%);
   }
 }
