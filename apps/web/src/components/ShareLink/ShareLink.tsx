@@ -155,7 +155,6 @@ export function ShareLink({
       span="full"
       background="halftone"
       color="sky"
-      title={ctrl.subject}
       footer={
         ctrl.active ? (
           <PreviewLanternStats

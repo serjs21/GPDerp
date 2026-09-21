@@ -51,7 +51,7 @@ export function ComicPanelTabs<T extends string>({
         const {
           className: tabPanelClassName,
           flexWeight: tabFlexWeight,
-          overflowVisible = true,
+          overflowVisible = false,
           isMotionBackground = false,
           shine = false,
           sunburstHalftone = false,

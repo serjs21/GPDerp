@@ -131,6 +131,7 @@ export function PostSignInput({
           onChange={(e) => onSubjectChange(e.target.value)}
           disabled={isLoading}
           autoComplete="off"
+          autoFocus
           placeholder={placeholder}
           aria-label="Haiku subject"
         />

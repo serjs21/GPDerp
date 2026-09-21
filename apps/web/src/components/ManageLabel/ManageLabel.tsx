@@ -66,7 +66,6 @@ export function ManageLabel({ accountId, label, onChanged }: ManageLabelProps) {
     <ComicPagePanel
       background="solid"
       color="white"
-      overflowVisible
       flexWeight={1}
       className={styles.labelPanel}
       ariaLabel={label.name}

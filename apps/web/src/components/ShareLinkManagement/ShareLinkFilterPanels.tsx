@@ -90,7 +90,6 @@ export function ShareLinkFilterPanels({ selected, onChange }: ShareLinkFilterPan
               isMotionBackground={false}
               shine={false}
               sunburstHalftone={false}
-              overflowVisible
               flexWeight={1}
               ariaLabel={
                 checked ? option.ariaLabel.replace(/^Show/, "Hide") : option.ariaLabel

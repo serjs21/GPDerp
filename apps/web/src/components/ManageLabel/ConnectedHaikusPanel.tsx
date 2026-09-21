@@ -32,7 +32,6 @@ export function ConnectedHaikusPanel({
     <ComicPagePanel
       background="halftone"
       color="sky"
-      overflowVisible
       flexWeight={1}
       contentAlign="center"
       footer={footer}

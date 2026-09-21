@@ -43,7 +43,6 @@ function SettingsLabelsStripStage({
         <ComicPagePanel
           background="solid"
           color="white"
-          overflowVisible
           flexWeight={1}
           className={manageStyles.labelPanel}
           ariaLabel="Label preview"
