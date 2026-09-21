@@ -25,7 +25,7 @@ export const HAIKU_LABELS_MAX = 10;
 /** Drop area padding around lantern content (CSS vars). */
 export const LABEL_HALO_DROP_PAD_REM = 5;
 /** Extra pad on top / left / right (not bottom). */
-export const LABEL_HALO_DROP_PAD_EXTRA_REM = 8;
+export const LABEL_HALO_DROP_PAD_EXTRA_REM = 0;
 
 export type LabelHaloLabelItem = {
   id: string;

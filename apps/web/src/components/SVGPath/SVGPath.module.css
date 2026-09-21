@@ -4,7 +4,8 @@
   width: 100%;
   height: 100%;
   min-height: min(72vh, 38rem);
-  overflow: hidden;
+  /* Visible so LabelHalo pad/labels can reach the sticky header band. */
+  overflow: visible;
   overscroll-behavior: contain;
   touch-action: none;
 }
@@ -16,7 +17,7 @@
   width: min(100%, var(--layout-content-max, 1200px));
   min-width: var(--layout-content-max, 1200px);
   height: 100%;
-  min-height: min(68vh, 36rem);
+  min-height: min(90vh, 50rem);
   padding: 2rem 1rem 3rem;
   position: relative;
   left: 50%;

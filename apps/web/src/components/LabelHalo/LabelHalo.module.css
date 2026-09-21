@@ -1,7 +1,7 @@
 .halo {
   --label-halo-pad: 5rem;
-  --label-halo-pad-x: 13rem;
-  --label-halo-pad-top: 13rem;
+  --label-halo-pad-x: 5rem;
+  --label-halo-pad-top: 5rem;
   --label-halo-pad-bottom: 5rem;
 
   /* Hug lantern + pad so the drop ring stays centered on content. */
