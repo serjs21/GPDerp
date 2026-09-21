@@ -6,9 +6,7 @@ import {
   useState,
   type CSSProperties,
   type FocusEvent,
-  type HTMLAttributes,
   type KeyboardEvent,
-  type Ref,
 } from "react";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
@@ -30,35 +28,45 @@ export type LabelSlotProps = {
   name: string;
   color: string;
   shape?: string;
-  connectionPointId: string;
-  /** Which label edge is the connection / rotate axis. */
+  xPercent: number;
+  yPercent: number;
+  /** Which label edge is the rotate axis. */
   connection?: LabelHaloAnchor;
   rotateDeg: number;
   /** Called on focus out / outside click when placement changed. */
   onPlacementCommit?: (placement: LabelPlacement) => void;
-  /** Live draft rotation (for drag preview / reconnect). */
+  /** Live draft rotation (for drag preview). */
   onRotateDraft?: (rotateDeg: number) => void;
   isDragging?: boolean;
   /** When true, show rotation control (parent-driven). */
   active?: boolean;
-  /** When false, never render/show the rotate control (drag overlay). */
+  /** When false, never render/show the rotate control. */
   showRotateControl?: boolean;
   disabled?: boolean;
   className?: string;
   style?: CSSProperties;
-  setNodeRef?: Ref<HTMLDivElement>;
-  dragListeners?: HTMLAttributes<HTMLElement>;
-  dragAttributes?: HTMLAttributes<HTMLElement>;
+  /** Ref to the slot root (anime.js createDraggable target). */
+  rootRef?: (node: HTMLDivElement | null) => void;
 };
 
-function mergeRefs<T>(...refs: Array<Ref<T> | undefined>) {
-  return (node: T | null) => {
+function mergeRefs(
+  ...refs: Array<((node: HTMLDivElement | null) => void) | { current: HTMLDivElement | null } | undefined>
+) {
+  return (node: HTMLDivElement | null) => {
     for (const ref of refs) {
       if (!ref) continue;
       if (typeof ref === "function") ref(node);
-      else (ref as { current: T | null }).current = node;
+      else ref.current = node;
     }
   };
+}
+
+function samePlacement(a: LabelPlacement, b: LabelPlacement) {
+  return (
+    a.xPercent === b.xPercent &&
+    a.yPercent === b.yPercent &&
+    a.rotateDeg === b.rotateDeg
+  );
 }
 
 export function LabelSlot({
@@ -66,7 +74,8 @@ export function LabelSlot({
   name,
   color,
   shape,
-  connectionPointId,
+  xPercent,
+  yPercent,
   connection = "start",
   rotateDeg,
   onPlacementCommit,
@@ -77,14 +86,14 @@ export function LabelSlot({
   disabled = false,
   className,
   style,
-  setNodeRef,
-  dragListeners,
-  dragAttributes,
+  rootRef: rootRefProp,
 }: LabelSlotProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const draftRotateRef = useRef(rotateDeg);
-  const connectionPointIdRef = useRef(connectionPointId);
-  connectionPointIdRef.current = connectionPointId;
+  const xPercentRef = useRef(xPercent);
+  const yPercentRef = useRef(yPercent);
+  xPercentRef.current = xPercent;
+  yPercentRef.current = yPercent;
   const onPlacementCommitRef = useRef(onPlacementCommit);
   onPlacementCommitRef.current = onPlacementCommit;
   const onRotateDraftRef = useRef(onRotateDraft);
@@ -92,13 +101,12 @@ export function LabelSlot({
   const [draftRotateDeg, setDraftRotateDeg] = useState(rotateDeg);
   const [selected, setSelected] = useState(false);
   const [isRotateDragging, setIsRotateDragging] = useState(false);
-  const committedRef = useRef({ connectionPointId, rotateDeg });
+  const committedRef = useRef<LabelPlacement>({ xPercent, yPercent, rotateDeg });
 
   useEffect(() => {
     draftRotateRef.current = rotateDeg;
     setDraftRotateDeg(rotateDeg);
-    committedRef.current = { connectionPointId, rotateDeg };
-  }, [connectionPointId, rotateDeg]);
+  }, [rotateDeg]);
 
   const preset = resolveComicLabelShapePreset(shape);
   const controlsVisible =
@@ -107,17 +115,12 @@ export function LabelSlot({
     (Boolean(activeProp) || selected || isRotateDragging);
 
   const commitIfChanged = () => {
-    const next = {
-      connectionPointId: connectionPointIdRef.current,
+    const next: LabelPlacement = {
+      xPercent: xPercentRef.current,
+      yPercent: yPercentRef.current,
       rotateDeg: draftRotateRef.current,
     };
-    const prev = committedRef.current;
-    if (
-      prev.connectionPointId === next.connectionPointId &&
-      prev.rotateDeg === next.rotateDeg
-    ) {
-      return;
-    }
+    if (samePlacement(committedRef.current, next)) return;
     committedRef.current = next;
     onPlacementCommitRef.current?.(next);
   };
@@ -154,18 +157,7 @@ export function LabelSlot({
       if (rootRef.current?.contains(target)) return;
       setSelected(false);
       setIsRotateDragging(false);
-      const next = {
-        connectionPointId: connectionPointIdRef.current,
-        rotateDeg: draftRotateRef.current,
-      };
-      const prev = committedRef.current;
-      if (
-        prev.connectionPointId !== next.connectionPointId ||
-        prev.rotateDeg !== next.rotateDeg
-      ) {
-        committedRef.current = next;
-        onPlacementCommitRef.current?.(next);
-      }
+      commitIfChanged();
     };
 
     document.addEventListener("pointerdown", onPointerDown, true);
@@ -212,7 +204,7 @@ export function LabelSlot({
   return (
     <div
       id={`label-slot-${id}`}
-      ref={mergeRefs(rootRef, setNodeRef)}
+      ref={mergeRefs(rootRef, rootRefProp)}
       className={[
         styles.slot,
         controlsVisible ? styles.slotActive : "",
@@ -235,8 +227,6 @@ export function LabelSlot({
       }}
       onBlur={onFocusOut}
       onKeyDown={onKeyDown}
-      {...dragAttributes}
-      {...dragListeners}
     >
       <RotationTable
         className={styles.rotationTable}

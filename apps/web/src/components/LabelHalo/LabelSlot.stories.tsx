@@ -16,18 +16,10 @@ import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { LabelSlot } from "./LabelSlot";
 import {
-  DEFAULT_LABEL_HALO_CONNECTION_POINTS,
-  type LabelHaloAnchor,
+  seedPlacementFromConnectionPoint,
   type LabelPlacement,
 } from "./consts/labelHaloConsts";
 import styles from "./LabelHalo.stories.module.css";
-
-function connectionForPoint(pointId: string): LabelHaloAnchor {
-  return (
-    DEFAULT_LABEL_HALO_CONNECTION_POINTS.find((point) => point.id === pointId)
-      ?.connection ?? "start"
-  );
-}
 
 const meta = {
   title: "Haiku/LabelHalo/LabelSlot",
@@ -45,9 +37,10 @@ const meta = {
     name: "Moonlight",
     color: "#f4511e",
     shape: "classic",
-    connectionPointId: "mr",
     connection: "start",
     rotateDeg: 0,
+    xPercent: 90,
+    yPercent: 28,
   },
 } satisfies Meta<typeof LabelSlot>;
 
@@ -58,22 +51,23 @@ function SlotLanternHost({
   name,
   color,
   shape,
-  connectionPointId,
+  pointId,
   rotateDeg,
   showMeta,
 }: {
   name: string;
   color: string;
   shape?: string;
-  connectionPointId: string;
+  pointId: "bl" | "ml" | "tl" | "tr" | "mr" | "br";
   rotateDeg: number;
   showMeta?: boolean;
 }) {
+  const seed = seedPlacementFromConnectionPoint(pointId);
   const [placement, setPlacement] = useState<LabelPlacement>({
-    connectionPointId,
+    xPercent: seed.xPercent,
+    yPercent: seed.yPercent,
     rotateDeg,
   });
-  const connection = connectionForPoint(placement.connectionPointId);
 
   return (
     <div className={styles.stage}>
@@ -90,14 +84,23 @@ function SlotLanternHost({
             })}
           />
         </LanternFrame>
-        <div className={styles.slotOverlay}>
+        <div
+          className={styles.slotOverlay}
+          style={{
+            top: `${placement.yPercent}%`,
+            left: `${placement.xPercent}%`,
+            right: "auto",
+            transform: "translate(-50%, -50%)",
+          }}
+        >
           <LabelSlot
             id="story-slot"
             name={name}
             color={color}
             shape={shape}
-            connectionPointId={placement.connectionPointId}
-            connection={connection}
+            xPercent={placement.xPercent}
+            yPercent={placement.yPercent}
+            connection={seed.connection}
             rotateDeg={placement.rotateDeg}
             onPlacementCommit={setPlacement}
           />
@@ -105,8 +108,8 @@ function SlotLanternHost({
       </div>
       {showMeta ? (
         <p className={styles.meta}>
-          point={placement.connectionPointId} connection={connection} rotate=
-          {Math.round(placement.rotateDeg)}° (drag rotate icon · commits on focus out)
+          x={placement.xPercent.toFixed(1)}% y={placement.yPercent.toFixed(1)}% rotate=
+          {Math.round(placement.rotateDeg)}° (rotate commits on focus out)
         </p>
       ) : null}
     </div>
@@ -119,7 +122,7 @@ export const Default: Story = {
       name={args.name}
       color={args.color}
       shape={args.shape}
-      connectionPointId={args.connectionPointId}
+      pointId="mr"
       rotateDeg={args.rotateDeg}
     />
   ),
@@ -128,7 +131,6 @@ export const Default: Story = {
 export const Rotated: Story = {
   args: {
     rotateDeg: -22,
-    connectionPointId: "bl",
     connection: "end",
   },
   render: (args) => (
@@ -136,7 +138,7 @@ export const Rotated: Story = {
       name={args.name}
       color={args.color}
       shape={args.shape}
-      connectionPointId={args.connectionPointId}
+      pointId="bl"
       rotateDeg={args.rotateDeg}
     />
   ),
@@ -148,7 +150,7 @@ export const Interactive: Story = {
       name="Pond"
       color="#13c2c2"
       shape="classic"
-      connectionPointId="mr"
+      pointId="mr"
       rotateDeg={0}
       showMeta
     />

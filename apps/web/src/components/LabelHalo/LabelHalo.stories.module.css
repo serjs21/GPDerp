@@ -3,33 +3,18 @@
   place-items: center;
   width: 100%;
   min-height: min(80vh, 42rem);
-  padding: 4rem 1.5rem;
+  padding: 2rem 1.5rem;
 }
 
 .host {
   position: relative;
-  display: grid;
-  place-items: center;
-  width: min(28rem, 92vw);
+  width: min(36rem, 96vw);
   margin: 0 auto;
-}
-
-.haloOverlay {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  pointer-events: none;
-}
-
-.haloOverlay > * {
-  pointer-events: auto;
 }
 
 .slotOverlay {
   position: absolute;
   z-index: 5;
-  top: 18%;
-  right: -0.5rem;
 }
 
 .meta {

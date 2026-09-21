@@ -1,33 +1,31 @@
 "use client";
 
+import { createDraggable } from "animejs";
 import {
-  DndContext,
-  DragOverlay,
-  PointerSensor,
-  useDraggable,
-  useDroppable,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-  type DragStartEvent,
-} from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities";
-import { useCallback, useMemo, useRef, useState, type CSSProperties } from "react";
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import {
-  connectionPointInsetStyle,
-  DEFAULT_LABEL_HALO_CONNECTION_POINTS,
-  LABEL_HALO_CONNECTION_POINT_SRC,
-  slotPositionStyle,
-  type LabelHaloConnectionPoint,
+  LABEL_HALO_DROP_PAD_REM,
   type LabelHaloLabelItem,
   type LabelPlacement,
 } from "./consts/labelHaloConsts";
 import { LabelSlot } from "./LabelSlot";
+import {
+  clearDropAreaRoughOutline,
+  paintDropAreaRoughOutline,
+} from "./utils/dropAreaRoughOutline";
 import styles from "./LabelHalo.module.css";
 
 export type LabelHaloProps = {
   labels: LabelHaloLabelItem[];
-  connectionPoints?: LabelHaloConnectionPoint[];
+  /** Lantern (or other) content centered inside the padded drop area. */
+  children?: ReactNode;
   onPlacementCommit?: (labelId: string, placement: LabelPlacement) => void;
   className?: string;
   style?: CSSProperties;
@@ -35,83 +33,121 @@ export type LabelHaloProps = {
   ariaLabel?: string;
 };
 
-function DraggableLabelSlot({
-  label,
-  point,
-  onPlacementCommit,
-  onRotateDraft,
-}: {
-  label: LabelHaloLabelItem;
-  point: LabelHaloConnectionPoint;
-  onPlacementCommit?: (labelId: string, placement: LabelPlacement) => void;
-  onRotateDraft: (labelId: string, rotateDeg: number) => void;
-}) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: label.id,
-    data: {
-      labelId: label.id,
-      connectionPointId: label.connectionPointId,
-      rotateDeg: label.rotateDeg,
-    },
-  });
+function clampPercent(value: number) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.min(100, Math.max(0, value));
+}
 
-  const style: CSSProperties = {
-    ...slotPositionStyle(point),
-    transform: CSS.Translate.toString(transform) ?? undefined,
-    // Source is hidden while dragging — only DragOverlay shows the preview.
-    opacity: isDragging ? 0 : 1,
+function percentFromRect(
+  el: HTMLElement,
+  container: HTMLElement,
+): { xPercent: number; yPercent: number } {
+  const elRect = el.getBoundingClientRect();
+  const box = container.getBoundingClientRect();
+  const width = Math.max(1, box.width);
+  const height = Math.max(1, box.height);
+  const cx = elRect.left + elRect.width / 2 - box.left;
+  const cy = elRect.top + elRect.height / 2 - box.top;
+  return {
+    xPercent: clampPercent((cx / width) * 100),
+    yPercent: clampPercent((cy / height) * 100),
   };
+}
+
+type DraggableLabelProps = {
+  label: LabelHaloLabelItem;
+  rotateDeg: number;
+  isDragging: boolean;
+  dropRef: RefObject<HTMLDivElement | null>;
+  outlineRef: RefObject<SVGSVGElement | null>;
+  onDragActiveChange: (labelId: string, active: boolean) => void;
+  onPositionDraft: (labelId: string, xPercent: number, yPercent: number) => void;
+  onRotateDraft: (labelId: string, rotateDeg: number) => void;
+  onPlacementCommit: (labelId: string, placement: LabelPlacement) => void;
+};
+
+function DraggableLabel({
+  label,
+  rotateDeg,
+  isDragging,
+  dropRef,
+  outlineRef,
+  onDragActiveChange,
+  onPositionDraft,
+  onRotateDraft,
+  onPlacementCommit,
+}: DraggableLabelProps) {
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const slotFocusRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const target = wrapRef.current;
+    const container = dropRef.current;
+    if (!target || !container) return;
+
+    const bakePosition = (draggable: { setX: (x: number, mute?: boolean) => void; setY: (y: number, mute?: boolean) => void }) => {
+      const drop = dropRef.current;
+      if (!drop) return;
+      const next = percentFromRect(target, drop);
+      target.style.left = `${next.xPercent}%`;
+      target.style.top = `${next.yPercent}%`;
+      draggable.setX(0, true);
+      draggable.setY(0, true);
+      onPositionDraft(label.id, next.xPercent, next.yPercent);
+      return next;
+    };
+
+    const instance = createDraggable(target, {
+      container,
+      dragThreshold: 6,
+      releaseStiffness: 0,
+      releaseDamping: 0,
+      onGrab: () => {
+        onDragActiveChange(label.id, true);
+        const svg = outlineRef.current;
+        if (svg) paintDropAreaRoughOutline(svg);
+        slotFocusRef.current?.focus({ preventScroll: true });
+      },
+      onRelease: () => {
+        bakePosition(instance);
+      },
+      onSettle: () => {
+        bakePosition(instance);
+        onDragActiveChange(label.id, false);
+      },
+    });
+
+    return () => {
+      instance.revert();
+    };
+  }, [dropRef, outlineRef, label.id, onDragActiveChange, onPositionDraft]);
 
   return (
-    <div className={styles.point} style={style}>
+    <div
+      ref={wrapRef}
+      className={[styles.slotWrap, isDragging ? styles.slotWrapDragging : ""]
+        .filter(Boolean)
+        .join(" ")}
+      style={{
+        left: `${label.xPercent}%`,
+        top: `${label.yPercent}%`,
+      }}
+    >
       <LabelSlot
         id={label.id}
         name={label.name}
         color={label.color}
         shape={label.shape}
-        connectionPointId={label.connectionPointId}
-        connection={point.connection}
-        rotateDeg={label.rotateDeg}
+        xPercent={label.xPercent}
+        yPercent={label.yPercent}
+        connection={label.connection ?? "start"}
+        rotateDeg={rotateDeg}
         isDragging={isDragging}
-        setNodeRef={setNodeRef}
-        dragListeners={listeners}
-        dragAttributes={attributes}
+        rootRef={(node) => {
+          slotFocusRef.current = node;
+        }}
         onRotateDraft={(next) => onRotateDraft(label.id, next)}
-        onPlacementCommit={(placement) => onPlacementCommit?.(label.id, placement)}
-      />
-    </div>
-  );
-}
-
-function ConnectionDroppable({
-  point,
-  showMarker,
-}: {
-  point: LabelHaloConnectionPoint;
-  showMarker: boolean;
-}) {
-  const { setNodeRef, isOver } = useDroppable({
-    id: `point:${point.id}`,
-    data: { connectionPointId: point.id },
-  });
-
-  if (!showMarker) return null;
-
-  return (
-    <div
-      ref={setNodeRef}
-      className={[styles.pointDroppable, isOver ? styles.pointDroppableOver : ""]
-        .filter(Boolean)
-        .join(" ")}
-      style={connectionPointInsetStyle(point)}
-      aria-hidden
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG asset */}
-      <img
-        className={styles.pointMarker}
-        src={LABEL_HALO_CONNECTION_POINT_SRC}
-        alt=""
-        draggable={false}
+        onPlacementCommit={(placement) => onPlacementCommit(label.id, placement)}
       />
     </div>
   );
@@ -119,131 +155,106 @@ function ConnectionDroppable({
 
 export function LabelHalo({
   labels,
-  connectionPoints = DEFAULT_LABEL_HALO_CONNECTION_POINTS,
+  children,
   onPlacementCommit,
   className,
   style,
   ariaLabel = "Label halo",
 }: LabelHaloProps) {
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-  );
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const draftRotateByIdRef = useRef<Map<string, number>>(new Map());
-  const [, bumpDraft] = useState(0);
+  const dropRef = useRef<HTMLDivElement | null>(null);
+  const outlineRef = useRef<SVGSVGElement | null>(null);
+  const activeDragIdsRef = useRef<Set<string>>(new Set());
 
-  const pointsById = useMemo(() => {
-    const map = new Map<string, LabelHaloConnectionPoint>();
-    for (const point of connectionPoints) map.set(point.id, point);
+  const [draft, setDraft] = useState<LabelHaloLabelItem[]>(labels);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [rotateById, setRotateById] = useState<Record<string, number>>(() => {
+    const map: Record<string, number> = {};
+    for (const label of labels) map[label.id] = label.rotateDeg;
     return map;
-  }, [connectionPoints]);
+  });
 
-  const rotateFor = useCallback(
-    (label: LabelHaloLabelItem) =>
-      draftRotateByIdRef.current.get(label.id) ?? label.rotateDeg,
-    [],
-  );
+  useEffect(() => {
+    setDraft(labels);
+    setRotateById((prev) => {
+      const next = { ...prev };
+      for (const label of labels) {
+        if (next[label.id] == null) next[label.id] = label.rotateDeg;
+      }
+      return next;
+    });
+  }, [labels]);
+
+  const onPositionDraft = useCallback((labelId: string, xPercent: number, yPercent: number) => {
+    setDraft((current) =>
+      current.map((label) =>
+        label.id === labelId ? { ...label, xPercent, yPercent } : label,
+      ),
+    );
+  }, []);
+
+  const onDragActiveChange = useCallback((labelId: string, active: boolean) => {
+    const set = activeDragIdsRef.current;
+    if (active) set.add(labelId);
+    else set.delete(labelId);
+    setDraggingId(active ? labelId : set.size ? [...set][set.size - 1]! : null);
+    if (set.size === 0) clearDropAreaRoughOutline(outlineRef.current);
+  }, []);
 
   const onRotateDraft = useCallback((labelId: string, next: number) => {
-    draftRotateByIdRef.current.set(labelId, next);
-    bumpDraft((n) => n + 1);
+    setRotateById((prev) => ({ ...prev, [labelId]: next }));
   }, []);
 
   const commitPlacement = useCallback(
     (labelId: string, placement: LabelPlacement) => {
-      draftRotateByIdRef.current.set(labelId, placement.rotateDeg);
+      setRotateById((prev) => ({ ...prev, [labelId]: placement.rotateDeg }));
+      setDraft((current) =>
+        current.map((label) =>
+          label.id === labelId
+            ? {
+                ...label,
+                xPercent: placement.xPercent,
+                yPercent: placement.yPercent,
+                rotateDeg: placement.rotateDeg,
+              }
+            : label,
+        ),
+      );
       onPlacementCommit?.(labelId, placement);
     },
     [onPlacementCommit],
   );
 
-  const activeLabel = activeId ? labels.find((label) => label.id === activeId) : null;
-  const activePoint = activeLabel
-    ? pointsById.get(activeLabel.connectionPointId)
-    : undefined;
-  const showMarkers = activeId != null;
-
-  const onDragStart = (event: DragStartEvent) => {
-    const labelId = String(event.active.id);
-    const label = labels.find((item) => item.id === labelId);
-    if (label && !draftRotateByIdRef.current.has(labelId)) {
-      draftRotateByIdRef.current.set(labelId, label.rotateDeg);
-    }
-    setActiveId(labelId);
-  };
-
-  const onDragEnd = (event: DragEndEvent) => {
-    const labelId = String(event.active.id);
-    const label = labels.find((item) => item.id === labelId);
-    const rotateDeg =
-      draftRotateByIdRef.current.get(labelId) ?? label?.rotateDeg ?? 0;
-    setActiveId(null);
-    if (!label || !event.over) return;
-
-    const overId = String(event.over.id);
-    if (!overId.startsWith("point:")) return;
-    const connectionPointId = overId.slice("point:".length);
-    if (!pointsById.has(connectionPointId)) return;
-    if (connectionPointId === label.connectionPointId) return;
-
-    commitPlacement(labelId, {
-      connectionPointId,
-      rotateDeg,
-    });
-  };
-
-  const onDragCancel = () => setActiveId(null);
-
   return (
-    <DndContext
-      sensors={sensors}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      onDragCancel={onDragCancel}
+    <div
+      ref={dropRef}
+      className={[styles.halo, className].filter(Boolean).join(" ")}
+      style={
+        {
+          ...style,
+          "--label-halo-pad": `${LABEL_HALO_DROP_PAD_REM}rem`,
+        } as CSSProperties
+      }
+      role="region"
+      aria-label={ariaLabel}
     >
-      <div
-        className={[styles.halo, className].filter(Boolean).join(" ")}
-        style={style}
-        role="region"
-        aria-label={ariaLabel}
-      >
-        {connectionPoints.map((point) => (
-          <ConnectionDroppable key={point.id} point={point} showMarker={showMarkers} />
-        ))}
+      <div className={styles.content}>{children}</div>
 
-        {labels.map((label) => {
-          const point = pointsById.get(label.connectionPointId);
-          if (!point) return null;
-          return (
-            <DraggableLabelSlot
-              key={label.id}
-              label={label}
-              point={point}
-              onPlacementCommit={commitPlacement}
-              onRotateDraft={onRotateDraft}
-            />
-          );
-        })}
-      </div>
+      <svg ref={outlineRef} className={styles.outline} aria-hidden />
 
-      <DragOverlay dropAnimation={null}>
-        {activeLabel ? (
-          <div className={styles.dragOverlay}>
-            <LabelSlot
-              id={`overlay-${activeLabel.id}`}
-              name={activeLabel.name}
-              color={activeLabel.color}
-              shape={activeLabel.shape}
-              connectionPointId={activeLabel.connectionPointId}
-              connection={activePoint?.connection ?? "start"}
-              rotateDeg={rotateFor(activeLabel)}
-              isDragging
-              showRotateControl={false}
-              disabled
-            />
-          </div>
-        ) : null}
-      </DragOverlay>
-    </DndContext>
+      {draft.map((label) => (
+        <DraggableLabel
+          key={label.id}
+          label={label}
+          rotateDeg={rotateById[label.id] ?? label.rotateDeg}
+          isDragging={draggingId === label.id}
+          dropRef={dropRef}
+          outlineRef={outlineRef}
+          onDragActiveChange={onDragActiveChange}
+          onPositionDraft={onPositionDraft}
+          onRotateDraft={onRotateDraft}
+          onPlacementCommit={commitPlacement}
+        />
+      ))}
+    </div>
   );
 }

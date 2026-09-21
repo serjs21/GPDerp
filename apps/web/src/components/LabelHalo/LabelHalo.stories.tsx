@@ -16,37 +16,55 @@ import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { LabelHalo } from "./LabelHalo";
 import {
-  DEFAULT_LABEL_HALO_CONNECTION_POINTS,
+  seedPlacementFromConnectionPoint,
   type LabelHaloLabelItem,
   type LabelPlacement,
 } from "./consts/labelHaloConsts";
 import styles from "./LabelHalo.stories.module.css";
 
+function labelFromPoint(
+  partial: Omit<LabelHaloLabelItem, "xPercent" | "yPercent" | "connection"> & {
+    pointId: "bl" | "ml" | "tl" | "tr" | "mr" | "br";
+  },
+): LabelHaloLabelItem {
+  const seed = seedPlacementFromConnectionPoint(partial.pointId);
+  return {
+    id: partial.id,
+    name: partial.name,
+    color: partial.color,
+    shape: partial.shape,
+    rotateDeg: partial.rotateDeg,
+    xPercent: seed.xPercent,
+    yPercent: seed.yPercent,
+    connection: seed.connection,
+  };
+}
+
 const SAMPLE_LABELS: LabelHaloLabelItem[] = [
-  {
+  labelFromPoint({
     id: "1",
     name: "Crow",
     color: "#fa541c",
     shape: "classic",
-    connectionPointId: "bl",
+    pointId: "bl",
     rotateDeg: -22,
-  },
-  {
+  }),
+  labelFromPoint({
     id: "2",
     name: "Pond",
     color: "#13c2c2",
     shape: "classic",
-    connectionPointId: "mr",
+    pointId: "mr",
     rotateDeg: 0,
-  },
-  {
+  }),
+  labelFromPoint({
     id: "3",
     name: "Autumn",
     color: "#faad14",
     shape: "classic",
-    connectionPointId: "tl",
+    pointId: "tl",
     rotateDeg: 22,
-  },
+  }),
 ];
 
 const meta = {
@@ -78,7 +96,8 @@ function HaloLanternHost({
         label.id === labelId
           ? {
               ...label,
-              connectionPointId: placement.connectionPointId,
+              xPercent: placement.xPercent,
+              yPercent: placement.yPercent,
               rotateDeg: placement.rotateDeg,
             }
           : label,
@@ -89,26 +108,20 @@ function HaloLanternHost({
   return (
     <div className={styles.stage}>
       <div className={styles.host}>
-        <LanternFrame ariaLabel="Haiku lantern with label halo">
-          <Lantern
-            haiku={makeMockHaiku({
-              id: "lantern-label-halo",
-              title: "Night questions",
-              titleSuffix: 0,
-              body: EXAMPLE_HAIKU_BODY,
-              createdAt: STORY_CREATED_AT,
-              labels: [],
-            })}
-          />
-        </LanternFrame>
-        <div className={styles.haloOverlay}>
-          <LabelHalo
-            labels={labels}
-            connectionPoints={DEFAULT_LABEL_HALO_CONNECTION_POINTS}
-            onPlacementCommit={onPlacementCommit}
-            style={{ position: "absolute", inset: 0 }}
-          />
-        </div>
+        <LabelHalo labels={labels} onPlacementCommit={onPlacementCommit}>
+          <LanternFrame ariaLabel="Haiku lantern with label halo">
+            <Lantern
+              haiku={makeMockHaiku({
+                id: "lantern-label-halo",
+                title: "Night questions",
+                titleSuffix: 0,
+                body: EXAMPLE_HAIKU_BODY,
+                createdAt: STORY_CREATED_AT,
+                labels: [],
+              })}
+            />
+          </LanternFrame>
+        </LabelHalo>
       </div>
     </div>
   );
@@ -126,14 +139,14 @@ export const SingleLabel: Story = {
   render: () => (
     <HaloLanternHost
       initialLabels={[
-        {
+        labelFromPoint({
           id: "solo",
           name: "Fine",
           color: "#94910a",
           shape: "classic",
-          connectionPointId: "br",
+          pointId: "br",
           rotateDeg: 22,
-        },
+        }),
       ]}
     />
   ),
