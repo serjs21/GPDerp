@@ -30,6 +30,7 @@ import {
   resolveComicLabelShapePreset,
   type ComicLabelShapeId,
 } from "./comicLabelShapes";
+import { isFineLabelText } from "./utils/isFineLabelText";
 import styles from "./ComicLabelCreationModal.module.css";
 
 const BRUSH_SRC = "/brush/brush-paint-repair.svg";
@@ -78,6 +79,7 @@ export function ComicLabelCreationModal({
   const previewText =
     trimmedName.length > 0 ? formatComicLabelText(trimmedName) : formatComicLabelText("__");
   const saveText = formatComicLabelText(label ? "Save" : "Create");
+  const previewBackground = isFineLabelText(trimmedName) ? "fine" : "solid";
 
   const isShort = trimmedName.length > 0 && trimmedName.length < COMIC_LABEL_NAME_MIN;
   const exists = labels.some(
@@ -185,7 +187,7 @@ export function ComicLabelCreationModal({
     <div className={[styles.body, embedded ? styles.bodyEmbedded : "", className].filter(Boolean).join(" ")}>
       <ComicPageRow columns="2fr-1fr" className={styles.topRow}>
         <ComicPagePanel
-          background="solid"
+          background={previewBackground}
           color="white"
           overflowVisible
           contentAlign="center"
