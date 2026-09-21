@@ -3,11 +3,16 @@
 import { useCallback, useRef } from "react";
 import type { PointerEvent as ReactPointerEvent, RefObject } from "react";
 import {
+  measureTransformOriginClient,
   pointerAngleFromOriginDeg,
+  pointerAngleFromPointDeg,
   shortestAngleDeltaDeg,
 } from "./rotationAngle";
 
 export type RotationValueMode = "absolute" | "relative";
+
+/** Ignore relative updates inside this radius of the frozen pivot (px). */
+const RELATIVE_MIN_RADIUS_PX = 12;
 
 type UseRotationTablePointerOptions = {
   originRef: RefObject<HTMLElement | null>;
@@ -25,6 +30,13 @@ type UseRotationTablePointerOptions = {
   stopPropagation?: boolean;
 };
 
+type RelativeSession = {
+  originX: number;
+  originY: number;
+  lastPointerAngle: number;
+  degrees: number;
+};
+
 export function useRotationTablePointer({
   originRef,
   degrees,
@@ -37,10 +49,7 @@ export function useRotationTablePointer({
 }: UseRotationTablePointerOptions) {
   const draggingRef = useRef(false);
   const lastDegreesRef = useRef(degrees);
-  const sessionRef = useRef<{
-    startPointerAngle: number;
-    startDegrees: number;
-  } | null>(null);
+  const relativeSessionRef = useRef<RelativeSession | null>(null);
   const degreesRef = useRef(degrees);
   degreesRef.current = degrees;
 
@@ -49,22 +58,33 @@ export function useRotationTablePointer({
       const origin = originRef.current;
       if (!origin) return;
 
+      if (valueMode === "relative") {
+        const session = relativeSessionRef.current;
+        if (!session) return;
+
+        const { angleDeg, distance } = pointerAngleFromPointDeg(
+          clientX,
+          clientY,
+          session.originX,
+          session.originY,
+        );
+        if (distance < RELATIVE_MIN_RADIUS_PX) return;
+
+        const step = shortestAngleDeltaDeg(session.lastPointerAngle, angleDeg);
+        session.lastPointerAngle = angleDeg;
+        session.degrees += step;
+        lastDegreesRef.current = session.degrees;
+        onDegreesChange(session.degrees);
+        return;
+      }
+
       const rect = origin.getBoundingClientRect();
       const { angleDeg, distance } = pointerAngleFromOriginDeg(clientX, clientY, rect);
       const deadZoneRadius = (deadZoneRadiusPercent / 100) * (rect.width / 2);
       if (distance < deadZoneRadius) return;
 
-      let next = angleDeg;
-      if (valueMode === "relative") {
-        const session = sessionRef.current;
-        if (!session) return;
-        next =
-          session.startDegrees +
-          shortestAngleDeltaDeg(session.startPointerAngle, angleDeg);
-      }
-
-      lastDegreesRef.current = next;
-      onDegreesChange(next);
+      lastDegreesRef.current = angleDeg;
+      onDegreesChange(angleDeg);
     },
     [deadZoneRadiusPercent, onDegreesChange, originRef, valueMode],
   );
@@ -79,20 +99,38 @@ export function useRotationTablePointer({
       const origin = originRef.current;
       if (!origin) return;
 
+      if (valueMode === "relative") {
+        const pivot = measureTransformOriginClient(origin);
+        const { angleDeg, distance } = pointerAngleFromPointDeg(
+          event.clientX,
+          event.clientY,
+          pivot.x,
+          pivot.y,
+        );
+        if (distance < RELATIVE_MIN_RADIUS_PX) return;
+
+        draggingRef.current = true;
+        relativeSessionRef.current = {
+          originX: pivot.x,
+          originY: pivot.y,
+          lastPointerAngle: angleDeg,
+          degrees: degreesRef.current,
+        };
+        lastDegreesRef.current = degreesRef.current;
+        event.currentTarget.setPointerCapture(event.pointerId);
+        return;
+      }
+
       const rect = origin.getBoundingClientRect();
-      const { angleDeg, distance } = pointerAngleFromOriginDeg(
+      const { distance } = pointerAngleFromOriginDeg(
         event.clientX,
         event.clientY,
         rect,
       );
       const deadZoneRadius = (deadZoneRadiusPercent / 100) * (rect.width / 2);
-      if (distance < deadZoneRadius && valueMode === "absolute") return;
+      if (distance < deadZoneRadius) return;
 
       draggingRef.current = true;
-      sessionRef.current = {
-        startPointerAngle: angleDeg,
-        startDegrees: degreesRef.current,
-      };
       event.currentTarget.setPointerCapture(event.pointerId);
       updateFromPointer(event.clientX, event.clientY);
     },
@@ -122,7 +160,7 @@ export function useRotationTablePointer({
     (event: ReactPointerEvent<HTMLElement>) => {
       if (!draggingRef.current) return;
       draggingRef.current = false;
-      sessionRef.current = null;
+      relativeSessionRef.current = null;
       if (event.currentTarget.hasPointerCapture(event.pointerId)) {
         event.currentTarget.releasePointerCapture(event.pointerId);
       }
