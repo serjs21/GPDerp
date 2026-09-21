@@ -15,8 +15,19 @@ import {
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { LabelSlot } from "./LabelSlot";
-import type { LabelPlacement } from "./consts/labelHaloConsts";
+import {
+  DEFAULT_LABEL_HALO_CONNECTION_POINTS,
+  type LabelHaloAnchor,
+  type LabelPlacement,
+} from "./consts/labelHaloConsts";
 import styles from "./LabelHalo.stories.module.css";
+
+function connectionForPoint(pointId: string): LabelHaloAnchor {
+  return (
+    DEFAULT_LABEL_HALO_CONNECTION_POINTS.find((point) => point.id === pointId)
+      ?.connection ?? "start"
+  );
+}
 
 const meta = {
   title: "Haiku/LabelHalo/LabelSlot",
@@ -35,6 +46,7 @@ const meta = {
     color: "#f4511e",
     shape: "classic",
     connectionPointId: "mr",
+    connection: "start",
     rotateDeg: 0,
   },
 } satisfies Meta<typeof LabelSlot>;
@@ -61,6 +73,7 @@ function SlotLanternHost({
     connectionPointId,
     rotateDeg,
   });
+  const connection = connectionForPoint(placement.connectionPointId);
 
   return (
     <div className={styles.stage}>
@@ -84,6 +97,7 @@ function SlotLanternHost({
             color={color}
             shape={shape}
             connectionPointId={placement.connectionPointId}
+            connection={connection}
             rotateDeg={placement.rotateDeg}
             onPlacementCommit={setPlacement}
           />
@@ -91,8 +105,8 @@ function SlotLanternHost({
       </div>
       {showMeta ? (
         <p className={styles.meta}>
-          point={placement.connectionPointId} rotate={Math.round(placement.rotateDeg)}°
-          (drag arrows · commits on focus out)
+          point={placement.connectionPointId} connection={connection} rotate=
+          {Math.round(placement.rotateDeg)}° (drag rotate icon · commits on focus out)
         </p>
       ) : null}
     </div>
@@ -115,6 +129,7 @@ export const Rotated: Story = {
   args: {
     rotateDeg: -22,
     connectionPointId: "bl",
+    connection: "end",
   },
   render: (args) => (
     <SlotLanternHost

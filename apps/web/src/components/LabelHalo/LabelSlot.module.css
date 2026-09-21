@@ -1,11 +1,8 @@
 .slot {
   position: relative;
   display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.35rem;
   width: max-content;
-  max-width: 11rem;
+  max-width: 14rem;
   margin: 0;
   padding: 0;
   border: none;
@@ -20,68 +17,78 @@
   cursor: grabbing;
 }
 
+.rotateWrap {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.35rem;
+  width: max-content;
+  max-width: 14rem;
+  line-height: 0;
+}
+
+.rotateWrapEnd {
+  flex-direction: row-reverse;
+}
+
 .burstWrap {
   position: relative;
   line-height: 0;
-  transform-origin: center center;
 }
 
-.arrows {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 160ms ease;
-}
-
-.slot:hover .arrows,
-.slot:focus-visible .arrows,
-.slotActive .arrows,
-.slotDragging .arrows {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.arrowButton {
+.rotateControl {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 1.85rem;
+  height: 1.85rem;
   margin: 0;
-  padding: 0;
+  padding: 0.15rem;
   border: 2px solid #111;
   border-radius: 999px;
   background: #fff;
-  color: #111;
-  font-size: 0.85rem;
-  line-height: 1;
   cursor: ew-resize;
   touch-action: none;
   appearance: none;
   user-select: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease, background 160ms ease;
 }
 
-.arrowButton:hover,
-.arrowButton:focus-visible {
+.slot:hover .rotateControl,
+.slot:focus-visible .rotateControl,
+.slotActive .rotateControl,
+.slotDragging .rotateControl,
+.slotRotateDragging .rotateControl {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.rotateControl:hover,
+.rotateControl:focus-visible,
+.slotRotateDragging .rotateControl {
   background: #ffe8a3;
   outline: none;
 }
 
-.arrowButton:disabled {
+.rotateControl:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
 
-.slotRotateDragging .arrowButton {
-  background: #ffe8a3;
-  cursor: ew-resize;
+.rotateIcon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .arrows {
+  .rotateControl {
     transition: none;
   }
 }

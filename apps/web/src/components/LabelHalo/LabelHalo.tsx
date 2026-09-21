@@ -17,6 +17,7 @@ import {
   connectionPointInsetStyle,
   DEFAULT_LABEL_HALO_CONNECTION_POINTS,
   LABEL_HALO_CONNECTION_POINT_SRC,
+  slotPositionStyle,
   type LabelHaloConnectionPoint,
   type LabelHaloLabelItem,
   type LabelPlacement,
@@ -34,10 +35,6 @@ export type LabelHaloProps = {
   ariaLabel?: string;
 };
 
-function pointAnchorStyle(point: LabelHaloConnectionPoint): CSSProperties {
-  return connectionPointInsetStyle(point);
-}
-
 function DraggableLabelSlot({
   label,
   point,
@@ -53,7 +50,7 @@ function DraggableLabelSlot({
   });
 
   const style: CSSProperties = {
-    ...pointAnchorStyle(point),
+    ...slotPositionStyle(point),
     transform: CSS.Translate.toString(transform) ?? undefined,
     opacity: isDragging ? 0.35 : 1,
   };
@@ -66,6 +63,7 @@ function DraggableLabelSlot({
         color={label.color}
         shape={label.shape}
         connectionPointId={label.connectionPointId}
+        connection={point.connection}
         rotateDeg={label.rotateDeg}
         isDragging={isDragging}
         setNodeRef={setNodeRef}
@@ -89,11 +87,7 @@ function ConnectionDroppable({
     data: { connectionPointId: point.id },
   });
 
-  if (!showMarker) {
-    // Keep droppable hit target during drag even when marker hidden for occupied points
-    // that are not the active label's origin — still show all points per plan.
-    return null;
-  }
+  if (!showMarker) return null;
 
   return (
     <div
@@ -101,7 +95,7 @@ function ConnectionDroppable({
       className={[styles.pointDroppable, isOver ? styles.pointDroppableOver : ""]
         .filter(Boolean)
         .join(" ")}
-      style={pointAnchorStyle(point)}
+      style={connectionPointInsetStyle(point)}
       aria-hidden
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG asset */}
@@ -135,6 +129,9 @@ export function LabelHalo({
   }, [connectionPoints]);
 
   const activeLabel = activeId ? labels.find((label) => label.id === activeId) : null;
+  const activePoint = activeLabel
+    ? pointsById.get(activeLabel.connectionPointId)
+    : undefined;
   const showMarkers = activeId != null;
 
   const onDragStart = (event: DragStartEvent) => {
@@ -201,6 +198,7 @@ export function LabelHalo({
               color={activeLabel.color}
               shape={activeLabel.shape}
               connectionPointId={activeLabel.connectionPointId}
+              connection={activePoint?.connection ?? "start"}
               rotateDeg={activeLabel.rotateDeg}
               isDragging
               active

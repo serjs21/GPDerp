@@ -15,12 +15,17 @@ import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import {
+  LABEL_HALO_ROTATE_ICON_SRC,
   LABEL_SLOT_ROTATE_STEP_DEG,
   type LabelPlacement,
 } from "./consts/labelHaloConsts";
+import {
+  transformOriginForConnection,
+  type LabelHaloAnchor,
+} from "./consts/labelHaloConnectionPoints";
 import styles from "./LabelSlot.module.css";
 
-/** Horizontal pixels → degrees while dragging a rotation arrow. */
+/** Horizontal pixels → degrees while dragging the rotation control. */
 const ROTATE_DRAG_DEG_PER_PX = 0.5;
 const ROTATE_DRAG_MOVE_THRESHOLD_PX = 3;
 
@@ -30,11 +35,13 @@ export type LabelSlotProps = {
   color: string;
   shape?: string;
   connectionPointId: string;
+  /** Which label edge is the connection / rotate axis. */
+  connection?: LabelHaloAnchor;
   rotateDeg: number;
   /** Called on focus out (and after connection-point drop via parent). */
   onPlacementCommit?: (placement: LabelPlacement) => void;
   isDragging?: boolean;
-  /** When true, show rotation arrows (hover / focus / click / drag). */
+  /** When true, show rotation control (hover / focus / click / drag). */
   active?: boolean;
   disabled?: boolean;
   className?: string;
@@ -58,8 +65,6 @@ type RotateDragSession = {
   pointerId: number;
   startX: number;
   startDeg: number;
-  /** Click nudge direction when the pointer barely moves. */
-  clickDelta: number;
   moved: boolean;
 };
 
@@ -69,6 +74,7 @@ export function LabelSlot({
   color,
   shape,
   connectionPointId,
+  connection = "start",
   rotateDeg,
   onPlacementCommit,
   isDragging = false,
@@ -95,7 +101,7 @@ export function LabelSlot({
   }, [connectionPointId, rotateDeg]);
 
   const preset = resolveComicLabelShapePreset(shape);
-  const showArrows =
+  const showControl =
     Boolean(activeProp) || selected || isDragging || isRotateDragging;
 
   const commitIfChanged = () => {
@@ -145,24 +151,22 @@ export function LabelSlot({
     }
   };
 
-  const onArrowPointerDown =
-    (clickDelta: number) => (event: PointerEvent<HTMLButtonElement>) => {
-      event.stopPropagation();
-      event.preventDefault();
-      if (disabled) return;
-      event.currentTarget.setPointerCapture(event.pointerId);
-      rotateDragRef.current = {
-        pointerId: event.pointerId,
-        startX: event.clientX,
-        startDeg: draftRotateRef.current,
-        clickDelta,
-        moved: false,
-      };
-      setSelected(true);
-      setIsRotateDragging(true);
+  const onRotatePointerDown = (event: PointerEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    event.preventDefault();
+    if (disabled) return;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    rotateDragRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startDeg: draftRotateRef.current,
+      moved: false,
     };
+    setSelected(true);
+    setIsRotateDragging(true);
+  };
 
-  const onArrowPointerMove = (event: PointerEvent<HTMLButtonElement>) => {
+  const onRotatePointerMove = (event: PointerEvent<HTMLButtonElement>) => {
     const drag = rotateDragRef.current;
     if (!drag || drag.pointerId !== event.pointerId) return;
     const dx = event.clientX - drag.startX;
@@ -172,11 +176,12 @@ export function LabelSlot({
     setDraft(drag.startDeg + dx * ROTATE_DRAG_DEG_PER_PX);
   };
 
-  const endArrowPointer = (event: PointerEvent<HTMLButtonElement>) => {
+  const endRotatePointer = (event: PointerEvent<HTMLButtonElement>) => {
     const drag = rotateDragRef.current;
     if (!drag || drag.pointerId !== event.pointerId) return;
     if (!drag.moved) {
-      nudge(drag.clickDelta);
+      // Click: nudge in the outward direction for this connection.
+      nudge(connection === "start" ? LABEL_SLOT_ROTATE_STEP_DEG : -LABEL_SLOT_ROTATE_STEP_DEG);
     }
     rotateDragRef.current = null;
     setIsRotateDragging(false);
@@ -191,7 +196,7 @@ export function LabelSlot({
       ref={mergeRefs(rootRef, setNodeRef)}
       className={[
         styles.slot,
-        showArrows ? styles.slotActive : "",
+        showControl ? styles.slotActive : "",
         isDragging ? styles.slotDragging : "",
         isRotateDragging ? styles.slotRotateDragging : "",
         className,
@@ -215,44 +220,46 @@ export function LabelSlot({
       {...dragListeners}
     >
       <div
-        className={styles.burstWrap}
-        style={{ transform: `rotate(${draftRotateDeg}deg)` }}
+        className={[
+          styles.rotateWrap,
+          connection === "end" ? styles.rotateWrapEnd : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        style={{
+          transform: `rotate(${draftRotateDeg}deg)`,
+          transformOrigin: transformOriginForConnection(connection),
+        }}
       >
-        <ComicBurstLabel
-          text={formatComicLabelText(name)}
-          fill={color}
-          shapeKind={preset.kind}
-          spikeCount={preset.spikeCount}
-          randomness={preset.randomness}
-          seed={preset.id}
-        />
-      </div>
-      <div className={styles.arrows} aria-hidden={!showArrows}>
+        <div className={styles.burstWrap}>
+          <ComicBurstLabel
+            text={formatComicLabelText(name)}
+            fill={color}
+            shapeKind={preset.kind}
+            spikeCount={preset.spikeCount}
+            randomness={preset.randomness}
+            seed={preset.id}
+          />
+        </div>
         <button
           type="button"
-          className={styles.arrowButton}
-          tabIndex={showArrows && !disabled ? 0 : -1}
-          aria-label="Rotate left — drag horizontally to adjust"
+          className={styles.rotateControl}
+          tabIndex={showControl && !disabled ? 0 : -1}
+          aria-label="Rotate label — drag horizontally to adjust"
+          aria-hidden={!showControl}
           disabled={disabled}
-          onPointerDown={onArrowPointerDown(-LABEL_SLOT_ROTATE_STEP_DEG)}
-          onPointerMove={onArrowPointerMove}
-          onPointerUp={endArrowPointer}
-          onPointerCancel={endArrowPointer}
+          onPointerDown={onRotatePointerDown}
+          onPointerMove={onRotatePointerMove}
+          onPointerUp={endRotatePointer}
+          onPointerCancel={endRotatePointer}
         >
-          ↺
-        </button>
-        <button
-          type="button"
-          className={styles.arrowButton}
-          tabIndex={showArrows && !disabled ? 0 : -1}
-          aria-label="Rotate right — drag horizontally to adjust"
-          disabled={disabled}
-          onPointerDown={onArrowPointerDown(LABEL_SLOT_ROTATE_STEP_DEG)}
-          onPointerMove={onArrowPointerMove}
-          onPointerUp={endArrowPointer}
-          onPointerCancel={endArrowPointer}
-        >
-          ↻
+          {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG asset */}
+          <img
+            className={styles.rotateIcon}
+            src={LABEL_HALO_ROTATE_ICON_SRC}
+            alt=""
+            draggable={false}
+          />
         </button>
       </div>
     </div>
