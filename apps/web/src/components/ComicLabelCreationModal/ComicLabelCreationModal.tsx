@@ -33,6 +33,7 @@ import {
 import styles from "./ComicLabelCreationModal.module.css";
 
 const BRUSH_SRC = "/brush/brush-paint-repair.svg";
+const FINE_DOG_SRC = "/thisisfine.svg";
 const SAVE_DISABLED_FILL = "#9e9e9e";
 
 export type ComicLabelCreationModalProps = {
@@ -189,7 +190,7 @@ export function ComicLabelCreationModal({
           overflowVisible
           contentAlign="center"
           className={styles.previewPanel}
-          title="Name"
+          title="This is"
           footer={
             trimmedName.length >= 0 && trimmedName.length < COMIC_LABEL_NAME_MIN
               ? `Min ${COMIC_LABEL_NAME_MIN} chars`
@@ -223,9 +224,24 @@ export function ComicLabelCreationModal({
 
         <div ref={colorShellRef} className={styles.colorShell}>
           <ComicPagePanel
-            title={pickerOpen ? undefined : "Color"}
+            title={
+              pickerOpen ? undefined : (
+                <span className={styles.colorTitle}>
+                  Color
+                  {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG asset */}
+                  <img
+                    className={styles.fineDog}
+                    src={FINE_DOG_SRC}
+                    alt=""
+                    draggable={false}
+                    aria-hidden
+                  />
+                </span>
+              )
+            }
             background="solid"
             color="white"
+            overflowVisible
             contentAlign="center"
             className={[styles.colorPanel, pickerOpen ? styles.colorPanelOpen : ""]
               .filter(Boolean)

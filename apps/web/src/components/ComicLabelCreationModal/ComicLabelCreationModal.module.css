@@ -2,6 +2,8 @@
   --comic-label-modal-gap: 0.55rem;
   --comic-label-preview-min: 16rem;
   --comic-label-caret-size: 28px;
+  /* Room for thisisfine dog sitting on the Color title. */
+  --comic-label-fine-dog-overhang: 2.5rem;
 
   box-sizing: border-box;
   display: flex;
@@ -9,6 +11,7 @@
   gap: var(--comic-label-modal-gap);
   width: 100%;
   min-width: min(100%, 40rem);
+  padding-top: var(--comic-label-fine-dog-overhang);
 }
 
 .bodyEmbedded {
@@ -29,6 +32,7 @@
 .topRow {
   flex: 0 0 auto;
   min-height: 7.5rem;
+  overflow: visible;
 }
 
 .previewPanel {
@@ -104,6 +108,26 @@
   flex: 1 1 0;
   min-width: 0;
   min-height: 7.5rem;
+  overflow: visible;
+}
+
+.colorTitle {
+  position: relative;
+  display: inline-block;
+}
+
+/* Anchor to the top-right of the Color title tab. */
+.fineDog {
+  position: absolute;
+  z-index: 1;
+  height: 7rem;
+  width: 7rem;
+  right: -2rem;
+  top: -1rem;
+  transform: translate(35%, -78%);
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
 }
 
 .colorPanel {
