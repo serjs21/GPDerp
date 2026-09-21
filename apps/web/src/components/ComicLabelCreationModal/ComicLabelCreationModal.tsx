@@ -189,7 +189,6 @@ export function ComicLabelCreationModal({
         <ComicPagePanel
           background={previewBackground}
           color="white"
-          overflowVisible
           contentAlign="center"
           className={styles.previewPanel}
           title="This is"

@@ -174,7 +174,7 @@ export function ComicPagePanel({
         <div className={[panelStyles.bgLayer, panelStyles.bgMotionOverlay].join(" ")} aria-hidden />
       ) : null}
       {fineBandsVisible ? (
-        <>
+        <div className={panelStyles.fineBandsClip} aria-hidden>
           <div
             className={[
               panelStyles.fineCloudBand,
@@ -182,7 +182,6 @@ export function ComicPagePanel({
             ]
               .filter(Boolean)
               .join(" ")}
-            aria-hidden
           >
             <FinePatternTiles src={FINE_CLOUD_SRC} />
           </div>
@@ -193,11 +192,10 @@ export function ComicPagePanel({
             ]
               .filter(Boolean)
               .join(" ")}
-            aria-hidden
           >
             <FinePatternTiles src={FINE_FLAME_SRC} />
           </div>
-        </>
+        </div>
       ) : null}
       {hasTitle ? (
         <div className={panelStyles.panelTitle}>{titleLabel ?? title}</div>
