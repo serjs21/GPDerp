@@ -81,6 +81,8 @@ function DraggableLabel({
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const visualRef = useRef<HTMLDivElement | null>(null);
   const slotFocusRef = useRef<HTMLDivElement | null>(null);
+  const rotateDegRef = useRef(rotateDeg);
+  rotateDegRef.current = rotateDeg;
 
   useEffect(() => {
     const target = wrapRef.current;
@@ -139,20 +141,34 @@ function DraggableLabel({
       onRelease: (self) => {
         // handleUp starts a velocity throw BEFORE onRelease. Bake the on-screen
         // position, then kill that throw so settle cannot rebake a flung spot.
-        bakePosition(self);
+        const next = bakePosition(self);
         self.stop();
         self.setX(0, true);
         self.setY(0, true);
         self.coords[0] = self.coords[2] = 0;
         self.coords[1] = self.coords[3] = 0;
         onDragActiveChange(label.id, false);
+        if (next) {
+          onPlacementCommit(label.id, {
+            xPercent: next.xPercent,
+            yPercent: next.yPercent,
+            rotateDeg: rotateDegRef.current,
+          });
+        }
       },
     });
 
     return () => {
       instance.revert();
     };
-  }, [dropRef, outlineRef, label.id, onDragActiveChange, onPositionDraft]);
+  }, [
+    dropRef,
+    outlineRef,
+    label.id,
+    onDragActiveChange,
+    onPositionDraft,
+    onPlacementCommit,
+  ]);
 
   return (
     <div

@@ -1,7 +1,7 @@
 "use client";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CelestialPresetName } from "@/theme/celestialPresets";
 import {
   composeDecorators,
@@ -120,14 +120,19 @@ type Story = StoryObj<typeof meta>;
 
 function HaloLanternHost({
   initialLabels,
+  captureLocations = false,
 }: {
   initialLabels: LabelHaloLabelItem[];
+  /** When true, emit debug location snapshots after each placement commit. */
+  captureLocations?: boolean;
 }) {
   const [labels, setLabels] = useState(initialLabels);
+  const labelsRef = useRef(labels);
+  labelsRef.current = labels;
 
   const onPlacementCommit = (labelId: string, placement: LabelPlacement) => {
-    setLabels((current) =>
-      current.map((label) =>
+    setLabels((current) => {
+      const next = current.map((label) =>
         label.id === labelId
           ? {
               ...label,
@@ -136,9 +141,93 @@ function HaloLanternHost({
               rotateDeg: placement.rotateDeg,
             }
           : label,
-      ),
-    );
+      );
+      // #region agent log
+      if (captureLocations) {
+        const moved = next.find((label) => label.id === labelId);
+        fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Debug-Session-Id": "ab780c",
+          },
+          body: JSON.stringify({
+            sessionId: "ab780c",
+            runId: "fifteen-locations",
+            hypothesisId: "LOC",
+            location: "LabelHalo.stories.tsx:onPlacementCommit",
+            message: "label placement",
+            data: {
+              labelId,
+              name: moved?.name ?? null,
+              xPercent: placement.xPercent,
+              yPercent: placement.yPercent,
+              rotateDeg: placement.rotateDeg,
+            },
+            timestamp: Date.now(),
+          }),
+        }).catch(() => {});
+        fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Debug-Session-Id": "ab780c",
+          },
+          body: JSON.stringify({
+            sessionId: "ab780c",
+            runId: "fifteen-locations",
+            hypothesisId: "LOC",
+            location: "LabelHalo.stories.tsx:snapshot",
+            message: "all label locations",
+            data: {
+              labels: next.map((label) => ({
+                id: label.id,
+                name: label.name,
+                color: label.color,
+                xPercent: label.xPercent,
+                yPercent: label.yPercent,
+                rotateDeg: label.rotateDeg,
+              })),
+            },
+            timestamp: Date.now(),
+          }),
+        }).catch(() => {});
+      }
+      // #endregion
+      return next;
+    });
   };
+
+  useEffect(() => {
+    if (!captureLocations) return;
+    // #region agent log
+    fetch("http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Debug-Session-Id": "ab780c",
+      },
+      body: JSON.stringify({
+        sessionId: "ab780c",
+        runId: "fifteen-locations",
+        hypothesisId: "LOC",
+        location: "LabelHalo.stories.tsx:mount",
+        message: "fifteen labels mount",
+        data: {
+          labels: labelsRef.current.map((label) => ({
+            id: label.id,
+            name: label.name,
+            color: label.color,
+            xPercent: label.xPercent,
+            yPercent: label.yPercent,
+            rotateDeg: label.rotateDeg,
+          })),
+        },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
+  }, [captureLocations]);
 
   return (
     <div className={styles.stage}>
@@ -188,5 +277,7 @@ export const SingleLabel: Story = {
 };
 
 export const FifteenLabels: Story = {
-  render: () => <HaloLanternHost initialLabels={FIFTEEN_LABELS} />,
+  render: () => (
+    <HaloLanternHost initialLabels={FIFTEEN_LABELS} captureLocations />
+  ),
 };
