@@ -2,6 +2,10 @@
 
 import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
 import { LabelHalo } from "@/components/LabelHalo/LabelHalo";
+import {
+  LABEL_HALO_DROP_PAD_EXTRA_REM,
+  LABEL_HALO_DROP_PAD_REM,
+} from "@/components/LabelHalo/consts/labelHaloConsts";
 import { toLabelHaloItems } from "@/components/LabelHalo/utils/toLabelHaloItems";
 import { useHaikuLabelPlacement } from "@/hooks/useHaikuLabelPlacement";
 import { LANTERN_WIDTH_REM } from "../constants";
@@ -71,9 +75,14 @@ export function LanternPathLantern({
     ? toLabelHaloItems(haiku.labels, excludeLabelIds)
     : [];
 
+  const haloPadTopRem = LABEL_HALO_DROP_PAD_REM + LABEL_HALO_DROP_PAD_EXTRA_REM;
+
   const pathStyle = {
     ...lanternTransformToCssVars(transform),
     "--lantern-width": `${LANTERN_WIDTH_REM}rem`,
+    // Focus stop was authored for the lantern box only; shift down so the
+    // LabelHalo fill pad (top) stays inside the viewport.
+    ...(isFocused ? { "--lantern-flight-y": `${haloPadTopRem}rem` } : null),
   };
 
   return (

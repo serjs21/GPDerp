@@ -123,14 +123,18 @@ function DraggableLabel({
       x: number;
       y: number;
       coords: number[];
+      transforms: {
+        normalizePoint: (x: number, y: number) => { x: number; y: number };
+      };
     }) => {
-      // Anchor is the label center; anime preserves pointer-to-origin offset.
-      // Zero that offset so center stays under the cursor for the whole drag.
+      // anime.js pointer is in inverse-ancestor-transform space, not client px.
+      // Normalize the 0×0 wrap anchor the same way before zeroing grab offset.
       const anchor = target.getBoundingClientRect();
+      const localAnchor = draggable.transforms.normalizePoint(anchor.left, anchor.top);
       const px = draggable.pointer[0] ?? 0;
       const py = draggable.pointer[1] ?? 0;
-      draggable.setX(draggable.x + (px - anchor.left), true);
-      draggable.setY(draggable.y + (py - anchor.top), true);
+      draggable.setX(draggable.x + (px - localAnchor.x), true);
+      draggable.setY(draggable.y + (py - localAnchor.y), true);
       draggable.coords[0] = draggable.coords[2] = draggable.x;
       draggable.coords[1] = draggable.coords[3] = draggable.y;
     };
@@ -327,6 +331,8 @@ export function LabelHalo({
       >
         {children}
       </div>
+
+      {draggingId ? <div className={styles.dragBlocker} aria-hidden /> : null}
 
       <svg ref={outlineRef} className={styles.outline} aria-hidden />
 

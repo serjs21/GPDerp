@@ -64,6 +64,18 @@
   pointer-events: none;
 }
 
+/* Blocks hover/pointer through to lantern while a label is dragged. */
+.dragBlocker {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+  pointer-events: auto;
+  touch-action: none;
+  background: transparent;
+}
+
 /* Zero-size center anchor — anime owns this node's transform. */
 .slotWrap {
   position: absolute;
