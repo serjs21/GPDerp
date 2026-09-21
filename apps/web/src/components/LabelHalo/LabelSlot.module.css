@@ -17,17 +17,11 @@
   cursor: grabbing;
 }
 
-.rotateWrap {
-  display: inline-flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.35rem;
-  width: max-content;
+.rotationTable {
   max-width: 14rem;
-  line-height: 0;
 }
 
-.rotateWrapEnd {
+.rotateContentEnd {
   flex-direction: row-reverse;
 }
 
@@ -48,7 +42,7 @@
   border: 2px solid #111;
   border-radius: 999px;
   background: #fff;
-  cursor: ew-resize;
+  cursor: grab;
   touch-action: none;
   appearance: none;
   user-select: none;

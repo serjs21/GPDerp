@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useImperativeHandle, useMemo, useRef, type KeyboardEvent } from "react";
+import { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, type KeyboardEvent } from "react";
 import {
   CELESTIAL_FIXED_DATE,
   CELESTIAL_SLOTS_PER_DAY,
@@ -8,9 +8,12 @@ import {
   stepSlot,
 } from "@/theme/celestialTime";
 import type { GeoCoordinates } from "@/theme/celestialTheme";
-import { getSelectorDialLayoutFromSlot } from "@/theme/celestialSelectorLayout";
+import {
+  getSelectorDialLayoutFromSlot,
+  viewerSunAngleToSlot,
+} from "@/theme/celestialSelectorLayout";
 import { StyleNavigationWheel } from "@/components/StyleNavigationWheel";
-import { useDialPointerSelection } from "./hooks/useDialPointerSelection";
+import { RotationTable } from "@/components/RotationTable";
 import styles from "./CelestialThemeClock.module.css";
 
 export type CelestialThemeClockProps = {
@@ -57,10 +60,20 @@ export const CelestialThemeClock = forwardRef<
     () => getSelectorDialLayoutFromSlot(value, coordinates),
     [value, coordinates],
   );
-  const { faceRef, pointerHandlers } = useDialPointerSelection({
-    onChange,
-    onDragEnd: onCommit,
-  });
+
+  const handleDegreesChange = useCallback(
+    (degrees: number) => {
+      onChange(viewerSunAngleToSlot(degrees));
+    },
+    [onChange],
+  );
+
+  const handleDegreesCommit = useCallback(
+    (degrees: number) => {
+      onCommit?.(viewerSunAngleToSlot(degrees));
+    },
+    [onCommit],
+  );
 
   useImperativeHandle(ref, () => ({
     focus: () => {
@@ -88,17 +101,26 @@ export const CelestialThemeClock = forwardRef<
 
   return (
     <div className={`${styles.root}${className ? ` ${className}` : ""}`}>
-      <StyleNavigationWheel
-        variant="panel"
-        layout={layout}
-        slot={value}
-        motionLayoutIdPrefix={motionLayoutIdPrefix}
-        motionInstant={motionInstant}
-        faceRef={faceRef}
-        pointerHandlers={pointerHandlers}
-        interactive
-        hideNavStar={hideNavStar}
-      />
+      <RotationTable
+        className={styles.dialTable}
+        fill
+        applyTransform={false}
+        deadZoneRadiusPercent={18}
+        degrees={0}
+        onDegreesChange={handleDegreesChange}
+        onDegreesCommit={onCommit ? handleDegreesCommit : undefined}
+        valueMode="absolute"
+      >
+        <StyleNavigationWheel
+          variant="panel"
+          layout={layout}
+          slot={value}
+          motionLayoutIdPrefix={motionLayoutIdPrefix}
+          motionInstant={motionInstant}
+          interactive
+          hideNavStar={hideNavStar}
+        />
+      </RotationTable>
 
       <input
         ref={inputRef}

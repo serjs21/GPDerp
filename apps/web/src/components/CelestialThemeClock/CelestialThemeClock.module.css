@@ -2,6 +2,10 @@
   position: relative;
 }
 
+.dialTable {
+  cursor: pointer;
+}
+
 .rangeInput {
   position: absolute;
   width: 1px;
