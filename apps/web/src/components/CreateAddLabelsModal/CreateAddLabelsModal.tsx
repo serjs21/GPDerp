@@ -9,6 +9,7 @@ import { ComicPageDialog } from "@/components/ComicPageLayout";
 import { ComicPanelTabs } from "@/components/ComicPanelTabs";
 import { comicToast } from "@/components/ComicToast";
 import { LabelMethodIcon } from "@/components/LabelMethodIcon";
+import { HAIKU_LABELS_MAX } from "@/components/LabelHalo/consts/labelHaloConsts";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
 import styles from "./CreateAddLabelsModal.module.css";
 
@@ -78,13 +79,17 @@ export function CreateAddLabelsModal({
 
   const flushAdd = useCallback(
     (ids: string[], options?: { closeOnSuccess?: boolean }) => {
-      if (sameIdSet(ids, addSeedIds)) {
+      const capped = ids.slice(0, HAIKU_LABELS_MAX);
+      if (capped.length < ids.length) {
+        comicToast.error(`A haiku can have at most ${HAIKU_LABELS_MAX} labels`);
+      }
+      if (sameIdSet(capped, addSeedIds)) {
         if (options?.closeOnSuccess) onClose();
         return;
       }
       void setHaikuLabels({
         haikuId: haiku.id,
-        labelIds: ids,
+        labelIds: capped,
         onSuccess: async () => {
           comicToast.success("Labels saved");
           onSaved?.();
@@ -197,6 +202,7 @@ export function CreateAddLabelsModal({
               onFooter={submitAdd}
               onSelectionChange={setDraftIds}
               footerBusy={isSettingLabels}
+              maxSelected={HAIKU_LABELS_MAX}
             />
           )}
         </div>

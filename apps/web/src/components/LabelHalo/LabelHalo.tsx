@@ -32,6 +32,13 @@ export type LabelHaloProps = {
   style?: CSSProperties;
   /** Accessible name for the halo region. */
   ariaLabel?: string;
+  /**
+   * wrap — fit-content around children (Storybook).
+   * fill — absolute overlay expanding pad outside a path-sized parent.
+   */
+  layout?: "wrap" | "fill";
+  /** When false, labels render without drag/rotate. */
+  interactive?: boolean;
 };
 
 function clampPercent(value: number) {
@@ -59,6 +66,7 @@ type DraggableLabelProps = {
   label: LabelHaloLabelItem;
   rotateDeg: number;
   isDragging: boolean;
+  interactive: boolean;
   dropRef: RefObject<HTMLDivElement | null>;
   outlineRef: RefObject<SVGSVGElement | null>;
   onDragActiveChange: (labelId: string, active: boolean) => void;
@@ -71,6 +79,7 @@ function DraggableLabel({
   label,
   rotateDeg,
   isDragging,
+  interactive,
   dropRef,
   outlineRef,
   onDragActiveChange,
@@ -85,6 +94,7 @@ function DraggableLabel({
   rotateDegRef.current = rotateDeg;
 
   useEffect(() => {
+    if (!interactive) return;
     const target = wrapRef.current;
     const visual = visualRef.current;
     const container = dropRef.current;
@@ -164,6 +174,7 @@ function DraggableLabel({
   }, [
     dropRef,
     outlineRef,
+    interactive,
     label.id,
     onDragActiveChange,
     onPositionDraft,
@@ -192,11 +203,19 @@ function DraggableLabel({
           connection={label.connection ?? "start"}
           rotateDeg={rotateDeg}
           isDragging={isDragging}
+          disabled={!interactive}
+          showRotateControl={interactive}
           rootRef={(node) => {
             slotFocusRef.current = node;
           }}
-          onRotateDraft={(next) => onRotateDraft(label.id, next)}
-          onPlacementCommit={(placement) => onPlacementCommit(label.id, placement)}
+          onRotateDraft={
+            interactive ? (next) => onRotateDraft(label.id, next) : undefined
+          }
+          onPlacementCommit={
+            interactive
+              ? (placement) => onPlacementCommit(label.id, placement)
+              : undefined
+          }
         />
       </div>
     </div>
@@ -210,6 +229,8 @@ export function LabelHalo({
   className,
   style,
   ariaLabel = "Label halo",
+  layout = "wrap",
+  interactive = true,
 }: LabelHaloProps) {
   const dropRef = useRef<HTMLDivElement | null>(null);
   const outlineRef = useRef<SVGSVGElement | null>(null);
@@ -277,7 +298,13 @@ export function LabelHalo({
   return (
     <div
       ref={dropRef}
-      className={[styles.halo, className].filter(Boolean).join(" ")}
+      className={[
+        styles.halo,
+        layout === "fill" ? styles.haloFill : "",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
       style={
         {
           ...style,
@@ -290,7 +317,16 @@ export function LabelHalo({
       role="region"
       aria-label={ariaLabel}
     >
-      <div className={styles.content}>{children}</div>
+      <div
+        className={[
+          styles.content,
+          layout === "fill" ? styles.contentFill : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
+        {children}
+      </div>
 
       <svg ref={outlineRef} className={styles.outline} aria-hidden />
 
@@ -300,6 +336,7 @@ export function LabelHalo({
           label={label}
           rotateDeg={rotateById[label.id] ?? label.rotateDeg}
           isDragging={draggingId === label.id}
+          interactive={interactive}
           dropRef={dropRef}
           outlineRef={outlineRef}
           onDragActiveChange={onDragActiveChange}

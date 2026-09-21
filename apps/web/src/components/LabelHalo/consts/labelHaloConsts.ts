@@ -19,6 +19,9 @@ export const LABEL_HALO_ROTATE_ICON_SRC = "/label_halo/rotate_label.svg";
 
 export const LABEL_SLOT_ROTATE_STEP_DEG = 5;
 
+/** Max labels linked to one haiku (matches API HAIKU_LABELS_MAX). */
+export const HAIKU_LABELS_MAX = 10;
+
 /** Drop area padding around lantern content (CSS vars). */
 export const LABEL_HALO_DROP_PAD_REM = 5;
 /** Extra pad on top / left / right (not bottom). */

@@ -110,6 +110,10 @@ const labelPluginImpl = async (app: FastifyInstance) => {
           res.code(400).send({ ok: false, error: "One or more labels do not belong to this account" });
           return;
         }
+        if (result.reason === "too_many_labels") {
+          res.code(400).send({ ok: false, error: "A haiku can have at most 10 labels" });
+          return;
+        }
         res.code(403).send({ ok: false, error: "Unauthorized" });
         return;
       }
@@ -140,21 +144,29 @@ const labelPluginImpl = async (app: FastifyInstance) => {
               labelId?: unknown;
               connectionPointId?: unknown;
               rotateDeg?: unknown;
+              xPercent?: unknown;
+              yPercent?: unknown;
             }
           | undefined) ?? {};
       const labelId = body.labelId;
       const connectionPointId = body.connectionPointId;
       const rotateDeg = body.rotateDeg;
+      const xPercent = body.xPercent;
+      const yPercent = body.yPercent;
       if (typeof labelId !== "string" || !isUuid(labelId)) {
         res.code(400).send({ ok: false, error: "labelId must be a UUID" });
         return;
       }
-      if (typeof connectionPointId !== "string" || !connectionPointId.trim()) {
-        res.code(400).send({ ok: false, error: "connectionPointId is required" });
-        return;
-      }
       if (typeof rotateDeg !== "number" || !Number.isFinite(rotateDeg)) {
         res.code(400).send({ ok: false, error: "rotateDeg must be a finite number" });
+        return;
+      }
+      if (typeof xPercent !== "number" || !Number.isFinite(xPercent)) {
+        res.code(400).send({ ok: false, error: "xPercent must be a finite number" });
+        return;
+      }
+      if (typeof yPercent !== "number" || !Number.isFinite(yPercent)) {
+        res.code(400).send({ ok: false, error: "yPercent must be a finite number" });
         return;
       }
 
@@ -162,8 +174,10 @@ const labelPluginImpl = async (app: FastifyInstance) => {
         userId,
         haikuId,
         labelId,
-        connectionPointId,
         rotateDeg,
+        xPercent,
+        yPercent,
+        ...(typeof connectionPointId === "string" ? { connectionPointId } : {}),
       });
 
       if (!result.ok) {

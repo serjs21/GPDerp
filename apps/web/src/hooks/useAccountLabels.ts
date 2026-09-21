@@ -50,6 +50,8 @@ export type UseAccountLabelsResult = {
           shape: string;
           connectionPointId: string;
           rotateDeg: number;
+          xPercent: number;
+          yPercent: number;
         }>,
       ) => void | Promise<void>;
       onError?: () => void | Promise<void>;

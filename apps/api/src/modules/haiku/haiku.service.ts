@@ -6,6 +6,7 @@ import { runHaikuAgentStreamMock } from "../../mocks/textStream";
 import { authRepository } from "../auth/repository";
 import { haikuRepository, type GeneratedHaikuRow } from "./haiku.repository";
 import type { HaikuLinkedLabel } from "./haikuLabelPlacement";
+import { HAIKU_LABELS_MAX } from "./haikuLabelPlacement";
 import { labelRepository } from "../label/label.repository";
 import { normalizeLabelShape } from "../label/labelShape";
 import { mailService } from "../email/mailService";
@@ -371,7 +372,7 @@ export const haikuService = {
     accountLabelIds: Set<string>;
   }): Promise<
     | { ok: true; labels: HaikuLinkedLabel[] }
-    | { ok: false; reason: "not_found" | "forbidden" | "invalid_labels" }
+    | { ok: false; reason: "not_found" | "forbidden" | "invalid_labels" | "too_many_labels" }
   > {
     const { userId, haikuId, labelIds, accountLabelIds } = params;
     const haiku = await haikuRepository.findById(haikuId);
@@ -386,6 +387,9 @@ export const haikuService = {
     }
 
     const uniqueIds = [...new Set(labelIds)];
+    if (uniqueIds.length > HAIKU_LABELS_MAX) {
+      return { ok: false, reason: "too_many_labels" };
+    }
     if (!uniqueIds.every((id) => accountLabelIds.has(id))) {
       return { ok: false, reason: "invalid_labels" };
     }
@@ -398,15 +402,25 @@ export const haikuService = {
     userId: string;
     haikuId: string;
     labelId: string;
-    connectionPointId: string;
     rotateDeg: number;
+    xPercent: number;
+    yPercent: number;
+    connectionPointId?: string;
   }): Promise<
     | { ok: true; label: HaikuLinkedLabel }
     | { ok: false; reason: "not_found" | "forbidden" | "invalid_placement" }
   > {
-    const { userId, haikuId, labelId, connectionPointId, rotateDeg } = params;
-    const trimmedPoint = connectionPointId.trim();
-    if (!trimmedPoint || !Number.isFinite(rotateDeg)) {
+    const { userId, haikuId, labelId, rotateDeg, xPercent, yPercent, connectionPointId } =
+      params;
+    if (
+      !Number.isFinite(rotateDeg) ||
+      !Number.isFinite(xPercent) ||
+      !Number.isFinite(yPercent) ||
+      xPercent < 0 ||
+      xPercent > 100 ||
+      yPercent < 0 ||
+      yPercent > 100
+    ) {
       return { ok: false, reason: "invalid_placement" };
     }
 
@@ -426,8 +440,10 @@ export const haikuService = {
     }
 
     const updated = await haikuRepository.updateLabelPlacement(haikuId, labelId, {
-      connectionPointId: trimmedPoint,
+      ...(connectionPointId?.trim() ? { connectionPointId: connectionPointId.trim() } : {}),
       rotateDeg,
+      xPercent,
+      yPercent,
     });
     if (!updated) return { ok: false, reason: "not_found" };
     return { ok: true, label: updated };

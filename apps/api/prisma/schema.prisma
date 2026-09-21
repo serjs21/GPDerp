@@ -219,6 +219,8 @@ model HaikuLabel {
   labelId           String @db.Uuid
   connectionPointId String @default("bl")
   rotateDeg         Float  @default(0)
+  xPercent          Float  @default(50)
+  yPercent          Float  @default(50)
 
   haiku Haiku @relation(fields: [haikuId], references: [id], onDelete: Cascade)
   label Label @relation(fields: [labelId], references: [id], onDelete: Cascade)

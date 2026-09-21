@@ -2,6 +2,8 @@
 
 import { memo, type CSSProperties, type ReactNode } from "react";
 import type { HaikuDto } from "@/api/haikus";
+import { LabelHalo } from "@/components/LabelHalo/LabelHalo";
+import { toLabelHaloItems } from "@/components/LabelHalo/utils/toLabelHaloItems";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternDeleteExit } from "@/components/Lantern/LanternDeleteExit";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
@@ -12,10 +14,19 @@ import {
 } from "@/components/Lantern/lanternTransform";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
+import { useHaikuLabelPlacement } from "@/hooks/useHaikuLabelPlacement";
 import type { StopFace } from "./pathStopRotation";
 import styles from "./SVGPath.module.css";
 
 const WIDTH_REM = 19;
+
+const IDENTITY_TRANSFORM = {
+  x: 0,
+  y: 0,
+  scale: 1,
+  rotate: 0,
+  positionMode: "translate" as const,
+};
 
 export type SVGPathLanternProps = {
   haiku?: HaikuDto;
@@ -121,6 +132,75 @@ function RotatedPathAnchor({
   );
 }
 
+function LanternWithHalo({
+  haiku,
+  transform,
+  flightStyle,
+  lanternClass,
+  exiting,
+  ariaLabel,
+  excludeLabelIds,
+  interactive,
+  onChanged,
+  children,
+}: {
+  haiku: HaikuDto;
+  transform: LanternTransform;
+  flightStyle?: CSSProperties;
+  lanternClass: string;
+  exiting: boolean;
+  ariaLabel: string;
+  excludeLabelIds?: string[];
+  interactive: boolean;
+  onChanged?: () => void;
+  children: ReactNode;
+}) {
+  const { onPlacementCommit } = useHaikuLabelPlacement({
+    haikuId: haiku.id,
+    enabled: interactive,
+    onChanged,
+  });
+  const haloLabels = toLabelHaloItems(haiku.labels, excludeLabelIds);
+  const pathStyle = {
+    ...lanternTransformToCssVars(transform),
+    ...flightStyle,
+    "--lantern-width": `${WIDTH_REM}rem`,
+  } as CSSProperties;
+
+  return (
+    <div
+      className={[
+        lanternStyles.root,
+        lanternStyles.pathPositioned,
+        lanternClass,
+        exiting ? lanternStyles.flightExiting : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      style={pathStyle}
+    >
+      <LabelHalo
+        layout="fill"
+        interactive={interactive}
+        labels={haloLabels}
+        onPlacementCommit={interactive ? onPlacementCommit : undefined}
+        ariaLabel={`${ariaLabel} labels`}
+      >
+        <LanternFrame
+          transform={IDENTITY_TRANSFORM}
+          flightExiting={exiting}
+          widthRem={WIDTH_REM}
+          ariaLabel={ariaLabel}
+          showLabelBelt={false}
+          style={{ width: "100%", height: "100%" }}
+        >
+          {children}
+        </LanternFrame>
+      </LabelHalo>
+    </div>
+  );
+}
+
 export function SVGPathLantern({
   haiku,
   generatingDraft,
@@ -188,15 +268,16 @@ export function SVGPathLantern({
           }
 
           return (
-            <LanternFrame
-              className={lanternClass}
+            <LanternWithHalo
+              haiku={haiku}
               transform={transform}
-              style={flightStyle}
-              flightExiting={exiting}
-              widthRem={WIDTH_REM}
+              flightStyle={flightStyle}
+              lanternClass={lanternClass}
+              exiting={exiting}
               ariaLabel={ariaLabel}
-              haikuLabels={haiku.labels}
               excludeLabelIds={excludeLabelIds}
+              interactive={!isAnimating}
+              onChanged={onChanged}
             >
               <SVGPathLanternBody
                 haiku={haiku}
@@ -206,7 +287,7 @@ export function SVGPathLantern({
                 onDelete={onDelete}
                 onChanged={onChanged}
               />
-            </LanternFrame>
+            </LanternWithHalo>
           );
         }}
       </LanternDeleteExit>

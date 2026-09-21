@@ -2,9 +2,9 @@ import { prismaClient } from "../../lib/prisma";
 import { HAIKU_GENERATION_CREDIT_COST } from "../payments/constants";
 import { trySpendGenerationCreditWithTx } from "../payments/payments.repository";
 import {
-  defaultPlacementForIndex,
   haikuLabelLinkSelect,
   mapHaikuLabelLinks,
+  pickLeastOccupiedLabelPlacement,
   type HaikuLinkedLabel,
 } from "./haikuLabelPlacement";
 
@@ -43,6 +43,8 @@ type HaikuRowWithLinks = {
   haikuLabels: Array<{
     connectionPointId: string;
     rotateDeg: number;
+    xPercent: number;
+    yPercent: number;
     label: { id: string; name: string; color: string; shape: string };
   }>;
 };
@@ -73,6 +75,8 @@ export type LabelPlacementInput = {
   labelId: string;
   connectionPointId?: string;
   rotateDeg?: number;
+  xPercent?: number;
+  yPercent?: number;
 };
 
 export const haikuRepository = {
@@ -181,7 +185,7 @@ export const haikuRepository = {
 
   /**
    * Replace haiku↔label membership. Keeps placement for labels that remain;
-   * assigns default connection points for newly linked labels.
+   * assigns least-occupied free % for newly linked labels.
    */
   async setLabels(id: string, labelIds: string[]): Promise<{ id: string; labels: HaikuLinkedLabel[] }> {
     const uniqueIds = [...new Set(labelIds)];
@@ -191,6 +195,8 @@ export const haikuRepository = {
         labelId: true,
         connectionPointId: true,
         rotateDeg: true,
+        xPercent: true,
+        yPercent: true,
       },
     });
     const existingByLabel = new Map(existing.map((row) => [row.labelId, row]));
@@ -198,11 +204,10 @@ export const haikuRepository = {
     const toDelete = existing.filter((row) => !nextIds.has(row.labelId)).map((row) => row.labelId);
     const toCreate = uniqueIds.filter((labelId) => !existingByLabel.has(labelId));
 
-    const occupiedPoints = new Set(
-      uniqueIds
-        .map((labelId) => existingByLabel.get(labelId)?.connectionPointId)
-        .filter((point): point is string => Boolean(point)),
-    );
+    const occupiedCenters = uniqueIds
+      .map((labelId) => existingByLabel.get(labelId))
+      .filter((row): row is NonNullable<typeof row> => Boolean(row))
+      .map((row) => ({ xPercent: row.xPercent, yPercent: row.yPercent }));
 
     await prismaClient.$transaction(async (tx) => {
       if (toDelete.length > 0) {
@@ -210,21 +215,20 @@ export const haikuRepository = {
           where: { haikuId: id, labelId: { in: toDelete } },
         });
       }
-      let createIndex = 0;
       for (const labelId of toCreate) {
-        let placement = defaultPlacementForIndex(createIndex);
-        while (occupiedPoints.has(placement.connectionPointId) && createIndex < 64) {
-          createIndex += 1;
-          placement = defaultPlacementForIndex(createIndex);
-        }
-        occupiedPoints.add(placement.connectionPointId);
-        createIndex += 1;
+        const placement = pickLeastOccupiedLabelPlacement(occupiedCenters);
+        occupiedCenters.push({
+          xPercent: placement.xPercent,
+          yPercent: placement.yPercent,
+        });
         await tx.haikuLabel.create({
           data: {
             haikuId: id,
             labelId,
             connectionPointId: placement.connectionPointId,
             rotateDeg: placement.rotateDeg,
+            xPercent: placement.xPercent,
+            yPercent: placement.yPercent,
           },
         });
       }
@@ -241,14 +245,23 @@ export const haikuRepository = {
   async updateLabelPlacement(
     haikuId: string,
     labelId: string,
-    placement: { connectionPointId: string; rotateDeg: number },
+    placement: {
+      connectionPointId?: string;
+      rotateDeg: number;
+      xPercent: number;
+      yPercent: number;
+    },
   ): Promise<HaikuLinkedLabel | null> {
     try {
       const row = await prismaClient.haikuLabel.update({
         where: { haikuId_labelId: { haikuId, labelId } },
         data: {
-          connectionPointId: placement.connectionPointId,
+          ...(placement.connectionPointId != null
+            ? { connectionPointId: placement.connectionPointId }
+            : {}),
           rotateDeg: placement.rotateDeg,
+          xPercent: placement.xPercent,
+          yPercent: placement.yPercent,
         },
         select: haikuLabelLinkSelect,
       });

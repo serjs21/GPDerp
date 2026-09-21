@@ -45,6 +45,8 @@ export type ComicLabelPickerPanelProps = {
   onSelectionChange?: (selectedIds: string[]) => void;
   footerBusy?: boolean;
   footerDisabled?: boolean;
+  /** When set, selecting beyond this count is ignored (deselect still works). */
+  maxSelected?: number;
   className?: string;
 };
 
@@ -79,6 +81,7 @@ export function ComicLabelPickerPanel({
   onSelectionChange,
   footerBusy = false,
   footerDisabled = false,
+  maxSelected,
   className,
 }: ComicLabelPickerPanelProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -204,6 +207,9 @@ export function ComicLabelPickerPanel({
     setSelectedIds((prev) => {
       if (prev.includes(label.id)) {
         return prev.filter((id) => id !== label.id);
+      }
+      if (maxSelected != null && prev.length >= maxSelected) {
+        return prev;
       }
       return [...prev, label.id];
     });

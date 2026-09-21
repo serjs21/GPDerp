@@ -12,6 +12,8 @@ export type HaikuLinkedLabelDto = {
   shape: string;
   connectionPointId: string;
   rotateDeg: number;
+  xPercent: number;
+  yPercent: number;
 };
 
 export type HaikuDto = {

@@ -14,6 +14,19 @@
   overflow: visible;
 }
 
+/* Expand pad outside a path-sized parent without shifting the path anchor. */
+.haloFill {
+  position: absolute;
+  top: calc(-1 * var(--label-halo-pad-top));
+  right: calc(-1 * var(--label-halo-pad-x));
+  bottom: calc(-1 * var(--label-halo-pad-bottom));
+  left: calc(-1 * var(--label-halo-pad-x));
+  width: auto;
+  max-width: none;
+  height: auto;
+  margin: 0;
+}
+
 .content {
   position: relative;
   z-index: 0;
@@ -25,6 +38,14 @@
   min-height: 18rem;
   /* Let labels receive pointer events over the lantern face. */
   pointer-events: none;
+}
+
+.contentFill {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  place-items: stretch;
 }
 
 .content > * {

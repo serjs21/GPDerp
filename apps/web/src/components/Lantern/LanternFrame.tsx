@@ -43,6 +43,8 @@ export type LanternFrameProps = LanternTransformInput & {
   /** Raw haiku labels; converted inside a memo boundary so tween frames skip the belt. */
   haikuLabels?: ReadonlyArray<LanternFrameLabelSource>;
   excludeLabelIds?: string[];
+  /** When false, skip LabelBelt (LabelHalo owns label chrome). Default true. */
+  showLabelBelt?: boolean;
   children: ReactNode;
 };
 
@@ -94,6 +96,7 @@ export function LanternFrame({
   labels,
   haikuLabels,
   excludeLabelIds,
+  showLabelBelt = true,
   children,
   step,
   progress,
@@ -144,11 +147,13 @@ export function LanternFrame({
         >
           <LanternFrameShell />
           <div className={styles.content}>{children}</div>
-          <LanternFrameBelt
-            labels={labels}
-            haikuLabels={haikuLabels}
-            excludeLabelIds={excludeLabelIds}
-          />
+          {showLabelBelt ? (
+            <LanternFrameBelt
+              labels={labels}
+              haikuLabels={haikuLabels}
+              excludeLabelIds={excludeLabelIds}
+            />
+          ) : null}
           <div
             ref={dockRef}
             className={styles.actionsBarHost}

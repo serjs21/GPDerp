@@ -55,7 +55,7 @@ export const labelService = {
     labelIds: string[];
   }): Promise<
     | { ok: true; labels: HaikuLinkedLabel[] }
-    | { ok: false; reason: "not_found" | "forbidden" | "invalid_labels" }
+    | { ok: false; reason: "not_found" | "forbidden" | "invalid_labels" | "too_many_labels" }
   > {
     const { userId, haikuId, labelIds } = params;
     const haiku = await haikuRepository.findById(haikuId);
@@ -78,8 +78,10 @@ export const labelService = {
     userId: string;
     haikuId: string;
     labelId: string;
-    connectionPointId: string;
     rotateDeg: number;
+    xPercent: number;
+    yPercent: number;
+    connectionPointId?: string;
   }): Promise<
     | { ok: true; label: HaikuLinkedLabel }
     | { ok: false; reason: "not_found" | "forbidden" | "invalid_placement" }

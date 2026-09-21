@@ -2,6 +2,7 @@ export { LabelHalo, type LabelHaloProps } from "./LabelHalo";
 export { LabelSlot, type LabelSlotProps } from "./LabelSlot";
 export {
   DEFAULT_LABEL_HALO_CONNECTION_POINTS,
+  HAIKU_LABELS_MAX,
   LABEL_HALO_CONNECTION_POINT_SRC,
   LABEL_HALO_DROP_PAD_EXTRA_REM,
   LABEL_HALO_DROP_PAD_REM,
@@ -16,3 +17,4 @@ export {
   type LabelHaloLabelItem,
   type LabelPlacement,
 } from "./consts/labelHaloConsts";
+export { toLabelHaloItems } from "./utils/toLabelHaloItems";

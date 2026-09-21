@@ -64,6 +64,8 @@ type SetHaikuLabelsResponse =
           shape: string;
           connectionPointId: string;
           rotateDeg: number;
+          xPercent: number;
+          yPercent: number;
         }>;
       };
     }
@@ -80,6 +82,8 @@ type UpdateHaikuLabelPlacementResponse =
           shape: string;
           connectionPointId: string;
           rotateDeg: number;
+          xPercent: number;
+          yPercent: number;
         };
       };
     }
@@ -123,6 +127,8 @@ export async function setLabelsForHaiku(
     shape: string;
     connectionPointId: string;
     rotateDeg: number;
+    xPercent: number;
+    yPercent: number;
   }>
 > {
   const { data } = await axios.put<SetHaikuLabelsResponse>(
@@ -139,8 +145,10 @@ export async function updateHaikuLabelPlacement(
   haikuId: string,
   placement: {
     labelId: string;
-    connectionPointId: string;
     rotateDeg: number;
+    xPercent: number;
+    yPercent: number;
+    connectionPointId?: string;
   },
 ): Promise<{
   id: string;
@@ -149,6 +157,8 @@ export async function updateHaikuLabelPlacement(
   shape: string;
   connectionPointId: string;
   rotateDeg: number;
+  xPercent: number;
+  yPercent: number;
 }> {
   const { data } = await axios.patch<UpdateHaikuLabelPlacementResponse>(
     `/label/haiku/${encodeURIComponent(haikuId)}/placement`,
