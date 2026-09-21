@@ -226,19 +226,17 @@ export function ComicLabelCreationModal({
         <div ref={colorShellRef} className={styles.colorShell}>
           <ComicPagePanel
             title={
-              pickerOpen ? undefined : (
-                <span className={styles.colorTitle}>
-                  Color
-                  {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG asset */}
-                  <img
-                    className={styles.fineDog}
-                    src={FINE_DOG_SRC}
-                    alt=""
-                    draggable={false}
-                    aria-hidden
-                  />
-                </span>
-              )
+              <span className={styles.colorTitle}>
+                Color
+                {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG asset */}
+                <img
+                  className={styles.fineDog}
+                  src={FINE_DOG_SRC}
+                  alt=""
+                  draggable={false}
+                  aria-hidden
+                />
+              </span>
             }
             background="solid"
             color="white"
