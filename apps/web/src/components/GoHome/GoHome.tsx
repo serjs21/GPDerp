@@ -25,7 +25,7 @@ export function GoHome({ className, forceShow = false }: GoHomeProps) {
   const pathname = usePathname();
   const sharpShape = resolveComicLabelShapePreset("sharp");
 
-  if (!forceShow && pathname === "/") return null;
+  if (!forceShow && (pathname === "/" || pathname.startsWith("/settings"))) return null;
 
   return (
     <div

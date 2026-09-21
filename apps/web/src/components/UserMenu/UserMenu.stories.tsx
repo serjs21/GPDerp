@@ -48,6 +48,17 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
+export const OnSettingsPage: Story = {
+  name: "On settings (Go home)",
+  parameters: {
+    nextjs: {
+      navigation: {
+        pathname: "/settings",
+      },
+    },
+  },
+};
+
 export const LongDisplayName: Story = {
   args: {
     user: makeUser({

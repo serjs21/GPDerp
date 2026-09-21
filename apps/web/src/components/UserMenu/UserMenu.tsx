@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { BrushMenu, type BrushMenuOption } from "@/components/BrushMenu";
 import { ComicConfirmModal } from "@/components/ComicConfirmModal";
 import type { UserObject } from "@/types";
@@ -49,23 +49,37 @@ function OptionIconLabel({
 
 export function UserMenu({ user, onLogout, className }: UserMenuProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const onSettingsPage = pathname.startsWith("/settings");
   const displayName = resolveDisplayName(user);
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
   const options = useMemo<BrushMenuOption[]>(
     () => [
-      {
-        value: "settings",
-        label: (
-          <OptionIconLabel
-            src="/nav/settings.svg"
-            iconLabel="Settings"
-            text="Settings"
-          />
-        ),
-        backgroundColor: "#1ac3b0",
-      },
+      onSettingsPage
+        ? {
+            value: "go-home",
+            label: (
+              <OptionIconLabel
+                src="/nav/go_back.svg"
+                iconLabel="Go home"
+                text="Go home"
+              />
+            ),
+            backgroundColor: "#1ac3b0",
+          }
+        : {
+            value: "settings",
+            label: (
+              <OptionIconLabel
+                src="/nav/settings.svg"
+                iconLabel="Settings"
+                text="Settings"
+              />
+            ),
+            backgroundColor: "#1ac3b0",
+          },
       {
         value: "logout",
         label: (
@@ -79,13 +93,16 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
         backgroundColor: "#0f8051",
       },
     ],
-    [],
+    [onSettingsPage],
   );
 
   const handleChange = (key: string) => {
     switch (key) {
       case "settings":
         router.push("/settings");
+        break;
+      case "go-home":
+        router.push("/");
         break;
       case "logout":
         setLogoutOpen(true);
