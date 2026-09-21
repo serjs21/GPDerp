@@ -34,11 +34,15 @@ export type LabelSlotProps = {
   /** Which label edge is the connection / rotate axis. */
   connection?: LabelHaloAnchor;
   rotateDeg: number;
-  /** Called on focus out (and after connection-point drop via parent). */
+  /** Called on focus out / outside click when placement changed. */
   onPlacementCommit?: (placement: LabelPlacement) => void;
+  /** Live draft rotation (for drag preview / reconnect). */
+  onRotateDraft?: (rotateDeg: number) => void;
   isDragging?: boolean;
-  /** When true, show rotation control (hover / focus / click / drag). */
+  /** When true, show rotation control (parent-driven). */
   active?: boolean;
+  /** When false, never render/show the rotate control (drag overlay). */
+  showRotateControl?: boolean;
   disabled?: boolean;
   className?: string;
   style?: CSSProperties;
@@ -66,8 +70,10 @@ export function LabelSlot({
   connection = "start",
   rotateDeg,
   onPlacementCommit,
+  onRotateDraft,
   isDragging = false,
   active: activeProp,
+  showRotateControl = true,
   disabled = false,
   className,
   style,
@@ -77,6 +83,12 @@ export function LabelSlot({
 }: LabelSlotProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const draftRotateRef = useRef(rotateDeg);
+  const connectionPointIdRef = useRef(connectionPointId);
+  connectionPointIdRef.current = connectionPointId;
+  const onPlacementCommitRef = useRef(onPlacementCommit);
+  onPlacementCommitRef.current = onPlacementCommit;
+  const onRotateDraftRef = useRef(onRotateDraft);
+  onRotateDraftRef.current = onRotateDraft;
   const [draftRotateDeg, setDraftRotateDeg] = useState(rotateDeg);
   const [selected, setSelected] = useState(false);
   const [isRotateDragging, setIsRotateDragging] = useState(false);
@@ -89,12 +101,14 @@ export function LabelSlot({
   }, [connectionPointId, rotateDeg]);
 
   const preset = resolveComicLabelShapePreset(shape);
-  const showControl =
-    Boolean(activeProp) || selected || isDragging || isRotateDragging;
+  const controlsVisible =
+    showRotateControl &&
+    !isDragging &&
+    (Boolean(activeProp) || selected || isRotateDragging);
 
   const commitIfChanged = () => {
     const next = {
-      connectionPointId,
+      connectionPointId: connectionPointIdRef.current,
       rotateDeg: draftRotateRef.current,
     };
     const prev = committedRef.current;
@@ -105,12 +119,13 @@ export function LabelSlot({
       return;
     }
     committedRef.current = next;
-    onPlacementCommit?.(next);
+    onPlacementCommitRef.current?.(next);
   };
 
   const setDraft = (next: number) => {
     draftRotateRef.current = next;
     setDraftRotateDeg(next);
+    onRotateDraftRef.current?.(next);
   };
 
   const nudge = (delta: number) => {
@@ -118,12 +133,44 @@ export function LabelSlot({
     setSelected(true);
   };
 
+  const blurSelection = () => {
+    setSelected(false);
+    setIsRotateDragging(false);
+    commitIfChanged();
+  };
+
   const onFocusOut = (event: FocusEvent<HTMLDivElement>) => {
     const next = event.relatedTarget;
     if (next instanceof Node && rootRef.current?.contains(next)) return;
-    setSelected(false);
-    commitIfChanged();
+    blurSelection();
   };
+
+  useEffect(() => {
+    if (!selected && !isRotateDragging) return;
+
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (rootRef.current?.contains(target)) return;
+      setSelected(false);
+      setIsRotateDragging(false);
+      const next = {
+        connectionPointId: connectionPointIdRef.current,
+        rotateDeg: draftRotateRef.current,
+      };
+      const prev = committedRef.current;
+      if (
+        prev.connectionPointId !== next.connectionPointId ||
+        prev.rotateDeg !== next.rotateDeg
+      ) {
+        committedRef.current = next;
+        onPlacementCommitRef.current?.(next);
+      }
+    };
+
+    document.addEventListener("pointerdown", onPointerDown, true);
+    return () => document.removeEventListener("pointerdown", onPointerDown, true);
+  }, [selected, isRotateDragging]);
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (disabled) return;
@@ -136,16 +183,20 @@ export function LabelSlot({
     } else if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       setSelected(true);
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      blurSelection();
+      rootRef.current?.blur();
     }
   };
 
-  const rotateControl = (
+  const rotateControl = showRotateControl ? (
     <button
       type="button"
       className={styles.rotateControl}
-      tabIndex={showControl && !disabled ? 0 : -1}
+      tabIndex={controlsVisible && !disabled ? 0 : -1}
       aria-label="Rotate label — drag around the label to adjust"
-      aria-hidden={!showControl}
+      aria-hidden={!controlsVisible}
       disabled={disabled}
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG asset */}
@@ -156,7 +207,7 @@ export function LabelSlot({
         draggable={false}
       />
     </button>
-  );
+  ) : null;
 
   return (
     <div
@@ -164,7 +215,7 @@ export function LabelSlot({
       ref={mergeRefs(rootRef, setNodeRef)}
       className={[
         styles.slot,
-        showControl ? styles.slotActive : "",
+        controlsVisible ? styles.slotActive : "",
         isDragging ? styles.slotDragging : "",
         isRotateDragging ? styles.slotRotateDragging : "",
         className,
@@ -201,7 +252,7 @@ export function LabelSlot({
         transformOrigin={transformOriginForConnection(connection)}
         applyTransform
         valueMode="relative"
-        disabled={disabled}
+        disabled={disabled || !showRotateControl}
         contentClassName={
           connection === "end" ? styles.rotateContentEnd : undefined
         }

@@ -51,10 +51,8 @@
   transition: opacity 160ms ease, background 160ms ease;
 }
 
-.slot:hover .rotateControl,
 .slot:focus-visible .rotateControl,
 .slotActive .rotateControl,
-.slotDragging .rotateControl,
 .slotRotateDragging .rotateControl {
   opacity: 1;
   pointer-events: auto;

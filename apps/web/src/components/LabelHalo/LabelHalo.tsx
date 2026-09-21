@@ -12,7 +12,7 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { useMemo, useState, type CSSProperties } from "react";
+import { useCallback, useMemo, useRef, useState, type CSSProperties } from "react";
 import {
   connectionPointInsetStyle,
   DEFAULT_LABEL_HALO_CONNECTION_POINTS,
@@ -39,20 +39,27 @@ function DraggableLabelSlot({
   label,
   point,
   onPlacementCommit,
+  onRotateDraft,
 }: {
   label: LabelHaloLabelItem;
   point: LabelHaloConnectionPoint;
   onPlacementCommit?: (labelId: string, placement: LabelPlacement) => void;
+  onRotateDraft: (labelId: string, rotateDeg: number) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: label.id,
-    data: { labelId: label.id, connectionPointId: label.connectionPointId },
+    data: {
+      labelId: label.id,
+      connectionPointId: label.connectionPointId,
+      rotateDeg: label.rotateDeg,
+    },
   });
 
   const style: CSSProperties = {
     ...slotPositionStyle(point),
     transform: CSS.Translate.toString(transform) ?? undefined,
-    opacity: isDragging ? 0.35 : 1,
+    // Source is hidden while dragging — only DragOverlay shows the preview.
+    opacity: isDragging ? 0 : 1,
   };
 
   return (
@@ -69,6 +76,7 @@ function DraggableLabelSlot({
         setNodeRef={setNodeRef}
         dragListeners={listeners}
         dragAttributes={attributes}
+        onRotateDraft={(next) => onRotateDraft(label.id, next)}
         onPlacementCommit={(placement) => onPlacementCommit?.(label.id, placement)}
       />
     </div>
@@ -121,12 +129,33 @@ export function LabelHalo({
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
   );
   const [activeId, setActiveId] = useState<string | null>(null);
+  const draftRotateByIdRef = useRef<Map<string, number>>(new Map());
+  const [, bumpDraft] = useState(0);
 
   const pointsById = useMemo(() => {
     const map = new Map<string, LabelHaloConnectionPoint>();
     for (const point of connectionPoints) map.set(point.id, point);
     return map;
   }, [connectionPoints]);
+
+  const rotateFor = useCallback(
+    (label: LabelHaloLabelItem) =>
+      draftRotateByIdRef.current.get(label.id) ?? label.rotateDeg,
+    [],
+  );
+
+  const onRotateDraft = useCallback((labelId: string, next: number) => {
+    draftRotateByIdRef.current.set(labelId, next);
+    bumpDraft((n) => n + 1);
+  }, []);
+
+  const commitPlacement = useCallback(
+    (labelId: string, placement: LabelPlacement) => {
+      draftRotateByIdRef.current.set(labelId, placement.rotateDeg);
+      onPlacementCommit?.(labelId, placement);
+    },
+    [onPlacementCommit],
+  );
 
   const activeLabel = activeId ? labels.find((label) => label.id === activeId) : null;
   const activePoint = activeLabel
@@ -135,12 +164,19 @@ export function LabelHalo({
   const showMarkers = activeId != null;
 
   const onDragStart = (event: DragStartEvent) => {
-    setActiveId(String(event.active.id));
+    const labelId = String(event.active.id);
+    const label = labels.find((item) => item.id === labelId);
+    if (label && !draftRotateByIdRef.current.has(labelId)) {
+      draftRotateByIdRef.current.set(labelId, label.rotateDeg);
+    }
+    setActiveId(labelId);
   };
 
   const onDragEnd = (event: DragEndEvent) => {
     const labelId = String(event.active.id);
     const label = labels.find((item) => item.id === labelId);
+    const rotateDeg =
+      draftRotateByIdRef.current.get(labelId) ?? label?.rotateDeg ?? 0;
     setActiveId(null);
     if (!label || !event.over) return;
 
@@ -150,9 +186,9 @@ export function LabelHalo({
     if (!pointsById.has(connectionPointId)) return;
     if (connectionPointId === label.connectionPointId) return;
 
-    onPlacementCommit?.(labelId, {
+    commitPlacement(labelId, {
       connectionPointId,
-      rotateDeg: label.rotateDeg,
+      rotateDeg,
     });
   };
 
@@ -183,7 +219,8 @@ export function LabelHalo({
               key={label.id}
               label={label}
               point={point}
-              onPlacementCommit={onPlacementCommit}
+              onPlacementCommit={commitPlacement}
+              onRotateDraft={onRotateDraft}
             />
           );
         })}
@@ -193,15 +230,16 @@ export function LabelHalo({
         {activeLabel ? (
           <div className={styles.dragOverlay}>
             <LabelSlot
-              id={activeLabel.id}
+              id={`overlay-${activeLabel.id}`}
               name={activeLabel.name}
               color={activeLabel.color}
               shape={activeLabel.shape}
               connectionPointId={activeLabel.connectionPointId}
               connection={activePoint?.connection ?? "start"}
-              rotateDeg={activeLabel.rotateDeg}
+              rotateDeg={rotateFor(activeLabel)}
               isDragging
-              active
+              showRotateControl={false}
+              disabled
             />
           </div>
         ) : null}
