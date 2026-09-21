@@ -74,21 +74,22 @@ const FIFTEEN_LABEL_SEEDS: Array<{
   yPercent: number;
   rotateDeg: number;
 }> = [
-  { name: "Crow", color: "#fa541c", xPercent: 8, yPercent: 62, rotateDeg: -18 },
-  { name: "Pond", color: "#13c2c2", xPercent: 92, yPercent: 30, rotateDeg: 0 },
-  { name: "Autumn", color: "#faad14", xPercent: 10, yPercent: 8, rotateDeg: 20 },
-  { name: "Mist", color: "#597ef7", xPercent: 88, yPercent: 8, rotateDeg: -16 },
-  { name: "Fine", color: "#94910a", xPercent: 90, yPercent: 68, rotateDeg: 14 },
-  { name: "River", color: "#36cfc9", xPercent: 6, yPercent: 36, rotateDeg: -8 },
-  { name: "Lantern", color: "#ff7a45", xPercent: 94, yPercent: 48, rotateDeg: 6 },
-  { name: "Pine", color: "#389e0d", xPercent: 18, yPercent: 78, rotateDeg: -24 },
-  { name: "Snow", color: "#adc6ff", xPercent: 78, yPercent: 82, rotateDeg: 22 },
-  { name: "Ink", color: "#434343", xPercent: 50, yPercent: 4, rotateDeg: 0 },
-  { name: "Moss", color: "#7cb305", xPercent: 4, yPercent: 52, rotateDeg: 12 },
-  { name: "Tide", color: "#08979c", xPercent: 96, yPercent: 58, rotateDeg: -10 },
-  { name: "Ember", color: "#d4380d", xPercent: 28, yPercent: 90, rotateDeg: -6 },
-  { name: "Cloud", color: "#85a5ff", xPercent: 70, yPercent: 92, rotateDeg: 18 },
-  { name: "Stone", color: "#8c8c8c", xPercent: 48, yPercent: 88, rotateDeg: 4 },
+  // Captured from FifteenLabels drag session (debug snapshot).
+  { name: "Crow", color: "#fa541c", xPercent: 10.7, yPercent: 68.18, rotateDeg: -18 },
+  { name: "Pond", color: "#13c2c2", xPercent: 85.13, yPercent: 17.97, rotateDeg: -30.72 },
+  { name: "Autumn", color: "#faad14", xPercent: 48.78, yPercent: 12.84, rotateDeg: 83.13 },
+  { name: "Mist", color: "#597ef7", xPercent: 63.86, yPercent: 22.92, rotateDeg: -57.69 },
+  { name: "Fine", color: "#94910a", xPercent: 75.93, yPercent: 67.5, rotateDeg: 4.04 },
+  { name: "River", color: "#36cfc9", xPercent: 26.8, yPercent: 34.71, rotateDeg: -20.77 },
+  { name: "Lantern", color: "#ff7a45", xPercent: 79.09, yPercent: 38.29, rotateDeg: -7.9 },
+  { name: "Pine", color: "#389e0d", xPercent: 15.59, yPercent: 80.65, rotateDeg: 8.31 },
+  { name: "Snow", color: "#adc6ff", xPercent: 90.88, yPercent: 86.8, rotateDeg: 6.64 },
+  { name: "Ink", color: "#434343", xPercent: 7.4, yPercent: 17.8, rotateDeg: -2.13 },
+  { name: "Moss", color: "#7cb305", xPercent: 11.57, yPercent: 48.03, rotateDeg: 13.06 },
+  { name: "Tide", color: "#08979c", xPercent: 85.99, yPercent: 55.2, rotateDeg: -7.8 },
+  { name: "Ember", color: "#d4380d", xPercent: 18.61, yPercent: 97.39, rotateDeg: -6 },
+  { name: "Cloud", color: "#85a5ff", xPercent: 78.81, yPercent: 100, rotateDeg: 18 },
+  { name: "Stone", color: "#8c8c8c", xPercent: 26.65, yPercent: 4.65, rotateDeg: 44.33 },
 ];
 
 const FIFTEEN_LABELS: LabelHaloLabelItem[] = FIFTEEN_LABEL_SEEDS.map((seed, index) => ({
@@ -209,7 +210,7 @@ function HaloLanternHost({
       },
       body: JSON.stringify({
         sessionId: "ab780c",
-        runId: "fifteen-locations",
+        runId: "fifteen-locations-verify",
         hypothesisId: "LOC",
         location: "LabelHalo.stories.tsx:mount",
         message: "fifteen labels mount",
