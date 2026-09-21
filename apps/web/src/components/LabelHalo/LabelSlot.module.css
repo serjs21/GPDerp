@@ -21,9 +21,9 @@
   max-width: 14rem;
 }
 
-/* Control always on the left (text end), 1rem from the burst. */
+/* Control on the right of the burst, 1rem gap. */
 .rotateContent {
-  flex-direction: row-reverse;
+  flex-direction: row;
   gap: 1rem;
 }
 
