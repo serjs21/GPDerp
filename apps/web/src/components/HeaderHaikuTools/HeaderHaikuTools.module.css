@@ -142,6 +142,17 @@
   min-width: 0;
   min-height: 36px;
   z-index: 1;
+  /* Slot stays pass-through; only widget roots capture hits. */
+  pointer-events: none;
+}
+
+.toolsSlot > * {
+  pointer-events: auto;
+}
+
+/* Chips tray is a wide fixed band — keep gaps pass-through (chips re-enable). */
+.toolsSlot > .filterChips {
+  pointer-events: none;
 }
 
 @media (max-width: 768px) {

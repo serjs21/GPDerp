@@ -39,6 +39,8 @@
   flex-wrap: wrap;
   width: 100%;
   min-width: 0;
+  /* Full-width layout only — hits go through gaps to labels below. */
+  pointer-events: none;
 }
 
 .headerNavSlot {
@@ -47,6 +49,7 @@
   gap: 0.65rem;
   min-width: 0;
   flex: 1;
+  pointer-events: none;
 }
 
 .headerAuthNav {

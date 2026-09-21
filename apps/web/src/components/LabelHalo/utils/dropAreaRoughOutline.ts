@@ -33,7 +33,7 @@ export function paintDropAreaRoughOutline(svg: SVGSVGElement): void {
     roughness: 1.35,
     bowing: 1.1,
     strokeWidth: 1.5,
-    stroke: "rgba(45, 45, 45, 0.72)",
+    stroke: "rgba(208, 225, 206, 0.95)",
     fill: "transparent",
     strokeLineDash: [5, 7],
     seed: OUTLINE_SEED,
