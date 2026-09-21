@@ -163,7 +163,7 @@ model Haiku {
   account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
   createdBy User    @relation("HaikuCreatedBy", fields: [createdById], references: [id])
 
-  labels     Label[]
+  haikuLabels HaikuLabel[]
   shareLinks ShareLink[]
 
   @@unique([accountId, title, titleSuffix])
@@ -207,11 +207,25 @@ model Label {
   accountId String  @db.Uuid
   account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
-  haikus Haiku[]
+  haikuLabels HaikuLabel[]
 
   @@unique([accountId, name])
   @@index([accountId])
   @@index([accountId, createdAt(sort: Desc)])
+}
+
+model HaikuLabel {
+  haikuId           String @db.Uuid
+  labelId           String @db.Uuid
+  connectionPointId String @default("bl")
+  rotateDeg         Float  @default(0)
+
+  haiku Haiku @relation(fields: [haikuId], references: [id], onDelete: Cascade)
+  label Label @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+  @@id([haikuId, labelId])
+  @@index([labelId])
+  @@index([haikuId])
 }
 
 model AuthIdentity {

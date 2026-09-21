@@ -1,6 +1,7 @@
 import { authRepository } from "../auth/repository";
 import { haikuRepository } from "../haiku/haiku.repository";
 import { haikuService } from "../haiku/haiku.service";
+import type { HaikuLinkedLabel } from "../haiku/haikuLabelPlacement";
 import { labelRepository } from "./label.repository";
 import { normalizeLabelShape } from "./labelShape";
 
@@ -53,7 +54,7 @@ export const labelService = {
     haikuId: string;
     labelIds: string[];
   }): Promise<
-    | { ok: true; labels: Array<{ id: string; name: string; color: string; shape: string }> }
+    | { ok: true; labels: HaikuLinkedLabel[] }
     | { ok: false; reason: "not_found" | "forbidden" | "invalid_labels" }
   > {
     const { userId, haikuId, labelIds } = params;
@@ -71,5 +72,18 @@ export const labelService = {
       labelIds,
       accountLabelIds,
     });
+  },
+
+  async updateHaikuLabelPlacementForUser(params: {
+    userId: string;
+    haikuId: string;
+    labelId: string;
+    connectionPointId: string;
+    rotateDeg: number;
+  }): Promise<
+    | { ok: true; label: HaikuLinkedLabel }
+    | { ok: false; reason: "not_found" | "forbidden" | "invalid_placement" }
+  > {
+    return haikuService.updateHaikuLabelPlacementForUser(params);
   },
 };

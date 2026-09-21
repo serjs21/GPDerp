@@ -117,6 +117,71 @@ const labelPluginImpl = async (app: FastifyInstance) => {
       res.send({ ok: true, data: { labels: result.labels } });
     },
   );
+
+  app.patch(
+    "/label/haiku/:haikuId/placement",
+    { preHandler: [app.requireAuthenticated] },
+    async (req: FastifyRequest, res: FastifyReply) => {
+      const userId = req.user?.sub;
+      if (!userId) {
+        res.code(401).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+
+      const { haikuId } = req.params as { haikuId: string };
+      if (!isUuid(haikuId)) {
+        res.code(400).send({ ok: false, error: "Invalid haiku id" });
+        return;
+      }
+
+      const body =
+        (req.body as
+          | {
+              labelId?: unknown;
+              connectionPointId?: unknown;
+              rotateDeg?: unknown;
+            }
+          | undefined) ?? {};
+      const labelId = body.labelId;
+      const connectionPointId = body.connectionPointId;
+      const rotateDeg = body.rotateDeg;
+      if (typeof labelId !== "string" || !isUuid(labelId)) {
+        res.code(400).send({ ok: false, error: "labelId must be a UUID" });
+        return;
+      }
+      if (typeof connectionPointId !== "string" || !connectionPointId.trim()) {
+        res.code(400).send({ ok: false, error: "connectionPointId is required" });
+        return;
+      }
+      if (typeof rotateDeg !== "number" || !Number.isFinite(rotateDeg)) {
+        res.code(400).send({ ok: false, error: "rotateDeg must be a finite number" });
+        return;
+      }
+
+      const result = await labelService.updateHaikuLabelPlacementForUser({
+        userId,
+        haikuId,
+        labelId,
+        connectionPointId,
+        rotateDeg,
+      });
+
+      if (!result.ok) {
+        if (result.reason === "not_found") {
+          res.code(404).send({ ok: false, error: "Not found" });
+          return;
+        }
+        if (result.reason === "invalid_placement") {
+          res.code(400).send({ ok: false, error: "Invalid placement" });
+          return;
+        }
+        res.code(403).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+
+      res.send({ ok: true, data: { label: result.label } });
+    },
+  );
 };
 
 export const labelPlugin = fp(labelPluginImpl);

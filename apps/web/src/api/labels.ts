@@ -54,7 +54,35 @@ type CreateLabelResponse =
   | { ok: false; error: string };
 
 type SetHaikuLabelsResponse =
-  | { ok: true; data: { labels: Array<{ id: string; name: string; color: string; shape: string }> } }
+  | {
+      ok: true;
+      data: {
+        labels: Array<{
+          id: string;
+          name: string;
+          color: string;
+          shape: string;
+          connectionPointId: string;
+          rotateDeg: number;
+        }>;
+      };
+    }
+  | { ok: false; error: string };
+
+type UpdateHaikuLabelPlacementResponse =
+  | {
+      ok: true;
+      data: {
+        label: {
+          id: string;
+          name: string;
+          color: string;
+          shape: string;
+          connectionPointId: string;
+          rotateDeg: number;
+        };
+      };
+    }
   | { ok: false; error: string };
 
 type ResolveManageAccountResponse =
@@ -87,7 +115,16 @@ export async function createLabelForAccount(options: CreateLabelForAccountOption
 export async function setLabelsForHaiku(
   haikuId: string,
   labelIds: string[],
-): Promise<Array<{ id: string; name: string; color: string; shape: string }>> {
+): Promise<
+  Array<{
+    id: string;
+    name: string;
+    color: string;
+    shape: string;
+    connectionPointId: string;
+    rotateDeg: number;
+  }>
+> {
   const { data } = await axios.put<SetHaikuLabelsResponse>(
     `/label/haiku/${encodeURIComponent(haikuId)}`,
     {
@@ -96,6 +133,29 @@ export async function setLabelsForHaiku(
   );
   if (!data.ok) throw new Error(data.error ?? "Failed to update labels");
   return data.data.labels;
+}
+
+export async function updateHaikuLabelPlacement(
+  haikuId: string,
+  placement: {
+    labelId: string;
+    connectionPointId: string;
+    rotateDeg: number;
+  },
+): Promise<{
+  id: string;
+  name: string;
+  color: string;
+  shape: string;
+  connectionPointId: string;
+  rotateDeg: number;
+}> {
+  const { data } = await axios.patch<UpdateHaikuLabelPlacementResponse>(
+    `/label/haiku/${encodeURIComponent(haikuId)}/placement`,
+    placement,
+  );
+  if (!data.ok) throw new Error(data.error ?? "Failed to update label placement");
+  return data.data.label;
 }
 
 export async function resolveManageLabelsAccountId(): Promise<string> {

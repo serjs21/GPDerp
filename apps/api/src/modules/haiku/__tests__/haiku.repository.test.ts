@@ -25,6 +25,17 @@ const haikuRow = {
   createdAt: new Date("2026-09-16T00:00:00.000Z"),
   accountId: "account-1",
   createdById: "user-1",
+  haikuLabels: [],
+};
+
+const haikuPayload = {
+  id: "haiku-1",
+  title: "Morning mist",
+  titleSuffix: 0,
+  body: "a haiku body",
+  createdAt: new Date("2026-09-16T00:00:00.000Z"),
+  accountId: "account-1",
+  createdById: "user-1",
   labels: [],
 };
 
@@ -52,7 +63,7 @@ describe("haikuRepository.createFromGeneration", () => {
       }),
     ).resolves.toEqual({
       ok: true,
-      haiku: haikuRow,
+      haiku: haikuPayload,
       creditsRemaining: 4,
     });
 

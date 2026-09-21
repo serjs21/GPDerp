@@ -67,13 +67,22 @@ export const labelRepository = {
       where: { id: labelId },
       select: {
         accountId: true,
-        _count: { select: { haikus: true } },
-        haikus: {
+        _count: { select: { haikuLabels: true } },
+        haikuLabels: {
           take,
-          orderBy: { createdAt: "desc" },
-          select: { id: true, title: true, body: true },
+          orderBy: { haiku: { createdAt: "desc" } },
+          select: {
+            haiku: { select: { id: true, title: true, body: true } },
+          },
         },
       },
+    }).then((row) => {
+      if (!row) return null;
+      return {
+        accountId: row.accountId,
+        _count: { haikus: row._count.haikuLabels },
+        haikus: row.haikuLabels.map((link) => link.haiku),
+      };
     });
   },
 
@@ -88,18 +97,28 @@ export const labelRepository = {
         }>,
       );
     }
-    return prismaClient.label.findMany({
-      where: { id: { in: labelIds } },
-      select: {
-        id: true,
-        _count: { select: { haikus: true } },
-        haikus: {
-          take,
-          orderBy: { createdAt: "desc" },
-          select: { id: true, title: true, body: true },
+    return prismaClient.label
+      .findMany({
+        where: { id: { in: labelIds } },
+        select: {
+          id: true,
+          _count: { select: { haikuLabels: true } },
+          haikuLabels: {
+            take,
+            orderBy: { haiku: { createdAt: "desc" } },
+            select: {
+              haiku: { select: { id: true, title: true, body: true } },
+            },
+          },
         },
-      },
-    });
+      })
+      .then((rows) =>
+        rows.map((row) => ({
+          id: row.id,
+          _count: { haikus: row._count.haikuLabels },
+          haikus: row.haikuLabels.map((link) => link.haiku),
+        })),
+      );
   },
 
   updateById(id: string, data: { name: string; color: string; shape: string }) {

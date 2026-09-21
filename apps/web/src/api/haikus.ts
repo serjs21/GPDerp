@@ -5,6 +5,15 @@ import uniqBy from "lodash-es/uniqBy";
 /** Page size for saved haiku list requests (must match product default). */
 export const HAIKU_LIST_PAGE_SIZE = 20;
 
+export type HaikuLinkedLabelDto = {
+  id: string;
+  name: string;
+  color: string;
+  shape: string;
+  connectionPointId: string;
+  rotateDeg: number;
+};
+
 export type HaikuDto = {
   id: string;
   title: string;
@@ -13,7 +22,7 @@ export type HaikuDto = {
   createdAt: string;
   accountId: string;
   createdById: string;
-  labels: Array<{ id: string; name: string; color: string; shape: string }>;
+  labels: HaikuLinkedLabelDto[];
 };
 
 export type HaikuListSuccess = {

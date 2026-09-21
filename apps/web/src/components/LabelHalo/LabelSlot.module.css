@@ -1,0 +1,80 @@
+.slot {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  width: max-content;
+  max-width: 11rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+  outline: none;
+}
+
+.slot:active,
+.slotDragging {
+  cursor: grabbing;
+}
+
+.burstWrap {
+  position: relative;
+  line-height: 0;
+  transform-origin: center center;
+}
+
+.arrows {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.slot:hover .arrows,
+.slot:focus-visible .arrows,
+.slotActive .arrows,
+.slotDragging .arrows {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.arrowButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: 0;
+  padding: 0;
+  border: 2px solid #111;
+  border-radius: 999px;
+  background: #fff;
+  color: #111;
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  appearance: none;
+}
+
+.arrowButton:hover,
+.arrowButton:focus-visible {
+  background: #ffe8a3;
+  outline: none;
+}
+
+.arrowButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arrows {
+    transition: none;
+  }
+}

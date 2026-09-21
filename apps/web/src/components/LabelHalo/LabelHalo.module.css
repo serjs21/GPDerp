@@ -1,0 +1,49 @@
+.halo {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 18rem;
+  overflow: visible;
+}
+
+.point {
+  position: absolute;
+  z-index: 2;
+  width: max-content;
+  max-width: 11rem;
+  margin: 0;
+  pointer-events: auto;
+}
+
+.pointDroppable {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin: 0;
+  pointer-events: auto;
+}
+
+.pointMarker {
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 2px rgb(255 255 255 / 80%));
+  pointer-events: none;
+  user-select: none;
+}
+
+.pointDroppableOver .pointMarker {
+  opacity: 1;
+  transform: scale(1.12);
+}
+
+.dragOverlay {
+  z-index: 20;
+  pointer-events: none;
+}

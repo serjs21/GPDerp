@@ -5,6 +5,7 @@ import { runHaikuAgentStream } from "../../agent";
 import { runHaikuAgentStreamMock } from "../../mocks/textStream";
 import { authRepository } from "../auth/repository";
 import { haikuRepository, type GeneratedHaikuRow } from "./haiku.repository";
+import type { HaikuLinkedLabel } from "./haikuLabelPlacement";
 import { labelRepository } from "../label/label.repository";
 import { normalizeLabelShape } from "../label/labelShape";
 import { mailService } from "../email/mailService";
@@ -43,7 +44,7 @@ export type HaikuPersistedPayload = {
   createdAt: string;
   accountId: string;
   createdById: string;
-  labels: Array<{ id: string; name: string; color: string; shape: string }>;
+  labels: HaikuLinkedLabel[];
 };
 
 export type HaikuStreamYield =
@@ -369,7 +370,7 @@ export const haikuService = {
     labelIds: string[];
     accountLabelIds: Set<string>;
   }): Promise<
-    | { ok: true; labels: Array<{ id: string; name: string; color: string; shape: string }> }
+    | { ok: true; labels: HaikuLinkedLabel[] }
     | { ok: false; reason: "not_found" | "forbidden" | "invalid_labels" }
   > {
     const { userId, haikuId, labelIds, accountLabelIds } = params;
@@ -391,6 +392,45 @@ export const haikuService = {
 
     const updated = await haikuRepository.setLabels(haikuId, uniqueIds);
     return { ok: true, labels: updated.labels };
+  },
+
+  async updateHaikuLabelPlacementForUser(params: {
+    userId: string;
+    haikuId: string;
+    labelId: string;
+    connectionPointId: string;
+    rotateDeg: number;
+  }): Promise<
+    | { ok: true; label: HaikuLinkedLabel }
+    | { ok: false; reason: "not_found" | "forbidden" | "invalid_placement" }
+  > {
+    const { userId, haikuId, labelId, connectionPointId, rotateDeg } = params;
+    const trimmedPoint = connectionPointId.trim();
+    if (!trimmedPoint || !Number.isFinite(rotateDeg)) {
+      return { ok: false, reason: "invalid_placement" };
+    }
+
+    const haiku = await haikuRepository.findById(haikuId);
+    if (!haiku) return { ok: false, reason: "not_found" };
+
+    if (haiku.createdById !== userId) {
+      const membership = await authRepository.findMembershipRoleForAccount(userId, haiku.accountId);
+      const role = membership?.role;
+      if (role !== "ADMIN" && role !== "OWNER") {
+        return { ok: false, reason: "forbidden" };
+      }
+    }
+
+    if (!haiku.labels.some((label) => label.id === labelId)) {
+      return { ok: false, reason: "not_found" };
+    }
+
+    const updated = await haikuRepository.updateLabelPlacement(haikuId, labelId, {
+      connectionPointId: trimmedPoint,
+      rotateDeg,
+    });
+    if (!updated) return { ok: false, reason: "not_found" };
+    return { ok: true, label: updated };
   },
 
   async shareHaikuByEmailForUser(params: {

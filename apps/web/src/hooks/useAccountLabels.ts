@@ -42,7 +42,16 @@ export type UseAccountLabelsResult = {
     options: {
       haikuId: string;
       labelIds: string[];
-      onSuccess?: (labels: Array<{ id: string; name: string; color: string; shape: string }>) => void | Promise<void>;
+      onSuccess?: (
+        labels: Array<{
+          id: string;
+          name: string;
+          color: string;
+          shape: string;
+          connectionPointId: string;
+          rotateDeg: number;
+        }>,
+      ) => void | Promise<void>;
       onError?: () => void | Promise<void>;
     },
   ) => Promise<void>;
