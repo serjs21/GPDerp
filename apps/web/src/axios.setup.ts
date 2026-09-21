@@ -2,7 +2,11 @@ import axios from "axios";
 import type { AxiosError, AxiosRequestConfig } from "axios";
 import { getTabId } from "./utils/tabId";
 import Cookies from "js-cookie";
-import { refreshAuthSession } from "./authRefresh";
+import {
+  hasCsrfCookie,
+  isAuthRefreshSkippedError,
+  refreshAuthSession,
+} from "./authRefresh";
 import {
   enqueueAuthRequest,
   shouldEnqueueAuthRequest,
@@ -20,6 +24,8 @@ export type AuthRequiredDetail = {
   status?: number;
   refreshFailed?: boolean;
   tabId?: string;
+  /** When true, useAuthentication must not POST /auth/debug-auth-log (API already logged, or anonymous). */
+  skipDebugLog?: boolean;
   detail?: Record<string, unknown>;
 };
 
@@ -42,6 +48,11 @@ export const notifyAuthRequired = (detail: AuthRequiredDetail) => {
     }),
   );
 };
+
+const cookiePresenceDetail = () => ({
+  hasAccess: Boolean(Cookies.get("access_token")),
+  hasCsrf: hasCsrfCookie(),
+});
 
 /** Final 401 after refresh is exhausted: open login; hold non-GET mutations. */
 const handleAuthRequired = (
@@ -122,12 +133,9 @@ axios.interceptors.response.use(
     const url = String(originalConfig.url);
 
     // Don't attempt refresh for the refresh/logout endpoint itself.
+    // Reject quietly so the outer caller emits at most one AUTH_REQUIRED (no refresh_endpoint_401 echo).
     if (url.startsWith("/auth/refresh") || url.startsWith("/auth/logout")) {
-      return handleAuthRequired(err, originalConfig, {
-        reason: url.startsWith("/auth/refresh") ? "refresh_endpoint_401" : "logout_endpoint_401",
-        message: `auth: 401 on ${url} without retry`,
-        refreshFailed: url.startsWith("/auth/refresh"),
-      });
+      return Promise.reject(err);
     }
 
     // Replayed requests that still 401 should not re-enter the queue.
@@ -146,16 +154,37 @@ axios.interceptors.response.use(
     }
     originalConfig._retry = true;
 
+    // No CSRF cookie: already anonymous / cleared — open login without debug_auth_logs noise.
+    if (!hasCsrfCookie()) {
+      return handleAuthRequired(err, originalConfig, {
+        reason: "anonymous_unauthenticated",
+        message: "auth: 401 with no csrf_token; skipping refresh",
+        skipDebugLog: true,
+        detail: cookiePresenceDetail(),
+      });
+    }
+
     try {
       await refreshAuthSession();
       return axios(originalConfig);
     } catch (refreshErr) {
+      if (isAuthRefreshSkippedError(refreshErr)) {
+        return handleAuthRequired(refreshErr, originalConfig, {
+          reason: "anonymous_unauthenticated",
+          message: "auth: refresh skipped — csrf_token cookie missing",
+          skipDebugLog: true,
+          detail: cookiePresenceDetail(),
+        });
+      }
+      // API already wrote debug_auth_logs for refresh/CSRF clears; skip client mirror.
       return handleAuthRequired(refreshErr, originalConfig, {
         reason: "refresh_failed",
         message: "auth: refreshAuthSession failed after API 401; clearing client session",
         refreshFailed: true,
+        skipDebugLog: true,
         detail: {
           failedRefreshUrl: "/auth/refresh",
+          ...cookiePresenceDetail(),
         },
       });
     }

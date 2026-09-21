@@ -21,6 +21,30 @@ export function isAccessTokenFresh(nowMs: number = Date.now()): boolean {
   }
 }
 
+/** Readable CSRF cookie required before POSTing `/auth/refresh`. */
+export function hasCsrfCookie(): boolean {
+  if (typeof document === "undefined") return false;
+  return Boolean(Cookies.get("csrf_token"));
+}
+
+export class AuthRefreshSkippedError extends Error {
+  readonly code = "AUTH_REFRESH_SKIPPED_NO_CSRF" as const;
+
+  constructor() {
+    super("auth: refresh skipped — csrf_token cookie missing");
+    this.name = "AuthRefreshSkippedError";
+  }
+}
+
+export function isAuthRefreshSkippedError(err: unknown): boolean {
+  return (
+    err instanceof AuthRefreshSkippedError ||
+    (typeof err === "object" &&
+      err !== null &&
+      (err as { code?: string }).code === "AUTH_REFRESH_SKIPPED_NO_CSRF")
+  );
+}
+
 async function withExclusiveLock<T>(run: () => Promise<T>): Promise<T> {
   const locks = typeof navigator !== "undefined" ? navigator.locks : undefined;
   if (locks?.request) {
@@ -45,10 +69,14 @@ async function withExclusiveLock<T>(run: () => Promise<T>): Promise<T> {
  * Single global refresh entrypoint (same-tab + cross-tab via Web Locks).
  * After waiting for the lock, skips the network call if another tab already
  * refreshed and left a fresh access token (unless `force` is set).
+ * Skips the network when the CSRF cookie is absent (anonymous / already cleared).
  */
 export async function refreshAuthSession(options?: { force?: boolean }): Promise<void> {
   return withExclusiveLock(async () => {
     if (!options?.force && isAccessTokenFresh()) return;
+    if (!hasCsrfCookie()) {
+      throw new AuthRefreshSkippedError();
+    }
     await axios.post("/auth/refresh");
   });
 }

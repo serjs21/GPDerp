@@ -156,6 +156,67 @@ describe("auth.controller", () => {
         source: "api",
         event: "cookies_cleared",
         reason: "refresh_cookie_missing",
+        detail: expect.objectContaining({
+          hasCsrfCookie: true,
+          hasRefreshCookie: false,
+        }),
+      }),
+      expect.anything(),
+    );
+    await app.close();
+  });
+
+  it("returns 401 without clearing or logging when access token is missing", async () => {
+    const app = await buildApp();
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/auth/me",
+    });
+
+    expect(response.statusCode).toBe(401);
+    expect(tokenService.clearAuthCookies).not.toHaveBeenCalled();
+    expect(recordDebugAuthLog).not.toHaveBeenCalled();
+    await app.close();
+  });
+
+  it("returns 401 without clearing or logging when CSRF cookie and header are both absent on refresh", async () => {
+    const app = await buildApp();
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/auth/refresh",
+    });
+
+    expect(response.statusCode).toBe(401);
+    expect(tokenService.clearAuthCookies).not.toHaveBeenCalled();
+    expect(recordDebugAuthLog).not.toHaveBeenCalled();
+    await app.close();
+  });
+
+  it("clears cookies and logs when CSRF cookie and header disagree", async () => {
+    const app = await buildApp();
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/auth/refresh",
+      headers: {
+        cookie: "csrf_token=cookie-value",
+        "x-csrf-token": "header-value",
+      },
+    });
+
+    expect(response.statusCode).toBe(401);
+    expect(tokenService.clearAuthCookies).toHaveBeenCalled();
+    expect(recordDebugAuthLog).toHaveBeenCalledWith(
+      expect.objectContaining({
+        source: "api",
+        event: "cookies_cleared",
+        reason: "csrf_mismatch",
+        detail: expect.objectContaining({
+          hasCsrfCookie: true,
+          hasCsrfHeader: true,
+        }),
       }),
       expect.anything(),
     );

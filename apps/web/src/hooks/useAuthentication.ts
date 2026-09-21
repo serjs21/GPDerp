@@ -6,7 +6,7 @@ import type { AccountToUserObject, UserObject } from "@/types";
 import Cookies from "js-cookie";
 import { decodeJwt } from "jose";
 import { postDebugAuthLog } from "@/api/authentication";
-import { refreshAuthSession } from "@/authRefresh";
+import { refreshAuthSession, hasCsrfCookie } from "@/authRefresh";
 import {
   AUTH_REQUIRED_EVENT,
   type AuthRequiredDetail,
@@ -81,7 +81,11 @@ const reportInvoluntaryAuthDrop = (payload: {
     requestPath: payload.requestPath,
     method: payload.method,
     tabId: getTabId(),
-    detail: payload.detail,
+    detail: {
+      hasAccess: Boolean(Cookies.get("access_token")),
+      hasCsrf: hasCsrfCookie(),
+      ...(payload.detail ?? {}),
+    },
   });
 };
 
@@ -103,9 +107,14 @@ export const useAuthentication = (): AuthenticationResult => {
       return { valid: false, shouldRefreshForMissingClaims: false, shouldAttemptRefresh: false };
     }
 
+    const canRefresh = hasCsrfCookie();
     const token = Cookies.get("access_token");
     if (!token) {
-      return { valid: false, shouldRefreshForMissingClaims: false, shouldAttemptRefresh: true };
+      return {
+        valid: false,
+        shouldRefreshForMissingClaims: false,
+        shouldAttemptRefresh: canRefresh,
+      };
     }
 
     try {
@@ -119,12 +128,20 @@ export const useAuthentication = (): AuthenticationResult => {
       };
 
       if (!payload?.sub || !payload?.sid || !payload?.exp) {
-        return { valid: false, shouldRefreshForMissingClaims: false, shouldAttemptRefresh: true };
+        return {
+          valid: false,
+          shouldRefreshForMissingClaims: false,
+          shouldAttemptRefresh: canRefresh,
+        };
       }
 
       const expMs = payload.exp * 1000;
       if (expMs <= Date.now()) {
-        return { valid: false, shouldRefreshForMissingClaims: false, shouldAttemptRefresh: true };
+        return {
+          valid: false,
+          shouldRefreshForMissingClaims: false,
+          shouldAttemptRefresh: canRefresh,
+        };
       }
 
       const hasUserNameClaim = typeof payload.userName === "string";
@@ -154,7 +171,11 @@ export const useAuthentication = (): AuthenticationResult => {
         shouldAttemptRefresh: false,
       };
     } catch {
-      return { valid: false, shouldRefreshForMissingClaims: false, shouldAttemptRefresh: true };
+      return {
+        valid: false,
+        shouldRefreshForMissingClaims: false,
+        shouldAttemptRefresh: canRefresh,
+      };
     }
   };
 
@@ -197,7 +218,7 @@ export const useAuthentication = (): AuthenticationResult => {
       });
     } catch (error) {
       const status = axios.isAxiosError(error) ? error.response?.status : undefined;
-      // 401 already emits AUTH_REQUIRED_EVENT with a full payload.
+      // 401 already emits AUTH_REQUIRED_EVENT; API may have logged cookie clears.
       if (status !== 401) {
         reportInvoluntaryAuthDrop({
           reason: "auth_me_failed",
@@ -218,7 +239,7 @@ export const useAuthentication = (): AuthenticationResult => {
         refreshAuthSession()
           .then(fetchAuthUser)
           .catch(() => {
-            // Refresh 401 already emits AUTH_REQUIRED_EVENT.
+            // Refresh 401 / skip already handled; avoid duplicate debug logs.
             setLoggedOut();
           });
       } else {
@@ -245,19 +266,22 @@ export const useAuthentication = (): AuthenticationResult => {
     const onAuthRequired = (event: Event) => {
       if (manualLogoutRef.current) return;
       const detail = (event as CustomEvent<AuthRequiredDetail>).detail;
-      reportInvoluntaryAuthDrop({
-        reason: detail?.reason ?? "auth_required_event",
-        message:
-          detail?.message ??
-          "auth: AUTH_REQUIRED_EVENT received; clearing client cookies and login state",
-        requestPath: detail?.originalUrl,
-        method: detail?.method,
-        detail: {
-          status: detail?.status,
-          refreshFailed: detail?.refreshFailed,
-          ...(detail?.detail ?? {}),
-        },
-      });
+      // Prefer API debug_auth_logs for cookie clears; only report client-only drops.
+      if (!detail?.skipDebugLog) {
+        reportInvoluntaryAuthDrop({
+          reason: detail?.reason ?? "auth_required_event",
+          message:
+            detail?.message ??
+            "auth: AUTH_REQUIRED_EVENT received; clearing client cookies and login state",
+          requestPath: detail?.originalUrl,
+          method: detail?.method,
+          detail: {
+            status: detail?.status,
+            refreshFailed: detail?.refreshFailed,
+            ...(detail?.detail ?? {}),
+          },
+        });
+      }
       clearClientAuthCookies();
       setLoggedOut();
     };

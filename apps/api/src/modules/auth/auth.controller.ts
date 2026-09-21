@@ -65,6 +65,18 @@ const authPluginImpl = async (app: FastifyInstance) => {
     return reply.code(400).send({ ok: false, error: AUTH_MESSAGES.invalidAuthRequest });
   };
 
+  const cookiePresenceDetail = (request: FastifyRequest) => ({
+    hasCookieHeader: Boolean(request.headers.cookie),
+    hasAccessCookie: Boolean(request.cookies?.[AUTH_COOKIE_NAMES.accessToken]),
+    hasRefreshCookie: Boolean(request.cookies?.[AUTH_COOKIE_NAMES.refreshToken]),
+    hasCsrfCookie: Boolean(request.cookies?.[AUTH_COOKIE_NAMES.csrfToken]),
+  });
+
+  /** Anonymous / no-session 401: do not clear cookies or write debug_auth_logs. */
+  const denyUnauthorized = (reply: FastifyReply, statusCode = 401) => {
+    reply.code(statusCode).send({ ok: false, error: AUTH_MESSAGES.unauthorized });
+  };
+
   const denyWithAuthCookiesCleared = (
     request: FastifyRequest,
     reply: FastifyReply,
@@ -77,6 +89,12 @@ const authPluginImpl = async (app: FastifyInstance) => {
     },
     statusCode = 401,
   ) => {
+    const detail = {
+      ...cookiePresenceDetail(request),
+      ...(meta.detail && typeof meta.detail === "object" && !Array.isArray(meta.detail)
+        ? (meta.detail as Record<string, unknown>)
+        : {}),
+    };
     void recordDebugAuthLog(
       {
         source: "api",
@@ -93,7 +111,7 @@ const authPluginImpl = async (app: FastifyInstance) => {
           : null,
         tabId:
           typeof request.headers["x-tab-id"] === "string" ? request.headers["x-tab-id"] : null,
-        detail: meta.detail,
+        detail,
       },
       app.log,
     );
@@ -101,10 +119,15 @@ const authPluginImpl = async (app: FastifyInstance) => {
     reply.code(statusCode).send({ ok: false, error: AUTH_MESSAGES.unauthorized });
   };
 
-  // Route guard for session-style endpoints (401 when not logged in).
-  const authenticate = async (request: FastifyRequest, reply: FastifyReply) => {
-    const result = await diagnoseAccessTokenFromRequest(request);
-    if (result.ok) return;
+  const denyAccessDiagnoseFailure = (
+    request: FastifyRequest,
+    reply: FastifyReply,
+    result: Exclude<Awaited<ReturnType<typeof diagnoseAccessTokenFromRequest>>, { ok: true }>,
+  ) => {
+    // No access cookie: anonymous request — plain 401, no clear/log.
+    if (result.reason === "access_token_missing") {
+      return denyUnauthorized(reply);
+    }
     return denyWithAuthCookiesCleared(request, reply, {
       reason: result.reason,
       message: `auth: access denied — ${result.reason}`,
@@ -113,16 +136,18 @@ const authPluginImpl = async (app: FastifyInstance) => {
     });
   };
 
+  // Route guard for session-style endpoints (401 when not logged in).
+  const authenticate = async (request: FastifyRequest, reply: FastifyReply) => {
+    const result = await diagnoseAccessTokenFromRequest(request);
+    if (result.ok) return;
+    return denyAccessDiagnoseFailure(request, reply, result);
+  };
+
   // Guard for resources that require a logged-in user (401 when not authenticated).
   const requireAuthenticated = async (request: FastifyRequest, reply: FastifyReply) => {
     const result = await diagnoseAccessTokenFromRequest(request);
     if (result.ok) return;
-    return denyWithAuthCookiesCleared(request, reply, {
-      reason: result.reason,
-      message: `auth: access denied — ${result.reason}`,
-      userId: result.userId,
-      sessionId: result.sessionId,
-    });
+    return denyAccessDiagnoseFailure(request, reply, result);
   };
 
   app.decorate("authenticate", authenticate);
@@ -156,12 +181,16 @@ const authPluginImpl = async (app: FastifyInstance) => {
       });
     }
 
+    // Both absent: not logged in / already cleared — plain 401, no clear/log.
+    if (!csrfCookie && !csrfHeader) {
+      return denyUnauthorized(reply);
+    }
+
     if (!csrfCookie || !csrfHeader || !safeEqual(csrfCookie, csrfHeader)) {
       return denyWithAuthCookiesCleared(request, reply, {
         reason: "csrf_mismatch",
         message: "auth: cookies cleared — CSRF cookie/header mismatch",
         detail: {
-          hasCsrfCookie: Boolean(csrfCookie),
           hasCsrfHeader: Boolean(csrfHeader),
         },
       });
