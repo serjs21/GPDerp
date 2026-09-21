@@ -1,10 +1,13 @@
 .halo {
   --label-halo-pad: 5rem;
+  --label-halo-pad-x: 13rem;
+  --label-halo-pad-top: 13rem;
+  --label-halo-pad-bottom: 5rem;
 
   position: relative;
   box-sizing: border-box;
   width: 100%;
-  padding: var(--label-halo-pad);
+  padding: var(--label-halo-pad-top) var(--label-halo-pad-x) var(--label-halo-pad-bottom);
   overflow: visible;
 }
 
@@ -15,6 +18,12 @@
   place-items: center;
   width: 100%;
   min-height: 18rem;
+  /* Let labels receive pointer events over the lantern face. */
+  pointer-events: none;
+}
+
+.content > * {
+  pointer-events: auto;
 }
 
 .outline {
@@ -29,16 +38,27 @@
   pointer-events: none;
 }
 
+/* Zero-size center anchor — anime owns this node's transform. */
 .slotWrap {
   position: absolute;
   z-index: 2;
-  width: max-content;
-  max-width: 14rem;
+  width: 0;
+  height: 0;
   margin: 0;
-  transform: translate(-50%, -50%);
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 .slotWrapDragging {
   z-index: 4;
+}
+
+/* Visual sits on the anchor; centering never fights anime translate. */
+.slotVisual {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: max-content;
+  max-width: 14rem;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
 }

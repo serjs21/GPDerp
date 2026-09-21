@@ -11,6 +11,7 @@ import {
   type RefObject,
 } from "react";
 import {
+  LABEL_HALO_DROP_PAD_EXTRA_REM,
   LABEL_HALO_DROP_PAD_REM,
   type LabelHaloLabelItem,
   type LabelPlacement,
@@ -78,17 +79,23 @@ function DraggableLabel({
   onPlacementCommit,
 }: DraggableLabelProps) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  const visualRef = useRef<HTMLDivElement | null>(null);
   const slotFocusRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const target = wrapRef.current;
+    const visual = visualRef.current;
     const container = dropRef.current;
-    if (!target || !container) return;
+    if (!target || !visual || !container) return;
 
-    const bakePosition = (draggable: { setX: (x: number, mute?: boolean) => void; setY: (y: number, mute?: boolean) => void }) => {
+    const bakePosition = (draggable: {
+      setX: (x: number, mute?: boolean) => void;
+      setY: (y: number, mute?: boolean) => void;
+    }) => {
       const drop = dropRef.current;
       if (!drop) return;
-      const next = percentFromRect(target, drop);
+      // Anchor is 0×0 at the label center; percentFromRect of the visual is equivalent.
+      const next = percentFromRect(visual, drop);
       target.style.left = `${next.xPercent}%`;
       target.style.top = `${next.yPercent}%`;
       draggable.setX(0, true);
@@ -97,12 +104,33 @@ function DraggableLabel({
       return next;
     };
 
+    const snapCenterUnderPointer = (draggable: {
+      pointer: number[];
+      setX: (x: number, mute?: boolean) => void;
+      setY: (y: number, mute?: boolean) => void;
+      x: number;
+      y: number;
+      coords: number[];
+    }) => {
+      // Anchor is the label center; anime preserves pointer-to-origin offset.
+      // Zero that offset so center stays under the cursor for the whole drag.
+      const anchor = target.getBoundingClientRect();
+      const px = draggable.pointer[0] ?? 0;
+      const py = draggable.pointer[1] ?? 0;
+      draggable.setX(draggable.x + (px - anchor.left), true);
+      draggable.setY(draggable.y + (py - anchor.top), true);
+      draggable.coords[0] = draggable.coords[2] = draggable.x;
+      draggable.coords[1] = draggable.coords[3] = draggable.y;
+    };
+
     const instance = createDraggable(target, {
+      trigger: visual,
       container,
       dragThreshold: 6,
       releaseStiffness: 0,
       releaseDamping: 0,
-      onGrab: () => {
+      onGrab: (self) => {
+        snapCenterUnderPointer(self);
         onDragActiveChange(label.id, true);
         const svg = outlineRef.current;
         if (svg) paintDropAreaRoughOutline(svg);
@@ -133,22 +161,24 @@ function DraggableLabel({
         top: `${label.yPercent}%`,
       }}
     >
-      <LabelSlot
-        id={label.id}
-        name={label.name}
-        color={label.color}
-        shape={label.shape}
-        xPercent={label.xPercent}
-        yPercent={label.yPercent}
-        connection={label.connection ?? "start"}
-        rotateDeg={rotateDeg}
-        isDragging={isDragging}
-        rootRef={(node) => {
-          slotFocusRef.current = node;
-        }}
-        onRotateDraft={(next) => onRotateDraft(label.id, next)}
-        onPlacementCommit={(placement) => onPlacementCommit(label.id, placement)}
-      />
+      <div ref={visualRef} className={styles.slotVisual}>
+        <LabelSlot
+          id={label.id}
+          name={label.name}
+          color={label.color}
+          shape={label.shape}
+          xPercent={label.xPercent}
+          yPercent={label.yPercent}
+          connection={label.connection ?? "start"}
+          rotateDeg={rotateDeg}
+          isDragging={isDragging}
+          rootRef={(node) => {
+            slotFocusRef.current = node;
+          }}
+          onRotateDraft={(next) => onRotateDraft(label.id, next)}
+          onPlacementCommit={(placement) => onPlacementCommit(label.id, placement)}
+        />
+      </div>
     </div>
   );
 }
@@ -232,6 +262,9 @@ export function LabelHalo({
         {
           ...style,
           "--label-halo-pad": `${LABEL_HALO_DROP_PAD_REM}rem`,
+          "--label-halo-pad-x": `${LABEL_HALO_DROP_PAD_REM + LABEL_HALO_DROP_PAD_EXTRA_REM}rem`,
+          "--label-halo-pad-top": `${LABEL_HALO_DROP_PAD_REM + LABEL_HALO_DROP_PAD_EXTRA_REM}rem`,
+          "--label-halo-pad-bottom": `${LABEL_HALO_DROP_PAD_REM}rem`,
         } as CSSProperties
       }
       role="region"

@@ -7,7 +7,8 @@ export type LabelHaloConnectionPointId = "bl" | "ml" | "tl" | "tr" | "mr" | "br"
 
 /**
  * Halo connection point: `top` plus exactly one of `left` | `right` (percent of halo).
- * `connection` chooses which label edge sits on the point and the rotate axis.
+ * `connection` chooses which side shows the rotate control (layout only).
+ * Rotate / drag anchors are always the label center.
  */
 export type LabelHaloConnectionPoint = {
   id: LabelHaloConnectionPointId;
@@ -63,6 +64,6 @@ export function slotPositionStyle(point: LabelHaloConnectionPoint): CSSPropertie
   return { top, right };
 }
 
-export function transformOriginForConnection(connection: LabelHaloAnchor): string {
-  return connection === "start" ? "left center" : "right center";
+export function transformOriginForConnection(_connection: LabelHaloAnchor): string {
+  return "center center";
 }

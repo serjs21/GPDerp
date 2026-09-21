@@ -17,10 +17,7 @@ import {
   LABEL_SLOT_ROTATE_STEP_DEG,
   type LabelPlacement,
 } from "./consts/labelHaloConsts";
-import {
-  transformOriginForConnection,
-  type LabelHaloAnchor,
-} from "./consts/labelHaloConnectionPoints";
+import { type LabelHaloAnchor } from "./consts/labelHaloConnectionPoints";
 import styles from "./LabelSlot.module.css";
 
 export type LabelSlotProps = {
@@ -239,7 +236,7 @@ export function LabelSlot({
         onDegreesCommit={() => {
           setIsRotateDragging(false);
         }}
-        transformOrigin={transformOriginForConnection(connection)}
+        transformOrigin="center center"
         applyTransform
         valueMode="relative"
         disabled={disabled || !showRotateControl}

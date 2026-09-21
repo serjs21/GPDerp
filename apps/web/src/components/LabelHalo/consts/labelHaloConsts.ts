@@ -19,8 +19,10 @@ export const LABEL_HALO_ROTATE_ICON_SRC = "/label_halo/rotate_label.svg";
 
 export const LABEL_SLOT_ROTATE_STEP_DEG = 5;
 
-/** Drop area padding around lantern content (also CSS `--label-halo-pad`). */
+/** Drop area padding around lantern content (CSS vars). */
 export const LABEL_HALO_DROP_PAD_REM = 5;
+/** Extra pad on top / left / right (not bottom). */
+export const LABEL_HALO_DROP_PAD_EXTRA_REM = 8;
 
 export type LabelHaloLabelItem = {
   id: string;
