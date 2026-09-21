@@ -8,7 +8,10 @@
 
 .host {
   position: relative;
-  width: min(36rem, 96vw);
+  display: flex;
+  justify-content: center;
+  width: fit-content;
+  max-width: min(96vw, 100%);
   margin: 0 auto;
 }
 

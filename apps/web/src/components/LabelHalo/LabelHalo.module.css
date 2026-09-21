@@ -4,9 +4,12 @@
   --label-halo-pad-top: 13rem;
   --label-halo-pad-bottom: 5rem;
 
+  /* Hug lantern + pad so the drop ring stays centered on content. */
   position: relative;
   box-sizing: border-box;
-  width: 100%;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
   padding: var(--label-halo-pad-top) var(--label-halo-pad-x) var(--label-halo-pad-bottom);
   overflow: visible;
 }
@@ -16,7 +19,9 @@
   z-index: 0;
   display: grid;
   place-items: center;
-  width: 100%;
+  width: max-content;
+  max-width: 100%;
+  min-width: var(--lantern-width, 11.5rem);
   min-height: 18rem;
   /* Let labels receive pointer events over the lantern face. */
   pointer-events: none;
