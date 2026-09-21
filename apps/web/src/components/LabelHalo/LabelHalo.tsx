@@ -136,11 +136,15 @@ function DraggableLabel({
         if (svg) paintDropAreaRoughOutline(svg);
         slotFocusRef.current?.focus({ preventScroll: true });
       },
-      onRelease: () => {
-        bakePosition(instance);
-      },
-      onSettle: () => {
-        bakePosition(instance);
+      onRelease: (self) => {
+        // handleUp starts a velocity throw BEFORE onRelease. Bake the on-screen
+        // position, then kill that throw so settle cannot rebake a flung spot.
+        bakePosition(self);
+        self.stop();
+        self.setX(0, true);
+        self.setY(0, true);
+        self.coords[0] = self.coords[2] = 0;
+        self.coords[1] = self.coords[3] = 0;
         onDragActiveChange(label.id, false);
       },
     });
