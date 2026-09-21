@@ -102,7 +102,9 @@ export function ManageLabelsPanel({
   return (
     <div className={[styles.root, className].filter(Boolean).join(" ")}>
       {searchVariant === "comic" ? (
-        <ComicModalSearchPanel {...searchInputProps} />
+        <div className={styles.searchChrome}>
+          <ComicModalSearchPanel {...searchInputProps} />
+        </div>
       ) : (
         <div className={styles.searchPlain}>
           <ComicModalInput {...searchInputProps} />
@@ -138,12 +140,12 @@ export function ManageLabelsPanel({
                     <SakuraPetalLoader />
                   </div>
                 ) : null}
-                {createPanel}
               </>
             )}
           </>
         )}
       </div>
+      {createPanel}
     </div>
   );
 }

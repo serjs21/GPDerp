@@ -3,6 +3,10 @@
   flex-direction: column;
   gap: var(--comic-page-gutter, 10px);
   width: 100%;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .emailPanel {

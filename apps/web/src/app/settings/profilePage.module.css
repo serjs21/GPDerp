@@ -6,14 +6,28 @@
   width: 100%;
   min-height: 0;
   padding: clamp(0.75rem, 2vw, 1.5rem);
-  overflow: auto;
+  overflow: hidden;
 }
 
 .layout {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   width: min(100%, 56rem);
   margin: 0 auto;
+  /* Definite height so tab lists get a real scrollport (not the comic frame). */
+  height: calc(90vh - 2rem);
   max-height: calc(90vh - 2rem);
-  overflow: auto;
+  overflow: hidden;
+}
+
+/* ComicPageLayout's .pageInner — fill the capped comic frame. */
+.layout > div {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .body {
@@ -22,10 +36,12 @@
 
   box-sizing: border-box;
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   gap: var(--profile-gap);
   width: 100%;
   min-height: 0;
+  overflow: hidden;
 }
 
 .tabRow {
@@ -50,7 +66,8 @@
   flex: 1 1 auto;
   flex-direction: column;
   width: 100%;
-  min-height: 22rem;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .contentSlot > * {

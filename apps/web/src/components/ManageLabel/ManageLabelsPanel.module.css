@@ -17,6 +17,12 @@
   background: color-mix(in srgb, var(--background-color, #fcfaf2) 90%, transparent);
 }
 
+.searchChrome {
+  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
+}
+
 .listScroll {
   flex: 1 1 auto;
   box-sizing: border-box;
