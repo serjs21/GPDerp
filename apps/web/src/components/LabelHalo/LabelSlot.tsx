@@ -73,7 +73,7 @@ export function LabelSlot({
   shape,
   xPercent,
   yPercent,
-  connection = "start",
+  connection: _connection = "start",
   rotateDeg,
   onPlacementCommit,
   onRotateDraft,
@@ -240,9 +240,7 @@ export function LabelSlot({
         applyTransform
         valueMode="relative"
         disabled={disabled || !showRotateControl}
-        contentClassName={
-          connection === "end" ? styles.rotateContentEnd : undefined
-        }
+        contentClassName={styles.rotateContent}
         control={rotateControl}
         stopPropagationOnControl
       >
