@@ -96,7 +96,7 @@ export function ManageLabel({ accountId, label, onChanged }: ManageLabelProps) {
   return (
     <article className={styles.root}>
       <ComicPageRow className={styles.strip}>
-        <OverlayTitle title="Edit" direction="bottom" className={styles.overlaySlot}>
+        <OverlayTitle title="Edit" direction="bottom" className={styles.labelSlot}>
           <button
             type="button"
             className={styles.panelButton}
@@ -111,7 +111,7 @@ export function ManageLabel({ accountId, label, onChanged }: ManageLabelProps) {
           <OverlayTitle
             title="Check them out"
             direction="bottom"
-            className={[styles.overlaySlot, styles.overlaySlotFan].join(" ")}
+            className={styles.connectedSlot}
           >
             <button
               type="button"
@@ -123,7 +123,7 @@ export function ManageLabel({ accountId, label, onChanged }: ManageLabelProps) {
             </button>
           </OverlayTitle>
         ) : (
-          <div className={styles.overlaySlot}>{connectedPanel}</div>
+          <div className={styles.connectedSlot}>{connectedPanel}</div>
         )}
 
         <SVGPanelActionButton

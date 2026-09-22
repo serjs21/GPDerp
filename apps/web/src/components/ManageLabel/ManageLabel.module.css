@@ -17,14 +17,30 @@
   overflow: visible;
 }
 
-.labelPanel,
-.connectedPanel,
-.actionSlot,
-.overlaySlot {
-  flex: 1 1 0 !important;
+.labelSlot,
+.connectedSlot,
+.actionSlot {
   min-height: 9.5rem;
   min-width: 0;
   width: 0;
+  border-radius: 0;
+}
+
+/* Manage-labels strip: label | connections | delete → 3fr 4fr 1fr */
+.strip > .labelSlot {
+  flex: 3 1 0 !important;
+}
+
+.strip > .connectedSlot {
+  flex: 4 1 0 !important;
+}
+
+.strip > .actionSlot {
+  flex: 1 1 0 !important;
+}
+
+.labelPanel,
+.connectedPanel {
   border-radius: 0;
 }
 
@@ -32,13 +48,15 @@
   margin-top: calc(-1 * var(--comic-page-border, 4px));
 }
 
-.overlaySlot {
+.labelSlot,
+.connectedSlot {
   display: flex;
   height: auto;
 }
 
-.overlaySlotFan {
-  overflow: visible !important;
+.connectedSlot {
+  /* Lantern fan may spill past the panel; OverlayTitle clips via clip-path. */
+  overflow: visible;
 }
 
 .panelButton {

@@ -6,7 +6,9 @@
   align-items: stretch;
   min-width: 0;
   min-height: 0;
-  overflow: hidden;
+  /* Visible so nested fans (e.g. ManageLabel lanterns) can spill; inactive
+     overlay is clipped via clip-path on `.overlay`, not this box. */
+  overflow: visible;
 }
 
 .root > :first-child {
@@ -28,7 +30,7 @@
   background: color-mix(in srgb, #111 58%, transparent);
   pointer-events: none;
   user-select: none;
-  transition: transform var(--overlay-title-motion) cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  transition: clip-path var(--overlay-title-motion) cubic-bezier(0.45, 0.05, 0.55, 0.95);
 }
 
 .overlayActive {
@@ -51,20 +53,21 @@
   text-wrap: balance;
 }
 
+/* Fully clipped while idle — works even when `.root` overflow is visible. */
 .fromBottom {
-  transform: translateY(100%);
+  clip-path: inset(100% 0 0 0);
 }
 
 .fromTop {
-  transform: translateY(-100%);
+  clip-path: inset(0 0 100% 0);
 }
 
 .fromLeft {
-  transform: translateX(-100%);
+  clip-path: inset(0 100% 0 0);
 }
 
 .fromRight {
-  transform: translateX(100%);
+  clip-path: inset(0 0 0 100%);
 }
 
 /* Hover only for pointer; :focus-visible for keyboard (not mouse click focus). */
@@ -76,7 +79,7 @@
 .root:has(:focus-visible) .fromLeft,
 .root:hover .fromRight,
 .root:has(:focus-visible) .fromRight {
-  transform: translate(0, 0);
+  clip-path: inset(0);
 }
 
 @media (prefers-reduced-motion: reduce) {

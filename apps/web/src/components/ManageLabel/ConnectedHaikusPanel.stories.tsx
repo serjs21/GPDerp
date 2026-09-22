@@ -44,19 +44,17 @@ function SettingsLabelsStripStage({
           background="solid"
           color="white"
           flexWeight={1}
-          className={manageStyles.labelPanel}
+          className={[manageStyles.labelSlot, manageStyles.labelPanel].join(" ")}
           ariaLabel="Label preview"
         >
           <div className={manageStyles.labelPreview} />
         </ComicPagePanel>
-        <div className={[manageStyles.overlaySlot, manageStyles.overlaySlotFan].join(" ")}>
-          {children}
-        </div>
+        <div className={manageStyles.connectedSlot}>{children}</div>
         <ComicPagePanel
           background="solid"
           color="white"
           flexWeight={1}
-          className={manageStyles.actionSlot}
+          className={[manageStyles.actionSlot].join(" ")}
           ariaLabel="Delete action"
         />
       </ComicPageRow>
