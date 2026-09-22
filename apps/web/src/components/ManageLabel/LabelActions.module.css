@@ -1,0 +1,77 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  align-self: stretch;
+  min-width: 0;
+  min-height: 9.5rem;
+  width: 0;
+  gap: 0;
+}
+
+.action {
+  flex: 1 1 0 !important;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  border-radius: 0;
+  filter: none !important;
+  transform: none !important;
+}
+
+.action + .action {
+  margin-top: calc(-1 * var(--comic-page-border, 4px));
+}
+
+.action::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--label-action-hover-fill, transparent);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.action:hover:not(.disabled)::before,
+.action:focus-visible:not(.disabled)::before {
+  opacity: 1;
+}
+
+.icon {
+  position: relative;
+  z-index: 2;
+  display: block;
+  box-sizing: border-box;
+  width: auto;
+  height: clamp(1.35rem, 28%, 2.35rem);
+  max-width: 72%;
+  margin: 0 auto;
+  object-fit: contain;
+  pointer-events: none;
+  transition: filter 0.2s ease;
+}
+
+.invertIconOnHover:hover:not(.disabled) .icon,
+.invertIconOnHover:focus-visible:not(.disabled) .icon {
+  filter: brightness(0) invert(1);
+}
+
+.disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.disabled:hover::before,
+.disabled:focus-visible::before {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .action::before,
+  .icon {
+    transition: none;
+  }
+}

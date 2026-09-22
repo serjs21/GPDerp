@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import type { LabelConnectedHaikuPreview } from "@/api/labels";
 import { ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
 import { ConnectedHaikusPanel } from "./ConnectedHaikusPanel";
+import { LabelActions } from "./LabelActions";
 import manageStyles from "./ManageLabel.module.css";
 
 const ACCOUNT_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
@@ -50,12 +51,13 @@ function SettingsLabelsStripStage({
           <div className={manageStyles.labelPreview} />
         </ComicPagePanel>
         <div className={manageStyles.connectedSlot}>{children}</div>
-        <ComicPagePanel
-          background="solid"
-          color="white"
-          flexWeight={1}
-          className={[manageStyles.actionSlot].join(" ")}
-          ariaLabel="Delete action"
+        <LabelActions
+          className={manageStyles.actionSlot}
+          labelName="Zen"
+          hasConnections
+          onTuneIn={() => undefined}
+          onEdit={() => undefined}
+          onDelete={() => undefined}
         />
       </ComicPageRow>
     </div>

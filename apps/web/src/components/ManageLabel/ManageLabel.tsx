@@ -11,10 +11,9 @@ import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationMod
 import { ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
 import { comicToast } from "@/components/ComicToast";
 import { DeleteConfirmModal } from "@/components/DeleteConfirmModal";
-import { OverlayTitle } from "@/components/OverlayTitle";
-import { SVGPanelActionButton } from "@/components/SVGPanelActionButton";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
 import { ConnectedHaikusPanel } from "./ConnectedHaikusPanel";
+import { LabelActions } from "./LabelActions";
 import styles from "./ManageLabel.module.css";
 
 export type ManageLabelProps = {
@@ -22,8 +21,6 @@ export type ManageLabelProps = {
   label: LabelDto;
   onChanged?: () => void;
 };
-
-const DELETE_HOVER = "var(--accent-red, #aa1f3f)";
 
 export function ManageLabel({ accountId, label, onChanged }: ManageLabelProps) {
   const router = useRouter();
@@ -57,83 +54,52 @@ export function ManageLabel({ accountId, label, onChanged }: ManageLabelProps) {
     }
   }, [deleteLabel, label.id, onChanged]);
 
-  const handleCheckThemOut = useCallback(() => {
+  const handleTuneIn = useCallback(() => {
     setSelectedLabelIds([label.id]);
     router.push("/");
   }, [label.id, router, setSelectedLabelIds]);
 
-  const labelPreview = (
-    <ComicPagePanel
-      background="solid"
-      color="white"
-      flexWeight={1}
-      className={styles.labelPanel}
-      ariaLabel={label.name}
-    >
-      <div className={styles.labelPreview}>
-        <ComicBurstLabel
-          text={formatComicLabelText(label.name)}
-          fill={label.color || "#888888"}
-          shapeKind={shape.kind}
-          spikeCount={shape.spikeCount}
-          randomness={shape.randomness}
-          seed={shape.id}
-          fontSize={20}
-        />
-      </div>
-    </ComicPagePanel>
-  );
-
-  const connectedPanel = (
-    <ConnectedHaikusPanel
-      accountId={accountId}
-      labelName={label.name}
-      items={connectedItems}
-      total={connectedTotal}
-    />
-  );
-
   return (
     <article className={styles.root}>
       <ComicPageRow className={styles.strip}>
-        <OverlayTitle title="Edit" direction="bottom" className={styles.labelSlot}>
-          <button
-            type="button"
-            className={styles.panelButton}
-            onClick={() => setEditOpen(true)}
-            aria-label={`Edit ${label.name}`}
+        <div className={styles.labelSlot}>
+          <ComicPagePanel
+            background="solid"
+            color="white"
+            flexWeight={1}
+            className={styles.labelPanel}
+            ariaLabel={label.name}
           >
-            {labelPreview}
-          </button>
-        </OverlayTitle>
+            <div className={styles.labelPreview}>
+              <ComicBurstLabel
+                text={formatComicLabelText(label.name)}
+                fill={label.color || "#888888"}
+                shapeKind={shape.kind}
+                spikeCount={shape.spikeCount}
+                randomness={shape.randomness}
+                seed={shape.id}
+                fontSize={20}
+              />
+            </div>
+          </ComicPagePanel>
+        </div>
 
-        {hasConnections ? (
-          <OverlayTitle
-            title="Check them out"
-            direction="bottom"
-            className={styles.connectedSlot}
-          >
-            <button
-              type="button"
-              className={styles.panelButton}
-              onClick={handleCheckThemOut}
-              aria-label={`View haikus labeled ${label.name}`}
-            >
-              {connectedPanel}
-            </button>
-          </OverlayTitle>
-        ) : (
-          <div className={styles.connectedSlot}>{connectedPanel}</div>
-        )}
+        <div className={styles.connectedSlot}>
+          <ConnectedHaikusPanel
+            accountId={accountId}
+            labelName={label.name}
+            items={connectedItems}
+            total={connectedTotal}
+          />
+        </div>
 
-        <SVGPanelActionButton
-          src="/panel_actions/delete.svg"
-          label="Delete"
-          ariaLabel={`Delete ${label.name}`}
-          hoverFill={DELETE_HOVER}
-          invertIconOnHover
-          onSelect={() => setDeleteOpen(true)}
+        <LabelActions
           className={styles.actionSlot}
+          labelName={label.name}
+          hasConnections={hasConnections}
+          onTuneIn={handleTuneIn}
+          onEdit={() => setEditOpen(true)}
+          onDelete={() => setDeleteOpen(true)}
         />
       </ComicPageRow>
 
