@@ -19,10 +19,10 @@ const OUTLINE_SEED = 71;
 
 const DEFAULT_STROKE = "rgba(208, 225, 206, 0.95)";
 const INSET = 3;
-const DASH_MIN = 9;
-const DASH_MAX = 18;
-const GAP_MIN = 4;
-const GAP_MAX = 8;
+const DASH_MIN = 4.5;
+const DASH_MAX = 9;
+const GAP_MIN = 10;
+const GAP_MAX = 16;
 const JITTER_MAX = 1.5;
 /** Share of dashes that get a more bent / rough stroke. */
 const WILD_DASH_CHANCE = 0.12;
