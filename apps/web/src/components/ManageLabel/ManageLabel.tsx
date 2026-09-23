@@ -6,8 +6,6 @@ import {
   useRef,
   useState,
   type AnimationEvent,
-  type CSSProperties,
-  type TransitionEvent,
 } from "react";
 import { useRouter } from "next/navigation";
 import type { LabelDto } from "@/api/labels";
@@ -64,8 +62,6 @@ export function ManageLabel({
   const [exiting, setExiting] = useState(forceExiting);
   const [collapsing, setCollapsing] = useState(false);
   const [entering, setEntering] = useState(animateEnter);
-  /** Locked pixel height during exit; collapses to `0` in parallel with boingOut. */
-  const [exitHeightPx, setExitHeightPx] = useState<number | null>(null);
   const exitNotifiedRef = useRef(false);
   const rootRef = useRef<HTMLElement>(null);
   const { deleteLabel } = useAccountLabels({ accountId, autofetch: false });
@@ -100,35 +96,57 @@ export function ManageLabel({
     onExitComplete?.();
   }, [onExitComplete]);
 
-  // BoingOut + height collapse start together; unmount when height hits 0.
+  // Lock measured height (no transition), then ease-in to 0 with boingOut.
   useEffect(() => {
     if (!exiting) {
-      setExitHeightPx(null);
       setCollapsing(false);
+      const node = rootRef.current;
+      if (node) {
+        node.style.height = "";
+        node.style.minHeight = "";
+        node.style.marginBottom = "";
+        node.style.transition = "";
+        node.style.overflow = "";
+      }
       return;
     }
 
     const node = rootRef.current;
     if (!node) return;
 
-    const measured = node.getBoundingClientRect().height;
-    setExitHeightPx(measured);
+    const fromHeight = node.getBoundingClientRect().height;
+    // 1) Pin current size with transition disabled so the start frame is real.
+    node.style.transition = "none";
+    node.style.overflow = "hidden";
+    node.style.minHeight = "0px";
+    node.style.height = `${fromHeight}px`;
+    node.style.marginBottom = "0px";
+    void node.offsetHeight; // force reflow with locked height
+
     setCollapsing(true);
 
-    let raf2 = 0;
-    const raf1 = window.requestAnimationFrame(() => {
-      raf2 = window.requestAnimationFrame(() => {
-        setExitHeightPx(0);
-      });
-    });
+    // 2) Enable transition and animate to 0 (same start as boingOut).
+    node.style.transition = [
+      `height ${MAGIC_EXIT_COLLAPSE_MS}ms ease-in`,
+      `margin-bottom ${MAGIC_EXIT_COLLAPSE_MS}ms ease-in`,
+    ].join(", ");
+    node.style.height = "0px";
+    node.style.marginBottom = "calc(-1 * var(--manage-label-list-gap, 2.25rem))";
+
+    const onTransitionEnd = (event: Event) => {
+      const te = event as globalThis.TransitionEvent;
+      if (te.target !== node) return;
+      if (te.propertyName !== "height") return;
+      notifyExitComplete();
+    };
+    node.addEventListener("transitionend", onTransitionEnd);
 
     const fallback = window.setTimeout(() => {
       notifyExitComplete();
     }, MAGIC_EXIT_COLLAPSE_MS + 80);
 
     return () => {
-      window.cancelAnimationFrame(raf1);
-      window.cancelAnimationFrame(raf2);
+      node.removeEventListener("transitionend", onTransitionEnd);
       window.clearTimeout(fallback);
     };
   }, [exiting, notifyExitComplete]);
@@ -166,31 +184,6 @@ export function ManageLabel({
     }
   };
 
-  const handleTransitionEnd = (event: TransitionEvent<HTMLElement>) => {
-    if (!collapsing) return;
-    if (event.target !== event.currentTarget) return;
-    if (event.propertyName !== "height") return;
-    notifyExitComplete();
-  };
-
-  const exitStyle: CSSProperties | undefined =
-    exitHeightPx == null
-      ? undefined
-      : {
-          height: exitHeightPx,
-          marginBottom:
-            collapsing && exitHeightPx === 0
-              ? "calc(-1 * var(--manage-label-list-gap, 2.25rem))"
-              : 0,
-          ...(collapsing
-            ? {
-                transitionProperty: "height, margin-bottom",
-                transitionDuration: `${MAGIC_EXIT_COLLAPSE_MS}ms`,
-                transitionTimingFunction: "ease-in",
-              }
-            : null),
-        };
-
   return (
     <>
       <article
@@ -202,8 +195,6 @@ export function ManageLabel({
         ]
           .filter(Boolean)
           .join(" ")}
-        style={exitStyle}
-        onTransitionEnd={handleTransitionEnd}
       >
         <div
           className={[

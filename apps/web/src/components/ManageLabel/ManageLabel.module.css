@@ -17,6 +17,14 @@
 
 .rootCollapsing {
   overflow: hidden;
+  min-height: 0;
+}
+
+.rootCollapsing .strip,
+.rootCollapsing .labelSlot,
+.rootCollapsing .connectedSlot,
+.rootCollapsing .actionSlot {
+  min-height: 0;
 }
 
 /* Softened boingInUp — less mid-swing overshoot than magic.css default. */
