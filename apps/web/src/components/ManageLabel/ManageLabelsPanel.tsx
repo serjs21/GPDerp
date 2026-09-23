@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ChangeEvent,
@@ -20,6 +21,29 @@ import styles from "./ManageLabelsPanel.module.css";
 
 const SEARCH_DEBOUNCE_MS = 200;
 const PAGE_SIZE = 12;
+
+function mergeDisplayLabels(
+  previousOrder: string[],
+  pagedLabels: LabelDto[],
+  exitingById: Record<string, LabelDto>,
+): { order: string[]; labels: LabelDto[] } {
+  const liveById = new Map(pagedLabels.map((label) => [label.id, label]));
+  const exitingIds = new Set(Object.keys(exitingById));
+  const order = previousOrder.filter((id) => liveById.has(id) || exitingIds.has(id));
+
+  for (const label of pagedLabels) {
+    if (!order.includes(label.id)) order.push(label.id);
+  }
+  for (const id of exitingIds) {
+    if (!order.includes(id)) order.push(id);
+  }
+
+  const labels = order
+    .map((id) => liveById.get(id) ?? exitingById[id])
+    .filter((label): label is LabelDto => Boolean(label));
+
+  return { order, labels };
+}
 
 export type ManageLabelsPanelProps = {
   accountId: string;
@@ -44,9 +68,9 @@ export function ManageLabelsPanel({
   const [enterDelays, setEnterDelays] = useState<Record<string, number>>({});
   /** Keep deleted rows mounted through vanishOut after query invalidation. */
   const [exitingById, setExitingById] = useState<Record<string, LabelDto>>({});
-  const [displayLabels, setDisplayLabels] = useState<LabelDto[]>([]);
   const searchRef = useRef<HTMLInputElement>(null);
   const knownIdsRef = useRef<Set<string> | null>(null);
+  const displayOrderRef = useRef<string[]>([]);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -61,9 +85,9 @@ export function ManageLabelsPanel({
       setSearchInput("");
       setDebouncedQ("");
       knownIdsRef.current = null;
+      displayOrderRef.current = [];
       setEnterDelays({});
       setExitingById({});
-      setDisplayLabels([]);
       return;
     }
     window.requestAnimationFrame(() => {
@@ -86,41 +110,14 @@ export function ManageLabelsPanel({
     includeConnectedHaikus: true,
   });
 
-  useEffect(() => {
-    setDisplayLabels((prev) => {
-      const liveById = new Map(pagedLabels.map((label) => [label.id, label]));
-      const exitingIds = new Set(Object.keys(exitingById));
-      const next: LabelDto[] = [];
-      const seen = new Set<string>();
-
-      for (const prevLabel of prev) {
-        const live = liveById.get(prevLabel.id);
-        if (live) {
-          next.push(live);
-          seen.add(prevLabel.id);
-          continue;
-        }
-        if (exitingIds.has(prevLabel.id)) {
-          next.push(exitingById[prevLabel.id] ?? prevLabel);
-          seen.add(prevLabel.id);
-        }
-      }
-
-      for (const label of pagedLabels) {
-        if (seen.has(label.id)) continue;
-        next.push(label);
-        seen.add(label.id);
-      }
-
-      // Re-attach exiting rows that dropped out of the live list before hold was registered.
-      for (const [id, label] of Object.entries(exitingById)) {
-        if (seen.has(id)) continue;
-        next.push(label);
-        seen.add(id);
-      }
-
-      return next;
-    });
+  const displayLabels = useMemo(() => {
+    const { order, labels } = mergeDisplayLabels(
+      displayOrderRef.current,
+      pagedLabels,
+      exitingById,
+    );
+    displayOrderRef.current = order;
+    return labels;
   }, [pagedLabels, exitingById]);
 
   const scheduleEnterAnimations = useCallback((orderedIds: string[]) => {
