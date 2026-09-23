@@ -2,15 +2,18 @@
 
 import {
   memo,
+  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
+  type AnimationEvent,
   type CSSProperties,
 } from "react";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
+import { MAGIC_ENTER_STAGGER_MS } from "@/components/ManageLabel/consts/magicAnimationConsts";
 import {
   labelBeltStopInsetStyle,
   labelBeltStopTransformOrigin,
@@ -23,6 +26,7 @@ import {
   type LabelBeltSlot,
 } from "./labelBeltLayout";
 import { useLabelBeltPortalTransition } from "./useLabelBeltPortalTransition";
+import { consumeLabelBeltPuffIn } from "./utils/labelBeltEnterQueue";
 import styles from "./LabelBelt.module.css";
 
 export type LabelBeltItem = {
@@ -73,17 +77,38 @@ type PortalTransition = {
   toVisible: LabelBeltItem[];
 };
 
-function burstFor(label: LabelBeltItem) {
+function burstFor(
+  label: LabelBeltItem,
+  options?: { puffDelayMs?: number; onPuffEnd?: () => void },
+) {
   const preset = resolveComicLabelShapePreset(label.shape);
+  const puffing = options?.puffDelayMs != null;
   return (
-    <ComicBurstLabel
-      text={formatComicLabelText(label.name)}
-      fill={label.color}
-      shapeKind={preset.kind}
-      spikeCount={preset.spikeCount}
-      randomness={preset.randomness}
-      seed={preset.id}
-    />
+    <div
+      className={puffing ? "magictime puffIn" : undefined}
+      style={
+        puffing && options.puffDelayMs! > 0
+          ? { animationDelay: `${options.puffDelayMs}ms` }
+          : undefined
+      }
+      onAnimationEnd={
+        puffing
+          ? (event: AnimationEvent<HTMLDivElement>) => {
+              if (!event.animationName.includes("puffIn")) return;
+              options.onPuffEnd?.();
+            }
+          : undefined
+      }
+    >
+      <ComicBurstLabel
+        text={formatComicLabelText(label.name)}
+        fill={label.color}
+        shapeKind={preset.kind}
+        spikeCount={preset.spikeCount}
+        randomness={preset.randomness}
+        seed={preset.id}
+      />
+    </div>
   );
 }
 
@@ -99,8 +124,52 @@ export const LabelBelt = memo(function LabelBelt({
 }: LabelBeltProps) {
   const [rotationOffset, setRotationOffset] = useState(0);
   const [transition, setTransition] = useState<PortalTransition | null>(null);
+  const [puffDelays, setPuffDelays] = useState<Record<string, number>>({});
   const { busy, setLayerRef, runPortal, clearInlineStyles } =
     useLabelBeltPortalTransition();
+  const knownIdsRef = useRef<Set<string> | null>(null);
+  const nextPuffAtRef = useRef(0);
+
+  useEffect(() => {
+    const currentIds = labels.map((label) => label.id);
+    const currentSet = new Set(currentIds);
+    const queued = consumeLabelBeltPuffIn().filter((id) => currentSet.has(id));
+
+    if (knownIdsRef.current == null) {
+      knownIdsRef.current = currentSet;
+      if (queued.length === 0) return;
+    }
+
+    const added =
+      queued.length > 0
+        ? queued
+        : currentIds.filter((id) => !knownIdsRef.current!.has(id));
+
+    knownIdsRef.current = currentSet;
+
+    if (added.length === 0) return;
+
+    const now = performance.now();
+    setPuffDelays((prev) => {
+      const next = { ...prev };
+      for (const id of added) {
+        if (id in next) continue;
+        const startAt = Math.max(now, nextPuffAtRef.current);
+        next[id] = Math.max(0, startAt - now);
+        nextPuffAtRef.current = startAt + MAGIC_ENTER_STAGGER_MS;
+      }
+      return next;
+    });
+  }, [labels]);
+
+  const clearPuff = (labelId: string) => {
+    setPuffDelays((prev) => {
+      if (!(labelId in prev)) return prev;
+      const next = { ...prev };
+      delete next[labelId];
+      return next;
+    });
+  };
 
   const overflow = labels.length > maxVisible;
   const committedVisible = useMemo(
@@ -152,6 +221,14 @@ export const LabelBelt = memo(function LabelBelt({
     setTransition({ delta, nextOffset, fromVisible, toVisible });
   };
 
+  const renderBurst = (label: LabelBeltItem) => {
+    const delay = puffDelays[label.id];
+    return burstFor(label, {
+      puffDelayMs: delay,
+      onPuffEnd: () => clearPuff(label.id),
+    });
+  };
+
   return (
     <div
       className={[styles.overlay, className].filter(Boolean).join(" ")}
@@ -174,7 +251,7 @@ export const LabelBelt = memo(function LabelBelt({
             data-belt-layer="out"
             ref={(el) => setLayerRef(slot.id, "out", el)}
           >
-            {burstFor(slot.out)}
+            {renderBurst(slot.out)}
           </div>
         );
         const innBlock = slot.inn ? (
@@ -184,7 +261,7 @@ export const LabelBelt = memo(function LabelBelt({
             data-belt-layer="inn"
             ref={(el) => setLayerRef(slot.id, "inn", el)}
           >
-            {burstFor(slot.inn)}
+            {renderBurst(slot.inn)}
           </div>
         ) : null;
 

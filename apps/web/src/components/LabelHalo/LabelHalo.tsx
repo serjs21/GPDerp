@@ -21,6 +21,8 @@ import {
   clearDropAreaRoughOutline,
   paintDropAreaRoughOutline,
 } from "./utils/dropAreaRoughOutline";
+import { MAGIC_ENTER_STAGGER_MS } from "@/components/ManageLabel/consts/magicAnimationConsts";
+import { consumeLabelBeltPuffIn } from "@/components/Lantern/utils/labelBeltEnterQueue";
 import styles from "./LabelHalo.module.css";
 
 export type LabelHaloProps = {
@@ -73,6 +75,8 @@ type DraggableLabelProps = {
   onPositionDraft: (labelId: string, xPercent: number, yPercent: number) => void;
   onRotateDraft: (labelId: string, rotateDeg: number) => void;
   onPlacementCommit: (labelId: string, placement: LabelPlacement) => void;
+  puffDelayMs?: number;
+  onPuffEnd?: () => void;
 };
 
 function DraggableLabel({
@@ -86,12 +90,15 @@ function DraggableLabel({
   onPositionDraft,
   onRotateDraft,
   onPlacementCommit,
+  puffDelayMs,
+  onPuffEnd,
 }: DraggableLabelProps) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const visualRef = useRef<HTMLDivElement | null>(null);
   const slotFocusRef = useRef<HTMLDivElement | null>(null);
   const rotateDegRef = useRef(rotateDeg);
   rotateDegRef.current = rotateDeg;
+  const puffing = puffDelayMs != null;
 
   useEffect(() => {
     if (!interactive) return;
@@ -196,7 +203,25 @@ function DraggableLabel({
         top: `${label.yPercent}%`,
       }}
     >
-      <div ref={visualRef} className={styles.slotVisual}>
+      <div
+        ref={visualRef}
+        className={[styles.slotVisual, puffing ? "magictime puffIn" : ""]
+          .filter(Boolean)
+          .join(" ")}
+        style={
+          puffing && puffDelayMs! > 0
+            ? { animationDelay: `${puffDelayMs}ms` }
+            : undefined
+        }
+        onAnimationEnd={
+          puffing
+            ? (event) => {
+                if (!event.animationName.includes("puffIn")) return;
+                onPuffEnd?.();
+              }
+            : undefined
+        }
+      >
         <LabelSlot
           id={label.id}
           name={label.name}
@@ -242,11 +267,14 @@ export function LabelHalo({
 
   const [draft, setDraft] = useState<LabelHaloLabelItem[]>(labels);
   const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [puffDelays, setPuffDelays] = useState<Record<string, number>>({});
   const [rotateById, setRotateById] = useState<Record<string, number>>(() => {
     const map: Record<string, number> = {};
     for (const label of labels) map[label.id] = label.rotateDeg;
     return map;
   });
+  const knownIdsRef = useRef<Set<string> | null>(null);
+  const nextPuffAtRef = useRef(0);
 
   useEffect(() => {
     setDraft(labels);
@@ -258,6 +286,46 @@ export function LabelHalo({
       return next;
     });
   }, [labels]);
+
+  useEffect(() => {
+    const currentIds = labels.map((label) => label.id);
+    const currentSet = new Set(currentIds);
+    const queued = consumeLabelBeltPuffIn().filter((id) => currentSet.has(id));
+
+    if (knownIdsRef.current == null) {
+      knownIdsRef.current = currentSet;
+      if (queued.length === 0) return;
+    }
+
+    const added =
+      queued.length > 0
+        ? queued
+        : currentIds.filter((id) => !knownIdsRef.current!.has(id));
+
+    knownIdsRef.current = currentSet;
+    if (added.length === 0) return;
+
+    const now = performance.now();
+    setPuffDelays((prev) => {
+      const next = { ...prev };
+      for (const id of added) {
+        if (id in next) continue;
+        const startAt = Math.max(now, nextPuffAtRef.current);
+        next[id] = Math.max(0, startAt - now);
+        nextPuffAtRef.current = startAt + MAGIC_ENTER_STAGGER_MS;
+      }
+      return next;
+    });
+  }, [labels]);
+
+  const clearPuff = useCallback((labelId: string) => {
+    setPuffDelays((prev) => {
+      if (!(labelId in prev)) return prev;
+      const next = { ...prev };
+      delete next[labelId];
+      return next;
+    });
+  }, []);
 
   const onPositionDraft = useCallback((labelId: string, xPercent: number, yPercent: number) => {
     setDraft((current) =>
@@ -349,6 +417,8 @@ export function LabelHalo({
           onPositionDraft={onPositionDraft}
           onRotateDraft={onRotateDraft}
           onPlacementCommit={commitPlacement}
+          puffDelayMs={puffDelays[label.id]}
+          onPuffEnd={() => clearPuff(label.id)}
         />
       ))}
     </div>

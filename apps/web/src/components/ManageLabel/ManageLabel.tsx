@@ -21,9 +21,9 @@ export type ManageLabelProps = {
   accountId: string;
   label: LabelDto;
   onChanged?: () => void;
-  /** Play magic.css puffIn on mount (newly added row). */
+  /** Play magic.css boingInUp on mount (newly added row). */
   animateEnter?: boolean;
-  /** Stagger delay for sequential puffIn (ms). */
+  /** Stagger delay for sequential boingInUp (ms). */
   enterDelayMs?: number;
   onEnterAnimationEnd?: () => void;
 };
@@ -44,6 +44,7 @@ export function ManageLabel({
   const [exiting, setExiting] = useState(false);
   const [entering, setEntering] = useState(animateEnter);
   const exitNotifiedRef = useRef(false);
+  const rootRef = useRef<HTMLElement>(null);
   const { deleteLabel } = useAccountLabels({ accountId, autofetch: false });
   const shape = resolveComicLabelShapePreset(label.shape);
 
@@ -54,6 +55,17 @@ export function ManageLabel({
   useEffect(() => {
     if (animateEnter) setEntering(true);
   }, [animateEnter, label.id]);
+
+  useEffect(() => {
+    if (!entering) return;
+    const node = rootRef.current;
+    if (!node) return;
+    const delay = Math.max(0, enterDelayMs);
+    const timer = window.setTimeout(() => {
+      node.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }, delay);
+    return () => window.clearTimeout(timer);
+  }, [entering, enterDelayMs, label.id]);
 
   const notifyExitComplete = useCallback(() => {
     if (exitNotifiedRef.current) return;
@@ -99,7 +111,7 @@ export function ManageLabel({
       notifyExitComplete();
       return;
     }
-    if (entering && name.includes("puffIn")) {
+    if (entering && name.includes("boingInUp")) {
       setEntering(false);
       onEnterAnimationEnd?.();
     }
@@ -107,10 +119,11 @@ export function ManageLabel({
 
   return (
     <article
+      ref={rootRef}
       className={[
         styles.root,
         exiting ? "magictime vanishOut" : "",
-        entering ? "magictime puffIn" : "",
+        entering ? "magictime boingInUp" : "",
       ]
         .filter(Boolean)
         .join(" ")}

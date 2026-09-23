@@ -13,7 +13,7 @@ import { labelQueryKeys } from "@/api/labels";
 import { ComicModalInput, ComicModalSearchPanel } from "@/components/ComicModalInput";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
-import { MAGIC_PUFF_STAGGER_MS } from "./consts/magicAnimationConsts";
+import { MAGIC_ENTER_STAGGER_MS } from "./consts/magicAnimationConsts";
 import { ManageLabel } from "./ManageLabel";
 import { ManageLabelCreatePanel } from "./ManageLabelCreatePanel";
 import styles from "./ManageLabelsPanel.module.css";
@@ -40,11 +40,11 @@ export function ManageLabelsPanel({
 }: ManageLabelsPanelProps) {
   const [searchInput, setSearchInput] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
-  /** labelId → puffIn delay ms (selection / insert order). */
+  /** labelId → boingInUp delay ms (insert order). */
   const [enterDelays, setEnterDelays] = useState<Record<string, number>>({});
   const searchRef = useRef<HTMLInputElement>(null);
   const knownIdsRef = useRef<Set<string> | null>(null);
-  const nextPuffAtRef = useRef(0);
+  const nextEnterAtRef = useRef(0);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export function ManageLabelsPanel({
       setDebouncedQ("");
       knownIdsRef.current = null;
       setEnterDelays({});
-      nextPuffAtRef.current = 0;
+      nextEnterAtRef.current = 0;
       return;
     }
     window.requestAnimationFrame(() => {
@@ -90,9 +90,9 @@ export function ManageLabelsPanel({
       const next = { ...prev };
       for (const id of orderedIds) {
         if (id in next) continue;
-        const startAt = Math.max(now, nextPuffAtRef.current);
+        const startAt = Math.max(now, nextEnterAtRef.current);
         next[id] = Math.max(0, startAt - now);
-        nextPuffAtRef.current = startAt + MAGIC_PUFF_STAGGER_MS;
+        nextEnterAtRef.current = startAt + MAGIC_ENTER_STAGGER_MS;
       }
       return next;
     });
