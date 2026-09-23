@@ -22,7 +22,7 @@ export const PATH_STOP_STEP_HOLD_MS = Math.round(
   PATH_STOP_STEP_TOTAL_MS / PATH_STOP_STEP_INTERVALS,
 );
 /** Hard cuts between poses — stop-motion, no opacity crossfade. */
-export const PATH_STOP_STEP_CROSSFADE_MS = 150;
+export const PATH_STOP_STEP_CROSSFADE_MS = 0;
 
 export type PathStepPose = TransitionPose & {
   stackOrder: number;

@@ -168,7 +168,7 @@ export function LabelActions({
         src={hasConnections ? TUNE_IN_SRC : NOT_CONNECTED_ACTION_SRC}
         caption={hasConnections ? "Tune in" : undefined}
         layout={hasConnections ? "iconEnd" : "iconOnly"}
-        color={hasConnections ? "blue" : "sky"}
+        color={hasConnections ? "#9ffbff" : "sky"}
         background={hasConnections ? "solid" : "sunburst"}
         captionClassName={hasConnections ? styles.captionTuneIn : undefined}
         iconClassName={
@@ -183,16 +183,18 @@ export function LabelActions({
         }
         onSelect={onTuneIn}
         disabled={!hasConnections}
+        hoverFill={'#52f8ff'}
       />
       <LabelActionButton
         src={EDIT_SRC}
         caption="Edit"
         layout="iconStart"
-        color="green"
+        color="#c0ffc3"
         captionClassName={styles.captionEdit}
         iconClassName={styles.iconEdit}
         ariaLabel={`Edit ${labelName}`}
         onSelect={onEdit}
+        hoverFill={'#6dfe73'}
       />
       <LabelActionButton
         src={DELETE_SRC}

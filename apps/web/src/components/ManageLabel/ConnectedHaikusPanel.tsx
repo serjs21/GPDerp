@@ -35,7 +35,6 @@ export function ConnectedHaikusPanel({
       flexWeight={1}
       contentAlign="center"
       footer={footer}
-      overflowVisible
       className={styles.connectedPanel}
       ariaLabel={`Haikus labeled ${labelName}`}
     >

@@ -257,7 +257,7 @@ export function ComicLabelPickerPanel({
                       selectable
                       selected={selected}
                       onSelect={() => toggleLabel(label)}
-                      background={selected ? "solid" : "halftone"}
+                      background={selected ? "sunburst" : "halftone"}
                       color="white"
                       overflowVisible
                       flexWeight={1}
