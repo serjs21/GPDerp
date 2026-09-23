@@ -76,15 +76,15 @@
 }
 
 .captionTuneIn {
-  transform: rotate(220deg);
+  transform: rotate(233deg) translate(3px, 6px);
 }
 
 .captionEdit {
-  transform: rotate(-50deg);
+  transform: rotate(-42deg) translate(1px, -3px);
 }
 
 .captionDelete {
-  transform: rotate(220deg);
+  transform: rotate(228deg) translate(0px, 5px);
 }
 
 .icon {
