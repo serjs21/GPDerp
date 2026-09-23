@@ -46,6 +46,11 @@
   animation: none;
 }
 
+/* Parent owns entrance (e.g. CreationModal fly-in); skip lanternReveal remount flash. */
+.suppressReveal {
+  animation: none;
+}
+
 .shell {
   position: absolute;
   inset: 0;

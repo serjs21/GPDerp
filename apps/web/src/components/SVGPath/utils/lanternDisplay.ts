@@ -9,7 +9,6 @@ import {
   SVG_PATH_EXIT_STOP,
   SVG_PATH_FOCUS_STOP,
   SVG_PATH_GONE_STOP,
-  CREATION_FOCUS_INDEX,
 } from "./stops";
 
 /**
@@ -88,20 +87,18 @@ export function lanternTransformAtStops(
   };
 }
 
-/** Scroll-synced fly-in progress for the generating lantern (0 = exit stop, 1 = focus stop). */
+/**
+ * Fly progress for the generating lantern (0 = exit stop, 1 = focus/creation stop).
+ * Always parks at the creation pose so the lantern never flashes at the exit stop
+ * before path scroll catches up — matching position right after create settles.
+ */
 export function creationFlyProgress(
-  focusIndex: number,
-  fromFocusIndex: number,
-  tweenProgress: number,
-  isAnimating: boolean,
+  _focusIndex: number,
+  _fromFocusIndex: number,
+  _tweenProgress: number,
+  _isAnimating: boolean,
 ): number {
-  if (focusIndex === CREATION_FOCUS_INDEX) {
-    if (isAnimating && fromFocusIndex !== CREATION_FOCUS_INDEX) {
-      return tweenProgress;
-    }
-    return 1;
-  }
-  return 0;
+  return 1;
 }
 
 /** Generating lantern pose along exit→focus segment; bottom from -exit to +focus. */

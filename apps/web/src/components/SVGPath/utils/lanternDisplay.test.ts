@@ -27,10 +27,10 @@ describe("lanternDisplay", () => {
     expect(opacityAtStop(22)).toBe(0);
   });
 
-  it("tracks creation fly progress with scroll tween", () => {
-    expect(creationFlyProgress(0, 0, 1, false)).toBe(0);
-    expect(creationFlyProgress(CREATION_FOCUS_INDEX, 0, 0, true)).toBe(0);
-    expect(creationFlyProgress(CREATION_FOCUS_INDEX, 0, 0.5, true)).toBe(0.5);
+  it("keeps generating lantern at creation pose (no exit flash before scroll)", () => {
+    expect(creationFlyProgress(0, 0, 1, false)).toBe(1);
+    expect(creationFlyProgress(CREATION_FOCUS_INDEX, 0, 0, true)).toBe(1);
+    expect(creationFlyProgress(CREATION_FOCUS_INDEX, 0, 0.5, true)).toBe(1);
     expect(creationFlyProgress(CREATION_FOCUS_INDEX, 0, 1, false)).toBe(1);
   });
 

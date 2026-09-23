@@ -67,8 +67,9 @@ export function CreationModal({
       ? `Haiku lantern: ${activeHaiku.title ?? ""}`
       : "Haiku creation";
 
+  // Prefer session key for the whole create flow so draft→saved does not remount fly-in.
   const flyInKey =
-    activeHaiku?.id ?? lanternSessionKey ?? generatingDraft?.requestId ?? "lantern";
+    lanternSessionKey ?? generatingDraft?.requestId ?? activeHaiku?.id ?? "lantern";
 
   return (
     <PathOverlay
@@ -81,16 +82,7 @@ export function CreationModal({
     >
       <div className={styles.stage}>
         <div className={styles.flyIn} key={flyInKey}>
-          {generatingDraft ? (
-            <LanternFrame
-              ariaLabel={ariaLabel}
-              widthRem={CREATION_LANTERN_WIDTH_REM}
-              transform={CREATION_LANTERN_TRANSFORM}
-              generating={isGenerating}
-            >
-              <Lantern generatingDraft={generatingDraft} showActions={false} />
-            </LanternFrame>
-          ) : activeHaiku ? (
+          {activeHaiku ? (
             <LanternDeleteExit
               haiku={activeHaiku}
               transform={CREATION_LANTERN_TRANSFORM}
@@ -110,6 +102,7 @@ export function CreationModal({
                   transform={CREATION_LANTERN_TRANSFORM}
                   style={flightStyle}
                   flightExiting={flightExiting}
+                  suppressReveal
                 >
                   <Lantern
                     haiku={activeHaiku}
@@ -120,6 +113,16 @@ export function CreationModal({
                 </LanternFrame>
               )}
             </LanternDeleteExit>
+          ) : generatingDraft ? (
+            <LanternFrame
+              ariaLabel={ariaLabel}
+              widthRem={CREATION_LANTERN_WIDTH_REM}
+              transform={CREATION_LANTERN_TRANSFORM}
+              generating={isGenerating}
+              suppressReveal
+            >
+              <Lantern generatingDraft={generatingDraft} showActions={false} />
+            </LanternFrame>
           ) : null}
         </div>
       </div>

@@ -34,6 +34,8 @@ export type LanternFrameProps = LanternTransformInput & {
   widthRem?: number;
   generating?: boolean;
   flightExiting?: boolean;
+  /** Skip lanternReveal when parent already owns the entrance motion. */
+  suppressReveal?: boolean;
   /** Horizontal offset of the actions bar relative to lantern center. */
   actionsBarOffsetX?: string;
   /** Vertical gap between lantern bottom and actions bar. */
@@ -91,6 +93,7 @@ export function LanternFrame({
   widthRem = LANTERN_WIDTH_REM,
   generating = false,
   flightExiting = false,
+  suppressReveal = false,
   actionsBarOffsetX,
   actionsBarOffsetY,
   labels,
@@ -131,6 +134,7 @@ export function LanternFrame({
     styles.root,
     resolved.positionMode === "percent" ? styles.pathPositioned : "",
     flightExiting ? styles.flightExiting : "",
+    suppressReveal ? styles.suppressReveal : "",
     className,
   ]
     .filter(Boolean)

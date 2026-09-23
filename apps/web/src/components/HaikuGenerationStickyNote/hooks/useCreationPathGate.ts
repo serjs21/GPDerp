@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import type { HaikuDto } from "@/api/haikus";
 import type { SVGPathHandle } from "@/components/SVGPath";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
@@ -16,7 +16,7 @@ export function useCreationPathGate(
   const handledRequestIdRef = useRef<string | null>(null);
   const staleDraftRef = useRef<GeneratingDraft | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!generatingDraft) return;
     if (handledRequestIdRef.current === generatingDraft.requestId) return;
     handledRequestIdRef.current = generatingDraft.requestId;
