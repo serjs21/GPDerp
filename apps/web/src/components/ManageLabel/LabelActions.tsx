@@ -1,7 +1,11 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { ComicPagePanel } from "@/components/ComicPageLayout";
+import {
+  ComicPagePanel,
+  type ComicPanelBackground,
+  type ComicPanelColor,
+} from "@/components/ComicPageLayout";
 import styles from "./LabelActions.module.css";
 
 const TUNE_IN_SRC = "/profile/label_actions/tune_in.svg";
@@ -34,6 +38,8 @@ type ActionButtonProps = {
   disabled?: boolean;
   hoverFill?: string;
   invertIconOnHover?: boolean;
+  background?: ComicPanelBackground;
+  color?: ComicPanelColor;
 };
 
 function rowLayoutClass(layout: ActionLayout): string {
@@ -53,6 +59,8 @@ function LabelActionButton({
   disabled = false,
   hoverFill,
   invertIconOnHover = false,
+  background = "solid",
+  color = "white",
 }: ActionButtonProps) {
   const style = (
     hoverFill
@@ -100,8 +108,8 @@ function LabelActionButton({
     <ComicPagePanel
       selectable
       selected={!disabled}
-      background="solid"
-      color="white"
+      background={background}
+      color={color}
       flexWeight={1}
       contentAlign="start"
       className={[
