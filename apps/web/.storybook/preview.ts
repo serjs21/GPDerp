@@ -5,6 +5,7 @@ import { Bangers, Geist, Geist_Mono, Noto_Serif_JP, Press_Start_2P, Zen_Kurenaid
 import { createElement } from 'react';
 import enMessages from '../messages/en.json';
 import '@/theme/globals.css';
+import 'magic.css/dist/magic.min.css';
 import '@/theme/themes/tokyo-dusk.css';
 import '@/theme/themes/sumie.css';
 import '@/theme/themes/night-sky.css';

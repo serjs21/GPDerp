@@ -1,11 +1,19 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef, useState, type ChangeEvent, type UIEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type UIEvent,
+} from "react";
 import { labelQueryKeys } from "@/api/labels";
 import { ComicModalInput, ComicModalSearchPanel } from "@/components/ComicModalInput";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
+import { MAGIC_PUFF_STAGGER_MS } from "./consts/magicAnimationConsts";
 import { ManageLabel } from "./ManageLabel";
 import { ManageLabelCreatePanel } from "./ManageLabelCreatePanel";
 import styles from "./ManageLabelsPanel.module.css";
@@ -32,7 +40,11 @@ export function ManageLabelsPanel({
 }: ManageLabelsPanelProps) {
   const [searchInput, setSearchInput] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
+  /** labelId → puffIn delay ms (selection / insert order). */
+  const [enterDelays, setEnterDelays] = useState<Record<string, number>>({});
   const searchRef = useRef<HTMLInputElement>(null);
+  const knownIdsRef = useRef<Set<string> | null>(null);
+  const nextPuffAtRef = useRef(0);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -46,6 +58,9 @@ export function ManageLabelsPanel({
     if (!active) {
       setSearchInput("");
       setDebouncedQ("");
+      knownIdsRef.current = null;
+      setEnterDelays({});
+      nextPuffAtRef.current = 0;
       return;
     }
     window.requestAnimationFrame(() => {
@@ -68,12 +83,53 @@ export function ManageLabelsPanel({
     includeConnectedHaikus: true,
   });
 
+  const scheduleEnterAnimations = useCallback((orderedIds: string[]) => {
+    if (orderedIds.length === 0) return;
+    const now = performance.now();
+    setEnterDelays((prev) => {
+      const next = { ...prev };
+      for (const id of orderedIds) {
+        if (id in next) continue;
+        const startAt = Math.max(now, nextPuffAtRef.current);
+        next[id] = Math.max(0, startAt - now);
+        nextPuffAtRef.current = startAt + MAGIC_PUFF_STAGGER_MS;
+      }
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!active || isPagedLoading) return;
+    const currentIds = pagedLabels.map((label) => label.id);
+    const currentSet = new Set(currentIds);
+
+    if (knownIdsRef.current == null) {
+      knownIdsRef.current = currentSet;
+      return;
+    }
+
+    const addedInListOrder = currentIds.filter((id) => !knownIdsRef.current!.has(id));
+    if (addedInListOrder.length > 0) {
+      scheduleEnterAnimations(addedInListOrder);
+    }
+    knownIdsRef.current = currentSet;
+  }, [active, isPagedLoading, pagedLabels, scheduleEnterAnimations]);
+
   const refresh = useCallback(() => {
     void queryClient.invalidateQueries({
       queryKey: [...labelQueryKeys.all, "account", accountId, "paged"],
     });
     void fetch(true);
   }, [accountId, fetch, queryClient]);
+
+  const clearEnterAnimation = useCallback((labelId: string) => {
+    setEnterDelays((prev) => {
+      if (!(labelId in prev)) return prev;
+      const next = { ...prev };
+      delete next[labelId];
+      return next;
+    });
+  }, []);
 
   const onListScroll = (event: UIEvent<HTMLDivElement>) => {
     const el = event.currentTarget;
@@ -126,14 +182,21 @@ export function ManageLabelsPanel({
               </div>
             ) : (
               <>
-                {pagedLabels.map((label) => (
-                  <ManageLabel
-                    key={label.id}
-                    accountId={label.accountId}
-                    label={label}
-                    onChanged={refresh}
-                  />
-                ))}
+                {pagedLabels.map((label) => {
+                  const enterDelayMs = enterDelays[label.id];
+                  const animateEnter = enterDelayMs != null;
+                  return (
+                    <ManageLabel
+                      key={label.id}
+                      accountId={label.accountId}
+                      label={label}
+                      onChanged={refresh}
+                      animateEnter={animateEnter}
+                      enterDelayMs={enterDelayMs ?? 0}
+                      onEnterAnimationEnd={() => clearEnterAnimation(label.id)}
+                    />
+                  );
+                })}
                 {isFetchingNextPage ? (
                   <div className={styles.loaderRow}>
                     <SakuraPetalLoader />

@@ -5,6 +5,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type AnimationEvent,
   type CSSProperties,
   type UIEvent,
 } from "react";
@@ -18,6 +19,7 @@ import {
 } from "@/components/ComicPageLayout";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
+import { MAGIC_PUFF_STAGGER_MS } from "@/components/ManageLabel/consts/magicAnimationConsts";
 import styles from "./ComicLabelPickerPanel.module.css";
 
 const SAVE_FILL = "#17131A";
@@ -88,9 +90,12 @@ export function ComicLabelPickerPanel({
   const [searchInput, setSearchInput] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
   const [listOrderIds, setListOrderIds] = useState<string[]>([]);
+  /** Newly selected label → puffIn delay (selection order). */
+  const [puffDelays, setPuffDelays] = useState<Record<string, number>>({});
   const searchRef = useRef<HTMLInputElement>(null);
   const seededActive = useRef(false);
   const orderQueryKey = useRef<string | null>(null);
+  const nextPuffAtRef = useRef(0);
 
   const seedLabelSource = useMemo(() => [...seedLabelIds], [seedLabelIds]);
 
@@ -108,6 +113,8 @@ export function ComicLabelPickerPanel({
       setSearchInput("");
       setDebouncedQ("");
       setListOrderIds([]);
+      setPuffDelays({});
+      nextPuffAtRef.current = 0;
       return;
     }
     if (seededActive.current) return;
@@ -203,16 +210,42 @@ export function ComicLabelPickerPanel({
 
   const rows = useMemo(() => chunkRows(displayLabels, 3), [displayLabels]);
 
-  const toggleLabel = (label: ComicLabelPickerSeedLabel) => {
-    setSelectedIds((prev) => {
-      if (prev.includes(label.id)) {
-        return prev.filter((id) => id !== label.id);
-      }
-      if (maxSelected != null && prev.length >= maxSelected) {
-        return prev;
-      }
-      return [...prev, label.id];
+  const schedulePuffIn = (labelId: string) => {
+    const now = performance.now();
+    const startAt = Math.max(now, nextPuffAtRef.current);
+    const delay = Math.max(0, startAt - now);
+    nextPuffAtRef.current = startAt + MAGIC_PUFF_STAGGER_MS;
+    setPuffDelays((prev) => ({ ...prev, [labelId]: delay }));
+  };
+
+  const clearPuffIn = (labelId: string) => {
+    setPuffDelays((prev) => {
+      if (!(labelId in prev)) return prev;
+      const next = { ...prev };
+      delete next[labelId];
+      return next;
     });
+  };
+
+  const toggleLabel = (label: ComicLabelPickerSeedLabel) => {
+    if (selectedIds.includes(label.id)) {
+      clearPuffIn(label.id);
+      setSelectedIds((prev) => prev.filter((id) => id !== label.id));
+      return;
+    }
+    if (maxSelected != null && selectedIds.length >= maxSelected) {
+      return;
+    }
+    schedulePuffIn(label.id);
+    setSelectedIds((prev) => [...prev, label.id]);
+  };
+
+  const onPuffAnimationEnd = (
+    labelId: string,
+    event: AnimationEvent<HTMLElement>,
+  ) => {
+    if (!event.animationName.includes("puffIn")) return;
+    clearPuffIn(labelId);
   };
 
   const onListScroll = (event: UIEvent<HTMLDivElement>) => {
@@ -251,32 +284,53 @@ export function ComicLabelPickerPanel({
                 {row.map((label) => {
                   const selected = selectedIdSet.has(label.id);
                   const shape = resolveComicLabelShapePreset(label.shape);
+                  const puffDelay = puffDelays[label.id];
+                  const puffing = puffDelay != null;
                   return (
-                    <ComicPagePanel
+                    <div
                       key={label.id}
-                      selectable
-                      selected={selected}
-                      onSelect={() => toggleLabel(label)}
-                      background={selected ? "sunburst" : "halftone"}
-                      color="white"
-                      overflowVisible
-                      flexWeight={1}
-                      className={styles.labelPanel}
-                      style={selected ? selectedPanelStyle(label.color) : undefined}
-                      ariaLabel={label.name}
+                      className={[
+                        styles.labelPuffWrap,
+                        puffing ? "magictime puffIn" : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                      style={
+                        puffing && puffDelay > 0
+                          ? { animationDelay: `${puffDelay}ms` }
+                          : undefined
+                      }
+                      onAnimationEnd={
+                        puffing
+                          ? (event) => onPuffAnimationEnd(label.id, event)
+                          : undefined
+                      }
                     >
-                      <div className={styles.labelPreview}>
-                        <ComicBurstLabel
-                          text={formatComicLabelText(label.name)}
-                          fill={label.color || "#888888"}
-                          shapeKind={shape.kind}
-                          spikeCount={shape.spikeCount}
-                          randomness={shape.randomness}
-                          seed={shape.id}
-                          fontSize={18}
-                        />
-                      </div>
-                    </ComicPagePanel>
+                      <ComicPagePanel
+                        selectable
+                        selected={selected}
+                        onSelect={() => toggleLabel(label)}
+                        background={selected ? "sunburst" : "halftone"}
+                        color="white"
+                        overflowVisible
+                        flexWeight={1}
+                        className={styles.labelPanel}
+                        style={selected ? selectedPanelStyle(label.color) : undefined}
+                        ariaLabel={label.name}
+                      >
+                        <div className={styles.labelPreview}>
+                          <ComicBurstLabel
+                            text={formatComicLabelText(label.name)}
+                            fill={label.color || "#888888"}
+                            shapeKind={shape.kind}
+                            spikeCount={shape.spikeCount}
+                            randomness={shape.randomness}
+                            seed={shape.id}
+                            fontSize={18}
+                          />
+                        </div>
+                      </ComicPagePanel>
+                    </div>
                   );
                 })}
               </ComicPageRow>
