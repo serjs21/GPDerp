@@ -2,8 +2,8 @@
 export const MAGIC_ANIMATION_DURATION_MS = 650;
 /** Softened boingOutDown duration (keep in sync with ManageLabel.module.css). */
 export const MAGIC_EXIT_BOING_MS = 550;
-/** Height collapse after boing finishes (ease-in-out). */
-export const MAGIC_EXIT_COLLAPSE_MS = 300;
+/** Height collapse (runs in parallel with boingOut, ease-in). */
+export const MAGIC_EXIT_COLLAPSE_MS = 700;
 /** Delay between staggered enter animation starts (selection / insert order). */
 export const MAGIC_ENTER_STAGGER_MS = 280;
 

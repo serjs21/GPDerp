@@ -64,10 +64,9 @@ export function ManageLabel({
   const [exiting, setExiting] = useState(forceExiting);
   const [collapsing, setCollapsing] = useState(false);
   const [entering, setEntering] = useState(animateEnter);
-  /** Locked pixel height during exit; animates to `0` only after boing finishes. */
+  /** Locked pixel height during exit; collapses to `0` in parallel with boingOut. */
   const [exitHeightPx, setExitHeightPx] = useState<number | null>(null);
   const exitNotifiedRef = useRef(false);
-  const collapseStartedRef = useRef(false);
   const rootRef = useRef<HTMLElement>(null);
   const { deleteLabel } = useAccountLabels({ accountId, autofetch: false });
   const shape = resolveComicLabelShapePreset(label.shape);
@@ -101,49 +100,38 @@ export function ManageLabel({
     onExitComplete?.();
   }, [onExitComplete]);
 
-  const beginCollapse = useCallback(() => {
-    if (collapseStartedRef.current) return;
-    collapseStartedRef.current = true;
-    setCollapsing(true);
-    // Double rAF so the browser paints the locked height before transitioning to 0.
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        setExitHeightPx(0);
-      });
-    });
-  }, []);
-
-  // On exit: lock height and play boing; collapse only after boing ends.
+  // BoingOut + height collapse start together; unmount when height hits 0.
   useEffect(() => {
     if (!exiting) {
       setExitHeightPx(null);
       setCollapsing(false);
-      collapseStartedRef.current = false;
       return;
     }
 
     const node = rootRef.current;
     if (!node) return;
 
-    setExitHeightPx(node.getBoundingClientRect().height);
+    const measured = node.getBoundingClientRect().height;
+    setExitHeightPx(measured);
+    setCollapsing(true);
 
-    const boingFallback = window.setTimeout(() => {
-      beginCollapse();
-    }, MAGIC_EXIT_BOING_MS + 40);
+    let raf2 = 0;
+    const raf1 = window.requestAnimationFrame(() => {
+      raf2 = window.requestAnimationFrame(() => {
+        setExitHeightPx(0);
+      });
+    });
 
-    return () => {
-      window.clearTimeout(boingFallback);
-    };
-  }, [exiting, beginCollapse]);
-
-  // Safety: unmount if height transition never fires.
-  useEffect(() => {
-    if (!collapsing) return;
-    const timer = window.setTimeout(() => {
+    const fallback = window.setTimeout(() => {
       notifyExitComplete();
     }, MAGIC_EXIT_COLLAPSE_MS + 80);
-    return () => window.clearTimeout(timer);
-  }, [collapsing, notifyExitComplete]);
+
+    return () => {
+      window.cancelAnimationFrame(raf1);
+      window.cancelAnimationFrame(raf2);
+      window.clearTimeout(fallback);
+    };
+  }, [exiting, notifyExitComplete]);
 
   const handleDeleteConfirm = useCallback(async () => {
     setDeleting(true);
@@ -172,10 +160,6 @@ export function ManageLabel({
 
   const handleAnimationEnd = (event: AnimationEvent<HTMLElement>) => {
     const name = event.animationName;
-    if (exiting && (name.includes("boingOutDown") || name.includes("manageLabelBoingOut"))) {
-      beginCollapse();
-      return;
-    }
     if (entering && (name.includes("boingInUp") || name.includes("manageLabelBoingIn"))) {
       setEntering(false);
       onEnterAnimationEnd?.();
@@ -202,7 +186,7 @@ export function ManageLabel({
             ? {
                 transitionProperty: "height, margin-bottom",
                 transitionDuration: `${MAGIC_EXIT_COLLAPSE_MS}ms`,
-                transitionTimingFunction: "ease-in-out",
+                transitionTimingFunction: "ease-in",
               }
             : null),
         };
