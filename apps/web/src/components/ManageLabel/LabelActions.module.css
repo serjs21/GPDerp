@@ -71,16 +71,20 @@
   white-space: nowrap;
   writing-mode: vertical-rl;
   text-orientation: mixed;
-  transform: rotate(190deg);
   transition: color 0.2s ease;
+  align-self: flex-start;
 }
 
-.caption:nth-of-type(2n) {
-  transform: rotate(19deg);
+.captionTuneIn {
+  transform: rotate(220deg);
 }
 
 .captionEdit {
-  transform: rotate(-27deg);
+  transform: rotate(-50deg);
+}
+
+.captionDelete {
+  transform: rotate(220deg);
 }
 
 .icon {
@@ -94,6 +98,18 @@
   object-fit: contain;
   pointer-events: none;
   transition: filter 0.2s ease;
+}
+
+.iconTuneIn {
+  transform: scale(1.5);
+}
+
+.iconEdit {
+  transform: scale(1.5);
+}
+
+.iconDelete {
+  transform: scale(1.5);
 }
 
 .invertOnHover:hover:not(.disabled) .icon,

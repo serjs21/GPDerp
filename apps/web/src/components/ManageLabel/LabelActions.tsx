@@ -27,6 +27,8 @@ type ActionButtonProps = {
   caption: string;
   ariaLabel: string;
   layout: ActionLayout;
+  captionClassName: string;
+  iconClassName: string;
   onSelect: () => void;
   disabled?: boolean;
   hoverFill?: string;
@@ -38,6 +40,8 @@ function LabelActionButton({
   caption,
   ariaLabel,
   layout,
+  captionClassName,
+  iconClassName,
   onSelect,
   disabled = false,
   hoverFill,
@@ -51,15 +55,16 @@ function LabelActionButton({
 
   const icon = (
     // eslint-disable-next-line @next/next/no-img-element -- static public SVG
-    <img className={styles.icon} src={src} alt="" draggable={false} decoding="async" />
+    <img
+      className={[styles.icon, iconClassName].join(" ")}
+      src={src}
+      alt=""
+      draggable={false}
+      decoding="async"
+    />
   );
   const label = (
-    <span
-      className={[styles.caption, layout === "iconStart" ? styles.captionEdit : ""]
-        .filter(Boolean)
-        .join(" ")}
-      aria-hidden
-    >
+    <span className={[styles.caption, captionClassName].join(" ")} aria-hidden>
       {caption}
     </span>
   );
@@ -130,6 +135,8 @@ export function LabelActions({
         src={TUNE_IN_SRC}
         caption="Tune in"
         layout="iconEnd"
+        captionClassName={styles.captionTuneIn}
+        iconClassName={styles.iconTuneIn}
         ariaLabel={
           hasConnections
             ? `Tune in to haikus labeled ${labelName}`
@@ -142,6 +149,8 @@ export function LabelActions({
         src={EDIT_SRC}
         caption="Edit"
         layout="iconStart"
+        captionClassName={styles.captionEdit}
+        iconClassName={styles.iconEdit}
         ariaLabel={`Edit ${labelName}`}
         onSelect={onEdit}
       />
@@ -149,6 +158,8 @@ export function LabelActions({
         src={DELETE_SRC}
         caption="Delete"
         layout="iconEnd"
+        captionClassName={styles.captionDelete}
+        iconClassName={styles.iconDelete}
         ariaLabel={`Delete ${labelName}`}
         onSelect={onDelete}
         hoverFill={DELETE_HOVER}
