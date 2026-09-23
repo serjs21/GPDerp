@@ -1,12 +1,14 @@
 .stack {
   display: flex;
   flex-direction: column;
-  flex: 1 1 0;
+  flex: 0 0 6.25rem;
   align-self: stretch;
-  min-width: 0;
+  box-sizing: border-box;
+  width: 6.25rem;
+  min-width: 6.25rem;
+  max-width: 6.25rem;
   min-height: 9.5rem;
-  width: 0;
-  gap: 0;
+  gap: 0.5rem;
 }
 
 .action {
@@ -17,10 +19,6 @@
   border-radius: 0;
   filter: none !important;
   transform: none !important;
-}
-
-.action + .action {
-  margin-top: calc(-1 * var(--comic-page-border, 4px));
 }
 
 .action::before {
@@ -81,8 +79,10 @@
 }
 
 .captionTuneIn {
-  transform: rotate(233deg) translate(3px, 6px);
+  font-size: 0.9rem;
+  transform: rotate(233deg) translate(1px, 9px);
 }
+
 
 .captionEdit {
   transform: rotate(-42deg) translate(1px, -3px);
@@ -110,12 +110,11 @@
 }
 
 .iconNotConnected {
-  transform: scale(1.2);
+  transform: scale(1.2) translateX(1rem);
  flex: 0 0 auto;
   width: 100%;
   height: auto;
   aspect-ratio: 1;
-  margin: auto;
 }
 
 .iconInkOnSky {

@@ -26,7 +26,7 @@
   border-radius: 0;
 }
 
-/* Manage-labels strip: label | connections | delete → 3fr 4fr 1fr */
+/* Manage-labels strip: label | connections | fixed actions → 3fr 4fr 6.25rem */
 .strip > .labelSlot {
   flex: 3 1 0 !important;
 }
@@ -36,7 +36,10 @@
 }
 
 .strip > .actionSlot {
-  flex: 1 1 0 !important;
+  flex: 0 0 6.25rem !important;
+  width: 6.25rem;
+  min-width: 6.25rem;
+  max-width: 6.25rem;
 }
 
 .labelPanel,

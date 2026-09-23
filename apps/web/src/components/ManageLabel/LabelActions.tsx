@@ -168,7 +168,7 @@ export function LabelActions({
         src={hasConnections ? TUNE_IN_SRC : NOT_CONNECTED_ACTION_SRC}
         caption={hasConnections ? "Tune in" : undefined}
         layout={hasConnections ? "iconEnd" : "iconOnly"}
-        color={hasConnections ? "blue" : "blue"}
+        color={hasConnections ? "blue" : "sky"}
         background={hasConnections ? "solid" : "sunburst"}
         captionClassName={hasConnections ? styles.captionTuneIn : undefined}
         iconClassName={
