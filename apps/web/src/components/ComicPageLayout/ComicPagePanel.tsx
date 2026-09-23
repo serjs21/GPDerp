@@ -32,10 +32,8 @@ export type ComicPagePanelProps = {
   isMotionBackground?: boolean;
   /** Crossfade anime speed-line overlay on top of the static background. */
   loading?: boolean;
-  /** When background is sunburst, rotate rays (shine). Default true. */
+  /** When background is sunburst / sunburstHalftone, rotate rays. Default false. */
   shine?: boolean;
-  /** When background is sunburst, overlay the comic halftone dots. Default true. */
-  sunburstHalftone?: boolean;
   selectable?: boolean;
   selected?: boolean;
   onSelect?: () => void;
@@ -59,7 +57,9 @@ function panelStyleVars(color: ComicPanelColor): CSSProperties {
 }
 
 function staticBgClass(background: ComicPanelBackground): string {
-  if (background === "sunburst") return panelStyles.bgSunburst;
+  if (background === "sunburst" || background === "sunburstHalftone") {
+    return panelStyles.bgSunburst;
+  }
   if (background === "halftone") return panelStyles.bgHalftone;
   if (background === "fine") return panelStyles.bgFine;
   return panelStyles.bgSolid;
@@ -75,8 +75,7 @@ export function ComicPagePanel({
   color = "white",
   isMotionBackground: isMotionBackgroundProp,
   loading = false,
-  shine = true,
-  sunburstHalftone = true,
+  shine = false,
   selectable = false,
   selected = false,
   onSelect,
@@ -118,6 +117,8 @@ export function ComicPagePanel({
       : background === "fine" && !isFineBackground
         ? "solid"
         : background;
+  const isSunburst =
+    resolvedBackground === "sunburst" || resolvedBackground === "sunburstHalftone";
   const fillClass = isFineBackground
     ? panelStyles.bgFine
     : fineBandsVisible
@@ -125,8 +126,8 @@ export function ComicPagePanel({
       : staticBgClass(resolvedBackground === "fine" ? "solid" : resolvedBackground);
   const bgClass = [
     fillClass,
-    resolvedBackground === "sunburst" && !shine && panelStyles.bgSunburstPaused,
-    resolvedBackground === "sunburst" && !sunburstHalftone && panelStyles.bgSunburstNoHalftone,
+    isSunburst && shine && panelStyles.bgSunburstShine,
+    resolvedBackground === "sunburstHalftone" && panelStyles.bgSunburstHalftone,
   ]
     .filter(Boolean)
     .join(" ");

@@ -169,7 +169,7 @@ export function LabelActions({
         caption={hasConnections ? "Tune in" : undefined}
         layout={hasConnections ? "iconEnd" : "iconOnly"}
         color={hasConnections ? "blue" : "blue"}
-        background={hasConnections ? "solid" : "halftone"}
+        background={hasConnections ? "solid" : "sunburst"}
         captionClassName={hasConnections ? styles.captionTuneIn : undefined}
         iconClassName={
           hasConnections ? styles.iconTuneIn : styles.iconNotConnected
@@ -199,7 +199,7 @@ export function LabelActions({
         caption="Delete"
         layout="iconEnd"
         captionClassName={styles.captionDelete}
-        color="red"
+        color="#ffaea8"
         iconClassName={styles.iconDelete}
         ariaLabel={`Delete ${labelName}`}
         onSelect={onDelete}

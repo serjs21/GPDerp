@@ -30,7 +30,7 @@ export function ConnectedHaikusPanel({
 
   return (
     <ComicPagePanel
-      background="halftone"
+      background={total ? "solid" : "halftone"}
       color="sky"
       flexWeight={1}
       contentAlign="center"

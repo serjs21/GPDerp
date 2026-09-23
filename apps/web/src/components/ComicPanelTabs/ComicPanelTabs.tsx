@@ -53,8 +53,6 @@ export function ComicPanelTabs<T extends string>({
           flexWeight: tabFlexWeight,
           overflowVisible = false,
           isMotionBackground = false,
-          shine = false,
-          sunburstHalftone = false,
           ...panelRest
         } = tab.panel ?? {};
 
@@ -67,8 +65,6 @@ export function ComicPanelTabs<T extends string>({
             onSelect={() => onChange(tab.id)}
             overflowVisible={overflowVisible}
             isMotionBackground={isMotionBackground}
-            shine={shine}
-            sunburstHalftone={sunburstHalftone}
             flexWeight={
               tabFlexWeight ?? (selected ? selectedFlexWeight : unselectedFlexWeight)
             }

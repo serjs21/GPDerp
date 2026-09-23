@@ -73,7 +73,7 @@
   background: var(--comic-panel-base, #fff);
 }
 
-/* Comic sunburst: radial rays + center glow + halftone; shine = slow ray rotation. */
+/* Comic sunburst: radial rays + center glow. Opt-in shine / halftone via modifier classes. */
 .bgSunburst {
   --comic-sunburst-ray: var(
     --comic-panel-accent,
@@ -101,13 +101,11 @@
       var(--comic-panel-base, #fff) 7deg 12deg,
       color-mix(in srgb, var(--comic-sunburst-ray) 82%, #111) 12deg 14deg
     );
-  animation: comicSunburstShine 10s linear infinite;
-  will-change: transform;
 }
 
-.bgSunburstPaused::before {
-  animation: none;
-  will-change: auto;
+.bgSunburstShine::before {
+  animation: comicSunburstShine 10s linear infinite;
+  will-change: transform;
 }
 
 .bgSunburst::after {
@@ -115,6 +113,17 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
+  background-image: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in srgb, var(--comic-panel-base, #fff) 96%, white) 0%,
+    color-mix(in srgb, var(--comic-panel-base, #fff) 40%, transparent) 26%,
+    transparent 48%
+  );
+  background-size: 100% 100%;
+  background-blend-mode: normal;
+}
+
+.bgSunburstHalftone::after {
   background-image:
     radial-gradient(
       circle at 50% 50%,
@@ -132,17 +141,6 @@
   /* Halftone only darkens; center glow stays bright. */
   background-blend-mode: normal, multiply;
   opacity: 0.9;
-}
-
-.bgSunburstNoHalftone::after {
-  background-image: radial-gradient(
-    circle at 50% 50%,
-    color-mix(in srgb, var(--comic-panel-base, #fff) 96%, white) 0%,
-    color-mix(in srgb, var(--comic-panel-base, #fff) 40%, transparent) 26%,
-    transparent 48%
-  );
-  background-size: 100% 100%;
-  background-blend-mode: normal;
 }
 
 .bgHalftone {
@@ -431,7 +429,7 @@
     transition: none;
   }
 
-  .bgSunburst::before {
+  .bgSunburstShine::before {
     animation: none;
   }
 

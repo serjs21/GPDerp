@@ -33,9 +33,9 @@ const BACKGROUND_SAMPLES: Array<{
   label: string;
 }> = [
   { background: "sunburst", color: "magenta", label: "Sunburst" },
+  { background: "sunburstHalftone", color: "orange", label: "Sunburst + halftone" },
   { background: "halftone", color: "teal", label: "Halftone" },
   { background: "solid", color: "yellow", label: "Solid" },
-  { background: "sunburst", color: "orange", label: "Sunburst" },
   { background: "halftone", color: "purple", label: "Halftone" },
   { background: "solid", color: "blue", label: "Solid" },
   { background: "solid", color: "sky", label: "Solid sky" },
@@ -259,15 +259,15 @@ export const SunburstShine: Story = {
     <div style={{ padding: "2rem", background: "#222", minHeight: "100vh" }}>
       <ComicPageLayout title="Sunburst shine">
         <ComicPageRow columns="1fr-1fr">
-          <ComicPagePanel background="sunburst" color="white">
+          <ComicPagePanel background="sunburst" color="white" shine>
             Inactive B/W
           </ComicPagePanel>
-          <ComicPagePanel background="sunburst" color="teal">
-            Active teal
+          <ComicPagePanel background="sunburstHalftone" color="teal" shine>
+            Active teal + halftone
           </ComicPagePanel>
         </ComicPageRow>
         <ComicPageRow>
-          <ComicPagePanel span="full" background="sunburst" color="orange">
+          <ComicPagePanel span="full" background="sunburst" color="orange" shine>
             Orange shine reference
           </ComicPagePanel>
         </ComicPageRow>

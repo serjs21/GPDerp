@@ -43,7 +43,6 @@ export function LibraryCard() {
         contentAlign="start"
         className={styles.panel}
         span="full"
-        sunburstHalftone={false}
       >
         <div className={styles.card}>
           <div className={styles.body}>

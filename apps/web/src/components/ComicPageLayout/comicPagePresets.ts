@@ -1,5 +1,6 @@
 export type ComicPanelBackground =
   | "sunburst"
+  | "sunburstHalftone"
   | "halftone"
   | "solid"
   | "motion"
