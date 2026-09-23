@@ -217,8 +217,9 @@ export function useAccountLabels(options: UseAccountLabelsOptions): UseAccountLa
       queryClient.setQueryData<LabelDto[]>(labelQueryKeys.byAccount(accountId), (prev) =>
         (prev ?? []).filter((l) => l.id !== options.labelId),
       );
-      await invalidatePagedQueries(queryClient, accountId);
+      // Let callers start exit animations before paged list refetch unmounts the row.
       await options.onSuccess?.();
+      await invalidatePagedQueries(queryClient, accountId);
     } catch {
       await options.onError?.();
       throw new Error("delete_label_failed");

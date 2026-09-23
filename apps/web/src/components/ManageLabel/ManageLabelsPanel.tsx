@@ -9,7 +9,7 @@ import {
   type ChangeEvent,
   type UIEvent,
 } from "react";
-import { labelQueryKeys } from "@/api/labels";
+import { labelQueryKeys, type LabelDto } from "@/api/labels";
 import { ComicModalInput, ComicModalSearchPanel } from "@/components/ComicModalInput";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
@@ -42,6 +42,9 @@ export function ManageLabelsPanel({
   const [debouncedQ, setDebouncedQ] = useState("");
   /** labelId → boingInUp delay ms (insert order). */
   const [enterDelays, setEnterDelays] = useState<Record<string, number>>({});
+  /** Keep deleted rows mounted through vanishOut after query invalidation. */
+  const [exitingById, setExitingById] = useState<Record<string, LabelDto>>({});
+  const [displayLabels, setDisplayLabels] = useState<LabelDto[]>([]);
   const searchRef = useRef<HTMLInputElement>(null);
   const knownIdsRef = useRef<Set<string> | null>(null);
   const queryClient = useQueryClient();
@@ -59,6 +62,8 @@ export function ManageLabelsPanel({
       setDebouncedQ("");
       knownIdsRef.current = null;
       setEnterDelays({});
+      setExitingById({});
+      setDisplayLabels([]);
       return;
     }
     window.requestAnimationFrame(() => {
@@ -80,6 +85,43 @@ export function ManageLabelsPanel({
     q: debouncedQ,
     includeConnectedHaikus: true,
   });
+
+  useEffect(() => {
+    setDisplayLabels((prev) => {
+      const liveById = new Map(pagedLabels.map((label) => [label.id, label]));
+      const exitingIds = new Set(Object.keys(exitingById));
+      const next: LabelDto[] = [];
+      const seen = new Set<string>();
+
+      for (const prevLabel of prev) {
+        const live = liveById.get(prevLabel.id);
+        if (live) {
+          next.push(live);
+          seen.add(prevLabel.id);
+          continue;
+        }
+        if (exitingIds.has(prevLabel.id)) {
+          next.push(exitingById[prevLabel.id] ?? prevLabel);
+          seen.add(prevLabel.id);
+        }
+      }
+
+      for (const label of pagedLabels) {
+        if (seen.has(label.id)) continue;
+        next.push(label);
+        seen.add(label.id);
+      }
+
+      // Re-attach exiting rows that dropped out of the live list before hold was registered.
+      for (const [id, label] of Object.entries(exitingById)) {
+        if (seen.has(id)) continue;
+        next.push(label);
+        seen.add(id);
+      }
+
+      return next;
+    });
+  }, [pagedLabels, exitingById]);
 
   const scheduleEnterAnimations = useCallback((orderedIds: string[]) => {
     if (orderedIds.length === 0) return;
@@ -127,6 +169,21 @@ export function ManageLabelsPanel({
     });
   }, []);
 
+  const handleExitStart = useCallback((label: LabelDto) => {
+    setExitingById((prev) =>
+      prev[label.id] ? prev : { ...prev, [label.id]: label },
+    );
+  }, []);
+
+  const handleExitComplete = useCallback((labelId: string) => {
+    setExitingById((prev) => {
+      if (!(labelId in prev)) return prev;
+      const next = { ...prev };
+      delete next[labelId];
+      return next;
+    });
+  }, []);
+
   const onListScroll = (event: UIEvent<HTMLDivElement>) => {
     const el = event.currentTarget;
     const remaining = el.scrollHeight - el.scrollTop - el.clientHeight;
@@ -151,6 +208,8 @@ export function ManageLabelsPanel({
       <ManageLabelCreatePanel accountId={accountId} onCreated={() => refresh()} />
     ) : null;
 
+  const showEmpty = !isPagedLoading && displayLabels.length === 0;
+
   return (
     <div className={[styles.root, className].filter(Boolean).join(" ")}>
       {searchVariant === "comic" ? (
@@ -170,7 +229,7 @@ export function ManageLabelsPanel({
           </div>
         ) : (
           <>
-            {pagedLabels.length === 0 ? (
+            {showEmpty ? (
               <div className={styles.emptyLayout}>
                 <p className={styles.empty}>
                   {debouncedQ ? "No labels found" : "No labels yet."}
@@ -178,16 +237,20 @@ export function ManageLabelsPanel({
               </div>
             ) : (
               <>
-                {pagedLabels.map((label) => {
+                {displayLabels.map((label) => {
                   const enterDelayMs = enterDelays[label.id];
                   const animateEnter = enterDelayMs != null;
+                  const isExiting = Boolean(exitingById[label.id]);
                   return (
                     <ManageLabel
                       key={label.id}
                       accountId={label.accountId}
                       label={label}
                       onChanged={refresh}
-                      animateEnter={animateEnter}
+                      onExitStart={() => handleExitStart(label)}
+                      onExitComplete={() => handleExitComplete(label.id)}
+                      forceExiting={isExiting}
+                      animateEnter={animateEnter && !isExiting}
                       enterDelayMs={enterDelayMs ?? 0}
                       onEnterAnimationEnd={() => clearEnterAnimation(label.id)}
                     />

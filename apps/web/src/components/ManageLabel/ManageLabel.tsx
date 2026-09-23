@@ -21,6 +21,12 @@ export type ManageLabelProps = {
   accountId: string;
   label: LabelDto;
   onChanged?: () => void;
+  /** Called before delete so the parent can keep the row mounted through vanishOut. */
+  onExitStart?: () => void;
+  /** Called when vanishOut finishes (or times out), or delete fails after hold. */
+  onExitComplete?: () => void;
+  /** Parent-held exit: keep playing vanishOut even if this instance remounts. */
+  forceExiting?: boolean;
   /** Play magic.css boingInUp on mount (newly added row). */
   animateEnter?: boolean;
   /** Stagger delay for sequential boingInUp (ms). */
@@ -32,6 +38,9 @@ export function ManageLabel({
   accountId,
   label,
   onChanged,
+  onExitStart,
+  onExitComplete,
+  forceExiting = false,
   animateEnter = false,
   enterDelayMs = 0,
   onEnterAnimationEnd,
@@ -41,7 +50,7 @@ export function ManageLabel({
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [exiting, setExiting] = useState(false);
+  const [exiting, setExiting] = useState(forceExiting);
   const [entering, setEntering] = useState(animateEnter);
   const exitNotifiedRef = useRef(false);
   const rootRef = useRef<HTMLElement>(null);
@@ -51,6 +60,10 @@ export function ManageLabel({
   const connectedTotal = label.connectedHaikus?.total ?? 0;
   const connectedItems = label.connectedHaikus?.items ?? [];
   const hasConnections = connectedTotal > 0;
+
+  useEffect(() => {
+    if (forceExiting) setExiting(true);
+  }, [forceExiting]);
 
   useEffect(() => {
     if (animateEnter) setEntering(true);
@@ -70,8 +83,8 @@ export function ManageLabel({
   const notifyExitComplete = useCallback(() => {
     if (exitNotifiedRef.current) return;
     exitNotifiedRef.current = true;
-    onChanged?.();
-  }, [onChanged]);
+    onExitComplete?.();
+  }, [onExitComplete]);
 
   useEffect(() => {
     if (!exiting) return;
@@ -89,6 +102,8 @@ export function ManageLabel({
         onSuccess: async () => {
           comicToast.success("Label deleted");
           setDeleteOpen(false);
+          // Hold in parent before invalidate (hook runs onSuccess first) so vanishOut can play.
+          onExitStart?.();
           setExiting(true);
         },
         onError: async () => {
@@ -98,7 +113,7 @@ export function ManageLabel({
     } finally {
       setDeleting(false);
     }
-  }, [deleteLabel, label.id]);
+  }, [deleteLabel, label.id, onExitStart]);
 
   const handleTuneIn = useCallback(() => {
     setSelectedLabelIds([label.id]);
