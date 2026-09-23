@@ -21,11 +21,11 @@ export type ManageLabelProps = {
   accountId: string;
   label: LabelDto;
   onChanged?: () => void;
-  /** Called before delete so the parent can keep the row mounted through vanishOut. */
+  /** Called before delete so the parent can keep the row mounted through boingOutDown. */
   onExitStart?: () => void;
-  /** Called when vanishOut finishes (or times out), or delete fails after hold. */
+  /** Called when boingOutDown finishes (or times out), or delete fails after hold. */
   onExitComplete?: () => void;
-  /** Parent-held exit: keep playing vanishOut even if this instance remounts. */
+  /** Parent-held exit: keep playing boingOutDown even if this instance remounts. */
   forceExiting?: boolean;
   /** Play magic.css boingInUp on mount (newly added row). */
   animateEnter?: boolean;
@@ -102,7 +102,7 @@ export function ManageLabel({
         onSuccess: async () => {
           comicToast.success("Label deleted");
           setDeleteOpen(false);
-          // Hold in parent before invalidate (hook runs onSuccess first) so vanishOut can play.
+          // Hold in parent before invalidate (hook runs onSuccess first) so boingOutDown can play.
           onExitStart?.();
           setExiting(true);
         },
@@ -122,7 +122,7 @@ export function ManageLabel({
 
   const handleAnimationEnd = (event: AnimationEvent<HTMLElement>) => {
     const name = event.animationName;
-    if (exiting && name.includes("vanishOut")) {
+    if (exiting && name.includes("boingOutDown")) {
       notifyExitComplete();
       return;
     }
@@ -137,7 +137,7 @@ export function ManageLabel({
       ref={rootRef}
       className={[
         styles.root,
-        exiting ? "magictime vanishOut" : "",
+        exiting ? "magictime boingOutDown" : "",
         entering ? styles.boingInUp : "",
       ]
         .filter(Boolean)

@@ -28,14 +28,25 @@ function mergeDisplayLabels(
   exitingById: Record<string, LabelDto>,
 ): { order: string[]; labels: LabelDto[] } {
   const liveById = new Map(pagedLabels.map((label) => [label.id, label]));
-  const exitingIds = new Set(Object.keys(exitingById));
-  const order = previousOrder.filter((id) => liveById.has(id) || exitingIds.has(id));
+  // Prefer live API order (createdAt desc → newest first).
+  const order = pagedLabels.map((label) => label.id);
 
-  for (const label of pagedLabels) {
-    if (!order.includes(label.id)) order.push(label.id);
-  }
-  for (const id of exitingIds) {
-    if (!order.includes(id)) order.push(id);
+  for (const id of Object.keys(exitingById)) {
+    if (liveById.has(id)) continue;
+    const prevIndex = previousOrder.indexOf(id);
+    if (prevIndex <= 0) {
+      order.unshift(id);
+      continue;
+    }
+    const neighborBefore = previousOrder
+      .slice(0, prevIndex)
+      .reverse()
+      .find((neighborId) => order.includes(neighborId));
+    if (neighborBefore != null) {
+      order.splice(order.indexOf(neighborBefore) + 1, 0, id);
+    } else {
+      order.unshift(id);
+    }
   }
 
   const labels = order
@@ -66,7 +77,7 @@ export function ManageLabelsPanel({
   const [debouncedQ, setDebouncedQ] = useState("");
   /** labelId → boingInUp delay ms (insert order). */
   const [enterDelays, setEnterDelays] = useState<Record<string, number>>({});
-  /** Keep deleted rows mounted through vanishOut after query invalidation. */
+  /** Keep deleted rows mounted through boingOutDown after query invalidation. */
   const [exitingById, setExitingById] = useState<Record<string, LabelDto>>({});
   const searchRef = useRef<HTMLInputElement>(null);
   const knownIdsRef = useRef<Set<string> | null>(null);

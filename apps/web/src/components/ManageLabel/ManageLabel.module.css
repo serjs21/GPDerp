@@ -10,7 +10,7 @@
 }
 
 .root.magictime {
-  /* Keep exiting rows above neighbors while vanishOut scales/blurs. */
+  /* Keep exiting rows above neighbors while boingOutDown plays. */
   z-index: 3;
   pointer-events: none;
 }
