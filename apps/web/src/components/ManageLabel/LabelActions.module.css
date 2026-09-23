@@ -58,6 +58,11 @@
   flex-direction: row;
 }
 
+.iconOnly {
+  justify-content: center;
+  align-items: center;
+}
+
 .caption {
   flex: 0 0 auto;
   margin: 0;
@@ -102,6 +107,14 @@
 
 .iconTuneIn {
   transform: scale(1.5);
+}
+
+.iconNotConnected {
+  transform: none;
+  max-width: min(72%, 2.5rem);
+  max-height: 80%;
+  height: auto;
+  margin: auto;
 }
 
 .iconEdit {
