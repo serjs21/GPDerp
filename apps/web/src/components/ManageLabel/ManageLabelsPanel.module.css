@@ -24,6 +24,7 @@
 }
 
 .listScroll {
+  --manage-label-list-gap: 2.25rem;
   flex: 1 1 auto;
   box-sizing: border-box;
   display: flex;
@@ -32,7 +33,7 @@
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
-  gap: 2.25rem;
+  gap: var(--manage-label-list-gap);
 }
 
 .emptyLayout {

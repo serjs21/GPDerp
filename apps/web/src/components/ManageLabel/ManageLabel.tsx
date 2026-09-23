@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
   type AnimationEvent,
+  type CSSProperties,
   type TransitionEvent,
 } from "react";
 import { useRouter } from "next/navigation";
@@ -21,16 +22,19 @@ import { DeleteConfirmModal } from "@/components/DeleteConfirmModal";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
 import { ConnectedHaikusPanel } from "./ConnectedHaikusPanel";
 import { LabelActions } from "./LabelActions";
-import { MAGIC_EXIT_DURATION_MS } from "./consts/magicAnimationConsts";
+import {
+  MAGIC_EXIT_BOING_MS,
+  MAGIC_EXIT_COLLAPSE_MS,
+} from "./consts/magicAnimationConsts";
 import styles from "./ManageLabel.module.css";
 
 export type ManageLabelProps = {
   accountId: string;
   label: LabelDto;
   onChanged?: () => void;
-  /** Called before delete so the parent can keep the row mounted through boingOutDown. */
+  /** Called before delete so the parent can keep the row mounted through exit. */
   onExitStart?: () => void;
-  /** Called when exit finishes (or times out), or delete fails after hold. */
+  /** Called when height reaches 0 (or collapse times out). */
   onExitComplete?: () => void;
   /** Parent-held exit: keep playing exit even if this instance remounts. */
   forceExiting?: boolean;
@@ -59,6 +63,8 @@ export function ManageLabel({
   const [deleting, setDeleting] = useState(false);
   const [exiting, setExiting] = useState(forceExiting);
   const [entering, setEntering] = useState(animateEnter);
+  /** Pixel height while collapsing; `0` when animating shut; null when not exiting. */
+  const [exitHeightPx, setExitHeightPx] = useState<number | null>(null);
   const exitNotifiedRef = useRef(false);
   const rootRef = useRef<HTMLElement>(null);
   const { deleteLabel } = useAccountLabels({ accountId, autofetch: false });
@@ -93,12 +99,35 @@ export function ManageLabel({
     onExitComplete?.();
   }, [onExitComplete]);
 
+  // Lock measured height, then collapse to 0 at 2× the boing duration; unmount at 0.
   useEffect(() => {
-    if (!exiting) return;
-    const timer = window.setTimeout(() => {
+    if (!exiting) {
+      setExitHeightPx(null);
+      return;
+    }
+
+    const node = rootRef.current;
+    if (!node) return;
+
+    const measured = node.getBoundingClientRect().height;
+    setExitHeightPx(measured);
+
+    let raf2 = 0;
+    const raf1 = window.requestAnimationFrame(() => {
+      raf2 = window.requestAnimationFrame(() => {
+        setExitHeightPx(0);
+      });
+    });
+
+    const fallback = window.setTimeout(() => {
       notifyExitComplete();
-    }, MAGIC_EXIT_DURATION_MS + 50);
-    return () => window.clearTimeout(timer);
+    }, MAGIC_EXIT_COLLAPSE_MS + 80);
+
+    return () => {
+      window.cancelAnimationFrame(raf1);
+      window.cancelAnimationFrame(raf2);
+      window.clearTimeout(fallback);
+    };
   }, [exiting, notifyExitComplete]);
 
   const handleDeleteConfirm = useCallback(async () => {
@@ -109,7 +138,6 @@ export function ManageLabel({
         onSuccess: async () => {
           comicToast.success("Label deleted");
           setDeleteOpen(false);
-          // Hold in parent before invalidate (hook runs onSuccess first) so exit can play.
           onExitStart?.();
           setExiting(true);
         },
@@ -138,74 +166,91 @@ export function ManageLabel({
   const handleTransitionEnd = (event: TransitionEvent<HTMLElement>) => {
     if (!exiting) return;
     if (event.target !== event.currentTarget) return;
-    if (event.propertyName !== "grid-template-rows") return;
+    if (event.propertyName !== "height") return;
+    if (exitHeightPx !== 0) return;
     notifyExitComplete();
   };
+
+  const exitStyle: CSSProperties | undefined =
+    exitHeightPx == null
+      ? undefined
+      : {
+          height: exitHeightPx,
+          // Collapse list gap with height so neighbors don't jump on unmount.
+          marginBottom:
+            exitHeightPx === 0
+              ? "calc(-1 * var(--manage-label-list-gap, 2.25rem))"
+              : 0,
+          transitionProperty: "height, margin-bottom",
+          transitionDuration: `${MAGIC_EXIT_COLLAPSE_MS}ms`,
+          transitionTimingFunction: "ease",
+        };
 
   return (
     <>
       <article
         ref={rootRef}
         className={[styles.root, exiting ? styles.rootExiting : ""].filter(Boolean).join(" ")}
+        style={exitStyle}
         onTransitionEnd={handleTransitionEnd}
       >
-        <div className={styles.exitClip}>
-          <div
-            className={[
-              exiting ? styles.boingOutDown : "",
-              entering ? styles.boingInUp : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-            style={
-              entering && enterDelayMs > 0
-                ? { animationDelay: `${enterDelayMs}ms` }
+        <div
+          className={[
+            exiting ? styles.boingOutDown : "",
+            entering ? styles.boingInUp : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+          style={
+            entering && enterDelayMs > 0
+              ? { animationDelay: `${enterDelayMs}ms` }
+              : exiting
+                ? { animationDuration: `${MAGIC_EXIT_BOING_MS}ms` }
                 : undefined
-            }
-            onAnimationEnd={handleAnimationEnd}
-          >
-            <ComicPageRow className={styles.strip}>
-              <div className={styles.labelSlot}>
-                <ComicPagePanel
-                  background="solid"
-                  color="white"
-                  flexWeight={1}
-                  className={styles.labelPanel}
-                  ariaLabel={label.name}
-                >
-                  <div className={styles.labelPreview}>
-                    <ComicBurstLabel
-                      text={formatComicLabelText(label.name)}
-                      fill={label.color || "#888888"}
-                      shapeKind={shape.kind}
-                      spikeCount={shape.spikeCount}
-                      randomness={shape.randomness}
-                      seed={shape.id}
-                      fontSize={20}
-                    />
-                  </div>
-                </ComicPagePanel>
-              </div>
+          }
+          onAnimationEnd={handleAnimationEnd}
+        >
+          <ComicPageRow className={styles.strip}>
+            <div className={styles.labelSlot}>
+              <ComicPagePanel
+                background="solid"
+                color="white"
+                flexWeight={1}
+                className={styles.labelPanel}
+                ariaLabel={label.name}
+              >
+                <div className={styles.labelPreview}>
+                  <ComicBurstLabel
+                    text={formatComicLabelText(label.name)}
+                    fill={label.color || "#888888"}
+                    shapeKind={shape.kind}
+                    spikeCount={shape.spikeCount}
+                    randomness={shape.randomness}
+                    seed={shape.id}
+                    fontSize={20}
+                  />
+                </div>
+              </ComicPagePanel>
+            </div>
 
-              <div className={styles.connectedSlot}>
-                <ConnectedHaikusPanel
-                  accountId={accountId}
-                  labelName={label.name}
-                  items={connectedItems}
-                  total={connectedTotal}
-                />
-              </div>
-
-              <LabelActions
-                className={styles.actionSlot}
+            <div className={styles.connectedSlot}>
+              <ConnectedHaikusPanel
+                accountId={accountId}
                 labelName={label.name}
-                hasConnections={hasConnections}
-                onTuneIn={handleTuneIn}
-                onEdit={() => setEditOpen(true)}
-                onDelete={() => setDeleteOpen(true)}
+                items={connectedItems}
+                total={connectedTotal}
               />
-            </ComicPageRow>
-          </div>
+            </div>
+
+            <LabelActions
+              className={styles.actionSlot}
+              labelName={label.name}
+              hasConnections={hasConnections}
+              onTuneIn={handleTuneIn}
+              onEdit={() => setEditOpen(true)}
+              onDelete={() => setDeleteOpen(true)}
+            />
+          </ComicPageRow>
         </div>
       </article>
 
