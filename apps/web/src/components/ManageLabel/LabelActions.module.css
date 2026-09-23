@@ -45,7 +45,7 @@
   display: block;
   box-sizing: border-box;
   width: auto;
-  height: clamp(1.35rem, 28%, 2.35rem);
+  height: 100%;
   max-width: 72%;
   margin: 0 auto;
   object-fit: contain;
