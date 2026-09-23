@@ -6,6 +6,7 @@ import {
 } from "./parseSplitPathSvg";
 import { pointBetweenStops } from "./pathGeometry";
 import {
+  CREATION_FOCUS_INDEX,
   SVG_PATH_EXIT_STOP,
   SVG_PATH_FOCUS_STOP,
   SVG_PATH_GONE_STOP,
@@ -88,17 +89,48 @@ export function lanternTransformAtStops(
 }
 
 /**
- * Fly progress for the generating lantern (0 = exit stop, 1 = focus/creation stop).
- * Always parks at the creation pose so the lantern never flashes at the exit stop
- * before path scroll catches up — matching position right after create settles.
+ * Scroll-gated visibility for the generating lantern.
+ * While the list is still stepping back toward the creation slot, return null so the
+ * creation overlay does not fly in on top of the default-stop lantern (overlap).
+ * Once settled on the creation focus, return 1 (caller may run a separate enter fly).
  */
 export function creationFlyProgress(
-  _focusIndex: number,
-  _fromFocusIndex: number,
-  _tweenProgress: number,
-  _isAnimating: boolean,
-): number {
-  return 1;
+  focusIndex: number,
+  fromFocusIndex: number,
+  tweenProgress: number,
+  isAnimating: boolean,
+): number | null {
+  if (focusIndex === CREATION_FOCUS_INDEX) {
+    if (isAnimating && fromFocusIndex !== CREATION_FOCUS_INDEX) {
+      return null;
+    }
+    return 1;
+  }
+  return null;
+}
+
+/** Path default-stop (stop-20) pose — same transform the focused list lantern uses. */
+export function defaultStopLanternTransform(
+  parsed: ParsedSplitPathSvg,
+): LanternTransform | null {
+  return lanternTransformAtStops(
+    parsed,
+    SVG_PATH_FOCUS_STOP,
+    SVG_PATH_FOCUS_STOP,
+    1,
+  );
+}
+
+/**
+ * Creation lantern pose: fly exit→focus during scroll; park on default stop transform
+ * when settled so handoff matches the list lantern exactly.
+ */
+export function creationLanternTransformAtFlyT(
+  parsed: ParsedSplitPathSvg,
+  flyT: number,
+): LanternTransform | null {
+  if (flyT >= 1) return defaultStopLanternTransform(parsed);
+  return generatingLanternTransformAtFlyT(parsed, flyT);
 }
 
 /** Generating lantern pose along exit→focus segment; bottom from -exit to +focus. */

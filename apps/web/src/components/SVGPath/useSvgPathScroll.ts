@@ -203,19 +203,32 @@ export function useSvgPathScroll(
     pendingDirectionRef.current = null;
     animationRef.current?.stop();
 
-    return runJump(
-      CREATION_FOCUS_INDEX,
-      {
-        durationMs: scrollToTopNearDurationMs(current, durationMs),
-        ease: "easeOut",
-        onSettled: (settled) => {
-          setIsAnimating(false);
-          animatingRef.current = false;
-          onFocusChange?.(settled);
+    // Adjacent unit steps so list lanterns use SteppedTransition (avoids content
+    // overlapping the creation lantern during a long multi-index jump).
+    const stepTowardCreation = (from: number): boolean => {
+      const next = Math.max(CREATION_FOCUS_INDEX, from - 1);
+      if (next === from) return false;
+
+      return runJump(
+        next,
+        {
+          durationMs,
+          ease: "linear",
+          onSettled: (settled) => {
+            if (settled > CREATION_FOCUS_INDEX) {
+              stepTowardCreation(settled);
+              return;
+            }
+            setIsAnimating(false);
+            animatingRef.current = false;
+            onFocusChange?.(settled);
+          },
         },
-      },
-      clampScrollFocusIndex,
-    );
+        clampScrollFocusIndex,
+      );
+    };
+
+    return stepTowardCreation(current);
   }, [durationMs, haikuCount, onFocusChange, runJump]);
 
   const getFocusIndex = useCallback(() => focusRef.current, []);

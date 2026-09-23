@@ -150,7 +150,7 @@
 .panelHoverShare .slotShare,
 .panelHoverLabel .slotLabel,
 .panelHoverCopy .slotCopy {
-  flex-grow: 5;
+  flex-grow: 1;
 }
 
 .panelHoverDelete .slot:not(.slotDelete),
@@ -220,7 +220,7 @@
   width: 100%;
   height: 100%;
   max-width: 100%;
-  /* padding: 0 0.15rem; */
+  padding: 0 0.15rem;
   overflow: hidden;
   background: #111;
   color: #fff;

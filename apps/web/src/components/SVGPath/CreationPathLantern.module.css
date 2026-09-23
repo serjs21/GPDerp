@@ -1,0 +1,17 @@
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+/* Fixed portal mirroring guideBox — above PathOverlay chrome (z≥1001). */
+.overlayElevated {
+  pointer-events: none;
+  overflow: visible;
+  will-change: opacity;
+}
+
+.overlayElevated :global(article) {
+  pointer-events: auto;
+}

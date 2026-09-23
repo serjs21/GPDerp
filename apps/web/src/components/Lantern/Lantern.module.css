@@ -11,7 +11,8 @@
   --lantern-width: 11.5rem;
   --lantern-flame-bottom: 0.075;
   --lantern-flame-height: 0.1;
-  --lantern-flame-anchor-y: 0.125;
+  /* Must match LANTERN_FLAME_ANCHOR_Y — pathPositioned uses this for translateY. */
+  --lantern-flame-anchor-y: -0.075;
   --lantern-flight-x: 0px;
   --lantern-flight-y: 0px;
   --lantern-actions-bar-offset-x: 0px;
@@ -46,7 +47,7 @@
   animation: none;
 }
 
-/* Parent owns entrance (e.g. CreationModal fly-in); skip lanternReveal remount flash. */
+/* Parent owns entrance motion; skip lanternReveal remount flash. */
 .suppressReveal {
   animation: none;
 }

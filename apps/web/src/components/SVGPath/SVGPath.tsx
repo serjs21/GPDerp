@@ -36,15 +36,18 @@ import { useSvgPathScroll } from "./useSvgPathScroll";
 import {
   catchUpStopForHaiku,
   creationFlyProgress,
-  generatingLanternTransformAtFlyT,
+  creationLanternTransformAtFlyT,
+  CREATION_FOCUS_INDEX,
   isStopOnPath,
   lanternTransformAtStops,
   parseSplitPathSvg,
   shouldFetchNextQueuePage,
   splitPathSvgInnerMarkup,
   stopForHaikuIndex,
+  SVG_PATH_FOCUS_STOP,
   type ParsedSplitPathSvg,
 } from "./utils";
+import { CreationPathLantern } from "./CreationPathLantern";
 import styles from "./SVGPath.module.css";
 
 const SVG_PATH_SRC = "/path/split_path_colored_stops.svg";
@@ -52,8 +55,19 @@ const SVG_PATH_SRC = "/path/split_path_colored_stops.svg";
 const SVG_PATH_STEP_MS = PATH_STOP_STEP_TOTAL_MS;
 const SVG_PATH_CATCH_UP_MS = 450;
 const SVG_PATH_DELETE_PACK_MS = 450;
+/** Creation lantern exit→focus fly after list scroll-back settles. */
+const CREATION_ENTER_MS = PATH_STOP_STEP_TOTAL_MS;
 /** Start neighbor pack when exit flight first holds this pose (0-based; 3 = 4th frame). */
 const DELETE_PACK_CUE_POSE_INDEX = 3;
+
+type CreationLayerState = {
+  requestId: string;
+  draft: GeneratingDraft | null;
+  /** Far-path: keep showing saved haiku under modal chrome after stream ends. */
+  handoffHaiku: HaikuDto | null;
+  /** Kept at 1 while mounted; overlay unmounts instantly on near-path handoff. */
+  overlayOpacity: number;
+};
 
 function pathStepPoseAsTransform(pose: PathStepPose): LanternTransform {
   return pathStepPoseToTransform(pose, 1);
@@ -81,6 +95,11 @@ export type SVGPathHandle = {
 export type SVGPathProps = {
   haikus: HaikuDto[];
   generatingDraft?: GeneratingDraft | null;
+  /**
+   * Far-path CreationModal chrome is open — park creation lantern on guideBox stop-20
+   * (do not render a second lantern in the modal).
+   */
+  creationChromeOpen?: boolean;
   initialFocusIndex?: number;
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
@@ -130,6 +149,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
   {
     haikus,
     generatingDraft = null,
+    creationChromeOpen = false,
     initialFocusIndex,
     hasNextPage = false,
     isFetchingNextPage = false,
@@ -148,6 +168,10 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
   const parsed = splitPath?.parsed ?? null;
   const stageRef = useRef<HTMLDivElement>(null);
   const svgAreaRef = useRef<HTMLDivElement>(null);
+  const [creationLayer, setCreationLayer] = useState<CreationLayerState | null>(null);
+  const newestAtCreationStartRef = useRef<string | null>(null);
+  const [creationEnterT, setCreationEnterT] = useState<number | null>(null);
+  const creationEnterAnimRef = useRef<ReturnType<typeof animate> | null>(null);
   const onVacantQueueSlotRef = useRef(onVacantQueueSlot);
   onVacantQueueSlotRef.current = onVacantQueueSlot;
   const [exitingLanterns, setExitingLanterns] = useState<ExitingLantern[]>([]);
@@ -235,6 +259,116 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
     initialFocusIndex,
     onFocusChange,
   });
+
+  // Keep absolute creation overlay mounted across draft updates; near vs far handoff differ.
+  useLayoutEffect(() => {
+    if (!generatingDraft) return;
+    setCreationLayer((prev) => {
+      if (prev?.requestId === generatingDraft.requestId) {
+        return { ...prev, draft: generatingDraft, handoffHaiku: null };
+      }
+      newestAtCreationStartRef.current = haikusRef.current[0]?.id ?? null;
+      creationEnterAnimRef.current?.stop();
+      creationEnterAnimRef.current = null;
+      setCreationEnterT(null);
+      return {
+        requestId: generatingDraft.requestId,
+        draft: generatingDraft,
+        handoffHaiku: null,
+        overlayOpacity: 1,
+      };
+    });
+  }, [generatingDraft]);
+
+  useLayoutEffect(() => {
+    if (generatingDraft) return;
+    setCreationLayer((prev) => {
+      if (!prev?.draft) return prev;
+      const newest = haikus[0];
+      if (!newest || newest.id === newestAtCreationStartRef.current) {
+        return creationChromeOpen ? prev : null;
+      }
+
+      if (focusIndex === 0) {
+        // Near path: list lantern owns stop-20; drop overlay (no crossfade flicker).
+        creationEnterAnimRef.current?.stop();
+        creationEnterAnimRef.current = null;
+        setCreationEnterT(null);
+        return null;
+      }
+
+      // Far path: keep path lantern under modal chrome until chrome closes.
+      return {
+        ...prev,
+        draft: null,
+        handoffHaiku: newest,
+        overlayOpacity: 1,
+      };
+    });
+  }, [generatingDraft, haikus, focusIndex, creationChromeOpen]);
+
+  // Drop far-path overlay when modal chrome closes.
+  useLayoutEffect(() => {
+    if (creationChromeOpen || generatingDraft) return;
+    setCreationLayer((prev) => {
+      if (!prev) return prev;
+      if (prev.draft) return prev;
+      creationEnterAnimRef.current?.stop();
+      creationEnterAnimRef.current = null;
+      setCreationEnterT(null);
+      return null;
+    });
+  }, [creationChromeOpen, generatingDraft]);
+
+  // After list scroll-back settles on creation focus, fly the creation lantern in alone.
+  // Far-path chrome: park immediately at stop-20 (same guideBox as default lantern).
+  useEffect(() => {
+    if (!creationLayer?.draft && !creationLayer?.handoffHaiku) return;
+    const nearSettled =
+      focusIndex === CREATION_FOCUS_INDEX && !isAnimating;
+    const farParked =
+      creationChromeOpen &&
+      focusIndex !== CREATION_FOCUS_INDEX &&
+      !isAnimating;
+    if (!nearSettled && !farParked) return;
+    if (creationEnterT === 1) return;
+
+    creationEnterAnimRef.current?.stop();
+
+    if (farParked || prefersReducedMotion()) {
+      setCreationEnterT(1);
+      return;
+    }
+
+    setCreationEnterT(0);
+    creationEnterAnimRef.current = animate(0, 1, {
+      duration: CREATION_ENTER_MS / 1000,
+      ease: "easeOut",
+      onUpdate: (value) => setCreationEnterT(value),
+      onComplete: () => {
+        setCreationEnterT(1);
+        creationEnterAnimRef.current = null;
+      },
+    });
+
+    return () => {
+      creationEnterAnimRef.current?.stop();
+      creationEnterAnimRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- start once per settle/park
+  }, [
+    creationLayer?.draft?.requestId,
+    creationLayer?.handoffHaiku?.id,
+    focusIndex,
+    isAnimating,
+    creationChromeOpen,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      creationEnterAnimRef.current?.stop();
+    };
+  }, []);
 
   useImperativeHandle(
     ref,
@@ -445,14 +579,33 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
     adjacentFocusStep ? 0 : tweenProgress,
   ]);
 
-  const generatingFlyT = generatingDraft
+  // Near: hide during scroll-back, then enter fly. Far chrome: park on stop-20 in guideBox.
+  const scrollGate = creationLayer
     ? creationFlyProgress(focusIndex, fromFocusIndex, tweenProgress, isAnimating)
     : null;
+  const farPark =
+    Boolean(creationLayer) &&
+    creationChromeOpen &&
+    focusIndex !== CREATION_FOCUS_INDEX &&
+    !isAnimating &&
+    scrollGate === null;
+  const creationParked = scrollGate === 1 || farPark ? 1 : scrollGate;
+  const creationFlyT =
+    creationParked === 1
+      ? farPark
+        ? 1
+        : (creationEnterT ?? 0)
+      : creationParked;
 
-  const generatingTransform =
-    parsed && generatingFlyT !== null
-      ? generatingLanternTransformAtFlyT(parsed, generatingFlyT)
+  const creationTransform =
+    parsed && creationFlyT !== null
+      ? creationLanternTransformAtFlyT(parsed, creationFlyT)
       : null;
+
+  const creationOverlayOpacity = creationLayer?.overlayOpacity ?? 0;
+  /** Far path: hide the list lantern that would sit under the creation overlay at stop-20. */
+  const hideListFocusStop =
+    creationFlyT !== null && creationTransform != null && farPark;
 
   const viewportClass = [styles.viewport, className].filter(Boolean).join(" ");
   const exitingIds = useMemo(
@@ -476,6 +629,13 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
           {visibleLanterns
             .filter(({ haiku }) => !haiku || !exitingIds.has(haiku.id))
             .map(({ haiku, haikuIndex, loading, transform, face, poses, stepRunKey }) => {
+              // Far-path: creation overlay owns stop-20; hide the list lantern underneath.
+              if (
+                hideListFocusStop &&
+                stopForHaikuIndex(haikuIndex, focusIndex) === SVG_PATH_FOCUS_STOP
+              ) {
+                return null;
+              }
               const key = loading
                 ? "pagination-loader"
                 : (haiku?.id ?? `svg-path-${haikuIndex}`);
@@ -528,13 +688,15 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
               onComplete={handleLanternExitComplete}
             />
           ))}
-          {generatingDraft && generatingTransform ? (
-            <SVGPathLantern
-              key={`generating-${generatingDraft.requestId}`}
-              generatingDraft={generatingDraft}
-              transform={generatingTransform}
-              isAnimating={isAnimating}
+          {creationTransform && creationLayer ? (
+            <CreationPathLantern
+              transform={creationTransform}
+              overlayOpacity={creationOverlayOpacity}
+              generatingDraft={creationLayer.draft}
+              handoffHaiku={creationLayer.handoffHaiku}
               excludeLabelIds={excludeLabelIds}
+              elevateAboveChrome={creationChromeOpen}
+              guideBoxRef={svgAreaRef}
             />
           ) : null}
         </div>

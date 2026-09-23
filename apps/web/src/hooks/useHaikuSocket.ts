@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { flushSync } from "react-dom";
 import type { HaikuDto } from "@/api/haikus";
 import { formatChatTime } from "../utils/date";
 import { useWebSocket } from "./useWebSocket";
@@ -82,8 +83,11 @@ export const useHaikuSocket = (options?: UseHaikuSocketOptions) => {
       if (!msg) return;
 
       if (msg.kind === "saved") {
-        onHaikuSaved?.(msg.data.haiku);
-        setGeneratingDraft((d) => (d?.requestId === msg.id ? null : d));
+        // One paint: drop draft, snap creation→0, prepend haiku (avoids stop-19 flash at focus -1).
+        flushSync(() => {
+          setGeneratingDraft((d) => (d?.requestId === msg.id ? null : d));
+          onHaikuSaved?.(msg.data.haiku);
+        });
         return;
       }
 

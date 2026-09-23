@@ -34,7 +34,7 @@ export type LanternFrameProps = LanternTransformInput & {
   widthRem?: number;
   generating?: boolean;
   flightExiting?: boolean;
-  /** Skip lanternReveal when parent already owns the entrance motion. */
+  /** Skip lanternReveal only (keeps pointer events). */
   suppressReveal?: boolean;
   /** Horizontal offset of the actions bar relative to lantern center. */
   actionsBarOffsetX?: string;
@@ -47,6 +47,8 @@ export type LanternFrameProps = LanternTransformInput & {
   excludeLabelIds?: string[];
   /** When false, skip LabelBelt (LabelHalo owns label chrome). Default true. */
   showLabelBelt?: boolean;
+  /** Marks this frame for path handoff DOM measurements. */
+  pathHaikuId?: string;
   children: ReactNode;
 };
 
@@ -100,6 +102,7 @@ export function LanternFrame({
   haikuLabels,
   excludeLabelIds,
   showLabelBelt = true,
+  pathHaikuId,
   children,
   step,
   progress,
@@ -148,6 +151,7 @@ export function LanternFrame({
           style={rootStyle}
           aria-label={ariaLabel}
           {...(generating ? { "data-haiku-generating": true } : {})}
+          {...(pathHaikuId ? { "data-path-haiku-id": pathHaikuId } : {})}
         >
           <LanternFrameShell />
           <div className={styles.content}>{children}</div>

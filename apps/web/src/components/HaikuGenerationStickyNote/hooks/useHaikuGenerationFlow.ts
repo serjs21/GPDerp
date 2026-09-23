@@ -27,8 +27,9 @@ export function useHaikuGenerationFlow(options?: UseHaikuGenerationFlowOptions) 
 
   const { generatingDraft } = useHaikuSocket({
     onHaikuSaved: (haiku) => {
-      prependHaikuToInfiniteCache(queryClient, HAIKU_LIST_PAGE_SIZE, haiku);
+      // Snap before prepend so index-0 never paints at stop-19 under creation focus.
       onHaikuSavedExtra?.(haiku);
+      prependHaikuToInfiniteCache(queryClient, HAIKU_LIST_PAGE_SIZE, haiku);
     },
   });
 

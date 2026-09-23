@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import type { HaikuDto } from "@/api/haikus";
 import type { SVGPathHandle } from "@/components/SVGPath";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
@@ -16,6 +23,7 @@ export function useCreationPathGate(
   const handledRequestIdRef = useRef<string | null>(null);
   const staleDraftRef = useRef<GeneratingDraft | null>(null);
 
+  // Layout phase: start scroll/open before paint so near-path never flashes exit pose.
   useLayoutEffect(() => {
     if (!generatingDraft) return;
     if (handledRequestIdRef.current === generatingDraft.requestId) return;
@@ -26,8 +34,9 @@ export function useCreationPathGate(
     setCreationSessionKey(generatingDraft.requestId);
 
     const focusIndex = pathRef.current?.getFocusIndex() ?? 0;
+    const openOverlay = shouldOpenCreationOverlay(focusIndex);
 
-    if (shouldOpenCreationOverlay(focusIndex)) {
+    if (openOverlay) {
       setCreationOpen(true);
       return;
     }

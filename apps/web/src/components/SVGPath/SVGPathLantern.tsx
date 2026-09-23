@@ -7,6 +7,11 @@ import { toLabelHaloItems } from "@/components/LabelHalo/utils/toLabelHaloItems"
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternDeleteExit } from "@/components/Lantern/LanternDeleteExit";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
+import {
+  LANTERN_FLAME_ANCHOR_Y,
+  LANTERN_FLAME_BOTTOM,
+  LANTERN_FLAME_HEIGHT,
+} from "@/components/Lantern/constants";
 import lanternStyles from "@/components/Lantern/Lantern.module.css";
 import {
   lanternTransformToCssVars,
@@ -15,10 +20,23 @@ import {
 import { SakuraPetalLoader } from "@/components/Loaders";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { useHaikuLabelPlacement } from "@/hooks/useHaikuLabelPlacement";
+import { SVG_PATH_LANTERN_WIDTH_REM } from "./consts/pathLanternLayoutConsts";
 import type { StopFace } from "./pathStopRotation";
 import styles from "./SVGPath.module.css";
 
-const WIDTH_REM = 19;
+const WIDTH_REM = SVG_PATH_LANTERN_WIDTH_REM;
+
+/** Flame CSS vars required on every pathPositioned root (not only LanternFrame). */
+function pathLanternCssVars(transform: LanternTransform, flightStyle?: CSSProperties): CSSProperties {
+  return {
+    ...lanternTransformToCssVars(transform),
+    ...flightStyle,
+    "--lantern-width": `${WIDTH_REM}rem`,
+    "--lantern-flame-bottom": String(LANTERN_FLAME_BOTTOM),
+    "--lantern-flame-height": String(LANTERN_FLAME_HEIGHT),
+    "--lantern-flame-anchor-y": String(LANTERN_FLAME_ANCHOR_Y),
+  } as CSSProperties;
+}
 
 const IDENTITY_TRANSFORM = {
   x: 0,
@@ -97,6 +115,7 @@ function RotatedPathAnchor({
   suppressReveal,
   isAnimating,
   ariaLabel,
+  pathHaikuId,
   children,
 }: {
   transform: LanternTransform;
@@ -104,12 +123,11 @@ function RotatedPathAnchor({
   suppressReveal: boolean;
   isAnimating: boolean;
   ariaLabel: string;
+  pathHaikuId?: string;
   children: ReactNode;
 }) {
   const anchorStyle = {
-    ...lanternTransformToCssVars(transform),
-    ...flightStyle,
-    "--lantern-width": `${WIDTH_REM}rem`,
+    ...pathLanternCssVars(transform, flightStyle),
     animation: "none",
   } as CSSProperties;
 
@@ -126,6 +144,7 @@ function RotatedPathAnchor({
         .join(" ")}
       style={anchorStyle}
       aria-label={ariaLabel}
+      {...(pathHaikuId ? { "data-path-haiku-id": pathHaikuId } : {})}
     >
       {children}
     </div>
@@ -161,11 +180,7 @@ function LanternWithHalo({
     onChanged,
   });
   const haloLabels = toLabelHaloItems(haiku.labels, excludeLabelIds);
-  const pathStyle = {
-    ...lanternTransformToCssVars(transform),
-    ...flightStyle,
-    "--lantern-width": `${WIDTH_REM}rem`,
-  } as CSSProperties;
+  const pathStyle = pathLanternCssVars(transform, flightStyle);
 
   return (
     <div
@@ -178,6 +193,7 @@ function LanternWithHalo({
         .filter(Boolean)
         .join(" ")}
       style={pathStyle}
+      data-path-haiku-id={haiku.id}
     >
       <LabelHalo
         layout="fill"
@@ -244,6 +260,7 @@ function RotatedLanternWithHalo({
       suppressReveal={suppressReveal}
       isAnimating={isAnimating}
       ariaLabel={ariaLabel}
+      pathHaikuId={haiku.id}
     >
       <Lantern
         haiku={haiku}

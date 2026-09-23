@@ -112,7 +112,8 @@ export function HaikuGenerationStickyNote({
       <div className={styles.displayArea}>
         <SavedHaikusLanternPath
           ref={pathRef}
-          generatingDraft={creationOpen ? null : generatingDraft}
+          generatingDraft={generatingDraft}
+          creationChromeOpen={creationOpen}
         />
         <InitialHaikuGate
           key={isLoggedIn ? "logged-in" : "logged-out"}
@@ -138,6 +139,7 @@ export function HaikuGenerationStickyNote({
         isGenerating={Boolean(generatingDraft)}
         lanternSessionKey={creationSessionKey}
         showLanternActions={Boolean(creationHaiku)}
+        showLantern={false}
         onHaikuDeleted={(haiku) => {
           onHaikuDeleted(haiku);
           onCreationHaikuDeleted();

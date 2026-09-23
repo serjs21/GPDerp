@@ -11,6 +11,8 @@ import styles from "@/components/Lantern/LanternPath/LanternPath.module.css";
 
 export type SavedHaikusLanternPathProps = {
   generatingDraft?: GeneratingDraft | null;
+  /** Far-path modal chrome open — park creation lantern on the path guideBox. */
+  creationChromeOpen?: boolean;
   searchString?: string;
   selectedLabelIds?: string[];
 };
@@ -18,7 +20,12 @@ export type SavedHaikusLanternPathProps = {
 export const SavedHaikusLanternPath = forwardRef<
   SVGPathHandle,
   SavedHaikusLanternPathProps
->(function SavedHaikusLanternPath({ generatingDraft = null, searchString = "", selectedLabelIds = [] }, ref) {
+>(function SavedHaikusLanternPath({
+  generatingDraft = null,
+  creationChromeOpen = false,
+  searchString = "",
+  selectedLabelIds = [],
+}, ref) {
   const {
     haikus,
     hasNextPage,
@@ -88,6 +95,7 @@ export const SavedHaikusLanternPath = forwardRef<
         ref={ref}
         haikus={filteredHaikus}
         generatingDraft={generatingDraft}
+        creationChromeOpen={creationChromeOpen}
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetchingNextPage}
         onVacantQueueSlot={handleVacantQueueSlot}

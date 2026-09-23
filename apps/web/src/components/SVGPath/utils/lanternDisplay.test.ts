@@ -2,11 +2,18 @@ import {
   opacityAtStop,
   scaleAtStop,
   creationFlyProgress,
+  creationLanternTransformAtFlyT,
+  defaultStopLanternTransform,
   generatingLanternTransformAtFlyT,
   SVG_PATH_EXIT_SCALE,
   SVG_PATH_GONE_SCALE,
   SVG_PATH_QUEUE_SCALE_RATIO,
 } from "./lanternDisplay";
+import {
+  defaultStopLanternTransformFallback,
+  SVG_PATH_DEFAULT_STOP,
+  SVG_PATH_LANTERN_WIDTH_REM,
+} from "../consts/pathLanternLayoutConsts";
 import { CREATION_FOCUS_INDEX } from "./stops";
 
 describe("lanternDisplay", () => {
@@ -27,11 +34,41 @@ describe("lanternDisplay", () => {
     expect(opacityAtStop(22)).toBe(0);
   });
 
-  it("keeps generating lantern at creation pose (no exit flash before scroll)", () => {
-    expect(creationFlyProgress(0, 0, 1, false)).toBe(1);
-    expect(creationFlyProgress(CREATION_FOCUS_INDEX, 0, 0, true)).toBe(1);
-    expect(creationFlyProgress(CREATION_FOCUS_INDEX, 0, 0.5, true)).toBe(1);
+  it("hides creation overlay during list scroll-back, then parks when settled", () => {
+    expect(creationFlyProgress(0, 0, 1, false)).toBeNull();
+    // During 0→-1 scroll-back: keep hidden so list clears stop-20 first.
+    expect(creationFlyProgress(CREATION_FOCUS_INDEX, 0, 0, true)).toBeNull();
+    expect(creationFlyProgress(CREATION_FOCUS_INDEX, 0, 0.5, true)).toBeNull();
     expect(creationFlyProgress(CREATION_FOCUS_INDEX, 0, 1, false)).toBe(1);
+    expect(creationFlyProgress(CREATION_FOCUS_INDEX, CREATION_FOCUS_INDEX, 1, false)).toBe(1);
+  });
+
+  it("exports default-stop fallback matching authored stop-20 percent pose", () => {
+    expect(SVG_PATH_LANTERN_WIDTH_REM).toBe(19);
+    const t = defaultStopLanternTransformFallback();
+    expect(t.x).toBeCloseTo(SVG_PATH_DEFAULT_STOP.cx / SVG_PATH_DEFAULT_STOP.viewBoxWidth, 6);
+    expect(t.y).toBeCloseTo(SVG_PATH_DEFAULT_STOP.cy / SVG_PATH_DEFAULT_STOP.viewBoxHeight, 6);
+    expect(t.scale).toBe(1);
+    expect(t.opacity).toBe(1);
+  });
+
+  it("parks settled creation pose on the default focus stop transform", () => {
+    const parsed = {
+      viewBox: { width: 100, height: 100 },
+      stopsById: {
+        20: { cx: 50, cy: 97.2778 },
+        21: { cx: 94.098, cy: 68.8194 },
+      },
+      segmentsByIndex: {},
+    } as import("./parseSplitPathSvg").ParsedSplitPathSvg;
+
+    const parked = creationLanternTransformAtFlyT(parsed, 1);
+    const def = defaultStopLanternTransform(parsed);
+    expect(parked).not.toBeNull();
+    expect(def).not.toBeNull();
+    expect(parked!.x).toBeCloseTo(def!.x, 6);
+    expect(parked!.y).toBeCloseTo(def!.y, 6);
+    expect(parked!.scale).toBeCloseTo(def!.scale, 6);
   });
 
   it("flies bottom from -exit to +focus while left follows exit→focus segment", () => {

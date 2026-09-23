@@ -50,7 +50,8 @@ export function HaikuDisplay() {
       <div className={styles.displayArea}>
         <SavedHaikusLanternPath
           ref={pathRef}
-          generatingDraft={creationOpen ? null : generatingDraft}
+          generatingDraft={generatingDraft}
+          creationChromeOpen={creationOpen}
           searchString={searchString}
           selectedLabelIds={selectedLabelIds}
         />
@@ -70,6 +71,7 @@ export function HaikuDisplay() {
         haiku={creationHaiku}
         generatingDraft={modalGeneratingDraft}
         lanternSessionKey={creationSessionKey}
+        showLantern={false}
         onKeepScrolling={onKeepScrolling}
         onGoToHaiku={onGoToHaiku}
         onHaikuDeleted={(haiku) => {

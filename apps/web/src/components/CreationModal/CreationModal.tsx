@@ -5,21 +5,17 @@ import type { HaikuDto } from "@/api/haikus";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternDeleteExit } from "@/components/Lantern/LanternDeleteExit";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
-import type { LanternTransform } from "@/components/Lantern/lanternTransform";
 import { PathOverlay } from "@/components/PathOverlay";
+import {
+  defaultStopLanternTransformFallback,
+  SVG_PATH_LANTERN_WIDTH_REM,
+} from "@/components/SVGPath/consts/pathLanternLayoutConsts";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import styles from "./CreationModal.module.css";
 
-/** Resting pose from PathOverlay App view (devtools) — centered, mid-low. */
-const CREATION_LANTERN_WIDTH_REM = 20;
-const CREATION_LANTERN_TRANSFORM: LanternTransform = {
-  positionMode: "percent",
-  x: 0.5,
-  y: 0.70635, // --lantern-bottom: 29.365%
-  scale: 1,
-  rotate: 0,
-  opacity: 1,
-};
+/** Same width + stop-20 pose as SVGPath list / creation overlay. */
+const CREATION_LANTERN_WIDTH_REM = SVG_PATH_LANTERN_WIDTH_REM;
+const CREATION_LANTERN_TRANSFORM = defaultStopLanternTransformFallback();
 
 export type CreationModalProps = {
   open: boolean;
@@ -34,6 +30,8 @@ export type CreationModalProps = {
   lanternSessionKey?: string | null;
   /** Show hover actions on a saved lantern (e.g. Storybook clickability checks). */
   showLanternActions?: boolean;
+  /** When false, PathOverlay chrome only — lantern lives on SVGPath guideBox (aligned). */
+  showLantern?: boolean;
   onHaikuDeleted?: (haiku: HaikuDto) => void;
   onHaikuDeleteFailed?: (haiku: HaikuDto) => void;
   onHaikuChanged?: () => void;
@@ -48,6 +46,7 @@ export function CreationModal({
   isGenerating = false,
   lanternSessionKey = null,
   showLanternActions = false,
+  showLantern = true,
   onHaikuDeleted,
   onHaikuDeleteFailed,
   onHaikuChanged,
@@ -67,7 +66,7 @@ export function CreationModal({
       ? `Haiku lantern: ${activeHaiku.title ?? ""}`
       : "Haiku creation";
 
-  // Prefer session key for the whole create flow so draft→saved does not remount fly-in.
+  // Prefer session key so draft→saved does not remount .flyIn.
   const flyInKey =
     lanternSessionKey ?? generatingDraft?.requestId ?? activeHaiku?.id ?? "lantern";
 
@@ -81,50 +80,51 @@ export function CreationModal({
       onClose={onKeepScrolling}
     >
       <div className={styles.stage}>
-        <div className={styles.flyIn} key={flyInKey}>
-          {activeHaiku ? (
-            <LanternDeleteExit
-              haiku={activeHaiku}
-              transform={CREATION_LANTERN_TRANSFORM}
-              widthRem={CREATION_LANTERN_WIDTH_REM}
-              onDeleted={(deleted) => {
-                setExitingHaiku(deleted);
-                onHaikuDeleted?.(deleted);
-              }}
-              onDeleteFailed={onHaikuDeleteFailed}
-              onExitComplete={() => setExitingHaiku(null)}
-              onChanged={onHaikuChanged}
-            >
-              {({ onDelete, flightStyle, flightExiting }) => (
-                <LanternFrame
-                  ariaLabel={ariaLabel}
-                  widthRem={CREATION_LANTERN_WIDTH_REM}
-                  transform={CREATION_LANTERN_TRANSFORM}
-                  style={flightStyle}
-                  flightExiting={flightExiting}
-                  suppressReveal
-                >
-                  <Lantern
-                    haiku={activeHaiku}
-                    showActions={showLanternActions && !flightExiting}
-                    onDelete={onDelete}
-                    onChanged={onHaikuChanged}
-                  />
-                </LanternFrame>
-              )}
-            </LanternDeleteExit>
-          ) : generatingDraft ? (
-            <LanternFrame
-              ariaLabel={ariaLabel}
-              widthRem={CREATION_LANTERN_WIDTH_REM}
-              transform={CREATION_LANTERN_TRANSFORM}
-              generating={isGenerating}
-              suppressReveal
-            >
-              <Lantern generatingDraft={generatingDraft} showActions={false} />
-            </LanternFrame>
-          ) : null}
-        </div>
+        {showLantern ? (
+          <div className={styles.flyIn} key={flyInKey}>
+            {activeHaiku ? (
+              <LanternDeleteExit
+                haiku={activeHaiku}
+                transform={CREATION_LANTERN_TRANSFORM}
+                widthRem={CREATION_LANTERN_WIDTH_REM}
+                onDeleted={(deleted) => {
+                  setExitingHaiku(deleted);
+                  onHaikuDeleted?.(deleted);
+                }}
+                onDeleteFailed={onHaikuDeleteFailed}
+                onExitComplete={() => setExitingHaiku(null)}
+                onChanged={onHaikuChanged}
+              >
+                {({ onDelete, flightStyle, flightExiting }) => (
+                  <LanternFrame
+                    ariaLabel={ariaLabel}
+                    widthRem={CREATION_LANTERN_WIDTH_REM}
+                    transform={CREATION_LANTERN_TRANSFORM}
+                    style={flightStyle}
+                    flightExiting={flightExiting}
+                    suppressReveal
+                  >
+                    <Lantern
+                      haiku={activeHaiku}
+                      showActions={showLanternActions && !flightExiting}
+                      onDelete={onDelete}
+                      onChanged={onHaikuChanged}
+                    />
+                  </LanternFrame>
+                )}
+              </LanternDeleteExit>
+            ) : generatingDraft ? (
+              <LanternFrame
+                ariaLabel={ariaLabel}
+                widthRem={CREATION_LANTERN_WIDTH_REM}
+                transform={CREATION_LANTERN_TRANSFORM}
+                generating={isGenerating}
+              >
+                <Lantern generatingDraft={generatingDraft} showActions={false} />
+              </LanternFrame>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </PathOverlay>
   );
