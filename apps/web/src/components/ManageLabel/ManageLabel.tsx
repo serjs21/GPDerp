@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type AnimationEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type AnimationEvent,
+  type TransitionEvent,
+} from "react";
 import { useRouter } from "next/navigation";
 import type { LabelDto } from "@/api/labels";
 import { useHaikuFilters } from "@/app/providers/HaikuFiltersProvider";
@@ -23,11 +30,11 @@ export type ManageLabelProps = {
   onChanged?: () => void;
   /** Called before delete so the parent can keep the row mounted through boingOutDown. */
   onExitStart?: () => void;
-  /** Called when boingOutDown finishes (or times out), or delete fails after hold. */
+  /** Called when exit finishes (or times out), or delete fails after hold. */
   onExitComplete?: () => void;
-  /** Parent-held exit: keep playing boingOutDown even if this instance remounts. */
+  /** Parent-held exit: keep playing exit even if this instance remounts. */
   forceExiting?: boolean;
-  /** Play magic.css boingInUp on mount (newly added row). */
+  /** Play boingInUp on mount (newly added row). */
   animateEnter?: boolean;
   /** Stagger delay for sequential boingInUp (ms). */
   enterDelayMs?: number;
@@ -102,7 +109,7 @@ export function ManageLabel({
         onSuccess: async () => {
           comicToast.success("Label deleted");
           setDeleteOpen(false);
-          // Hold in parent before invalidate (hook runs onSuccess first) so boingOutDown can play.
+          // Hold in parent before invalidate (hook runs onSuccess first) so exit can play.
           onExitStart?.();
           setExiting(true);
         },
@@ -122,75 +129,85 @@ export function ManageLabel({
 
   const handleAnimationEnd = (event: AnimationEvent<HTMLElement>) => {
     const name = event.animationName;
-    if (exiting && (name.includes("boingOutDown") || name.includes("manageLabelBoingOut"))) {
-      notifyExitComplete();
-      return;
-    }
     if (entering && (name.includes("boingInUp") || name.includes("manageLabelBoingIn"))) {
       setEntering(false);
       onEnterAnimationEnd?.();
     }
   };
 
+  const handleTransitionEnd = (event: TransitionEvent<HTMLElement>) => {
+    if (!exiting) return;
+    if (event.target !== event.currentTarget) return;
+    if (event.propertyName !== "grid-template-rows") return;
+    notifyExitComplete();
+  };
+
   return (
-    <article
-      ref={rootRef}
-      className={[
-        styles.root,
-        exiting ? styles.rootExiting : "",
-        exiting ? styles.boingOutDown : "",
-        entering ? styles.boingInUp : "",
-      ]
-        .filter(Boolean)
-        .join(" ")}
-      style={
-        entering && enterDelayMs > 0
-          ? { animationDelay: `${enterDelayMs}ms` }
-          : undefined
-      }
-      onAnimationEnd={handleAnimationEnd}
-    >
-      <ComicPageRow className={styles.strip}>
-        <div className={styles.labelSlot}>
-          <ComicPagePanel
-            background="solid"
-            color="white"
-            flexWeight={1}
-            className={styles.labelPanel}
-            ariaLabel={label.name}
+    <>
+      <article
+        ref={rootRef}
+        className={[styles.root, exiting ? styles.rootExiting : ""].filter(Boolean).join(" ")}
+        onTransitionEnd={handleTransitionEnd}
+      >
+        <div className={styles.exitClip}>
+          <div
+            className={[
+              exiting ? styles.boingOutDown : "",
+              entering ? styles.boingInUp : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            style={
+              entering && enterDelayMs > 0
+                ? { animationDelay: `${enterDelayMs}ms` }
+                : undefined
+            }
+            onAnimationEnd={handleAnimationEnd}
           >
-            <div className={styles.labelPreview}>
-              <ComicBurstLabel
-                text={formatComicLabelText(label.name)}
-                fill={label.color || "#888888"}
-                shapeKind={shape.kind}
-                spikeCount={shape.spikeCount}
-                randomness={shape.randomness}
-                seed={shape.id}
-                fontSize={20}
+            <ComicPageRow className={styles.strip}>
+              <div className={styles.labelSlot}>
+                <ComicPagePanel
+                  background="solid"
+                  color="white"
+                  flexWeight={1}
+                  className={styles.labelPanel}
+                  ariaLabel={label.name}
+                >
+                  <div className={styles.labelPreview}>
+                    <ComicBurstLabel
+                      text={formatComicLabelText(label.name)}
+                      fill={label.color || "#888888"}
+                      shapeKind={shape.kind}
+                      spikeCount={shape.spikeCount}
+                      randomness={shape.randomness}
+                      seed={shape.id}
+                      fontSize={20}
+                    />
+                  </div>
+                </ComicPagePanel>
+              </div>
+
+              <div className={styles.connectedSlot}>
+                <ConnectedHaikusPanel
+                  accountId={accountId}
+                  labelName={label.name}
+                  items={connectedItems}
+                  total={connectedTotal}
+                />
+              </div>
+
+              <LabelActions
+                className={styles.actionSlot}
+                labelName={label.name}
+                hasConnections={hasConnections}
+                onTuneIn={handleTuneIn}
+                onEdit={() => setEditOpen(true)}
+                onDelete={() => setDeleteOpen(true)}
               />
-            </div>
-          </ComicPagePanel>
+            </ComicPageRow>
+          </div>
         </div>
-
-        <div className={styles.connectedSlot}>
-          <ConnectedHaikusPanel
-            accountId={accountId}
-            labelName={label.name}
-            items={connectedItems}
-            total={connectedTotal}
-          />
-        </div>
-
-        <LabelActions
-          className={styles.actionSlot}
-          labelName={label.name}
-          hasConnections={hasConnections}
-          onTuneIn={handleTuneIn}
-          onEdit={() => setEditOpen(true)}
-          onDelete={() => setDeleteOpen(true)}
-        />
-      </ComicPageRow>
+      </article>
 
       <ComicLabelCreationModal
         open={editOpen}
@@ -211,6 +228,6 @@ export function ManageLabel({
         cancelLabel="Not yet"
         confirmLabel="Delete"
       />
-    </article>
+    </>
   );
 }

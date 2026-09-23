@@ -2,6 +2,9 @@
   position: relative;
   width: 100%;
   z-index: 0;
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.42s ease;
 }
 
 .root:hover,
@@ -12,6 +15,12 @@
 .rootExiting {
   z-index: 3;
   pointer-events: none;
+  grid-template-rows: 0fr;
+}
+
+.exitClip {
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* Softened boingInUp — less mid-swing overshoot than magic.css default. */
@@ -61,6 +70,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .root {
+    transition: none;
+  }
+
   .boingInUp,
   .boingOutDown {
     animation: none;
