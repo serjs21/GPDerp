@@ -79,6 +79,10 @@
   transform: rotate(233deg) translate(3px, 6px);
 }
 
+.captionNotConnected {
+  transform: rotate(233deg) translate(3px, 6px);
+}
+
 .captionEdit {
   transform: rotate(-42deg) translate(1px, -3px);
 }
@@ -101,6 +105,10 @@
 }
 
 .iconTuneIn {
+  transform: scale(1.5);
+}
+
+.iconNotConnected {
   transform: scale(1.5);
 }
 

@@ -16,13 +16,13 @@ import type { LanternTransform } from "@/components/Lantern/lanternTransform";
 /** Discrete holds from one path stop to the next (matches SteppedStops story). */
 export const PATH_STOP_STEP_POSE_COUNT = 5;
 /** Total stop→stop duration (hold budget across pose intervals). */
-export const PATH_STOP_STEP_TOTAL_MS = 1000;
+export const PATH_STOP_STEP_TOTAL_MS = 300;
 const PATH_STOP_STEP_INTERVALS = PATH_STOP_STEP_POSE_COUNT - 1;
 export const PATH_STOP_STEP_HOLD_MS = Math.round(
   PATH_STOP_STEP_TOTAL_MS / PATH_STOP_STEP_INTERVALS,
 );
 /** Hard cuts between poses — stop-motion, no opacity crossfade. */
-export const PATH_STOP_STEP_CROSSFADE_MS = 0;
+export const PATH_STOP_STEP_CROSSFADE_MS = 150;
 
 export type PathStepPose = TransitionPose & {
   stackOrder: number;

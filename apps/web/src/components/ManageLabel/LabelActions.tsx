@@ -5,6 +5,7 @@ import { ComicPagePanel } from "@/components/ComicPageLayout";
 import styles from "./LabelActions.module.css";
 
 const TUNE_IN_SRC = "/profile/label_actions/tune_in.svg";
+const NOT_CONNECTED_SRC = "/profile/label_actions/not_connected.svg";
 const EDIT_SRC = "/profile/label_actions/edit.svg";
 const DELETE_SRC = "/profile/label_actions/delete.svg";
 
@@ -132,11 +133,15 @@ export function LabelActions({
       aria-label={`Actions for ${labelName}`}
     >
       <LabelActionButton
-        src={TUNE_IN_SRC}
-        caption="Tune in"
+        src={hasConnections ? TUNE_IN_SRC : NOT_CONNECTED_SRC}
+        caption={hasConnections ? "Tune in" : "not connected"}
         layout="iconEnd"
-        captionClassName={styles.captionTuneIn}
-        iconClassName={styles.iconTuneIn}
+        captionClassName={
+          hasConnections ? styles.captionTuneIn : styles.captionNotConnected
+        }
+        iconClassName={
+          hasConnections ? styles.iconTuneIn : styles.iconNotConnected
+        }
         ariaLabel={
           hasConnections
             ? `Tune in to haikus labeled ${labelName}`
