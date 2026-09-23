@@ -63,6 +63,7 @@ export function ManageLabel({
   const [collapsing, setCollapsing] = useState(false);
   const [entering, setEntering] = useState(animateEnter);
   const exitNotifiedRef = useRef(false);
+  const measuredExitHeightRef = useRef<number | null>(null);
   const rootRef = useRef<HTMLElement>(null);
   const { deleteLabel } = useAccountLabels({ accountId, autofetch: false });
   const shape = resolveComicLabelShapePreset(label.shape);
@@ -96,10 +97,11 @@ export function ManageLabel({
     onExitComplete?.();
   }, [onExitComplete]);
 
-  // Lock measured height (no transition), then ease-in to 0 with boingOut.
+  // Lock measured height (no transition), paint, then ease-in to 0 with boingOut.
   useEffect(() => {
     if (!exiting) {
       setCollapsing(false);
+      measuredExitHeightRef.current = null;
       const node = rootRef.current;
       if (node) {
         node.style.height = "";
@@ -107,6 +109,7 @@ export function ManageLabel({
         node.style.marginBottom = "";
         node.style.transition = "";
         node.style.overflow = "";
+        node.style.flexShrink = "";
       }
       return;
     }
@@ -114,24 +117,46 @@ export function ManageLabel({
     const node = rootRef.current;
     if (!node) return;
 
-    const fromHeight = node.getBoundingClientRect().height;
-    // 1) Pin current size with transition disabled so the start frame is real.
+    const strip = node.querySelector(`.${styles.strip}`) as HTMLElement | null;
+    const liveHeight = node.getBoundingClientRect().height;
+    // Keep first real measure across Strict Mode re-runs (second run sees height 0).
+    if (measuredExitHeightRef.current == null || measuredExitHeightRef.current < 1) {
+      if (liveHeight >= 1) {
+        measuredExitHeightRef.current = liveHeight;
+      } else if (strip) {
+        const stripHeight = strip.getBoundingClientRect().height;
+        if (stripHeight >= 1) measuredExitHeightRef.current = stripHeight;
+      }
+    }
+    const fromHeight = measuredExitHeightRef.current ?? liveHeight;
+
+    if (fromHeight < 1) {
+      notifyExitComplete();
+      return;
+    }
+
+    // Pin size without min-height:0 (that lets flex crush the row to 0 immediately).
     node.style.transition = "none";
+    node.style.flexShrink = "0";
     node.style.overflow = "hidden";
-    node.style.minHeight = "0px";
     node.style.height = `${fromHeight}px`;
     node.style.marginBottom = "0px";
-    void node.offsetHeight; // force reflow with locked height
+    void node.offsetHeight;
 
     setCollapsing(true);
 
-    // 2) Enable transition and animate to 0 (same start as boingOut).
-    node.style.transition = [
-      `height ${MAGIC_EXIT_COLLAPSE_MS}ms ease-in`,
-      `margin-bottom ${MAGIC_EXIT_COLLAPSE_MS}ms ease-in`,
-    ].join(", ");
-    node.style.height = "0px";
-    node.style.marginBottom = "calc(-1 * var(--manage-label-list-gap, 2.25rem))";
+    let raf2 = 0;
+    const raf1 = window.requestAnimationFrame(() => {
+      raf2 = window.requestAnimationFrame(() => {
+        node.style.transition = [
+          `height ${MAGIC_EXIT_COLLAPSE_MS}ms ease-in`,
+          `margin-bottom ${MAGIC_EXIT_COLLAPSE_MS}ms ease-in`,
+        ].join(", ");
+        node.style.height = "0px";
+        node.style.marginBottom =
+          "calc(-1 * var(--manage-label-list-gap, 2.25rem))";
+      });
+    });
 
     const onTransitionEnd = (event: Event) => {
       const te = event as globalThis.TransitionEvent;
@@ -146,6 +171,8 @@ export function ManageLabel({
     }, MAGIC_EXIT_COLLAPSE_MS + 80);
 
     return () => {
+      window.cancelAnimationFrame(raf1);
+      window.cancelAnimationFrame(raf2);
       node.removeEventListener("transitionend", onTransitionEnd);
       window.clearTimeout(fallback);
     };
