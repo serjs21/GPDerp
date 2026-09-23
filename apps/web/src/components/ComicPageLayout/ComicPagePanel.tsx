@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import {
-  COMIC_PANEL_COLORS,
+  resolveComicPanelColor,
   type ComicPanelBackground,
   type ComicPanelColor,
 } from "./comicPagePresets";
@@ -51,10 +51,10 @@ export type ComicPagePanelProps = {
 };
 
 function panelStyleVars(color: ComicPanelColor): CSSProperties {
-  const preset = COMIC_PANEL_COLORS[color];
+  const resolved = resolveComicPanelColor(color);
   return {
-    "--comic-panel-base": preset.base,
-    "--comic-panel-accent": preset.accent ?? preset.base,
+    "--comic-panel-base": resolved.base,
+    "--comic-panel-accent": resolved.accent,
   } as CSSProperties;
 }
 
@@ -158,8 +158,8 @@ export function ComicPagePanel({
 
   const style = {
     ...panelStyleVars(color),
-    "--comic-title-bg": COMIC_PANEL_COLORS[titleColor].base,
-    "--comic-footer-bg": COMIC_PANEL_COLORS[footerColor].base,
+    "--comic-title-bg": resolveComicPanelColor(titleColor).base,
+    "--comic-footer-bg": resolveComicPanelColor(footerColor).base,
     ...(span === "auto" ? { "--comic-panel-flex": flexWeight } : {}),
     ...styleProp,
   } as CSSProperties;

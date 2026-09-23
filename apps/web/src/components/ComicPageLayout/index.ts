@@ -9,8 +9,10 @@ export {
 export {
   COMIC_PAGE_BLANK_TEMPLATE_ROWS,
   COMIC_PANEL_COLORS,
+  resolveComicPanelColor,
   type ComicPanelBackground,
   type ComicPanelColor,
+  type ComicPanelNamedColor,
   type ComicPageRowColumns,
 } from "./comicPagePresets";
 export {

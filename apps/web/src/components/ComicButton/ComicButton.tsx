@@ -11,6 +11,7 @@ import {
 import {
   COMIC_PANEL_COLORS,
   type ComicPanelColor,
+  type ComicPanelNamedColor,
 } from "../ComicPageLayout/comicPagePresets";
 import styles from "./ComicButton.module.css";
 
@@ -18,8 +19,8 @@ export type ComicButtonMode = "standalone" | "embedded";
 
 function resolveFontColor(fontColor: ComicPanelColor | (string & {}) | undefined): string | undefined {
   if (!fontColor) return undefined;
-  if (fontColor in COMIC_PANEL_COLORS) {
-    return COMIC_PANEL_COLORS[fontColor as ComicPanelColor].base;
+  if (Object.prototype.hasOwnProperty.call(COMIC_PANEL_COLORS, fontColor)) {
+    return COMIC_PANEL_COLORS[fontColor as ComicPanelNamedColor].base;
   }
   return fontColor;
 }
