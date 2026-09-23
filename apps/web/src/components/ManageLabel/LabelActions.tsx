@@ -54,7 +54,12 @@ function LabelActionButton({
     <img className={styles.icon} src={src} alt="" draggable={false} decoding="async" />
   );
   const label = (
-    <span className={styles.caption} aria-hidden>
+    <span
+      className={[styles.caption, layout === "iconStart" ? styles.captionEdit : ""]
+        .filter(Boolean)
+        .join(" ")}
+      aria-hidden
+    >
       {caption}
     </span>
   );

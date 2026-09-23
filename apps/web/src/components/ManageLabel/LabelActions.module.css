@@ -63,7 +63,7 @@
   margin: 0;
   color: var(--comic-ink, #2d2d2d);
   font-family: var(--font-comic-label), "Bangers", sans-serif;
-  font-size: clamp(0.72rem, 1.6vw, 0.95rem);
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
   font-weight: 400;
   letter-spacing: 0.06em;
   line-height: 1;
@@ -71,8 +71,16 @@
   white-space: nowrap;
   writing-mode: vertical-rl;
   text-orientation: mixed;
-  transform: rotate(180deg);
+  transform: rotate(190deg);
   transition: color 0.2s ease;
+}
+
+.caption:nth-of-type(2n) {
+  transform: rotate(19deg);
+}
+
+.captionEdit {
+  transform: rotate(-27deg);
 }
 
 .icon {
