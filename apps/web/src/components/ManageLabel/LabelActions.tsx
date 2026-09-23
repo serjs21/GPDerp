@@ -21,7 +21,7 @@ export type LabelActionsProps = {
   className?: string;
 };
 
-type ActionLayout = "iconEnd" | "iconStart";
+type ActionLayout = "iconEnd" | "iconStart" | "columnReverse";
 
 type ActionButtonProps = {
   src: string;
@@ -35,6 +35,12 @@ type ActionButtonProps = {
   hoverFill?: string;
   invertIconOnHover?: boolean;
 };
+
+function rowLayoutClass(layout: ActionLayout): string {
+  if (layout === "iconStart") return styles.iconStart;
+  if (layout === "columnReverse") return styles.columnReverse;
+  return styles.iconEnd;
+}
 
 function LabelActionButton({
   src,
@@ -70,6 +76,19 @@ function LabelActionButton({
     </span>
   );
 
+  const content =
+    layout === "iconStart" ? (
+      <>
+        {icon}
+        {label}
+      </>
+    ) : (
+      <>
+        {label}
+        {icon}
+      </>
+    );
+
   return (
     <ComicPagePanel
       selectable
@@ -92,24 +111,7 @@ function LabelActionButton({
         onSelect();
       }}
     >
-      <div
-        className={[
-          styles.row,
-          layout === "iconEnd" ? styles.iconEnd : styles.iconStart,
-        ].join(" ")}
-      >
-        {layout === "iconEnd" ? (
-          <>
-            {label}
-            {icon}
-          </>
-        ) : (
-          <>
-            {icon}
-            {label}
-          </>
-        )}
-      </div>
+      <div className={[styles.row, rowLayoutClass(layout)].join(" ")}>{content}</div>
     </ComicPagePanel>
   );
 }
@@ -135,7 +137,7 @@ export function LabelActions({
       <LabelActionButton
         src={hasConnections ? TUNE_IN_SRC : NOT_CONNECTED_SRC}
         caption={hasConnections ? "Tune in" : "not connected"}
-        layout="iconEnd"
+        layout={hasConnections ? "iconEnd" : "columnReverse"}
         captionClassName={
           hasConnections ? styles.captionTuneIn : styles.captionNotConnected
         }
