@@ -13,7 +13,7 @@ import { labelQueryKeys } from "@/api/labels";
 import { ComicModalInput, ComicModalSearchPanel } from "@/components/ComicModalInput";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
-import { MAGIC_ENTER_STAGGER_MS } from "./consts/magicAnimationConsts";
+import { buildEnterStaggerDelays } from "./consts/magicAnimationConsts";
 import { ManageLabel } from "./ManageLabel";
 import { ManageLabelCreatePanel } from "./ManageLabelCreatePanel";
 import styles from "./ManageLabelsPanel.module.css";
@@ -44,7 +44,6 @@ export function ManageLabelsPanel({
   const [enterDelays, setEnterDelays] = useState<Record<string, number>>({});
   const searchRef = useRef<HTMLInputElement>(null);
   const knownIdsRef = useRef<Set<string> | null>(null);
-  const nextEnterAtRef = useRef(0);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -60,7 +59,6 @@ export function ManageLabelsPanel({
       setDebouncedQ("");
       knownIdsRef.current = null;
       setEnterDelays({});
-      nextEnterAtRef.current = 0;
       return;
     }
     window.requestAnimationFrame(() => {
@@ -85,14 +83,12 @@ export function ManageLabelsPanel({
 
   const scheduleEnterAnimations = useCallback((orderedIds: string[]) => {
     if (orderedIds.length === 0) return;
-    const now = performance.now();
+    const batch = buildEnterStaggerDelays(orderedIds);
     setEnterDelays((prev) => {
       const next = { ...prev };
-      for (const id of orderedIds) {
+      for (const [id, delay] of Object.entries(batch)) {
         if (id in next) continue;
-        const startAt = Math.max(now, nextEnterAtRef.current);
-        next[id] = Math.max(0, startAt - now);
-        nextEnterAtRef.current = startAt + MAGIC_ENTER_STAGGER_MS;
+        next[id] = delay;
       }
       return next;
     });

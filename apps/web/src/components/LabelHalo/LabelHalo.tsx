@@ -21,8 +21,8 @@ import {
   clearDropAreaRoughOutline,
   paintDropAreaRoughOutline,
 } from "./utils/dropAreaRoughOutline";
-import { MAGIC_ENTER_STAGGER_MS } from "@/components/ManageLabel/consts/magicAnimationConsts";
-import { consumeLabelBeltPuffIn } from "@/components/Lantern/utils/labelBeltEnterQueue";
+import { buildEnterStaggerDelays } from "@/components/ManageLabel/consts/magicAnimationConsts";
+import { takeLabelBeltPuffIn } from "@/components/Lantern/utils/labelBeltEnterQueue";
 import styles from "./LabelHalo.module.css";
 
 export type LabelHaloProps = {
@@ -205,23 +205,24 @@ function DraggableLabel({
     >
       <div
         ref={visualRef}
-        className={[styles.slotVisual, puffing ? "magictime puffIn" : ""]
-          .filter(Boolean)
-          .join(" ")}
-        style={
-          puffing && puffDelayMs! > 0
-            ? { animationDelay: `${puffDelayMs}ms` }
-            : undefined
-        }
-        onAnimationEnd={
-          puffing
-            ? (event) => {
-                if (!event.animationName.includes("puffIn")) return;
-                onPuffEnd?.();
-              }
-            : undefined
-        }
+        className={styles.slotVisual}
       >
+        <div
+          className={puffing ? "magictime puffIn" : undefined}
+          style={
+            puffing && puffDelayMs! > 0
+              ? { animationDelay: `${puffDelayMs}ms` }
+              : undefined
+          }
+          onAnimationEnd={
+            puffing
+              ? (event) => {
+                  if (!event.animationName.includes("puffIn")) return;
+                  onPuffEnd?.();
+                }
+              : undefined
+          }
+        >
         <LabelSlot
           id={label.id}
           name={label.name}
@@ -246,6 +247,7 @@ function DraggableLabel({
               : undefined
           }
         />
+        </div>
       </div>
     </div>
   );
@@ -274,7 +276,6 @@ export function LabelHalo({
     return map;
   });
   const knownIdsRef = useRef<Set<string> | null>(null);
-  const nextPuffAtRef = useRef(0);
 
   useEffect(() => {
     setDraft(labels);
@@ -290,7 +291,7 @@ export function LabelHalo({
   useEffect(() => {
     const currentIds = labels.map((label) => label.id);
     const currentSet = new Set(currentIds);
-    const queued = consumeLabelBeltPuffIn().filter((id) => currentSet.has(id));
+    const queued = takeLabelBeltPuffIn(currentSet);
 
     if (knownIdsRef.current == null) {
       knownIdsRef.current = currentSet;
@@ -305,14 +306,12 @@ export function LabelHalo({
     knownIdsRef.current = currentSet;
     if (added.length === 0) return;
 
-    const now = performance.now();
+    const batch = buildEnterStaggerDelays(added);
     setPuffDelays((prev) => {
       const next = { ...prev };
-      for (const id of added) {
+      for (const [id, delay] of Object.entries(batch)) {
         if (id in next) continue;
-        const startAt = Math.max(now, nextPuffAtRef.current);
-        next[id] = Math.max(0, startAt - now);
-        nextPuffAtRef.current = startAt + MAGIC_ENTER_STAGGER_MS;
+        next[id] = delay;
       }
       return next;
     });

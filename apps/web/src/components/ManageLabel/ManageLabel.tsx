@@ -111,7 +111,7 @@ export function ManageLabel({
       notifyExitComplete();
       return;
     }
-    if (entering && name.includes("boingInUp")) {
+    if (entering && (name.includes("boingInUp") || name.includes("manageLabelBoingIn"))) {
       setEntering(false);
       onEnterAnimationEnd?.();
     }
@@ -123,7 +123,7 @@ export function ManageLabel({
       className={[
         styles.root,
         exiting ? "magictime vanishOut" : "",
-        entering ? "magictime boingInUp" : "",
+        entering ? styles.boingInUp : "",
       ]
         .filter(Boolean)
         .join(" ")}

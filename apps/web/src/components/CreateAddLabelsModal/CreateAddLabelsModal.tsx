@@ -11,7 +11,7 @@ import { comicToast } from "@/components/ComicToast";
 import { LabelMethodIcon } from "@/components/LabelMethodIcon";
 import { HAIKU_LABELS_MAX } from "@/components/LabelHalo/consts/labelHaloConsts";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
-import { enqueueLabelBeltPuffIn } from "@/components/Lantern/utils/labelBeltEnterQueue";
+import { enqueueLabelBeltPuffIn, clearLabelBeltPuffIn } from "@/components/Lantern/utils/labelBeltEnterQueue";
 import styles from "./CreateAddLabelsModal.module.css";
 
 export type CreateAddLabelsTab = "create" | "add";
@@ -88,18 +88,20 @@ export function CreateAddLabelsModal({
         if (options?.closeOnSuccess) onClose();
         return;
       }
+      const previous = new Set(addSeedIds);
+      const addedInSelectionOrder = capped.filter((id) => !previous.has(id));
+      // Start the puffIn chain on confirm — first label at 0ms when halo mounts updates.
+      enqueueLabelBeltPuffIn(addedInSelectionOrder);
       void setHaikuLabels({
         haikuId: haiku.id,
         labelIds: capped,
         onSuccess: async () => {
-          const previous = new Set(addSeedIds);
-          const addedInSelectionOrder = capped.filter((id) => !previous.has(id));
-          enqueueLabelBeltPuffIn(addedInSelectionOrder);
           comicToast.success("Labels saved");
           onSaved?.();
           if (options?.closeOnSuccess) onClose();
         },
         onError: async () => {
+          clearLabelBeltPuffIn();
           comicToast.error("Could not save labels");
         },
       });

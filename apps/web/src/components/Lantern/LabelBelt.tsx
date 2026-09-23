@@ -13,7 +13,7 @@ import {
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
-import { MAGIC_ENTER_STAGGER_MS } from "@/components/ManageLabel/consts/magicAnimationConsts";
+import { buildEnterStaggerDelays } from "@/components/ManageLabel/consts/magicAnimationConsts";
 import {
   labelBeltStopInsetStyle,
   labelBeltStopTransformOrigin,
@@ -26,7 +26,7 @@ import {
   type LabelBeltSlot,
 } from "./labelBeltLayout";
 import { useLabelBeltPortalTransition } from "./useLabelBeltPortalTransition";
-import { consumeLabelBeltPuffIn } from "./utils/labelBeltEnterQueue";
+import { takeLabelBeltPuffIn } from "./utils/labelBeltEnterQueue";
 import styles from "./LabelBelt.module.css";
 
 export type LabelBeltItem = {
@@ -128,12 +128,11 @@ export const LabelBelt = memo(function LabelBelt({
   const { busy, setLayerRef, runPortal, clearInlineStyles } =
     useLabelBeltPortalTransition();
   const knownIdsRef = useRef<Set<string> | null>(null);
-  const nextPuffAtRef = useRef(0);
 
   useEffect(() => {
     const currentIds = labels.map((label) => label.id);
     const currentSet = new Set(currentIds);
-    const queued = consumeLabelBeltPuffIn().filter((id) => currentSet.has(id));
+    const queued = takeLabelBeltPuffIn(currentSet);
 
     if (knownIdsRef.current == null) {
       knownIdsRef.current = currentSet;
@@ -149,14 +148,12 @@ export const LabelBelt = memo(function LabelBelt({
 
     if (added.length === 0) return;
 
-    const now = performance.now();
+    const batch = buildEnterStaggerDelays(added);
     setPuffDelays((prev) => {
       const next = { ...prev };
-      for (const id of added) {
+      for (const [id, delay] of Object.entries(batch)) {
         if (id in next) continue;
-        const startAt = Math.max(now, nextPuffAtRef.current);
-        next[id] = Math.max(0, startAt - now);
-        nextPuffAtRef.current = startAt + MAGIC_ENTER_STAGGER_MS;
+        next[id] = delay;
       }
       return next;
     });

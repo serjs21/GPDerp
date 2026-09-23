@@ -1,6 +1,6 @@
 /**
  * Newly confirmed haiku labels (selection order) await LabelHalo / LabelBelt puffIn.
- * Enqueued on save; consumed when the belt/halo next sees updated labels.
+ * Enqueued on confirm click; taken when those ids are present on the lantern.
  */
 let pendingPuffInIds: string[] = [];
 
@@ -14,9 +14,19 @@ export function enqueueLabelBeltPuffIn(ids: readonly string[]) {
   }
 }
 
-export function consumeLabelBeltPuffIn(): string[] {
+/** Pull only ids already present; leave the rest queued for a later update. */
+export function takeLabelBeltPuffIn(presentIds: ReadonlySet<string>): string[] {
   if (pendingPuffInIds.length === 0) return [];
-  const ids = pendingPuffInIds;
+  const taken: string[] = [];
+  const remaining: string[] = [];
+  for (const id of pendingPuffInIds) {
+    if (presentIds.has(id)) taken.push(id);
+    else remaining.push(id);
+  }
+  pendingPuffInIds = remaining;
+  return taken;
+}
+
+export function clearLabelBeltPuffIn() {
   pendingPuffInIds = [];
-  return ids;
 }
