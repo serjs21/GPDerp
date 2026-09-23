@@ -20,9 +20,13 @@ export type LabelActionsProps = {
   className?: string;
 };
 
+type ActionLayout = "iconEnd" | "iconStart";
+
 type ActionButtonProps = {
   src: string;
+  caption: string;
   ariaLabel: string;
+  layout: ActionLayout;
   onSelect: () => void;
   disabled?: boolean;
   hoverFill?: string;
@@ -31,7 +35,9 @@ type ActionButtonProps = {
 
 function LabelActionButton({
   src,
+  caption,
   ariaLabel,
+  layout,
   onSelect,
   disabled = false,
   hoverFill,
@@ -43,6 +49,16 @@ function LabelActionButton({
       : undefined
   ) as CSSProperties | undefined;
 
+  const icon = (
+    // eslint-disable-next-line @next/next/no-img-element -- static public SVG
+    <img className={styles.icon} src={src} alt="" draggable={false} decoding="async" />
+  );
+  const label = (
+    <span className={styles.caption} aria-hidden>
+      {caption}
+    </span>
+  );
+
   return (
     <ComicPagePanel
       selectable
@@ -50,9 +66,10 @@ function LabelActionButton({
       background="solid"
       color="white"
       flexWeight={1}
+      contentAlign="start"
       className={[
         styles.action,
-        invertIconOnHover ? styles.invertIconOnHover : "",
+        invertIconOnHover ? styles.invertOnHover : "",
         disabled ? styles.disabled : "",
       ]
         .filter(Boolean)
@@ -64,8 +81,24 @@ function LabelActionButton({
         onSelect();
       }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
-      <img className={styles.icon} src={src} alt="" draggable={false} decoding="async" />
+      <div
+        className={[
+          styles.row,
+          layout === "iconEnd" ? styles.iconEnd : styles.iconStart,
+        ].join(" ")}
+      >
+        {layout === "iconEnd" ? (
+          <>
+            {label}
+            {icon}
+          </>
+        ) : (
+          <>
+            {icon}
+            {label}
+          </>
+        )}
+      </div>
     </ComicPagePanel>
   );
 }
@@ -90,6 +123,8 @@ export function LabelActions({
     >
       <LabelActionButton
         src={TUNE_IN_SRC}
+        caption="Tune in"
+        layout="iconEnd"
         ariaLabel={
           hasConnections
             ? `Tune in to haikus labeled ${labelName}`
@@ -100,11 +135,15 @@ export function LabelActions({
       />
       <LabelActionButton
         src={EDIT_SRC}
+        caption="Edit"
+        layout="iconStart"
         ariaLabel={`Edit ${labelName}`}
         onSelect={onEdit}
       />
       <LabelActionButton
         src={DELETE_SRC}
+        caption="Delete"
+        layout="iconEnd"
         ariaLabel={`Delete ${labelName}`}
         onSelect={onDelete}
         hoverFill={DELETE_HOVER}
