@@ -9,6 +9,7 @@ import { buildPreviewLanternTypographyStyle } from "@/components/Lantern/utils/p
 import styles from "./ConnectedLanternStack.module.css";
 
 const LANTERN_WIDTH_REM = 6.6;
+const NOT_CONNECTED_SRC = "/profile/label_actions/not_connected.svg";
 
 function previewLanternBodyStyle(body: string, title?: string): CSSProperties {
   return buildPreviewLanternTypographyStyle(body, {
@@ -38,6 +39,22 @@ export type ConnectedLanternStackProps = {
 };
 
 export function ConnectedLanternStack({ accountId, items }: ConnectedLanternStackProps) {
+  if (items.length === 0) {
+    return (
+      <div className={styles.emptyState} data-count={0}>
+        <p className={styles.emptyCaption}>not connected</p>
+        {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
+        <img
+          className={styles.emptyIcon}
+          src={NOT_CONNECTED_SRC}
+          alt=""
+          draggable={false}
+          decoding="async"
+        />
+      </div>
+    );
+  }
+
   return (
     <div className={styles.lanternStack} data-count={items.length}>
       {items.map((haiku, index) => {

@@ -86,6 +86,14 @@ function renderInConnectedPanel(
   );
 }
 
+export const Empty: Story = {
+  render: (args) => renderInConnectedPanel(args),
+  args: {
+    accountId: ACCOUNT_ID,
+    items: [],
+  },
+};
+
 export const Single: Story = {
   render: (args) => renderInConnectedPanel(args),
   args: {

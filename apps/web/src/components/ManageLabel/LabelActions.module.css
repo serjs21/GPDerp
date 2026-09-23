@@ -58,13 +58,6 @@
   flex-direction: row;
 }
 
-.columnReverse {
-  flex-direction: column-reverse;
-  align-items: center;
-  justify-content: center;
-  gap: 0.15rem;
-}
-
 .caption {
   flex: 0 0 auto;
   margin: 0;
@@ -84,17 +77,6 @@
 
 .captionTuneIn {
   transform: rotate(233deg) translate(3px, 6px);
-}
-
-.captionNotConnected {
-  writing-mode: horizontal-tb;
-  text-orientation: mixed;
-  transform: none;
-  align-self: center;
-  font-size: 0.7rem;
-  text-align: center;
-  white-space: normal;
-  max-width: 100%;
 }
 
 .captionEdit {
@@ -120,14 +102,6 @@
 
 .iconTuneIn {
   transform: scale(1.5);
-}
-
-.iconNotConnected {
-  align-self: center;
-  height: auto;
-  max-height: 45%;
-  max-width: min(70%, 2.75rem);
-  transform: none;
 }
 
 .iconEdit {
