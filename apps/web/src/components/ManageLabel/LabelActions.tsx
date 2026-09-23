@@ -125,6 +125,7 @@ function LabelActionButton({
       color={color}
       flexWeight={1}
       contentAlign="start"
+      isMotionBackground={false}
       className={[
         styles.action,
         invertIconOnHover ? styles.invertOnHover : "",
@@ -167,8 +168,8 @@ export function LabelActions({
         src={hasConnections ? TUNE_IN_SRC : NOT_CONNECTED_ACTION_SRC}
         caption={hasConnections ? "Tune in" : undefined}
         layout={hasConnections ? "iconEnd" : "iconOnly"}
-        color={hasConnections ? "white" : "sky"}
-        background="solid"
+        color={hasConnections ? "white" : "blue"}
+        background={hasConnections ? "solid" : "sunburst"}
         captionClassName={hasConnections ? styles.captionTuneIn : undefined}
         iconClassName={
           hasConnections ? styles.iconTuneIn : styles.iconNotConnected
@@ -187,6 +188,7 @@ export function LabelActions({
         src={EDIT_SRC}
         caption="Edit"
         layout="iconStart"
+        color="green"
         captionClassName={styles.captionEdit}
         iconClassName={styles.iconEdit}
         ariaLabel={`Edit ${labelName}`}
@@ -197,6 +199,7 @@ export function LabelActions({
         caption="Delete"
         layout="iconEnd"
         captionClassName={styles.captionDelete}
+        color="red"
         iconClassName={styles.iconDelete}
         ariaLabel={`Delete ${labelName}`}
         onSelect={onDelete}

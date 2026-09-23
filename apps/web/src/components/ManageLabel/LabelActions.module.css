@@ -110,12 +110,10 @@
 }
 
 .iconNotConnected {
-  transform: none;
-  flex: 0 0 auto;
-  width: min(72%, 2.5rem);
+  transform: scale(1.2);
+ flex: 0 0 auto;
+  width: 100%;
   height: auto;
-  max-width: min(72%, 2.5rem);
-  max-height: 80%;
   aspect-ratio: 1;
   margin: auto;
 }
