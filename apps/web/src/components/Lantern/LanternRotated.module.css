@@ -99,8 +99,7 @@
 }
 
 .root:hover [data-lantern-actions],
-.root:focus-within [data-lantern-actions],
-[data-lantern-actions]:has([aria-expanded="true"]) {
+.root:focus-within [data-lantern-actions] {
   opacity: 1;
 }
 

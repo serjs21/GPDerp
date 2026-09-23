@@ -168,8 +168,7 @@
 }
 
 .root:hover .actions,
-.root:focus-within .actions,
-.actions:has([aria-expanded="true"]) {
+.root:focus-within .actions {
   opacity: 1;
 }
 

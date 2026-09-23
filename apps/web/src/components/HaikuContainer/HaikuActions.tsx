@@ -4,7 +4,6 @@ import axios from "axios";
 import {
   useCallback,
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
   type FocusEvent,
@@ -41,6 +40,8 @@ export type HaikuActionsProps =
     };
 
 type HoverTarget = "delete" | "share" | "label" | "copy" | null;
+
+const CLAP_VISIBLE_MS = 1000;
 
 const ACTIONS = [
   {
@@ -123,12 +124,11 @@ export const HaikuActions = (props: HaikuActionsProps) => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [hover, setHover] = useState<HoverTarget>(null);
-  const [clapBurst, setClapBurst] = useState<"idle" | "hold" | "fade">("idle");
+  const [showClap, setShowClap] = useState(false);
   const [clapFixedPos, setClapFixedPos] = useState<{ top: number; left: number } | null>(
     null,
   );
-  const wasOpenRef = useRef(false);
-  const clapTimersRef = useRef<number[]>([]);
+  const clapTimerRef = useRef<number | null>(null);
   const toggleWrapRef = useRef<HTMLSpanElement | null>(null);
   const { copy } = useCopy();
   const dock = useLanternActionsDock();
@@ -144,44 +144,12 @@ export const HaikuActions = (props: HaikuActionsProps) => {
   const onDeleted = props.variant === "saved" ? props.onDeleted : undefined;
   const onDelete = props.variant === "saved" ? props.onDelete : undefined;
 
-  const clearClapTimers = useCallback(() => {
-    for (const id of clapTimersRef.current) window.clearTimeout(id);
-    clapTimersRef.current = [];
-  }, []);
-
-  const playClapBurst = useCallback(() => {
-    clearClapTimers();
-    setClapBurst("hold");
-    const fadeId = window.setTimeout(() => setClapBurst("fade"), 1000);
-    const doneId = window.setTimeout(() => setClapBurst("idle"), 1200);
-    clapTimersRef.current = [fadeId, doneId];
-  }, [clearClapTimers]);
-
-  useEffect(() => {
-    const wasOpen = wasOpenRef.current;
-    wasOpenRef.current = isOpen;
-    if (isOpen && !wasOpen) playClapBurst();
-    if (!isOpen) {
-      clearClapTimers();
-      setClapBurst("idle");
-    }
-  }, [clearClapTimers, isOpen, playClapBurst]);
-
-  useEffect(() => () => clearClapTimers(), [clearClapTimers]);
-
-  useLayoutEffect(() => {
-    if (clapBurst === "idle") {
-      setClapFixedPos(null);
-      return;
-    }
-    const wrap = toggleWrapRef.current;
-    if (!wrap) return;
-    const wrapRect = wrap.getBoundingClientRect();
-    setClapFixedPos({
-      top: wrapRect.top - 16,
-      left: wrapRect.right - 16,
-    });
-  }, [clapBurst]);
+  useEffect(
+    () => () => {
+      if (clapTimerRef.current != null) window.clearTimeout(clapTimerRef.current);
+    },
+    [],
+  );
 
   const setHoverIfLive = (next: HoverTarget) => {
     if (forcedHover === undefined) setHover(next);
@@ -194,6 +162,28 @@ export const HaikuActions = (props: HaikuActionsProps) => {
     // Clear hover only; open preference stays until the user toggles off.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modalBlocking]);
+
+  const handleToggle = () => {
+    const next = !isOpen;
+    if (next) {
+      const wrap = toggleWrapRef.current;
+      if (wrap) {
+        const wrapRect = wrap.getBoundingClientRect();
+        setClapFixedPos({
+          top: wrapRect.top - 16,
+          left: wrapRect.right - 16,
+        });
+      }
+      if (clapTimerRef.current != null) window.clearTimeout(clapTimerRef.current);
+      setShowClap(true);
+      clapTimerRef.current = window.setTimeout(() => {
+        setShowClap(false);
+        setClapFixedPos(null);
+        clapTimerRef.current = null;
+      }, CLAP_VISIBLE_MS);
+    }
+    setOpenPreference(next);
+  };
 
   const setHoverFromFocus = (next: HoverTarget, target: HTMLElement) => {
     if (target.matches(":focus-visible")) setHoverIfLive(next);
@@ -322,17 +312,12 @@ export const HaikuActions = (props: HaikuActionsProps) => {
   ) : null;
 
   const clapBurstNode =
-    clapBurst !== "idle" && clapFixedPos ? (
+    showClap && clapFixedPos ? (
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src="/lantern_actions/clap_sound.svg"
         alt=""
-        className={[
-          styles.clapBurst,
-          clapBurst === "fade" ? styles.clapBurstFade : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
+        className={styles.clapBurst}
         style={{ top: clapFixedPos.top, left: clapFixedPos.left }}
         width={28}
         height={28}
@@ -348,7 +333,7 @@ export const HaikuActions = (props: HaikuActionsProps) => {
           className={styles.toggle}
           aria-label={isOpen ? "Hide haiku actions" : "Show haiku actions"}
           aria-expanded={isOpen}
-          onClick={() => setOpenPreference(!isOpen)}
+          onClick={handleToggle}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
