@@ -1,7 +1,7 @@
 "use client";
 
 import { Dialog } from "@base-ui/react/dialog";
-import type { ReactNode } from "react";
+import type { KeyboardEvent, ReactNode } from "react";
 import { ComicPageLayout } from "./ComicPageLayout";
 import styles from "./ComicPageLayout.module.css";
 
@@ -21,6 +21,23 @@ export type ComicPageDialogProps = {
   /** Applied to the dialog content shell (width / max-height). */
   contentClassName?: string;
 };
+
+function submitOnEnter(event: KeyboardEvent<HTMLElement>) {
+  if (event.key !== "Enter" || event.defaultPrevented || event.nativeEvent.isComposing) {
+    return;
+  }
+  const target = event.target;
+  if (!(target instanceof HTMLElement)) return;
+  if (target.closest("textarea, select, [contenteditable='true']")) return;
+  if (target.closest("button, a, [role='button']")) return;
+
+  const submit = event.currentTarget.querySelector<HTMLButtonElement>(
+    'button[type="submit"]:not(:disabled)',
+  );
+  if (!submit) return;
+  event.preventDefault();
+  submit.click();
+}
 
 export function ComicPageDialog({
   open,
@@ -52,7 +69,7 @@ export function ComicPageDialog({
           <Dialog.Popup
             className={[styles.dialogPopup, contentClassName].filter(Boolean).join(" ")}
           >
-            <div className={styles.comicPageShell}>
+            <div className={styles.comicPageShell} onKeyDown={submitOnEnter}>
               {title ? (
                 <Dialog.Title className={styles.srOnly}>{title}</Dialog.Title>
               ) : (

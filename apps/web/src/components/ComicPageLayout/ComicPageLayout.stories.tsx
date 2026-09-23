@@ -343,7 +343,12 @@ function CtaFooterDemo() {
         ctaFooter={
           <>
             <ComicPageCtaAction label="Cancel" onClick={() => setLastAction("Cancel")} />
-            <ComicPageCtaAction label="Save" fill="#2f6fed" onClick={() => setLastAction("Save")} />
+            <ComicPageCtaAction
+              label="Save"
+              type="submit"
+              fill="#2f6fed"
+              onClick={() => setLastAction("Save")}
+            />
           </>
         }
       >

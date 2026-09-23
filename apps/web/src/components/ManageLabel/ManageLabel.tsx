@@ -14,7 +14,7 @@ import { DeleteConfirmModal } from "@/components/DeleteConfirmModal";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
 import { ConnectedHaikusPanel } from "./ConnectedHaikusPanel";
 import { LabelActions } from "./LabelActions";
-import { MAGIC_ANIMATION_DURATION_MS } from "./consts/magicAnimationConsts";
+import { MAGIC_EXIT_DURATION_MS } from "./consts/magicAnimationConsts";
 import styles from "./ManageLabel.module.css";
 
 export type ManageLabelProps = {
@@ -90,7 +90,7 @@ export function ManageLabel({
     if (!exiting) return;
     const timer = window.setTimeout(() => {
       notifyExitComplete();
-    }, MAGIC_ANIMATION_DURATION_MS + 50);
+    }, MAGIC_EXIT_DURATION_MS + 50);
     return () => window.clearTimeout(timer);
   }, [exiting, notifyExitComplete]);
 
@@ -122,7 +122,7 @@ export function ManageLabel({
 
   const handleAnimationEnd = (event: AnimationEvent<HTMLElement>) => {
     const name = event.animationName;
-    if (exiting && name.includes("boingOutDown")) {
+    if (exiting && (name.includes("boingOutDown") || name.includes("manageLabelBoingOut"))) {
       notifyExitComplete();
       return;
     }
@@ -137,7 +137,8 @@ export function ManageLabel({
       ref={rootRef}
       className={[
         styles.root,
-        exiting ? "magictime boingOutDown" : "",
+        exiting ? styles.rootExiting : "",
+        exiting ? styles.boingOutDown : "",
         entering ? styles.boingInUp : "",
       ]
         .filter(Boolean)

@@ -324,12 +324,13 @@ export function ComicLabelCreationModal({
         <Tooltip title={disabledReason ?? ""}>
           <span className={styles.tooltipWrap}>
             <button
-              type="button"
+              type="submit"
               className={styles.saveButton}
               disabled={!canSave}
               aria-busy={busy || undefined}
               aria-label={label ? "Save label" : "Create label"}
-              onClick={() => {
+              onClick={(event) => {
+                event.preventDefault();
                 if (!canSave) return;
                 submit();
               }}

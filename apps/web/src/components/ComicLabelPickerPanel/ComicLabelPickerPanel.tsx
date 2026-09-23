@@ -292,11 +292,14 @@ export function ComicLabelPickerPanel({
 
       <div className={styles.footerRow}>
         <button
-          type="button"
+          type="submit"
           className={styles.saveButton}
           disabled={!canSave}
           aria-busy={footerBusy || undefined}
-          onClick={() => onFooter(selectedIds)}
+          onClick={(event) => {
+            event.preventDefault();
+            onFooter(selectedIds);
+          }}
         >
           <ComicBurstLabel
             className={styles.saveBurst}

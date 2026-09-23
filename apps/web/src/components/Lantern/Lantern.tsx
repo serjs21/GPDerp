@@ -37,7 +37,7 @@ export type LanternProps = HaikuContainerProps & {
    * transformed onto the painted paper face.
    */
   rotationBase?: LanternRotatedVariantId;
-  /** Flip horizontally so the painted face follows path direction. */
+  /** Flip base PNG horizontally; face gets reverse skew (text stays readable). */
   mirrored?: boolean;
   /** Shell width when `rotationBase` is set. */
   widthRem?: number;

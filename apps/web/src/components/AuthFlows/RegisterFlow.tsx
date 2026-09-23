@@ -149,6 +149,7 @@ export const RegisterFlow = forwardRef<AuthFlowHandle, RegisterFlowProps>(functi
           <div className={authStyles.submitItem}>
             <ComicPageCtaAction
               label={submitting ? "Creating account" : "Create account"}
+              type="submit"
               busy={submitting}
               disabled={submitting}
               onClick={validateAndSubmit}

@@ -17,6 +17,8 @@ export type ComicPageCtaActionProps = {
   busy?: boolean;
   fill?: string;
   textColor?: string;
+  /** Use `submit` so Enter in ComicPageDialog fields activates this CTA. */
+  type?: "button" | "submit";
   "aria-label"?: string;
 };
 
@@ -28,6 +30,7 @@ export function ComicPageCtaAction({
   busy = false,
   fill,
   textColor,
+  type = "button",
   "aria-label": ariaLabel,
 }: ComicPageCtaActionProps) {
   const canPress = !disabled && !busy;
@@ -35,13 +38,15 @@ export function ComicPageCtaAction({
 
   return (
     <button
-      type="button"
+      type={type}
       className={styles.action}
       disabled={!canPress}
       aria-busy={busy || undefined}
       aria-label={ariaLabel ?? label}
-      onClick={() => {
+      onClick={(event) => {
         if (!canPress) return;
+        // Avoid nesting accidental form submits when type=submit is inside a <form>.
+        if (type === "submit") event.preventDefault();
         onClick();
       }}
     >

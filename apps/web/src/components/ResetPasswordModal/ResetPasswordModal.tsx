@@ -123,6 +123,7 @@ export function ResetPasswordModal({
       ctaFooter={
         <ComicPageCtaAction
           label={ctaLabel}
+          type="submit"
           busy={submitting}
           disabled={submitting}
           onClick={() => {

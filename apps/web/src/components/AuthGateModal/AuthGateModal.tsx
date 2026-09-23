@@ -61,6 +61,7 @@ export function AuthGateModal({
         mode === "login" ? (
           <ComicPageCtaAction
             label="Sign in"
+            type="submit"
             busy={submitting}
             disabled={submitting}
             onClick={() => loginRef.current?.submit()}
@@ -68,6 +69,7 @@ export function AuthGateModal({
         ) : (
           <ComicPageCtaAction
             label="Create account"
+            type="submit"
             busy={submitting}
             disabled={submitting}
             onClick={() => registerRef.current?.submit()}

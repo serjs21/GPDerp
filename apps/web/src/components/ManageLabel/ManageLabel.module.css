@@ -9,8 +9,7 @@
   z-index: 2;
 }
 
-.root.magictime {
-  /* Keep exiting rows above neighbors while boingOutDown plays. */
+.rootExiting {
   z-index: 3;
   pointer-events: none;
 }
@@ -40,8 +39,30 @@
   animation-fill-mode: both;
 }
 
+/* Softened boingOutDown — drop without stock left/right origin flips. */
+@keyframes manageLabelBoingOut {
+  0% {
+    opacity: 1;
+    transform-origin: 50% 100%;
+    transform: perspective(800px) rotateX(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform-origin: 50% 100%;
+    transform: perspective(800px) rotateX(52deg);
+  }
+}
+
+.boingOutDown {
+  animation-name: manageLabelBoingOut;
+  animation-duration: 0.55s;
+  animation-timing-function: ease-in;
+  animation-fill-mode: both;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .boingInUp {
+  .boingInUp,
+  .boingOutDown {
     animation: none;
   }
 }

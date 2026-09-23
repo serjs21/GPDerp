@@ -345,3 +345,49 @@ export const RotatedBoth: Story = {
     </div>
   ),
 };
+
+export const RotatedMirrored: Story = {
+  name: "Mirrored rotation (base flip + reverse skew)",
+  render: () => (
+    <div className={styles.labelsStage}>
+      <div className={styles.labelsSample}>
+        <Lantern
+          rotationBase="rotated"
+          haiku={ROTATED_DEMO_HAIKU}
+          showActions
+          widthRem={14}
+        />
+        <p className={styles.labelsCaption}>rotated</p>
+      </div>
+      <div className={styles.labelsSample}>
+        <Lantern
+          rotationBase="rotated"
+          mirrored
+          haiku={ROTATED_DEMO_HAIKU}
+          showActions
+          widthRem={14}
+        />
+        <p className={styles.labelsCaption}>rotated · mirrored</p>
+      </div>
+      <div className={styles.labelsSample}>
+        <Lantern
+          rotationBase="rotated2"
+          haiku={ROTATED_DEMO_HAIKU}
+          showActions
+          widthRem={14}
+        />
+        <p className={styles.labelsCaption}>rotated2</p>
+      </div>
+      <div className={styles.labelsSample}>
+        <Lantern
+          rotationBase="rotated2"
+          mirrored
+          haiku={ROTATED_DEMO_HAIKU}
+          showActions
+          widthRem={14}
+        />
+        <p className={styles.labelsCaption}>rotated2 · mirrored</p>
+      </div>
+    </div>
+  ),
+};

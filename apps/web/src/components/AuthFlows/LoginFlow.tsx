@@ -213,6 +213,7 @@ export const LoginFlow = forwardRef<AuthFlowHandle, LoginFlowProps>(function Log
           <div className={authStyles.submitItem}>
             <ComicPageCtaAction
               label={submitting ? "Signing in" : "Sign in"}
+              type="submit"
               busy={submitting}
               disabled={submitting}
               onClick={validateAndSubmit}

@@ -28,6 +28,7 @@ export type LanternRotatedShellProps = {
   className?: string;
   style?: CSSProperties;
   widthRem?: number;
+  /** Flip the base PNG horizontally; face uses mirrored left + reverse skew (readable text). */
   mirrored?: boolean;
   actionsBarOffsetX?: string;
   actionsBarOffsetY?: string;
@@ -58,12 +59,14 @@ export function LanternRotatedShell({
   const rootStyle = buildRotationBaseRootStyle({
     widthRem,
     transform,
+    mirrored,
     actionsBarOffsetX,
     actionsBarOffsetY,
     style,
   });
 
-  const rootClass = [styles.root, mirrored ? styles.mirrored : null, className]
+  const rootClass = [styles.root, className].filter(Boolean).join(" ");
+  const shellClass = [styles.shell, mirrored ? styles.shellMirrored : null]
     .filter(Boolean)
     .join(" ");
   const showFlame = transform.flameBottom != null || transform.flameHeight != null;
@@ -90,7 +93,7 @@ export function LanternRotatedShell({
     <LanternActionsDockProvider>
       {(dockRef) => (
         <article className={rootClass} style={rootStyle} aria-label={ariaLabel}>
-          <div className={styles.shell} aria-hidden>
+          <div className={shellClass} aria-hidden>
             {/* eslint-disable-next-line @next/next/no-img-element -- decorative lantern art from /public */}
             <img
               className={styles.image}
