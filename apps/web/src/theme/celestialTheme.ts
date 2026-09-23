@@ -39,6 +39,8 @@ export type ThemeColors = Record<ThemeToken, string> & {
   inkOnPaper: string;
   /** Accessible accent color for use on the note/card background. */
   highlightOnPaper: string;
+  /** Accessible text/icon color for use on sky panel surfaces (skyMid). */
+  inkOnSky: string;
 };
 
 export interface GeoCoordinates {
@@ -357,6 +359,41 @@ function ensureMinimumContrast(
     : nearWhite;
 }
 
+/** Dark-blue ink for bright/day sky panels. */
+export const SKY_INK_DAY = "#1A2744";
+
+/** Sky-mid luminance treated as fully night (prefer moon yellow). */
+const SKY_INK_NIGHT_LUMINANCE = 0.12;
+/** Sky-mid luminance treated as fully day (prefer navy). */
+const SKY_INK_DAY_LUMINANCE = 0.45;
+
+/**
+ * Moon-yellow on dark skies, dark blue on bright skies, contrast-guarded vs skyMid.
+ */
+export function resolveInkOnSky(skyMid: string, moon: string): string {
+  const luminance = relativeLuminance(skyMid);
+  const dayAmount = clamp01(
+    (luminance - SKY_INK_NIGHT_LUMINANCE) /
+      (SKY_INK_DAY_LUMINANCE - SKY_INK_NIGHT_LUMINANCE),
+  );
+  const preferred = mixHexOklab(moon, SKY_INK_DAY, dayAmount);
+  const minimumRatio = 4.5;
+
+  if (contrastRatio(preferred, skyMid) >= minimumRatio) {
+    return preferred;
+  }
+
+  const moonContrast = contrastRatio(moon, skyMid);
+  const dayContrast = contrastRatio(SKY_INK_DAY, skyMid);
+  const betterPole = moonContrast >= dayContrast ? moon : SKY_INK_DAY;
+
+  if (contrastRatio(betterPole, skyMid) >= minimumRatio) {
+    return betterPole;
+  }
+
+  return ensureMinimumContrast(betterPole, skyMid, minimumRatio);
+}
+
 const TOKEN_EASING: Record<ThemeToken, (progress: number) => number> = {
   skyTop: smootherstep,
   skyMid: smootherstep,
@@ -426,6 +463,7 @@ export function getSolarTimeline(date: Date, coordinates: GeoCoordinates): Phase
 /**
  * Resolve continuously interpolated colors for any selected time and location.
  * `inkOnPaper` and `highlightOnPaper` are contrast-guarded versions for text.
+ * `inkOnSky` is contrast-guarded for text/icons on sky panel surfaces.
  */
 export function getThemeAt(date: Date, coordinates: GeoCoordinates): ThemeColors {
   assertCoordinates(coordinates);
@@ -441,6 +479,7 @@ export function getThemeAt(date: Date, coordinates: GeoCoordinates): ThemeColors
       ...fallback,
       inkOnPaper: ensureMinimumContrast(fallback.ink, fallback.paper, 7),
       highlightOnPaper: ensureMinimumContrast(fallback.highlight, fallback.paper, 4.5),
+      inkOnSky: resolveInkOnSky(fallback.skyMid, fallback.moon),
     };
   }
 
@@ -472,6 +511,7 @@ export function getThemeAt(date: Date, coordinates: GeoCoordinates): ThemeColors
     ...colors,
     inkOnPaper: ensureMinimumContrast(colors.ink, colors.paper, 7),
     highlightOnPaper: ensureMinimumContrast(colors.highlight, colors.paper, 4.5),
+    inkOnSky: resolveInkOnSky(colors.skyMid, colors.moon),
   };
 }
 
@@ -578,6 +618,7 @@ export function getSceneCssVariables(
     "--sky-top": theme.skyTop,
     "--sky-mid": theme.skyMid,
     "--sky-horizon": theme.skyHorizon,
+    "--ink-on-sky": theme.inkOnSky,
     "--paper": theme.paper,
     "--ink": theme.inkOnPaper,
     "--highlight": theme.highlightOnPaper,

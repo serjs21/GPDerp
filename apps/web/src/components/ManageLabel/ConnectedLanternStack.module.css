@@ -20,7 +20,7 @@
 
 .emptyCaption {
   margin: 0;
-  color: var(--comic-ink, #2d2d2d);
+  color: var(--ink-on-sky, #1a2744);
   font-family: var(--font-comic-label), "Bangers", sans-serif;
   font-size: 0.7rem;
   font-weight: 400;
@@ -34,11 +34,19 @@
 .emptyIcon {
   display: block;
   box-sizing: border-box;
-  width: auto;
-  height: auto;
-  max-height: 45%;
-  max-width: min(70%, 2.75rem);
-  object-fit: contain;
+  width: min(70%, 2.75rem);
+  height: 45%;
+  max-height: 2.75rem;
+  aspect-ratio: 1;
+  background-color: var(--ink-on-sky, #1a2744);
+  mask-image: url("/profile/label_actions/not_connected.svg");
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-image: url("/profile/label_actions/not_connected.svg");
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
   pointer-events: none;
 }
 

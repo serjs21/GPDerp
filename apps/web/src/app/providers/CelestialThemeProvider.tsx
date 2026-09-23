@@ -87,10 +87,12 @@ export function CelestialThemeProvider({
     root.style.setProperty("--sky-top", sceneVars["--sky-top"] ?? "");
     root.style.setProperty("--sky-mid", sceneVars["--sky-mid"] ?? "");
     root.style.setProperty("--sky-horizon", sceneVars["--sky-horizon"] ?? "");
+    root.style.setProperty("--ink-on-sky", sceneVars["--ink-on-sky"] ?? "");
     return () => {
       root.style.removeProperty("--sky-top");
       root.style.removeProperty("--sky-mid");
       root.style.removeProperty("--sky-horizon");
+      root.style.removeProperty("--ink-on-sky");
     };
   }, [scene]);
 

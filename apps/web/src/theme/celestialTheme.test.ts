@@ -4,6 +4,8 @@ import {
   getSceneCssVariables,
   getThemeAt,
   mixHexOklab,
+  resolveInkOnSky,
+  SKY_INK_DAY,
   type GeoCoordinates,
 } from "./celestialTheme";
 
@@ -29,15 +31,50 @@ describe("contrastRatio", () => {
   });
 });
 
+describe("resolveInkOnSky", () => {
+  it("prefers dark blue against a bright day sky mid", () => {
+    const ink = resolveInkOnSky("#B8C7D3", "#F7F0D8");
+    expect(contrastRatio(ink, "#B8C7D3")).toBeGreaterThanOrEqual(4.5);
+    // Day preference should land near navy (darker than mid-gray).
+    expect(ink.toLowerCase()).toBe(SKY_INK_DAY.toLowerCase());
+  });
+
+  it("prefers moon yellow against a dark night sky mid", () => {
+    const moon = "#FFF1CD";
+    const ink = resolveInkOnSky("#312B4A", moon);
+    expect(contrastRatio(ink, "#312B4A")).toBeGreaterThanOrEqual(4.5);
+    expect(ink.toLowerCase()).toBe(moon.toLowerCase());
+  });
+});
+
 describe("getThemeAt", () => {
   it("returns contrast-guarded ink and highlight for Bangkok noon", () => {
     const theme = getThemeAt(new Date("2026-06-21T12:00:00+07:00"), BANGKOK);
 
-    expect(theme.paper).toMatch(/^#[0-9A-F]{6}$/);
+    expect(theme.paper).toMatch(/^#[0-9A-F]{6}$/i);
     expect(contrastRatio(theme.inkOnPaper, theme.paper)).toBeGreaterThanOrEqual(7);
     expect(contrastRatio(theme.highlightOnPaper, theme.paper)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(theme.inkOnSky, theme.skyMid)).toBeGreaterThanOrEqual(4.5);
+    // Noon sky should drive ink toward dark blue (low luminance).
+    expect(relativeChannelSum(theme.inkOnSky)).toBeLessThan(relativeChannelSum(theme.moon));
+  });
+
+  it("returns moon-yellowish inkOnSky for Bangkok midnight", () => {
+    const theme = getThemeAt(new Date("2026-06-21T00:00:00+07:00"), BANGKOK);
+
+    expect(contrastRatio(theme.inkOnSky, theme.skyMid)).toBeGreaterThanOrEqual(4.5);
+    // Midnight sky should drive ink toward moon yellow (high luminance).
+    expect(relativeChannelSum(theme.inkOnSky)).toBeGreaterThan(relativeChannelSum(SKY_INK_DAY));
   });
 });
+
+function relativeChannelSum(hex: string): number {
+  const normalized = hex.replace("#", "");
+  const r = Number.parseInt(normalized.slice(0, 2), 16);
+  const g = Number.parseInt(normalized.slice(2, 4), 16);
+  const b = Number.parseInt(normalized.slice(4, 6), 16);
+  return r + g + b;
+}
 
 describe("getCelestialLayout", () => {
   it("keeps sun and moon within padded percentage bounds", () => {
@@ -77,5 +114,6 @@ describe("getSceneCssVariables", () => {
     expect(sceneVars["--sun-x"]).toMatch(/^-?\d+(\.\d{1,4})?%$/);
     expect(sceneVars["--moon-limb-angle"]).toMatch(/^-?\d+(\.\d{1,4})?deg$/);
     expect(sceneVars["--moon-opacity"]).toMatch(/^-?\d+(\.\d{1,4})?$/);
+    expect(sceneVars["--ink-on-sky"]).toBe(theme.inkOnSky);
   });
 });
