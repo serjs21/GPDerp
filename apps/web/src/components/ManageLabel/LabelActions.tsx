@@ -36,10 +36,14 @@ type ActionButtonProps = {
   iconClassName: string;
   onSelect: () => void;
   disabled?: boolean;
+  /** When omitted, mirrors `!disabled` (ComicPagePanel grayscale when false). */
+  selected?: boolean;
   hoverFill?: string;
   invertIconOnHover?: boolean;
   background?: ComicPanelBackground;
   color?: ComicPanelColor;
+  /** Mask the icon with `--ink-on-sky` instead of showing the raw SVG fill. */
+  inkOnSkyIcon?: boolean;
 };
 
 function rowLayoutClass(layout: ActionLayout): string {
@@ -57,18 +61,27 @@ function LabelActionButton({
   iconClassName,
   onSelect,
   disabled = false,
+  selected,
   hoverFill,
   invertIconOnHover = false,
   background = "solid",
   color = "white",
+  inkOnSkyIcon = false,
 }: ActionButtonProps) {
+  const isSelected = selected ?? !disabled;
   const style = (
     hoverFill
       ? { "--label-action-hover-fill": hoverFill }
       : undefined
   ) as CSSProperties | undefined;
 
-  const icon = (
+  const icon = inkOnSkyIcon ? (
+    <span
+      className={[styles.icon, styles.iconInkOnSky, iconClassName].join(" ")}
+      style={{ "--label-action-icon-mask": `url("${src}")` } as CSSProperties}
+      aria-hidden
+    />
+  ) : (
     // eslint-disable-next-line @next/next/no-img-element -- static public SVG
     <img
       className={[styles.icon, iconClassName].join(" ")}
@@ -107,7 +120,7 @@ function LabelActionButton({
   return (
     <ComicPagePanel
       selectable
-      selected={!disabled}
+      selected={isSelected}
       background={background}
       color={color}
       flexWeight={1}
@@ -116,6 +129,7 @@ function LabelActionButton({
         styles.action,
         invertIconOnHover ? styles.invertOnHover : "",
         disabled ? styles.disabled : "",
+        disabled && inkOnSkyIcon ? styles.disabledPreserveBg : "",
       ]
         .filter(Boolean)
         .join(" ")}
@@ -153,10 +167,14 @@ export function LabelActions({
         src={hasConnections ? TUNE_IN_SRC : NOT_CONNECTED_ACTION_SRC}
         caption={hasConnections ? "Tune in" : undefined}
         layout={hasConnections ? "iconEnd" : "iconOnly"}
+        color={hasConnections ? "white" : "sky"}
+        background="solid"
         captionClassName={hasConnections ? styles.captionTuneIn : undefined}
         iconClassName={
           hasConnections ? styles.iconTuneIn : styles.iconNotConnected
         }
+        inkOnSkyIcon={!hasConnections}
+        selected
         ariaLabel={
           hasConnections
             ? `Tune in to haikus labeled ${labelName}`
