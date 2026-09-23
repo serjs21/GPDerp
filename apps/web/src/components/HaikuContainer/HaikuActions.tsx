@@ -41,7 +41,8 @@ export type HaikuActionsProps =
 
 type HoverTarget = "delete" | "share" | "label" | "copy" | null;
 
-const CLAP_VISIBLE_MS = 1000;
+const CLAP_HOLD_MS = 1000;
+const CLAP_FADE_MS = 200;
 
 const ACTIONS = [
   {
@@ -125,10 +126,11 @@ export const HaikuActions = (props: HaikuActionsProps) => {
   const [deleting, setDeleting] = useState(false);
   const [hover, setHover] = useState<HoverTarget>(null);
   const [showClap, setShowClap] = useState(false);
+  const [clapFading, setClapFading] = useState(false);
   const [clapFixedPos, setClapFixedPos] = useState<{ top: number; left: number } | null>(
     null,
   );
-  const clapTimerRef = useRef<number | null>(null);
+  const clapTimersRef = useRef<number[]>([]);
   const toggleWrapRef = useRef<HTMLSpanElement | null>(null);
   const { copy } = useCopy();
   const dock = useLanternActionsDock();
@@ -146,7 +148,7 @@ export const HaikuActions = (props: HaikuActionsProps) => {
 
   useEffect(
     () => () => {
-      if (clapTimerRef.current != null) window.clearTimeout(clapTimerRef.current);
+      for (const id of clapTimersRef.current) window.clearTimeout(id);
     },
     [],
   );
@@ -174,13 +176,21 @@ export const HaikuActions = (props: HaikuActionsProps) => {
           left: wrapRect.right - 16,
         });
       }
-      if (clapTimerRef.current != null) window.clearTimeout(clapTimerRef.current);
+      for (const id of clapTimersRef.current) window.clearTimeout(id);
+      clapTimersRef.current = [];
+      setClapFading(false);
       setShowClap(true);
-      clapTimerRef.current = window.setTimeout(() => {
-        setShowClap(false);
-        setClapFixedPos(null);
-        clapTimerRef.current = null;
-      }, CLAP_VISIBLE_MS);
+      const fadeId = window.setTimeout(() => {
+        setClapFading(true);
+        const doneId = window.setTimeout(() => {
+          setShowClap(false);
+          setClapFading(false);
+          setClapFixedPos(null);
+          clapTimersRef.current = [];
+        }, CLAP_FADE_MS);
+        clapTimersRef.current.push(doneId);
+      }, CLAP_HOLD_MS);
+      clapTimersRef.current = [fadeId];
     }
     setOpenPreference(next);
   };
@@ -317,7 +327,9 @@ export const HaikuActions = (props: HaikuActionsProps) => {
       <img
         src="/lantern_actions/clap_sound.svg"
         alt=""
-        className={styles.clapBurst}
+        className={[styles.clapBurst, clapFading ? styles.clapBurstFade : ""]
+          .filter(Boolean)
+          .join(" ")}
         style={{ top: clapFixedPos.top, left: clapFixedPos.left }}
         width={28}
         height={28}

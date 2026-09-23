@@ -54,6 +54,17 @@
   opacity: 1;
 }
 
+.clapBurstFade {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clapBurstFade {
+    transition: none;
+  }
+}
+
 .inlinePanel {
   position: absolute;
   right: 0;
