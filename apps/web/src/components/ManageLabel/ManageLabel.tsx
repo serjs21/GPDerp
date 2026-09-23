@@ -62,10 +62,12 @@ export function ManageLabel({
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [exiting, setExiting] = useState(forceExiting);
+  const [collapsing, setCollapsing] = useState(false);
   const [entering, setEntering] = useState(animateEnter);
-  /** Pixel height while collapsing; `0` when animating shut; null when not exiting. */
+  /** Locked pixel height during exit; animates to `0` only after boing finishes. */
   const [exitHeightPx, setExitHeightPx] = useState<number | null>(null);
   const exitNotifiedRef = useRef(false);
+  const collapseStartedRef = useRef(false);
   const rootRef = useRef<HTMLElement>(null);
   const { deleteLabel } = useAccountLabels({ accountId, autofetch: false });
   const shape = resolveComicLabelShapePreset(label.shape);
@@ -99,36 +101,49 @@ export function ManageLabel({
     onExitComplete?.();
   }, [onExitComplete]);
 
-  // Lock measured height, then collapse to 0 at 2× the boing duration; unmount at 0.
+  const beginCollapse = useCallback(() => {
+    if (collapseStartedRef.current) return;
+    collapseStartedRef.current = true;
+    setCollapsing(true);
+    // Double rAF so the browser paints the locked height before transitioning to 0.
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        setExitHeightPx(0);
+      });
+    });
+  }, []);
+
+  // On exit: lock height and play boing; collapse only after boing ends.
   useEffect(() => {
     if (!exiting) {
       setExitHeightPx(null);
+      setCollapsing(false);
+      collapseStartedRef.current = false;
       return;
     }
 
     const node = rootRef.current;
     if (!node) return;
 
-    const measured = node.getBoundingClientRect().height;
-    setExitHeightPx(measured);
+    setExitHeightPx(node.getBoundingClientRect().height);
 
-    let raf2 = 0;
-    const raf1 = window.requestAnimationFrame(() => {
-      raf2 = window.requestAnimationFrame(() => {
-        setExitHeightPx(0);
-      });
-    });
-
-    const fallback = window.setTimeout(() => {
-      notifyExitComplete();
-    }, MAGIC_EXIT_COLLAPSE_MS + 80);
+    const boingFallback = window.setTimeout(() => {
+      beginCollapse();
+    }, MAGIC_EXIT_BOING_MS + 40);
 
     return () => {
-      window.cancelAnimationFrame(raf1);
-      window.cancelAnimationFrame(raf2);
-      window.clearTimeout(fallback);
+      window.clearTimeout(boingFallback);
     };
-  }, [exiting, notifyExitComplete]);
+  }, [exiting, beginCollapse]);
+
+  // Safety: unmount if height transition never fires.
+  useEffect(() => {
+    if (!collapsing) return;
+    const timer = window.setTimeout(() => {
+      notifyExitComplete();
+    }, MAGIC_EXIT_COLLAPSE_MS + 80);
+    return () => window.clearTimeout(timer);
+  }, [collapsing, notifyExitComplete]);
 
   const handleDeleteConfirm = useCallback(async () => {
     setDeleting(true);
@@ -157,6 +172,10 @@ export function ManageLabel({
 
   const handleAnimationEnd = (event: AnimationEvent<HTMLElement>) => {
     const name = event.animationName;
+    if (exiting && (name.includes("boingOutDown") || name.includes("manageLabelBoingOut"))) {
+      beginCollapse();
+      return;
+    }
     if (entering && (name.includes("boingInUp") || name.includes("manageLabelBoingIn"))) {
       setEntering(false);
       onEnterAnimationEnd?.();
@@ -164,10 +183,9 @@ export function ManageLabel({
   };
 
   const handleTransitionEnd = (event: TransitionEvent<HTMLElement>) => {
-    if (!exiting) return;
+    if (!collapsing) return;
     if (event.target !== event.currentTarget) return;
     if (event.propertyName !== "height") return;
-    if (exitHeightPx !== 0) return;
     notifyExitComplete();
   };
 
@@ -176,21 +194,30 @@ export function ManageLabel({
       ? undefined
       : {
           height: exitHeightPx,
-          // Collapse list gap with height so neighbors don't jump on unmount.
           marginBottom:
-            exitHeightPx === 0
+            collapsing && exitHeightPx === 0
               ? "calc(-1 * var(--manage-label-list-gap, 2.25rem))"
               : 0,
-          transitionProperty: "height, margin-bottom",
-          transitionDuration: `${MAGIC_EXIT_COLLAPSE_MS}ms`,
-          transitionTimingFunction: "ease",
+          ...(collapsing
+            ? {
+                transitionProperty: "height, margin-bottom",
+                transitionDuration: `${MAGIC_EXIT_COLLAPSE_MS}ms`,
+                transitionTimingFunction: "ease-in-out",
+              }
+            : null),
         };
 
   return (
     <>
       <article
         ref={rootRef}
-        className={[styles.root, exiting ? styles.rootExiting : ""].filter(Boolean).join(" ")}
+        className={[
+          styles.root,
+          exiting ? styles.rootExiting : "",
+          collapsing ? styles.rootCollapsing : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
         style={exitStyle}
         onTransitionEnd={handleTransitionEnd}
       >

@@ -13,6 +13,9 @@
 .rootExiting {
   z-index: 3;
   pointer-events: none;
+}
+
+.rootCollapsing {
   overflow: hidden;
 }
 

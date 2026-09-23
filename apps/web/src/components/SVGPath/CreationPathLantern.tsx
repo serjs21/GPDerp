@@ -110,6 +110,7 @@ export function CreationPathLantern({
         transform={transform}
         suppressReveal
         isAnimating={overlayOpacity < 1}
+        actionsAlwaysVisible
         excludeLabelIds={excludeLabelIds}
       />
     </div>

@@ -162,8 +162,14 @@
   transition: opacity 0.15s ease;
 }
 
-.content:hover .actions,
-.content:focus-within .actions {
+/* Hit-test the PNG base so hover covers the whole lantern, not only the text inset. */
+.root:has([data-lantern-actions]) .shell {
+  pointer-events: auto;
+}
+
+.root:hover .actions,
+.root:focus-within .actions,
+.actions:has([aria-expanded="true"]) {
   opacity: 1;
 }
 

@@ -20,7 +20,8 @@
 }
 
 .root:hover .actions,
-.root:focus-within .actions {
+.root:focus-within .actions,
+.actions:has([aria-expanded="true"]) {
   opacity: 1;
 }
 

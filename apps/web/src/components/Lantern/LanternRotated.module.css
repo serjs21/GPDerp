@@ -93,13 +93,19 @@
   font-family: var(--font-lantern-script, "Zen Kurenaido", cursive);
 }
 
-.content:hover [data-lantern-actions],
-.content:focus-within [data-lantern-actions] {
+/* Hit-test the PNG base so hover covers the whole lantern, not only the paper face. */
+.root:has([data-lantern-actions]) .shell {
+  pointer-events: auto;
+}
+
+.root:hover [data-lantern-actions],
+.root:focus-within [data-lantern-actions],
+[data-lantern-actions]:has([aria-expanded="true"]) {
   opacity: 1;
 }
 
 @media (max-width: 1024px) {
-  .content [data-lantern-actions] {
+  .root [data-lantern-actions] {
     opacity: 1;
   }
 }

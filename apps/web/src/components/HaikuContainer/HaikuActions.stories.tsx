@@ -98,7 +98,7 @@ export const InteractiveOnLantern: Story = {
     <div className={lanternStoryStyles.stage}>
       <div className={styles.sample}>
         <p className={styles.caption}>
-          Hover the lantern (desktop) or tap the toggle — click to open/close the bar
+          Hover the lantern base (desktop) or tap the toggle — click to open/close the bar
         </p>
         <LanternFrame
           ariaLabel="Interactive haiku actions lantern"

@@ -21,6 +21,7 @@ import { ShareModal } from "@/components/ShareModal/ShareModal";
 import { Tooltip } from "@/components/StyledComponents";
 import { useLanternActionsDock } from "@/components/Lantern/LanternActionsDockContext";
 import { useCopy } from "@/hooks/useCopy";
+import { useHaikuActionsOpenPreference } from "@/hooks/useHaikuActionsOpenPreference";
 import { formatHaikuPlainToText, formatHaikuTitle } from "@/utils/strings";
 import styles from "./HaikuActions.module.css";
 
@@ -122,7 +123,6 @@ export const HaikuActions = (props: HaikuActionsProps) => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [hover, setHover] = useState<HoverTarget>(null);
-  const [open, setOpen] = useState(false);
   const [clapBurst, setClapBurst] = useState<"idle" | "hold" | "fade">("idle");
   const [clapFixedPos, setClapFixedPos] = useState<{ top: number; left: number } | null>(
     null,
@@ -135,8 +135,10 @@ export const HaikuActions = (props: HaikuActionsProps) => {
 
   const forcedHover = props.variant === "saved" ? props.forcedHover : undefined;
   const forcedOpen = props.variant === "saved" ? props.forcedOpen : undefined;
+  const { isOpen, setOpenPreference } = useHaikuActionsOpenPreference(forcedOpen);
   const activeHover = forcedHover !== undefined ? forcedHover : hover;
-  const isOpen = forcedOpen !== undefined ? forcedOpen : open;
+  const modalBlocking = shareOpen || labelsOpen || deleteOpen;
+  const showPanel = isOpen && !modalBlocking;
 
   const haiku = props.variant === "saved" ? props.haiku : null;
   const onDeleted = props.variant === "saved" ? props.onDeleted : undefined;
@@ -187,18 +189,11 @@ export const HaikuActions = (props: HaikuActionsProps) => {
 
   const clearHover = () => setHoverIfLive(null);
 
-  const setOpenIfLive = (next: boolean) => {
-    if (forcedOpen === undefined) setOpen(next);
-  };
-
   useEffect(() => {
-    if (shareOpen || labelsOpen || deleteOpen) {
-      setHoverIfLive(null);
-      setOpenIfLive(false);
-    }
-    // Intentionally only depend on modal visibility.
+    if (modalBlocking) setHoverIfLive(null);
+    // Clear hover only; open preference stays until the user toggles off.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shareOpen, labelsOpen, deleteOpen]);
+  }, [modalBlocking]);
 
   const setHoverFromFocus = (next: HoverTarget, target: HTMLElement) => {
     if (target.matches(":focus-visible")) setHoverIfLive(next);
@@ -318,7 +313,7 @@ export const HaikuActions = (props: HaikuActionsProps) => {
     </div>
   );
 
-  const panelNode = isOpen ? (
+  const panelNode = showPanel ? (
     dock ? (
       createPortal(panel, dock)
     ) : (
@@ -353,7 +348,7 @@ export const HaikuActions = (props: HaikuActionsProps) => {
           className={styles.toggle}
           aria-label={isOpen ? "Hide haiku actions" : "Show haiku actions"}
           aria-expanded={isOpen}
-          onClick={() => setOpenIfLive(!isOpen)}
+          onClick={() => setOpenPreference(!isOpen)}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

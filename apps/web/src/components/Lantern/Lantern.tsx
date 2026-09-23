@@ -24,11 +24,6 @@ export type LanternProps = HaikuContainerProps & {
   bodyOnly?: boolean;
   /** Hover actions; omit during path tween so content stays cheap. */
   showActions?: boolean;
-  /**
-   * @deprecated Toggle visibility is CSS-driven (hover desktop / always ≤1024).
-   * Kept for call-site compatibility.
-   */
-  actionsAlwaysVisible?: boolean;
   onDelete?: () => Promise<void>;
   onDeleted?: () => void;
   onChanged?: () => void;
