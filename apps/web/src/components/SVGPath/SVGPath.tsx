@@ -311,7 +311,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
 
   const loaderShown = morePages && shouldFetchNextQueuePage(haikus.length, focusIndex);
 
-  useSvgPathInput(stageRef, stepForward, stepBack);
+  useSvgPathInput(stageRef, stepForward, stepBack, !generatingDraft);
   useScrollBlocking(svgAreaRef);
 
   useEffect(() => {

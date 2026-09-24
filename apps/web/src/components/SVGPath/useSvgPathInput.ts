@@ -7,10 +7,16 @@ export function useSvgPathInput(
   stageRef: React.RefObject<HTMLDivElement | null>,
   stepForward: () => boolean,
   stepBack: () => boolean,
+  enabled = true,
 ) {
-  usePathWheelScroll(stageRef, stepForward, stepBack);
+  const gatedForward = () => (enabled ? stepForward() : false);
+  const gatedBack = () => (enabled ? stepBack() : false);
+
+  usePathWheelScroll(stageRef, gatedForward, gatedBack);
 
   useEffect(() => {
+    if (!enabled) return;
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowRight") stepForward();
       if (event.key === "ArrowLeft") stepBack();
@@ -18,5 +24,5 @@ export function useSvgPathInput(
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [stepBack, stepForward]);
+  }, [enabled, stepBack, stepForward]);
 }
