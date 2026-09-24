@@ -1,5 +1,5 @@
 .root {
-  --duality-flip-ms: 300ms;
+  --duality-flip-ms: 500ms;
   --duality-ink: #231f20;
   --duality-paper: #ffffff;
 
@@ -36,12 +36,8 @@
   position: absolute;
   inset: 0;
   transition: transform var(--duality-flip-ms) ease;
-  transform: rotate(0deg);
+  transform: rotate(var(--duality-base-rotate, 0deg));
   will-change: transform;
-}
-
-.flipped .baseWrap {
-  transform: rotate(180deg);
 }
 
 .base {
