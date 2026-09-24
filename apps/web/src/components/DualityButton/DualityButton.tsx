@@ -45,7 +45,7 @@ export function DualityButton({
   topIconSrc,
   bottomIconSrc,
   centerIconSrc,
-  centerIconScale = 2,
+  centerIconScale = 1,
   iconTone = "mask",
   flipped: flippedProp,
   defaultFlipped = false,
@@ -119,7 +119,7 @@ export function DualityButton({
             src={centerIconSrc}
             position="center"
             tone={iconTone}
-            scale={centerIconScale}
+            scale={1.2}
           />
         ) : null}
       </span>
