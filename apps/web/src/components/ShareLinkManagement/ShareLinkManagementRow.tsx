@@ -126,7 +126,7 @@ export function ShareLinkManagementRow({
       className={styles.previewLantern}
     />
   );
-  
+
   const lanternStats = ctrl.active ? (
     <PreviewLanternStats
       hits={ctrl.hits}
