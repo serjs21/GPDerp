@@ -66,8 +66,8 @@
   position: absolute;
   left: 50%;
   z-index: 1;
-  width: 40%;
-  height: 40%;
+  width: calc(40% * var(--duality-icon-scale, 1));
+  height: calc(40% * var(--duality-icon-scale, 1));
   transform: translateX(-50%);
   pointer-events: none;
 }
@@ -92,6 +92,12 @@
   background-color: var(--duality-paper);
 }
 
+.iconCenter.iconMask {
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--duality-ink);
+}
+
 .flipped .iconTop.iconMask {
   background-color: var(--duality-paper);
 }
@@ -100,7 +106,11 @@
   background-color: var(--duality-ink);
 }
 
-/* Multi-color glyphs: only black strokes follow `currentColor`. */
+.flipped .iconCenter.iconMask {
+  background-color: var(--duality-paper);
+}
+
+/* Multi-color glyphs: only black ink follows `currentColor`. */
 .iconRich {
   top: auto;
   display: flex;
@@ -121,6 +131,12 @@
   color: var(--duality-paper);
 }
 
+.iconCenter.iconRich {
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--duality-ink);
+}
+
 .flipped .iconTop.iconRich {
   color: var(--duality-paper);
 }
@@ -129,11 +145,20 @@
   color: var(--duality-ink);
 }
 
+.flipped .iconCenter.iconRich {
+  color: var(--duality-paper);
+}
+
 .iconRich :global(svg) {
   display: block;
   width: 100%;
   height: 100%;
   overflow: visible;
+}
+
+/* Unclassed paths/circles default to black in SVG — drive them with currentColor. */
+.iconRich :global(svg) :is(path, circle, ellipse, polygon, rect):not([class]) {
+  fill: currentColor;
 }
 
 @media (prefers-reduced-motion: reduce) {

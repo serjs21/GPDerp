@@ -13,13 +13,17 @@ import {
 import styles from "./DualityButton.module.css";
 
 export type DualityButtonProps = {
-  /** Icon shown at the top of the face (e.g. “new”). */
-  topIconSrc: string;
-  /** Icon shown at the bottom of the face (e.g. “old”). */
-  bottomIconSrc: string;
+  /** Icon shown at the top of the face (e.g. “new”). Ignored when `centerIconSrc` is set. */
+  topIconSrc?: string;
+  /** Icon shown at the bottom of the face (e.g. “old”). Ignored when `centerIconSrc` is set. */
+  bottomIconSrc?: string;
+  /** Single centered glyph (e.g. time remaining). Overrides top/bottom. */
+  centerIconSrc?: string;
+  /** Size multiplier for the centered glyph (default 2). */
+  centerIconScale?: number;
   /**
    * `mask` — mono tint (black/white swap on flip).
-   * `strokeInvert` — only black strokes flip; fills stay as authored.
+   * `strokeInvert` — only black ink flips; light fills stay as authored.
    */
   iconTone?: DualityIconTone;
   /** Controlled flip state. When omitted, the button manages its own state. */
@@ -40,6 +44,8 @@ function flippedFromTurns(clockwiseDeg: number): boolean {
 export function DualityButton({
   topIconSrc,
   bottomIconSrc,
+  centerIconSrc,
+  centerIconScale = 2,
   iconTone = "mask",
   flipped: flippedProp,
   defaultFlipped = false,
@@ -109,8 +115,27 @@ export function DualityButton({
           decoding="async"
         />
       </span>
-      <DualityFaceIcon src={topIconSrc} position="top" tone={iconTone} />
-      <DualityFaceIcon src={bottomIconSrc} position="bottom" tone={iconTone} />
+      {centerIconSrc ? (
+        <DualityFaceIcon
+          src={centerIconSrc}
+          position="center"
+          tone={iconTone}
+          scale={centerIconScale}
+        />
+      ) : (
+        <>
+          {topIconSrc ? (
+            <DualityFaceIcon src={topIconSrc} position="top" tone={iconTone} />
+          ) : null}
+          {bottomIconSrc ? (
+            <DualityFaceIcon
+              src={bottomIconSrc}
+              position="bottom"
+              tone={iconTone}
+            />
+          ) : null}
+        </>
+      )}
     </button>
   );
 }

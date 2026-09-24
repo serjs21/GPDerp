@@ -40,6 +40,15 @@ export const HitpointsSort: Story = {
   },
 };
 
+export const TimeLeft: Story = {
+  args: {
+    centerIconSrc: "/sort_button/time_left.svg",
+    centerIconScale: 2,
+    iconTone: "strokeInvert",
+    "aria-label": "Toggle time remaining sort",
+  },
+};
+
 function ControlledDemo() {
   const [flipped, setFlipped] = useState(false);
   return (
