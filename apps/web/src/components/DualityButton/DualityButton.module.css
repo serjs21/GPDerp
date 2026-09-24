@@ -42,12 +42,12 @@
 
 .direction {
   position: absolute;
-  left: 50%;
+  left: 33%;
   top: 0;
   z-index: 0;
   width: 52%;
-  height: 30%;
-  transform: translate(-50%, -88%);
+  height: 50%;
+  transform: translate(-50%, -65%) rotate(-12deg);
   object-fit: contain;
   pointer-events: none;
   user-select: none;
@@ -70,8 +70,10 @@
   height: 40%;
   transform: translateX(-50%);
   pointer-events: none;
+}
+
+.iconMask {
   transition: background-color var(--duality-flip-ms) ease;
-  /* Tint via mask so any public SVG can be black or white. */
   -webkit-mask-size: contain;
   mask-size: contain;
   -webkit-mask-repeat: no-repeat;
@@ -80,27 +82,64 @@
   mask-position: center;
 }
 
-.iconTop {
-  top: 11%;
+.iconTop.iconMask {
+  top: 9%;
   background-color: var(--duality-ink);
 }
 
-.iconBottom {
-  bottom: 11%;
+.iconBottom.iconMask {
+  bottom: 9%;
   background-color: var(--duality-paper);
 }
 
-.flipped .iconTop {
+.flipped .iconTop.iconMask {
   background-color: var(--duality-paper);
 }
 
-.flipped .iconBottom {
+.flipped .iconBottom.iconMask {
   background-color: var(--duality-ink);
+}
+
+/* Multi-color glyphs: only black strokes follow `currentColor`. */
+.iconRich {
+  top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--duality-ink);
+  background: none;
+  transition: color var(--duality-flip-ms) ease;
+}
+
+.iconTop.iconRich {
+  top: 9%;
+  color: var(--duality-ink);
+}
+
+.iconBottom.iconRich {
+  bottom: 9%;
+  color: var(--duality-paper);
+}
+
+.flipped .iconTop.iconRich {
+  color: var(--duality-paper);
+}
+
+.flipped .iconBottom.iconRich {
+  color: var(--duality-ink);
+}
+
+.iconRich :global(svg) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .baseWrap,
-  .icon {
+  .iconMask,
+  .iconRich {
     transition: none;
   }
 }

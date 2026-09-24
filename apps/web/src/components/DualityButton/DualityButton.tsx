@@ -6,6 +6,10 @@ import {
   DUALITY_BUTTON_DIRECTION_SRC,
   DUALITY_BUTTON_FLIP_MS,
 } from "./consts/dualityButtonConsts";
+import {
+  DualityFaceIcon,
+  type DualityIconTone,
+} from "./DualityFaceIcon";
 import styles from "./DualityButton.module.css";
 
 export type DualityButtonProps = {
@@ -13,6 +17,11 @@ export type DualityButtonProps = {
   topIconSrc: string;
   /** Icon shown at the bottom of the face (e.g. “old”). */
   bottomIconSrc: string;
+  /**
+   * `mask` — mono tint (black/white swap on flip).
+   * `strokeInvert` — only black strokes flip; fills stay as authored.
+   */
+  iconTone?: DualityIconTone;
   /** Controlled flip state. When omitted, the button manages its own state. */
   flipped?: boolean;
   /** Initial flip when uncontrolled. */
@@ -31,6 +40,7 @@ function flippedFromTurns(clockwiseDeg: number): boolean {
 export function DualityButton({
   topIconSrc,
   bottomIconSrc,
+  iconTone = "mask",
   flipped: flippedProp,
   defaultFlipped = false,
   onFlippedChange,
@@ -99,26 +109,8 @@ export function DualityButton({
           decoding="async"
         />
       </span>
-      <span
-        className={[styles.icon, styles.iconTop].join(" ")}
-        style={
-          {
-            WebkitMaskImage: `url("${topIconSrc}")`,
-            maskImage: `url("${topIconSrc}")`,
-          } as CSSProperties
-        }
-        aria-hidden
-      />
-      <span
-        className={[styles.icon, styles.iconBottom].join(" ")}
-        style={
-          {
-            WebkitMaskImage: `url("${bottomIconSrc}")`,
-            maskImage: `url("${bottomIconSrc}")`,
-          } as CSSProperties
-        }
-        aria-hidden
-      />
+      <DualityFaceIcon src={topIconSrc} position="top" tone={iconTone} />
+      <DualityFaceIcon src={bottomIconSrc} position="bottom" tone={iconTone} />
     </button>
   );
 }

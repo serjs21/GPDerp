@@ -23,6 +23,15 @@ export const TimeSort: Story = {
   },
 };
 
+export const AlphabeticSort: Story = {
+  args: {
+    topIconSrc: "/sort_button/alpabeth_start.svg",
+    bottomIconSrc: "/sort_button/alpabeth_end.svg",
+    iconTone: "strokeInvert",
+    "aria-label": "Toggle A–Z / Z–A",
+  },
+};
+
 function ControlledDemo() {
   const [flipped, setFlipped] = useState(false);
   return (
