@@ -23,9 +23,11 @@ export function useSvgPathScroll(
   options: {
     initialFocusIndex?: number;
     onFocusChange?: (focusIndex: number) => void;
+    /** Duration for scroll-to-creation; defaults to `durationMs`. */
+    creationSlotDurationMs?: number;
   } = {},
 ) {
-  const { initialFocusIndex, onFocusChange } = options;
+  const { initialFocusIndex, onFocusChange, creationSlotDurationMs = durationMs } = options;
   const initialFocus = clampFocusIndex(initialFocusIndex ?? 0, haikuCount);
 
   const [focusIndex, setFocusIndex] = useState(initialFocus);
@@ -203,33 +205,21 @@ export function useSvgPathScroll(
     pendingDirectionRef.current = null;
     animationRef.current?.stop();
 
-    // Adjacent unit steps so list lanterns use SteppedTransition (avoids content
-    // overlapping the creation lantern during a long multi-index jump).
-    const stepTowardCreation = (from: number): boolean => {
-      const next = Math.max(CREATION_FOCUS_INDEX, from - 1);
-      if (next === from) return false;
-
-      return runJump(
-        next,
-        {
-          durationMs,
-          ease: "linear",
-          onSettled: (settled) => {
-            if (settled > CREATION_FOCUS_INDEX) {
-              stepTowardCreation(settled);
-              return;
-            }
-            setIsAnimating(false);
-            animatingRef.current = false;
-            onFocusChange?.(settled);
-          },
+    // Single jump timed with the creation fly-in (same duration / shared tween).
+    return runJump(
+      CREATION_FOCUS_INDEX,
+      {
+        durationMs: creationSlotDurationMs,
+        ease: "easeOut",
+        onSettled: (settled) => {
+          setIsAnimating(false);
+          animatingRef.current = false;
+          onFocusChange?.(settled);
         },
-        clampScrollFocusIndex,
-      );
-    };
-
-    return stepTowardCreation(current);
-  }, [durationMs, haikuCount, onFocusChange, runJump]);
+      },
+      clampScrollFocusIndex,
+    );
+  }, [creationSlotDurationMs, haikuCount, onFocusChange, runJump]);
 
   const getFocusIndex = useCallback(() => focusRef.current, []);
 

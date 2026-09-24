@@ -89,10 +89,9 @@ export function lanternTransformAtStops(
 }
 
 /**
- * Scroll-gated visibility for the generating lantern.
- * While the list is still stepping back toward the creation slot, return null so the
- * creation overlay does not fly in on top of the default-stop lantern (overlap).
- * Once settled on the creation focus, return 1 (caller may run a separate enter fly).
+ * Creation lantern fly progress, tied to list scroll into the creation focus.
+ * While scrolling toward creation (any index → -1), returns tweenProgress so the
+ * fly-in runs in lockstep with the list making space. Settled → 1. Otherwise null.
  */
 export function creationFlyProgress(
   focusIndex: number,
@@ -102,7 +101,7 @@ export function creationFlyProgress(
 ): number | null {
   if (focusIndex === CREATION_FOCUS_INDEX) {
     if (isAnimating && fromFocusIndex !== CREATION_FOCUS_INDEX) {
-      return null;
+      return tweenProgress;
     }
     return 1;
   }

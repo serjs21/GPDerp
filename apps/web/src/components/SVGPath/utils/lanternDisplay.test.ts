@@ -34,11 +34,11 @@ describe("lanternDisplay", () => {
     expect(opacityAtStop(22)).toBe(0);
   });
 
-  it("hides creation overlay during list scroll-back, then parks when settled", () => {
+  it("syncs creation fly progress with list scroll-back toward creation focus", () => {
     expect(creationFlyProgress(0, 0, 1, false)).toBeNull();
-    // During 0→-1 scroll-back: keep hidden so list clears stop-20 first.
-    expect(creationFlyProgress(CREATION_FOCUS_INDEX, 0, 0, true)).toBeNull();
-    expect(creationFlyProgress(CREATION_FOCUS_INDEX, 0, 0.5, true)).toBeNull();
+    // During 0→-1 scroll-back: fly tracks the same tween as the list.
+    expect(creationFlyProgress(CREATION_FOCUS_INDEX, 0, 0, true)).toBe(0);
+    expect(creationFlyProgress(CREATION_FOCUS_INDEX, 0, 0.5, true)).toBe(0.5);
     expect(creationFlyProgress(CREATION_FOCUS_INDEX, 0, 1, false)).toBe(1);
     expect(creationFlyProgress(CREATION_FOCUS_INDEX, CREATION_FOCUS_INDEX, 1, false)).toBe(1);
   });

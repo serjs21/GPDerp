@@ -41,6 +41,7 @@ import {
   type ParsedSplitPathSvg,
 } from "./utils";
 import { CreationPathLantern } from "./CreationPathLantern";
+import { CREATION_ENTER_MS } from "./consts/creationPathLanternConsts";
 import styles from "./SVGPath.module.css";
 
 const SVG_PATH_SRC = "/path/split_path_colored_stops.svg";
@@ -48,8 +49,6 @@ const SVG_PATH_SRC = "/path/split_path_colored_stops.svg";
 const SVG_PATH_STEP_MS = 300;
 const SVG_PATH_CATCH_UP_MS = 450;
 const SVG_PATH_DELETE_PACK_MS = 450;
-/** Creation lantern exit→focus fly after list scroll-back settles. */
-const CREATION_ENTER_MS = 1500;
 /** Start neighbor pack when exit flight first holds this pose (0-based; 3 = 4th frame). */
 const DELETE_PACK_CUE_POSE_INDEX = 3;
 
@@ -159,8 +158,6 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
   const svgAreaRef = useRef<HTMLDivElement>(null);
   const [creationLayer, setCreationLayer] = useState<CreationLayerState | null>(null);
   const newestAtCreationStartRef = useRef<string | null>(null);
-  const [creationEnterT, setCreationEnterT] = useState<number | null>(null);
-  const creationEnterAnimRef = useRef<ReturnType<typeof animate> | null>(null);
   const onVacantQueueSlotRef = useRef(onVacantQueueSlot);
   onVacantQueueSlotRef.current = onVacantQueueSlot;
   const [exitingLanterns, setExitingLanterns] = useState<ExitingLantern[]>([]);
@@ -247,6 +244,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
   } = useSvgPathScroll(scrollCount, SVG_PATH_STEP_MS, {
     initialFocusIndex,
     onFocusChange,
+    creationSlotDurationMs: CREATION_ENTER_MS,
   });
 
   // Keep absolute creation overlay mounted across draft updates; near vs far handoff differ.
@@ -257,9 +255,6 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
         return { ...prev, draft: generatingDraft, handoffHaiku: null };
       }
       newestAtCreationStartRef.current = haikusRef.current[0]?.id ?? null;
-      creationEnterAnimRef.current?.stop();
-      creationEnterAnimRef.current = null;
-      setCreationEnterT(null);
       return {
         requestId: generatingDraft.requestId,
         draft: generatingDraft,
@@ -280,9 +275,6 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
 
       if (focusIndex === 0) {
         // Near path: list lantern owns stop-20; drop overlay (no crossfade flicker).
-        creationEnterAnimRef.current?.stop();
-        creationEnterAnimRef.current = null;
-        setCreationEnterT(null);
         return null;
       }
 
@@ -302,62 +294,9 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
     setCreationLayer((prev) => {
       if (!prev) return prev;
       if (prev.draft) return prev;
-      creationEnterAnimRef.current?.stop();
-      creationEnterAnimRef.current = null;
-      setCreationEnterT(null);
       return null;
     });
   }, [creationChromeOpen, generatingDraft]);
-
-  // After list scroll-back settles on creation focus, fly the creation lantern in alone.
-  // Far-path chrome: park immediately at stop-20 (same guideBox as default lantern).
-  useEffect(() => {
-    if (!creationLayer?.draft && !creationLayer?.handoffHaiku) return;
-    const nearSettled =
-      focusIndex === CREATION_FOCUS_INDEX && !isAnimating;
-    const farParked =
-      creationChromeOpen &&
-      focusIndex !== CREATION_FOCUS_INDEX &&
-      !isAnimating;
-    if (!nearSettled && !farParked) return;
-    if (creationEnterT === 1) return;
-
-    creationEnterAnimRef.current?.stop();
-
-    if (farParked || prefersReducedMotion()) {
-      setCreationEnterT(1);
-      return;
-    }
-
-    setCreationEnterT(0);
-    creationEnterAnimRef.current = animate(0, 1, {
-      duration: CREATION_ENTER_MS / 1000,
-      ease: "easeOut",
-      onUpdate: (value) => setCreationEnterT(value),
-      onComplete: () => {
-        setCreationEnterT(1);
-        creationEnterAnimRef.current = null;
-      },
-    });
-
-    return () => {
-      creationEnterAnimRef.current?.stop();
-      creationEnterAnimRef.current = null;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- start once per settle/park
-  }, [
-    creationLayer?.draft?.requestId,
-    creationLayer?.handoffHaiku?.id,
-    focusIndex,
-    isAnimating,
-    creationChromeOpen,
-  ]);
-
-  useEffect(() => {
-    return () => {
-      creationEnterAnimRef.current?.stop();
-    };
-  }, []);
 
   useImperativeHandle(
     ref,
@@ -523,7 +462,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
     tweenProgress,
   ]);
 
-  // Near: hide during scroll-back, then enter fly. Far chrome: park on stop-20 in guideBox.
+  // Near: fly tracks list scroll-back tween. Far chrome: park on stop-20 in guideBox.
   const scrollGate = creationLayer
     ? creationFlyProgress(focusIndex, fromFocusIndex, tweenProgress, isAnimating)
     : null;
@@ -533,13 +472,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
     focusIndex !== CREATION_FOCUS_INDEX &&
     !isAnimating &&
     scrollGate === null;
-  const creationParked = scrollGate === 1 || farPark ? 1 : scrollGate;
-  const creationFlyT =
-    creationParked === 1
-      ? farPark
-        ? 1
-        : (creationEnterT ?? 0)
-      : creationParked;
+  const creationFlyT = farPark ? 1 : scrollGate;
 
   const creationTransform =
     parsed && creationFlyT !== null

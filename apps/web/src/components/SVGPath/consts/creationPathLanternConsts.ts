@@ -15,3 +15,9 @@ export const CREATION_PATH_LANTERN_Z_INDEX = 10 + SVG_PATH_GONE_STOP * 10 + 1;
  * lantern must portal above that stacking context while keeping guideBox geometry.
  */
 export const CREATION_PATH_LANTERN_ABOVE_CHROME_Z_INDEX = 1001;
+
+/**
+ * Near-path list scroll-back to creation focus and creation lantern fly-in share
+ * this duration and start together (same tween progress).
+ */
+export const CREATION_ENTER_MS = 1500;
