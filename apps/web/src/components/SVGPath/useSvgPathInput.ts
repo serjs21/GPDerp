@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePathWheelScroll } from "./usePathWheelScroll";
 
 export function useSvgPathInput(
@@ -9,20 +9,26 @@ export function useSvgPathInput(
   stepBack: () => boolean,
   enabled = true,
 ) {
-  const gatedForward = () => (enabled ? stepForward() : false);
-  const gatedBack = () => (enabled ? stepBack() : false);
+  const enabledRef = useRef(enabled);
+  const stepForwardRef = useRef(stepForward);
+  const stepBackRef = useRef(stepBack);
+  enabledRef.current = enabled;
+  stepForwardRef.current = stepForward;
+  stepBackRef.current = stepBack;
+
+  const gatedForward = () => (enabledRef.current ? stepForwardRef.current() : false);
+  const gatedBack = () => (enabledRef.current ? stepBackRef.current() : false);
 
   usePathWheelScroll(stageRef, gatedForward, gatedBack);
 
   useEffect(() => {
-    if (!enabled) return;
-
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "ArrowRight") stepForward();
-      if (event.key === "ArrowLeft") stepBack();
+      if (!enabledRef.current) return;
+      if (event.key === "ArrowRight") stepForwardRef.current();
+      if (event.key === "ArrowLeft") stepBackRef.current();
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [enabled, stepBack, stepForward]);
+  }, []);
 }
