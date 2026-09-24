@@ -114,15 +114,16 @@ export function DualityButton({
           draggable={false}
           decoding="async"
         />
+        {centerIconSrc ? (
+          <DualityFaceIcon
+            src={centerIconSrc}
+            position="center"
+            tone={iconTone}
+            scale={centerIconScale}
+          />
+        ) : null}
       </span>
-      {centerIconSrc ? (
-        <DualityFaceIcon
-          src={centerIconSrc}
-          position="center"
-          tone={iconTone}
-          scale={centerIconScale}
-        />
-      ) : (
+      {!centerIconSrc ? (
         <>
           {topIconSrc ? (
             <DualityFaceIcon src={topIconSrc} position="top" tone={iconTone} />
@@ -135,7 +136,7 @@ export function DualityButton({
             />
           ) : null}
         </>
-      )}
+      ) : null}
     </button>
   );
 }

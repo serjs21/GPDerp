@@ -1,10 +1,16 @@
 import { useEffect, useState } from "react";
 
+/** Bump when prepare rules change so in-memory entries are not reused. */
+const SVG_CACHE_VERSION = 2;
 const svgCache = new Map<string, string>();
 
+function cacheKey(src: string): string {
+  return `${SVG_CACHE_VERSION}:${src}`;
+}
+
 /**
- * Rewrite near-black strokes/fills to `currentColor` so light fills (e.g. #fff)
- * stay authored while ink can flip with the duality face.
+ * Rewrite pure black (`#000` / `#000000`) strokes/fills to `currentColor`.
+ * Other colors (e.g. `#1c0300`, `#fff`) stay as authored.
  */
 export function prepareStrokeInvertSvg(svgText: string): string {
   return svgText
@@ -12,17 +18,15 @@ export function prepareStrokeInvertSvg(svgText: string): string {
     .replace(/stroke:\s*#000\b/gi, "stroke: currentColor")
     .replace(/\bstroke="#000000"/gi, 'stroke="currentColor"')
     .replace(/\bstroke="#000"/gi, 'stroke="currentColor"')
-    .replace(/fill:\s*#1c0300\b/gi, "fill: currentColor")
     .replace(/fill:\s*#000000\b/gi, "fill: currentColor")
     .replace(/fill:\s*#000\b/gi, "fill: currentColor")
-    .replace(/\bfill="#1c0300"/gi, 'fill="currentColor"')
     .replace(/\bfill="#000000"/gi, 'fill="currentColor"')
     .replace(/\bfill="#000"/gi, 'fill="currentColor"');
 }
 
 export function useStrokeInvertSvg(src: string): string | null {
   const [markup, setMarkup] = useState<string | null>(() =>
-    src ? (svgCache.get(src) ?? null) : null,
+    src ? (svgCache.get(cacheKey(src)) ?? null) : null,
   );
 
   useEffect(() => {
@@ -31,7 +35,8 @@ export function useStrokeInvertSvg(src: string): string | null {
       return;
     }
 
-    const cached = svgCache.get(src);
+    const key = cacheKey(src);
+    const cached = svgCache.get(key);
     if (cached != null) {
       setMarkup(cached);
       return;
@@ -45,7 +50,7 @@ export function useStrokeInvertSvg(src: string): string | null {
       })
       .then((text) => {
         const prepared = prepareStrokeInvertSvg(text);
-        svgCache.set(src, prepared);
+        svgCache.set(key, prepared);
         if (!cancelled) setMarkup(prepared);
       })
       .catch(() => {

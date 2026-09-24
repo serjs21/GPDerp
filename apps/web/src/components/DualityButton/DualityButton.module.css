@@ -156,8 +156,8 @@
   overflow: visible;
 }
 
-/* Unclassed paths/circles default to black in SVG — drive them with currentColor. */
-.iconRich :global(svg) :is(path, circle, ellipse, polygon, rect):not([class]) {
+/* Unclassed shapes default to #000 in SVG — only those follow currentColor. */
+.iconRich :global(svg) :is(path, circle, ellipse, polygon, rect):not([class]):not([fill]) {
   fill: currentColor;
 }
 
