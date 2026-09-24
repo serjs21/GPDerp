@@ -17,7 +17,7 @@ export function HaikuDisplay() {
   const bindHaikuSavedRef = useRef<(haiku: import("@/api/haikus").HaikuDto) => void>(() => {});
   const { invalidate } = useInfiniteHaikusQuery();
   const { onHaikuDeleted, onHaikuDeleteFailed, deleteFailedModal } = useHaikuDeleteController();
-  const { searchString, selectedLabelIds } = useHaikuFilters();
+  const { searchString, selectedLabelIds, excludedLabelIds } = useHaikuFilters();
 
   const {
     subject,
@@ -54,6 +54,7 @@ export function HaikuDisplay() {
           creationChromeOpen={creationOpen}
           searchString={searchString}
           selectedLabelIds={selectedLabelIds}
+          excludedLabelIds={excludedLabelIds}
         />
       </div>
       <div className={styles.inputSection}>

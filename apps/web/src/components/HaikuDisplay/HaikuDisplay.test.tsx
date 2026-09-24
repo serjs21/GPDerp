@@ -51,7 +51,11 @@ jest.mock("@/components/HaikuGenerationStickyNote/hooks/useHaikuGenerationFlow",
 }));
 
 jest.mock("@/app/providers/HaikuFiltersProvider", () => ({
-  useHaikuFilters: () => ({ searchString: "", selectedLabelIds: [] }),
+  useHaikuFilters: () => ({
+    searchString: "",
+    selectedLabelIds: [],
+    excludedLabelIds: [],
+  }),
 }));
 
 describe("HaikuDisplay", () => {

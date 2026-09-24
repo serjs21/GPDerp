@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { labelQueryKeys } from "@/api/labels";
 import { STORY_ACCOUNT_ID, withQueryClientSeed } from "@/storybook";
-import { FilterManageLabelsModal } from "./FilterManageLabelsModal";
+import { LabelsFilterModal } from "./LabelsFilterModal";
 
 const labelCatalog = [
   {
@@ -57,8 +57,8 @@ function seedLabelQueries(
 }
 
 const meta = {
-  title: "Haiku/FilterManageLabelsModal",
-  component: FilterManageLabelsModal,
+  title: "Haiku/LabelsFilterModal",
+  component: LabelsFilterModal,
   parameters: {
     layout: "fullscreen",
   },
@@ -70,16 +70,31 @@ const meta = {
   args: {
     open: true,
     accountId: STORY_ACCOUNT_ID,
-    selectedIds: ["00000000-0000-4000-8000-000000000201"],
+    includeIds: ["00000000-0000-4000-8000-000000000201"],
+    excludeIds: [],
     onApply: () => undefined,
     onClose: () => undefined,
   },
-} satisfies Meta<typeof FilterManageLabelsModal>;
+} satisfies Meta<typeof LabelsFilterModal>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const FilterDefault: Story = {};
+export const IncludeOnly: Story = {};
+
+export const ExcludeOnly: Story = {
+  args: {
+    includeIds: [],
+    excludeIds: ["00000000-0000-4000-8000-000000000203"],
+  },
+};
+
+export const IncludeAndExclude: Story = {
+  args: {
+    includeIds: ["00000000-0000-4000-8000-000000000201"],
+    excludeIds: ["00000000-0000-4000-8000-000000000204"],
+  },
+};
 
 export const Closed: Story = {
   args: {

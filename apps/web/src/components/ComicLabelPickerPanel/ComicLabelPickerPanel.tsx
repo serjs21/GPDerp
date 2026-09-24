@@ -47,6 +47,8 @@ export type ComicLabelPickerPanelProps = {
   footerDisabled?: boolean;
   /** When set, selecting beyond this count is ignored (deselect still works). */
   maxSelected?: number;
+  /** Labels that cannot be selected (e.g. already chosen on the opposite filter tab). */
+  disabledIds?: string[];
   className?: string;
 };
 
@@ -82,6 +84,7 @@ export function ComicLabelPickerPanel({
   footerBusy = false,
   footerDisabled = false,
   maxSelected,
+  disabledIds = [],
   className,
 }: ComicLabelPickerPanelProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -91,6 +94,7 @@ export function ComicLabelPickerPanel({
   const searchRef = useRef<HTMLInputElement>(null);
   const seededActive = useRef(false);
   const orderQueryKey = useRef<string | null>(null);
+  const disabledIdSet = useMemo(() => new Set(disabledIds), [disabledIds]);
 
   const seedLabelSource = useMemo(() => [...seedLabelIds], [seedLabelIds]);
 
@@ -204,6 +208,7 @@ export function ComicLabelPickerPanel({
   const rows = useMemo(() => chunkRows(displayLabels, 3), [displayLabels]);
 
   const toggleLabel = (label: ComicLabelPickerSeedLabel) => {
+    if (disabledIdSet.has(label.id)) return;
     setSelectedIds((prev) => {
       if (prev.includes(label.id)) {
         return prev.filter((id) => id !== label.id);
@@ -250,20 +255,32 @@ export function ComicLabelPickerPanel({
               <ComicPageRow key={rowIndex} className={styles.labelRow}>
                 {row.map((label) => {
                   const selected = selectedIdSet.has(label.id);
+                  const disabled = disabledIdSet.has(label.id);
                   const shape = resolveComicLabelShapePreset(label.shape);
                   return (
                     <ComicPagePanel
                       key={label.id}
-                      selectable
+                      selectable={!disabled}
                       selected={selected}
-                      onSelect={() => toggleLabel(label)}
+                      onSelect={
+                        disabled ? undefined : () => toggleLabel(label)
+                      }
                       background={selected ? "sunburst" : "halftone"}
                       color="white"
                       overflowVisible
                       flexWeight={1}
-                      className={styles.labelPanel}
+                      className={[
+                        styles.labelPanel,
+                        disabled ? styles.labelPanelDisabled : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
                       style={selected ? selectedPanelStyle(label.color) : undefined}
-                      ariaLabel={label.name}
+                      ariaLabel={
+                        disabled
+                          ? `${label.name} (already used in the other filter)`
+                          : label.name
+                      }
                     >
                       <div className={styles.labelPreview}>
                         <ComicBurstLabel

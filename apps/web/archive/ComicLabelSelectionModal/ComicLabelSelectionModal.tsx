@@ -37,7 +37,7 @@ export type ComicLabelSelectionModalProps =
 
 /**
  * Standalone assign/filter picker (archive / Storybook).
- * Prefer FilterManageLabelsModal or CreateAddLabelsModal for product entry points.
+ * Prefer LabelsFilterModal or CreateAddLabelsModal for product entry points.
  */
 export function ComicLabelSelectionModal(props: ComicLabelSelectionModalProps) {
   const { open, onClose } = props;

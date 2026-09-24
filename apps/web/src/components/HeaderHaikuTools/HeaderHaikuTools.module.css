@@ -95,6 +95,21 @@
   filter: drop-shadow(0 0.1rem 0.15rem rgb(0 0 0 / 25%));
 }
 
+.filterChipExclude {
+  opacity: 0.72;
+}
+
+.filterChipExclude::after {
+  content: "";
+  position: absolute;
+  inset: 45% 8%;
+  z-index: 0;
+  height: 2px;
+  background: #111;
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+
 .filterChipBurst {
   display: block;
   max-width: 9rem;

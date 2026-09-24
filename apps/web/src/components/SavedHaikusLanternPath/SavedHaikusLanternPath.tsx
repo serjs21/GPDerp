@@ -15,6 +15,7 @@ export type SavedHaikusLanternPathProps = {
   creationChromeOpen?: boolean;
   searchString?: string;
   selectedLabelIds?: string[];
+  excludedLabelIds?: string[];
 };
 
 export const SavedHaikusLanternPath = forwardRef<
@@ -25,6 +26,7 @@ export const SavedHaikusLanternPath = forwardRef<
   creationChromeOpen = false,
   searchString = "",
   selectedLabelIds = [],
+  excludedLabelIds = [],
 }, ref) {
   const {
     haikus,
@@ -52,9 +54,16 @@ export const SavedHaikusLanternPath = forwardRef<
         haiku.labels.some((label) => selectedLabelIds.includes(label.id)),
       );
     }
+
+    if (excludedLabelIds.length > 0) {
+      result = result.filter(
+        (haiku) =>
+          !haiku.labels.some((label) => excludedLabelIds.includes(label.id)),
+      );
+    }
     
     return result;
-  }, [haikus, searchString, selectedLabelIds]);
+  }, [haikus, searchString, selectedLabelIds, excludedLabelIds]);
 
   const { onHaikuDeleted, onHaikuDeleteFailed, deleteFailedModal } = useHaikuDeleteController();
 
