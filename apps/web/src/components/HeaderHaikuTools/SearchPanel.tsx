@@ -105,13 +105,9 @@ function LabelFilterExtras({
                   seed={shape.id}
                   fontSize={14}
                 />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <span
                   className={toolStyles.filterChipExcludeMark}
-                  src="/cross.svg"
-                  alt=""
                   aria-hidden
-                  draggable={false}
                 />
                 <button
                   type="button"
