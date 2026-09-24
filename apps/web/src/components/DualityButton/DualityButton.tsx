@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   DUALITY_BUTTON_BASE_SRC,
+  DUALITY_BUTTON_DIRECTION_SRC,
   DUALITY_BUTTON_FLIP_MS,
 } from "./consts/dualityButtonConsts";
 import styles from "./DualityButton.module.css";
@@ -81,6 +82,14 @@ export function DualityButton({
       }}
     >
       <span className={styles.baseWrap} aria-hidden>
+        {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
+        <img
+          className={styles.direction}
+          src={DUALITY_BUTTON_DIRECTION_SRC}
+          alt=""
+          draggable={false}
+          decoding="async"
+        />
         {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
         <img
           className={styles.base}
