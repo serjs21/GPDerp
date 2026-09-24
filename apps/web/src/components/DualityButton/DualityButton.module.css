@@ -1,0 +1,97 @@
+.root {
+  --duality-flip-ms: 300ms;
+  --duality-ink: #231f20;
+  --duality-paper: #ffffff;
+
+  appearance: none;
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.25rem;
+  height: 4.25rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  line-height: 0;
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.root:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--duality-ink) 70%, #c44 30%);
+  outline-offset: 3px;
+}
+
+.root:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+.baseWrap {
+  position: absolute;
+  inset: 0;
+  transition: transform var(--duality-flip-ms) ease;
+  transform: rotate(0deg);
+  will-change: transform;
+}
+
+.flipped .baseWrap {
+  transform: rotate(180deg);
+}
+
+.base {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.icon {
+  position: absolute;
+  left: 50%;
+  z-index: 1;
+  width: 28%;
+  height: 28%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  transition: background-color var(--duality-flip-ms) ease;
+  /* Tint via mask so any public SVG can be black or white. */
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.iconTop {
+  top: 11%;
+  background-color: var(--duality-ink);
+}
+
+.iconBottom {
+  bottom: 11%;
+  background-color: var(--duality-paper);
+}
+
+.flipped .iconTop {
+  background-color: var(--duality-paper);
+}
+
+.flipped .iconBottom {
+  background-color: var(--duality-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .baseWrap,
+  .icon {
+    transition: none;
+  }
+}
