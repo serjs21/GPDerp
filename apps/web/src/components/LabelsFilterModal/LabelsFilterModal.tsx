@@ -112,7 +112,7 @@ export function LabelsFilterModal({
               panel: {
                 background: "sunburst",
                 color: "blue",
-                title: "See",
+                title: "To see",
                 ariaLabel: "See",
               },
               content: (
