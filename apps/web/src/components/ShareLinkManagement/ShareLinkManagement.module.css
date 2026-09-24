@@ -216,6 +216,15 @@
   pointer-events: none;
 }
 
+.previewFooter {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+  text-transform: none;
+  pointer-events: none;
+}
+
 .previewStat {
   display: inline-flex;
   align-items: center;

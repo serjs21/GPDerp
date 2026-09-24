@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import { Bangers, Geist, Geist_Mono, Noto_Serif_JP, Press_Start_2P, Zen_Kurenaido } from "next/font/google";
 import "@/theme/globals.css";
 import "magic.css/dist/magic.min.css";
@@ -56,6 +57,14 @@ const bangers = Bangers({
   display: "swap",
 });
 
+/** Street graffiti display (Flacucho — Gonzalo Gallardo, free for commercial use). */
+const flacucho = localFont({
+  src: "../fonts/flacucho/Flacucho-Regular.otf",
+  variable: "--font-flacucho",
+  display: "swap",
+  weight: "400",
+});
+
 export const metadata: Metadata = {
   title: "GPDerp!",
   description: "AI, but useless",
@@ -84,7 +93,7 @@ export default async function RootLayout({
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? process.env.GOOGLE_CLIENT_ID;
   
   return (
-    <html lang={initialLocale} data-theme={initialTheme} className={`${notoSerifJP.variable} ${zenKurenaido.variable} ${geistSans.variable} ${geistMono.variable} ${pressStart2P.variable} ${bangers.variable}`}>
+    <html lang={initialLocale} data-theme={initialTheme} className={`${notoSerifJP.variable} ${zenKurenaido.variable} ${geistSans.variable} ${geistMono.variable} ${pressStart2P.variable} ${bangers.variable} ${flacucho.variable}`}>
       <body>
         <AntdRegistry>
           <HtmlLoader />

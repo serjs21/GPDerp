@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 import type { ShareLinkListItem } from "@/api/shareLinks";
 import type { HaikuDto } from "@/api/haikus";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
+import { DateGraffiti } from "@/components/DateGraffiti";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { buildPreviewLanternTypographyStyle } from "@/components/Lantern/utils/previewLanternTypography";
@@ -135,11 +136,15 @@ export function ShareLinkManagementRow({
     />
   ) : undefined;
 
+  const createdAt = haiku?.createdAt ?? link.createdAt;
+  const previewFooter = <DateGraffiti date={createdAt} />;
+
   const lanternPanel = (
     <ComicPagePanel
       background="halftone"
       color="sky"
       title={lanternStats}
+      footer={previewFooter}
       contentAlign="center"
       className={[
         styles.lanternPanel,

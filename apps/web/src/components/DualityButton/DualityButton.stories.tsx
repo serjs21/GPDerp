@@ -32,6 +32,14 @@ export const AlphabeticSort: Story = {
   },
 };
 
+export const HitpointsSort: Story = {
+  args: {
+    topIconSrc: "/sort_button/hitpoints_high.svg",
+    bottomIconSrc: "/sort_button/hitpoints_low.svg",
+    "aria-label": "Toggle highest / lowest hitpoints",
+  },
+};
+
 function ControlledDemo() {
   const [flipped, setFlipped] = useState(false);
   return (

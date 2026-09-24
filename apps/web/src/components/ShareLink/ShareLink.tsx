@@ -5,6 +5,7 @@ import type { ShareLinkListItem } from "@/api/shareLinks";
 import type { HaikuDto } from "@/api/haikus";
 import * as shareLinksApi from "@/api/shareLinks";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
+import { DateGraffiti } from "@/components/DateGraffiti";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { buildPreviewLanternTypographyStyle } from "@/components/Lantern/utils/previewLanternTypography";
@@ -124,6 +125,22 @@ export function ShareLink({
   });
 
   const previewBody = haiku?.body ?? "";
+  const createdAt = haiku?.createdAt ?? link?.createdAt ?? null;
+  const previewFooter =
+    ctrl.active || createdAt ? (
+      <div className={managementStyles.previewFooter}>
+        {ctrl.active ? (
+          <PreviewLanternStats
+            hits={ctrl.hits}
+            time={ctrl.time}
+            hitsLabel={ctrl.hitsLabel}
+            timeLabel={ctrl.timeLabel}
+          />
+        ) : null}
+        {createdAt ? <DateGraffiti date={createdAt} /> : null}
+      </div>
+    ) : undefined;
+
   const lanternContent = haiku ? (
     <Lantern
       haiku={haiku}
@@ -155,16 +172,7 @@ export function ShareLink({
       span="full"
       background="halftone"
       color="sky"
-      footer={
-        ctrl.active ? (
-          <PreviewLanternStats
-            hits={ctrl.hits}
-            time={ctrl.time}
-            hitsLabel={ctrl.hitsLabel}
-            timeLabel={ctrl.timeLabel}
-          />
-        ) : undefined
-      }
+      footer={previewFooter}
       contentAlign="center"
       className={[
         managementStyles.lanternPanel,
