@@ -101,10 +101,10 @@
 
 .filterChipExcludeMark {
   position: absolute;
-  inset: -12% -8%;
+  right: 23%;
+  top: -22%;
+  height: 3rem;
   z-index: 0;
-  width: auto;
-  height: auto;
   object-fit: contain;
   pointer-events: none;
   user-select: none;
