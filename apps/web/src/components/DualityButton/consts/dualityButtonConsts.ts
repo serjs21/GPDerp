@@ -32,3 +32,18 @@ export const COVER_LABEL_FONT_MAX_REM = 0.95;
 export const COVER_LABEL_FONT_MIN_REM = 0.52;
 /** Approx Bangers uppercase glyph width in em. */
 export const COVER_LABEL_CHAR_EM = 0.62;
+
+/**
+ * Arrow rest angle on the concentric track (matches title arc center).
+ * CSS: 0° = 12 o'clock with radial translateY(-R).
+ */
+export const COVER_LABEL_ARROW_REST_DEG = COVER_LABEL_ARC_CENTER_DEG;
+/**
+ * How far behind the first title char the arrow starts (degrees, CCW =
+ * more negative in this CSS angle system).
+ */
+export const COVER_LABEL_ARROW_BEHIND_DEG = 42;
+/** How far the title spins clockwise while fading (degrees). */
+export const COVER_LABEL_TITLE_PUSH_DEG = 42;
+/** Arrow glyph chord width as a fraction of face diameter. */
+export const COVER_LABEL_ARROW_WIDTH_FRAC = 0.55;

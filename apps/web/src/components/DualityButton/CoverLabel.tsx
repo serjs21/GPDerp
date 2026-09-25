@@ -3,19 +3,21 @@
 import { useRef, type CSSProperties } from "react";
 import {
   COVER_LABEL_ARC_GAP_REM,
+  COVER_LABEL_ARROW_WIDTH_FRAC,
   DUALITY_BUTTON_DIRECTION_SRC,
   DUALITY_BUTTON_SIZE_REM,
 } from "./consts/dualityButtonConsts";
 import styles from "./CoverLabel.module.css";
 import { useCoverLabelMorph } from "./useCoverLabelMorph";
 import {
+  coverLabelArrowStartDeg,
   coverLabelCharAngles,
   coverLabelFontSizeRem,
 } from "./utils/coverLabelArcUtils";
 
 export type CoverLabelProps = {
   title: string;
-  /** When true, flips title chars out and the direction arrow in. */
+  /** When true, arrow pushes title along the arc and title fades out. */
   expanded: boolean;
   /** Face diameter in rem — used to size the concentric title arc. */
   sizeRem?: number;
@@ -25,9 +27,8 @@ export type CoverLabelProps = {
 };
 
 /**
- * Direction-slot cue: title sits on an arc concentric with the face circle.
- * On open, the arrow rises from behind on its rotateX hinge and pushes the
- * title outward while it fades.
+ * Title + arrow on one concentric track around the face. On open, the arrow
+ * rotates in from behind the title, pushes it clockwise, and the title fades.
  */
 export function CoverLabel({
   title,
@@ -37,16 +38,18 @@ export function CoverLabel({
   onMorphComplete,
   className,
 }: CoverLabelProps) {
+  const cueRef = useRef<HTMLSpanElement>(null);
   const titleLineRef = useRef<HTMLSpanElement>(null);
-  const arrowFaceRef = useRef<HTMLSpanElement>(null);
   const chars = Array.from(title);
   const angles = coverLabelCharAngles(chars.length);
   const fontSizeRem = coverLabelFontSizeRem(chars.length, sizeRem);
+  const arrowStartDeg = coverLabelArrowStartDeg(chars.length);
 
   useCoverLabelMorph(
     expanded,
+    cueRef,
     titleLineRef,
-    arrowFaceRef,
+    chars.length,
     uncoverMs,
     onMorphComplete,
   );
@@ -54,10 +57,14 @@ export function CoverLabel({
   const cueStyle = {
     "--cover-label-arc-gap": `${COVER_LABEL_ARC_GAP_REM}rem`,
     "--cover-label-font-size": `${fontSizeRem}rem`,
+    "--cover-label-arrow-width": String(COVER_LABEL_ARROW_WIDTH_FRAC),
+    "--arrow-angle": `${arrowStartDeg}deg`,
+    "--title-spin": "0deg",
   } as CSSProperties;
 
   return (
     <span
+      ref={cueRef}
       className={[styles.cue, className].filter(Boolean).join(" ")}
       style={cueStyle}
       aria-hidden
@@ -81,7 +88,7 @@ export function CoverLabel({
           ))}
         </span>
         <span className={styles.arrowSlot}>
-          <span ref={arrowFaceRef} className={styles.arrowFace}>
+          <span className={styles.arrowFace}>
             {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
             <img
               className={styles.arrow}
