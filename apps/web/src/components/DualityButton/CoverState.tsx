@@ -43,7 +43,7 @@ export type CoverStateProps = {
 } & Omit<DualityButtonProps, "className" | "style" | "showDirection">;
 
 /**
- * Duality face with CoverIcon (same-size disk; exits with magic.css rotateRight)
+ * Duality face with CoverIcon (same-size disk; coin-flips out on the vertical axis)
  * and CoverLabel (title↔arrow rotateX flip in the direction slot).
  */
 export function CoverState({

@@ -13,6 +13,8 @@
   overflow: visible;
   flex: 0 0 auto;
   line-height: 0;
+  perspective: 800px;
+  perspective-origin: 50% 50%;
 }
 
 .face {

@@ -9,7 +9,7 @@ export type CoverIconProps = {
   backgroundColor?: string;
   className?: string;
   style?: CSSProperties;
-  /** When true, exits with magic.css `rotateRight`. */
+  /** When true, exits with a vertical-axis coin flip. */
   dismissing?: boolean;
   onDismissComplete?: () => void;
 };
@@ -40,7 +40,7 @@ export function CoverIcon({
 
   const onAnimationEnd = (event: AnimationEvent<HTMLSpanElement>) => {
     if (!dismissing) return;
-    if (!event.animationName.toLowerCase().includes("rotateright")) return;
+    if (!event.animationName.toLowerCase().includes("covercoinflipout")) return;
     onDismissComplete?.();
   };
 
@@ -54,7 +54,7 @@ export function CoverIcon({
     <span
       className={[
         styles.disk,
-        dismissing ? `magictime rotateRight ${styles.diskExiting}` : "",
+        dismissing ? styles.diskExiting : "",
         className,
       ]
         .filter(Boolean)
