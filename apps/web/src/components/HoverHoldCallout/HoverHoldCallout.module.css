@@ -6,13 +6,22 @@
   max-width: 100%;
 }
 
+/* Fixed box matching the trigger; callout is absolutely placed inside. */
+.portalAnchor {
+  position: fixed;
+  z-index: 1050;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+}
+
 .callout {
   position: absolute;
-  z-index: 5;
+  z-index: 1;
   margin: 0;
   pointer-events: none;
   opacity: 0;
-  transition: opacity var(--hover-hold-fade-ms) ease;
+  transition: opacity var(--hover-hold-fade-ms, 200ms) ease;
 }
 
 .calloutVisible {

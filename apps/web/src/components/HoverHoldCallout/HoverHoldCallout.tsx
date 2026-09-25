@@ -3,11 +3,13 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
   type ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
 import styles from "./HoverHoldCallout.module.css";
 import {
   buildCalloutPositionStyle,
@@ -19,7 +21,8 @@ export type HoverHoldCalloutProps = {
   /** Overlay content (e.g. speech bubble). */
   callout: ReactNode;
   /**
-   * Absolute placement of the callout inside this area.
+   * Absolute placement of the callout relative to the trigger box
+   * (portaled to `document.body` as a fixed anchor matching the trigger).
    * Defaults to top-centered above the children.
    */
   position?: CalloutPosition;
@@ -37,9 +40,17 @@ const DEFAULT_POSITION: CalloutPosition = {
   transform: "translate(-50%, calc(-100% - 0.55rem))",
 };
 
+type AnchorBox = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
+
 /**
- * Shows an absolutely positioned callout on hover.
- * A click holds it open for `holdMs`, then fades out over `fadeMs`.
+ * Shows a callout on hover, portaled to `document.body` so it stacks above
+ * clipped/overflow ancestors. A click holds it open for `holdMs`, then fades
+ * out over `fadeMs`.
  */
 export function HoverHoldCallout({
   children,
@@ -50,11 +61,17 @@ export function HoverHoldCallout({
   className,
   calloutClassName,
 }: HoverHoldCalloutProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const [hovered, setHovered] = useState(false);
   const [held, setHeld] = useState(false);
   const [fading, setFading] = useState(false);
+  const [anchor, setAnchor] = useState<AnchorBox | null>(null);
+  const [portalReady, setPortalReady] = useState(false);
   const hoveredRef = useRef(false);
+  const heldRef = useRef(false);
   const timersRef = useRef<number[]>([]);
+
+  heldRef.current = held;
 
   const clearTimers = useCallback(() => {
     for (const id of timersRef.current) window.clearTimeout(id);
@@ -62,6 +79,45 @@ export function HoverHoldCallout({
   }, []);
 
   useEffect(() => () => clearTimers(), [clearTimers]);
+
+  useEffect(() => {
+    setPortalReady(true);
+  }, []);
+
+  const syncAnchor = useCallback(() => {
+    const node = rootRef.current;
+    if (!node) return;
+    const rect = node.getBoundingClientRect();
+    setAnchor({
+      left: rect.left,
+      top: rect.top,
+      width: rect.width,
+      height: rect.height,
+    });
+  }, []);
+
+  const open = hovered || held;
+  const mounted = open || fading;
+  const visible = open && !fading;
+
+  useLayoutEffect(() => {
+    if (!mounted) {
+      setAnchor(null);
+      return;
+    }
+    syncAnchor();
+  }, [mounted, syncAnchor]);
+
+  useEffect(() => {
+    if (!mounted) return;
+    const onReposition = () => syncAnchor();
+    window.addEventListener("scroll", onReposition, true);
+    window.addEventListener("resize", onReposition);
+    return () => {
+      window.removeEventListener("scroll", onReposition, true);
+      window.removeEventListener("resize", onReposition);
+    };
+  }, [mounted, syncAnchor]);
 
   const beginFadeOut = useCallback(() => {
     setFading(true);
@@ -81,7 +137,7 @@ export function HoverHoldCallout({
   const onLeave = () => {
     hoveredRef.current = false;
     setHovered(false);
-    if (!held) beginFadeOut();
+    if (!heldRef.current) beginFadeOut();
   };
 
   const onClick = () => {
@@ -96,16 +152,44 @@ export function HoverHoldCallout({
     timersRef.current.push(holdId);
   };
 
-  const open = hovered || held;
-  const mounted = open || fading;
-  const visible = open && !fading;
-
   const rootStyle = {
     "--hover-hold-fade-ms": `${fadeMs}ms`,
   } as CSSProperties;
 
+  const portal =
+    portalReady && mounted && anchor
+      ? createPortal(
+          <div
+            className={styles.portalAnchor}
+            style={{
+              left: anchor.left,
+              top: anchor.top,
+              width: anchor.width,
+              height: anchor.height,
+              ["--hover-hold-fade-ms" as string]: `${fadeMs}ms`,
+            }}
+            aria-hidden={!visible}
+          >
+            <div
+              className={[
+                styles.callout,
+                visible ? styles.calloutVisible : styles.calloutFading,
+                calloutClassName,
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              style={buildCalloutPositionStyle(position)}
+            >
+              {callout}
+            </div>
+          </div>,
+          document.body,
+        )
+      : null;
+
   return (
     <div
+      ref={rootRef}
       className={[styles.root, className].filter(Boolean).join(" ")}
       style={rootStyle}
       onMouseEnter={onEnter}
@@ -113,21 +197,7 @@ export function HoverHoldCallout({
       onClick={onClick}
     >
       {children}
-      {mounted ? (
-        <div
-          className={[
-            styles.callout,
-            visible ? styles.calloutVisible : styles.calloutFading,
-            calloutClassName,
-          ]
-            .filter(Boolean)
-            .join(" ")}
-          style={buildCalloutPositionStyle(position)}
-          aria-hidden={!visible}
-        >
-          {callout}
-        </div>
-      ) : null}
+      {portal}
     </div>
   );
 }
