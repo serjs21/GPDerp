@@ -77,7 +77,7 @@ export const Controlled: Story = {
   render: () => <ControlledDemo />,
 };
 
-/** Covered time sort — click slides the cover overlay down to reveal the face. */
+/** Covered time sort — CoverIcon over the base; CoverLabel morphs into the arrow. */
 export const TimeCover: Story = {
   name: "Time cover",
   args: {
@@ -92,7 +92,7 @@ export const TimeCover: Story = {
         flexDirection: "column",
         alignItems: "center",
         gap: "2.5rem",
-        paddingTop: "1rem",
+        paddingTop: "1.5rem",
       }}
     >
       <CoverState
@@ -104,7 +104,7 @@ export const TimeCover: Story = {
         aria-label="Toggle newest / oldest"
       />
       <p style={{ margin: 0, fontFamily: "system-ui", fontSize: "0.8rem", opacity: 0.75 }}>
-        Click — icon overlay slides down; title sits where the arrow is
+        Click — icon cover clears; title flips into the direction arrow
       </p>
     </div>
   ),

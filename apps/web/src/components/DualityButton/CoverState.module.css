@@ -1,6 +1,5 @@
 .shell {
   --duality-cover-uncover-ms: 420ms;
-  --duality-ink: #231f20;
   --duality-face-size: 4.25rem;
 
   position: relative;
@@ -28,90 +27,24 @@
   pointer-events: none;
 }
 
-.cover {
+.hit {
   appearance: none;
   position: absolute;
   inset: 0;
-  z-index: 2;
-  box-sizing: border-box;
-  width: 100%;
-  height: 100%;
+  z-index: 4;
   margin: 0;
   padding: 0;
   border: none;
   border-radius: 50%;
   background: transparent;
   cursor: pointer;
-  overflow: hidden;
-  line-height: 0;
 }
 
-.cover:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--duality-ink) 70%, #c44 30%);
+.hit:focus-visible {
+  outline: 2px solid color-mix(in srgb, #231f20 70%, #c44 30%);
   outline-offset: 3px;
 }
 
-.cover:disabled {
+.hit:disabled {
   cursor: default;
-}
-
-/* Icon-only cover overlay — no fill; duality face stays visible underneath. */
-.overlay {
-  position: absolute;
-  inset: 0;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: transparent;
-  will-change: transform;
-}
-
-.icon {
-  display: block;
-  width: 72%;
-  height: 72%;
-  object-fit: contain;
-  pointer-events: none;
-  user-select: none;
-}
-
-/* Matches DualityButton .direction placement (outside the face disk). */
-.titleLayer {
-  position: absolute;
-  left: 33%;
-  top: 0;
-  z-index: 3;
-  width: 72%;
-  height: 50%;
-  transform: translate(-50%, -65%) rotate(-12deg);
-  overflow: visible;
-  pointer-events: none;
-  will-change: opacity, transform;
-}
-
-.titleSvg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.titleText {
-  fill: var(--duality-ink);
-  font-family: var(--font-comic-label), "Bangers", sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .overlay,
-  .titleLayer {
-    transition: none;
-  }
 }

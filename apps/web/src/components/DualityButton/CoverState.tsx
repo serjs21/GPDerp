@@ -1,34 +1,32 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
-  useId,
-  useRef,
   useState,
   type CSSProperties,
 } from "react";
-import { COVER_TITLE_ARC_D } from "./consts/coverStateConsts";
 import {
   DUALITY_BUTTON_SIZE_REM,
   DUALITY_COVER_UNCOVER_MS,
 } from "./consts/dualityButtonConsts";
+import { CoverIcon } from "./CoverIcon";
+import { CoverLabel } from "./CoverLabel";
 import styles from "./CoverState.module.css";
 import {
   DualityButton,
   type DualityButtonProps,
 } from "./DualityButton";
-import { useCoverStateUncover } from "./useCoverStateUncover";
 
 export type CoverStateProps = {
   /** Cover glyph (e.g. `/sort_button/time_cover.svg`). */
   iconSrc: string;
-  /** Curved label seated where the direction arrow lives (outside the face). */
+  /** Title in the direction-arrow slot; morphs into the arrow on open. */
   title: string;
   /** Controlled uncovered state. */
   uncovered?: boolean;
   defaultUncovered?: boolean;
   onUncoveredChange?: (uncovered: boolean) => void;
-  /** Overlay slide duration (ms). */
   uncoverMs?: number;
   className?: string;
   style?: CSSProperties;
@@ -37,9 +35,9 @@ export type CoverStateProps = {
 } & Omit<DualityButtonProps, "className" | "style" | "showDirection">;
 
 /**
- * Duality face + icon cover overlay (no fill) in one shell.
- * Title sits outside the face in the direction-arrow slot.
- * Click slides the icon overlay down to reveal the button.
+ * Duality face with CoverIcon (disk over the base) and CoverLabel (title↔arrow
+ * in the direction slot). Open removes the icon overlay and flips the label
+ * into the direction arrow (RestartLinkButton-style rotateX).
  */
 export function CoverState({
   iconSrc,
@@ -55,46 +53,44 @@ export function CoverState({
   "aria-label": ariaLabel,
   ...dualityProps
 }: CoverStateProps) {
-  const reactId = useId();
-  const arcId = `cover-arc-${reactId.replace(/:/g, "")}`;
   const isControlled = uncoveredProp != null;
   const [uncoveredInternal, setUncoveredInternal] = useState(defaultUncovered);
   const uncovered = isControlled ? uncoveredProp! : uncoveredInternal;
-  const [coverMounted, setCoverMounted] = useState(!uncovered);
-
-  const overlayRef = useRef<HTMLSpanElement>(null);
-  const titleRef = useRef<HTMLSpanElement>(null);
-  const { run, cancel } = useCoverStateUncover(uncoverMs);
-
-  useEffect(() => () => cancel(), [cancel]);
+  const [opening, setOpening] = useState(false);
+  const [iconMounted, setIconMounted] = useState(!uncovered);
+  const [labelMounted, setLabelMounted] = useState(true);
 
   useEffect(() => {
-    if (!uncovered) setCoverMounted(true);
+    if (!uncovered) {
+      setOpening(false);
+      setIconMounted(true);
+      setLabelMounted(true);
+    }
   }, [uncovered]);
 
-  const setUncovered = (next: boolean) => {
-    if (!isControlled) setUncoveredInternal(next);
-    onUncoveredChange?.(next);
-  };
-
-  const finishUncover = () => {
-    setUncovered(true);
-    setCoverMounted(false);
-  };
+  const onMorphComplete = useCallback(() => {
+    if (!isControlled) setUncoveredInternal(true);
+    onUncoveredChange?.(true);
+    setOpening(false);
+    setIconMounted(false);
+    // Hand the cue off to DualityButton.direction (rotates with the face).
+    setLabelMounted(false);
+  }, [isControlled, onUncoveredChange]);
 
   const onCoverClick = () => {
-    if (disabled || uncovered || !coverMounted) return;
-    run(
-      { overlay: overlayRef.current, title: titleRef.current },
-      finishUncover,
-    );
+    if (disabled || uncovered || opening) return;
+    setOpening(true);
   };
 
   const rootStyle = {
     ...style,
     "--duality-cover-uncover-ms": `${uncoverMs}ms`,
     "--duality-face-size": `${DUALITY_BUTTON_SIZE_REM}rem`,
+    "--cover-icon-dismiss-ms": `${uncoverMs}ms`,
   } as CSSProperties;
+
+  const coverActive = !uncovered && (iconMounted || labelMounted);
+  const labelExpanded = opening || uncovered;
 
   return (
     <div
@@ -103,56 +99,35 @@ export function CoverState({
     >
       <DualityButton
         {...dualityProps}
-        className={[styles.face, coverMounted ? styles.faceInert : ""]
+        className={[styles.face, coverActive ? styles.faceInert : ""]
           .filter(Boolean)
           .join(" ")}
-        disabled={disabled || coverMounted}
-        showDirection={!coverMounted}
+        disabled={disabled || coverActive}
+        showDirection={!labelMounted}
         aria-label={ariaLabel}
       />
 
-      {coverMounted ? (
-        <>
-          <span ref={titleRef} className={styles.titleLayer} aria-hidden>
-            <svg
-              className={styles.titleSvg}
-              viewBox="0 0 100 60"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <defs>
-                <path id={arcId} d={COVER_TITLE_ARC_D} fill="none" />
-              </defs>
-              <text className={styles.titleText}>
-                <textPath
-                  href={`#${arcId}`}
-                  startOffset="50%"
-                  textAnchor="middle"
-                >
-                  {title}
-                </textPath>
-              </text>
-            </svg>
-          </span>
+      {labelMounted ? (
+        <CoverLabel
+          title={title}
+          expanded={labelExpanded}
+          uncoverMs={uncoverMs}
+          onMorphComplete={opening ? onMorphComplete : undefined}
+        />
+      ) : null}
 
-          <button
-            type="button"
-            className={styles.cover}
-            aria-label={coverAriaLabel ?? `Reveal ${title}`}
-            disabled={disabled}
-            onClick={onCoverClick}
-          >
-            <span ref={overlayRef} className={styles.overlay}>
-              {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
-              <img
-                className={styles.icon}
-                src={iconSrc}
-                alt=""
-                draggable={false}
-                decoding="async"
-              />
-            </span>
-          </button>
-        </>
+      {iconMounted ? (
+        <CoverIcon iconSrc={iconSrc} dismissing={opening || uncovered} />
+      ) : null}
+
+      {coverActive ? (
+        <button
+          type="button"
+          className={styles.hit}
+          aria-label={coverAriaLabel ?? `Reveal ${title}`}
+          disabled={disabled || opening}
+          onClick={onCoverClick}
+        />
       ) : null}
     </div>
   );

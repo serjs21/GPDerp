@@ -1,0 +1,66 @@
+/* Matches DualityButton .direction placement. */
+.cue {
+  --duality-ink: #231f20;
+
+  position: absolute;
+  left: 33%;
+  top: 0;
+  z-index: 3;
+  width: 52%;
+  height: 50%;
+  transform: translate(-50%, -65%) rotate(-12deg);
+  overflow: visible;
+  pointer-events: none;
+  line-height: 1;
+}
+
+.flipStage {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  perspective: 280px;
+}
+
+.titleLine,
+.arrowFace {
+  grid-area: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.titleLine {
+  color: var(--duality-ink);
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.arrowFace {
+  transform: rotateX(-90deg);
+}
+
+.char {
+  display: inline-block;
+  transform-origin: 50% 50%;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.arrow {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  transform-origin: 50% 50%;
+  backface-visibility: hidden;
+}
