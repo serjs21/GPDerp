@@ -6,6 +6,7 @@ import {
   type ComicPanelBackground,
   type ComicPanelColor,
 } from "@/components/ComicPageLayout";
+import { HoverHoldCallout } from "@/components/HoverHoldCallout";
 import styles from "./LabelActions.module.css";
 
 const TUNE_IN_SRC = "/profile/label_actions/tune_in.svg";
@@ -14,6 +15,14 @@ const EDIT_SRC = "/profile/label_actions/edit.svg";
 const DELETE_SRC = "/profile/label_actions/delete.svg";
 
 const DELETE_HOVER = "var(--accent-red, #aa1f3f)";
+
+const TUNE_IN_DISABLED_CALLOUT_POSITION = {
+  left: "50%",
+  top: "0.2rem",
+  transform: "translate(-50%, calc(-100% - 0.35rem))",
+} as const;
+
+const TUNE_IN_DISABLED_MESSAGE = "There's no use in searching for me";
 
 export type LabelActionsProps = {
   labelName: string;
@@ -158,33 +167,52 @@ export function LabelActions({
   onDelete,
   className,
 }: LabelActionsProps) {
+  const tuneInButton = (
+    <LabelActionButton
+      src={hasConnections ? TUNE_IN_SRC : NOT_CONNECTED_ACTION_SRC}
+      caption={hasConnections ? "Tune in" : undefined}
+      layout={hasConnections ? "iconEnd" : "iconOnly"}
+      color={hasConnections ? "#9ffbff" : "sky"}
+      background={hasConnections ? "solid" : "sunburst"}
+      captionClassName={hasConnections ? styles.captionTuneIn : undefined}
+      iconClassName={
+        hasConnections ? styles.iconTuneIn : styles.iconNotConnected
+      }
+      inkOnSkyIcon={!hasConnections}
+      selected
+      ariaLabel={
+        hasConnections
+          ? `Tune in to haikus labeled ${labelName}`
+          : `No haikus labeled ${labelName}`
+      }
+      onSelect={onTuneIn}
+      disabled={!hasConnections}
+      hoverFill={"#52f8ff"}
+    />
+  );
+
   return (
     <div
       className={[styles.stack, className].filter(Boolean).join(" ")}
       role="group"
       aria-label={`Actions for ${labelName}`}
     >
-      <LabelActionButton
-        src={hasConnections ? TUNE_IN_SRC : NOT_CONNECTED_ACTION_SRC}
-        caption={hasConnections ? "Tune in" : undefined}
-        layout={hasConnections ? "iconEnd" : "iconOnly"}
-        color={hasConnections ? "#9ffbff" : "sky"}
-        background={hasConnections ? "solid" : "sunburst"}
-        captionClassName={hasConnections ? styles.captionTuneIn : undefined}
-        iconClassName={
-          hasConnections ? styles.iconTuneIn : styles.iconNotConnected
-        }
-        inkOnSkyIcon={!hasConnections}
-        selected
-        ariaLabel={
-          hasConnections
-            ? `Tune in to haikus labeled ${labelName}`
-            : `No haikus labeled ${labelName}`
-        }
-        onSelect={onTuneIn}
-        disabled={!hasConnections}
-        hoverFill={'#52f8ff'}
-      />
+      {hasConnections ? (
+        tuneInButton
+      ) : (
+        <HoverHoldCallout
+          className={styles.tuneInCallout}
+          holdMs={3000}
+          fadeMs={200}
+          position={TUNE_IN_DISABLED_CALLOUT_POSITION}
+          callout={
+            <div className={styles.speechBubble}>{TUNE_IN_DISABLED_MESSAGE}</div>
+          }
+          calloutClassName={styles.speechBubbleSlot}
+        >
+          {tuneInButton}
+        </HoverHoldCallout>
+      )}
       <LabelActionButton
         src={EDIT_SRC}
         caption="Edit"
@@ -194,7 +222,7 @@ export function LabelActions({
         iconClassName={styles.iconEdit}
         ariaLabel={`Edit ${labelName}`}
         onSelect={onEdit}
-        hoverFill={'#6dfe73'}
+        hoverFill={"#6dfe73"}
       />
       <LabelActionButton
         src={DELETE_SRC}
