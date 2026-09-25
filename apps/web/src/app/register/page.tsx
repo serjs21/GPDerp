@@ -1,13 +1,22 @@
-'use client';
+"use client";
 
 import { Card, Typography } from "@/components/StyledComponents";
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import authStyles from '../auth.shared.module.css';
-import { RegisterFlow } from '@/components/AuthFlows/RegisterFlow';
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import authStyles from "../auth.shared.module.css";
+import { RegisterFlow } from "@/components/AuthFlows/RegisterFlow";
+import {
+  consumePostLoginReturn,
+  ensurePostLoginReturnFromReferrer,
+} from "@/utils/auth/postLoginReturn";
 
 const RegisterPage = () => {
   const router = useRouter();
+
+  useEffect(() => {
+    ensurePostLoginReturnFromReferrer();
+  }, []);
 
   return (
     <div className={authStyles.authPage}>
@@ -15,7 +24,7 @@ const RegisterPage = () => {
         <RegisterFlow
           showGoogle
           onSuccess={() => {
-            router.replace('/');
+            router.replace(consumePostLoginReturn("/"));
             router.refresh();
           }}
         />

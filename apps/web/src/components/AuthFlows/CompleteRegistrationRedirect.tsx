@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
+import { savePostLoginReturn } from "@/utils/auth/postLoginReturn";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -25,6 +26,7 @@ export function CompleteRegistrationRedirect() {
     if (!user.emailVerifiedAt) return;
     const needsUsername = user.userName == null || user.userName === "";
     if (needsUsername) {
+      savePostLoginReturn(undefined, { overwrite: true });
       router.replace("/complete-registration");
     }
   }, [initialized, isLoggedIn, user.emailVerifiedAt, user.userName, pathname, router]);

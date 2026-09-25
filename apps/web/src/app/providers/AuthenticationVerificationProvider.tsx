@@ -22,6 +22,7 @@ import {
   cancelAuthRequestQueue,
   flushAuthRequestQueue,
 } from "@/axios.setup";
+import { savePostLoginReturn } from "@/utils/auth/postLoginReturn";
 import { useAuthenticationState } from "./AuthenticationProvider";
 
 type AuthModalMode = "login" | "register";
@@ -74,6 +75,7 @@ export function AuthenticationVerificationProvider({ children }: { children: Rea
   }, []);
 
   const openAuthenticationModal = useCallback((initialMode: AuthModalMode = "login") => {
+    savePostLoginReturn(undefined, { overwrite: true });
     setAuthModalMode(initialMode);
     setIsAuthModalOpen(true);
   }, []);

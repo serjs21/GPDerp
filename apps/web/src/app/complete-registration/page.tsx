@@ -13,6 +13,7 @@ import {
 } from "@/api/authentication";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { MIN_USERNAME_LENGTH } from "@/hooks/useRegistration";
+import { consumePostLoginReturn } from "@/utils/auth/postLoginReturn";
 
 type FormValues = { userName: string };
 
@@ -33,7 +34,7 @@ const CompleteRegistrationPage = () => {
       return;
     }
     if (user.userName) {
-      router.replace("/");
+      router.replace(consumePostLoginReturn("/"));
     }
   }, [initialized, isLoggedIn, user.emailVerifiedAt, user.userName, router]);
 
@@ -52,7 +53,7 @@ const CompleteRegistrationPage = () => {
       await completeRegistrationUsername({ userName: values.userName.trim() });
       comicToast.success("You’re all set");
       checkAuthentication();
-      router.replace("/");
+      router.replace(consumePostLoginReturn("/"));
       router.refresh();
     } catch (e: unknown) {
       if (axios.isAxiosError(e) && e.response?.data) {
