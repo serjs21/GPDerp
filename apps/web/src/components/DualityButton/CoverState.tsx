@@ -34,6 +34,8 @@ export type CoverStateProps = {
   onUncoveredChange?: (uncovered: boolean) => void;
   /** CoverLabel morph duration (ms). CoverIcon exit is fixed at 1.5s. */
   labelMorphMs?: number;
+  /** Round CoverIcon label fill. Defaults to paper white. */
+  coverBackgroundColor?: string;
   className?: string;
   style?: CSSProperties;
   /** Accessible name for the cover control. Defaults to `Reveal {title}`. */
@@ -52,6 +54,7 @@ export function CoverState({
   defaultUncovered = false,
   onUncoveredChange,
   labelMorphMs = COVER_LABEL_MORPH_MS,
+  coverBackgroundColor,
   className,
   style,
   coverAriaLabel,
@@ -121,6 +124,7 @@ export function CoverState({
       {iconMounted ? (
         <CoverIcon
           iconSrc={iconSrc}
+          backgroundColor={coverBackgroundColor}
           dismissing={opening || uncovered}
           onDismissComplete={opening ? onOpenComplete : undefined}
         />

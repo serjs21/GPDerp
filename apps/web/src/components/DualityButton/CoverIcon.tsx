@@ -5,6 +5,8 @@ import styles from "./CoverIcon.module.css";
 
 export type CoverIconProps = {
   iconSrc: string;
+  /** Round label fill. Defaults to paper white. */
+  backgroundColor?: string;
   className?: string;
   style?: CSSProperties;
   /** When true, exits with magic.css `rotateRight`. */
@@ -24,6 +26,7 @@ function prefersReducedMotion() {
  */
 export function CoverIcon({
   iconSrc,
+  backgroundColor,
   className,
   style,
   dismissing = false,
@@ -41,6 +44,12 @@ export function CoverIcon({
     onDismissComplete?.();
   };
 
+  const diskStyle = (
+    backgroundColor
+      ? { ...style, "--cover-icon-bg-color": backgroundColor }
+      : style
+  ) as CSSProperties | undefined;
+
   return (
     <span
       className={[
@@ -50,7 +59,7 @@ export function CoverIcon({
       ]
         .filter(Boolean)
         .join(" ")}
-      style={style}
+      style={diskStyle}
       aria-hidden
       onAnimationEnd={onAnimationEnd}
     >

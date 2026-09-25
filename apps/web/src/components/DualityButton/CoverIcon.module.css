@@ -1,6 +1,7 @@
 .disk {
   --duality-ink: #231f20;
   --duality-paper: #ffffff;
+  --cover-icon-bg: var(--cover-icon-bg-color, var(--duality-paper));
 
   position: absolute;
   inset: 0;
@@ -13,14 +14,17 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: var(--duality-paper);
+  background-color: var(--cover-icon-bg);
+  box-shadow: inset 0 0 0 2px var(--duality-ink);
+  overflow: hidden;
   pointer-events: none;
 }
 
-/* magic.css rotateRight — transparent fill; 1.5s exit (COVER_ICON_EXIT_MS). */
+/* magic.css rotateRight — drop fill on exit so opacity fade does not wash the base. */
 .diskExiting {
-  background: transparent;
-  animation-duration: 1s;
+  background-color: transparent;
+  box-shadow: none;
+  animation-duration: 1.5s;
   animation-fill-mode: both;
 }
 
