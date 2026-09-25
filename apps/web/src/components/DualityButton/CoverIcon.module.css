@@ -20,10 +20,8 @@
   pointer-events: none;
 }
 
-/* magic.css rotateRight — drop fill on exit so opacity fade does not wash the base. */
+/* magic.css rotateRight — full disk (fill + icon) exits together. */
 .diskExiting {
-  background-color: transparent;
-  box-shadow: none;
   animation-duration: 1.5s;
   animation-fill-mode: both;
 }
