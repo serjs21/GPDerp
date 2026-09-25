@@ -31,6 +31,8 @@ export type DualityButtonProps = {
   /** Initial flip when uncontrolled. */
   defaultFlipped?: boolean;
   onFlippedChange?: (flipped: boolean) => void;
+  /** When false, hides the curved direction cue (e.g. while a cover overlay is up). */
+  showDirection?: boolean;
   disabled?: boolean;
   className?: string;
   style?: CSSProperties;
@@ -50,6 +52,7 @@ export function DualityButton({
   flipped: flippedProp,
   defaultFlipped = false,
   onFlippedChange,
+  showDirection = true,
   disabled = false,
   className,
   style,
@@ -98,14 +101,16 @@ export function DualityButton({
       }}
     >
       <span className={styles.baseWrap} aria-hidden>
-        {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
-        <img
-          className={styles.direction}
-          src={DUALITY_BUTTON_DIRECTION_SRC}
-          alt=""
-          draggable={false}
-          decoding="async"
-        />
+        {showDirection ? (
+          // eslint-disable-next-line @next/next/no-img-element -- static public SVG
+          <img
+            className={styles.direction}
+            src={DUALITY_BUTTON_DIRECTION_SRC}
+            alt=""
+            draggable={false}
+            decoding="async"
+          />
+        ) : null}
         {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
         <img
           className={styles.base}

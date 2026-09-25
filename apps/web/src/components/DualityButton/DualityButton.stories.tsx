@@ -77,7 +77,7 @@ export const Controlled: Story = {
   render: () => <ControlledDemo />,
 };
 
-/** Covered time sort — click drops the icon disk and draws the direction arrow. */
+/** Covered time sort — click slides the cover overlay down to reveal the face. */
 export const TimeCover: Story = {
   name: "Time cover",
   args: {
@@ -92,22 +92,19 @@ export const TimeCover: Story = {
         flexDirection: "column",
         alignItems: "center",
         gap: "2.5rem",
-        paddingTop: "2rem",
+        paddingTop: "1rem",
       }}
     >
       <CoverState
         iconSrc="/sort_button/time_cover.svg"
         title="Time"
-        aria-label="Reveal time sort"
-      >
-        <DualityButton
-          topIconSrc="/sort_button/time_new.svg"
-          bottomIconSrc="/sort_button/time_old.svg"
-          aria-label="Toggle newest / oldest"
-        />
-      </CoverState>
+        coverAriaLabel="Reveal time sort"
+        topIconSrc="/sort_button/time_new.svg"
+        bottomIconSrc="/sort_button/time_old.svg"
+        aria-label="Toggle newest / oldest"
+      />
       <p style={{ margin: 0, fontFamily: "system-ui", fontSize: "0.8rem", opacity: 0.75 }}>
-        Click cover — title becomes arrow, icon drops
+        Click — cover slides down over the duality face
       </p>
     </div>
   ),
