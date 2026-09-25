@@ -15,3 +15,20 @@ export const COVER_LABEL_MORPH_MS = 420;
 
 /** Face / cover disk size (matches DualityButton.root). */
 export const DUALITY_BUTTON_SIZE_REM = 4.25;
+
+/**
+ * CoverLabel title arc — CSS angles with radial `translateY(-R)`:
+ * 0° = 12 o'clock, negative = toward 9 o'clock (top-left). Gap sits just
+ * outside the face rim so the baseline matches the label circle.
+ */
+export const COVER_LABEL_ARC_CENTER_DEG = -18;
+/** Total angular width of the title arc (keeps long labels on the top rim). */
+export const COVER_LABEL_ARC_SPAN_DEG = 96;
+/** Extra radius beyond half face size (rem). */
+export const COVER_LABEL_ARC_GAP_REM = 0.42;
+/** Max title font size (rem) when the arc has room. */
+export const COVER_LABEL_FONT_MAX_REM = 0.95;
+/** Min title font size (rem) for long labels. */
+export const COVER_LABEL_FONT_MIN_REM = 0.52;
+/** Approx Bangers uppercase glyph width in em. */
+export const COVER_LABEL_CHAR_EM = 0.62;

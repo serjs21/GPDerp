@@ -162,6 +162,7 @@ export function CoverState({
         <CoverLabel
           title={title}
           expanded={labelExpanded}
+          sizeRem={sizeRem}
           uncoverMs={labelMorphMs}
         />
       ) : null}

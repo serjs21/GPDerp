@@ -97,7 +97,7 @@ export const TimeCover: Story = {
     >
       <CoverState
         iconSrc="/sort_button/time_cover.svg"
-        title="Time"
+        title="Creation date"
         sizeRem={3.5}
         coverAriaLabel="Reveal time sort"
         topIconSrc="/sort_button/time_new.svg"
