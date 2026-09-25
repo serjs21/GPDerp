@@ -1,0 +1,73 @@
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.5rem;
+  padding: 3rem 1.5rem 1.5rem;
+}
+
+.caption {
+  margin: 0;
+  color: var(--comic-ink, #f7f4ef);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+  text-align: center;
+}
+
+.tuneInTarget {
+  appearance: none;
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 4px solid #111;
+  background: none;
+  box-shadow: 4px 4px 0 #111;
+  line-height: 0;
+  cursor: pointer;
+}
+
+.tuneInPanel {
+  display: block;
+  width: 220px;
+  height: 120px;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.calloutSlot {
+  z-index: 6;
+}
+
+.speechBubble {
+  position: relative;
+  box-sizing: border-box;
+  max-width: 11.5rem;
+  padding: 0.45rem 0.65rem 0.55rem;
+  border: 2.5px solid #111;
+  border-radius: 0.85rem;
+  background: #f7f4ef;
+  color: #221e1f;
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  text-align: center;
+  box-shadow: 3px 3px 0 #111;
+  white-space: normal;
+}
+
+.speechBubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -0.45rem;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-right: 2.5px solid #111;
+  border-bottom: 2.5px solid #111;
+  background: #f7f4ef;
+  transform: translateX(-50%) rotate(45deg);
+  box-shadow: 2px 2px 0 #111;
+}

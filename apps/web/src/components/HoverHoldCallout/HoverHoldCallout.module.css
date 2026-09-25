@@ -1,0 +1,30 @@
+.root {
+  --hover-hold-fade-ms: 200ms;
+
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.callout {
+  position: absolute;
+  z-index: 5;
+  margin: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--hover-hold-fade-ms) ease;
+}
+
+.calloutVisible {
+  opacity: 1;
+}
+
+.calloutFading {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .callout {
+    transition: none;
+  }
+}
