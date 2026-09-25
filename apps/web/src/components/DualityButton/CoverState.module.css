@@ -1,6 +1,6 @@
 .shell {
   --duality-face-size: 4.25rem;
-  --cover-coin-flip-ms: 1.5s;
+  --cover-coin-flip-ms: 0.3s;
 
   position: relative;
   box-sizing: border-box;
