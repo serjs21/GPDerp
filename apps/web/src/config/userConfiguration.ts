@@ -25,7 +25,7 @@ export const PREFERENCE_LOCALE_STORAGE_KEY = "gpderp.profile.selectedLanguage";
 export const PENDING_HAIKU_SUBJECT_STORAGE_KEY = "gpderp.pendingHaikuSubject";
 export const PENDING_HAIKU_AFTER_PURCHASE_STORAGE_KEY = "gpderp.pendingHaikuAfterPurchase";
 export const PREFERENCE_HAIKU_ACTIONS_OPEN_STORAGE_KEY = "gpderp.profile.haikuActionsOpen";
-/** Relative path (+ query/hash) to restore after login / registration. */
+/** Relative path (+ query/hash) to restore after login / registration (sessionStorage; per-tab). */
 export const POST_LOGIN_RETURN_STORAGE_KEY = "gpderp.auth.postLoginReturn";
 export const RESUME_PENDING_HAIKU_EVENT = "gpderp:resume-pending-haiku";
 export const NO_CREDITS_LEFT_EVENT = "gpderp:no-credits-left";

@@ -8,7 +8,7 @@ import { POST_LOGIN_RETURN_STORAGE_KEY } from "@/config/userConfiguration";
 
 describe("postLoginReturn", () => {
   beforeEach(() => {
-    window.localStorage.removeItem(POST_LOGIN_RETURN_STORAGE_KEY);
+    window.sessionStorage.removeItem(POST_LOGIN_RETURN_STORAGE_KEY);
   });
 
   it("sanitizes relative app paths and rejects open redirects", () => {

@@ -31,7 +31,7 @@ export function sanitizePostLoginReturn(href: string | null | undefined): string
 export function readPostLoginReturn(): string | null {
   if (typeof window === "undefined") return null;
   try {
-    return sanitizePostLoginReturn(window.localStorage.getItem(POST_LOGIN_RETURN_STORAGE_KEY));
+    return sanitizePostLoginReturn(window.sessionStorage.getItem(POST_LOGIN_RETURN_STORAGE_KEY));
   } catch {
     return null;
   }
@@ -56,7 +56,7 @@ export function savePostLoginReturn(
   if (!safe) return;
 
   try {
-    window.localStorage.setItem(POST_LOGIN_RETURN_STORAGE_KEY, safe);
+    window.sessionStorage.setItem(POST_LOGIN_RETURN_STORAGE_KEY, safe);
   } catch {
     // Quota / private mode — skip persistence.
   }
@@ -67,7 +67,7 @@ export function consumePostLoginReturn(fallback = "/"): string {
   const saved = readPostLoginReturn();
   if (typeof window !== "undefined") {
     try {
-      window.localStorage.removeItem(POST_LOGIN_RETURN_STORAGE_KEY);
+      window.sessionStorage.removeItem(POST_LOGIN_RETURN_STORAGE_KEY);
     } catch {
       // ignore
     }
