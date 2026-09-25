@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type AnimationEvent, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import styles from "./CoverIcon.module.css";
 
 export type CoverIconProps = {
@@ -9,41 +9,17 @@ export type CoverIconProps = {
   backgroundColor?: string;
   className?: string;
   style?: CSSProperties;
-  /** When true, exits with a vertical-axis coin flip. */
-  dismissing?: boolean;
-  onDismissComplete?: () => void;
 };
 
-function prefersReducedMotion() {
-  return (
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
-}
-
 /**
- * Circular cover disk seated exactly over the duality base (fill + icon).
+ * Circular cover disk — front face of the CoverState coin.
  */
 export function CoverIcon({
   iconSrc,
   backgroundColor,
   className,
   style,
-  dismissing = false,
-  onDismissComplete,
 }: CoverIconProps) {
-  useEffect(() => {
-    if (!dismissing || !onDismissComplete) return;
-    if (!prefersReducedMotion()) return;
-    onDismissComplete();
-  }, [dismissing, onDismissComplete]);
-
-  const onAnimationEnd = (event: AnimationEvent<HTMLSpanElement>) => {
-    if (!dismissing) return;
-    if (!event.animationName.toLowerCase().includes("covercoinflipout")) return;
-    onDismissComplete?.();
-  };
-
   const diskStyle = (
     backgroundColor
       ? { ...style, "--cover-icon-bg-color": backgroundColor }
@@ -52,16 +28,9 @@ export function CoverIcon({
 
   return (
     <span
-      className={[
-        styles.disk,
-        dismissing ? styles.diskExiting : "",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      className={[styles.disk, className].filter(Boolean).join(" ")}
       style={diskStyle}
       aria-hidden
-      onAnimationEnd={onAnimationEnd}
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
       <img

@@ -2,11 +2,9 @@
   --duality-ink: #231f20;
   --duality-paper: #ffffff;
   --cover-icon-bg: var(--cover-icon-bg-color, var(--duality-paper));
-  --cover-icon-exit-ms: 1.5s;
 
   position: absolute;
   inset: 0;
-  z-index: 2;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -19,23 +17,6 @@
   box-shadow: inset 0 0 0 2px var(--duality-ink);
   overflow: hidden;
   pointer-events: none;
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-/* Vertical-axis coin flip — cover turns edge-on to reveal the duality base. */
-@keyframes coverCoinFlipOut {
-  from {
-    transform: rotateY(0deg);
-  }
-  to {
-    transform: rotateY(90deg);
-  }
-}
-
-.diskExiting {
-  animation: coverCoinFlipOut var(--cover-icon-exit-ms) ease-in both;
 }
 
 .icon {
@@ -45,11 +26,4 @@
   object-fit: contain;
   pointer-events: none;
   user-select: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .diskExiting {
-    animation: none;
-    opacity: 0;
-  }
 }

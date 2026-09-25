@@ -4,9 +4,11 @@ import {
   useCallback,
   useEffect,
   useState,
+  type AnimationEvent,
   type CSSProperties,
 } from "react";
 import {
+  COVER_ICON_EXIT_MS,
   COVER_LABEL_MORPH_MS,
   DUALITY_BUTTON_SIZE_REM,
 } from "./consts/dualityButtonConsts";
@@ -32,7 +34,7 @@ export type CoverStateProps = {
   uncovered?: boolean;
   defaultUncovered?: boolean;
   onUncoveredChange?: (uncovered: boolean) => void;
-  /** CoverLabel morph duration (ms). CoverIcon exit is fixed at 1.5s. */
+  /** CoverLabel morph duration (ms). Coin flip is fixed at COVER_ICON_EXIT_MS. */
   labelMorphMs?: number;
   /** Round CoverIcon label fill. Defaults to paper white. */
   coverBackgroundColor?: string;
@@ -42,9 +44,17 @@ export type CoverStateProps = {
   coverAriaLabel?: string;
 } & Omit<DualityButtonProps, "className" | "style" | "showDirection">;
 
+function prefersReducedMotion() {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
 /**
- * Duality face with CoverIcon (same-size disk; coin-flips out on the vertical axis)
- * and CoverLabel (title↔arrow rotateX flip in the direction slot).
+ * Duality face + CoverIcon as two sides of a coin. Open flips the coin on the
+ * vertical axis so the duality base is the reverse face. CoverLabel morphs in
+ * the direction-arrow slot.
  */
 export function CoverState({
   iconSrc,
@@ -87,46 +97,72 @@ export function CoverState({
 
   const onCoverClick = () => {
     if (disabled || uncovered || opening) return;
+    if (prefersReducedMotion()) {
+      onOpenComplete();
+      return;
+    }
     setOpening(true);
+  };
+
+  const onCoinAnimationEnd = (event: AnimationEvent<HTMLDivElement>) => {
+    if (!opening) return;
+    if (event.target !== event.currentTarget) return;
+    if (!event.animationName.toLowerCase().includes("covercoinflip")) return;
+    onOpenComplete();
   };
 
   const rootStyle = {
     ...style,
     "--duality-face-size": `${sizeRem}rem`,
+    "--cover-coin-flip-ms": `${COVER_ICON_EXIT_MS}ms`,
   } as CSSProperties;
 
   const coverActive = !uncovered && iconMounted;
   const labelExpanded = opening || uncovered || !iconMounted;
+
+  const dualityButton = (
+    <DualityButton
+      {...dualityProps}
+      className={[styles.face, coverActive ? styles.faceInert : ""]
+        .filter(Boolean)
+        .join(" ")}
+      disabled={disabled}
+      showDirection={false}
+      aria-label={ariaLabel}
+    />
+  );
 
   return (
     <div
       className={[styles.shell, className].filter(Boolean).join(" ")}
       style={rootStyle}
     >
-      <DualityButton
-        {...dualityProps}
-        className={[styles.face, coverActive ? styles.faceInert : ""]
-          .filter(Boolean)
-          .join(" ")}
-        disabled={disabled}
-        showDirection={false}
-        aria-label={ariaLabel}
-      />
+      {iconMounted ? (
+        <div
+          className={[styles.coin, opening ? styles.coinFlipping : ""]
+            .filter(Boolean)
+            .join(" ")}
+          onAnimationEnd={onCoinAnimationEnd}
+        >
+          <div className={[styles.coinFace, styles.coinBack].join(" ")}>
+            {dualityButton}
+          </div>
+          <div className={[styles.coinFace, styles.coinFront].join(" ")}>
+            <CoverIcon
+              iconSrc={iconSrc}
+              backgroundColor={coverBackgroundColor}
+            />
+          </div>
+        </div>
+      ) : (
+        dualityButton
+      )}
 
       {labelMounted ? (
         <CoverLabel
           title={title}
           expanded={labelExpanded}
           uncoverMs={labelMorphMs}
-        />
-      ) : null}
-
-      {iconMounted ? (
-        <CoverIcon
-          iconSrc={iconSrc}
-          backgroundColor={coverBackgroundColor}
-          dismissing={opening || uncovered}
-          onDismissComplete={opening ? onOpenComplete : undefined}
         />
       ) : null}
 

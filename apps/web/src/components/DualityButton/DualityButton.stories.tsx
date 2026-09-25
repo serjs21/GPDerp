@@ -105,7 +105,7 @@ export const TimeCover: Story = {
         aria-label="Toggle newest / oldest"
       />
       <p style={{ margin: 0, fontFamily: "system-ui", fontSize: "0.8rem", opacity: 0.75 }}>
-        Click — cover coin-flips on the vertical axis; title flips into the arrow
+        Click — coin flips; cover / duality base are opposite faces
       </p>
     </div>
   ),
