@@ -1,7 +1,6 @@
 .disk {
   --duality-ink: #231f20;
   --duality-paper: #ffffff;
-  --cover-icon-dismiss-ms: 420ms;
 
   position: absolute;
   inset: 0;
@@ -18,9 +17,10 @@
   pointer-events: none;
 }
 
-/* magic.css rotateRight — duration matches uncoverMs via inherited CSS var. */
+/* magic.css rotateRight — transparent fill; 1.5s exit (COVER_ICON_EXIT_MS). */
 .diskExiting {
-  animation-duration: var(--cover-icon-dismiss-ms, 420ms);
+  background: transparent;
+  animation-duration: 1s;
   animation-fill-mode: both;
 }
 

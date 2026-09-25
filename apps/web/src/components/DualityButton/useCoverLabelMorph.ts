@@ -2,7 +2,7 @@
 
 import { animate } from "animejs";
 import { useEffect, useRef, type RefObject } from "react";
-import { DUALITY_COVER_UNCOVER_MS } from "./consts/dualityButtonConsts";
+import { COVER_LABEL_MORPH_MS } from "./consts/dualityButtonConsts";
 
 const CHAR_STAGGER_MS = 22;
 
@@ -123,7 +123,7 @@ export function useCoverLabelMorph(
   expanded: boolean,
   titleLineRef: RefObject<HTMLElement | null>,
   arrowFaceRef: RefObject<HTMLElement | null>,
-  durationMs = DUALITY_COVER_UNCOVER_MS,
+  durationMs = COVER_LABEL_MORPH_MS,
   onSettled?: () => void,
 ) {
   const primedRef = useRef(false);

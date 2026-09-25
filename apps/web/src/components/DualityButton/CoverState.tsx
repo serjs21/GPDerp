@@ -7,8 +7,8 @@ import {
   type CSSProperties,
 } from "react";
 import {
+  COVER_LABEL_MORPH_MS,
   DUALITY_BUTTON_SIZE_REM,
-  DUALITY_COVER_UNCOVER_MS,
 } from "./consts/dualityButtonConsts";
 import { CoverIcon } from "./CoverIcon";
 import { CoverLabel } from "./CoverLabel";
@@ -32,7 +32,8 @@ export type CoverStateProps = {
   uncovered?: boolean;
   defaultUncovered?: boolean;
   onUncoveredChange?: (uncovered: boolean) => void;
-  uncoverMs?: number;
+  /** CoverLabel morph duration (ms). CoverIcon exit is fixed at 1.5s. */
+  labelMorphMs?: number;
   className?: string;
   style?: CSSProperties;
   /** Accessible name for the cover control. Defaults to `Reveal {title}`. */
@@ -50,7 +51,7 @@ export function CoverState({
   uncovered: uncoveredProp,
   defaultUncovered = false,
   onUncoveredChange,
-  uncoverMs = DUALITY_COVER_UNCOVER_MS,
+  labelMorphMs = COVER_LABEL_MORPH_MS,
   className,
   style,
   coverAriaLabel,
@@ -78,8 +79,7 @@ export function CoverState({
     onUncoveredChange?.(true);
     setOpening(false);
     setIconMounted(false);
-    // Hand the cue off to DualityButton.direction (rotates with the face).
-    setLabelMounted(false);
+    // Keep CoverLabel arrow in place — swapping to DualityButton.direction jumps position/size.
   }, [isControlled, onUncoveredChange]);
 
   const onCoverClick = () => {
@@ -89,13 +89,11 @@ export function CoverState({
 
   const rootStyle = {
     ...style,
-    "--duality-cover-uncover-ms": `${uncoverMs}ms`,
     "--duality-face-size": `${sizeRem}rem`,
-    "--cover-icon-dismiss-ms": `${uncoverMs}ms`,
   } as CSSProperties;
 
-  const coverActive = !uncovered && (iconMounted || labelMounted);
-  const labelExpanded = opening || uncovered;
+  const coverActive = !uncovered && iconMounted;
+  const labelExpanded = opening || uncovered || !iconMounted;
 
   return (
     <div
@@ -107,8 +105,8 @@ export function CoverState({
         className={[styles.face, coverActive ? styles.faceInert : ""]
           .filter(Boolean)
           .join(" ")}
-        disabled={disabled || coverActive}
-        showDirection={!labelMounted}
+        disabled={disabled}
+        showDirection={false}
         aria-label={ariaLabel}
       />
 
@@ -116,7 +114,7 @@ export function CoverState({
         <CoverLabel
           title={title}
           expanded={labelExpanded}
-          uncoverMs={uncoverMs}
+          uncoverMs={labelMorphMs}
         />
       ) : null}
 
