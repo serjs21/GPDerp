@@ -104,7 +104,7 @@ export const TimeCover: Story = {
         aria-label="Toggle newest / oldest"
       />
       <p style={{ margin: 0, fontFamily: "system-ui", fontSize: "0.8rem", opacity: 0.75 }}>
-        Click — cover slides down over the duality face
+        Click — icon overlay slides down; title sits where the arrow is
       </p>
     </div>
   ),

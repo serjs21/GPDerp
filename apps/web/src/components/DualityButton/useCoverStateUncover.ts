@@ -1,6 +1,6 @@
 "use client";
 
-import { animate } from "animejs";
+import { createTimeline } from "animejs";
 import { useCallback, useRef } from "react";
 import { DUALITY_COVER_UNCOVER_MS } from "./consts/dualityButtonConsts";
 
@@ -28,8 +28,13 @@ function stopAnim(anim: AnimLike | null) {
   }
 }
 
+export type CoverUncoverTargets = {
+  overlay: HTMLElement | null;
+  title: HTMLElement | null;
+};
+
 /**
- * Slides the cover overlay straight down (no fade / bounce) to reveal the face.
+ * Slides the icon overlay down (clipped to the face) and fades the external title.
  */
 export function useCoverStateUncover(durationMs = DUALITY_COVER_UNCOVER_MS) {
   const animRef = useRef<AnimLike | null>(null);
@@ -42,27 +47,54 @@ export function useCoverStateUncover(durationMs = DUALITY_COVER_UNCOVER_MS) {
   }, []);
 
   const run = useCallback(
-    (overlay: HTMLElement | null, onComplete: () => void) => {
+    (targets: CoverUncoverTargets, onComplete: () => void) => {
       if (busyRef.current) return;
       busyRef.current = true;
       stopAnim(animRef.current);
 
-      if (!overlay || prefersReducedMotion()) {
+      const { overlay, title } = targets;
+
+      if ((!overlay && !title) || prefersReducedMotion()) {
         busyRef.current = false;
         onComplete();
         return;
       }
 
-      animRef.current = animate(overlay, {
-        translateY: ["0%", "100%"],
-        duration: durationMs,
-        ease: "inOutQuad",
+      const timeline = createTimeline({
+        defaults: {
+          duration: durationMs,
+          ease: "inOutQuad",
+        },
         onComplete: () => {
           animRef.current = null;
           busyRef.current = false;
           onComplete();
         },
       });
+      animRef.current = timeline;
+
+      if (overlay) {
+        timeline.add(
+          overlay,
+          {
+            translateY: ["0%", "100%"],
+            ease: "inOutQuad",
+          },
+          0,
+        );
+      }
+
+      if (title) {
+        timeline.add(
+          title,
+          {
+            opacity: [1, 0],
+            duration: durationMs * 0.55,
+            ease: "inQuad",
+          },
+          0,
+        );
+      }
     },
     [durationMs],
   );

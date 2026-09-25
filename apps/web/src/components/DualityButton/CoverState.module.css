@@ -1,7 +1,6 @@
 .shell {
   --duality-cover-uncover-ms: 420ms;
   --duality-ink: #231f20;
-  --duality-paper: #ffffff;
   --duality-face-size: 4.25rem;
 
   position: relative;
@@ -13,15 +12,9 @@
   height: var(--duality-face-size);
   margin: 0;
   padding: 0;
-  border-radius: 50%;
   overflow: visible;
   flex: 0 0 auto;
   line-height: 0;
-}
-
-/* Clip the sliding overlay to the circular face while covered. */
-.shellCovered {
-  overflow: hidden;
 }
 
 .face {
@@ -62,6 +55,7 @@
   cursor: default;
 }
 
+/* Icon-only cover overlay — no fill; duality face stays visible underneath. */
 .overlay {
   position: absolute;
   inset: 0;
@@ -72,27 +66,31 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: var(--duality-paper);
+  background: transparent;
   will-change: transform;
 }
 
 .icon {
-  position: relative;
-  z-index: 1;
   display: block;
-  width: 54%;
-  height: 54%;
+  width: 72%;
+  height: 72%;
   object-fit: contain;
   pointer-events: none;
   user-select: none;
 }
 
+/* Matches DualityButton .direction placement (outside the face disk). */
 .titleLayer {
   position: absolute;
-  inset: 0;
-  z-index: 2;
+  left: 33%;
+  top: 0;
+  z-index: 3;
+  width: 72%;
+  height: 50%;
+  transform: translate(-50%, -65%) rotate(-12deg);
   overflow: visible;
   pointer-events: none;
+  will-change: opacity, transform;
 }
 
 .titleSvg {
@@ -105,14 +103,15 @@
 .titleText {
   fill: var(--duality-ink);
   font-family: var(--font-comic-label), "Bangers", sans-serif;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 400;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .overlay {
+  .overlay,
+  .titleLayer {
     transition: none;
   }
 }

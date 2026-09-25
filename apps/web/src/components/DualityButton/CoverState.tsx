@@ -22,7 +22,7 @@ import { useCoverStateUncover } from "./useCoverStateUncover";
 export type CoverStateProps = {
   /** Cover glyph (e.g. `/sort_button/time_cover.svg`). */
   iconSrc: string;
-  /** Curved label along the top of the cover disk. */
+  /** Curved label seated where the direction arrow lives (outside the face). */
   title: string;
   /** Controlled uncovered state. */
   uncovered?: boolean;
@@ -37,8 +37,9 @@ export type CoverStateProps = {
 } & Omit<DualityButtonProps, "className" | "style" | "showDirection">;
 
 /**
- * Duality face + same-size circular cover overlay in one shell.
- * Click slides the cover straight down (clipped to the face) to reveal the button.
+ * Duality face + icon cover overlay (no fill) in one shell.
+ * Title sits outside the face in the direction-arrow slot.
+ * Click slides the icon overlay down to reveal the button.
  */
 export function CoverState({
   iconSrc,
@@ -62,6 +63,7 @@ export function CoverState({
   const [coverMounted, setCoverMounted] = useState(!uncovered);
 
   const overlayRef = useRef<HTMLSpanElement>(null);
+  const titleRef = useRef<HTMLSpanElement>(null);
   const { run, cancel } = useCoverStateUncover(uncoverMs);
 
   useEffect(() => () => cancel(), [cancel]);
@@ -82,7 +84,10 @@ export function CoverState({
 
   const onCoverClick = () => {
     if (disabled || uncovered || !coverMounted) return;
-    run(overlayRef.current, finishUncover);
+    run(
+      { overlay: overlayRef.current, title: titleRef.current },
+      finishUncover,
+    );
   };
 
   const rootStyle = {
@@ -93,13 +98,7 @@ export function CoverState({
 
   return (
     <div
-      className={[
-        styles.shell,
-        coverMounted ? styles.shellCovered : "",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      className={[styles.shell, className].filter(Boolean).join(" ")}
       style={rootStyle}
     >
       <DualityButton
@@ -113,44 +112,47 @@ export function CoverState({
       />
 
       {coverMounted ? (
-        <button
-          type="button"
-          className={styles.cover}
-          aria-label={coverAriaLabel ?? `Reveal ${title}`}
-          disabled={disabled}
-          onClick={onCoverClick}
-        >
-          <span ref={overlayRef} className={styles.overlay}>
-            {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
-            <img
-              className={styles.icon}
-              src={iconSrc}
-              alt=""
-              draggable={false}
-              decoding="async"
-            />
-            <span className={styles.titleLayer} aria-hidden>
-              <svg
-                className={styles.titleSvg}
-                viewBox="0 0 100 100"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <defs>
-                  <path id={arcId} d={COVER_TITLE_ARC_D} fill="none" />
-                </defs>
-                <text className={styles.titleText}>
-                  <textPath
-                    href={`#${arcId}`}
-                    startOffset="50%"
-                    textAnchor="middle"
-                  >
-                    {title}
-                  </textPath>
-                </text>
-              </svg>
-            </span>
+        <>
+          <span ref={titleRef} className={styles.titleLayer} aria-hidden>
+            <svg
+              className={styles.titleSvg}
+              viewBox="0 0 100 60"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <path id={arcId} d={COVER_TITLE_ARC_D} fill="none" />
+              </defs>
+              <text className={styles.titleText}>
+                <textPath
+                  href={`#${arcId}`}
+                  startOffset="50%"
+                  textAnchor="middle"
+                >
+                  {title}
+                </textPath>
+              </text>
+            </svg>
           </span>
-        </button>
+
+          <button
+            type="button"
+            className={styles.cover}
+            aria-label={coverAriaLabel ?? `Reveal ${title}`}
+            disabled={disabled}
+            onClick={onCoverClick}
+          >
+            <span ref={overlayRef} className={styles.overlay}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
+              <img
+                className={styles.icon}
+                src={iconSrc}
+                alt=""
+                draggable={false}
+                decoding="async"
+              />
+            </span>
+          </button>
+        </>
       ) : null}
     </div>
   );
