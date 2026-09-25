@@ -1,13 +1,13 @@
 "use client";
 
-import { useRef, type CSSProperties } from "react";
+import { useRef } from "react";
 import { DUALITY_BUTTON_DIRECTION_SRC } from "./consts/dualityButtonConsts";
 import styles from "./CoverLabel.module.css";
 import { useCoverLabelMorph } from "./useCoverLabelMorph";
 
 export type CoverLabelProps = {
   title: string;
-  /** When true, title exits with magic.css rotateRight; arrow flips in. */
+  /** When true, flips title chars out and the direction arrow in. */
   expanded: boolean;
   uncoverMs?: number;
   onMorphComplete?: () => void;
@@ -15,7 +15,8 @@ export type CoverLabelProps = {
 };
 
 /**
- * Direction-slot cue: title exits via `magictime rotateRight`, arrow flips in.
+ * Direction-slot cue: title morphs into the duality arrow via per-character
+ * rotateX (RestartLinkButton-style). CoverIcon handles rotateRight separately.
  */
 export function CoverLabel({
   title,
@@ -24,15 +25,16 @@ export function CoverLabel({
   onMorphComplete,
   className,
 }: CoverLabelProps) {
+  const titleLineRef = useRef<HTMLSpanElement>(null);
   const arrowFaceRef = useRef<HTMLSpanElement>(null);
 
-  useCoverLabelMorph(expanded, arrowFaceRef, uncoverMs, onMorphComplete);
-
-  const titleStyle = (
-    uncoverMs != null
-      ? { "--cover-label-exit-ms": `${uncoverMs}ms` }
-      : undefined
-  ) as CSSProperties | undefined;
+  useCoverLabelMorph(
+    expanded,
+    titleLineRef,
+    arrowFaceRef,
+    uncoverMs,
+    onMorphComplete,
+  );
 
   return (
     <span
@@ -40,17 +42,13 @@ export function CoverLabel({
       aria-hidden
     >
       <span className={styles.flipStage}>
-        <span
-          className={[
-            styles.titleLine,
-            expanded ? `magictime rotateRight ${styles.titleExiting}` : "",
-          ]
-            .filter(Boolean)
-            .join(" ")}
-          style={titleStyle}
-        >
+        <span ref={titleLineRef} className={styles.titleLine}>
           {Array.from(title).map((ch, index) => (
-            <span key={`${ch}-${String(index)}`} className={styles.char}>
+            <span
+              key={`${ch}-${String(index)}`}
+              className={styles.char}
+              data-cover-char
+            >
               {ch === " " ? "\u00a0" : ch}
             </span>
           ))}

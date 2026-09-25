@@ -105,7 +105,7 @@ export const TimeCover: Story = {
         aria-label="Toggle newest / oldest"
       />
       <p style={{ margin: 0, fontFamily: "system-ui", fontSize: "0.8rem", opacity: 0.75 }}>
-        Click — cover clears; title exits with rotateRight into the arrow
+        Click — CoverIcon exits with rotateRight; title flips into the arrow
       </p>
     </div>
   ),

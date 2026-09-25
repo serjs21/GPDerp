@@ -15,18 +15,13 @@
   height: 100%;
   border-radius: 50%;
   background: var(--duality-paper);
-  opacity: 1;
-  transform: none;
   pointer-events: none;
-  will-change: opacity, transform;
-  transition:
-    opacity var(--cover-icon-dismiss-ms) ease,
-    transform var(--cover-icon-dismiss-ms) ease;
 }
 
-.diskDismissing {
-  opacity: 0;
-  transform: translateY(12%);
+/* magic.css rotateRight — duration matches uncoverMs via inherited CSS var. */
+.diskExiting {
+  animation-duration: var(--cover-icon-dismiss-ms, 420ms);
+  animation-fill-mode: both;
 }
 
 .icon {
@@ -39,7 +34,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .disk {
-    transition: none;
+  .diskExiting {
+    animation: none;
+    opacity: 0;
   }
 }

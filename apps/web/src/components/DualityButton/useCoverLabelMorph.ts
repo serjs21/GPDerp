@@ -4,6 +4,8 @@ import { animate } from "animejs";
 import { useEffect, useRef, type RefObject } from "react";
 import { DUALITY_COVER_UNCOVER_MS } from "./consts/dualityButtonConsts";
 
+const CHAR_STAGGER_MS = 22;
+
 type AnimLike = {
   pause?: () => void;
   cancel?: () => void;
@@ -26,6 +28,15 @@ function stopAnim(anim: AnimLike | null) {
   }
 }
 
+function stopAll(anims: AnimLike[]) {
+  for (const anim of anims) stopAnim(anim);
+}
+
+function charsOf(line: HTMLElement | null): HTMLElement[] {
+  if (!line) return [];
+  return Array.from(line.querySelectorAll<HTMLElement>("[data-cover-char]"));
+}
+
 function setRotateX(el: HTMLElement, deg: number) {
   el.style.transform = `rotateX(${deg}deg)`;
 }
@@ -33,6 +44,34 @@ function setRotateX(el: HTMLElement, deg: number) {
 function readRotateX(el: HTMLElement, fallback: number) {
   const match = /rotateX\((-?\d+(?:\.\d+)?)deg\)/.exec(el.style.transform);
   return match ? Number(match[1]) : fallback;
+}
+
+function animateChars(
+  line: HTMLElement | null,
+  toDeg: number,
+  fallbackFrom: number,
+  durationMs: number,
+  anims: AnimLike[],
+) {
+  const chars = charsOf(line);
+  chars.forEach((el, i) => {
+    const model = { t: 0 };
+    const fromDeg = readRotateX(el, fallbackFrom);
+    anims.push(
+      animate(model, {
+        t: 1,
+        duration: durationMs,
+        delay: i * CHAR_STAGGER_MS,
+        ease: "inOutSine",
+        onUpdate: () => {
+          setRotateX(el, fromDeg + (toDeg - fromDeg) * model.t);
+        },
+        onComplete: () => {
+          setRotateX(el, toDeg);
+        },
+      }),
+    );
+  });
 }
 
 function animateRotateX(
@@ -65,11 +104,24 @@ function animateRotateX(
   );
 }
 
+function snap(
+  expanded: boolean,
+  titleLine: HTMLElement | null,
+  arrowFace: HTMLElement | null,
+) {
+  for (const el of charsOf(titleLine)) {
+    setRotateX(el, expanded ? 90 : 0);
+  }
+  if (arrowFace) setRotateX(arrowFace, expanded ? 0 : -90);
+}
+
 /**
- * Title exits via magic.css `rotateRight`; arrow flips in on rotateX.
+ * RestartLinkButton-style rotateX flip: title chars out, arrow face in.
+ * (CoverIcon uses magic.css rotateRight separately.)
  */
 export function useCoverLabelMorph(
   expanded: boolean,
+  titleLineRef: RefObject<HTMLElement | null>,
   arrowFaceRef: RefObject<HTMLElement | null>,
   durationMs = DUALITY_COVER_UNCOVER_MS,
   onSettled?: () => void,
@@ -80,37 +132,35 @@ export function useCoverLabelMorph(
 
   useEffect(() => {
     const anims: AnimLike[] = [];
+    const titleLine = titleLineRef.current;
     const arrowFace = arrowFaceRef.current;
 
     if (prefersReducedMotion()) {
-      if (arrowFace) setRotateX(arrowFace, expanded ? 0 : -90);
+      snap(expanded, titleLine, arrowFace);
       primedRef.current = true;
       if (expanded) settledRef.current?.();
-      return () => stopAnim(anims[0] ?? null);
+      return () => stopAll(anims);
     }
 
     if (!expanded && !primedRef.current) {
-      if (arrowFace) setRotateX(arrowFace, -90);
+      snap(false, titleLine, arrowFace);
       primedRef.current = true;
-      return () => undefined;
+      return () => stopAll(anims);
     }
 
     primedRef.current = true;
 
     if (!expanded) {
+      animateChars(titleLine, 0, 90, durationMs * 0.55, anims);
       animateRotateX(arrowFace, -90, 0, durationMs * 0.55, anims);
-      return () => {
-        for (const a of anims) stopAnim(a);
-      };
+      return () => stopAll(anims);
     }
 
-    // Title rotateRight runs in CSS; arrow flips in over the same window.
-    animateRotateX(arrowFace, 0, -90, durationMs, anims, () => {
+    animateChars(titleLine, 90, 0, durationMs * 0.55, anims);
+    animateRotateX(arrowFace, 0, -90, durationMs * 0.55, anims, () => {
       settledRef.current?.();
     });
 
-    return () => {
-      for (const a of anims) stopAnim(a);
-    };
-  }, [arrowFaceRef, durationMs, expanded]);
+    return () => stopAll(anims);
+  }, [arrowFaceRef, durationMs, expanded, titleLineRef]);
 }

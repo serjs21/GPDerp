@@ -1,15 +1,23 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useEffect, type AnimationEvent, type CSSProperties } from "react";
 import styles from "./CoverIcon.module.css";
 
 export type CoverIconProps = {
   iconSrc: string;
   className?: string;
   style?: CSSProperties;
-  /** When true, fades out (no leftover overlay over the face). */
+  /** When true, exits with magic.css `rotateRight`. */
   dismissing?: boolean;
+  onDismissComplete?: () => void;
 };
+
+function prefersReducedMotion() {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
 
 /**
  * Circular cover disk seated exactly over the duality base (fill + icon).
@@ -19,18 +27,32 @@ export function CoverIcon({
   className,
   style,
   dismissing = false,
+  onDismissComplete,
 }: CoverIconProps) {
+  useEffect(() => {
+    if (!dismissing || !onDismissComplete) return;
+    if (!prefersReducedMotion()) return;
+    onDismissComplete();
+  }, [dismissing, onDismissComplete]);
+
+  const onAnimationEnd = (event: AnimationEvent<HTMLSpanElement>) => {
+    if (!dismissing) return;
+    if (!event.animationName.toLowerCase().includes("rotateright")) return;
+    onDismissComplete?.();
+  };
+
   return (
     <span
       className={[
         styles.disk,
-        dismissing ? styles.diskDismissing : "",
+        dismissing ? `magictime rotateRight ${styles.diskExiting}` : "",
         className,
       ]
         .filter(Boolean)
         .join(" ")}
       style={style}
       aria-hidden
+      onAnimationEnd={onAnimationEnd}
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
       <img

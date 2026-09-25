@@ -21,7 +21,7 @@ import {
 export type CoverStateProps = {
   /** Cover glyph (e.g. `/sort_button/time_cover.svg`). */
   iconSrc: string;
-  /** Title in the direction-arrow slot; exits with rotateRight into the arrow. */
+  /** Title in the direction-arrow slot; morphs into the arrow on open. */
   title: string;
   /**
    * Face + CoverIcon diameter in rem. CoverIcon and DualityButton share this
@@ -40,8 +40,8 @@ export type CoverStateProps = {
 } & Omit<DualityButtonProps, "className" | "style" | "showDirection">;
 
 /**
- * Duality face with CoverIcon (same-size disk over the base) and CoverLabel
- * (title exits with magic.css rotateRight; arrow flips in).
+ * Duality face with CoverIcon (same-size disk; exits with magic.css rotateRight)
+ * and CoverLabel (title↔arrow rotateX flip in the direction slot).
  */
 export function CoverState({
   iconSrc,
@@ -73,7 +73,7 @@ export function CoverState({
     }
   }, [uncovered]);
 
-  const onMorphComplete = useCallback(() => {
+  const onOpenComplete = useCallback(() => {
     if (!isControlled) setUncoveredInternal(true);
     onUncoveredChange?.(true);
     setOpening(false);
@@ -92,7 +92,6 @@ export function CoverState({
     "--duality-cover-uncover-ms": `${uncoverMs}ms`,
     "--duality-face-size": `${sizeRem}rem`,
     "--cover-icon-dismiss-ms": `${uncoverMs}ms`,
-    "--cover-label-exit-ms": `${uncoverMs}ms`,
   } as CSSProperties;
 
   const coverActive = !uncovered && (iconMounted || labelMounted);
@@ -118,12 +117,15 @@ export function CoverState({
           title={title}
           expanded={labelExpanded}
           uncoverMs={uncoverMs}
-          onMorphComplete={opening ? onMorphComplete : undefined}
         />
       ) : null}
 
       {iconMounted ? (
-        <CoverIcon iconSrc={iconSrc} dismissing={opening || uncovered} />
+        <CoverIcon
+          iconSrc={iconSrc}
+          dismissing={opening || uncovered}
+          onDismissComplete={opening ? onOpenComplete : undefined}
+        />
       ) : null}
 
       {coverActive ? (
