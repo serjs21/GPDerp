@@ -6,8 +6,10 @@
 }
 
 .root {
+  position: relative;
   display: block;
   margin: 0;
+  overflow: visible;
   color: var(--comic-ink, #2d2d2d);
   font-family: var(--font-graffiti), "Flacucho", cursive;
   font-size: 0.95rem;
@@ -19,4 +21,16 @@
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
+}
+
+.filterDefs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.paint {
+  display: inline;
 }

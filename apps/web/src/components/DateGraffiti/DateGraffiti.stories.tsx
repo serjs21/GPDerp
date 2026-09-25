@@ -47,3 +47,11 @@ export const OnPaper: Story = {
     </div>
   ),
 };
+
+export const FixedSeed: Story = {
+  name: "Fixed seed",
+  args: {
+    date: new Date(2026, 2, 24).toISOString(),
+    seed: 77,
+  },
+};
