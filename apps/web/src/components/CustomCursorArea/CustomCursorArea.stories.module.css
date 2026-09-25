@@ -1,0 +1,115 @@
+.hoverCard {
+  box-sizing: border-box;
+  width: min(18rem, 90vw);
+  padding: 1.1rem 1.25rem;
+  border: 4px solid #111;
+  background: #f7f4ef;
+  box-shadow: 4px 4px 0 #111;
+  color: #221e1f;
+}
+
+.cardTitle {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: 1.35rem;
+  letter-spacing: 0.03em;
+}
+
+.cardBody {
+  margin: 0;
+  font-family: var(--font-lantern-script), cursive;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.stampCursor {
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 2px solid #111;
+  background: #f7d06a;
+  color: #111;
+  font-size: 0.95rem;
+  line-height: 1;
+  box-shadow: 2px 2px 0 #111;
+}
+
+.hoverStrip {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(22rem, 92vw);
+  min-height: 4.5rem;
+  padding: 0.75rem 1rem;
+  border: 4px solid #111;
+  background: color-mix(in srgb, #1a5fb4 18%, #f7f4ef);
+  color: #221e1f;
+  font-family: var(--font-lantern-script), cursive;
+  font-size: 1.05rem;
+  box-shadow: 4px 4px 0 #111;
+}
+
+.inkDot {
+  display: block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background: #221e1f;
+  box-shadow:
+    0 0 0 1px #f7f4ef,
+    2px 2px 0 #111;
+}
+
+.tuneInTarget {
+  appearance: none;
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 4px solid #111;
+  background: none;
+  box-shadow: 4px 4px 0 #111;
+  line-height: 0;
+  cursor: none;
+}
+
+.tuneInPanel {
+  display: block;
+  width: 220px;
+  height: 120px;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.speechBubble {
+  position: relative;
+  box-sizing: border-box;
+  max-width: 11.5rem;
+  padding: 0.45rem 0.65rem 0.55rem;
+  border: 2.5px solid #111;
+  border-radius: 0.85rem;
+  background: #f7f4ef;
+  color: #221e1f;
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  text-align: center;
+  box-shadow: 3px 3px 0 #111;
+}
+
+.speechBubble::after {
+  content: "";
+  position: absolute;
+  left: 0.85rem;
+  bottom: -0.45rem;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-right: 2.5px solid #111;
+  border-bottom: 2.5px solid #111;
+  background: #f7f4ef;
+  transform: rotate(45deg);
+  box-shadow: 2px 2px 0 #111;
+}

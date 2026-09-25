@@ -1,0 +1,30 @@
+.root {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.rootCustom {
+  cursor: none;
+}
+
+.rootCustom * {
+  cursor: none;
+}
+
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+  display: block;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+}
+
+.cursorVisible {
+  opacity: 1;
+}
