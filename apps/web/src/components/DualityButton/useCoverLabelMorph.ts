@@ -4,7 +4,8 @@ import { animate } from "animejs";
 import { useEffect, useRef, type RefObject } from "react";
 import { COVER_LABEL_MORPH_MS } from "./consts/dualityButtonConsts";
 
-const CHAR_STAGGER_MS = 22;
+/** How far the title is pushed radially outward (rem) as the arrow rises. */
+const TITLE_PUSH_REM = 0.85;
 
 type AnimLike = {
   pause?: () => void;
@@ -32,76 +33,32 @@ function stopAll(anims: AnimLike[]) {
   for (const anim of anims) stopAnim(anim);
 }
 
-function charsOf(line: HTMLElement | null): HTMLElement[] {
-  if (!line) return [];
-  return Array.from(line.querySelectorAll<HTMLElement>("[data-cover-char]"));
-}
-
-function setRotateX(el: HTMLElement, deg: number) {
+function setArrowRotateX(el: HTMLElement, deg: number) {
   el.style.transform = `rotateX(${deg}deg)`;
 }
 
-function readRotateX(el: HTMLElement, fallback: number) {
+function readArrowRotateX(el: HTMLElement, fallback: number) {
   const match = /rotateX\((-?\d+(?:\.\d+)?)deg\)/.exec(el.style.transform);
   return match ? Number(match[1]) : fallback;
 }
 
-function animateChars(
-  line: HTMLElement | null,
-  toDeg: number,
-  fallbackFrom: number,
-  durationMs: number,
-  anims: AnimLike[],
-) {
-  const chars = charsOf(line);
-  chars.forEach((el, i) => {
-    const model = { t: 0 };
-    const fromDeg = readRotateX(el, fallbackFrom);
-    anims.push(
-      animate(model, {
-        t: 1,
-        duration: durationMs,
-        delay: i * CHAR_STAGGER_MS,
-        ease: "inOutSine",
-        onUpdate: () => {
-          setRotateX(el, fromDeg + (toDeg - fromDeg) * model.t);
-        },
-        onComplete: () => {
-          setRotateX(el, toDeg);
-        },
-      }),
-    );
-  });
+function setTitlePose(el: HTMLElement, pushRem: number, opacity: number) {
+  el.style.setProperty("--title-push", `${pushRem}rem`);
+  el.style.opacity = String(opacity);
 }
 
-function animateRotateX(
-  el: HTMLElement | null,
-  toDeg: number,
-  fallbackFrom: number,
-  durationMs: number,
-  anims: AnimLike[],
-  onComplete?: () => void,
-) {
-  if (!el) {
-    onComplete?.();
-    return;
-  }
-  const model = { t: 0 };
-  const fromDeg = readRotateX(el, fallbackFrom);
-  anims.push(
-    animate(model, {
-      t: 1,
-      duration: durationMs,
-      ease: "inOutSine",
-      onUpdate: () => {
-        setRotateX(el, fromDeg + (toDeg - fromDeg) * model.t);
-      },
-      onComplete: () => {
-        setRotateX(el, toDeg);
-        onComplete?.();
-      },
-    }),
-  );
+function readTitlePush(el: HTMLElement, fallback: number) {
+  const raw = el.style.getPropertyValue("--title-push").trim();
+  if (!raw) return fallback;
+  const n = Number.parseFloat(raw);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function readOpacity(el: HTMLElement, fallback: number) {
+  const raw = el.style.opacity;
+  if (raw === "") return fallback;
+  const n = Number.parseFloat(raw);
+  return Number.isFinite(n) ? n : fallback;
 }
 
 function snap(
@@ -109,15 +66,15 @@ function snap(
   titleLine: HTMLElement | null,
   arrowFace: HTMLElement | null,
 ) {
-  for (const el of charsOf(titleLine)) {
-    setRotateX(el, expanded ? 90 : 0);
+  if (titleLine) {
+    setTitlePose(titleLine, expanded ? TITLE_PUSH_REM : 0, expanded ? 0 : 1);
   }
-  if (arrowFace) setRotateX(arrowFace, expanded ? 0 : -90);
+  if (arrowFace) setArrowRotateX(arrowFace, expanded ? 0 : -90);
 }
 
 /**
- * RestartLinkButton-style rotateX flip: title chars out, arrow face in.
- * (CoverIcon uses magic.css rotateRight separately.)
+ * Arrow rises on its rotateX hinge from behind the title, pushing the title
+ * radially outward while the title fades.
  */
 export function useCoverLabelMorph(
   expanded: boolean,
@@ -150,16 +107,52 @@ export function useCoverLabelMorph(
 
     primedRef.current = true;
 
-    if (!expanded) {
-      animateChars(titleLine, 0, 90, durationMs * 0.55, anims);
-      animateRotateX(arrowFace, -90, 0, durationMs * 0.55, anims);
-      return () => stopAll(anims);
-    }
+    const toExpanded = expanded;
+    const arrowFrom = arrowFace
+      ? readArrowRotateX(arrowFace, toExpanded ? -90 : 0)
+      : toExpanded
+        ? -90
+        : 0;
+    const arrowTo = toExpanded ? 0 : -90;
+    const pushFrom = titleLine
+      ? readTitlePush(titleLine, toExpanded ? 0 : TITLE_PUSH_REM)
+      : toExpanded
+        ? 0
+        : TITLE_PUSH_REM;
+    const pushTo = toExpanded ? TITLE_PUSH_REM : 0;
+    const opacityFrom = titleLine
+      ? readOpacity(titleLine, toExpanded ? 1 : 0)
+      : toExpanded
+        ? 1
+        : 0;
+    const opacityTo = toExpanded ? 0 : 1;
 
-    animateChars(titleLine, 90, 0, durationMs * 0.55, anims);
-    animateRotateX(arrowFace, 0, -90, durationMs * 0.55, anims, () => {
-      settledRef.current?.();
-    });
+    const model = { t: 0 };
+    anims.push(
+      animate(model, {
+        t: 1,
+        duration: durationMs,
+        ease: "inOutSine",
+        onUpdate: () => {
+          const t = model.t;
+          if (arrowFace) {
+            setArrowRotateX(arrowFace, arrowFrom + (arrowTo - arrowFrom) * t);
+          }
+          if (titleLine) {
+            setTitlePose(
+              titleLine,
+              pushFrom + (pushTo - pushFrom) * t,
+              opacityFrom + (opacityTo - opacityFrom) * t,
+            );
+          }
+        },
+        onComplete: () => {
+          if (arrowFace) setArrowRotateX(arrowFace, arrowTo);
+          if (titleLine) setTitlePose(titleLine, pushTo, opacityTo);
+          if (toExpanded) settledRef.current?.();
+        },
+      }),
+    );
 
     return () => stopAll(anims);
   }, [arrowFaceRef, durationMs, expanded, titleLineRef]);

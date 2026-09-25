@@ -25,8 +25,9 @@ export type CoverLabelProps = {
 };
 
 /**
- * Direction-slot cue: title sits on an arc concentric with the face circle,
- * then morphs into the duality arrow via per-character rotateX.
+ * Direction-slot cue: title sits on an arc concentric with the face circle.
+ * On open, the arrow rises from behind on its rotateX hinge and pushes the
+ * title outward while it fades.
  */
 export function CoverLabel({
   title,
