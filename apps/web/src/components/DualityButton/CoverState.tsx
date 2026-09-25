@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useRef,
   useState,
   type AnimationEvent,
   type CSSProperties,
@@ -56,6 +57,7 @@ function prefersReducedMotion() {
  * Duality face + CoverIcon as two sides of a coin. Open flips the coin on the
  * vertical axis so the duality base is the reverse face. CoverLabel morphs in
  * the direction-arrow slot; after open the arrow rotates with each base flip.
+ * Controlled `uncovered → false` flips the cover back on (category switch).
  */
 export function CoverState({
   iconSrc,
@@ -78,41 +80,84 @@ export function CoverState({
   const [uncoveredInternal, setUncoveredInternal] = useState(defaultUncovered);
   const uncovered = isControlled ? uncoveredProp! : uncoveredInternal;
   const [opening, setOpening] = useState(false);
+  const [closing, setClosing] = useState(false);
   const [iconMounted, setIconMounted] = useState(!uncovered);
   const [labelMounted, setLabelMounted] = useState(true);
   /** Matches DualityButton baseWrap clockwise turns after uncover. */
   const [baseRotateDeg, setBaseRotateDeg] = useState(0);
+  const prevUncoveredRef = useRef(uncovered);
+
+  const snapCovered = useCallback(() => {
+    setOpening(false);
+    setClosing(false);
+    setIconMounted(true);
+    setLabelMounted(true);
+    setBaseRotateDeg(0);
+  }, []);
 
   useEffect(() => {
-    if (!uncovered) {
+    const wasUncovered = prevUncoveredRef.current;
+    prevUncoveredRef.current = uncovered;
+
+    if (!uncovered && wasUncovered) {
+      if (prefersReducedMotion()) {
+        snapCovered();
+        return;
+      }
       setOpening(false);
-      setIconMounted(true);
-      setLabelMounted(true);
       setBaseRotateDeg(0);
+      setLabelMounted(true);
+      setIconMounted(true);
+      setClosing(true);
+      return;
     }
-  }, [uncovered]);
+
+    if (uncovered && !wasUncovered && !opening) {
+      // Parent forced open without local open animation.
+      setClosing(false);
+      setOpening(false);
+      setIconMounted(false);
+    }
+  }, [opening, snapCovered, uncovered]);
 
   const onOpenComplete = useCallback(() => {
     if (!isControlled) setUncoveredInternal(true);
     onUncoveredChange?.(true);
     setOpening(false);
+    setClosing(false);
     setIconMounted(false);
   }, [isControlled, onUncoveredChange]);
 
+  const onCloseComplete = useCallback(() => {
+    setClosing(false);
+    setIconMounted(true);
+    if (!isControlled) setUncoveredInternal(false);
+  }, [isControlled]);
+
   const onCoverClick = () => {
-    if (disabled || uncovered || opening) return;
+    if (disabled || uncovered || opening || closing) return;
+    // Select immediately so the previous category can re-cover in parallel.
+    if (!isControlled) setUncoveredInternal(true);
+    onUncoveredChange?.(true);
     if (prefersReducedMotion()) {
-      onOpenComplete();
+      setOpening(false);
+      setClosing(false);
+      setIconMounted(false);
       return;
     }
     setOpening(true);
   };
 
   const onCoinAnimationEnd = (event: AnimationEvent<HTMLDivElement>) => {
-    if (!opening) return;
     if (event.target !== event.currentTarget) return;
-    if (!event.animationName.toLowerCase().includes("covercoinflip")) return;
-    onOpenComplete();
+    const name = event.animationName.toLowerCase();
+    if (opening && name.includes("covercoinflip") && !name.includes("back")) {
+      onOpenComplete();
+      return;
+    }
+    if (closing && name.includes("covercoinflipback")) {
+      onCloseComplete();
+    }
   };
 
   const handleFlippedChange = (flipped: boolean) => {
@@ -126,14 +171,19 @@ export function CoverState({
     "--cover-coin-flip-ms": `${COVER_ICON_EXIT_MS}ms`,
   } as CSSProperties;
 
-  const coverActive = !uncovered && iconMounted;
-  const labelExpanded = opening || uncovered || !iconMounted;
-  const arrowFollowsBase = uncovered || !iconMounted;
+  const coverActive = !uncovered && iconMounted && !closing;
+  const labelExpanded =
+    opening || ((uncovered || !iconMounted) && !closing);
+  const arrowFollowsBase =
+    (uncovered || !iconMounted) && !closing && !opening;
 
   const dualityButton = (
     <DualityButton
       {...dualityProps}
-      className={[styles.face, coverActive ? styles.faceInert : ""]
+      className={[
+        styles.face,
+        coverActive || closing ? styles.faceInert : "",
+      ]
         .filter(Boolean)
         .join(" ")}
       disabled={disabled}
@@ -143,18 +193,21 @@ export function CoverState({
     />
   );
 
+  const coinClass = [
+    styles.coin,
+    opening ? styles.coinFlipping : "",
+    closing ? styles.coinClosing : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <div
       className={[styles.shell, className].filter(Boolean).join(" ")}
       style={rootStyle}
     >
       {iconMounted ? (
-        <div
-          className={[styles.coin, opening ? styles.coinFlipping : ""]
-            .filter(Boolean)
-            .join(" ")}
-          onAnimationEnd={onCoinAnimationEnd}
-        >
+        <div className={coinClass} onAnimationEnd={onCoinAnimationEnd}>
           <div className={[styles.coinFace, styles.coinBack].join(" ")}>
             {dualityButton}
           </div>
@@ -177,6 +230,7 @@ export function CoverState({
           uncoverMs={labelMorphMs}
           baseRotateDeg={arrowFollowsBase ? baseRotateDeg : 0}
           baseRotateMs={DUALITY_BUTTON_FLIP_MS}
+          followBaseRotate={arrowFollowsBase}
         />
       ) : null}
 
@@ -185,7 +239,7 @@ export function CoverState({
           type="button"
           className={styles.hit}
           aria-label={coverAriaLabel ?? `Reveal ${title}`}
-          disabled={disabled || opening}
+          disabled={disabled || opening || closing}
           onClick={onCoverClick}
         />
       ) : null}

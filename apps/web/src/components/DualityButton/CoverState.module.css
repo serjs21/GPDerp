@@ -34,8 +34,21 @@
   }
 }
 
+@keyframes coverCoinFlipBack {
+  from {
+    transform: rotateY(180deg);
+  }
+  to {
+    transform: rotateY(0deg);
+  }
+}
+
 .coinFlipping {
   animation: coverCoinFlip var(--cover-coin-flip-ms) ease-in-out forwards;
+}
+
+.coinClosing {
+  animation: coverCoinFlipBack var(--cover-coin-flip-ms) ease-in-out forwards;
 }
 
 .coinFace {
@@ -92,7 +105,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .coinFlipping {
+  .coinFlipping,
+  .coinClosing {
     animation: none;
   }
 }

@@ -29,6 +29,8 @@ export type CoverLabelProps = {
   baseRotateDeg?: number;
   /** Match DualityButton `--duality-flip-ms`. */
   baseRotateMs?: number;
+  /** When false, snap base rotate (no tween) — used while re-covering. */
+  followBaseRotate?: boolean;
   className?: string;
 };
 
@@ -45,6 +47,7 @@ export function CoverLabel({
   onMorphComplete,
   baseRotateDeg = 0,
   baseRotateMs = DUALITY_BUTTON_FLIP_MS,
+  followBaseRotate = false,
   className,
 }: CoverLabelProps) {
   const cueRef = useRef<HTMLSpanElement>(null);
@@ -72,7 +75,13 @@ export function CoverLabel({
   return (
     <span
       ref={cueRef}
-      className={[styles.cue, className].filter(Boolean).join(" ")}
+      className={[
+        styles.cue,
+        followBaseRotate ? styles.cueTracking : "",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
       style={cueStyle}
       aria-hidden
     >

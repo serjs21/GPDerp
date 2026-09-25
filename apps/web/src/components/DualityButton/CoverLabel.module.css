@@ -18,8 +18,11 @@
   line-height: 1;
   /* After open: turn with DualityButton baseWrap (same ms / ease). */
   transform: rotate(var(--cover-label-base-rotate));
-  transition: transform var(--cover-label-flip-ms) ease;
   will-change: transform;
+}
+
+.cueTracking {
+  transition: transform var(--cover-label-flip-ms) ease;
 }
 
 .flipStage {
@@ -106,7 +109,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cue {
+  .cueTracking {
     transition: none;
   }
 }
