@@ -33,3 +33,26 @@
   background: #f7f4ef;
   box-shadow: 4px 4px 0 #111;
 }
+
+.stampHost {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 12rem;
+  height: 7.5rem;
+  padding: 0.5rem;
+  border: 4px solid #111;
+  background: #f7f4ef;
+  box-shadow: 4px 4px 0 #111;
+}
+
+.stampForeground {
+  position: relative;
+  z-index: 1;
+  color: #c44;
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: 1.6rem;
+  letter-spacing: 0.04em;
+}

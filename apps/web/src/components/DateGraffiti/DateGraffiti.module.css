@@ -23,6 +23,15 @@
   user-select: none;
 }
 
+.rootAbsolute {
+  position: absolute;
+  z-index: 0;
+  display: block;
+  margin: 0;
+  line-height: 1;
+  pointer-events: none;
+}
+
 .filterDefs {
   position: absolute;
   width: 0;

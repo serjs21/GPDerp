@@ -55,3 +55,18 @@ export const FixedSeed: Story = {
     seed: 77,
   },
 };
+
+export const BackgroundStamp: Story = {
+  name: "Background stamp",
+  render: () => (
+    <div className={styles.stampHost}>
+      <DateGraffiti
+        date={new Date(2026, 2, 24)}
+        color="color-mix(in srgb, #2d2d2d 22%, transparent)"
+        size="2rem"
+        position={{ right: "0.5rem", bottom: "0.4rem", transform: "rotate(-9deg)" }}
+      />
+      <span className={styles.stampForeground}>LABEL</span>
+    </div>
+  ),
+};
