@@ -45,5 +45,3 @@ export const COVER_LABEL_ARROW_REST_DEG = COVER_LABEL_ARC_CENTER_DEG;
 export const COVER_LABEL_ARROW_BEHIND_DEG = 42;
 /** How far the title spins clockwise while fading (degrees). */
 export const COVER_LABEL_TITLE_PUSH_DEG = 42;
-/** Arrow glyph chord width as a fraction of face diameter. */
-export const COVER_LABEL_ARROW_WIDTH_FRAC = 0.55;

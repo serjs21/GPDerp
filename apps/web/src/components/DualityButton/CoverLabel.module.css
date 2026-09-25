@@ -4,6 +4,7 @@
   --cover-label-arc-gap: 0.42rem;
   --title-spin: 0deg;
   --arrow-angle: 0deg;
+  --arrow-opacity: 0;
 
   position: absolute;
   inset: 0;
@@ -58,7 +59,10 @@
   transform-origin: 50% 50%;
 }
 
-/* Same track as title chars; sits behind title until fade clears it. */
+/*
+ * Same track as title; size matches DualityButton .direction (52% × 50%).
+ * Hidden when covered; fades in with the open morph.
+ */
 .arrowSlot {
   position: absolute;
   left: 50%;
@@ -67,14 +71,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: calc(var(--duality-face-size, 4.25rem) * var(--cover-label-arrow-width, 0.55));
-  height: calc(var(--duality-face-size, 4.25rem) * 0.28);
+  width: 52%;
+  height: 50%;
+  opacity: var(--arrow-opacity, 0);
   transform: translate(-50%, -50%) rotate(var(--arrow-angle, 0deg))
     translateY(
       calc(-0.5 * var(--duality-face-size, 4.25rem) - var(--cover-label-arc-gap))
     );
   transform-origin: 50% 50%;
-  will-change: transform;
+  will-change: transform, opacity;
 }
 
 .arrowFace {

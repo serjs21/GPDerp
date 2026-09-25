@@ -39,9 +39,11 @@ function setCuePose(
   cue: HTMLElement,
   arrowDeg: number,
   titleSpinDeg: number,
+  arrowOpacity: number,
 ) {
   cue.style.setProperty("--arrow-angle", `${arrowDeg}deg`);
   cue.style.setProperty("--title-spin", `${titleSpinDeg}deg`);
+  cue.style.setProperty("--arrow-opacity", String(arrowOpacity));
 }
 
 function setTitleOpacity(titleLine: HTMLElement | null, opacity: number) {
@@ -50,6 +52,13 @@ function setTitleOpacity(titleLine: HTMLElement | null, opacity: number) {
 }
 
 function readCssDeg(el: HTMLElement, prop: string, fallback: number) {
+  const raw = el.style.getPropertyValue(prop).trim();
+  if (!raw) return fallback;
+  const n = Number.parseFloat(raw);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function readCssNumber(el: HTMLElement, prop: string, fallback: number) {
   const raw = el.style.getPropertyValue(prop).trim();
   if (!raw) return fallback;
   const n = Number.parseFloat(raw);
@@ -73,14 +82,19 @@ function snap(
   const start = coverLabelArrowStartDeg(charCount);
   const rest = coverLabelArrowRestDeg();
   const push = coverLabelTitlePushDeg();
-  setCuePose(cue, expanded ? rest : start, expanded ? push : 0);
+  setCuePose(
+    cue,
+    expanded ? rest : start,
+    expanded ? push : 0,
+    expanded ? 1 : 0,
+  );
   setTitleOpacity(titleLine, expanded ? 0 : 1);
 }
 
 /**
- * Arrow and title share the face-centered arc. On open, the arrow rotates
- * clockwise from behind the title to rest while the title spins further CW
- * and fades out.
+ * Arrow and title share the face-centered arc. On open, the arrow fades in
+ * while rotating from behind the title to rest; the title spins CW and fades
+ * out over the same duration.
  */
 export function useCoverLabelMorph(
   expanded: boolean,
@@ -131,6 +145,12 @@ export function useCoverLabelMorph(
       toExpanded ? 0 : pushDeg,
     );
     const spinTo = toExpanded ? pushDeg : 0;
+    const arrowOpFrom = readCssNumber(
+      cue,
+      "--arrow-opacity",
+      toExpanded ? 0 : 1,
+    );
+    const arrowOpTo = toExpanded ? 1 : 0;
     const opacityFrom = titleLine
       ? readOpacity(titleLine, toExpanded ? 1 : 0)
       : toExpanded
@@ -150,6 +170,7 @@ export function useCoverLabelMorph(
             cue,
             arrowFrom + (arrowTo - arrowFrom) * t,
             spinFrom + (spinTo - spinFrom) * t,
+            arrowOpFrom + (arrowOpTo - arrowOpFrom) * t,
           );
           setTitleOpacity(
             titleLine,
@@ -157,7 +178,7 @@ export function useCoverLabelMorph(
           );
         },
         onComplete: () => {
-          setCuePose(cue, arrowTo, spinTo);
+          setCuePose(cue, arrowTo, spinTo, arrowOpTo);
           setTitleOpacity(titleLine, opacityTo);
           if (toExpanded) settledRef.current?.();
         },

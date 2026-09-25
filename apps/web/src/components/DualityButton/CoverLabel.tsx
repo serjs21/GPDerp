@@ -3,7 +3,6 @@
 import { useRef, type CSSProperties } from "react";
 import {
   COVER_LABEL_ARC_GAP_REM,
-  COVER_LABEL_ARROW_WIDTH_FRAC,
   DUALITY_BUTTON_DIRECTION_SRC,
   DUALITY_BUTTON_SIZE_REM,
 } from "./consts/dualityButtonConsts";
@@ -28,7 +27,7 @@ export type CoverLabelProps = {
 
 /**
  * Title + arrow on one concentric track around the face. On open, the arrow
- * rotates in from behind the title, pushes it clockwise, and the title fades.
+ * fades in from behind the title, pushes it clockwise, and the title fades.
  */
 export function CoverLabel({
   title,
@@ -57,9 +56,9 @@ export function CoverLabel({
   const cueStyle = {
     "--cover-label-arc-gap": `${COVER_LABEL_ARC_GAP_REM}rem`,
     "--cover-label-font-size": `${fontSizeRem}rem`,
-    "--cover-label-arrow-width": String(COVER_LABEL_ARROW_WIDTH_FRAC),
     "--arrow-angle": `${arrowStartDeg}deg`,
     "--title-spin": "0deg",
+    "--arrow-opacity": "0",
   } as CSSProperties;
 
   return (
