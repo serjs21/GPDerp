@@ -10,6 +10,7 @@ import {
 import {
   COVER_ICON_EXIT_MS,
   COVER_LABEL_MORPH_MS,
+  DUALITY_BUTTON_FLIP_MS,
   DUALITY_BUTTON_SIZE_REM,
 } from "./consts/dualityButtonConsts";
 import { CoverIcon } from "./CoverIcon";
@@ -54,7 +55,7 @@ function prefersReducedMotion() {
 /**
  * Duality face + CoverIcon as two sides of a coin. Open flips the coin on the
  * vertical axis so the duality base is the reverse face. CoverLabel morphs in
- * the direction-arrow slot.
+ * the direction-arrow slot; after open the arrow rotates with each base flip.
  */
 export function CoverState({
   iconSrc,
@@ -70,6 +71,7 @@ export function CoverState({
   coverAriaLabel,
   disabled = false,
   "aria-label": ariaLabel,
+  onFlippedChange,
   ...dualityProps
 }: CoverStateProps) {
   const isControlled = uncoveredProp != null;
@@ -78,12 +80,15 @@ export function CoverState({
   const [opening, setOpening] = useState(false);
   const [iconMounted, setIconMounted] = useState(!uncovered);
   const [labelMounted, setLabelMounted] = useState(true);
+  /** Matches DualityButton baseWrap clockwise turns after uncover. */
+  const [baseRotateDeg, setBaseRotateDeg] = useState(0);
 
   useEffect(() => {
     if (!uncovered) {
       setOpening(false);
       setIconMounted(true);
       setLabelMounted(true);
+      setBaseRotateDeg(0);
     }
   }, [uncovered]);
 
@@ -92,7 +97,6 @@ export function CoverState({
     onUncoveredChange?.(true);
     setOpening(false);
     setIconMounted(false);
-    // Keep CoverLabel arrow in place — swapping to DualityButton.direction jumps position/size.
   }, [isControlled, onUncoveredChange]);
 
   const onCoverClick = () => {
@@ -111,6 +115,11 @@ export function CoverState({
     onOpenComplete();
   };
 
+  const handleFlippedChange = (flipped: boolean) => {
+    setBaseRotateDeg((deg) => deg + 180);
+    onFlippedChange?.(flipped);
+  };
+
   const rootStyle = {
     ...style,
     "--duality-face-size": `${sizeRem}rem`,
@@ -119,6 +128,7 @@ export function CoverState({
 
   const coverActive = !uncovered && iconMounted;
   const labelExpanded = opening || uncovered || !iconMounted;
+  const arrowFollowsBase = uncovered || !iconMounted;
 
   const dualityButton = (
     <DualityButton
@@ -128,6 +138,7 @@ export function CoverState({
         .join(" ")}
       disabled={disabled}
       showDirection={false}
+      onFlippedChange={handleFlippedChange}
       aria-label={ariaLabel}
     />
   );
@@ -164,6 +175,8 @@ export function CoverState({
           expanded={labelExpanded}
           sizeRem={sizeRem}
           uncoverMs={labelMorphMs}
+          baseRotateDeg={arrowFollowsBase ? baseRotateDeg : 0}
+          baseRotateMs={DUALITY_BUTTON_FLIP_MS}
         />
       ) : null}
 

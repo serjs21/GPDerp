@@ -5,6 +5,8 @@
   --title-spin: 0deg;
   --arrow-angle: 0deg;
   --arrow-opacity: 0;
+  --cover-label-base-rotate: 0deg;
+  --cover-label-flip-ms: 300ms;
 
   position: absolute;
   inset: 0;
@@ -14,6 +16,10 @@
   overflow: visible;
   pointer-events: none;
   line-height: 1;
+  /* After open: turn with DualityButton baseWrap (same ms / ease). */
+  transform: rotate(var(--cover-label-base-rotate));
+  transition: transform var(--cover-label-flip-ms) ease;
+  will-change: transform;
 }
 
 .flipStage {
@@ -97,4 +103,10 @@
   object-fit: contain;
   pointer-events: none;
   user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cue {
+    transition: none;
+  }
 }

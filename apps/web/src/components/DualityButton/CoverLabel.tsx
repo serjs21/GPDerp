@@ -4,12 +4,12 @@ import { useRef, type CSSProperties } from "react";
 import {
   COVER_LABEL_ARC_GAP_REM,
   DUALITY_BUTTON_DIRECTION_SRC,
+  DUALITY_BUTTON_FLIP_MS,
   DUALITY_BUTTON_SIZE_REM,
 } from "./consts/dualityButtonConsts";
 import styles from "./CoverLabel.module.css";
 import { useCoverLabelMorph } from "./useCoverLabelMorph";
 import {
-  coverLabelArrowStartDeg,
   coverLabelCharAngles,
   coverLabelFontSizeRem,
 } from "./utils/coverLabelArcUtils";
@@ -22,12 +22,20 @@ export type CoverLabelProps = {
   sizeRem?: number;
   uncoverMs?: number;
   onMorphComplete?: () => void;
+  /**
+   * After open: clockwise base turn (0, 180, 360…) so the arrow rotates with
+   * DualityButton flips. Keep 0 while covered / morphing in.
+   */
+  baseRotateDeg?: number;
+  /** Match DualityButton `--duality-flip-ms`. */
+  baseRotateMs?: number;
   className?: string;
 };
 
 /**
  * Title + arrow on one concentric track around the face. On open, the arrow
  * fades in from behind the title, pushes it clockwise, and the title fades.
+ * After open, `baseRotateDeg` turns the cue with the duality base.
  */
 export function CoverLabel({
   title,
@@ -35,6 +43,8 @@ export function CoverLabel({
   sizeRem = DUALITY_BUTTON_SIZE_REM,
   uncoverMs,
   onMorphComplete,
+  baseRotateDeg = 0,
+  baseRotateMs = DUALITY_BUTTON_FLIP_MS,
   className,
 }: CoverLabelProps) {
   const cueRef = useRef<HTMLSpanElement>(null);
@@ -42,7 +52,6 @@ export function CoverLabel({
   const chars = Array.from(title);
   const angles = coverLabelCharAngles(chars.length);
   const fontSizeRem = coverLabelFontSizeRem(chars.length, sizeRem);
-  const arrowStartDeg = coverLabelArrowStartDeg(chars.length);
 
   useCoverLabelMorph(
     expanded,
@@ -56,9 +65,8 @@ export function CoverLabel({
   const cueStyle = {
     "--cover-label-arc-gap": `${COVER_LABEL_ARC_GAP_REM}rem`,
     "--cover-label-font-size": `${fontSizeRem}rem`,
-    "--arrow-angle": `${arrowStartDeg}deg`,
-    "--title-spin": "0deg",
-    "--arrow-opacity": "0",
+    "--cover-label-base-rotate": `${baseRotateDeg}deg`,
+    "--cover-label-flip-ms": `${baseRotateMs}ms`,
   } as CSSProperties;
 
   return (
