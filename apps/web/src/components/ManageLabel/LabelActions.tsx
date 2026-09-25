@@ -172,7 +172,7 @@ export function LabelActions({
       src={hasConnections ? TUNE_IN_SRC : NOT_CONNECTED_ACTION_SRC}
       caption={hasConnections ? "Tune in" : undefined}
       layout={hasConnections ? "iconEnd" : "iconOnly"}
-      color={hasConnections ? "#9ffbff" : "sky"}
+      color={hasConnections ? "#9fa1ff" : "sky"}
       background={hasConnections ? "solid" : "sunburst"}
       captionClassName={hasConnections ? styles.captionTuneIn : undefined}
       iconClassName={
@@ -187,7 +187,7 @@ export function LabelActions({
       }
       onSelect={onTuneIn}
       disabled={!hasConnections}
-      hoverFill={"#52f8ff"}
+      hoverFill={"#738aff"}
     />
   );
 

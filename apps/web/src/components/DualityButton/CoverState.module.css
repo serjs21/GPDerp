@@ -1,0 +1,148 @@
+.shell {
+  --duality-cover-uncover-ms: 420ms;
+  --duality-ink: #231f20;
+  --duality-paper: #ffffff;
+  --duality-face-size: 4.25rem;
+
+  position: relative;
+  display: inline-flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: var(--duality-face-size);
+  height: var(--duality-face-size);
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  flex: 0 0 auto;
+  line-height: 0;
+}
+
+.faceSlot {
+  position: relative;
+  z-index: 0;
+  width: var(--duality-face-size);
+  height: var(--duality-face-size);
+}
+
+.faceSlotInert {
+  pointer-events: none;
+}
+
+.faceSlotInert > * {
+  pointer-events: none;
+}
+
+.cover {
+  appearance: none;
+  position: absolute;
+  z-index: 2;
+  /* Hit area includes curved title above the disk. */
+  left: 50%;
+  top: -1.35rem;
+  bottom: 0;
+  width: calc(var(--duality-face-size) * 1.35);
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  overflow: visible;
+  line-height: 0;
+}
+
+.cover:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--duality-ink) 70%, #c44 30%);
+  outline-offset: 3px;
+  border-radius: 0.35rem;
+}
+
+.cover:disabled {
+  cursor: default;
+}
+
+.diskSlot {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: var(--duality-face-size);
+  height: var(--duality-face-size);
+  transform: translateX(-50%);
+  overflow: visible;
+}
+
+.iconDisk {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--duality-paper);
+  box-shadow: 0 0 0 2px var(--duality-ink);
+  will-change: transform, opacity;
+}
+
+.icon {
+  display: block;
+  width: 54%;
+  height: 54%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.titleLayer {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  z-index: 3;
+  width: 100%;
+  height: 2.6rem;
+  transform: translateX(-50%);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.titleSvg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.titleText {
+  fill: var(--duality-ink);
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.arrowGroup {
+  /* Matches DualityButton .direction placement within the title layer. */
+  transform: translate(18px, -2px) scale(0.165) rotate(-8deg);
+  transform-origin: 0 0;
+}
+
+.arrowPath {
+  fill: none;
+  stroke: var(--duality-ink);
+  stroke-opacity: 0.9;
+  stroke-width: 16;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iconDisk,
+  .titleText,
+  .arrowPath {
+    transition: none;
+  }
+}

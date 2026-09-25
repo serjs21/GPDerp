@@ -2,6 +2,7 @@
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
+import { CoverState } from "./CoverState";
 import { DualityButton } from "./DualityButton";
 
 const meta = {
@@ -74,4 +75,40 @@ export const Controlled: Story = {
     "aria-label": "Toggle newest / oldest",
   },
   render: () => <ControlledDemo />,
+};
+
+/** Covered time sort — click drops the icon disk and draws the direction arrow. */
+export const TimeCover: Story = {
+  name: "Time cover",
+  args: {
+    topIconSrc: "/sort_button/time_new.svg",
+    bottomIconSrc: "/sort_button/time_old.svg",
+    "aria-label": "Toggle newest / oldest",
+  },
+  render: () => (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "2.5rem",
+        paddingTop: "2rem",
+      }}
+    >
+      <CoverState
+        iconSrc="/sort_button/time_cover.svg"
+        title="Time"
+        aria-label="Reveal time sort"
+      >
+        <DualityButton
+          topIconSrc="/sort_button/time_new.svg"
+          bottomIconSrc="/sort_button/time_old.svg"
+          aria-label="Toggle newest / oldest"
+        />
+      </CoverState>
+      <p style={{ margin: 0, fontFamily: "system-ui", fontSize: "0.8rem", opacity: 0.75 }}>
+        Click cover — title becomes arrow, icon drops
+      </p>
+    </div>
+  ),
 };
