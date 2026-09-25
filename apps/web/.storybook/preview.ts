@@ -1,6 +1,7 @@
 import type { Preview } from '@storybook/nextjs-vite'
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { NextIntlClientProvider } from 'next-intl';
+import localFont from 'next/font/local';
 import { Bangers, Geist, Geist_Mono, Noto_Serif_JP, Press_Start_2P, Zen_Kurenaido } from 'next/font/google';
 import { createElement } from 'react';
 import enMessages from '../messages/en.json';
@@ -47,6 +48,13 @@ const bangers = Bangers({
   display: 'swap',
 });
 
+const flacucho = localFont({
+  src: '../src/fonts/flacucho/Flacucho-Regular.otf',
+  variable: '--font-flacucho',
+  display: 'swap',
+  weight: '400',
+});
+
 const storybookFontVariableClass = [
   notoSerifJP.variable,
   zenKurenaido.variable,
@@ -54,6 +62,7 @@ const storybookFontVariableClass = [
   geistMono.variable,
   pressStart2P.variable,
   bangers.variable,
+  flacucho.variable,
 ].join(' ');
 
 const preview: Preview = {

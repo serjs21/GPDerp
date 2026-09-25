@@ -66,7 +66,7 @@
   /* Pixel display for share-link meters (Press Start 2P via next/font) */
   --font-pixel-display: var(--font-pixel, ui-monospace), ui-monospace, monospace;
   /* Street graffiti display (Flacucho via next/font/local) */
-  --font-graffiti: var(--font-flacucho), "Flacucho", cursive;
+  --font-graffiti: var(--font-flacucho, "Flacucho"), cursive;
 }
 
 *,
