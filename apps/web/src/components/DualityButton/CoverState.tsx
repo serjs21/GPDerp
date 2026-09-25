@@ -21,8 +21,13 @@ import {
 export type CoverStateProps = {
   /** Cover glyph (e.g. `/sort_button/time_cover.svg`). */
   iconSrc: string;
-  /** Title in the direction-arrow slot; morphs into the arrow on open. */
+  /** Title in the direction-arrow slot; exits with rotateRight into the arrow. */
   title: string;
+  /**
+   * Face + CoverIcon diameter in rem. CoverIcon and DualityButton share this
+   * via `--duality-face-size` (default 4.25).
+   */
+  sizeRem?: number;
   /** Controlled uncovered state. */
   uncovered?: boolean;
   defaultUncovered?: boolean;
@@ -35,13 +40,13 @@ export type CoverStateProps = {
 } & Omit<DualityButtonProps, "className" | "style" | "showDirection">;
 
 /**
- * Duality face with CoverIcon (disk over the base) and CoverLabel (title↔arrow
- * in the direction slot). Open removes the icon overlay and flips the label
- * into the direction arrow (RestartLinkButton-style rotateX).
+ * Duality face with CoverIcon (same-size disk over the base) and CoverLabel
+ * (title exits with magic.css rotateRight; arrow flips in).
  */
 export function CoverState({
   iconSrc,
   title,
+  sizeRem = DUALITY_BUTTON_SIZE_REM,
   uncovered: uncoveredProp,
   defaultUncovered = false,
   onUncoveredChange,
@@ -85,8 +90,9 @@ export function CoverState({
   const rootStyle = {
     ...style,
     "--duality-cover-uncover-ms": `${uncoverMs}ms`,
-    "--duality-face-size": `${DUALITY_BUTTON_SIZE_REM}rem`,
+    "--duality-face-size": `${sizeRem}rem`,
     "--cover-icon-dismiss-ms": `${uncoverMs}ms`,
+    "--cover-label-exit-ms": `${uncoverMs}ms`,
   } as CSSProperties;
 
   const coverActive = !uncovered && (iconMounted || labelMounted);

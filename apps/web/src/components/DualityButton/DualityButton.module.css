@@ -9,8 +9,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 4.25rem;
-  height: 4.25rem;
+  width: var(--duality-face-size, 4.25rem);
+  height: var(--duality-face-size, 4.25rem);
   margin: 0;
   padding: 0;
   border: none;

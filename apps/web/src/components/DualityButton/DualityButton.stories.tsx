@@ -98,13 +98,14 @@ export const TimeCover: Story = {
       <CoverState
         iconSrc="/sort_button/time_cover.svg"
         title="Time"
+        sizeRem={3.5}
         coverAriaLabel="Reveal time sort"
         topIconSrc="/sort_button/time_new.svg"
         bottomIconSrc="/sort_button/time_old.svg"
         aria-label="Toggle newest / oldest"
       />
       <p style={{ margin: 0, fontFamily: "system-ui", fontSize: "0.8rem", opacity: 0.75 }}>
-        Click — icon cover clears; title flips into the direction arrow
+        Click — cover clears; title exits with rotateRight into the arrow
       </p>
     </div>
   ),
