@@ -367,11 +367,11 @@
   box-sizing: border-box;
   width: fit-content;
   max-width: min(100%, 16rem);
-  padding: 0.45rem 0.85rem;
+  padding: 0.25rem 0.75rem;
   border: none;
   color: var(--comic-ink, #2d2d2d);
   font-family: var(--font-lantern-script, cursive);
-  font-size: 0.95rem;
+  font-size: 0.75rem;
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: 0.05em;

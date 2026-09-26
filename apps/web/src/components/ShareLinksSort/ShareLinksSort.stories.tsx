@@ -67,7 +67,7 @@ function StatefulSort({ initial }: { initial: ShareLinksSortValue }) {
 export const CombinedIcons: Story = {
   name: "Combined icons",
   args: {
-    value: SHARE_LINKS_SORT_DEFAULT_VALUE,
+    value: undefined,
     onChange: () => {},
   },
   render: () => <StatefulSort initial={SHARE_LINKS_SORT_DEFAULT_VALUE} />,

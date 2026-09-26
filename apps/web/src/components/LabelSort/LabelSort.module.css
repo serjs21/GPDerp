@@ -2,6 +2,7 @@
   flex: 0 0 auto;
   width: fit-content;
   max-width: 100%;
+  min-height: 8.5rem;
 }
 
 .cluster {
