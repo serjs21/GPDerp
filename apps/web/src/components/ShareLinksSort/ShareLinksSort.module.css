@@ -1,10 +1,16 @@
+.panel {
+  flex: 0 0 auto;
+  width: fit-content;
+  max-width: 100%;
+}
+
 .cluster {
   display: inline-flex;
   align-items: flex-start;
   justify-content: center;
   gap: 1.1rem;
   /* Room for concentric CoverLabel arcs above the disks. */
-  padding: 1.35rem 0.35rem 0.35rem;
+  padding: 1.35rem 0.75rem 0.5rem;
   box-sizing: border-box;
 }
 
