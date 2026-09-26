@@ -46,7 +46,7 @@ export const isShareLinkActive = (row: ShareLinkSortableRow, now: Date): boolean
 };
 
 /**
- * Time left buckets (fixed order; direction only sorts within active finite):
+ * Time left buckets (asc):
  * 0 active infinite → 1 active finite → 2 inactive infinite → 3 inactive expired
  */
 function timeLeftBucket(row: ShareLinkSortableRow, now: Date): number {
@@ -55,14 +55,13 @@ function timeLeftBucket(row: ShareLinkSortableRow, now: Date): number {
   const expired = isExpired(row, now);
   if (active && infinite) return 0;
   if (active) return 1;
-  if (infinite) return 2; // inactive, no expiry
+  if (infinite) return 2;
   if (expired) return 3;
-  // Inactive with a future expiry: keep ahead of expired, after infinite inactive
   return 2;
 }
 
 /**
- * Hits left buckets (fixed order; direction only sorts within active finite):
+ * Hits left buckets (asc):
  * 0 active infinite → 1 active finite → 2 inactive infinite → 3 inactive at 0
  */
 function hitsLeftBucket(row: ShareLinkSortableRow, now: Date): number {
@@ -71,26 +70,71 @@ function hitsLeftBucket(row: ShareLinkSortableRow, now: Date): number {
   const remaining = hitsRemaining(row);
   if (active && infinite) return 0;
   if (active) return 1;
-  if (infinite) return 2; // inactive, unlimited hits
+  if (infinite) return 2;
   if (remaining <= 0) return 3;
-  // Inactive with finite hits left: keep with infinite-inactive tier, after true infinites
   return 2;
 }
 
-function compareByDirection(delta: number, direction: ShareLinkSortDirection): number {
-  return direction === "desc" ? -delta : delta;
+function compareCreatedAtAsc(a: ShareLinkSortableRow, b: ShareLinkSortableRow): number {
+  return a.createdAt.getTime() - b.createdAt.getTime();
 }
 
-function compareCreatedAt(
+/** Ascending compare for a category (desc is applied by reversing the result). */
+function compareAsc(
   a: ShareLinkSortableRow,
   b: ShareLinkSortableRow,
-  direction: ShareLinkSortDirection,
+  categoryId: ShareLinkSortCategoryId,
+  now: Date,
 ): number {
-  return compareByDirection(a.createdAt.getTime() - b.createdAt.getTime(), direction);
+  switch (categoryId) {
+    case "creationDate":
+      return compareCreatedAtAsc(a, b);
+    case "alpacabeth":
+      return a.haikuSubject.localeCompare(b.haikuSubject, undefined, {
+        sensitivity: "base",
+      });
+    case "timeLeft": {
+      const bucketDelta = timeLeftBucket(a, now) - timeLeftBucket(b, now);
+      if (bucketDelta !== 0) return bucketDelta;
+      const aBucket = timeLeftBucket(a, now);
+      if (aBucket === 1) {
+        return timeRemainingMs(a, now) - timeRemainingMs(b, now);
+      }
+      if (aBucket === 2) {
+        const aInf = a.expirationDate == null;
+        const bInf = b.expirationDate == null;
+        if (aInf !== bInf) return aInf ? -1 : 1;
+        if (!aInf) {
+          return timeRemainingMs(a, now) - timeRemainingMs(b, now);
+        }
+      }
+      return compareCreatedAtAsc(b, a); // newer first as tie-break
+    }
+    case "hitsLeft": {
+      const bucketDelta = hitsLeftBucket(a, now) - hitsLeftBucket(b, now);
+      if (bucketDelta !== 0) return bucketDelta;
+      const aBucket = hitsLeftBucket(a, now);
+      if (aBucket === 1) {
+        return hitsRemaining(a) - hitsRemaining(b);
+      }
+      if (aBucket === 2) {
+        const aInf = a.maxViews == null;
+        const bInf = b.maxViews == null;
+        if (aInf !== bInf) return aInf ? -1 : 1;
+        if (!aInf) {
+          return hitsRemaining(a) - hitsRemaining(b);
+        }
+      }
+      return compareCreatedAtAsc(b, a);
+    }
+    default:
+      return compareCreatedAtAsc(b, a);
+  }
 }
 
 /**
  * Sort share-link rows for listShareLinksForUser.
+ * Builds the asc order, then reverses the full list when direction is `desc`.
  * Default (no category): newest createdAt first.
  */
 export function sortShareLinkRows<T extends ShareLinkSortableRow>(
@@ -99,74 +143,13 @@ export function sortShareLinkRows<T extends ShareLinkSortableRow>(
   now: Date = new Date(),
 ): T[] {
   const categoryId = sort.categoryId;
-  const direction = sort.direction;
 
   if (categoryId == null) {
-    return [...rows].sort((a, b) => compareCreatedAt(a, b, "desc"));
+    return [...rows].sort((a, b) => compareCreatedAtAsc(b, a));
   }
 
-  return [...rows].sort((a, b) => {
-    switch (categoryId) {
-      case "creationDate":
-        return compareCreatedAt(a, b, direction);
-      case "alpacabeth": {
-        const delta = a.haikuSubject.localeCompare(b.haikuSubject, undefined, {
-          sensitivity: "base",
-        });
-        return compareByDirection(delta, direction);
-      }
-      case "timeLeft": {
-        const bucketDelta = timeLeftBucket(a, now) - timeLeftBucket(b, now);
-        if (bucketDelta !== 0) return bucketDelta;
-        const aBucket = timeLeftBucket(a, now);
-        if (aBucket === 1) {
-          // Active finite: sort by time remaining
-          return compareByDirection(
-            timeRemainingMs(a, now) - timeRemainingMs(b, now),
-            direction,
-          );
-        }
-        if (aBucket === 2) {
-          // Inactive with time: infinites first, then by remaining
-          const aInf = a.expirationDate == null;
-          const bInf = b.expirationDate == null;
-          if (aInf !== bInf) return aInf ? -1 : 1;
-          if (!aInf) {
-            return compareByDirection(
-              timeRemainingMs(a, now) - timeRemainingMs(b, now),
-              direction,
-            );
-          }
-        }
-        return compareCreatedAt(a, b, "desc");
-      }
-      case "hitsLeft": {
-        const bucketDelta = hitsLeftBucket(a, now) - hitsLeftBucket(b, now);
-        if (bucketDelta !== 0) return bucketDelta;
-        const aBucket = hitsLeftBucket(a, now);
-        if (aBucket === 1) {
-          return compareByDirection(
-            hitsRemaining(a) - hitsRemaining(b),
-            direction,
-          );
-        }
-        if (aBucket === 2) {
-          const aInf = a.maxViews == null;
-          const bInf = b.maxViews == null;
-          if (aInf !== bInf) return aInf ? -1 : 1;
-          if (!aInf) {
-            return compareByDirection(
-              hitsRemaining(a) - hitsRemaining(b),
-              direction,
-            );
-          }
-        }
-        return compareCreatedAt(a, b, "desc");
-      }
-      default:
-        return compareCreatedAt(a, b, "desc");
-    }
-  });
+  const ascending = [...rows].sort((a, b) => compareAsc(a, b, categoryId, now));
+  return sort.direction === "desc" ? ascending.reverse() : ascending;
 }
 
 export const SHARE_LINK_SORT_CATEGORY_IDS = [

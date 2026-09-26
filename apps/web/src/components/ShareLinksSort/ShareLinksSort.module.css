@@ -1,7 +1,7 @@
 .panel {
   flex: 0 0 auto;
   max-width: 100%;
-  min-height: 8.5rem;
+  min-height: 6rem;
 }
 
 .cluster {

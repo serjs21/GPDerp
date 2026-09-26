@@ -54,7 +54,7 @@ describe("sortShareLinkRows", () => {
       expect(sorted.map((r) => r.id)).toEqual(["ai", "as", "al", "ii", "ie"]);
     });
 
-    it("reverses active finite by direction without changing buckets", () => {
+    it("reverses the full asc order when direction is desc", () => {
       const activeInfinite = row({ id: "ai", expirationDate: null });
       const activeSoon = row({
         id: "as",
@@ -76,7 +76,8 @@ describe("sortShareLinkRows", () => {
         now,
       );
 
-      expect(sorted.map((r) => r.id)).toEqual(["ai", "al", "as", "ie"]);
+      // Asc would be ai, as, al, ie — desc reverses the whole list.
+      expect(sorted.map((r) => r.id)).toEqual(["ie", "al", "as", "ai"]);
     });
   });
 

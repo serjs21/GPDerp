@@ -106,7 +106,6 @@
   align-items: stretch;
   justify-content: center;
   min-width: 0;
-  min-height: 8.5rem;
 }
 
 .sortCell > * {

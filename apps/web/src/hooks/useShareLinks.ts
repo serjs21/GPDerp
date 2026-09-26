@@ -13,8 +13,11 @@ import {
   SHARE_LINKS_SORT_DEFAULT_VALUE,
   type ShareLinksSortValue,
 } from "@/components/ShareLinksSort";
+import { sortShareLinkItems } from "@/components/ShareLinksSort/utils/sortShareLinkItems";
 
 const PAGE_SIZE = 50;
+/** Cache list pages for an hour so sort/filter toggles can reuse loaded data. */
+const SHARE_LINKS_STALE_MS = 60 * 60 * 1000;
 
 const FILTER_SET = new Set<ShareLinkFilter>(ALL_SHARE_LINK_FILTERS);
 
@@ -66,20 +69,16 @@ export function useShareLinks(enabled: boolean) {
   }, [search]);
 
   const filterKey = serializeFilters(filters) ?? "all";
-  const sortKey = sort.categoryId
-    ? `${sort.categoryId}:${sort.direction}`
-    : "none";
 
   const query = useInfiniteQuery({
-    queryKey: ["share-links", PAGE_SIZE, filterKey, search, sortKey],
+    // Sort is applied in memory once all pages are loaded — keep it out of the key.
+    queryKey: ["share-links", PAGE_SIZE, filterKey, search],
     queryFn: ({ pageParam }) =>
       fetchShareLinksPaged({
         pageSize: PAGE_SIZE,
         offset: pageParam as number,
         filters: serializeFilters(filters) ? filters : undefined,
         search: search || undefined,
-        sort: sort.categoryId ?? undefined,
-        dir: sort.categoryId ? sort.direction : undefined,
       }),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => {
@@ -87,13 +86,33 @@ export function useShareLinks(enabled: boolean) {
       return loaded < lastPage.total ? loaded : undefined;
     },
     placeholderData: keepPreviousData,
+    staleTime: SHARE_LINKS_STALE_MS,
+    gcTime: SHARE_LINKS_STALE_MS,
     enabled,
   });
 
+  // When a sort is selected but more pages remain, finish loading so we can sort in memory.
+  useEffect(() => {
+    if (!enabled || !sort.categoryId) return;
+    if (!query.hasNextPage || query.isFetchingNextPage) return;
+    void query.fetchNextPage();
+  }, [
+    enabled,
+    sort.categoryId,
+    query.hasNextPage,
+    query.isFetchingNextPage,
+    query.fetchNextPage,
+  ]);
+
   const items = useMemo(() => {
     const raw = query.data?.pages.flatMap((p) => p.items) ?? [];
-    return raw.filter((link) => shareLinkMatchesFilters(link, filters));
-  }, [query.data?.pages, filters]);
+    const filtered = raw.filter((link) => shareLinkMatchesFilters(link, filters));
+    // In-memory sort only when the full result set is loaded.
+    if (sort.categoryId && !query.hasNextPage) {
+      return sortShareLinkItems(filtered, sort);
+    }
+    return filtered;
+  }, [query.data?.pages, query.hasNextPage, filters, sort]);
 
   const updateSearchParams = useCallback(
     (next: {
@@ -139,9 +158,7 @@ export function useShareLinks(enabled: boolean) {
     search,
     searchInput,
     setSearchInput,
-    sort: sort.categoryId
-      ? sort
-      : SHARE_LINKS_SORT_DEFAULT_VALUE,
+    sort: sort.categoryId ? sort : SHARE_LINKS_SORT_DEFAULT_VALUE,
     updateSearchParams,
     onEnd,
   };

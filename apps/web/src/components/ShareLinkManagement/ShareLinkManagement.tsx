@@ -224,16 +224,7 @@ export function ShareLinkManagement({ active = true }: ShareLinkManagementProps)
   return (
     <div className={styles.root}>
       <div className={styles.controlsLeft}>
-        <ShareLinkSearchCell
-          searchInput={searchInput}
-          hasActiveSearch={hasActiveSearch}
-          onSearchInputChange={setSearchInput}
-          onSubmitSearch={() => updateSearchParams({ filters, search: searchInput })}
-          onResetSearch={() => {
-            setSearchInput("");
-            updateSearchParams({ filters, search: "" });
-          }}
-        />
+
 
         <div className={styles.sortCell}>
           <ShareLinksSort
@@ -244,6 +235,17 @@ export function ShareLinkManagement({ active = true }: ShareLinkManagementProps)
       </div>
 
       <div className={styles.filtersCell}>
+      <ShareLinkSearchCell
+          searchInput={searchInput}
+          hasActiveSearch={hasActiveSearch}
+          onSearchInputChange={setSearchInput}
+          onSubmitSearch={() => updateSearchParams({ filters, search: searchInput })}
+          onResetSearch={() => {
+            setSearchInput("");
+            updateSearchParams({ filters, search: "" });
+          }}
+        />
+        
         <ShareLinkFilterPanels
           selected={filters}
           onChange={(next) => updateSearchParams({ filters: next, search })}
