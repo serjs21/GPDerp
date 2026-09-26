@@ -1,6 +1,10 @@
 export { ComicPageLayout, type ComicPageLayoutProps } from "./ComicPageLayout";
 export { ComicPageRow, type ComicPageRowProps } from "./ComicPageRow";
-export { ComicPagePanel, type ComicPagePanelProps } from "./ComicPagePanel";
+export {
+  ComicPagePanel,
+  type ComicPagePanelProps,
+  type ComicPanelTitleDirection,
+} from "./ComicPagePanel";
 export { ComicPageDialog, type ComicPageDialogProps } from "./ComicPageDialog";
 export {
   ComicPageCtaAction,

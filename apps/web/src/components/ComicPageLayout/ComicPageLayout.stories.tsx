@@ -248,6 +248,29 @@ export const PanelWithTitle: Story = {
   ),
 };
 
+export const PanelWithVerticalTitle: Story = {
+  name: "Panel with vertical title",
+  render: () => (
+    <div style={{ padding: "2rem", background: "#222", minHeight: "100vh" }}>
+      <ComicPageLayout title="Vertical spine title">
+        <ComicPageRow>
+          <ComicPagePanel
+            span="full"
+            color="white"
+            background="solid"
+            title="Sort by"
+            titleDirection="vertical"
+            contentAlign="center"
+            style={{ minHeight: "8.5rem" }}
+          >
+            Title reads bottom → top along the left edge.
+          </ComicPagePanel>
+        </ComicPageRow>
+      </ComicPageLayout>
+    </div>
+  ),
+};
+
 const MOTION_SAMPLES: Array<{ color: ComicPanelColor; label: string }> = [
   { color: "purple", label: "Purple motion" },
   { color: "teal", label: "Teal motion" },

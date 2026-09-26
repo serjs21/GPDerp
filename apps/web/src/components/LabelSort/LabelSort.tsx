@@ -38,6 +38,7 @@ export function LabelSort({
   return (
     <ComicPagePanel
       title="Sort by"
+      titleDirection="vertical"
       background="solid"
       color="white"
       contentAlign="center"

@@ -13,10 +13,18 @@ const FINE_CLOUD_SRC = "/fine_panel/fine_cloud_pattern.svg";
 const FINE_FLAME_SRC = "/fine_panel/fine_flame_pattern.svg";
 const FINE_BAND_EXIT_MS = 1000;
 
+export type ComicPanelTitleDirection = "horizontal" | "vertical";
+
 export type ComicPagePanelProps = {
   children?: ReactNode;
   /** Comic caption box in the panel top-left corner. */
   title?: ReactNode;
+  /**
+   * Title caption layout.
+   * - `horizontal` (default): top-left corner chip
+   * - `vertical`: left-edge spine; text reads bottom → top (see sort panels)
+   */
+  titleDirection?: ComicPanelTitleDirection;
   /** Background color for the title caption box. Defaults to white. */
   titleColor?: ComicPanelColor;
   /** Comic caption box in the panel bottom-right corner. */
@@ -68,6 +76,7 @@ function staticBgClass(background: ComicPanelBackground): string {
 export function ComicPagePanel({
   children,
   title,
+  titleDirection = "horizontal",
   titleColor = "white",
   footer,
   footerColor = "white",
@@ -144,11 +153,17 @@ export function ComicPagePanel({
     .filter(Boolean)
     .join(" ");
 
+  const titleIsVertical = titleDirection === "vertical";
+
   const contentClass = [
     panelStyles.content,
     contentAlign === "start" && panelStyles.contentStart,
     contentAlign === "start" && panelStyles.contentStretch,
-    hasTitle && contentAlign === "start" && panelStyles.contentWithTitle,
+    hasTitle &&
+      !titleIsVertical &&
+      contentAlign === "start" &&
+      panelStyles.contentWithTitle,
+    hasTitle && titleIsVertical && panelStyles.contentWithTitleVertical,
     hasFooter && contentAlign === "start" && panelStyles.contentWithFooter,
   ]
     .filter(Boolean)
@@ -164,6 +179,13 @@ export function ComicPagePanel({
     ...(span === "auto" ? { "--comic-panel-flex": flexWeight } : {}),
     ...styleProp,
   } as CSSProperties;
+
+  const titleClass = [
+    panelStyles.panelTitle,
+    titleIsVertical ? panelStyles.panelTitleVertical : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const inner = (
     <>
@@ -199,7 +221,7 @@ export function ComicPagePanel({
         </div>
       ) : null}
       {hasTitle ? (
-        <div className={panelStyles.panelTitle}>{titleLabel ?? title}</div>
+        <div className={titleClass}>{titleLabel ?? title}</div>
       ) : null}
       <div className={contentClass}>{children}</div>
       {hasFooter ? (
