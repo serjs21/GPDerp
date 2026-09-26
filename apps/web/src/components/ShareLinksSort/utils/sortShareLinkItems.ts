@@ -11,31 +11,53 @@ function timeRemainingMs(link: ShareLinkListItem, nowMs: number): number {
   return new Date(link.expirationDate).getTime() - nowMs;
 }
 
+/** Live share link — not disabled, expired, or out of hits. */
+function isActiveLink(link: ShareLinkListItem, nowMs: number): boolean {
+  const expiredByDate =
+    link.expirationDate != null &&
+    new Date(link.expirationDate).getTime() <= nowMs;
+  const viewLimitReached =
+    link.maxViews != null && link.viewCount >= link.maxViews;
+  return !link.disabled && !expiredByDate && !viewLimitReached;
+}
+
+function compareMetric(
+  a: ShareLinkListItem,
+  b: ShareLinkListItem,
+  categoryId: string,
+  nowMs: number,
+): number {
+  switch (categoryId) {
+    case "alpacabeth":
+      return a.haikuSubject.localeCompare(b.haikuSubject, undefined, {
+        sensitivity: "base",
+      });
+    case "hitsLeft":
+      return hitsRemaining(a) - hitsRemaining(b);
+    case "timeLeft":
+      return timeRemainingMs(a, nowMs) - timeRemainingMs(b, nowMs);
+    case "creationDate":
+    default:
+      return (
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      );
+  }
+}
+
 function compareLinks(
   a: ShareLinkListItem,
   b: ShareLinkListItem,
   sort: ShareLinksSortValue & { categoryId: string },
   nowMs: number,
 ): number {
-  let delta = 0;
-  switch (sort.categoryId) {
-    case "alpacabeth":
-      delta = a.haikuSubject.localeCompare(b.haikuSubject, undefined, {
-        sensitivity: "base",
-      });
-      break;
-    case "hitsLeft":
-      delta = hitsRemaining(a) - hitsRemaining(b);
-      break;
-    case "timeLeft":
-      delta = timeRemainingMs(a, nowMs) - timeRemainingMs(b, nowMs);
-      break;
-    case "creationDate":
-    default:
-      delta =
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-      break;
+  // Hits / time: keep every active link ahead of inactive, then sort by metric.
+  if (sort.categoryId === "hitsLeft" || sort.categoryId === "timeLeft") {
+    const aActive = isActiveLink(a, nowMs);
+    const bActive = isActiveLink(b, nowMs);
+    if (aActive !== bActive) return aActive ? -1 : 1;
   }
+
+  const delta = compareMetric(a, b, sort.categoryId, nowMs);
   return sort.direction === "desc" ? -delta : delta;
 }
 
