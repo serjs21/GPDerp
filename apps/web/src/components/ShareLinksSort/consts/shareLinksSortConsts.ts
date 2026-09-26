@@ -34,7 +34,7 @@ export const SHARE_LINKS_SORT_CATEGORIES: ShareLinksSortCategory[] = [
     coverSrc: "/sort_button/alpacabeth_cover.svg",
     topIconSrc: "/sort_button/alpabeth_start.svg",
     bottomIconSrc: "/sort_button/alpabeth_end.svg",
-    iconTone: "strokeInvert",
+    iconTone: "mask",
     ariaLabel: "Sort alphabetically",
   },
   {
