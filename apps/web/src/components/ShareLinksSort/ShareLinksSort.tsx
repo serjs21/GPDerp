@@ -54,7 +54,7 @@ export function ShareLinksSort({
               if (!open) return;
               onChange({
                 categoryId: category.id,
-                direction: value.direction,
+                direction: "asc",
               });
             }}
             flipped={selected && value.direction === "desc"}
