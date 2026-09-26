@@ -55,23 +55,26 @@ function timeLeftBucket(row: ShareLinkSortableRow, now: Date): number {
   const expired = isExpired(row, now);
   if (active && infinite) return 0;
   if (active) return 1;
-  if (!expired && infinite) return 2;
-  if (!expired) return 2; // inactive, still has time → with infinite inactive tier
-  return 3;
+  if (infinite) return 2; // inactive, no expiry
+  if (expired) return 3;
+  // Inactive with a future expiry: keep ahead of expired, after infinite inactive
+  return 2;
 }
 
 /**
  * Hits left buckets (fixed order; direction only sorts within active finite):
- * 0 active infinite → 1 active finite → 2 inactive with hits left → 3 inactive at 0
+ * 0 active infinite → 1 active finite → 2 inactive infinite → 3 inactive at 0
  */
 function hitsLeftBucket(row: ShareLinkSortableRow, now: Date): number {
   const active = isShareLinkActive(row, now);
-  const remaining = hitsRemaining(row);
   const infinite = row.maxViews == null;
+  const remaining = hitsRemaining(row);
   if (active && infinite) return 0;
   if (active) return 1;
-  if (remaining > 0) return 2; // inactive infinite or still has hits
-  return 3;
+  if (infinite) return 2; // inactive, unlimited hits
+  if (remaining <= 0) return 3;
+  // Inactive with finite hits left: keep with infinite-inactive tier, after true infinites
+  return 2;
 }
 
 function compareByDirection(delta: number, direction: ShareLinkSortDirection): number {

@@ -81,7 +81,7 @@ describe("sortShareLinkRows", () => {
   });
 
   describe("hitsLeft", () => {
-    it("orders active infinite, active finite, inactive with hits, inactive at 0", () => {
+    it("orders active infinite, active finite, inactive infinite, inactive at 0", () => {
       const activeInfinite = row({ id: "ai", maxViews: null, disabled: false });
       const activeLow = row({
         id: "alow",
@@ -100,6 +100,12 @@ describe("sortShareLinkRows", () => {
         maxViews: null,
         disabled: true,
       });
+      const inactiveFinite = row({
+        id: "if",
+        maxViews: 10,
+        viewCount: 3,
+        disabled: true,
+      });
       const inactiveZero = row({
         id: "iz",
         maxViews: 5,
@@ -108,12 +114,27 @@ describe("sortShareLinkRows", () => {
       });
 
       const sorted = sortShareLinkRows(
-        [inactiveZero, activeHigh, inactiveInfinite, activeLow, activeInfinite],
+        [
+          inactiveZero,
+          activeHigh,
+          inactiveFinite,
+          inactiveInfinite,
+          activeLow,
+          activeInfinite,
+        ],
         { categoryId: "hitsLeft", direction: "asc" },
         now,
       );
 
-      expect(sorted.map((r) => r.id)).toEqual(["ai", "alow", "ahi", "ii", "iz"]);
+      // inactive finite (still has hits) stays with inactive-infinite tier, after true infinite
+      expect(sorted.map((r) => r.id)).toEqual([
+        "ai",
+        "alow",
+        "ahi",
+        "ii",
+        "if",
+        "iz",
+      ]);
     });
   });
 
