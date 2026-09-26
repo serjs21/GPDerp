@@ -2,6 +2,10 @@ import fp from "fastify-plugin";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { isUuid } from "../../utils/uuid";
 import { shareLinkService, type ShareLinkListItem } from "./shareLink.service";
+import {
+  parseShareLinkSortCategoryId,
+  parseShareLinkSortDirection,
+} from "./shareLinkSort";
 
 const broadcastShareLink = (app: FastifyInstance, userId: string, shareLink: ShareLinkListItem) => {
   app.sendToUser(userId, { kind: "share_link", data: shareLink });
@@ -37,6 +41,8 @@ const shareLinkPluginImpl = async (app: FastifyInstance) => {
         ),
       ];
       const search = (q.search ?? "").trim();
+      const sortCategoryId = parseShareLinkSortCategoryId(q.sort);
+      const sortDirection = parseShareLinkSortDirection(q.dir);
 
       const result = await shareLinkService.listShareLinksForUser({
         userId,
@@ -44,6 +50,8 @@ const shareLinkPluginImpl = async (app: FastifyInstance) => {
         offset,
         filters: filters.length > 0 ? filters : undefined,
         search: search || undefined,
+        sortCategoryId,
+        sortDirection,
       });
 
       res.send({

@@ -138,6 +138,8 @@ export default function ProfilePage() {
     if (next !== "share-links") {
       params.delete("filter");
       params.delete("search");
+      params.delete("sort");
+      params.delete("dir");
     }
     router.replace(`/settings?${params.toString()}`, { scroll: false });
   };

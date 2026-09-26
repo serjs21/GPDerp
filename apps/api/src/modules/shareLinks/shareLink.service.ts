@@ -6,6 +6,11 @@ import { isUniqueConstraintError } from "../../utils/prismaErrors";
 import { authRepository } from "../auth/repository";
 import { haikuRepository } from "../haiku/haiku.repository";
 import { shareLinkRepository } from "./shareLink.repository";
+import {
+  sortShareLinkRows,
+  type ShareLinkSortCategoryId,
+  type ShareLinkSortDirection,
+} from "./shareLinkSort";
 
 const haikuPayload = (
   row: NonNullable<Awaited<ReturnType<typeof haikuRepository.findFullById>>>,
@@ -246,6 +251,8 @@ export const shareLinkService = {
     offset: number;
     filters?: Array<"active" | "inactive" | "expired" | "view_limit_reached">;
     search?: string;
+    sortCategoryId?: ShareLinkSortCategoryId | null;
+    sortDirection?: ShareLinkSortDirection;
   }): Promise<{
     ok: true;
     items: Array<{
@@ -332,22 +339,25 @@ export const shareLinkService = {
       }
     }
 
-    const [rows, total] = await Promise.all([
-      shareLinkRepository.listForCreator({
-        createdByUserId: params.userId,
-        where,
-        pageSize,
-        offset,
-      }),
-      shareLinkRepository.countForCreator({
-        createdByUserId: params.userId,
-        where,
-      }),
-    ]);
+    const rows = await shareLinkRepository.listForCreator({
+      createdByUserId: params.userId,
+      where,
+    });
+
+    const sorted = sortShareLinkRows(
+      rows,
+      {
+        categoryId: params.sortCategoryId ?? null,
+        direction: params.sortDirection ?? "asc",
+      },
+      now,
+    );
+    const total = sorted.length;
+    const page = sorted.slice(offset, offset + pageSize);
 
     return {
       ok: true,
-      items: rows.map((row) => shareLinkItemFromRow(row)),
+      items: page.map((row) => shareLinkItemFromRow(row)),
       total,
       pageSize,
       offset,

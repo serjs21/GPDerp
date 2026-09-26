@@ -1,18 +1,14 @@
 "use client";
 
-import { useMemo, useRef, useState, type RefObject } from "react";
+import { useRef, type RefObject } from "react";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import { ComicModalInput } from "@/components/ComicModalInput";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { SakuraPetalLoader } from "@/components/Loaders";
-import {
-  SHARE_LINKS_SORT_DEFAULT_VALUE,
-  ShareLinksSort,
-  type ShareLinksSortValue,
-} from "@/components/ShareLinksSort";
-import { sortShareLinkItems } from "@/components/ShareLinksSort/utils/sortShareLinkItems";
+import { ShareLinksSort } from "@/components/ShareLinksSort";
+import type { ShareLinkListItem } from "@/api/shareLinks";
 import { useEndOfContentScroll } from "@/hooks/useEndOfContentScroll";
 import { useShareLinks } from "@/hooks/useShareLinks";
 import { useShareLinkSocket } from "@/hooks/useShareLinkSocket";
@@ -138,7 +134,7 @@ function ShareLinkListBody({
   showCenterLoader: boolean;
   showEmpty: boolean;
   showBottomLoader: boolean;
-  items: ReturnType<typeof useShareLinks>["items"];
+  items: ShareLinkListItem[];
   getHaiku: ReturnType<typeof useShareLinkHaikuEnrichment>["getHaiku"];
   haikusLoading: boolean;
   onChanged: () => void;
@@ -195,7 +191,6 @@ function resolveListFlags(query: ReturnType<typeof useShareLinks>["query"], item
 export function ShareLinkManagement({ active = true }: ShareLinkManagementProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
-  const [sort, setSort] = useState<ShareLinksSortValue>(SHARE_LINKS_SORT_DEFAULT_VALUE);
 
   const {
     query,
@@ -204,19 +199,15 @@ export function ShareLinkManagement({ active = true }: ShareLinkManagementProps)
     search,
     searchInput,
     setSearchInput,
+    sort,
     updateSearchParams,
     onEnd,
   } = useShareLinks(active);
 
   useShareLinkSocket(active);
 
-  const sortedItems = useMemo(
-    () => sortShareLinkItems(items, sort),
-    [items, sort],
-  );
-
   const { getHaiku, isLoading: haikusLoading } = useShareLinkHaikuEnrichment(
-    sortedItems,
+    items,
     active,
   );
 
@@ -226,25 +217,30 @@ export function ShareLinkManagement({ active = true }: ShareLinkManagementProps)
 
   const { showCenterLoader, showEmpty, showBottomLoader } = resolveListFlags(
     query,
-    sortedItems.length,
+    items.length,
   );
   const hasActiveSearch = search.trim().length > 0;
 
   return (
     <div className={styles.root}>
-      <ShareLinkSearchCell
-        searchInput={searchInput}
-        hasActiveSearch={hasActiveSearch}
-        onSearchInputChange={setSearchInput}
-        onSubmitSearch={() => updateSearchParams({ filters, search: searchInput })}
-        onResetSearch={() => {
-          setSearchInput("");
-          updateSearchParams({ filters, search: "" });
-        }}
-      />
+      <div className={styles.controlsLeft}>
+        <ShareLinkSearchCell
+          searchInput={searchInput}
+          hasActiveSearch={hasActiveSearch}
+          onSearchInputChange={setSearchInput}
+          onSubmitSearch={() => updateSearchParams({ filters, search: searchInput })}
+          onResetSearch={() => {
+            setSearchInput("");
+            updateSearchParams({ filters, search: "" });
+          }}
+        />
 
-      <div className={styles.sortCell}>
-        <ShareLinksSort value={sort} onChange={setSort} />
+        <div className={styles.sortCell}>
+          <ShareLinksSort
+            value={sort}
+            onChange={(next) => updateSearchParams({ sort: next })}
+          />
+        </div>
       </div>
 
       <div className={styles.filtersCell}>
@@ -259,7 +255,7 @@ export function ShareLinkManagement({ active = true }: ShareLinkManagementProps)
           showCenterLoader={showCenterLoader}
           showEmpty={showEmpty}
           showBottomLoader={showBottomLoader}
-          items={sortedItems}
+          items={items}
           getHaiku={getHaiku}
           haikusLoading={haikusLoading}
           onChanged={() => void query.refetch()}

@@ -122,6 +122,10 @@ export async function fetchShareLinksPaged(params: {
   /** @deprecated use `filters` */
   filter?: ShareLinkFilter;
   search?: string;
+  /** Sort category id from ShareLinksSort (creationDate / alpacabeth / hitsLeft / timeLeft). */
+  sort?: string;
+  /** Sort direction; ignored when `sort` is omitted. */
+  dir?: "asc" | "desc";
 }): Promise<{ items: ShareLinkListItem[]; total: number; pageSize: number; offset: number }> {
   const filters =
     params.filters ?? (params.filter ? [params.filter] : undefined);
@@ -139,6 +143,8 @@ export async function fetchShareLinksPaged(params: {
       offset: params.offset,
       filter: filterParam,
       search: params.search,
+      sort: params.sort,
+      dir: params.dir,
     },
   });
   if (!data.ok) throw new Error(data.error ?? "Failed to fetch share links");

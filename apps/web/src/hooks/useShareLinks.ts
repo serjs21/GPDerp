@@ -9,10 +9,21 @@ import {
   shareLinkMatchesFilters,
   type ShareLinkFilter,
 } from "@/api/shareLinks";
+import {
+  SHARE_LINKS_SORT_DEFAULT_VALUE,
+  type ShareLinksSortValue,
+} from "@/components/ShareLinksSort";
 
 const PAGE_SIZE = 50;
 
 const FILTER_SET = new Set<ShareLinkFilter>(ALL_SHARE_LINK_FILTERS);
+
+const SORT_CATEGORY_IDS = new Set([
+  "creationDate",
+  "alpacabeth",
+  "hitsLeft",
+  "timeLeft",
+]);
 
 function parseFilters(value: string | null): ShareLinkFilter[] {
   if (!value || value.trim().length === 0) return [...ALL_SHARE_LINK_FILTERS];
@@ -30,6 +41,14 @@ function serializeFilters(filters: ShareLinkFilter[]): string | undefined {
   return unique.join(",");
 }
 
+function parseSort(searchParams: URLSearchParams): ShareLinksSortValue {
+  const categoryRaw = searchParams.get("sort");
+  const categoryId =
+    categoryRaw && SORT_CATEGORY_IDS.has(categoryRaw) ? categoryRaw : null;
+  const direction = searchParams.get("dir") === "desc" ? "desc" : "asc";
+  return { categoryId, direction };
+}
+
 export function useShareLinks(enabled: boolean) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -39,6 +58,7 @@ export function useShareLinks(enabled: boolean) {
     [searchParams],
   );
   const search = (searchParams.get("search") ?? "").trim();
+  const sort = useMemo(() => parseSort(searchParams), [searchParams]);
   const [searchInput, setSearchInput] = useState(search);
 
   useEffect(() => {
@@ -46,15 +66,20 @@ export function useShareLinks(enabled: boolean) {
   }, [search]);
 
   const filterKey = serializeFilters(filters) ?? "all";
+  const sortKey = sort.categoryId
+    ? `${sort.categoryId}:${sort.direction}`
+    : "none";
 
   const query = useInfiniteQuery({
-    queryKey: ["share-links", PAGE_SIZE, filterKey, search],
+    queryKey: ["share-links", PAGE_SIZE, filterKey, search, sortKey],
     queryFn: ({ pageParam }) =>
       fetchShareLinksPaged({
         pageSize: PAGE_SIZE,
         offset: pageParam as number,
         filters: serializeFilters(filters) ? filters : undefined,
         search: search || undefined,
+        sort: sort.categoryId ?? undefined,
+        dir: sort.categoryId ? sort.direction : undefined,
       }),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => {
@@ -71,7 +96,11 @@ export function useShareLinks(enabled: boolean) {
   }, [query.data?.pages, filters]);
 
   const updateSearchParams = useCallback(
-    (next: { filters?: ShareLinkFilter[]; search?: string }) => {
+    (next: {
+      filters?: ShareLinkFilter[];
+      search?: string;
+      sort?: ShareLinksSortValue;
+    }) => {
       const params = new URLSearchParams(searchParams.toString());
       params.set("tab", "share-links");
       if (next.filters !== undefined) {
@@ -82,6 +111,15 @@ export function useShareLinks(enabled: boolean) {
       if (next.search !== undefined) {
         if (next.search.trim().length > 0) params.set("search", next.search.trim());
         else params.delete("search");
+      }
+      if (next.sort !== undefined) {
+        if (next.sort.categoryId) {
+          params.set("sort", next.sort.categoryId);
+          params.set("dir", next.sort.direction);
+        } else {
+          params.delete("sort");
+          params.delete("dir");
+        }
       }
       const queryString = params.toString();
       router.replace(`/settings?${queryString}`);
@@ -101,6 +139,9 @@ export function useShareLinks(enabled: boolean) {
     search,
     searchInput,
     setSearchInput,
+    sort: sort.categoryId
+      ? sort
+      : SHARE_LINKS_SORT_DEFAULT_VALUE,
     updateSearchParams,
     onEnd,
   };

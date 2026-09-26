@@ -88,8 +88,8 @@ export const shareLinkRepository = {
   listForCreator(params: {
     createdByUserId: string;
     where?: Prisma.ShareLinkWhereInput;
-    offset: number;
-    pageSize: number;
+    offset?: number;
+    pageSize?: number;
   }) {
     return prismaClient.shareLink.findMany({
       where: {
