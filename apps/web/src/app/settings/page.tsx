@@ -135,9 +135,10 @@ export default function ProfilePage() {
     if (next === tab) return;
     const params = new URLSearchParams(searchParams.toString());
     params.set("tab", next);
+    // Search is tab-scoped (share-links vs labels); clear on every switch.
+    params.delete("search");
     if (next !== "share-links") {
       params.delete("filter");
-      params.delete("search");
       params.delete("sort");
       params.delete("dir");
     }
@@ -360,7 +361,8 @@ export default function ProfilePage() {
                 <ManageLabelsPanel
                   accountId={labelsAccountId}
                   active
-                  searchVariant="comic"
+                  searchVariant="none"
+                  searchQuery={searchParams.get("search") ?? ""}
                   showCreate
                 />
               ) : null}

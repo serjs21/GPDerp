@@ -61,8 +61,10 @@ export type ManageLabelsPanelProps = {
   /** When false, skips fetch until activated (inactive modal tab). */
   active?: boolean;
   className?: string;
-  /** Comic search panel chrome (modal) vs plain input (page). */
-  searchVariant?: "comic" | "plain";
+  /** Comic / plain local search, or none when header drives `searchQuery`. */
+  searchVariant?: "comic" | "plain" | "none";
+  /** Controlled query when `searchVariant` is `"none"` (settings header). */
+  searchQuery?: string;
   showCreate?: boolean;
 };
 
@@ -71,8 +73,10 @@ export function ManageLabelsPanel({
   active = true,
   className,
   searchVariant = "comic",
+  searchQuery = "",
   showCreate = true,
 }: ManageLabelsPanelProps) {
+  const headerDriven = searchVariant === "none";
   const [searchInput, setSearchInput] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
   /** labelId → boingInUp delay ms (insert order). */
@@ -85,11 +89,12 @@ export function ManageLabelsPanel({
   const queryClient = useQueryClient();
 
   useEffect(() => {
+    if (headerDriven) return;
     const handle = window.setTimeout(() => {
       setDebouncedQ(searchInput.trim());
     }, SEARCH_DEBOUNCE_MS);
     return () => window.clearTimeout(handle);
-  }, [searchInput]);
+  }, [searchInput, headerDriven]);
 
   useEffect(() => {
     if (!active) {
@@ -101,10 +106,13 @@ export function ManageLabelsPanel({
       setExitingById({});
       return;
     }
+    if (headerDriven) return;
     window.requestAnimationFrame(() => {
       searchRef.current?.focus();
     });
-  }, [active]);
+  }, [active, headerDriven]);
+
+  const resolvedQ = headerDriven ? searchQuery.trim() : debouncedQ;
 
   const {
     pagedLabels,
@@ -117,7 +125,7 @@ export function ManageLabelsPanel({
     accountId,
     autofetch: active && Boolean(accountId),
     pageSize: PAGE_SIZE,
-    q: debouncedQ,
+    q: resolvedQ,
     includeConnectedHaikus: true,
   });
 
@@ -224,11 +232,12 @@ export function ManageLabelsPanel({
         <div className={styles.searchChrome}>
           <ComicModalSearchPanel {...searchInputProps} />
         </div>
-      ) : (
+      ) : null}
+      {searchVariant === "plain" ? (
         <div className={styles.searchPlain}>
           <ComicModalInput {...searchInputProps} />
         </div>
-      )}
+      ) : null}
 
       <div className={styles.listScroll} onScroll={onListScroll}>
         {isPagedLoading ? (
@@ -240,7 +249,7 @@ export function ManageLabelsPanel({
             {showEmpty ? (
               <div className={styles.emptyLayout}>
                 <p className={styles.empty}>
-                  {debouncedQ ? "No labels found" : "No labels yet."}
+                  {resolvedQ ? "No labels found" : "No labels yet."}
                 </p>
               </div>
             ) : (

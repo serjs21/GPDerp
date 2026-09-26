@@ -12,6 +12,7 @@ import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationMod
 import { LabelsFilterModal } from "@/components/LabelsFilterModal";
 import { useHeaderHaikuLabelManage } from "./useHeaderHaikuLabelManage";
 import { useHeaderHaikuSearch } from "./useHeaderHaikuSearch";
+import { useHeaderSettingsSearch } from "./useHeaderSettingsSearch";
 import toolStyles from "./HeaderHaikuTools.module.css";
 import styles from "./SearchPanel.module.css";
 
@@ -142,16 +143,11 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
   const activeHover = forcedHover !== undefined ? forcedHover : hover;
   const sharpShape = resolveComicLabelShapePreset("sharp");
   const labels = useHeaderHaikuLabelManage();
-  const {
-    enabled: searchEnabled,
-    expanded,
-    fadingOut,
-    searchString,
-    setSearchString,
-    openSearch,
-    onBlur,
-    inputRef,
-  } = useHeaderHaikuSearch();
+  const haikuSearch = useHeaderHaikuSearch();
+  const settingsSearch = useHeaderSettingsSearch();
+
+  const isSettings = settingsSearch.enabled;
+  const isHaiku = labels.enabled && haikuSearch.enabled;
 
   const setHoverIfLive = (next: HoverTarget) => {
     if (forcedHover === undefined) setHover(next);
@@ -178,7 +174,30 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
     clearHover();
   };
 
-  if (!labels.enabled || !searchEnabled) return null;
+  if (!isSettings && !isHaiku) return null;
+
+  const expanded = isSettings ? settingsSearch.expanded : haikuSearch.expanded;
+  const fadingOut = isSettings ? false : haikuSearch.fadingOut;
+  const searchString = isSettings
+    ? settingsSearch.searchString
+    : haikuSearch.searchString;
+  const setSearchString = isSettings
+    ? settingsSearch.setSearchString
+    : haikuSearch.setSearchString;
+  const inputRef = isSettings ? settingsSearch.inputRef : haikuSearch.inputRef;
+  const placeholder = isSettings
+    ? settingsSearch.placeholder
+    : "Search titles…";
+  const inputAriaLabel = isSettings
+    ? settingsSearch.ariaLabel
+    : "Search haiku titles";
+  const searchButtonAriaLabel = isSettings
+    ? settingsSearch.buttonAriaLabel
+    : "Search haikus";
+  const onSearchClick = isSettings
+    ? settingsSearch.toggleExpanded
+    : haikuSearch.openSearch;
+  const onInputBlur = isSettings ? undefined : haikuSearch.onBlur;
 
   return (
     <>
@@ -196,7 +215,7 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
             randomness={sharpShape.randomness}
             seed={sharpShape.id}
             fontSize={PANEL_HEIGHT_PX}
-            paddingX={28}
+            paddingX={isSettings ? 16 : 28}
             paddingY={0}
             strokeWidth={3}
             fill="#f7f4ef"
@@ -208,62 +227,67 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
           <div
             className={[
               styles.panel,
-              activeHover === "filter" ? styles.panelHoverLabels : "",
+              isSettings ? styles.panelSearchOnly : "",
+              !isSettings && activeHover === "filter"
+                ? styles.panelHoverLabels
+                : "",
               activeHover === "search" ? styles.panelHoverSearch : "",
             ]
               .filter(Boolean)
               .join(" ")}
             role="group"
-            aria-label="Haiku tools"
+            aria-label={isSettings ? "Settings search" : "Haiku tools"}
           >
-            <div className={`${styles.slot} ${styles.slotLabels}`}>
-              <button
-                type="button"
-                className={styles.panelButton}
-                aria-label="Filter haikus by labels"
-                aria-expanded={labels.modalOpen}
-                disabled={!labels.canOpen}
-                onMouseEnter={() => setHoverIfLive("filter")}
-                onFocus={(event) =>
-                  setHoverFromFocus("filter", event.currentTarget)
-                }
-                onBlur={clearHoverFromBlur}
-                onClick={() => {
-                  clearHover();
-                  labels.setModalOpen(true);
-                }}
-              >
-                <SlotFace>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/nav/filter_label_icon.svg"
-                    alt=""
-                    className={`${styles.iconImg} ${styles.iconImgLight}`}
-                    width={22}
-                    height={28}
-                  />
-                </SlotFace>
-                <SlotFace
-                  enterFrom="left"
-                  hidden={activeHover !== "filter"}
+            {!isSettings ? (
+              <div className={`${styles.slot} ${styles.slotLabels}`}>
+                <button
+                  type="button"
+                  className={styles.panelButton}
+                  aria-label="Filter haikus by labels"
+                  aria-expanded={labels.modalOpen}
+                  disabled={!labels.canOpen}
+                  onMouseEnter={() => setHoverIfLive("filter")}
+                  onFocus={(event) =>
+                    setHoverFromFocus("filter", event.currentTarget)
+                  }
+                  onBlur={clearHoverFromBlur}
+                  onClick={() => {
+                    clearHover();
+                    labels.setModalOpen(true);
+                  }}
                 >
-                  <span className={styles.actionName}>Filter</span>
-                </SlotFace>
-              </button>
-            </div>
+                  <SlotFace>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/nav/filter_label_icon.svg"
+                      alt=""
+                      className={`${styles.iconImg} ${styles.iconImgLight}`}
+                      width={22}
+                      height={28}
+                    />
+                  </SlotFace>
+                  <SlotFace
+                    enterFrom="left"
+                    hidden={activeHover !== "filter"}
+                  >
+                    <span className={styles.actionName}>Filter</span>
+                  </SlotFace>
+                </button>
+              </div>
+            ) : null}
 
             <div className={`${styles.slot} ${styles.slotSearch}`}>
               <button
                 type="button"
                 className={styles.panelButton}
-                aria-label="Search haikus"
+                aria-label={searchButtonAriaLabel}
                 aria-expanded={expanded}
                 onMouseEnter={() => setHoverIfLive("search")}
                 onFocus={(event) =>
                   setHoverFromFocus("search", event.currentTarget)
                 }
                 onBlur={clearHoverFromBlur}
-                onClick={openSearch}
+                onClick={onSearchClick}
               >
                 <SlotFace>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -298,22 +322,24 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
             type="search"
             value={searchString}
             onChange={(event) => setSearchString(event.target.value)}
-            onBlur={onBlur}
-            placeholder="Search titles…"
-            aria-label="Search haiku titles"
+            onBlur={onInputBlur}
+            placeholder={placeholder}
+            aria-label={inputAriaLabel}
             autoComplete="off"
             spellCheck={false}
           />
         ) : null}
       </div>
 
-      <LabelFilterExtras
-        labels={labels}
-        onModalClose={() => {
-          labels.setModalOpen(false);
-          clearHover();
-        }}
-      />
+      {!isSettings ? (
+        <LabelFilterExtras
+          labels={labels}
+          onModalClose={() => {
+            labels.setModalOpen(false);
+            clearHover();
+          }}
+        />
+      ) : null}
     </>
   );
 }

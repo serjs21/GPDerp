@@ -53,6 +53,10 @@
   background-color: #1a5fb4;
 }
 
+.panelSearchOnly .slotSearch {
+  border-left: none;
+}
+
 .panelHoverLabels .slotLabels {
   flex-grow: 7;
 }

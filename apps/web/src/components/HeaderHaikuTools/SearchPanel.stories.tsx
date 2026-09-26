@@ -36,3 +36,31 @@ export const HoverSearch: Story = {
     forcedHover: "search",
   },
 };
+
+export const SettingsShareLinks: Story = {
+  parameters: {
+    nextjs: {
+      appDirectory: true,
+      navigation: {
+        pathname: "/settings",
+        query: {
+          tab: "share-links",
+        },
+      },
+    },
+  },
+};
+
+export const SettingsLabels: Story = {
+  parameters: {
+    nextjs: {
+      appDirectory: true,
+      navigation: {
+        pathname: "/settings",
+        query: {
+          tab: "labels",
+        },
+      },
+    },
+  },
+};

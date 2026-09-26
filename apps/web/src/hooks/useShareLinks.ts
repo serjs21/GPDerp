@@ -2,7 +2,7 @@
 
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import {
   ALL_SHARE_LINK_FILTERS,
   fetchShareLinksPaged,
@@ -62,11 +62,6 @@ export function useShareLinks(enabled: boolean) {
   );
   const search = (searchParams.get("search") ?? "").trim();
   const sort = useMemo(() => parseSort(searchParams), [searchParams]);
-  const [searchInput, setSearchInput] = useState(search);
-
-  useEffect(() => {
-    setSearchInput(search);
-  }, [search]);
 
   const filterKey = serializeFilters(filters) ?? "all";
 
@@ -156,8 +151,6 @@ export function useShareLinks(enabled: boolean) {
     items,
     filters,
     search,
-    searchInput,
-    setSearchInput,
     sort: sort.categoryId ? sort : SHARE_LINKS_SORT_DEFAULT_VALUE,
     updateSearchParams,
     onEnd,
