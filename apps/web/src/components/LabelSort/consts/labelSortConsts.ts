@@ -3,7 +3,7 @@ import type { DualityIconTone } from "@/components/DualityButton";
 export type LabelSortDirection = "asc" | "desc";
 
 export type LabelSortValue = {
-  categoryId: string;
+  categoryId: string | null;
   direction: LabelSortDirection;
 };
 
@@ -49,7 +49,7 @@ export const LABEL_SORT_CATEGORIES: LabelSortCategory[] = [
 ];
 
 export const LABEL_SORT_DEFAULT_VALUE: LabelSortValue = {
-  categoryId: LABEL_SORT_CATEGORIES[0]!.id,
+  categoryId: null,
   direction: "asc",
 };
 

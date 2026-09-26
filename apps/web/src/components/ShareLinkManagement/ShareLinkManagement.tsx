@@ -1,12 +1,18 @@
 "use client";
 
-import { useRef, type RefObject } from "react";
+import { useMemo, useRef, useState, type RefObject } from "react";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import { ComicModalInput } from "@/components/ComicModalInput";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { SakuraPetalLoader } from "@/components/Loaders";
+import {
+  SHARE_LINKS_SORT_DEFAULT_VALUE,
+  ShareLinksSort,
+  type ShareLinksSortValue,
+} from "@/components/ShareLinksSort";
+import { sortShareLinkItems } from "@/components/ShareLinksSort/utils/sortShareLinkItems";
 import { useEndOfContentScroll } from "@/hooks/useEndOfContentScroll";
 import { useShareLinks } from "@/hooks/useShareLinks";
 import { useShareLinkSocket } from "@/hooks/useShareLinkSocket";
@@ -189,6 +195,7 @@ function resolveListFlags(query: ReturnType<typeof useShareLinks>["query"], item
 export function ShareLinkManagement({ active = true }: ShareLinkManagementProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const [sort, setSort] = useState<ShareLinksSortValue>(SHARE_LINKS_SORT_DEFAULT_VALUE);
 
   const {
     query,
@@ -203,13 +210,24 @@ export function ShareLinkManagement({ active = true }: ShareLinkManagementProps)
 
   useShareLinkSocket(active);
 
-  const { getHaiku, isLoading: haikusLoading } = useShareLinkHaikuEnrichment(items, active);
+  const sortedItems = useMemo(
+    () => sortShareLinkItems(items, sort),
+    [items, sort],
+  );
+
+  const { getHaiku, isLoading: haikusLoading } = useShareLinkHaikuEnrichment(
+    sortedItems,
+    active,
+  );
 
   useEndOfContentScroll(scrollRef, sentinelRef, onEnd, {
     enabled: Boolean(active && query.hasNextPage && !query.isFetchingNextPage),
   });
 
-  const { showCenterLoader, showEmpty, showBottomLoader } = resolveListFlags(query, items.length);
+  const { showCenterLoader, showEmpty, showBottomLoader } = resolveListFlags(
+    query,
+    sortedItems.length,
+  );
   const hasActiveSearch = search.trim().length > 0;
 
   return (
@@ -225,6 +243,10 @@ export function ShareLinkManagement({ active = true }: ShareLinkManagementProps)
         }}
       />
 
+      <div className={styles.sortCell}>
+        <ShareLinksSort value={sort} onChange={setSort} />
+      </div>
+
       <div className={styles.filtersCell}>
         <ShareLinkFilterPanels
           selected={filters}
@@ -237,7 +259,7 @@ export function ShareLinkManagement({ active = true }: ShareLinkManagementProps)
           showCenterLoader={showCenterLoader}
           showEmpty={showEmpty}
           showBottomLoader={showBottomLoader}
-          items={items}
+          items={sortedItems}
           getHaiku={getHaiku}
           haikusLoading={haikusLoading}
           onChanged={() => void query.refetch()}

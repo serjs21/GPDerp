@@ -44,7 +44,7 @@ function StatefulSort({ initial }: { initial: LabelSortValue }) {
           opacity: 0.72,
         }}
       >
-        {value.categoryId} · {value.direction}
+        {value.categoryId ?? "none"} · {value.direction}
       </p>
       <p
         style={{
@@ -56,8 +56,9 @@ function StatefulSort({ initial }: { initial: LabelSortValue }) {
           textAlign: "center",
         }}
       >
-        Selected coin is uncovered. Click another cover to re-cover the current
-        coin and open the new one. Click the open face to flip asc/desc.
+        Selected coin is uncovered (none selected by default). Click a cover to
+        open that category. Click another cover to switch. Click the open face
+        to flip asc/desc.
       </p>
     </div>
   );

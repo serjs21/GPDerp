@@ -3,7 +3,7 @@ import type { DualityIconTone } from "@/components/DualityButton";
 export type ShareLinksSortDirection = "asc" | "desc";
 
 export type ShareLinksSortValue = {
-  categoryId: string;
+  categoryId: string | null;
   direction: ShareLinksSortDirection;
 };
 
@@ -57,7 +57,7 @@ export const SHARE_LINKS_SORT_CATEGORIES: ShareLinksSortCategory[] = [
 ];
 
 export const SHARE_LINKS_SORT_DEFAULT_VALUE: ShareLinksSortValue = {
-  categoryId: SHARE_LINKS_SORT_CATEGORIES[0]!.id,
+  categoryId: null,
   direction: "asc",
 };
 
