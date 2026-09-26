@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useAuthenticationVerification } from "@/app/providers/AuthenticationVerificationProvider";
 import { BrushMenu, type BrushMenuOption } from "@/components/BrushMenu";
 import { ComicConfirmModal } from "@/components/ComicConfirmModal";
 import type { UserObject } from "@/types";
@@ -50,6 +51,7 @@ function OptionIconLabel({
 export function UserMenu({ user, onLogout, className }: UserMenuProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const { openAuthenticationModal } = useAuthenticationVerification();
   const onSettingsPage = pathname.startsWith("/settings");
   const displayName = resolveDisplayName(user);
   const [logoutOpen, setLogoutOpen] = useState(false);
@@ -116,6 +118,7 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
     setLoggingOut(true);
     try {
       await onLogout();
+      openAuthenticationModal("login");
     } finally {
       setLoggingOut(false);
       setLogoutOpen(false);

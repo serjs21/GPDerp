@@ -7,6 +7,7 @@ import {
   ComicPageLayout,
 } from "@/components/ComicPageLayout";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
+import { useAuthenticationVerification } from "@/app/providers/AuthenticationVerificationProvider";
 import { AuthProvider } from "@/types";
 import { isValidEmail } from "@/utils/strings";
 import {
@@ -89,6 +90,7 @@ export default function ProfilePage() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
   const { initialized, isLoggedIn, checkAuthentication } = useAuthenticationState();
+  const { openAuthenticationModal } = useAuthenticationVerification();
   const hasStoredTheme = useRef(false);
   const hasStoredLanguage = useRef(false);
   const [loading, setLoading] = useState(false);
@@ -156,8 +158,8 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!initialized) return;
-    if (!isLoggedIn) router.replace("/");
-  }, [initialized, isLoggedIn, router]);
+    if (!isLoggedIn) openAuthenticationModal("login");
+  }, [initialized, isLoggedIn, openAuthenticationModal]);
 
   const validEmailDraft = useMemo(() => isValidEmail(emailDraft), [emailDraft]);
 

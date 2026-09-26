@@ -3,6 +3,7 @@ import { fn } from "storybook/test";
 
 import type { UserObject } from "@/types";
 import { AuthProvider } from "@/types";
+import { withAuthProviders } from "@/storybook/decorators/withAuthProviders";
 import { UserMenu } from "./UserMenu";
 
 const avatarAristotle =
@@ -34,6 +35,7 @@ const meta = {
   title: "Auth/UserMenu",
   component: UserMenu,
   tags: ["autodocs"],
+  decorators: [withAuthProviders],
   parameters: {
     layout: "centered",
   },
