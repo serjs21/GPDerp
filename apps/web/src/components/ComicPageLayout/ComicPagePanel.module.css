@@ -389,23 +389,25 @@
   background: var(--comic-title-bg, #fff);
 }
 
-/* Left-edge spine; letters read bottom → top (counterclockwise from horizontal). */
+/* Left-edge caption; letters read bottom → top. After rotate(180deg),
+   border-top/left paint as the content-side L (bottom + right). */
 .panelTitleVertical {
   top: 0;
-  bottom: 0;
   left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: auto;
+  bottom: auto;
+  display: block;
+  width: max-content;
   max-width: none;
-  height: auto;
-  min-height: 100%;
+  height: max-content;
+  min-height: 0;
   padding: 0.75rem 0.25rem;
-  border-right: var(--comic-page-border, 4px) solid #111;
+  border-top: var(--comic-page-border, 4px) solid #111;
+  border-left: var(--comic-page-border, 4px) solid #111;
+  border-right: none;
   border-bottom: none;
   writing-mode: vertical-rl;
   transform: rotate(180deg);
+  transform-origin: center center;
   letter-spacing: 0.12em;
 }
 
