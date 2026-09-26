@@ -138,6 +138,8 @@ export function useCoverLabelMorph(
       "--arrow-angle",
       toExpanded ? startDeg : restDeg,
     );
+    // Collapse rotates/fades from the current angle (baseRotate holds rim
+    // position separately — do not snap --arrow-angle to rest/top first).
     const arrowTo = toExpanded ? restDeg : startDeg;
     const spinFrom = readCssDeg(
       cue,

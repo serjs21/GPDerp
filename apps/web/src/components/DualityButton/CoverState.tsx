@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type AnimationEvent,
@@ -95,7 +96,9 @@ export function CoverState({
     setBaseRotateDeg(0);
   }, []);
 
-  useEffect(() => {
+  // useLayoutEffect: set closing before paint so baseRotate never drops to 0
+  // for a frame (that snapped the arrow to top center on re-cover).
+  useLayoutEffect(() => {
     const wasUncovered = prevUncoveredRef.current;
     prevUncoveredRef.current = uncovered;
 
@@ -105,7 +108,7 @@ export function CoverState({
         return;
       }
       setOpening(false);
-      setBaseRotateDeg(0);
+      // Keep baseRotateDeg so the arrow exits from its current rim position.
       setLabelMounted(true);
       setIconMounted(true);
       setClosing(true);
@@ -131,6 +134,7 @@ export function CoverState({
   const onCloseComplete = useCallback(() => {
     setClosing(false);
     setIconMounted(true);
+    setBaseRotateDeg(0);
     if (!isControlled) setUncoveredInternal(false);
   }, [isControlled]);
 
@@ -176,13 +180,45 @@ export function CoverState({
     opening || ((uncovered || !iconMounted) && !closing);
   const arrowFollowsBase =
     (uncovered || !iconMounted) && !closing && !opening;
+  // Keep rim angle while closing (and on the uncovered→false frame before
+  // closing flips true) so the arrow never snaps to top center.
+  const labelBaseRotateDeg =
+    arrowFollowsBase || closing || (!uncovered && baseRotateDeg !== 0)
+      ? baseRotateDeg
+      : 0;
+
+  // Keep CoverLabel arrow orbit in sync when opening already-desc (flipped).
+  // Skip while covering so flipped→false does not +180 the exit pose to top.
+  const flippedProp = dualityProps.flipped;
+  const wantFlipped = Boolean(flippedProp);
+  useEffect(() => {
+    if (!arrowFollowsBase || !uncovered) return;
+    setBaseRotateDeg((deg) => {
+      const isFlipped = Math.round(deg / 180) % 2 === 1;
+      if (isFlipped === wantFlipped) return deg;
+      return deg + 180;
+    });
+  }, [arrowFollowsBase, uncovered, wantFlipped]);
+
+  // Coin back is viewed after rotateY(180); pre-flip the base so the open
+  // animation ends matching the flat DualityButton that replaces the coin.
+  const coinFaceFlipped = opening ? !wantFlipped : wantFlipped;
 
   const dualityButton = (
     <DualityButton
       {...dualityProps}
+      key={opening ? "coin-preflip" : "live"}
+      flipped={flippedProp === undefined ? undefined : coinFaceFlipped}
+      defaultFlipped={
+        flippedProp === undefined
+          ? opening
+            ? !Boolean(dualityProps.defaultFlipped)
+            : dualityProps.defaultFlipped
+          : dualityProps.defaultFlipped
+      }
       className={[
         styles.face,
-        coverActive || closing ? styles.faceInert : "",
+        coverActive || closing || opening ? styles.faceInert : "",
       ]
         .filter(Boolean)
         .join(" ")}
@@ -228,7 +264,7 @@ export function CoverState({
           expanded={labelExpanded}
           sizeRem={sizeRem}
           uncoverMs={labelMorphMs}
-          baseRotateDeg={arrowFollowsBase ? baseRotateDeg : 0}
+          baseRotateDeg={labelBaseRotateDeg}
           baseRotateMs={DUALITY_BUTTON_FLIP_MS}
           followBaseRotate={arrowFollowsBase}
         />

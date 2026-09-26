@@ -75,13 +75,7 @@ export function CoverLabel({
   return (
     <span
       ref={cueRef}
-      className={[
-        styles.cue,
-        followBaseRotate ? styles.cueTracking : "",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      className={[styles.cue, className].filter(Boolean).join(" ")}
       style={cueStyle}
       aria-hidden
     >
@@ -103,7 +97,14 @@ export function CoverLabel({
             </span>
           ))}
         </span>
-        <span className={styles.arrowSlot}>
+        <span
+          className={[
+            styles.arrowSlot,
+            followBaseRotate ? styles.arrowSlotTracking : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
           <span className={styles.arrowFace}>
             {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
             <img

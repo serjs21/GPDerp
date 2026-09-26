@@ -59,7 +59,9 @@ export function DualityButton({
   "aria-label": ariaLabel,
 }: DualityButtonProps) {
   const isControlled = flippedProp != null;
-  const [clockwiseDeg, setClockwiseDeg] = useState(defaultFlipped ? 180 : 0);
+  const [clockwiseDeg, setClockwiseDeg] = useState(
+    (flippedProp ?? defaultFlipped) ? 180 : 0,
+  );
   const flipped = flippedFromTurns(clockwiseDeg);
   const lastControlledRef = useRef(flippedProp);
 
