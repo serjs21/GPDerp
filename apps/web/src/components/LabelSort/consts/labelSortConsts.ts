@@ -39,10 +39,11 @@ export const LABEL_SORT_CATEGORIES: LabelSortCategory[] = [
   },
   {
     id: "connection",
-    title: "Connection",
+    title: "Connections",
     coverSrc: "/sort_button/connections_cover.svg",
     topIconSrc: "/sort_button/connections_high.svg",
     bottomIconSrc: "/sort_button/connections_low.svg",
+    iconTone: "strokeInvert",
     ariaLabel: "Sort by connection",
   },
 ];

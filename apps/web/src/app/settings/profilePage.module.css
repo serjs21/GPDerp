@@ -13,7 +13,7 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  width: min(100%, 56rem);
+  width: min(100%, 76rem);
   margin: 0 auto;
   /* Definite height so tab lists get a real scrollport (not the comic frame). */
   height: calc(90vh - 2rem);
