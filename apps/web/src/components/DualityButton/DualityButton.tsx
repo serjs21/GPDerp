@@ -71,9 +71,9 @@ export function DualityButton({
     const target = flippedProp!;
     if (lastControlledRef.current === target) return;
     lastControlledRef.current = target;
-    setClockwiseDeg((prev) => {
-      if (flippedFromTurns(prev) === target) return prev;
-      return prev + 180;
+    setClockwiseDeg((prevDeg) => {
+      if (flippedFromTurns(prevDeg) === target) return prevDeg;
+      return prevDeg + 180;
     });
   }, [flippedProp, isControlled]);
 
