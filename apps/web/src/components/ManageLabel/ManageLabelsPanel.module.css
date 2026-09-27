@@ -23,6 +23,12 @@
   min-width: 0;
 }
 
+.sortRow {
+  flex: 0 0 auto;
+  display: flex;
+  min-width: 0;
+}
+
 .listScroll {
   --manage-label-list-gap: 2.25rem;
   flex: 1 1 auto;

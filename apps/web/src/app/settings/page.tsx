@@ -364,6 +364,7 @@ export default function ProfilePage() {
                   searchVariant="none"
                   searchQuery={searchParams.get("search") ?? ""}
                   showCreate
+                  showSort
                 />
               ) : null}
             </div>

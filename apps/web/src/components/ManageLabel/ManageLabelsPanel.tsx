@@ -12,6 +12,12 @@ import {
 } from "react";
 import { labelQueryKeys, type LabelDto } from "@/api/labels";
 import { ComicModalInput, ComicModalSearchPanel } from "@/components/ComicModalInput";
+import {
+  LabelSort,
+  LABEL_SORT_DEFAULT_VALUE,
+  type LabelSortValue,
+} from "@/components/LabelSort";
+import { sortLabelItems } from "@/components/LabelSort/utils/sortLabelItems";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
 import { buildEnterStaggerDelays } from "./consts/magicAnimationConsts";
@@ -66,6 +72,8 @@ export type ManageLabelsPanelProps = {
   /** Controlled query when `searchVariant` is `"none"` (settings header). */
   searchQuery?: string;
   showCreate?: boolean;
+  /** Show the LabelSort panel above the list. */
+  showSort?: boolean;
 };
 
 export function ManageLabelsPanel({
@@ -75,8 +83,10 @@ export function ManageLabelsPanel({
   searchVariant = "comic",
   searchQuery = "",
   showCreate = true,
+  showSort = false,
 }: ManageLabelsPanelProps) {
   const headerDriven = searchVariant === "none";
+  const [sort, setSort] = useState<LabelSortValue>(LABEL_SORT_DEFAULT_VALUE);
   const [searchInput, setSearchInput] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
   /** labelId → boingInUp delay ms (insert order). */
@@ -129,15 +139,27 @@ export function ManageLabelsPanel({
     includeConnectedHaikus: true,
   });
 
+  // When a sort is selected but more pages remain, finish loading so we can sort in memory.
+  useEffect(() => {
+    if (!active || !sort.categoryId) return;
+    if (!hasNextPage || isFetchingNextPage) return;
+    void fetchNextPage();
+  }, [active, sort.categoryId, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const orderedLabels = useMemo(() => {
+    if (!sort.categoryId || hasNextPage) return pagedLabels;
+    return sortLabelItems(pagedLabels, sort);
+  }, [pagedLabels, hasNextPage, sort]);
+
   const displayLabels = useMemo(() => {
     const { order, labels } = mergeDisplayLabels(
       displayOrderRef.current,
-      pagedLabels,
+      orderedLabels,
       exitingById,
     );
     displayOrderRef.current = order;
     return labels;
-  }, [pagedLabels, exitingById]);
+  }, [orderedLabels, exitingById]);
 
   const scheduleEnterAnimations = useCallback((orderedIds: string[]) => {
     if (orderedIds.length === 0) return;
@@ -236,6 +258,11 @@ export function ManageLabelsPanel({
       {searchVariant === "plain" ? (
         <div className={styles.searchPlain}>
           <ComicModalInput {...searchInputProps} />
+        </div>
+      ) : null}
+      {showSort ? (
+        <div className={styles.sortRow}>
+          <LabelSort value={sort} onChange={setSort} />
         </div>
       ) : null}
 
