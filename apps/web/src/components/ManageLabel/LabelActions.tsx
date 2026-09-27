@@ -17,9 +17,10 @@ const DELETE_SRC = "/profile/label_actions/delete.svg";
 const DELETE_HOVER = "var(--accent-red, #aa1f3f)";
 
 const TUNE_IN_DISABLED_CALLOUT_POSITION = {
-  left: "50%",
-  top: "0.2rem",
-  transform: "translate(-50%, calc(-100% - 0.35rem))",
+  left: "-7.5rem",
+  bottom: "-1rem",
+  // transform: "translate(-100%, 0%)",
+  // transformOrigin: "bottom left",
 } as const;
 
 const TUNE_IN_DISABLED_MESSAGE = "There's no use in searching for me";
@@ -204,6 +205,7 @@ export function LabelActions({
           className={styles.tuneInCallout}
           holdMs={3000}
           fadeMs={200}
+          
           position={TUNE_IN_DISABLED_CALLOUT_POSITION}
           callout={
             <div className={styles.speechBubble}>{TUNE_IN_DISABLED_MESSAGE}</div>

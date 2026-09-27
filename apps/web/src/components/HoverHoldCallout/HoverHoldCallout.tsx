@@ -35,14 +35,16 @@ export type HoverHoldCalloutProps = {
 };
 
 const DEFAULT_POSITION: CalloutPosition = {
-  left: "50%",
-  top: "0",
-  transform: "translate(-50%, calc(-100% - 0.55rem))",
+  left: "-1.5rem",
+  bottom: "-0.55rem",
+  transform: "translate(0, -50%)",
 };
 
 type AnchorBox = {
   left: number;
   top: number;
+  bottom: number;
+  right: number;
   width: number;
   height: number;
 };
@@ -91,6 +93,8 @@ export function HoverHoldCallout({
     setAnchor({
       left: rect.left,
       top: rect.top,
+      bottom: rect.bottom,
+      right: rect.right,
       width: rect.width,
       height: rect.height,
     });
@@ -164,6 +168,8 @@ export function HoverHoldCallout({
             style={{
               left: anchor.left,
               top: anchor.top,
+              bottom: anchor.bottom,
+              right: anchor.right,
               width: anchor.width,
               height: anchor.height,
               ["--hover-hold-fade-ms" as string]: `${fadeMs}ms`,
