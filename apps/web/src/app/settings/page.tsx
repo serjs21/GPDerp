@@ -32,6 +32,8 @@ import { ManageLabelsPanel } from "@/components/ManageLabel";
 import { ShareLinkManagement } from "@/components/ShareLinkManagement";
 import { ComicPanelTabs } from "@/components/ComicPanelTabs";
 import { useManageLabelsAccount } from "@/hooks/useAccountLabels";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { SETTINGS_SIDE_PANEL_QUERY } from "@/consts/settings/settingsLayoutConsts";
 import { ProfileProvider, type ProfileContextValue } from "./ProfileContext";
 import { ProfileInfoTab } from "./components/ProfileInfoTab";
 import { shouldApplyServerPreference } from "./tabState";
@@ -103,6 +105,8 @@ export default function ProfilePage() {
   const [requestingEmailChange, setRequestingEmailChange] = useState(false);
   const [resendingEmailChange, setResendingEmailChange] = useState(false);
   const [savingAvatar, setSavingAvatar] = useState(false);
+  const [sideNode, setSideNode] = useState<HTMLElement | null>(null);
+  const sidePanelWide = useMediaQuery(SETTINGS_SIDE_PANEL_QUERY);
   const { setTheme } = useTheme();
   const { setLocale } = useLocale();
   const { data: labelsAccountId } = useManageLabelsAccount();
@@ -322,54 +326,76 @@ export default function ProfilePage() {
     onConfirmResend: () => void resendChange(),
   };
 
+  const showSidePanel = sidePanelWide && tab !== "profile";
+  const sidePanelTarget = showSidePanel ? sideNode : null;
+
   return (
     <main className={styles.page}>
       <ProfileProvider value={profileContextValue}>
-        <ComicPageLayout className={styles.layout}>
-          <div className={styles.body}>
-            <ComicPanelTabs
-              className={styles.tabRow}
-              panelClassName={styles.tabPanel}
-              value={tab}
-              onChange={setTab}
-              tabs={PROFILE_TABS.map((id) => {
-                const meta = TAB_META[id];
-                return {
-                  id,
-                  panel: {
-                    title: meta.title,
-                    background: meta.background,
-                    color: meta.color,
-                    ariaLabel: meta.ariaLabel,
-                  },
-                  content: (
-                    <LabelMethodIcon
-                      src={meta.iconSrc}
-                      bubbleStyle={meta.bubbleStyle}
-                      sourceDirection="none"
-                      active={tab === id}
-                    />
-                  ),
-                };
-              })}
-            />
+        <div
+          className={[styles.stage, showSidePanel ? styles.stageWithSide : ""]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          <ComicPageLayout className={styles.layout}>
+            <div className={styles.body}>
+              <ComicPanelTabs
+                className={styles.tabRow}
+                panelClassName={styles.tabPanel}
+                value={tab}
+                onChange={setTab}
+                tabs={PROFILE_TABS.map((id) => {
+                  const meta = TAB_META[id];
+                  return {
+                    id,
+                    panel: {
+                      title: meta.title,
+                      background: meta.background,
+                      color: meta.color,
+                      ariaLabel: meta.ariaLabel,
+                    },
+                    content: (
+                      <LabelMethodIcon
+                        src={meta.iconSrc}
+                        bubbleStyle={meta.bubbleStyle}
+                        sourceDirection="none"
+                        active={tab === id}
+                      />
+                    ),
+                  };
+                })}
+              />
 
-            <div className={styles.contentSlot}>
-              {tab === "profile" ? <ProfileInfoTab /> : null}
-              {tab === "share-links" ? <ShareLinkManagement active /> : null}
-              {tab === "labels" && labelsAccountId ? (
-                <ManageLabelsPanel
-                  accountId={labelsAccountId}
-                  active
-                  searchVariant="none"
-                  searchQuery={searchParams.get("search") ?? ""}
-                  showCreate
-                  showSort
-                />
-              ) : null}
+              <div className={styles.contentSlot}>
+                {tab === "profile" ? <ProfileInfoTab /> : null}
+                {tab === "share-links" ? (
+                  <ShareLinkManagement
+                    active
+                    sidePanelTarget={sidePanelTarget}
+                  />
+                ) : null}
+                {tab === "labels" && labelsAccountId ? (
+                  <ManageLabelsPanel
+                    accountId={labelsAccountId}
+                    active
+                    searchVariant="none"
+                    searchQuery={searchParams.get("search") ?? ""}
+                    showCreate
+                    showSort
+                    sidePanelTarget={sidePanelTarget}
+                  />
+                ) : null}
+              </div>
             </div>
-          </div>
-        </ComicPageLayout>
+          </ComicPageLayout>
+          {showSidePanel ? (
+            <aside
+              ref={setSideNode}
+              className={styles.sidePanel}
+              aria-label="Sort and filter"
+            />
+          ) : null}
+        </div>
       </ProfileProvider>
     </main>
   );

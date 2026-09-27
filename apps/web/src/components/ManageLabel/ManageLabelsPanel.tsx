@@ -10,6 +10,7 @@ import {
   type ChangeEvent,
   type UIEvent,
 } from "react";
+import { createPortal } from "react-dom";
 import { labelQueryKeys, type LabelDto } from "@/api/labels";
 import { ComicModalInput, ComicModalSearchPanel } from "@/components/ComicModalInput";
 import {
@@ -75,6 +76,8 @@ export type ManageLabelsPanelProps = {
   showCreate?: boolean;
   /** Show the LabelSort panel above the list. */
   showSort?: boolean;
+  /** When set, sort (rotated) + create render here instead of above the list. */
+  sidePanelTarget?: HTMLElement | null;
 };
 
 export function ManageLabelsPanel({
@@ -85,6 +88,7 @@ export function ManageLabelsPanel({
   searchQuery = "",
   showCreate = true,
   showSort = false,
+  sidePanelTarget = null,
 }: ManageLabelsPanelProps) {
   const headerDriven = searchVariant === "none";
   const [sort, setSort] = useState<LabelSortValue>(LABEL_SORT_DEFAULT_VALUE);
@@ -242,6 +246,14 @@ export function ManageLabelsPanel({
     spellCheck: false,
   };
 
+  const sortInSide = showSort && sidePanelTarget != null;
+  const sortInFrame = showSort && !sortInSide;
+  const createClassName = sortInSide
+    ? styles.createInSide
+    : sortInFrame
+      ? styles.createBesideSort
+      : undefined;
+
   const createPanel =
     showCreate && !isPagedLoading ? (
       <ManageLabelCreatePanel
@@ -249,7 +261,7 @@ export function ManageLabelsPanel({
         onCreated={() => refresh()}
         color="#4fabf5"
         background="solid"
-        className={showSort ? styles.createBesideSort : undefined}
+        className={createClassName}
       />
     ) : null;
 
@@ -267,7 +279,23 @@ export function ManageLabelsPanel({
           <ComicModalInput {...searchInputProps} />
         </div>
       ) : null}
-      {showSort ? (
+      {sortInSide
+        ? createPortal(
+            <div className={styles.sideStack}>
+              <LabelSort
+                value={sort}
+                onChange={setSort}
+                rotated
+                color="#ea695e"
+                background="solid"
+                className={styles.sortInSide}
+              />
+              {createPanel}
+            </div>,
+            sidePanelTarget,
+          )
+        : null}
+      {sortInFrame ? (
         <div className={styles.sortRow}>
           <LabelSort
             value={sort}

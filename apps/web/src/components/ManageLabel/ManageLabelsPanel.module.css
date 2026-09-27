@@ -51,6 +51,26 @@
   height: 100%;
 }
 
+/* Portaled into the settings side panel (>= 1000px). */
+.sideStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--comic-page-gutter, 10px);
+  width: 100%;
+  min-width: 0;
+}
+
+.sideStack .sortInSide {
+  width: 100%;
+}
+
+.sideStack .createInSide {
+  --manage-create-font-size: 1.1rem;
+  --manage-create-gap: 0.5rem;
+  width: 100%;
+  margin-top: 0;
+}
+
 .listScroll {
   --manage-label-list-gap: 2.25rem;
   flex: 1 1 auto;

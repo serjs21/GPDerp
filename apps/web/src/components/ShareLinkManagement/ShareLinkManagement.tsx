@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, type RefObject } from "react";
+import { createPortal } from "react-dom";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { ShareLinksSort } from "@/components/ShareLinksSort";
 import type { ShareLinkListItem } from "@/api/shareLinks";
@@ -14,6 +15,8 @@ import styles from "./ShareLinkManagement.module.css";
 
 export type ShareLinkManagementProps = {
   active?: boolean;
+  /** When set, sort (rotated) + filters (2 per row) render here instead of above the list. */
+  sidePanelTarget?: HTMLElement | null;
 };
 
 function ShareLinkListBody({
@@ -83,7 +86,10 @@ function resolveListFlags(query: ReturnType<typeof useShareLinks>["query"], item
   };
 }
 
-export function ShareLinkManagement({ active = true }: ShareLinkManagementProps) {
+export function ShareLinkManagement({
+  active = true,
+  sidePanelTarget = null,
+}: ShareLinkManagementProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -113,23 +119,46 @@ export function ShareLinkManagement({ active = true }: ShareLinkManagementProps)
     items.length,
   );
 
-  return (
-    <div className={styles.root}>
-      <div className={styles.controlsLeft}>
-        <div className={styles.sortCell}>
-          <ShareLinksSort
-            value={sort}
-            onChange={(next) => updateSearchParams({ sort: next })}
-          />
-        </div>
-      </div>
+  const onSortChange = (next: typeof sort) => updateSearchParams({ sort: next });
+  const onFiltersChange = (next: typeof filters) =>
+    updateSearchParams({ filters: next, search });
 
-      <div className={styles.filtersCell}>
-        <ShareLinkFilterPanels
-          selected={filters}
-          onChange={(next) => updateSearchParams({ filters: next, search })}
-        />
-      </div>
+  return (
+    <div
+      className={[styles.root, sidePanelTarget ? styles.rootListOnly : ""]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      {sidePanelTarget ? (
+        createPortal(
+          <div className={styles.sideStack}>
+            <ShareLinksSort
+              value={sort}
+              onChange={onSortChange}
+              rotated
+              className={styles.sortInSide}
+            />
+            <ShareLinkFilterPanels
+              selected={filters}
+              onChange={onFiltersChange}
+              columns={2}
+            />
+          </div>,
+          sidePanelTarget,
+        )
+      ) : (
+        <>
+          <div className={styles.controlsLeft}>
+            <div className={styles.sortCell}>
+              <ShareLinksSort value={sort} onChange={onSortChange} />
+            </div>
+          </div>
+
+          <div className={styles.filtersCell}>
+            <ShareLinkFilterPanels selected={filters} onChange={onFiltersChange} />
+          </div>
+        </>
+      )}
 
       <div ref={scrollRef} className={styles.listShell}>
         <ShareLinkListBody

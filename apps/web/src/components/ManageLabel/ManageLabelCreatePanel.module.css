@@ -59,8 +59,8 @@
 
   font-family: "Bangers";
   color: var(--text-color, #2c2c2c);
-  font-size: 2rem;
-  gap: 2rem;
+  font-size: var(--manage-create-font-size, 2rem);
+  gap: var(--manage-create-gap, 2rem);
   align-items: center;
   justify-self: center;
   align-self: center;

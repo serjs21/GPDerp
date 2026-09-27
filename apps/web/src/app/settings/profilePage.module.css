@@ -1,19 +1,31 @@
 .page {
+  --profile-tab-height: 6.5rem;
+
   box-sizing: border-box;
   display: flex;
   flex: 1;
   flex-direction: column;
   width: 100%;
   min-height: 0;
-    overflow: hidden;
+  /* Same inline inset + 76rem cap as the header bar. */
+  padding-inline: 1rem;
+  overflow: hidden;
+}
+
+.stage {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 76rem);
+  margin: 0 auto;
 }
 
 .layout {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  width: min(100%, 76rem);
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   /* Definite height so tab lists get a real scrollport (not the comic frame). */
   height: calc(90vh - 2rem);
   max-height: calc(90vh - 2rem);
@@ -30,7 +42,6 @@
 }
 
 .body {
-  --profile-tab-height: 6.5rem;
   --profile-gap: var(--comic-page-gutter, 10px);
 
   box-sizing: border-box;
@@ -73,4 +84,39 @@
   flex: 1 1 auto;
   min-height: 0;
   width: 100%;
+}
+
+.sidePanel {
+  display: none;
+}
+
+/* Keep the breakpoint in sync with SETTINGS_SIDE_PANEL_QUERY. */
+@media (min-width: 1000px) {
+  .stage.stageWithSide {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(9rem, 14vw, 13rem);
+    align-items: start;
+    gap: var(--comic-page-gutter, 10px);
+  }
+
+  /* Top edge lines up with the tab content (below the tab row). */
+  .sidePanel {
+    --settings-side-top: calc(
+      var(--comic-page-border, 4px) + var(--comic-page-frame-gutter, 34px) +
+        2 * var(--comic-page-gutter, 10px) + var(--profile-tab-height)
+    );
+
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: var(--comic-page-gutter, 10px);
+    min-width: 0;
+    margin-top: var(--settings-side-top);
+    max-height: calc(90vh - 2rem - var(--settings-side-top));
+    /* Room for panel borders / shadows inside the scrollport. */
+    padding: 0.25rem 0.35rem 0.5rem 0.1rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
 }
