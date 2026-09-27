@@ -17,8 +17,8 @@ const DELETE_SRC = "/profile/label_actions/delete.svg";
 const DELETE_HOVER = "var(--accent-red, #aa1f3f)";
 
 const TUNE_IN_DISABLED_CALLOUT_POSITION = {
-  left: "-7.5rem",
-  bottom: "-1rem",
+  left: "-8.5rem",
+  bottom: "0rem",
 } as const;
 
 const TUNE_IN_DISABLED_MESSAGE = "There's no use in searching for me";

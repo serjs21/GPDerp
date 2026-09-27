@@ -64,7 +64,7 @@ export function HoverHoldCallout({
   calloutClassName,
 }: HoverHoldCalloutProps) {
   const rootRef = useRef<HTMLDivElement>(null);
-  const [hovered, setHovered] = useState(false);
+  const [hovered, setHovered] = useState(true);
   const [held, setHeld] = useState(false);
   const [fading, setFading] = useState(false);
   const [anchor, setAnchor] = useState<AnchorBox | null>(null);
@@ -140,7 +140,7 @@ export function HoverHoldCallout({
 
   const onLeave = () => {
     hoveredRef.current = false;
-    setHovered(false);
+    // setHovered(false);
     if (!heldRef.current) beginFadeOut();
   };
 

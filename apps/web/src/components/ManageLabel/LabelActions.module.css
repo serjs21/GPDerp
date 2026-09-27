@@ -199,16 +199,16 @@
   white-space: normal;
 }
 
-/* Tail on the top-right edge, pointing up toward the Tune in trigger. */
+/* Tail on the right edge near the top, pointing right toward the Tune in trigger. */
 .speechBubble::after {
   content: "";
   position: absolute;
-  top: -0.45rem;
-  right: 1.1rem;
+  top: 0.6rem;
+  right: -0.45rem;
   width: 0.7rem;
   height: 0.7rem;
   border-top: 2.5px solid #111;
-  border-left: 2.5px solid #111;
+  border-right: 2.5px solid #111;
   background: #f7f4ef;
   transform: rotate(45deg);
 }
