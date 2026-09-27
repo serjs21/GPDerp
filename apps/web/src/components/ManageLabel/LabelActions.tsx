@@ -19,8 +19,6 @@ const DELETE_HOVER = "var(--accent-red, #aa1f3f)";
 const TUNE_IN_DISABLED_CALLOUT_POSITION = {
   left: "-7.5rem",
   bottom: "-1rem",
-  // transform: "translate(-100%, 0%)",
-  // transformOrigin: "bottom left",
 } as const;
 
 const TUNE_IN_DISABLED_MESSAGE = "There's no use in searching for me";

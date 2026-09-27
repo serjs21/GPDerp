@@ -199,18 +199,18 @@
   white-space: normal;
 }
 
+/* Tail on the top-right edge, pointing up toward the Tune in trigger. */
 .speechBubble::after {
   content: "";
   position: absolute;
-  left: 50%;
-  bottom: -0.45rem;
+  top: -0.45rem;
+  right: 1.1rem;
   width: 0.7rem;
   height: 0.7rem;
-  border-right: 2.5px solid #111;
-  border-bottom: 2.5px solid #111;
+  border-top: 2.5px solid #111;
+  border-left: 2.5px solid #111;
   background: #f7f4ef;
-  transform: translateX(-50%) rotate(45deg);
-  box-shadow: 2px 2px 0 #111;
+  transform: rotate(45deg);
 }
 
 .disabled:hover::before,
