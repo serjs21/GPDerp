@@ -37,7 +37,6 @@
   display: flex;
   align-items: stretch;
   min-width: 0;
-  min-height: 8.5rem;
 }
 
 .listShell {

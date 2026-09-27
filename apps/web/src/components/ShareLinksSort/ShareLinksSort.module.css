@@ -2,6 +2,7 @@
   flex: 0 0 auto;
   max-width: 100%;
   min-height: 6rem;
+  height: 6rem;
 }
 
 .cluster {
@@ -10,7 +11,7 @@
   justify-content: center;
   gap: 1.1rem;
   /* Room for concentric CoverLabel arcs above the disks. */
-  padding: 1.35rem 0.75rem 0.5rem;
+  padding: 0.35rem 0.75rem 0.5rem;
   box-sizing: border-box;
 }
 
