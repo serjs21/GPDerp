@@ -203,14 +203,15 @@
 .speechBubble::after {
   content: "";
   position: absolute;
-  top: 0.6rem;
-  right: -0.45rem;
-  width: 0.7rem;
-  height: 0.7rem;
+  width: .5rem;
+  height: 0.5rem;
+  position: absolute;
+  top: 5px;
+  right: -5px;
+  transform: rotate(35deg);
   border-top: 2.5px solid #111;
   border-right: 2.5px solid #111;
   background: #f7f4ef;
-  transform: rotate(45deg);
 }
 
 .disabled:hover::before,
