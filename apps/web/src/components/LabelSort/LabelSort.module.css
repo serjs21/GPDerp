@@ -27,6 +27,7 @@
   align-items: center;
   align-self: stretch;
   width: 100%;
+  max-width: 15rem;
   /* Each coin's CoverLabel arc sits above its disk; spacing scales with coin size. */
   gap: 1.75rem;
   min-width: 6rem;
