@@ -2,12 +2,13 @@
 
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { CoverState } from "@/components/DualityButton";
+import { useLocale } from "@/hooks/useLocale";
 import {
-  LABEL_SORT_CATEGORIES,
   LABEL_SORT_SIZE_REM,
   type LabelSortCategory,
   type LabelSortValue,
 } from "./consts/labelSortConsts";
+import { resolveLabelSortCategories } from "./utils/labelSortLocaleUtils";
 import styles from "./LabelSort.module.css";
 
 export type LabelSortProps = {
@@ -29,12 +30,14 @@ export type LabelSortProps = {
 export function LabelSort({
   value,
   onChange,
-  categories = LABEL_SORT_CATEGORIES,
+  categories: categoriesProp,
   sizeRem = LABEL_SORT_SIZE_REM,
   disabled = false,
   className,
   "aria-label": ariaLabel = "Sort labels",
 }: LabelSortProps) {
+  const { locale } = useLocale();
+  const categories = categoriesProp ?? resolveLabelSortCategories(locale);
   return (
     <ComicPagePanel
       title="Sort by"

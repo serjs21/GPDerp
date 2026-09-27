@@ -2,12 +2,13 @@
 
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { CoverState } from "@/components/DualityButton";
+import { useLocale } from "@/hooks/useLocale";
 import {
-  SHARE_LINKS_SORT_CATEGORIES,
   SHARE_LINKS_SORT_SIZE_REM,
   type ShareLinksSortCategory,
   type ShareLinksSortValue,
 } from "./consts/shareLinksSortConsts";
+import { resolveShareLinksSortCategories } from "./utils/shareLinksSortLocaleUtils";
 import styles from "./ShareLinksSort.module.css";
 
 export type ShareLinksSortProps = {
@@ -29,12 +30,14 @@ export type ShareLinksSortProps = {
 export function ShareLinksSort({
   value,
   onChange,
-  categories = SHARE_LINKS_SORT_CATEGORIES,
+  categories: categoriesProp,
   sizeRem = SHARE_LINKS_SORT_SIZE_REM,
   disabled = false,
   className,
   "aria-label": ariaLabel = "Sort share links",
 }: ShareLinksSortProps) {
+  const { locale } = useLocale();
+  const categories = categoriesProp ?? resolveShareLinksSortCategories(locale);
   return (
     <ComicPagePanel
       title="Sort by"

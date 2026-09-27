@@ -19,6 +19,9 @@ export type LabelSortCategory = {
   iconTone?: DualityIconTone;
 };
 
+/** Japanese locale swaps creation-date covers with the share-links tab. */
+export const LABEL_CREATION_DATE_COVER_JA = "/sort_button/time_cover.svg";
+
 export const LABEL_SORT_CATEGORIES: LabelSortCategory[] = [
   {
     id: "creationDate",
