@@ -25,7 +25,8 @@
   align-items: center;
   /* Each coin's CoverLabel arc sits above its disk. */
   gap: 1.75rem;
-  padding: 1.35rem 0.75rem 0.75rem;
+  min-width: 6rem;
+  padding: 3.35rem 0.75rem 0.75rem;
 }
 
 .coin {
