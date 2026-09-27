@@ -243,7 +243,11 @@ export function ManageLabelsPanel({
 
   const createPanel =
     showCreate && !isPagedLoading ? (
-      <ManageLabelCreatePanel accountId={accountId} onCreated={() => refresh()} />
+      <ManageLabelCreatePanel
+        accountId={accountId}
+        onCreated={() => refresh()}
+        className={showSort ? styles.createBesideSort : undefined}
+      />
     ) : null;
 
   const showEmpty = !isPagedLoading && displayLabels.length === 0;
@@ -263,6 +267,7 @@ export function ManageLabelsPanel({
       {showSort ? (
         <div className={styles.sortRow}>
           <LabelSort value={sort} onChange={setSort} />
+          {createPanel}
         </div>
       ) : null}
 
@@ -310,7 +315,7 @@ export function ManageLabelsPanel({
           </>
         )}
       </div>
-      {createPanel}
+      {showSort ? null : createPanel}
     </div>
   );
 }

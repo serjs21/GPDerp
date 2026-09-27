@@ -12,11 +12,16 @@ import styles from "./ManageLabelCreatePanel.module.css";
 export type ManageLabelCreatePanelProps = {
   accountId: string;
   onCreated?: (label: LabelDto) => void | Promise<void>;
+  className?: string;
 };
 
 const CREATE_HOVER = COMIC_PANEL_COLORS.info.base;
 
-export function ManageLabelCreatePanel({ accountId, onCreated }: ManageLabelCreatePanelProps) {
+export function ManageLabelCreatePanel({
+  accountId,
+  onCreated,
+  className,
+}: ManageLabelCreatePanelProps) {
   const [open, setOpen] = useState(false);
 
   const hoverStyle = {
@@ -24,7 +29,7 @@ export function ManageLabelCreatePanel({ accountId, onCreated }: ManageLabelCrea
   } as CSSProperties;
 
   return (
-    <article className={styles.root}>
+    <article className={[styles.root, className].filter(Boolean).join(" ")}>
       <ComicPageRow className={styles.strip}>
         <ComicPagePanel
           selectable
