@@ -14,7 +14,7 @@ export function SortCreateOrBurst() {
         text="Or"
         fill="#ffffff"
         stroke="#111111"
-        textColor="#111111"
+        textColor="#ffffff"
         shapeKind={shape.kind}
         spikeCount={shape.spikeCount}
         randomness={shape.randomness}
