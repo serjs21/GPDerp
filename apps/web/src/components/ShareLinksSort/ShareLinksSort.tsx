@@ -57,6 +57,7 @@ export function ShareLinksSort({
               key={category.id}
               className={styles.coin}
               iconSrc={category.coverSrc}
+              coverMirrored={category.coverMirrored}
               title={category.title}
               sizeRem={sizeRem}
               uncovered={selected}

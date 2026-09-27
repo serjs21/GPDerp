@@ -7,6 +7,8 @@ export type CoverIconProps = {
   iconSrc: string;
   /** Round label fill. Defaults to paper white. */
   backgroundColor?: string;
+  /** Mirror the glyph horizontally (rotateY 180deg). */
+  mirrored?: boolean;
   className?: string;
   style?: CSSProperties;
 };
@@ -17,6 +19,7 @@ export type CoverIconProps = {
 export function CoverIcon({
   iconSrc,
   backgroundColor,
+  mirrored = false,
   className,
   style,
 }: CoverIconProps) {
@@ -34,7 +37,9 @@ export function CoverIcon({
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
       <img
-        className={styles.icon}
+        className={[styles.icon, mirrored ? styles.iconMirrored : ""]
+          .filter(Boolean)
+          .join(" ")}
         src={iconSrc}
         alt=""
         draggable={false}

@@ -27,3 +27,7 @@
   pointer-events: none;
   user-select: none;
 }
+
+.iconMirrored {
+  transform: rotateY(180deg);
+}

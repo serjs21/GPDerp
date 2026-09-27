@@ -41,6 +41,8 @@ export type CoverStateProps = {
   labelMorphMs?: number;
   /** Round CoverIcon label fill. Defaults to paper white. */
   coverBackgroundColor?: string;
+  /** Mirror the cover glyph horizontally. */
+  coverMirrored?: boolean;
   className?: string;
   style?: CSSProperties;
   /** Accessible name for the cover control. Defaults to `Reveal {title}`. */
@@ -68,6 +70,7 @@ export function CoverState({
   onUncoveredChange,
   labelMorphMs = COVER_LABEL_MORPH_MS,
   coverBackgroundColor,
+  coverMirrored = false,
   className,
   style,
   coverAriaLabel,
@@ -243,6 +246,7 @@ export function CoverState({
           <CoverIcon
             iconSrc={iconSrc}
             backgroundColor={coverBackgroundColor}
+            mirrored={coverMirrored}
           />
         </div>
       </div>

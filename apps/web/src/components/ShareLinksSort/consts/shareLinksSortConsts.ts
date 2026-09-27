@@ -11,6 +11,7 @@ export type ShareLinksSortCategory = {
   id: string;
   title: string;
   coverSrc: string;
+  coverMirrored?: boolean;
   ariaLabel: string;
   topIconSrc?: string;
   bottomIconSrc?: string;
