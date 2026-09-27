@@ -32,9 +32,18 @@ function VerticalSortFilters() {
 
   return (
     <div className={styles.stage}>
-      <ShareLinksSort value={sort} onChange={setSort} rotated />
+      <ShareLinksSort
+        value={sort}
+        onChange={setSort}
+        rotated
+        className={styles.sort}
+      />
       <div className={styles.filters}>
-        <ShareLinkFilterPanels selected={filters} onChange={setFilters} />
+        <ShareLinkFilterPanels
+          selected={filters}
+          onChange={setFilters}
+          columns={2}
+        />
       </div>
       <p className={styles.readout}>
         sort: {sort.categoryId ?? "none"} · {sort.direction} — filters:{" "}
@@ -44,7 +53,7 @@ function VerticalSortFilters() {
   );
 }
 
-/** Rotated (vertical) share-link sort beside the status filter panels. */
+/** Rotated (vertical) share-link sort above the status filters (2 per row). */
 export const VerticalSortWithFilters: Story = {
   name: "Vertical sort + filters",
   args: {

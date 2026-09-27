@@ -20,13 +20,17 @@
   min-height: 0;
 }
 
+/* Full width so the measured size drives coin scale (not shrink-to-fit). */
 .cluster.clusterRotated {
+  display: flex;
   flex-direction: column;
   align-items: center;
-  /* Each coin's CoverLabel arc sits above its disk. */
-  gap: 1.75rem;
+  align-self: stretch;
+  width: 100%;
+  /* Each coin's CoverLabel arc sits above its disk; spacing scales with coin size. */
+  gap: var(--rotated-sort-gap, 1.75rem);
   min-width: 6rem;
-  padding: 3.35rem 0.75rem 0.75rem;
+  padding: var(--rotated-sort-top-pad, 3.35rem) 0.75rem 0.75rem;
 }
 
 .coin {

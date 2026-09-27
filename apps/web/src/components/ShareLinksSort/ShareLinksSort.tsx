@@ -2,7 +2,12 @@
 
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { CoverState } from "@/components/DualityButton";
+import { useElementWidth } from "@/hooks/useElementWidth";
 import { useLocale } from "@/hooks/useLocale";
+import {
+  buildRotatedSortClusterStyle,
+  rotatedSortCoinSizeRem,
+} from "@/utils/sort/rotatedSortUtils";
 import {
   SHARE_LINKS_SORT_SIZE_REM,
   type ShareLinksSortCategory,
@@ -41,6 +46,8 @@ export function ShareLinksSort({
 }: ShareLinksSortProps) {
   const { locale } = useLocale();
   const categories = categoriesProp ?? resolveShareLinksSortCategories(locale);
+  const [clusterRef, clusterWidth] = useElementWidth<HTMLDivElement>(rotated);
+  const coinSizeRem = rotatedSortCoinSizeRem(clusterWidth, sizeRem);
   return (
     <ComicPagePanel
       title="Sort by"
@@ -55,9 +62,11 @@ export function ShareLinksSort({
       ariaLabel={ariaLabel}
     >
       <div
+        ref={clusterRef}
         className={[styles.cluster, rotated ? styles.clusterRotated : ""]
           .filter(Boolean)
           .join(" ")}
+        style={rotated ? buildRotatedSortClusterStyle(coinSizeRem) : undefined}
         role="radiogroup"
         aria-label={ariaLabel}
       >
@@ -70,7 +79,7 @@ export function ShareLinksSort({
               iconSrc={category.coverSrc}
               coverMirrored={category.coverMirrored}
               title={category.title}
-              sizeRem={sizeRem}
+              sizeRem={coinSizeRem}
               uncovered={selected}
               onUncoveredChange={(open) => {
                 if (!open) return;

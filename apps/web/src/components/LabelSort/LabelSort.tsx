@@ -6,7 +6,12 @@ import type {
   ComicPanelColor,
 } from "@/components/ComicPageLayout/comicPagePresets";
 import { CoverState } from "@/components/DualityButton";
+import { useElementWidth } from "@/hooks/useElementWidth";
 import { useLocale } from "@/hooks/useLocale";
+import {
+  buildRotatedSortClusterStyle,
+  rotatedSortCoinSizeRem,
+} from "@/utils/sort/rotatedSortUtils";
 import {
   LABEL_SORT_SIZE_REM,
   type LabelSortCategory,
@@ -49,6 +54,8 @@ export function LabelSort({
 }: LabelSortProps) {
   const { locale } = useLocale();
   const categories = categoriesProp ?? resolveLabelSortCategories(locale);
+  const [clusterRef, clusterWidth] = useElementWidth<HTMLDivElement>(rotated);
+  const coinSizeRem = rotatedSortCoinSizeRem(clusterWidth, sizeRem);
   return (
     <ComicPagePanel
       title="Sort by"
@@ -63,9 +70,11 @@ export function LabelSort({
       ariaLabel={ariaLabel}
     >
       <div
+        ref={clusterRef}
         className={[styles.cluster, rotated ? styles.clusterRotated : ""]
           .filter(Boolean)
           .join(" ")}
+        style={rotated ? buildRotatedSortClusterStyle(coinSizeRem) : undefined}
         role="radiogroup"
         aria-label={ariaLabel}
       >
@@ -78,7 +87,7 @@ export function LabelSort({
               iconSrc={category.coverSrc}
               coverMirrored={category.coverMirrored}
               title={category.title}
-              sizeRem={sizeRem}
+              sizeRem={coinSizeRem}
               uncovered={selected}
               onUncoveredChange={(open) => {
                 if (!open) return;

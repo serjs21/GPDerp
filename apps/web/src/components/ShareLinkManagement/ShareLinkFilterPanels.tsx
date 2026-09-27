@@ -56,9 +56,15 @@ const FILTER_OPTIONS: Array<{
 export type ShareLinkFilterPanelsProps = {
   selected: ShareLinkFilter[];
   onChange: (next: ShareLinkFilter[]) => void;
+  /** Panels per row: 4 (single row, default) or 2 (two rows, vertical layouts). */
+  columns?: 2 | 4;
 };
 
-export function ShareLinkFilterPanels({ selected, onChange }: ShareLinkFilterPanelsProps) {
+export function ShareLinkFilterPanels({
+  selected,
+  onChange,
+  columns = 4,
+}: ShareLinkFilterPanelsProps) {
   const selectedSet = new Set(selected);
 
   const toggle = (id: ShareLinkFilter) => {
@@ -69,7 +75,13 @@ export function ShareLinkFilterPanels({ selected, onChange }: ShareLinkFilterPan
   };
 
   return (
-    <div className={styles.group} role="group" aria-label="Filter share links by status">
+    <div
+      className={[styles.group, columns === 2 ? styles.groupPairs : ""]
+        .filter(Boolean)
+        .join(" ")}
+      role="group"
+      aria-label="Filter share links by status"
+    >
       {FILTER_OPTIONS.map((option) => {
         const checked = selectedSet.has(option.id);
         const action = checked ? "Hide" : "Show";

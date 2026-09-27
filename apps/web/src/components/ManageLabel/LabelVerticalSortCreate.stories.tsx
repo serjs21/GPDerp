@@ -34,6 +34,7 @@ function VerticalSortCreate() {
         rotated
         color="red"
         background="halftone"
+        className={styles.sort}
       />
       <ManageLabelCreatePanel
         accountId={STORY_ACCOUNT_ID}
@@ -48,7 +49,7 @@ function VerticalSortCreate() {
   );
 }
 
-/** Rotated (vertical) label sort beside the "Create a new one" panel. */
+/** Rotated (vertical) label sort above the "Create a new one" panel. */
 export const VerticalSortWithCreate: Story = {
   name: "Vertical sort + create",
   args: {
