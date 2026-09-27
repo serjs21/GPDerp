@@ -15,9 +15,9 @@ function compareAsc(a: LabelDto, b: LabelDto, categoryId: string): number {
     case "alpacabet":
       return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
     case "connection": {
-      const delta = connectionCount(a) - connectionCount(b);
+      const delta = connectionCount(b) - connectionCount(a);
       if (delta !== 0) return delta;
-      return compareCreatedAtAsc(b, a);
+      return compareCreatedAtAsc(a, b);
     }
     default:
       return compareCreatedAtAsc(b, a);
