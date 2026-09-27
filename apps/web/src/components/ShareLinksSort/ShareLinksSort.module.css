@@ -28,9 +28,9 @@
   align-self: stretch;
   width: 100%;
   /* Each coin's CoverLabel arc sits above its disk; spacing scales with coin size. */
-  gap: var(--rotated-sort-gap, 1.75rem);
+  gap: 1.75rem;
   min-width: 6rem;
-  padding: var(--rotated-sort-top-pad, 3.35rem) 0.75rem 0.75rem;
+  padding: 3.35rem 0.75rem 0.75rem;
 }
 
 .coin {
