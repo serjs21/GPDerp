@@ -26,7 +26,7 @@ export type ComicPanelColor = ComicPanelNamedColor | `#${string}`;
 
 export const COMIC_PAGE_GUTTER_PX = 10;
 /** Black frame around the white page; sized to hold the close control. */
-export const COMIC_PAGE_FRAME_GUTTER_PX = 34;
+export const COMIC_PAGE_FRAME_GUTTER_PX = 16;
 export const COMIC_PAGE_BORDER_PX = 4;
 export const COMIC_PAGE_INSET_PX = 3;
 
