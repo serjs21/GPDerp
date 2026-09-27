@@ -126,7 +126,7 @@ function strokeCapsForShape(shapeKind: ComicBurstShapeKind): {
   strokeLinejoin: "miter" | "round";
   strokeLinecap: "square" | "round";
 } {
-  if (shapeKind === "rect") {
+  if (shapeKind === "rect" || shapeKind === "diamond") {
     return { strokeLinejoin: "miter", strokeLinecap: "square" };
   }
   return { strokeLinejoin: "round", strokeLinecap: "round" };

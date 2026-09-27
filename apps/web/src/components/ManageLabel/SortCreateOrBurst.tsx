@@ -1,12 +1,10 @@
 "use client";
 
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
-import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import styles from "./SortCreateOrBurst.module.css";
 
-/** "Or" burst on the seam between the sort panel and the create panel. */
+/** "Or" diamond on the seam between the sort panel and the create panel. */
 export function SortCreateOrBurst() {
-  const shape = resolveComicLabelShapePreset("classic");
   return (
     <span className={styles.orBurst} aria-hidden>
       <ComicBurstLabel
@@ -14,12 +12,12 @@ export function SortCreateOrBurst() {
         text="Or"
         fill="#ffffff"
         stroke="#111111"
-        textColor="#ffffff"
-        shapeKind={shape.kind}
-        spikeCount={shape.spikeCount}
-        randomness={shape.randomness}
+        textColor="#111111"
+        shapeKind="diamond"
         seed="sort-create-or"
         fontSize={26}
+        paddingX={26}
+        paddingY={18}
         strokeWidth={3}
       />
     </span>

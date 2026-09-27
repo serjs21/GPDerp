@@ -1,7 +1,13 @@
 import { COMIC_BURST_LONG_TEXT_THRESHOLD } from "./measureComicBurstText";
 import { createBurstRng } from "./comicBurstSeed";
 
-export type ComicBurstShapeKind = "burst" | "circle" | "square" | "rect" | "thought";
+export type ComicBurstShapeKind =
+  | "burst"
+  | "circle"
+  | "square"
+  | "rect"
+  | "thought"
+  | "diamond";
 
 export type ComicBurstPathOptions = {
   width: number;
@@ -101,6 +107,20 @@ function buildSquarePath(
   return { width, height, cx, cy, d };
 }
 
+function buildDiamondPath(width: number, height: number): ComicBurstLayout {
+  const cx = width / 2;
+  const cy = height / 2;
+  const inset = 3;
+  const d = [
+    `M ${fmt(cx)} ${fmt(inset)}`,
+    `L ${fmt(width - inset)} ${fmt(cy)}`,
+    `L ${fmt(cx)} ${fmt(height - inset)}`,
+    `L ${fmt(inset)} ${fmt(cy)}`,
+    "Z",
+  ].join(" ");
+  return { width, height, cx, cy, d };
+}
+
 /**
  * Thought-bubble scallops: lobe count grows with spikeCount for longer text.
  */
@@ -168,6 +188,9 @@ export function buildComicBurstPath(options: ComicBurstPathOptions): ComicBurstL
   }
   if (kind === "thought") {
     return buildThoughtPath(width, height, spikeCount, randomness, seedKey);
+  }
+  if (kind === "diamond") {
+    return buildDiamondPath(width, height);
   }
 
   const cx = width / 2;
