@@ -1,9 +1,10 @@
 .orBurst {
   position: absolute;
   top: 50%;
-  /* Seam between the 2fr / 3fr columns (gap-aware). */
+  /* Seam between minmax(20rem, 2fr) / 3fr columns (gap-aware). */
   left: calc(
-    (100% - var(--comic-page-gutter, 10px)) * 0.4 + var(--comic-page-gutter, 10px) / 2
+    max(20rem, (100% - var(--comic-page-gutter, 10px)) * 0.4) +
+      var(--comic-page-gutter, 10px) / 2
   );
   z-index: 3;
   transform: translate(-50%, -50%);

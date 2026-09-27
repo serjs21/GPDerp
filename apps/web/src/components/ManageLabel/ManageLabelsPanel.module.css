@@ -27,7 +27,8 @@
   position: relative;
   flex: 0 0 auto;
   display: grid;
-  grid-template-columns: 2fr 3fr;
+  /* Sort never shrinks below 20rem; the create panel absorbs the squeeze. */
+  grid-template-columns: minmax(20rem, 2fr) minmax(0, 3fr);
   align-items: stretch;
   gap: var(--comic-page-gutter, 10px);
   min-width: 0;
