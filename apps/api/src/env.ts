@@ -1,6 +1,12 @@
 import "dotenv/config";
 
 const toList = (value: string) => value.split(",").map((s) => s.trim());
+/** Headers the web client always sends; must survive any CORS_HEADERS override. */
+const REQUIRED_CORS_HEADERS = ["x-tab-id", "x-csrf-token"];
+const withRequiredCorsHeaders = (headers: string[]) => {
+  const present = new Set(headers.map((h) => h.toLowerCase()));
+  return [...headers, ...REQUIRED_CORS_HEADERS.filter((h) => !present.has(h))];
+};
 const toBool = (value: string | undefined, fallback = false) => {
   if (value === undefined) return fallback;
   return value === "true";
@@ -42,7 +48,7 @@ export const env = {
 
   CORS_ORIGIN: toList(process.env.CLIENT_URL ?? "http://localhost:3000"),
   CORS_METHODS: toList(process.env.CORS_METHODS ?? "GET,POST,OPTIONS,PATCH,PUT,DELETE"),
-  CORS_HEADERS: toList(process.env.CORS_HEADERS ?? "Content-Type"),
+  CORS_HEADERS: withRequiredCorsHeaders(toList(process.env.CORS_HEADERS ?? "Content-Type")),
   CORS_CREDENTIALS: toBool(process.env.CORS_CREDENTIALS, true),
 
   JWT_ACCESS_SECRET: requireMinLengthEnv("JWT_ACCESS_SECRET", 32),

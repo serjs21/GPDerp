@@ -234,3 +234,19 @@
   padding: 0.65rem 0.5rem 0.5rem;
   box-sizing: border-box;
 }
+
+@media (max-width: 749.98px) {
+  .root {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+
+  .filtersCell {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .listShell {
+    grid-row: 3;
+  }
+}
