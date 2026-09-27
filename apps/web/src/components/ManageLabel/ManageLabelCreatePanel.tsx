@@ -50,18 +50,11 @@ export function ManageLabelCreatePanel({
           ariaLabel="Create a new one"
           onSelect={() => setOpen(true)}
         >
+
           <div className={styles.createContent}>
-            <ComicBurstLabel
-              className={styles.createBurst}
-              text={formatComicLabelText("Create a new one")}
-              fill="#17131A"
-              shapeKind="rect"
-              fontSize={18}
-              leading={
-                // eslint-disable-next-line @next/next/no-img-element -- static public SVG asset
-                <img src="/label_modal/create.svg" alt="" draggable={false} />
-              }
-            />
+          <img className={styles.createIcon} src="/label_modal/create.svg" alt="" draggable={false} />
+          {formatComicLabelText("Create a new one")}
+
           </div>
         </ComicPagePanel>
       </ComicPageRow>

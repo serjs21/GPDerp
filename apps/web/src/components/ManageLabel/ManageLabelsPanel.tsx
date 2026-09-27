@@ -247,8 +247,8 @@ export function ManageLabelsPanel({
       <ManageLabelCreatePanel
         accountId={accountId}
         onCreated={() => refresh()}
-        color={showSort ? "blue" : undefined}
-        background={showSort ? "halftone" : undefined}
+        color="#4fabf5"
+        background="solid"
         className={showSort ? styles.createBesideSort : undefined}
       />
     ) : null;
@@ -272,8 +272,8 @@ export function ManageLabelsPanel({
           <LabelSort
             value={sort}
             onChange={setSort}
-            color="red"
-            background="halftone"
+            color="#ea695e"
+            background="solid"
             className={styles.sortBesideCreate}
           />
           {createPanel}
