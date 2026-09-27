@@ -6,12 +6,18 @@ import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { ComicLabelCreationModal } from "@/components/ComicLabelCreationModal";
 import { ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
-import { COMIC_PANEL_COLORS } from "@/components/ComicPageLayout/comicPagePresets";
+import {
+  COMIC_PANEL_COLORS,
+  type ComicPanelBackground,
+  type ComicPanelColor,
+} from "@/components/ComicPageLayout/comicPagePresets";
 import styles from "./ManageLabelCreatePanel.module.css";
 
 export type ManageLabelCreatePanelProps = {
   accountId: string;
   onCreated?: (label: LabelDto) => void | Promise<void>;
+  color?: ComicPanelColor;
+  background?: ComicPanelBackground;
   className?: string;
 };
 
@@ -20,6 +26,8 @@ const CREATE_HOVER = COMIC_PANEL_COLORS.info.base;
 export function ManageLabelCreatePanel({
   accountId,
   onCreated,
+  color = "white",
+  background = "solid",
   className,
 }: ManageLabelCreatePanelProps) {
   const [open, setOpen] = useState(false);
@@ -34,8 +42,8 @@ export function ManageLabelCreatePanel({
         <ComicPagePanel
           selectable
           selected
-          background="solid"
-          color="white"
+          background={background}
+          color={color}
           flexWeight={1}
           className={styles.createPanel}
           style={hoverStyle}

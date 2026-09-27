@@ -1,6 +1,10 @@
 "use client";
 
 import { ComicPagePanel } from "@/components/ComicPageLayout";
+import type {
+  ComicPanelBackground,
+  ComicPanelColor,
+} from "@/components/ComicPageLayout/comicPagePresets";
 import { CoverState } from "@/components/DualityButton";
 import { useLocale } from "@/hooks/useLocale";
 import {
@@ -20,6 +24,8 @@ export type LabelSortProps = {
   disabled?: boolean;
   /** Horizontal (unrotated) title with the sort coins stacked in a column. */
   rotated?: boolean;
+  color?: ComicPanelColor;
+  background?: ComicPanelBackground;
   className?: string;
   "aria-label"?: string;
 };
@@ -36,6 +42,8 @@ export function LabelSort({
   sizeRem = LABEL_SORT_SIZE_REM,
   disabled = false,
   rotated = false,
+  color = "white",
+  background = "solid",
   className,
   "aria-label": ariaLabel = "Sort labels",
 }: LabelSortProps) {
@@ -45,8 +53,8 @@ export function LabelSort({
     <ComicPagePanel
       title="Sort by"
       titleDirection={rotated ? "horizontal" : "vertical"}
-      background="solid"
-      color="white"
+      background={background}
+      color={color}
       contentAlign="center"
       overflowVisible
       className={[styles.panel, rotated ? styles.panelRotated : "", className]

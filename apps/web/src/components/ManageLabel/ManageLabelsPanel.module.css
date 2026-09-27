@@ -24,15 +24,21 @@
 }
 
 .sortRow {
+  position: relative;
   flex: 0 0 auto;
-  display: flex;
+  display: grid;
+  grid-template-columns: 2fr 3fr;
   align-items: stretch;
   gap: var(--comic-page-gutter, 10px);
   min-width: 0;
 }
 
+.sortRow .sortBesideCreate {
+  width: 100%;
+  min-width: 0;
+}
+
 .sortRow .createBesideSort {
-  flex: 1 1 auto;
   min-width: 0;
   width: auto;
   margin-top: 0;
