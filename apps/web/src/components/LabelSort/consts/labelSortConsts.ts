@@ -47,7 +47,7 @@ export const LABEL_SORT_CATEGORIES: LabelSortCategory[] = [
     coverSrc: "/sort_button/connections_cover.svg",
     topIconSrc: "/sort_button/connections_high.svg",
     bottomIconSrc: "/sort_button/connections_low.svg",
-    iconTone: "strokeInvert",
+    iconTone: "mask",
     ariaLabel: "Sort by connection",
   },
 ];

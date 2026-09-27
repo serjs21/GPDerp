@@ -50,12 +50,12 @@
   box-sizing: border-box;
   width: min(42vw, 16rem);
   margin: 0;
-  padding: 0.5rem 1.5rem;
+  padding: 0.4rem 0.9rem;
   border: 3px solid #111;
   background: #fff;
   color: var(--comic-ink, #2d2d2d);
   font-family: var(--font-lantern-script, cursive);
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   letter-spacing: 0.03em;
   line-height: 1.2;
   outline: none;
