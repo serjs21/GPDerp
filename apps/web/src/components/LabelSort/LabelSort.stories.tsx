@@ -24,7 +24,13 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function StatefulSort({ initial }: { initial: LabelSortValue }) {
+function StatefulSort({
+  initial,
+  rotated = false,
+}: {
+  initial: LabelSortValue;
+  rotated?: boolean;
+}) {
   const [value, setValue] = useState<LabelSortValue>(initial);
   return (
     <div
@@ -35,7 +41,7 @@ function StatefulSort({ initial }: { initial: LabelSortValue }) {
         gap: "1.25rem",
       }}
     >
-      <LabelSort value={value} onChange={setValue} />
+      <LabelSort value={value} onChange={setValue} rotated={rotated} />
       <p
         style={{
           margin: 0,
@@ -72,4 +78,13 @@ export const CombinedIcons: Story = {
     onChange: () => {},
   },
   render: () => <StatefulSort initial={LABEL_SORT_DEFAULT_VALUE} />,
+};
+
+/** Horizontal title; coins stacked in a column. */
+export const Rotated: Story = {
+  args: {
+    value: LABEL_SORT_DEFAULT_VALUE,
+    onChange: () => {},
+  },
+  render: () => <StatefulSort initial={LABEL_SORT_DEFAULT_VALUE} rotated />,
 };

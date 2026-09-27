@@ -18,6 +18,8 @@ export type LabelSortProps = {
   categories?: LabelSortCategory[];
   sizeRem?: number;
   disabled?: boolean;
+  /** Horizontal (unrotated) title with the sort coins stacked in a column. */
+  rotated?: boolean;
   className?: string;
   "aria-label"?: string;
 };
@@ -33,6 +35,7 @@ export function LabelSort({
   categories: categoriesProp,
   sizeRem = LABEL_SORT_SIZE_REM,
   disabled = false,
+  rotated = false,
   className,
   "aria-label": ariaLabel = "Sort labels",
 }: LabelSortProps) {
@@ -41,15 +44,23 @@ export function LabelSort({
   return (
     <ComicPagePanel
       title="Sort by"
-      titleDirection="vertical"
+      titleDirection={rotated ? "horizontal" : "vertical"}
       background="solid"
       color="white"
       contentAlign="center"
       overflowVisible
-      className={[styles.panel, className].filter(Boolean).join(" ")}
+      className={[styles.panel, rotated ? styles.panelRotated : "", className]
+        .filter(Boolean)
+        .join(" ")}
       ariaLabel={ariaLabel}
     >
-      <div className={styles.cluster} role="radiogroup" aria-label={ariaLabel}>
+      <div
+        className={[styles.cluster, rotated ? styles.clusterRotated : ""]
+          .filter(Boolean)
+          .join(" ")}
+        role="radiogroup"
+        aria-label={ariaLabel}
+      >
         {categories.map((category) => {
           const selected = category.id === value.categoryId;
           return (

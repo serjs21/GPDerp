@@ -24,7 +24,13 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function StatefulSort({ initial }: { initial: ShareLinksSortValue }) {
+function StatefulSort({
+  initial,
+  rotated = false,
+}: {
+  initial: ShareLinksSortValue;
+  rotated?: boolean;
+}) {
   const [value, setValue] = useState<ShareLinksSortValue>(initial);
   return (
     <div
@@ -35,7 +41,7 @@ function StatefulSort({ initial }: { initial: ShareLinksSortValue }) {
         gap: "1.25rem",
       }}
     >
-      <ShareLinksSort value={value} onChange={setValue} />
+      <ShareLinksSort value={value} onChange={setValue} rotated={rotated} />
       <p
         style={{
           margin: 0,
@@ -72,4 +78,15 @@ export const CombinedIcons: Story = {
     onChange: () => {},
   },
   render: () => <StatefulSort initial={SHARE_LINKS_SORT_DEFAULT_VALUE} />,
+};
+
+/** Horizontal title; coins stacked in a column. */
+export const Rotated: Story = {
+  args: {
+    value: undefined,
+    onChange: () => {},
+  },
+  render: () => (
+    <StatefulSort initial={SHARE_LINKS_SORT_DEFAULT_VALUE} rotated />
+  ),
 };
