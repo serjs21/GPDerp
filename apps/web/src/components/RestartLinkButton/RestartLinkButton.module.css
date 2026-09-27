@@ -161,6 +161,7 @@
 .labelLineHover {
   font-family: var(--font-comic-label), "Bangers", sans-serif;
   font-size: 1.35rem;
+  line-height: 1.35rem;
   font-weight: 400;
   letter-spacing: 0.06em;
 }
