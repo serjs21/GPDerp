@@ -1,7 +1,7 @@
 "use client";
 
 import { ALL_SHARE_LINK_FILTERS, type ShareLinkFilter } from "@/api/shareLinks";
-import { ComicPagePanel } from "@/components/ComicPageLayout";
+import { ComicPagePanel, type ComicPanelColor } from "@/components/ComicPageLayout";
 import { LabelMethodIcon } from "@/components/LabelMethodIcon";
 import { OverlayTitle } from "@/components/OverlayTitle";
 import styles from "./ShareLinkFilterPanels.module.css";
@@ -11,7 +11,7 @@ const FILTER_OPTIONS: Array<{
   title: string;
   iconSrc: string;
   background: "sunburst" | "halftone" | "solid";
-  color: "green" | "blue" | "orange" | "magenta";
+  color: ComicPanelColor;
   bubbleStyle: "circle" | "diamond" | "thought" | "rectangle";
   ariaLabel: string;
 }> = [
