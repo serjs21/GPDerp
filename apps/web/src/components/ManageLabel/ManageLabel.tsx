@@ -17,6 +17,7 @@ import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationMod
 import { ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
 import { comicToast } from "@/components/ComicToast";
 import { MfgDate } from "@/components/MfgDate";
+import { OverlayTitle } from "@/components/OverlayTitle";
 import { DeleteConfirmModal } from "@/components/DeleteConfirmModal";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
 import { ConnectedHaikusPanel } from "./ConnectedHaikusPanel";
@@ -204,6 +205,15 @@ export function ManageLabel({
     router.push("/");
   }, [label.id, router, setSelectedLabelIds]);
 
+  const connectedPanel = (
+    <ConnectedHaikusPanel
+      accountId={accountId}
+      labelName={label.name}
+      items={connectedItems}
+      total={connectedTotal}
+    />
+  );
+
   const handleAnimationEnd = (event: AnimationEvent<HTMLElement>) => {
     const name = event.animationName;
     if (entering && (name.includes("boingInUp") || name.includes("manageLabelBoingIn"))) {
@@ -242,37 +252,54 @@ export function ManageLabel({
         >
           <ComicPageRow className={styles.strip}>
             <div className={styles.labelSlot}>
-              <ComicPagePanel
-                background="solid"
-                color="white"
-                flexWeight={1}
-                className={styles.labelPanel}
-                ariaLabel={label.name}
-              >
-                <MfgDate date={label.createdAt} className={styles.createdDate} />
-                <div className={styles.labelPreview}>
-                  <div className={styles.labelPreviewBurst}>
-                    <ComicBurstLabel
-                      text={formatComicLabelText(label.name)}
-                      fill={label.color || "#888888"}
-                      shapeKind={shape.kind}
-                      spikeCount={shape.spikeCount}
-                      randomness={shape.randomness}
-                      seed={shape.id}
-                      fontSize={20}
-                    />
-                  </div>
-                </div>
-              </ComicPagePanel>
+              <OverlayTitle title="Edit" direction="bottom">
+                <button
+                  type="button"
+                  className={styles.overlayAction}
+                  onClick={() => setEditOpen(true)}
+                  aria-label={`Edit label ${label.name}`}
+                >
+                  <ComicPagePanel
+                    background="solid"
+                    color="white"
+                    flexWeight={1}
+                    className={styles.labelPanel}
+                    ariaLabel={label.name}
+                  >
+                    <MfgDate date={label.createdAt} className={styles.createdDate} />
+                    <div className={styles.labelPreview}>
+                      <div className={styles.labelPreviewBurst}>
+                        <ComicBurstLabel
+                          text={formatComicLabelText(label.name)}
+                          fill={label.color || "#888888"}
+                          shapeKind={shape.kind}
+                          spikeCount={shape.spikeCount}
+                          randomness={shape.randomness}
+                          seed={shape.id}
+                          fontSize={20}
+                        />
+                      </div>
+                    </div>
+                  </ComicPagePanel>
+                </button>
+              </OverlayTitle>
             </div>
 
             <div className={styles.connectedSlot}>
-              <ConnectedHaikusPanel
-                accountId={accountId}
-                labelName={label.name}
-                items={connectedItems}
-                total={connectedTotal}
-              />
+              {hasConnections ? (
+                <OverlayTitle title="Tune in" direction="bottom">
+                  <button
+                    type="button"
+                    className={styles.overlayAction}
+                    onClick={handleTuneIn}
+                    aria-label={`Tune in to haikus labeled ${label.name}`}
+                  >
+                    {connectedPanel}
+                  </button>
+                </OverlayTitle>
+              ) : (
+                connectedPanel
+              )}
             </div>
 
             <LabelActions

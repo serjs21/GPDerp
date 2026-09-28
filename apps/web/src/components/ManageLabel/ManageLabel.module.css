@@ -139,6 +139,28 @@
   overflow: visible;
 }
 
+.overlayAction {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 10.5rem;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+}
+
+.overlayAction > * {
+  flex: 1 1 auto;
+  width: 100%;
+}
+
 .labelPreview {
   position: relative;
   display: flex;
