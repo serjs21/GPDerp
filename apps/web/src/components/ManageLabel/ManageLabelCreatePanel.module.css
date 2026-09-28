@@ -45,8 +45,8 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: var(--ticket-length, 92%);
-  height: var(--ticket-thickness, min(84%, 5rem));
+  width: var(--ticket-length, 52%);
+  height: var(--ticket-thickness, min(54%, 5rem));
   transform: translate(-50%, -50%) rotate(var(--ticket-angle, 0deg));
   container-type: size;
   transition: translate 0.15s ease;

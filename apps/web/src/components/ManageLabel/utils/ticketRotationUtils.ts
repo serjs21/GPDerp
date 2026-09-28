@@ -1,10 +1,10 @@
 import type { CSSProperties } from "react";
 import {
+  TICKET_ASPECT_RATIO,
   TICKET_INSET_RATIO,
   TICKET_MAX_ANGLE_DEG,
   TICKET_MAX_THICKNESS_REM,
   TICKET_ROOT_FONT_PX,
-  TICKET_THICKNESS_RATIO,
 } from "../consts/ticketRotationConsts";
 
 export type TicketFaceGeometry = {
@@ -12,9 +12,6 @@ export type TicketFaceGeometry = {
   lengthPx: number;
   thicknessPx: number;
 };
-
-/** Below this, sin/cos of the angle is treated as 0 so that axis does not constrain length. */
-const TRIG_EPSILON = 1e-6;
 
 /**
  * Smooth rotation from the stage aspect ratio r = height / width:
@@ -26,7 +23,11 @@ export function ticketRotationDeg(width: number, height: number): number {
   return Math.min(TICKET_MAX_ANGLE_DEG, Math.max(0, angle));
 }
 
-/** Largest ticket (length x thickness) that fits the stage once rotated. Null until measured. */
+/**
+ * Largest ticket at the SVG's own aspect ratio that fits the stage once rotated.
+ * The rotated bounding box is T*(R*cos + sin) wide and T*(R*sin + cos) tall (R = length / thickness).
+ * Null until measured.
+ */
 export function ticketFaceGeometry(width: number, height: number): TicketFaceGeometry | null {
   if (width <= 0 || height <= 0) return null;
 
@@ -34,20 +35,15 @@ export function ticketFaceGeometry(width: number, height: number): TicketFaceGeo
   const rad = (angleDeg * Math.PI) / 180;
   const sin = Math.sin(rad);
   const cos = Math.cos(rad);
+  const ratio = TICKET_ASPECT_RATIO;
 
   const thicknessPx = Math.min(
     TICKET_MAX_THICKNESS_REM * TICKET_ROOT_FONT_PX,
-    TICKET_THICKNESS_RATIO * Math.min(width, height),
+    (TICKET_INSET_RATIO * width) / (ratio * cos + sin),
+    (TICKET_INSET_RATIO * height) / (ratio * sin + cos),
   );
-  const availableW = TICKET_INSET_RATIO * width;
-  const availableH = TICKET_INSET_RATIO * height;
 
-  const fits: number[] = [];
-  if (cos > TRIG_EPSILON) fits.push((availableW - thicknessPx * sin) / cos);
-  if (sin > TRIG_EPSILON) fits.push((availableH - thicknessPx * cos) / sin);
-  const lengthPx = Math.max(thicknessPx, Math.min(...fits));
-
-  return { angleDeg, lengthPx, thicknessPx };
+  return { angleDeg, lengthPx: thicknessPx * ratio, thicknessPx };
 }
 
 /** CSS vars consumed by `.ticketFace`; undefined keeps the CSS fallbacks (unrotated). */
