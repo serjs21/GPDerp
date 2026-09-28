@@ -5,13 +5,13 @@ import type { LabelDto } from "@/api/labels";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { ComicLabelCreationModal } from "@/components/ComicLabelCreationModal";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
+import { useElementSize } from "@/hooks/useElementSize";
 import styles from "./ManageLabelCreatePanel.module.css";
+import { buildTicketFaceStyle, ticketFaceGeometry } from "./utils/ticketRotationUtils";
 
 export type ManageLabelCreatePanelProps = {
   accountId: string;
   onCreated?: (label: LabelDto) => void | Promise<void>;
-  /** Side-panel column: the ticket never rotates, even when the panel is portrait. */
-  vertical?: boolean;
   /** Stretch the panel to fill the parent's width and height. */
   stretch?: boolean;
   className?: string;
@@ -20,20 +20,18 @@ export type ManageLabelCreatePanelProps = {
 export function ManageLabelCreatePanel({
   accountId,
   onCreated,
-  vertical = false,
   stretch = false,
   className,
 }: ManageLabelCreatePanelProps) {
   const [open, setOpen] = useState(false);
+  const [stageRef, stageSize] = useElementSize<HTMLSpanElement>();
+  const faceStyle = buildTicketFaceStyle(
+    ticketFaceGeometry(stageSize.width, stageSize.height),
+  );
 
   return (
     <article
-      className={[
-        styles.root,
-        vertical ? styles.rootVertical : "",
-        stretch ? styles.rootStretch : "",
-        className,
-      ]
+      className={[styles.root, stretch ? styles.rootStretch : "", className]
         .filter(Boolean)
         .join(" ")}
     >
@@ -46,8 +44,8 @@ export function ManageLabelCreatePanel({
         ariaLabel="Create new label"
         className={styles.panel}
       >
-        <span className={styles.stage}>
-          <span className={styles.ticketFace}>
+        <span ref={stageRef} className={styles.stage}>
+          <span className={styles.ticketFace} style={faceStyle}>
             {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
             <img
               className={styles.ticketArt}

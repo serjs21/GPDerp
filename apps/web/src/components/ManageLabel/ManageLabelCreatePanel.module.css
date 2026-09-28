@@ -29,24 +29,25 @@
   height: 100%;
 }
 
-/* Size container for the rotation query: the panel's inner box. */
+/* The panel's inner box; measured to derive the ticket angle and size. */
 .stage {
   position: relative;
   display: block;
   width: 100%;
   height: 100%;
-  container-type: size;
 }
 
 /*
-  label_ticket_base.svg is 1266 x 328.51 with preserveAspectRatio="none": width stretches
-  with the panel, height is capped at 5rem and centred.
+  label_ticket_base.svg is 1266 x 328.51 with preserveAspectRatio="none", so it stretches
+  to the length/thickness from ticketRotationUtils. Fallbacks: unrotated, before measuring.
 */
 .ticketFace {
   position: absolute;
-  inset: 0 4%;
-  height: min(84%, 5rem);
-  margin-block: auto;
+  top: 50%;
+  left: 50%;
+  width: var(--ticket-length, 92%);
+  height: var(--ticket-thickness, min(84%, 5rem));
+  transform: translate(-50%, -50%) rotate(var(--ticket-angle, 0deg));
   container-type: size;
   transition: translate 0.15s ease;
 }
@@ -77,26 +78,10 @@
   align-items: center;
   justify-content: center;
   font-family: "Bangers";
-  font-size: clamp(13.6cqw, 55cqh, 19.4cqw);
+  font-size: clamp(9.6cqw, 38cqh, 8.4cqw);
   line-height: 1;
   /* The ticket art is always solid black, so the text colour is not themed. */
   color: #fffaf0;
   white-space: nowrap;
   pointer-events: none;
-}
-
-/*
-  Portrait panel (horizontal layout only): lay the ticket out landscape along the stage
-  height and turn it 90deg clockwise. The side-panel (vertical) layout never rotates.
-*/
-@container (aspect-ratio < 1) {
-  .root:not(.rootVertical) .ticketFace {
-    inset: auto;
-    top: 50%;
-    left: 50%;
-    width: 92cqh;
-    height: min(84cqw, 5rem);
-    margin: 0;
-    transform: translate(-50%, -50%) rotate(90deg);
-  }
 }
