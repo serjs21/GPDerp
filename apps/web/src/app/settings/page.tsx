@@ -332,70 +332,71 @@ export default function ProfilePage() {
   return (
     <main className={styles.page}>
       <ProfileProvider value={profileContextValue}>
-        <div
-          className={[styles.stage, showSidePanel ? styles.stageWithSide : ""]
-            .filter(Boolean)
-            .join(" ")}
-        >
-          <ComicPageLayout className={styles.layout}>
-            <div className={styles.body}>
-              <ComicPanelTabs
-                className={styles.tabRow}
-                panelClassName={styles.tabPanel}
-                value={tab}
-                onChange={setTab}
-                tabs={PROFILE_TABS.map((id) => {
-                  const meta = TAB_META[id];
-                  return {
-                    id,
-                    panel: {
-                      title: meta.title,
-                      background: meta.background,
-                      color: meta.color,
-                      ariaLabel: meta.ariaLabel,
-                    },
-                    content: (
-                      <LabelMethodIcon
-                        src={meta.iconSrc}
-                        bubbleStyle={meta.bubbleStyle}
-                        sourceDirection="none"
-                        active={tab === id}
-                      />
-                    ),
-                  };
-                })}
-              />
-
-              <div className={styles.contentSlot}>
-                {tab === "profile" ? <ProfileInfoTab /> : null}
-                {tab === "share-links" ? (
-                  <ShareLinkManagement
-                    active
-                    sidePanelTarget={sidePanelTarget}
-                  />
-                ) : null}
-                {tab === "labels" && labelsAccountId ? (
-                  <ManageLabelsPanel
-                    accountId={labelsAccountId}
-                    active
-                    searchVariant="none"
-                    searchQuery={searchParams.get("search") ?? ""}
-                    showCreate
-                    showSort
-                    sidePanelTarget={sidePanelTarget}
-                  />
-                ) : null}
-              </div>
-            </div>
-          </ComicPageLayout>
-          {showSidePanel ? (
-            <aside
-              ref={setSideNode}
-              className={styles.sidePanel}
-              aria-label="Sort and filter"
+        <ComicPageLayout className={styles.layout}>
+          <div className={styles.body}>
+            <ComicPanelTabs
+              className={styles.tabRow}
+              panelClassName={styles.tabPanel}
+              value={tab}
+              onChange={setTab}
+              tabs={PROFILE_TABS.map((id) => {
+                const meta = TAB_META[id];
+                return {
+                  id,
+                  panel: {
+                    title: meta.title,
+                    background: meta.background,
+                    color: meta.color,
+                    ariaLabel: meta.ariaLabel,
+                  },
+                  content: (
+                    <LabelMethodIcon
+                      src={meta.iconSrc}
+                      bubbleStyle={meta.bubbleStyle}
+                      sourceDirection="none"
+                      active={tab === id}
+                    />
+                  ),
+                };
+              })}
             />
-          ) : null}
-        </div>
+
+            <div
+              className={[
+                styles.contentSlot,
+                showSidePanel ? styles.contentSlotWithSide : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
+              {tab === "profile" ? <ProfileInfoTab /> : null}
+              {tab === "share-links" ? (
+                <ShareLinkManagement
+                  active
+                  sidePanelTarget={sidePanelTarget}
+                />
+              ) : null}
+              {tab === "labels" && labelsAccountId ? (
+                <ManageLabelsPanel
+                  accountId={labelsAccountId}
+                  active
+                  searchVariant="none"
+                  searchQuery={searchParams.get("search") ?? ""}
+                  showCreate
+                  showSort
+                  sidePanelTarget={sidePanelTarget}
+                />
+              ) : null}
+              {showSidePanel ? (
+                <aside
+                  ref={setSideNode}
+                  className={styles.sidePanel}
+                  aria-label="Sort and filter"
+                />
+              ) : null}
+            </div>
+          </div>
+        </ComicPageLayout>
       </ProfileProvider>
     </main>
   );

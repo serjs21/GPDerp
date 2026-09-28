@@ -12,20 +12,12 @@
   overflow: hidden;
 }
 
-.stage {
+.layout {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   width: min(100%, 76rem);
   margin: 0 auto;
-}
-
-.layout {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  margin: 0;
   /* Definite height so tab lists get a real scrollport (not the comic frame). */
   height: calc(90vh - 2rem);
   max-height: calc(90vh - 2rem);
@@ -92,31 +84,34 @@
 
 /* Keep the breakpoint in sync with SETTINGS_SIDE_PANEL_QUERY. */
 @media (min-width: 1000px) {
-  .stage.stageWithSide {
+  /*
+    List column keeps its own scrollport (row = slot height); the slot only
+    scrolls when the sticky side panel is taller than the frame.
+  */
+  .contentSlot.contentSlotWithSide {
     display: grid;
     grid-template-columns: minmax(0, 1fr) clamp(9rem, 14vw, 13rem);
-    align-items: start;
+    grid-template-rows: 100%;
     gap: var(--comic-page-gutter, 10px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
-  /* Top edge lines up with the tab content (below the tab row). */
-  .sidePanel {
-    --settings-side-top: calc(
-      var(--comic-page-border, 4px) + var(--comic-page-frame-gutter, 34px) +
-        2 * var(--comic-page-gutter, 10px) + var(--profile-tab-height)
-    );
+  .contentSlotWithSide > * {
+    height: 100%;
+  }
 
+  .contentSlotWithSide > .sidePanel {
+    position: sticky;
+    top: 0;
+    align-self: start;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     gap: var(--comic-page-gutter, 10px);
+    width: 100%;
     min-width: 0;
-    margin-top: var(--settings-side-top);
-    max-height: calc(90vh - 2rem - var(--settings-side-top));
-    /* Room for panel borders / shadows inside the scrollport. */
-    padding: 0.25rem 0.35rem 0.5rem 0.1rem;
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    height: auto;
   }
 }
