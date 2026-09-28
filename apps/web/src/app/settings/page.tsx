@@ -30,7 +30,10 @@ import { useTranslations } from "next-intl";
 import { LabelMethodIcon } from "@/components/LabelMethodIcon";
 import { ManageLabelsPanel } from "@/components/ManageLabel";
 import { ShareLinkManagement } from "@/components/ShareLinkManagement";
-import { ComicPanelTabs } from "@/components/ComicPanelTabs";
+import {
+  ComicPanelTabs,
+  type ComicPagePanelOptions,
+} from "@/components/ComicPanelTabs";
 import { useManageLabelsAccount } from "@/hooks/useAccountLabels";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { SETTINGS_SIDE_PANEL_QUERY } from "@/consts/settings/settingsLayoutConsts";
@@ -54,8 +57,8 @@ const TAB_META: Record<
   ProfilePageTab,
   {
     title: string;
-    background: "sunburst" | "halftone" | "solid";
-    color: "blue" | "orange" | "teal" | "green";
+    background: NonNullable<ComicPagePanelOptions["background"]>;
+    color: NonNullable<ComicPagePanelOptions["color"]>;
     ariaLabel: string;
     iconSrc: string;
     bubbleStyle: "circle" | "diamond" | "thought" | "rectangle";
@@ -64,7 +67,7 @@ const TAB_META: Record<
   profile: {
     title: "Profile",
     background: "sunburst",
-    color: "blue",
+    color: "yellow",
     ariaLabel: "Profile information",
     iconSrc: "/profile/profile.svg",
     bubbleStyle: "circle",
@@ -72,7 +75,7 @@ const TAB_META: Record<
   "share-links": {
     title: "Share Links",
     background: "solid",
-    color: "teal",
+    color: "#9d8ccd",
     ariaLabel: "Manage share links",
     iconSrc: "/profile/share_link.svg",
     bubbleStyle: "rectangle",
@@ -80,7 +83,7 @@ const TAB_META: Record<
   labels: {
     title: "Labels",
     background: "halftone",
-    color: "green",
+    color: "#4ce8d9",
     ariaLabel: "Manage labels",
     iconSrc: "/profile/labels.svg",
     bubbleStyle: "thought",

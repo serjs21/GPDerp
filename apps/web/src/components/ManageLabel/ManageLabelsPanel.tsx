@@ -284,7 +284,7 @@ export function ManageLabelsPanel({
                 value={sort}
                 onChange={setSort}
                 rotated
-                color="#ea695e"
+                color="#ffca91"
                 background="solid"
                 className={styles.sortInSide}
               />
@@ -298,7 +298,7 @@ export function ManageLabelsPanel({
           <LabelSort
             value={sort}
             onChange={setSort}
-            color="#ea695e"
+            color="#ffca91"
             background="solid"
             className={styles.sortBesideCreate}
           />
