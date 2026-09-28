@@ -45,14 +45,23 @@ export function ManageLabelCreatePanel({
         <span className={styles.ticketFace}>
           {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
           <img
-            className={styles.ticketArt}
-            src="/label_ticket_base.svg"
+            className={styles.ticketStart}
+            src="/create_label_button_base/label_create_start.svg"
             alt=""
             draggable={false}
           />
-          <span className={styles.ticketContent}>
-            <span className={styles.ticketText}>
-              {formatComicLabelText("Create new")}
+          <span className={styles.ticketEnd}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
+            <img
+              className={styles.ticketEndArt}
+              src="/create_label_button_base/create_label_end.svg"
+              alt=""
+              draggable={false}
+            />
+            <span className={styles.ticketContent}>
+              <span className={styles.ticketText}>
+                {formatComicLabelText("Create new")}
+              </span>
             </span>
           </span>
         </span>

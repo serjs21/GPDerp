@@ -11,8 +11,10 @@
   width: 100%;
 }
 
+/* Stand-in for the side panel's remaining height below the sort. */
 .stage .create {
   min-width: 0;
+  height: 20rem;
   margin-top: 0;
 }
 
