@@ -1,0 +1,15 @@
+.root {
+  display: block;
+  margin: 0;
+  font-family: var(--font-pixel-display);
+  font-size: 0.58rem;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: var(--comic-ink, #2d2d2d);
+  white-space: nowrap;
+  text-transform: uppercase;
+  pointer-events: none;
+  user-select: none;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}

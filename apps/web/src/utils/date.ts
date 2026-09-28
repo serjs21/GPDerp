@@ -15,6 +15,29 @@ export const formatCreatedOn = (iso: string): string => {
   return date.toLocaleDateString(undefined, { dateStyle: "medium" });
 };
 
+const MFG_MONTHS = [
+  "JAN",
+  "FEB",
+  "MAR",
+  "APR",
+  "MAY",
+  "JUN",
+  "JUL",
+  "AUG",
+  "SEP",
+  "OCT",
+  "NOV",
+  "DEC",
+] as const;
+
+/** Product-stamp date, e.g. `MFG 01 MAY 2024`. Empty string for invalid input. */
+export const formatMfgDate = (input: string | Date): string => {
+  const date = typeof input === "string" ? new Date(input) : input;
+  if (Number.isNaN(date.getTime())) return "";
+  const day = String(date.getDate()).padStart(2, "0");
+  return `MFG ${day} ${MFG_MONTHS[date.getMonth()]} ${date.getFullYear()}`;
+};
+
 export const formatChatTime = (input: Date | number | string) => {
   const d = new Date(input);
   const now = new Date();

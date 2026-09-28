@@ -5,7 +5,7 @@ import type { ShareLinkListItem } from "@/api/shareLinks";
 import type { HaikuDto } from "@/api/haikus";
 import * as shareLinksApi from "@/api/shareLinks";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
-import { DateGraffiti } from "@/components/DateGraffiti";
+import { MfgDate } from "@/components/MfgDate";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { buildPreviewLanternTypographyStyle } from "@/components/Lantern/utils/previewLanternTypography";
@@ -137,7 +137,7 @@ export function ShareLink({
             timeLabel={ctrl.timeLabel}
           />
         ) : null}
-        {createdAt ? <DateGraffiti date={createdAt} /> : null}
+        {createdAt ? <MfgDate date={createdAt} /> : null}
       </div>
     ) : undefined;
 

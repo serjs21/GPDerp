@@ -152,6 +152,14 @@
   overflow: visible;
 }
 
+/* Footer corner, without the caption border box. */
+.createdDate {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  z-index: 0;
+}
+
 .labelPreviewBurst {
   position: relative;
   z-index: 1;
