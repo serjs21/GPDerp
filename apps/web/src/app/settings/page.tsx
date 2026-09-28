@@ -326,7 +326,7 @@ export default function ProfilePage() {
     onConfirmResend: () => void resendChange(),
   };
 
-  const showSidePanel = sidePanelWide && tab !== "profile";
+  const showSidePanel = sidePanelWide && tab === "labels";
   const sidePanelTarget = showSidePanel ? sideNode : null;
 
   return (
@@ -370,12 +370,7 @@ export default function ProfilePage() {
                 .join(" ")}
             >
               {tab === "profile" ? <ProfileInfoTab /> : null}
-              {tab === "share-links" ? (
-                <ShareLinkManagement
-                  active
-                  sidePanelTarget={sidePanelTarget}
-                />
-              ) : null}
+              {tab === "share-links" ? <ShareLinkManagement active /> : null}
               {tab === "labels" && labelsAccountId ? (
                 <ManageLabelsPanel
                   accountId={labelsAccountId}

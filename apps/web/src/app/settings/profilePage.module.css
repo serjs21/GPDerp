@@ -19,8 +19,8 @@
   width: min(100%, 76rem);
   margin: 0 auto;
   /* Definite height so tab lists get a real scrollport (not the comic frame). */
-  height: calc(90vh - 2rem);
-  max-height: calc(90vh - 2rem);
+  height: calc(95vh - 2rem);
+  max-height: calc(95vh - 2rem);
   overflow: hidden;
 }
 
@@ -90,7 +90,7 @@
   */
   .contentSlot.contentSlotWithSide {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) clamp(9rem, 14vw, 13rem);
+    grid-template-columns: clamp(9rem, 14vw, 13rem) minmax(0, 1fr);
     grid-template-rows: 100%;
     gap: var(--comic-page-gutter, 10px);
     overflow-x: hidden;
@@ -103,6 +103,8 @@
   }
 
   .contentSlotWithSide > .sidePanel {
+    grid-column: 1;
+    grid-row: 1;
     position: sticky;
     top: 0;
     align-self: start;

@@ -51,28 +51,6 @@
   padding: 0.15rem 0.1rem 0.5rem;
 }
 
-/* Controls live in the settings side panel (>= 1000px); only the list stays in-frame. */
-.root.rootListOnly {
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr);
-}
-
-.rootListOnly .listShell {
-  grid-row: 1;
-}
-
-.sideStack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--comic-page-gutter, 10px);
-  width: 100%;
-  min-width: 0;
-}
-
-.sideStack .sortInSide {
-  width: 100%;
-}
-
 .loaderRow {
   display: flex;
   justify-content: center;
