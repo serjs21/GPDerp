@@ -3,7 +3,7 @@
   top: 50%;
   /* Seam between minmax(20rem, 2fr) / 3fr columns (gap-aware). */
   left: calc(
-    max(20rem, (100% - var(--comic-page-gutter, 10px)) * 0.4) +
+    max(17.5rem, (100% - var(--comic-page-gutter, 10px)) * 0.4) +
       var(--comic-page-gutter, 10px) / 2
   );
   z-index: 3;

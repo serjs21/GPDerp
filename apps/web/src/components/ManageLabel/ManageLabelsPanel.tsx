@@ -260,7 +260,7 @@ export function ManageLabelsPanel({
         accountId={accountId}
         onCreated={() => refresh()}
         color="#4fabf5"
-        background="solid"
+        vertical={sortInSide}
         className={createClassName}
       />
     ) : null;

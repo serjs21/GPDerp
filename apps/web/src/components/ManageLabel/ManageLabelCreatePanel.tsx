@@ -2,13 +2,11 @@
 
 import { useState, type CSSProperties } from "react";
 import type { LabelDto } from "@/api/labels";
-import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { ComicLabelCreationModal } from "@/components/ComicLabelCreationModal";
-import { ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
 import {
   COMIC_PANEL_COLORS,
-  type ComicPanelBackground,
+  resolveComicPanelColor,
   type ComicPanelColor,
 } from "@/components/ComicPageLayout/comicPagePresets";
 import styles from "./ManageLabelCreatePanel.module.css";
@@ -16,8 +14,10 @@ import styles from "./ManageLabelCreatePanel.module.css";
 export type ManageLabelCreatePanelProps = {
   accountId: string;
   onCreated?: (label: LabelDto) => void | Promise<void>;
+  /** Ticket fill. */
   color?: ComicPanelColor;
-  background?: ComicPanelBackground;
+  /** Ticket rotated 90deg clockwise (side-panel column). */
+  vertical?: boolean;
   className?: string;
 };
 
@@ -27,37 +27,47 @@ export function ManageLabelCreatePanel({
   accountId,
   onCreated,
   color = "white",
-  background = "solid",
+  vertical = false,
   className,
 }: ManageLabelCreatePanelProps) {
   const [open, setOpen] = useState(false);
 
-  const hoverStyle = {
-    "--manage-create-hover-fill": CREATE_HOVER,
+  const ticketStyle = {
+    "--create-ticket-fill": resolveComicPanelColor(color).base,
+    "--create-ticket-hover": CREATE_HOVER,
   } as CSSProperties;
 
   return (
-    <article className={[styles.root, className].filter(Boolean).join(" ")}>
-      <ComicPageRow className={styles.strip}>
-        <ComicPagePanel
-          selectable
-          selected
-          background={background}
-          color={color}
-          flexWeight={1}
-          className={styles.createPanel}
-          style={hoverStyle}
-          ariaLabel="Create a new one"
-          onSelect={() => setOpen(true)}
-        >
-
-          <div className={styles.createContent}>
-          <img className={styles.createIcon} src="/label_modal/create.svg" alt="" draggable={false} />
-          {formatComicLabelText("Create a new one")}
-
-          </div>
-        </ComicPagePanel>
-      </ComicPageRow>
+    <article
+      className={[styles.root, vertical ? styles.rootVertical : "", className]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      <button
+        type="button"
+        className={styles.ticket}
+        style={ticketStyle}
+        aria-label="Create a new one"
+        onClick={() => setOpen(true)}
+      >
+        <span className={styles.ticketFace}>
+          <span className={styles.ticketInk} aria-hidden>
+            <span className={styles.ticketShape} />
+          </span>
+          <span className={styles.ticketContent}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
+            <img
+              className={styles.createIcon}
+              src="/label_modal/create.svg"
+              alt=""
+              draggable={false}
+            />
+            <span className={styles.ticketText}>
+              {formatComicLabelText("Create a new one")}
+            </span>
+          </span>
+        </span>
+      </button>
 
       <ComicLabelCreationModal
         open={open}

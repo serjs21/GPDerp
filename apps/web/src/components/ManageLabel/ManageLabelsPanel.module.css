@@ -30,7 +30,7 @@
   flex: 0 0 auto;
   display: grid;
   /* Sort never shrinks below 20rem; the create panel absorbs the squeeze. */
-  grid-template-columns: minmax(20rem, 2fr) minmax(0, 3fr);
+  grid-template-columns: minmax(17.5rem, 2fr) minmax(0, 3fr);
   align-items: stretch;
   gap: var(--comic-page-gutter, 10px);
   min-width: 0;
@@ -41,14 +41,12 @@
   min-width: 0;
 }
 
+/* Ticket fills the row height (matches the sort panel). */
 .sortRow .createBesideSort {
+  --create-ticket-height: 100%;
   min-width: 0;
   width: auto;
   margin-top: 0;
-}
-
-.sortRow .createBesideSort > * {
-  height: 100%;
 }
 
 /* Portaled into the settings side panel (>= 1000px). */
@@ -65,8 +63,6 @@
 }
 
 .sideStack .createInSide {
-  --manage-create-font-size: 1.1rem;
-  --manage-create-gap: 0.5rem;
   width: 100%;
   margin-top: 0;
 }

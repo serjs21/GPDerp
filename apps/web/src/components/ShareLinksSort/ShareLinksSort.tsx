@@ -53,7 +53,7 @@ export function ShareLinksSort({
       title="Sort by"
       titleDirection={rotated ? "horizontal" : "vertical"}
       background="solid"
-      color="white"
+      color="#58adff"
       contentAlign="center"
       overflowVisible
       className={[styles.panel, rotated ? styles.panelRotated : "", className]

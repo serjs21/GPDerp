@@ -39,7 +39,7 @@ function VerticalSortCreate() {
       <ManageLabelCreatePanel
         accountId={STORY_ACCOUNT_ID}
         color="blue"
-        background="halftone"
+        vertical
         className={styles.create}
       />
       <p className={styles.readout}>
