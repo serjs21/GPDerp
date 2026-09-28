@@ -20,8 +20,7 @@ export function ConnectedHaikusPanel({
 }: ConnectedHaikusPanelProps) {
   const footer =
   total > 0 ? (
-      <div className={styles.connectedBody}>
-        <p className={styles.connectedMore}>{`${total} connected`}</p>
+      <div >{`${total} connected`}
       </div>
     ) : undefined;
 
