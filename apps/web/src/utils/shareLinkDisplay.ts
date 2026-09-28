@@ -8,8 +8,8 @@ const MS_PER_YEAR = 365.25 * MS_PER_DAY;
 
 export type HitsMeterDisplay =
   | { kind: "unlimited" }
-  | { kind: "remaining"; count: number }
-  | { kind: "empty"; count: 0 };
+  | { kind: "remaining"; count: number; total: number }
+  | { kind: "empty"; count: 0; total: number };
 
 export type TimeMeterDisplay =
   | { kind: "unlimited" }
@@ -19,8 +19,8 @@ export type TimeMeterDisplay =
 export function getHitsMeterDisplay(link: Pick<ShareLinkListItem, "maxViews" | "viewCount">): HitsMeterDisplay {
   if (link.maxViews == null) return { kind: "unlimited" };
   const count = Math.max(0, link.maxViews - link.viewCount);
-  if (count === 0) return { kind: "empty", count: 0 };
-  return { kind: "remaining", count };
+  if (count === 0) return { kind: "empty", count: 0, total: link.maxViews };
+  return { kind: "remaining", count, total: link.maxViews };
 }
 
 export function formatHms(ms: number): string {

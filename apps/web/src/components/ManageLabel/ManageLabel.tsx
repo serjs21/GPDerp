@@ -16,9 +16,9 @@ import { ComicLabelCreationModal } from "@/components/ComicLabelCreationModal";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import { ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
 import { comicToast } from "@/components/ComicToast";
+import { DateGraffiti } from "@/components/DateGraffiti";
 import { DeleteConfirmModal } from "@/components/DeleteConfirmModal";
 import { useAccountLabels } from "@/hooks/useAccountLabels";
-import { formatCreatedOn } from "@/utils/date";
 import { ConnectedHaikusPanel } from "./ConnectedHaikusPanel";
 import { LabelActions } from "./LabelActions";
 import {
@@ -26,6 +26,9 @@ import {
   MAGIC_EXIT_COLLAPSE_MS,
 } from "./consts/magicAnimationConsts";
 import styles from "./ManageLabel.module.css";
+
+/** Same corner as the panel footer caption, without its border box. */
+const LABEL_CREATED_POSITION = { right: "0.5rem", bottom: "0.5rem" };
 
 export type ManageLabelProps = {
   accountId: string;
@@ -248,8 +251,11 @@ export function ManageLabel({
                 flexWeight={1}
                 className={styles.labelPanel}
                 ariaLabel={label.name}
-                footer={`Created on: ${formatCreatedOn(label.createdAt)}`}
               >
+                <DateGraffiti
+                  date={label.createdAt}
+                  position={LABEL_CREATED_POSITION}
+                />
                 <div className={styles.labelPreview}>
                   <div className={styles.labelPreviewBurst}>
                     <ComicBurstLabel

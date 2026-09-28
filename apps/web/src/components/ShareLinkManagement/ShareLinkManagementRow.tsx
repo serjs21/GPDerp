@@ -58,7 +58,9 @@ function PreviewLanternStats({
           // eslint-disable-next-line @next/next/no-img-element -- pixel meter icons
           <img src={INFINITY_SRC} alt="" className={styles.previewStatIcon} aria-hidden />
         ) : (
-          <span className={styles.previewStatValue}>{hits.count}</span>
+          <span className={styles.previewStatValue}>
+            {hits.count}/{hits.total}
+          </span>
         )}
       </span>
       <span className={styles.previewStat} aria-label={timeLabel}>

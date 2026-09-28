@@ -24,12 +24,24 @@ describe("getHitsMeterDisplay", () => {
   });
 
   it("returns remaining visits", () => {
-    expect(getHitsMeterDisplay({ maxViews: 10, viewCount: 3 })).toEqual({ kind: "remaining", count: 7 });
+    expect(getHitsMeterDisplay({ maxViews: 10, viewCount: 3 })).toEqual({
+      kind: "remaining",
+      count: 7,
+      total: 10,
+    });
   });
 
   it("returns empty heart at zero remaining", () => {
-    expect(getHitsMeterDisplay({ maxViews: 5, viewCount: 5 })).toEqual({ kind: "empty", count: 0 });
-    expect(getHitsMeterDisplay({ maxViews: 2, viewCount: 9 })).toEqual({ kind: "empty", count: 0 });
+    expect(getHitsMeterDisplay({ maxViews: 5, viewCount: 5 })).toEqual({
+      kind: "empty",
+      count: 0,
+      total: 5,
+    });
+    expect(getHitsMeterDisplay({ maxViews: 2, viewCount: 9 })).toEqual({
+      kind: "empty",
+      count: 0,
+      total: 2,
+    });
   });
 });
 
