@@ -5,8 +5,6 @@ import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { ConnectedLanternStack } from "./ConnectedLanternStack";
 import styles from "./ManageLabel.module.css";
 
-const CONNECTED_PREVIEW_LIMIT = 3;
-
 export type ConnectedHaikusPanelProps = {
   accountId: string;
   labelName: string;
@@ -20,11 +18,10 @@ export function ConnectedHaikusPanel({
   items,
   total,
 }: ConnectedHaikusPanelProps) {
-  const moreCount = Math.max(0, total - CONNECTED_PREVIEW_LIMIT);
   const footer =
-    moreCount > 0 ? (
+  total > 0 ? (
       <div className={styles.connectedBody}>
-        <p className={styles.connectedMore}>{`+${moreCount} more`}</p>
+        <p className={styles.connectedMore}>{`${total} connected`}</p>
       </div>
     ) : undefined;
 
