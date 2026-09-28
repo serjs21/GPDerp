@@ -11,14 +11,14 @@
   margin-top: 0;
 }
 
-/* label_ticket_base.svg viewBox is 800 x 671.11 (preserveAspectRatio="none" so it can stretch). */
+/* label_ticket_base.svg viewBox is 807.96 x 328.51 (preserveAspectRatio="none" so it can stretch). */
 .ticket {
   position: relative;
   display: block;
   box-sizing: border-box;
   height: var(--create-ticket-height, 5.5rem);
   max-width: 100%;
-  aspect-ratio: 800 / 671.11;
+  aspect-ratio: 807.96 / 328.51;
   margin: 0;
   padding: 0;
   border: none;
@@ -53,17 +53,18 @@
   user-select: none;
 }
 
-/* Between the hatch marks (left) and the notch (right). */
+/* Ticket body only: clear of the punched hole on the left. */
 .ticketContent {
   position: absolute;
-  inset: 10% 30% 10% 25%;
+  inset: 10% 5% 10% 13%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: "Bangers";
   font-size: 19cqh;
   line-height: 1;
-  color: var(--text-color, #2c2c2c);
+  /* The ticket art is always solid black, so the text colour is not themed. */
+  color: #fffaf0;
   white-space: nowrap;
   pointer-events: none;
 }
@@ -105,5 +106,22 @@
 .rootVertical .ticketText {
   transform: rotate(-90deg);
   font-size: 1rem;
-  padding-bottom: 2rem;
+}
+
+/*
+  Text follows the longer side of the on-screen button: tall -> reads at -90deg.
+  Vertical faces are already turned +90deg, so the text needs 180deg there.
+*/
+@container (aspect-ratio < 1) {
+  .rootStretch .ticketContent {
+    font-size: clamp(1rem, 22cqw, 2.5rem);
+  }
+
+  .ticketText {
+    transform: rotate(-90deg);
+  }
+
+  .rootVertical .ticketText {
+    transform: rotate(180deg);
+  }
 }

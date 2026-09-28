@@ -39,7 +39,7 @@ export function ManageLabelCreatePanel({
       <button
         type="button"
         className={styles.ticket}
-        aria-label="Create a new one"
+        aria-label="Create new label"
         onClick={() => setOpen(true)}
       >
         <span className={styles.ticketFace}>
@@ -52,7 +52,7 @@ export function ManageLabelCreatePanel({
           />
           <span className={styles.ticketContent}>
             <span className={styles.ticketText}>
-              {formatComicLabelText("Create a new one")}
+              {formatComicLabelText("Create new")}
             </span>
           </span>
         </span>
