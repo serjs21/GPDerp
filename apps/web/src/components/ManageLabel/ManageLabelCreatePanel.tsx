@@ -4,14 +4,13 @@ import { useState } from "react";
 import type { LabelDto } from "@/api/labels";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { ComicLabelCreationModal } from "@/components/ComicLabelCreationModal";
+import { ComicPagePanel } from "@/components/ComicPageLayout";
 import styles from "./ManageLabelCreatePanel.module.css";
 
 export type ManageLabelCreatePanelProps = {
   accountId: string;
   onCreated?: (label: LabelDto) => void | Promise<void>;
-  /** Ticket rotated 90deg clockwise (side-panel column). */
-  vertical?: boolean;
-  /** Stretch the ticket to fill the parent's width and height. */
+  /** Stretch the panel to fill the parent's width and height. */
   stretch?: boolean;
   className?: string;
 };
@@ -19,7 +18,6 @@ export type ManageLabelCreatePanelProps = {
 export function ManageLabelCreatePanel({
   accountId,
   onCreated,
-  vertical = false,
   stretch = false,
   className,
 }: ManageLabelCreatePanelProps) {
@@ -27,45 +25,34 @@ export function ManageLabelCreatePanel({
 
   return (
     <article
-      className={[
-        styles.root,
-        vertical ? styles.rootVertical : "",
-        stretch ? styles.rootStretch : "",
-        className,
-      ]
+      className={[styles.root, stretch ? styles.rootStretch : "", className]
         .filter(Boolean)
         .join(" ")}
     >
-      <button
-        type="button"
-        className={styles.ticket}
-        aria-label="Create new label"
-        onClick={() => setOpen(true)}
+      <ComicPagePanel
+        selectable
+        onSelect={() => setOpen(true)}
+        background="halftone"
+        color="yellow"
+        isMotionBackground={false}
+        ariaLabel="Create new label"
+        className={styles.panel}
       >
-        <span className={styles.ticketFace}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
-          <img
-            className={styles.ticketStart}
-            src="/create_label_button_base/label_create_start.svg"
-            alt=""
-            draggable={false}
-          />
-          <span className={styles.ticketEnd}>
+        <span className={styles.stage}>
+          <span className={styles.ticketFace}>
             {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
             <img
-              className={styles.ticketEndArt}
-              src="/create_label_button_base/create_label_end.svg"
+              className={styles.ticketArt}
+              src="/create_label_button_base/label_ticket_base.svg"
               alt=""
               draggable={false}
             />
             <span className={styles.ticketContent}>
-              <span className={styles.ticketText}>
-                {formatComicLabelText("Create new")}
-              </span>
+              {formatComicLabelText("Create")}
             </span>
           </span>
         </span>
-      </button>
+      </ComicPagePanel>
 
       <ComicLabelCreationModal
         open={open}
