@@ -24,7 +24,6 @@ import { useAccountLabels } from "@/hooks/useAccountLabels";
 import { buildEnterStaggerDelays } from "./consts/magicAnimationConsts";
 import { ManageLabel } from "./ManageLabel";
 import { ManageLabelCreatePanel } from "./ManageLabelCreatePanel";
-import { SortCreateOrBurst } from "./SortCreateOrBurst";
 import styles from "./ManageLabelsPanel.module.css";
 
 const SEARCH_DEBOUNCE_MS = 200;
@@ -259,8 +258,8 @@ export function ManageLabelsPanel({
       <ManageLabelCreatePanel
         accountId={accountId}
         onCreated={() => refresh()}
-        color="#4fabf5"
         vertical={sortInSide}
+        stretch={showSort}
         className={createClassName}
       />
     ) : null;
@@ -305,7 +304,6 @@ export function ManageLabelsPanel({
             className={styles.sortBesideCreate}
           />
           {createPanel}
-          {createPanel ? <SortCreateOrBurst /> : null}
         </div>
       ) : null}
 

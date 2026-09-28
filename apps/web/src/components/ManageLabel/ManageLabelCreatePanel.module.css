@@ -11,19 +11,20 @@
   margin-top: 0;
 }
 
-/* label_ticket_base.svg viewBox is 807.96 x 328.51. */
+/* label_ticket_base.svg viewBox is 800 x 671.11 (preserveAspectRatio="none" so it can stretch). */
 .ticket {
   position: relative;
   display: block;
   box-sizing: border-box;
   height: var(--create-ticket-height, 5.5rem);
   max-width: 100%;
-  aspect-ratio: 807.96 / 328.51;
+  aspect-ratio: 800 / 671.11;
   margin: 0;
   padding: 0;
   border: none;
   background: transparent;
   cursor: pointer;
+  container-type: size;
   transition: transform 0.15s ease;
 }
 
@@ -39,39 +40,26 @@
 .ticketFace {
   position: absolute;
   inset: 0;
-  container-type: size;
 }
 
-/* Filter sits on the wrapper: a mask on the same element would cut the outline off. */
-.ticketInk {
+.ticketArt {
   position: absolute;
   inset: 0;
-  filter: drop-shadow(2px 0 0 #111) drop-shadow(-2px 0 0 #111)
-    drop-shadow(0 2px 0 #111) drop-shadow(0 -2px 0 #111);
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  user-select: none;
 }
 
-.ticketShape {
-  position: absolute;
-  inset: 0;
-  background-color: var(--create-ticket-fill, #fff);
-  -webkit-mask: url("/label_ticket_base.svg") center / contain no-repeat;
-  mask: url("/label_ticket_base.svg") center / contain no-repeat;
-  transition: background-color 0.2s ease;
-}
-
-.ticket:hover .ticketShape,
-.ticket:focus-visible .ticketShape {
-  background-color: var(--create-ticket-hover, var(--create-ticket-fill));
-}
-
-/* Ticket body only: clear of the punched hole on the left. */
+/* Between the hatch marks (left) and the notch (right). */
 .ticketContent {
   position: absolute;
-  inset: 10% 5% 10% 14%;
+  inset: 10% 30% 10% 25%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6cqh;
   font-family: "Bangers";
   font-size: 19cqh;
   line-height: 1;
@@ -80,28 +68,42 @@
   pointer-events: none;
 }
 
-.createIcon {
-  flex: 0 0 auto;
-  width: 30cqh;
-  height: 30cqh;
-}
-
 .ticketText {
   min-width: 0;
 }
 
-/* Vertical: a tall slot; the face keeps landscape proportions and turns 90deg clockwise. */
-.rootVertical .ticket {
-  width: min(100%, 7.5rem);
-  height: auto;
-  aspect-ratio: 328.51 / 807.96;
+/* Fill the parent: width and height both follow the available space. */
+.rootStretch {
+  height: 100%;
 }
 
+.rootStretch .ticket {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  aspect-ratio: auto;
+}
+
+.rootStretch .ticketContent {
+  font-size: clamp(1rem, 22cqh, 2.5rem);
+}
+
+/* Vertical: the face is laid out landscape (button height x width) and turned 90deg clockwise. */
 .rootVertical .ticketFace {
   inset: auto;
   top: 50%;
   left: 50%;
-  width: calc(100% * 807.96 / 328.51);
-  aspect-ratio: 807.96 / 328.51;
+  width: 100cqh;
+  height: 100cqw;
   transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.rootVertical .ticketContent {
+  font-size: clamp(1rem, 16cqw, 2.5rem);
+}
+
+.rootVertical .ticketText {
+  transform: rotate(-90deg);
+  font-size: 1rem;
+  padding-bottom: 2rem;
 }

@@ -41,29 +41,34 @@
   min-width: 0;
 }
 
-/* Ticket fills the row height (matches the sort panel). */
+/* Ticket fills the rest of the row: column width x sort panel height. */
 .sortRow .createBesideSort {
-  --create-ticket-height: 100%;
   min-width: 0;
   width: auto;
   margin-top: 0;
 }
 
-/* Portaled into the settings side panel (>= 1000px). */
+/* Portaled into the settings side panel (>= 1000px); fills the column height. */
 .sideStack {
   display: flex;
   flex-direction: column;
   gap: var(--comic-page-gutter, 10px);
   width: 100%;
+  height: 100%;
   min-width: 0;
+  min-height: 0;
 }
 
 .sideStack .sortInSide {
+  flex: 0 0 auto;
   width: 100%;
 }
 
+/* Ticket takes whatever height is left below the sort panel. */
 .sideStack .createInSide {
+  flex: 1 1 0;
   width: 100%;
+  min-height: 0;
   margin-top: 0;
 }
 

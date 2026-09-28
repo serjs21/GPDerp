@@ -114,6 +114,7 @@
     gap: var(--comic-page-gutter, 10px);
     width: 100%;
     min-width: 0;
-    height: auto;
+    /* Full column height so the create ticket can take the space under the sort. */
+    height: 100%;
   }
 }

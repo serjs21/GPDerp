@@ -1,67 +1,56 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
+import { useState } from "react";
 import type { LabelDto } from "@/api/labels";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { ComicLabelCreationModal } from "@/components/ComicLabelCreationModal";
-import {
-  COMIC_PANEL_COLORS,
-  resolveComicPanelColor,
-  type ComicPanelColor,
-} from "@/components/ComicPageLayout/comicPagePresets";
 import styles from "./ManageLabelCreatePanel.module.css";
 
 export type ManageLabelCreatePanelProps = {
   accountId: string;
   onCreated?: (label: LabelDto) => void | Promise<void>;
-  /** Ticket fill. */
-  color?: ComicPanelColor;
   /** Ticket rotated 90deg clockwise (side-panel column). */
   vertical?: boolean;
+  /** Stretch the ticket to fill the parent's width and height. */
+  stretch?: boolean;
   className?: string;
 };
-
-const CREATE_HOVER = COMIC_PANEL_COLORS.info.base;
 
 export function ManageLabelCreatePanel({
   accountId,
   onCreated,
-  color = "white",
   vertical = false,
+  stretch = false,
   className,
 }: ManageLabelCreatePanelProps) {
   const [open, setOpen] = useState(false);
 
-  const ticketStyle = {
-    "--create-ticket-fill": resolveComicPanelColor(color).base,
-    "--create-ticket-hover": CREATE_HOVER,
-  } as CSSProperties;
-
   return (
     <article
-      className={[styles.root, vertical ? styles.rootVertical : "", className]
+      className={[
+        styles.root,
+        vertical ? styles.rootVertical : "",
+        stretch ? styles.rootStretch : "",
+        className,
+      ]
         .filter(Boolean)
         .join(" ")}
     >
       <button
         type="button"
         className={styles.ticket}
-        style={ticketStyle}
         aria-label="Create a new one"
         onClick={() => setOpen(true)}
       >
         <span className={styles.ticketFace}>
-          <span className={styles.ticketInk} aria-hidden>
-            <span className={styles.ticketShape} />
-          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
+          <img
+            className={styles.ticketArt}
+            src="/label_ticket_base.svg"
+            alt=""
+            draggable={false}
+          />
           <span className={styles.ticketContent}>
-            {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
-            <img
-              className={styles.createIcon}
-              src="/label_modal/create.svg"
-              alt=""
-              draggable={false}
-            />
             <span className={styles.ticketText}>
               {formatComicLabelText("Create a new one")}
             </span>
