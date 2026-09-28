@@ -73,7 +73,7 @@
 }
 
 .listScroll {
-  --manage-label-list-gap: 2.25rem;
+  --manage-label-list-gap: 1.25rem;
   flex: 1 1 auto;
   box-sizing: border-box;
   display: flex;
