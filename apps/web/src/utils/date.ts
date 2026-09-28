@@ -9,6 +9,12 @@ export const formatCreatedAt = (iso: string): string => {
   }
 };
 
+export const formatCreatedOn = (iso: string): string => {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return date.toLocaleDateString(undefined, { dateStyle: "medium" });
+};
+
 export const formatChatTime = (input: Date | number | string) => {
   const d = new Date(input);
   const now = new Date();

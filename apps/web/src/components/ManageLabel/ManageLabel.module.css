@@ -152,10 +152,6 @@
   overflow: visible;
 }
 
-.labelDateGraffiti {
-  z-index: 0;
-}
-
 .labelPreviewBurst {
   position: relative;
   z-index: 1;
