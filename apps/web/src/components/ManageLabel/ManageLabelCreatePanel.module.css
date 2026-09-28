@@ -38,10 +38,16 @@
   container-type: size;
 }
 
-/* label_ticket_base.svg is 1266 x 328.51 with preserveAspectRatio="none" so it stretches. */
+/*
+  label_ticket_base.svg is 1266 x 328.51 with preserveAspectRatio="none": width stretches
+  with the panel, height is capped at 5rem and centred.
+*/
 .ticketFace {
   position: absolute;
-  inset: 8% 4%;
+  inset: 0 4%;
+  height: min(84%, 5rem);
+  margin-block: auto;
+  container-type: size;
   transition: translate 0.15s ease;
 }
 
@@ -60,15 +66,18 @@
   user-select: none;
 }
 
-/* Right side of the ticket body, clear of the punched hole. */
+/*
+  Right side of the ticket body, clear of the punched hole.
+  "CREATE!" in Bangers is 2.576em wide, so 13.6cqw-19.4cqw keeps it at 35-50% of the ticket width.
+*/
 .ticketContent {
   position: absolute;
-  inset: 12% 4% 12% 45%;
+  inset: 0 3% 0 42%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: "Bangers";
-  font-size: clamp(1rem, 22cqh, 2.5rem);
+  font-size: clamp(13.6cqw, 55cqh, 19.4cqw);
   line-height: 1;
   /* The ticket art is always solid black, so the text colour is not themed. */
   color: #fffaf0;
@@ -76,18 +85,18 @@
   pointer-events: none;
 }
 
-/* Portrait panel: lay the ticket out landscape (stage height x width) and turn it 90deg clockwise. */
+/*
+  Portrait panel (horizontal layout only): lay the ticket out landscape along the stage
+  height and turn it 90deg clockwise. The side-panel (vertical) layout never rotates.
+*/
 @container (aspect-ratio < 1) {
-  .ticketFace {
+  .root:not(.rootVertical) .ticketFace {
     inset: auto;
     top: 50%;
     left: 50%;
     width: 92cqh;
-    height: 84cqw;
+    height: min(84cqw, 5rem);
+    margin: 0;
     transform: translate(-50%, -50%) rotate(90deg);
-  }
-
-  .ticketContent {
-    font-size: clamp(1rem, 22cqw, 2.5rem);
   }
 }

@@ -258,6 +258,7 @@ export function ManageLabelsPanel({
       <ManageLabelCreatePanel
         accountId={accountId}
         onCreated={() => refresh()}
+        vertical={sortInSide}
         stretch={showSort}
         className={createClassName}
       />

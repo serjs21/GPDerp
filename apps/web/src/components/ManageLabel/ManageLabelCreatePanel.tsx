@@ -10,6 +10,8 @@ import styles from "./ManageLabelCreatePanel.module.css";
 export type ManageLabelCreatePanelProps = {
   accountId: string;
   onCreated?: (label: LabelDto) => void | Promise<void>;
+  /** Side-panel column: the ticket never rotates, even when the panel is portrait. */
+  vertical?: boolean;
   /** Stretch the panel to fill the parent's width and height. */
   stretch?: boolean;
   className?: string;
@@ -18,6 +20,7 @@ export type ManageLabelCreatePanelProps = {
 export function ManageLabelCreatePanel({
   accountId,
   onCreated,
+  vertical = false,
   stretch = false,
   className,
 }: ManageLabelCreatePanelProps) {
@@ -25,7 +28,12 @@ export function ManageLabelCreatePanel({
 
   return (
     <article
-      className={[styles.root, stretch ? styles.rootStretch : "", className]
+      className={[
+        styles.root,
+        vertical ? styles.rootVertical : "",
+        stretch ? styles.rootStretch : "",
+        className,
+      ]
         .filter(Boolean)
         .join(" ")}
     >

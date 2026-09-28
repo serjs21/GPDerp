@@ -38,6 +38,7 @@ function VerticalSortCreate() {
       />
       <ManageLabelCreatePanel
         accountId={STORY_ACCOUNT_ID}
+        vertical
         stretch
         className={styles.create}
       />
