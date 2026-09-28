@@ -33,7 +33,7 @@ export type LabelActionsProps = {
   className?: string;
 };
 
-type ActionLayout = "iconEnd" | "iconStart" | "iconOnly";
+type ActionLayout = "iconEnd" | "iconStart" | "iconOnly" | "iconFill";
 
 type ActionButtonProps = {
   src: string;
@@ -57,6 +57,7 @@ type ActionButtonProps = {
 function rowLayoutClass(layout: ActionLayout): string {
   if (layout === "iconStart") return styles.iconStart;
   if (layout === "iconOnly") return styles.iconOnly;
+  if (layout === "iconFill") return styles.iconFill;
   return styles.iconEnd;
 }
 
@@ -101,7 +102,7 @@ function LabelActionButton({
   );
 
   const content =
-    layout === "iconOnly" || !caption ? (
+    layout === "iconOnly" || layout === "iconFill" || !caption ? (
       icon
     ) : layout === "iconStart" ? (
       <>
@@ -138,7 +139,9 @@ function LabelActionButton({
         styles.action,
         invertIconOnHover ? styles.invertOnHover : "",
         disabled ? styles.disabled : "",
-        disabled && inkOnSkyIcon ? styles.disabledPreserveBg : "",
+        disabled && (inkOnSkyIcon || layout === "iconFill")
+          ? styles.disabledPreserveBg
+          : "",
       ]
         .filter(Boolean)
         .join(" ")}
@@ -170,14 +173,13 @@ export function LabelActions({
     <LabelActionButton
       src={hasConnections ? TUNE_IN_SRC : NOT_CONNECTED_ACTION_SRC}
       caption={hasConnections ? "Tune in" : undefined}
-      layout={hasConnections ? "iconEnd" : "iconOnly"}
+      layout={hasConnections ? "iconEnd" : "iconFill"}
       color={hasConnections ? "#9fa1ff" : "sky"}
       background={hasConnections ? "solid" : "sunburst"}
       captionClassName={hasConnections ? styles.captionTuneIn : undefined}
       iconClassName={
         hasConnections ? styles.iconTuneIn : styles.iconNotConnected
       }
-      inkOnSkyIcon={!hasConnections}
       selected
       ariaLabel={
         hasConnections
