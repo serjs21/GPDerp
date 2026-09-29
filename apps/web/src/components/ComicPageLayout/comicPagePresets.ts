@@ -51,7 +51,7 @@ export const COMIC_PANEL_COLORS: Record<
     base: "var(--sky-mid, #a8cce0)",
     accent: "var(--sky-horizon, #d4e6f0)",
   },
-  soviet: { base: "#cc0000", accent: "#ffd700" },
+  soviet: { base: "#ff7c7c", accent: "#ffdf5d" },
 };
 
 export function resolveComicPanelColor(

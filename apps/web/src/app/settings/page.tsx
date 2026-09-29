@@ -70,7 +70,7 @@ const TAB_META: Record<
   profile: {
     title: "Profile",
     background: "sunburst",
-    color: "#ff4545",
+    color: "soviet",
     ariaLabel: "Profile information",
     iconSrc: "/profile/profile.svg",
     bubbleStyle: "square",
