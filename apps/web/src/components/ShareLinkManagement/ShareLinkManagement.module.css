@@ -71,7 +71,7 @@
 
 .linkRow {
   display: grid;
-  grid-template-columns: 2fr 3fr 6.25rem;
+  grid-template-columns: 2fr 6.25rem 3fr;
   gap: var(--comic-page-gutter, 10px);
   flex: 0 0 auto;
   min-height: 14rem;

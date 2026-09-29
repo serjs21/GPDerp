@@ -246,6 +246,19 @@ export function ShareLinkManagementRow({
         lanternPanel
       )}
 
+      <ShareLinkActions
+        subject={ctrl.subject}
+        active={ctrl.active}
+        canUpdate={ctrl.showUpdate && ctrl.formValid}
+        updating={ctrl.updatingLimits}
+        showLabels={showLabels}
+        togglingLabels={ctrl.togglingLabels}
+        onPreview={() => setPreviewOpen(true)}
+        onUpdate={() => void ctrl.onUpdateLimits()}
+        onToggleLabels={() => void ctrl.onToggleLabels(!showLabels)}
+        onDelete={() => setDeleteOpen(true)}
+      />
+
       <ComicPagePanel
         background="solid"
         color="white"
@@ -276,19 +289,6 @@ export function ShareLinkManagementRow({
           />
         </div>
       </ComicPagePanel>
-
-      <ShareLinkActions
-        subject={ctrl.subject}
-        active={ctrl.active}
-        canUpdate={ctrl.showUpdate && ctrl.formValid}
-        updating={ctrl.updatingLimits}
-        showLabels={showLabels}
-        togglingLabels={ctrl.togglingLabels}
-        onPreview={() => setPreviewOpen(true)}
-        onUpdate={() => void ctrl.onUpdateLimits()}
-        onToggleLabels={() => void ctrl.onToggleLabels(!showLabels)}
-        onDelete={() => setDeleteOpen(true)}
-      />
 
       <ShareLinkPreviewModal
         open={previewOpen}
