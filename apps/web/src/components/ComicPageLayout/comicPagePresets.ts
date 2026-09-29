@@ -19,7 +19,8 @@ export type ComicPanelNamedColor =
   | "info"
   | "green"
   | "darkGreen"
-  | "sky";
+  | "sky"
+  | "soviet";
 
 /** Named preset or any `#…` hex (or CSS color starting with `#`). */
 export type ComicPanelColor = ComicPanelNamedColor | `#${string}`;
@@ -50,6 +51,7 @@ export const COMIC_PANEL_COLORS: Record<
     base: "var(--sky-mid, #a8cce0)",
     accent: "var(--sky-horizon, #d4e6f0)",
   },
+  soviet: { base: "#cc0000", accent: "#ffd700" },
 };
 
 export function resolveComicPanelColor(
