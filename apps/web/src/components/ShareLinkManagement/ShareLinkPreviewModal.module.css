@@ -1,0 +1,26 @@
+.dialog {
+  width: min(32rem, 92vw);
+}
+
+.panel {
+  min-height: 22rem;
+}
+
+.lanternFrame {
+  margin: 2rem auto 3rem;
+}
+
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 18rem;
+}
+
+.empty {
+  margin: 0;
+  padding: 2rem 1rem;
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  text-align: center;
+}

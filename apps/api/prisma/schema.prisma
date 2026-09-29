@@ -185,6 +185,7 @@ model ShareLink {
   viewCount          Int                          @default(0)
   disabled           Boolean                      @default(false)
   deactivationReason ShareLinkDeactivationReason?
+  showLabels         Boolean                      @default(true)
   createdAt          DateTime                     @default(now())
 
   createdBy User  @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)

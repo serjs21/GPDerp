@@ -35,6 +35,7 @@ const stubCreatedLinkFromUrl = (
   maxViews: null,
   viewCount: 0,
   disabled: false,
+  showLabels: true,
 });
 
 type UseShareModalControllerParams = {

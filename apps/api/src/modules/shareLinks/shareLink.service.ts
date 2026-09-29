@@ -56,6 +56,7 @@ type ShareLinkListRow = {
   viewCount: number;
   disabled: boolean;
   deactivationReason?: ShareLinkDeactivationReason | null;
+  showLabels: boolean;
   haikuSubject: string;
   sharedHaikuId: string;
 };
@@ -101,6 +102,7 @@ const shareLinkItemFromRow = (row: ShareLinkListRow) => ({
   viewCount: row.viewCount,
   disabled: row.disabled,
   deactivationReason: resolveDeactivationReason(row),
+  showLabels: row.showLabels,
 });
 
 const snapshotFromOwnerRow = (
@@ -234,6 +236,26 @@ export const shareLinkService = {
     return { ok: true, shareLink: shareLinkItemFromRow(updated) };
   },
 
+  async setShowLabels(params: {
+    userId: string;
+    shareLinkId: string;
+    showLabels: boolean;
+  }): Promise<
+    | { ok: true; shareLink: ReturnType<typeof shareLinkItemFromRow> }
+    | { ok: false; reason: "not_found" | "forbidden" }
+  > {
+    const row = await shareLinkRepository.findById(params.shareLinkId);
+    if (!row) return { ok: false, reason: "not_found" };
+    if (row.createdByUserId !== params.userId) return { ok: false, reason: "forbidden" };
+
+    const updated = await shareLinkRepository.updateShowLabelsById({
+      id: params.shareLinkId,
+      showLabels: params.showLabels,
+    });
+
+    return { ok: true, shareLink: shareLinkItemFromRow(updated) };
+  },
+
   async deleteShareLink(params: {
     userId: string;
     shareLinkId: string;
@@ -266,6 +288,7 @@ export const shareLinkService = {
       viewCount: number;
       disabled: boolean;
       deactivationReason: ShareLinkDeactivationReason | null;
+      showLabels: boolean;
     }>;
     total: number;
     pageSize: number;
@@ -408,6 +431,7 @@ export const shareLinkService = {
         haiku: ReturnType<typeof haikuPayload>;
         remainingViews: number | null;
         permanent: boolean;
+        showLabels: boolean;
         sharedByUserName: string;
         createdByUserId: string;
         shareLink: ShareLinkListItem;
@@ -482,6 +506,7 @@ export const shareLinkService = {
       viewCount: updated.viewCount,
       disabled: updated.disabled,
       deactivationReason: updated.deactivationReason,
+      showLabels: updated.showLabels,
       haikuSubject: updated.haikuSubject,
       sharedHaikuId: updated.sharedHaikuId,
     };
@@ -496,11 +521,13 @@ export const shareLinkService = {
     }
 
     const snapshot = snapshotFromOwnerRow(row.createdByUserId, liveRow);
+    const haiku = haikuPayload(haikuRow);
     return {
       ok: true,
-      haiku: haikuPayload(haikuRow),
+      haiku: updated.showLabels ? haiku : { ...haiku, labels: [] },
       remainingViews,
       permanent,
+      showLabels: updated.showLabels,
       sharedByUserName: resolveDisplayName(row.createdBy),
       createdByUserId: snapshot.createdByUserId,
       shareLink: snapshot.shareLink,

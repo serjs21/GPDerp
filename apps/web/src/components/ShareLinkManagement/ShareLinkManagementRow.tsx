@@ -1,9 +1,13 @@
 "use client";
 
-import type { CSSProperties } from "react";
-import type { ShareLinkListItem } from "@/api/shareLinks";
+import { useReducedMotion } from "motion/react";
+import { useState, type AnimationEvent, type CSSProperties } from "react";
+import { deleteShareLink, type ShareLinkListItem } from "@/api/shareLinks";
 import type { HaikuDto } from "@/api/haikus";
+import { ComicConfirmModal } from "@/components/ComicConfirmModal";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
+import { comicToast } from "@/components/ComicToast";
+import { ShareLinkActions } from "@/components/ShareLinkActions";
 import { MfgDate } from "@/components/MfgDate";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
@@ -21,7 +25,10 @@ import {
   useShareLinkControls,
 } from "@/components/ShareLink/useShareLinkControls";
 import type { HitsMeterDisplay, TimeMeterDisplay } from "@/utils/shareLinkDisplay";
+import { ShareLinkPreviewModal } from "./ShareLinkPreviewModal";
 import styles from "./ShareLinkManagement.module.css";
+
+const DELETE_QUESTION = "Do you want to magically erase this link from existance?";
 
 function previewLanternBodyStyle(body: string, title?: string): CSSProperties {
   return buildPreviewLanternTypographyStyle(body, {
@@ -90,12 +97,54 @@ export function ShareLinkManagementRow({
   haikuLoading = false,
   onChanged,
 }: ShareLinkManagementRowProps) {
+  const reduceMotion = useReducedMotion();
+  // Optimistic until the list refetch catches up (`base` stops matching the link).
+  const [labelsOverride, setLabelsOverride] = useState<{ base: boolean; value: boolean } | null>(
+    null,
+  );
+  const showLabels =
+    labelsOverride && labelsOverride.base === link.showLabels
+      ? labelsOverride.value
+      : link.showLabels;
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [vanishing, setVanishing] = useState(false);
+
   const ctrl = useShareLinkControls({
     link,
     haikuId: link.sharedHaikuId ?? "",
     haikuSubject: link.haikuSubject,
     onChanged,
+    onLinkUpdate: (updated) =>
+      setLabelsOverride({ base: link.showLabels, value: updated.showLabels }),
   });
+
+  // Animate first: the delete socket event drops the row from cache immediately.
+  const eraseLink = async () => {
+    try {
+      await deleteShareLink(link.id);
+      comicToast.success("Share link erased");
+      onChanged();
+    } catch {
+      setVanishing(false);
+      comicToast.error("Could not erase share link");
+    }
+  };
+
+  const handleDeleteConfirm = () => {
+    setDeleteOpen(false);
+    if (reduceMotion) {
+      void eraseLink();
+      return;
+    }
+    setVanishing(true);
+  };
+
+  const handleRowAnimationEnd = (event: AnimationEvent<HTMLDivElement>) => {
+    if (!vanishing || event.target !== event.currentTarget) return;
+    if (event.animationName !== "vanishOut") return;
+    void eraseLink();
+  };
 
   const showLoader = haikuLoading;
   const previewBody = haiku?.body ?? "";
@@ -173,7 +222,15 @@ export function ShareLinkManagementRow({
   );
 
   return (
-    <div className={styles.linkRow}>
+    <div
+      className={[
+        styles.linkRow,
+        vanishing ? `magictime vanishOut ${styles.linkRowVanishing}` : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      onAnimationEnd={handleRowAnimationEnd}
+    >
       {ctrl.copyEnabled ? (
         <OverlayTitle title="Copy link!" direction="bottom" className={styles.lanternSlot}>
           <button
@@ -215,9 +272,40 @@ export function ShareLinkManagementRow({
             onStop={ctrl.onStop}
             stopButtonClassName={shareStyles.stopButton}
             restartReason={ctrl.restartReason}
+            hideUpdate
           />
         </div>
       </ComicPagePanel>
+
+      <ShareLinkActions
+        subject={ctrl.subject}
+        active={ctrl.active}
+        canUpdate={ctrl.showUpdate && ctrl.formValid}
+        updating={ctrl.updatingLimits}
+        showLabels={showLabels}
+        togglingLabels={ctrl.togglingLabels}
+        onPreview={() => setPreviewOpen(true)}
+        onUpdate={() => void ctrl.onUpdateLimits()}
+        onToggleLabels={() => void ctrl.onToggleLabels(!showLabels)}
+        onDelete={() => setDeleteOpen(true)}
+      />
+
+      <ShareLinkPreviewModal
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        subject={ctrl.subject}
+        haiku={haiku}
+        loading={haikuLoading}
+      />
+
+      <ComicConfirmModal
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        question={DELETE_QUESTION}
+        cancelLabel="Not yet"
+        confirmLabel="Erase"
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 }

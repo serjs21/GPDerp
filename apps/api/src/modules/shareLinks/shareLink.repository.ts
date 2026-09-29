@@ -10,6 +10,7 @@ const shareLinkSelect = {
   viewCount: true,
   disabled: true,
   deactivationReason: true,
+  showLabels: true,
   sharedHaikuId: true,
   haikuSubject: true,
 } as const;
@@ -66,6 +67,7 @@ export const shareLinkRepository = {
         viewCount: true,
         disabled: true,
         deactivationReason: true,
+        showLabels: true,
         createdAt: true,
         createdBy: {
           select: {
@@ -142,6 +144,14 @@ export const shareLinkRepository = {
         disabled: params.disabled,
         deactivationReason: params.deactivationReason,
       },
+      select: shareLinkSelect,
+    });
+  },
+
+  updateShowLabelsById(params: { id: string; showLabels: boolean }) {
+    return prismaClient.shareLink.update({
+      where: { id: params.id },
+      data: { showLabels: params.showLabels },
       select: shareLinkSelect,
     });
   },

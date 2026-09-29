@@ -304,6 +304,48 @@ const shareLinkPluginImpl = async (app: FastifyInstance) => {
     },
   );
 
+  app.patch(
+    "/share_link/:share_link_id/settings",
+    { preHandler: [app.requireAuthenticated] },
+    async (req: FastifyRequest, res: FastifyReply) => {
+      const userId = req.user?.sub;
+      if (!userId) {
+        res.code(401).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+
+      const { share_link_id } = req.params as { share_link_id: string };
+      if (!isUuid(share_link_id)) {
+        res.code(400).send({ ok: false, error: "Invalid share link id" });
+        return;
+      }
+
+      const body = (req.body as { showLabels?: boolean } | undefined) ?? {};
+      if (typeof body.showLabels !== "boolean") {
+        res.code(400).send({ ok: false, error: "showLabels must be a boolean" });
+        return;
+      }
+
+      const result = await shareLinkService.setShowLabels({
+        userId,
+        shareLinkId: share_link_id,
+        showLabels: body.showLabels,
+      });
+
+      if (!result.ok) {
+        if (result.reason === "not_found") {
+          res.code(404).send({ ok: false, error: "Share link not found" });
+          return;
+        }
+        res.code(403).send({ ok: false, error: "Only the creator can update this share link" });
+        return;
+      }
+
+      res.send({ ok: true, data: result.shareLink });
+      broadcastShareLink(app, userId, result.shareLink);
+    },
+  );
+
   app.get("/share_link/:share_link_id", async (req: FastifyRequest, res: FastifyReply) => {
     const { share_link_id } = req.params as { share_link_id: string };
     const token = share_link_id?.trim() ?? "";
@@ -327,6 +369,7 @@ const shareLinkPluginImpl = async (app: FastifyInstance) => {
         haiku: result.haiku,
         remainingViews: result.remainingViews,
         permanent: result.permanent,
+        showLabels: result.showLabels,
         sharedByUserName: result.sharedByUserName,
       },
     });

@@ -21,7 +21,14 @@ jest.mock("../shareLink.repository", () => ({
     findByShareHash: jest.fn(),
     create: jest.fn(),
     updateDisabledById: jest.fn(),
+    updateShowLabelsById: jest.fn(),
     markDeactivatedById: jest.fn(),
+  },
+}));
+
+jest.mock("../../../lib/prisma", () => ({
+  prismaClient: {
+    $transaction: jest.fn(),
   },
 }));
 
@@ -32,8 +39,13 @@ const { shareLinkRepository } = jest.requireMock("../shareLink.repository") as {
     findByShareHash: jest.Mock;
     create: jest.Mock;
     updateDisabledById: jest.Mock;
+    updateShowLabelsById: jest.Mock;
     markDeactivatedById: jest.Mock;
   };
+};
+
+const { prismaClient } = jest.requireMock("../../../lib/prisma") as {
+  prismaClient: { $transaction: jest.Mock };
 };
 
 const { haikuRepository } = jest.requireMock("../../haiku/haiku.repository") as {
@@ -314,6 +326,112 @@ describe("shareLinkService.resolveSharedHaiku snapshots", () => {
     if (!result.ok) {
       expect(result.shareLink?.deactivationReason).toBe("limit_reached");
       expect(result.createdByUserId).toBe("user-1");
+    }
+  });
+});
+
+describe("shareLinkService.setShowLabels", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("rejects non-owners", async () => {
+    shareLinkRepository.findById.mockResolvedValue({ id: "link-1", createdByUserId: "owner" });
+
+    const result = await shareLinkService.setShowLabels({
+      userId: "someone-else",
+      shareLinkId: "link-1",
+      showLabels: false,
+    });
+
+    expect(result).toEqual({ ok: false, reason: "forbidden" });
+    expect(shareLinkRepository.updateShowLabelsById).not.toHaveBeenCalled();
+  });
+
+  it("updates the flag for the creator", async () => {
+    shareLinkRepository.findById.mockResolvedValue({ id: "link-1", createdByUserId: "user-1" });
+    shareLinkRepository.updateShowLabelsById.mockResolvedValue({
+      id: "link-1",
+      shareHash: "abc",
+      createdAt: new Date("2026-01-01T00:00:00.000Z"),
+      expirationDate: null,
+      maxViews: null,
+      viewCount: 0,
+      disabled: false,
+      showLabels: false,
+      sharedHaikuId: "haiku-1",
+      haikuSubject: "Mist",
+    });
+
+    const result = await shareLinkService.setShowLabels({
+      userId: "user-1",
+      shareLinkId: "link-1",
+      showLabels: false,
+    });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.shareLink.showLabels).toBe(false);
+    expect(shareLinkRepository.updateShowLabelsById).toHaveBeenCalledWith({
+      id: "link-1",
+      showLabels: false,
+    });
+  });
+});
+
+describe("shareLinkService.resolveSharedHaiku labels", () => {
+  const baseRow = {
+    id: "link-1",
+    shareHash: "abc",
+    createdByUserId: "user-1",
+    sharedHaikuId: "haiku-1",
+    haikuSubject: "Mist",
+    createdAt: new Date("2026-01-01T00:00:00.000Z"),
+    expirationDate: null,
+    maxViews: null,
+    viewCount: 0,
+    disabled: false,
+    deactivationReason: null,
+    createdBy: { userName: "Ada", firstName: "Ada", lastName: "L", email: "ada@example.com" },
+  };
+  const haikuRow = {
+    id: "haiku-1",
+    title: "Mist",
+    titleSuffix: 0,
+    body: "a\nb\nc",
+    createdAt: new Date("2026-01-01T00:00:00.000Z"),
+    accountId: "acc-1",
+    createdById: "user-1",
+    labels: [{ id: "label-1", name: "Calm" }],
+  };
+
+  const mockResolve = (showLabels: boolean) => {
+    shareLinkRepository.findByShareHash.mockResolvedValue({ ...baseRow, showLabels });
+    prismaClient.$transaction.mockResolvedValue({ ...baseRow, showLabels, viewCount: 1 });
+    haikuRepository.findFullById.mockResolvedValue(haikuRow);
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("keeps labels when showLabels is on", async () => {
+    mockResolve(true);
+    const result = await shareLinkService.resolveSharedHaiku("abc");
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.showLabels).toBe(true);
+      expect(result.haiku.labels).toHaveLength(1);
+    }
+  });
+
+  it("strips labels when showLabels is off", async () => {
+    mockResolve(false);
+    const result = await shareLinkService.resolveSharedHaiku("abc");
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.showLabels).toBe(false);
+      expect(result.haiku.labels).toEqual([]);
+      expect(result.shareLink.showLabels).toBe(false);
     }
   });
 });

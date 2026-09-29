@@ -66,6 +66,19 @@
   color: rgb(0 0 0 / 45%);
 }
 
+.labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.labelItem {
+  line-height: 0;
+}
+
 .contentContainer {
   padding: 1.5rem;
   display: flex;

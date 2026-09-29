@@ -167,6 +167,7 @@ export function useShareLinkControls({
   const [activating, setActivating] = useState(false);
   const [deactivating, setDeactivating] = useState(false);
   const [updatingLimits, setUpdatingLimits] = useState(false);
+  const [togglingLabels, setTogglingLabels] = useState(false);
   const [busyDots, setBusyDots] = useState<(typeof ACTIVATING_DOT_CYCLE)[number]>("");
   const [now, setNow] = useState<Date | null>(null);
   const [form, setForm] = useState<LimitForm>(() => formFromLink(link));
@@ -293,6 +294,7 @@ export function useShareLinkControls({
           maxViews: created.maxViews,
           viewCount: created.viewCount,
           disabled: created.disabled,
+          showLabels: created.showLabels,
         };
         onLinkUpdate?.(next);
       } else {
@@ -333,6 +335,20 @@ export function useShareLinkControls({
       setIsUpdating(false);
       await holdMinBusy(startedAt);
       setUpdatingLimits(false);
+    }
+  };
+
+  const onToggleLabels = async (next: boolean = !link?.showLabels) => {
+    if (!link || togglingLabels) return;
+    setTogglingLabels(true);
+    try {
+      const updated = await shareLinksApi.setShareLinkShowLabels(link.id, next);
+      onLinkUpdate?.(updated);
+      onChanged();
+    } catch (error: unknown) {
+      comicToast.error(getAxiosErrorMessage(error, "Could not update label visibility"));
+    } finally {
+      setTogglingLabels(false);
     }
   };
 
@@ -378,9 +394,11 @@ export function useShareLinkControls({
     activating,
     deactivating,
     updatingLimits,
+    togglingLabels,
     onStop,
     onStart,
     onUpdateLimits,
+    onToggleLabels,
     onCopy,
   };
 }

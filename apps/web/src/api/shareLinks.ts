@@ -22,6 +22,7 @@ export type CreateShareLinkResponse = {
     viewCount: number;
     disabled: boolean;
     deactivationReason?: ShareLinkDeactivationReason | null;
+    showLabels: boolean;
   };
 };
 
@@ -46,6 +47,8 @@ export type ShareLinkListItem = {
   viewCount: number;
   disabled: boolean;
   deactivationReason?: ShareLinkDeactivationReason | null;
+  /** Show haiku labels on the public share page. */
+  showLabels: boolean;
 };
 
 /** Client-side OR match mirroring share-link list filters (for optimistic UI). */
@@ -185,6 +188,18 @@ export async function setShareLinkDisabled(
     { disabled },
   );
   if (!data.ok) throw new Error(data.error ?? "Failed to update share link status");
+  return data.data;
+}
+
+export async function setShareLinkShowLabels(
+  shareLinkId: string,
+  showLabels: boolean,
+): Promise<ShareLinkListItem> {
+  const { data } = await axios.patch<SetShareLinkStatusResponse>(
+    `/share_link/${encodeURIComponent(shareLinkId)}/settings`,
+    { showLabels },
+  );
+  if (!data.ok) throw new Error(data.error ?? "Failed to update share link settings");
   return data.data;
 }
 

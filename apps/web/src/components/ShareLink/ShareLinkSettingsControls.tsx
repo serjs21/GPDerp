@@ -30,6 +30,8 @@ export type ShareLinkSettingsControlsProps = {
   onStop: () => void | Promise<void>;
   stopButtonClassName?: string;
   restartReason?: RestartLinkReason | null;
+  /** Omit the inline Update button (e.g. when a ShareLinkActions column owns it). */
+  hideUpdate?: boolean;
 };
 
 function minTimeoutAt() {
@@ -94,6 +96,7 @@ export function ShareLinkSettingsControls({
   onStop,
   stopButtonClassName,
   restartReason = null,
+  hideUpdate = false,
 }: ShareLinkSettingsControlsProps) {
   return (
     <>
@@ -146,7 +149,7 @@ export function ShareLinkSettingsControls({
           </label>
         </div>
 
-        {showUpdate ? (
+        {showUpdate && !hideUpdate ? (
           <button
             type="button"
             className={styles.updateButton}

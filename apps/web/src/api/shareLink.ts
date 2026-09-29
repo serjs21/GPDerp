@@ -4,6 +4,8 @@ export type SharedHaikuPayload = {
   haiku: HaikuDto;
   remainingViews: number | null;
   permanent: boolean;
+  /** When false the API returns `haiku.labels` empty. */
+  showLabels: boolean;
   sharedByUserName: string;
 };
 

@@ -6,6 +6,7 @@ import type { ShareLinkListItem } from "@/api/shareLinks";
 import { fetchHaikusByIds, type HaikuDto } from "@/api/haikus";
 
 const CHUNK_SIZE = 50;
+export const SHARE_LINK_HAIKUS_QUERY_KEY = "share-link-haikus";
 
 function chunkIds(ids: string[]): string[][] {
   const chunks: string[][] = [];
@@ -27,7 +28,7 @@ export function useShareLinkHaikuEnrichment(items: ShareLinkListItem[], enabled:
 
   const queries = useQueries({
     queries: chunks.map((ids) => ({
-      queryKey: ["share-link-haikus", ids.join(",")] as const,
+      queryKey: [SHARE_LINK_HAIKUS_QUERY_KEY, ids.join(",")] as const,
       queryFn: () => fetchHaikusByIds(ids),
       enabled: enabled && ids.length > 0,
       staleTime: 60_000,
