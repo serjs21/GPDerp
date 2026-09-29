@@ -61,16 +61,16 @@ const TAB_META: Record<
     color: NonNullable<ComicPagePanelOptions["color"]>;
     ariaLabel: string;
     iconSrc: string;
-    bubbleStyle: "circle" | "diamond" | "thought" | "rectangle";
+    bubbleStyle: "circle" | "diamond" | "thought" | "rectangle" | "square";
   }
 > = {
   profile: {
     title: "Profile",
     background: "sunburst",
-    color: "yellow",
+    color: "#ff4545",
     ariaLabel: "Profile information",
     iconSrc: "/profile/profile.svg",
-    bubbleStyle: "circle",
+    bubbleStyle: "square",
   },
   "share-links": {
     title: "Share Links",
@@ -78,7 +78,7 @@ const TAB_META: Record<
     color: "#9d8ccd",
     ariaLabel: "Manage share links",
     iconSrc: "/profile/share_link.svg",
-    bubbleStyle: "rectangle",
+    bubbleStyle: "thought",
   },
   labels: {
     title: "Labels",
@@ -86,7 +86,7 @@ const TAB_META: Record<
     color: "#4ce8d9",
     ariaLabel: "Manage labels",
     iconSrc: "/profile/labels.svg",
-    bubbleStyle: "thought",
+    bubbleStyle: "diamond",
   },
 };
 
