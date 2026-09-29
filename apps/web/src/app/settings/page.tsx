@@ -27,7 +27,10 @@ import {
 import { useTheme } from "@/hooks/useTheme";
 import { useLocale } from "@/hooks/useLocale";
 import { useTranslations } from "next-intl";
-import { LabelMethodIcon } from "@/components/LabelMethodIcon";
+import {
+  LabelMethodIcon,
+  type LabelMethodIconProps,
+} from "@/components/LabelMethodIcon";
 import { ManageLabelsPanel } from "@/components/ManageLabel";
 import { ShareLinkManagement } from "@/components/ShareLinkManagement";
 import {
@@ -61,7 +64,7 @@ const TAB_META: Record<
     color: NonNullable<ComicPagePanelOptions["color"]>;
     ariaLabel: string;
     iconSrc: string;
-    bubbleStyle: "circle" | "diamond" | "thought" | "rectangle" | "square";
+    bubbleStyle: NonNullable<LabelMethodIconProps["bubbleStyle"]>;
   }
 > = {
   profile: {
