@@ -14,17 +14,19 @@ function parseSearchableTab(value: string | null): SettingsSearchTab | null {
 
 const COPY: Record<
   SettingsSearchTab,
-  { placeholder: string; ariaLabel: string; buttonAriaLabel: string }
+  { placeholder: string; ariaLabel: string; buttonAriaLabel: string; iconSrc: string }
 > = {
   "share-links": {
     placeholder: "Search by title",
     ariaLabel: "Search by title",
     buttonAriaLabel: "Search share links",
+    iconSrc: "/nav/search-icon.svg",
   },
   labels: {
     placeholder: "Search labels…",
     ariaLabel: "Search labels by name",
     buttonAriaLabel: "Search labels",
+    iconSrc: "/profile/seach_label.svg",
   },
 };
 
@@ -96,5 +98,6 @@ export function useHeaderSettingsSearch() {
     placeholder: copy.placeholder,
     ariaLabel: copy.ariaLabel,
     buttonAriaLabel: copy.buttonAriaLabel,
+    iconSrc: copy.iconSrc,
   };
 }

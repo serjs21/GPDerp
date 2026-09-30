@@ -198,6 +198,7 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
     ? settingsSearch.toggleExpanded
     : haikuSearch.openSearch;
   const onInputBlur = isSettings ? undefined : haikuSearch.onBlur;
+  const searchIconSrc = isSettings ? settingsSearch.iconSrc : "/nav/search-icon.svg";
 
   return (
     <>
@@ -292,7 +293,7 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
                 <SlotFace>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/nav/search-icon.svg"
+                    src={searchIconSrc}
                     alt=""
                     className={styles.iconImg}
                     width={28}
