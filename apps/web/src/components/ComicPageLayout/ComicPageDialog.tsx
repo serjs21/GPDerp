@@ -1,7 +1,7 @@
 "use client";
 
 import { Dialog } from "@base-ui/react/dialog";
-import type { KeyboardEvent, ReactNode } from "react";
+import type { CSSProperties, KeyboardEvent, ReactNode } from "react";
 import { ComicPageLayout } from "./ComicPageLayout";
 import styles from "./ComicPageLayout.module.css";
 
@@ -20,6 +20,8 @@ export type ComicPageDialogProps = {
   className?: string;
   /** Applied to the dialog content shell (width / max-height). */
   contentClassName?: string;
+  /** Inline style on the dialog content shell (e.g. computed height). */
+  contentStyle?: CSSProperties;
 };
 
 function submitOnEnter(event: KeyboardEvent<HTMLElement>) {
@@ -50,6 +52,7 @@ export function ComicPageDialog({
   showClose = false,
   className,
   contentClassName,
+  contentStyle,
 }: ComicPageDialogProps) {
   return (
     <Dialog.Root
@@ -68,6 +71,7 @@ export function ComicPageDialog({
         <Dialog.Viewport className={styles.dialogViewport}>
           <Dialog.Popup
             className={[styles.dialogPopup, contentClassName].filter(Boolean).join(" ")}
+            style={contentStyle}
           >
             <div className={styles.comicPageShell} onKeyDown={submitOnEnter}>
               {title ? (

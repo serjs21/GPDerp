@@ -1,13 +1,33 @@
+/* Height comes from shareLinkPreviewDialogStyle(); children stretch to fill it. */
 .dialog {
-  width: min(32rem, 92vw);
+  display: flex;
+  flex-direction: column;
+  width: min(36rem, 94vw);
+  max-height: 92vh;
+}
+
+.dialog > * {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.page {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.page > :last-child {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .panel {
-  min-height: 22rem;
-}
-
-.lanternFrame {
-  margin: 2rem auto 3rem;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .loader {
