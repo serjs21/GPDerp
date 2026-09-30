@@ -53,6 +53,10 @@
   background-color: #1a5fb4;
 }
 
+.slotSearchLabels {
+  background-color: var(--hanko-red, #bc002d);
+}
+
 .panelSearchOnly .slotSearch {
   border-left: none;
 }

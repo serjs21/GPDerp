@@ -277,7 +277,15 @@ export function SearchPanel({ className, forcedHover }: SearchPanelProps) {
               </div>
             ) : null}
 
-            <div className={`${styles.slot} ${styles.slotSearch}`}>
+            <div
+              className={[
+                styles.slot,
+                styles.slotSearch,
+                isSettings && settingsSearch.tab === "labels" ? styles.slotSearchLabels : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
               <button
                 type="button"
                 className={styles.panelButton}
