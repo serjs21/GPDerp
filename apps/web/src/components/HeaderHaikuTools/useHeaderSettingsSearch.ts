@@ -20,7 +20,7 @@ const COPY: Record<
     placeholder: "Search by title",
     ariaLabel: "Search by title",
     buttonAriaLabel: "Search share links",
-    iconSrc: "/nav/search-icon.svg",
+    iconSrc: "/profile/search_links.svg",
   },
   labels: {
     placeholder: "Search labels…",
