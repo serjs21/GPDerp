@@ -17,13 +17,13 @@ const COPY: Record<
   { placeholder: string; ariaLabel: string; buttonAriaLabel: string; iconSrc: string }
 > = {
   "share-links": {
-    placeholder: "Search by title",
+    placeholder: "Search links",
     ariaLabel: "Search by title",
     buttonAriaLabel: "Search share links",
     iconSrc: "/profile/search_links.svg",
   },
   labels: {
-    placeholder: "Search labels…",
+    placeholder: "Search labels",
     ariaLabel: "Search labels by name",
     buttonAriaLabel: "Search labels",
     iconSrc: "/profile/seach_label.svg",
