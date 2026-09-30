@@ -10,7 +10,7 @@ import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { useHaikuLabelPlacement } from "@/hooks/useHaikuLabelPlacement";
 import { SHARE_LINK_HAIKUS_QUERY_KEY } from "./useShareLinkHaikuEnrichment";
-import { shareLinkPreviewDialogStyle } from "./utils/shareLinkPreviewModalUtils";
+import { shareLinkPreviewPanelStyle } from "./utils/shareLinkPreviewModalUtils";
 import type { ShareLinkPreviewModalProps } from "./ShareLinkPreviewModal.types";
 import styles from "./ShareLinkPreviewModal.module.css";
 
@@ -45,7 +45,6 @@ export function ShareLinkPreviewModal({
         showClose
         className={styles.page}
         contentClassName={styles.dialog}
-        contentStyle={shareLinkPreviewDialogStyle()}
         ctaFooter={
           <ComicPageCtaAction
             label="Edit labels"
@@ -55,11 +54,12 @@ export function ShareLinkPreviewModal({
         }
       >
         <ComicPagePanel
-          background="halftone"
+          background="solid"
           color="sky"
           span="full"
           overflowVisible
           className={styles.panel}
+          style={shareLinkPreviewPanelStyle()}
           ariaLabel={`Shared lantern: ${subject}`}
         >
           {haiku ? (

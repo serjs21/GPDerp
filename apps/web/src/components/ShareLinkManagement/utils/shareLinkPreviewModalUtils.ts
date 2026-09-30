@@ -21,7 +21,7 @@ export function labelHaloHeightRem(lanternWidthRem: number = LANTERN_WIDTH_REM):
   return padTop + Math.max(LABEL_HALO_CONTENT_MIN_HEIGHT_REM, lanternHeightRem) + padBottom;
 }
 
-export function shareLinkPreviewDialogStyle(): CSSProperties {
+export function shareLinkPreviewPanelStyle(): CSSProperties {
   return {
     height: `${labelHaloHeightRem() + SHARE_LINK_PREVIEW_EXTRA_HEIGHT_REM}rem`,
   };
