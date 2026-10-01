@@ -296,6 +296,9 @@ export function ShareLinkManagementRow({
         subject={ctrl.subject}
         haiku={haiku}
         loading={haikuLoading}
+        showLabels={showLabels}
+        togglingLabels={ctrl.togglingLabels}
+        onToggleLabels={() => void ctrl.onToggleLabels(!showLabels)}
       />
 
       <ComicConfirmModal

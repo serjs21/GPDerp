@@ -20,6 +20,9 @@ export function ShareLinkPreviewModal({
   subject,
   haiku,
   loading = false,
+  showLabels,
+  togglingLabels,
+  onToggleLabels,
 }: ShareLinkPreviewModalProps) {
   const queryClient = useQueryClient();
   const [labelsOpen, setLabelsOpen] = useState(false);
@@ -45,11 +48,18 @@ export function ShareLinkPreviewModal({
         className={styles.page}
         contentClassName={styles.dialog}
         ctaFooter={
-          <ComicPageCtaAction
-            label="Edit labels"
-            disabled={!haiku}
-            onClick={() => setLabelsOpen(true)}
-          />
+          <>
+            <ComicPageCtaAction
+              label={showLabels ? "Hide labels" : "Show labels"}
+              busy={togglingLabels}
+              onClick={onToggleLabels}
+            />
+            <ComicPageCtaAction
+              label="Edit labels"
+              disabled={!haiku}
+              onClick={() => setLabelsOpen(true)}
+            />
+          </>
         }
       >
         <ComicPagePanel
@@ -66,6 +76,7 @@ export function ShareLinkPreviewModal({
               labels={haloLabels}
               onPlacementCommit={(labelId, placement) => void onPlacementCommit(labelId, placement)}
               ariaLabel={`${subject} labels`}
+              className={showLabels ? undefined : styles.labelsHidden}
             >
               <LanternFrame ariaLabel={`Haiku lantern: ${subject}`} showLabelBelt={false}>
                 <Lantern haiku={haiku} showActions={false} bodyOnly />

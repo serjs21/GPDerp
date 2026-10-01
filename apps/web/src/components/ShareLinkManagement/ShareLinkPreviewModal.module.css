@@ -8,6 +8,12 @@
   flex: 0 0 auto;
 }
 
+/* Preview-only: labels stay placeable but read as hidden on the public page. */
+.labelsHidden :global([data-comic-role="label"]) {
+  opacity: 0.3;
+  transition: opacity 0.2s ease;
+}
+
 .loader {
   display: flex;
   align-items: center;
