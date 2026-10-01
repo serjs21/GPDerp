@@ -77,6 +77,11 @@
   transition: color 0.2s ease;
 }
 
+.captionLabels {
+  white-space: break-spaces;
+  width: 2.5rem;
+}
+
 .inverted .caption {
   color: #fff;
 }

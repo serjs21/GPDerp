@@ -55,7 +55,8 @@ export function ShareLinkActions({
       />
       <ShareLinkActionButton
         src={showLabels ? SHARE_LINK_ACTION_ICONS.showLabels : SHARE_LINK_ACTION_ICONS.hideLabels}
-        caption={showLabels ? "Labels" : "Hidden"}
+        caption={showLabels ? "Labels visible" : "Labels hidden"}
+        captionClassName={styles.captionLabels}
         layout={showLabels ? SHARE_LINK_ACTION_LAYOUTS.showLabels : SHARE_LINK_ACTION_LAYOUTS.hideLabels}
         ariaLabel={`Show labels on share link for ${subject}`}
         color={labelsColors.panel}

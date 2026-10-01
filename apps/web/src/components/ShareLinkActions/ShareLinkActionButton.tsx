@@ -11,6 +11,7 @@ import styles from "./ShareLinkActions.module.css";
 export function ShareLinkActionButton({
   src,
   caption,
+  captionClassName,
   layout,
   ariaLabel,
   onSelect,
@@ -50,7 +51,10 @@ export function ShareLinkActionButton({
       <div className={styles.row}>
         {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
         <img className={styles.icon} src={src} alt="" draggable={false} decoding="async" />
-        <span className={styles.caption} aria-hidden>
+        <span
+          className={[styles.caption, captionClassName].filter(Boolean).join(" ")}
+          aria-hidden
+        >
           {caption}
         </span>
       </div>

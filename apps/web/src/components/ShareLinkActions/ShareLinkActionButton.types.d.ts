@@ -22,6 +22,7 @@ export type ShareLinkActionLayout = {
 export type ShareLinkActionButtonProps = {
   src: string;
   caption: string;
+  captionClassName?: string;
   layout: ShareLinkActionLayout;
   ariaLabel: string;
   onSelect: () => void;
