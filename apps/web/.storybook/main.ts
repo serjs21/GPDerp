@@ -12,6 +12,10 @@ const config: StorybookConfig = {
     "@storybook/addon-docs"
   ],
   "framework": "@storybook/nextjs-vite",
+  "env": (config) => ({
+    ...config,
+    NEXT_PUBLIC_WS_DISABLED: "true",
+  }),
   "staticDirs": [
     "../public"
   ]

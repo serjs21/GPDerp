@@ -1,6 +1,9 @@
 import { getTabId } from "@/utils/tabId";
 import { useEffect, useRef, useState, useCallback } from "react";
 
+// Storybook sets this so stories never open sockets to the real API.
+const WEBSOCKETS_DISABLED = process.env.NEXT_PUBLIC_WS_DISABLED === "true";
+
 type UseWebSocketOptions = {
   url: string;
   protocols?: string | string[];
@@ -25,7 +28,7 @@ type UseWebSocketReturn = {
 export function useWebSocket({
   url,
   protocols,
-  enabled = true,
+  enabled: enabledOption = true,
   reconnect = true,
   minReconnectDelayMs = 250,
   maxReconnectDelayMs = 8000,
@@ -34,6 +37,7 @@ export function useWebSocket({
   onClose,
   onError,
 }: UseWebSocketOptions): UseWebSocketReturn {
+  const enabled = enabledOption && !WEBSOCKETS_DISABLED;
   const wsRef = useRef<WebSocket | null>(null);
 
   // keep latest callbacks without re-creating socket

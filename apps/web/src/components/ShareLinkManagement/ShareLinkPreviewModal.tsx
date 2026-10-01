@@ -56,7 +56,7 @@ export function ShareLinkPreviewModal({
         className={styles.page}
         contentClassName={styles.dialog}
         ctaFooter={
-          <>
+          <div className={styles.footerActions}>
             <div className={styles.footerAction}>
               <ShareLinkGoToLinkAction
                 subject={subject}
@@ -89,7 +89,7 @@ export function ShareLinkPreviewModal({
                 captionClassName={styles.footerCaption}
               />
             </div>
-          </>
+          </div>
         }
       >
         <ComicPagePanel

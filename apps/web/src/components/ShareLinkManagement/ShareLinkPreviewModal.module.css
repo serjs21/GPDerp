@@ -14,11 +14,18 @@
   transition: opacity 0.2s ease;
 }
 
+.footerActions {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
 /* Icon/caption placement: SHARE_LINK_PREVIEW_ACTION_LAYOUTS. */
 .footerAction {
   display: flex;
+  flex: 1 1 0;
   flex-direction: column;
-  width: 8rem;
+  min-width: 0;
   height: 6rem;
 }
 
