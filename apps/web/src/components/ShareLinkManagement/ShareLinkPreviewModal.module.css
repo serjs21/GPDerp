@@ -22,6 +22,12 @@
   height: 6rem;
 }
 
+/* Nested selector outranks the default `.caption` / `.captionLabels` rules. */
+.footerAction .footerCaption {
+  width: fit-content;
+  font-size: 1rem;
+}
+
 .loader {
   display: flex;
   align-items: center;

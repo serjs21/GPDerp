@@ -72,8 +72,14 @@ export const SHARE_LINK_PREVIEW_ACTION_LAYOUTS = {
 } as const satisfies Record<string, ShareLinkActionLayout>;
 
 export const SHARE_LINK_PREVIEW_LABELS_TOGGLE_LAYOUTS = {
-  show: SHARE_LINK_PREVIEW_ACTION_LAYOUTS.showLabels,
-  hide: SHARE_LINK_PREVIEW_ACTION_LAYOUTS.hideLabels,
+  show: {
+    icon: { size: "4.5rem", bottom: "0.2rem", left: "0.2rem", rotateDeg: 0 },
+    caption: PREVIEW_CAPTION_TOP_RIGHT,
+  },
+  hide: {
+    icon: { size: "4.5rem", bottom: "0.2rem", left: "0.2rem", rotateDeg: 0 },
+    caption: PREVIEW_CAPTION_TOP_RIGHT,
+  },
 } as const;
 
 export const SHARE_LINK_UPDATE_DISABLED_MESSAGES = {

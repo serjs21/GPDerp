@@ -16,6 +16,7 @@ export function ShareLinkLabelsToggle({
   togglingLabels,
   onToggleLabels,
   layouts = { show: SHARE_LINK_ACTION_LAYOUTS.showLabels, hide: SHARE_LINK_ACTION_LAYOUTS.hideLabels },
+  captionClassName,
 }: ShareLinkLabelsToggleProps) {
   const colors = showLabels
     ? SHARE_LINK_ACTION_COLORS.showLabels
@@ -25,7 +26,7 @@ export function ShareLinkLabelsToggle({
     <ShareLinkActionButton
       src={showLabels ? SHARE_LINK_ACTION_ICONS.showLabels : SHARE_LINK_ACTION_ICONS.hideLabels}
       caption={showLabels ? "Labels visible" : "Labels hidden"}
-      captionClassName={styles.captionLabels}
+      captionClassName={[styles.captionLabels, captionClassName].filter(Boolean).join(" ")}
       layout={showLabels ? layouts.show : layouts.hide}
       ariaLabel={`Show labels on share link for ${subject}`}
       color={colors.panel}

@@ -14,12 +14,13 @@ export function ShareLinkEditLabelsAction({
   subject,
   disabled = false,
   onEditLabels,
+  captionClassName,
 }: ShareLinkEditLabelsActionProps) {
   return (
     <ShareLinkActionButton
       src={SHARE_LINK_ACTION_ICONS.editLabels}
       caption="Edit labels"
-      captionClassName={styles.captionLabels}
+      captionClassName={[styles.captionLabels, captionClassName].filter(Boolean).join(" ")}
       layout={SHARE_LINK_PREVIEW_ACTION_LAYOUTS.editLabels}
       ariaLabel={`Edit labels for ${subject}`}
       color={SHARE_LINK_ACTION_COLORS.editLabels.panel}

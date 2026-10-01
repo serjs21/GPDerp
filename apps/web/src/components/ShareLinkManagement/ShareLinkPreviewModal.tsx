@@ -57,7 +57,11 @@ export function ShareLinkPreviewModal({
         ctaFooter={
           <>
             <div className={styles.footerAction}>
-              <ShareLinkGoToLinkAction subject={subject} shareUrl={shareUrl} />
+              <ShareLinkGoToLinkAction
+                subject={subject}
+                shareUrl={shareUrl}
+                captionClassName={styles.footerCaption}
+              />
             </div>
             <div className={styles.footerAction}>
               <ShareLinkLabelsToggle
@@ -66,6 +70,7 @@ export function ShareLinkPreviewModal({
                 togglingLabels={togglingLabels}
                 onToggleLabels={onToggleLabels}
                 layouts={SHARE_LINK_PREVIEW_LABELS_TOGGLE_LAYOUTS}
+                captionClassName={styles.footerCaption}
               />
             </div>
             <div className={styles.footerAction}>
@@ -73,6 +78,7 @@ export function ShareLinkPreviewModal({
                 subject={subject}
                 disabled={!haiku}
                 onEditLabels={() => setLabelsOpen(true)}
+                captionClassName={styles.footerCaption}
               />
             </div>
           </>

@@ -10,12 +10,16 @@ import type { ShareLinkGoToLinkActionProps } from "./ShareLinkGoToLinkAction.typ
 import styles from "./ShareLinkActions.module.css";
 
 /** Opens the public share page in a new tab; fills its parent box. */
-export function ShareLinkGoToLinkAction({ subject, shareUrl }: ShareLinkGoToLinkActionProps) {
+export function ShareLinkGoToLinkAction({
+  subject,
+  shareUrl,
+  captionClassName,
+}: ShareLinkGoToLinkActionProps) {
   return (
     <ShareLinkActionButton
       src={SHARE_LINK_ACTION_ICONS.followLink}
       caption="Go to link"
-      captionClassName={styles.captionLabels}
+      captionClassName={[styles.captionLabels, captionClassName].filter(Boolean).join(" ")}
       layout={SHARE_LINK_PREVIEW_ACTION_LAYOUTS.followLink}
       ariaLabel={`Open share link for ${subject} in a new tab`}
       color={SHARE_LINK_ACTION_COLORS.followLink.panel}
