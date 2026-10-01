@@ -15,7 +15,7 @@
 }
 
 /* Same cell size as the ShareLinkActions column (6.25rem wide). */
-.labelsToggle {
+.footerAction {
   display: flex;
   flex-direction: column;
   width: 6.25rem;

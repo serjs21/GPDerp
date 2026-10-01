@@ -9,6 +9,8 @@ export const SHARE_LINK_ACTION_ICONS = {
   showLabels: "/share_link_actions/show_labels.svg",
   hideLabels: "/share_link_actions/hide_labels.svg",
   delete: "/share_link_actions/delete.svg",
+  followLink: "/share_link_actions/follow_link.svg",
+  editLabels: "/share_link_actions/edit_labels.svg",
 } as const;
 
 export const SHARE_LINK_ACTION_COLORS = {
@@ -17,6 +19,8 @@ export const SHARE_LINK_ACTION_COLORS = {
   showLabels: { panel: "#ffffff", hover: "#d9d9da" },
   hideLabels: { panel: "#111111", hover: "#3a3a3a" },
   delete: { panel: "#ffaea8", hover: "var(--accent-red, #aa1f3f)" },
+  followLink: { panel: "#c0ffc3", hover: "#6dfe73" },
+  editLabels: { panel: "#f3d1ff", hover: "#e2a3ff" },
 } as const satisfies Record<string, { panel: ComicPanelColor; hover: string }>;
 
 
@@ -42,6 +46,14 @@ export const SHARE_LINK_ACTION_LAYOUTS = {
   delete: {
     icon: { size: "2.8rem", top: "0.1rem", left: "0rem", rotateDeg: 0 },
     caption: { top: COMMON_CAPTION_TOP, right: COMMON_CAPTION_RIGHT, rotateDeg: 0 },
+  },
+  followLink: {
+    icon: { size: "2.8rem", top: "0.1rem", left: "0rem", rotateDeg: 0 },
+    caption: { top: "10px", right: "6px", rotateDeg: 0 },
+  },
+  editLabels: {
+    icon: { size: "2.8rem", top: "0.1rem", left: "0rem", rotateDeg: 0 },
+    caption: { top: "10px", right: "6px", rotateDeg: 0 },
   },
 } as const satisfies Record<string, ShareLinkActionLayout>;
 

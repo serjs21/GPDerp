@@ -2,13 +2,17 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
-import { ComicPageCtaAction, ComicPageDialog, ComicPagePanel } from "@/components/ComicPageLayout";
+import { ComicPageDialog, ComicPagePanel } from "@/components/ComicPageLayout";
 import { CreateAddLabelsModal } from "@/components/CreateAddLabelsModal";
 import { LabelHalo, toLabelHaloItems } from "@/components/LabelHalo";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { SakuraPetalLoader } from "@/components/Loaders";
-import { ShareLinkLabelsToggle } from "@/components/ShareLinkActions";
+import {
+  ShareLinkEditLabelsAction,
+  ShareLinkGoToLinkAction,
+  ShareLinkLabelsToggle,
+} from "@/components/ShareLinkActions";
 import { useHaikuLabelPlacement } from "@/hooks/useHaikuLabelPlacement";
 import { SHARE_LINK_HAIKUS_QUERY_KEY } from "./useShareLinkHaikuEnrichment";
 import { shareLinkPreviewPanelStyle } from "./utils/shareLinkPreviewModalUtils";
@@ -19,6 +23,7 @@ export function ShareLinkPreviewModal({
   open,
   onOpenChange,
   subject,
+  shareUrl,
   haiku,
   loading = false,
   showLabels,
@@ -50,7 +55,10 @@ export function ShareLinkPreviewModal({
         contentClassName={styles.dialog}
         ctaFooter={
           <>
-            <div className={styles.labelsToggle}>
+            <div className={styles.footerAction}>
+              <ShareLinkGoToLinkAction subject={subject} shareUrl={shareUrl} />
+            </div>
+            <div className={styles.footerAction}>
               <ShareLinkLabelsToggle
                 subject={subject}
                 showLabels={showLabels}
@@ -58,11 +66,13 @@ export function ShareLinkPreviewModal({
                 onToggleLabels={onToggleLabels}
               />
             </div>
-            <ComicPageCtaAction
-              label="Edit labels"
-              disabled={!haiku}
-              onClick={() => setLabelsOpen(true)}
-            />
+            <div className={styles.footerAction}>
+              <ShareLinkEditLabelsAction
+                subject={subject}
+                disabled={!haiku}
+                onEditLabels={() => setLabelsOpen(true)}
+              />
+            </div>
           </>
         }
       >
