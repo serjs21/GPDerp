@@ -2,14 +2,15 @@
 
 import { NAVIGATION_ARROW_SRC } from "@/consts/navigation/navigationArrowConsts";
 import { useVisibleHeight } from "@/hooks/useVisibleHeight";
+import { LEGAL_SCROLL_ARROW_FOOTER_RATIO } from "./consts/legalScrollArrowConsts";
 import type { LegalScrollArrowProps } from "./LegalScrollArrow.types";
 import { legalScrollArrowStyle } from "./utils/legalScrollArrowStyleUtils";
 import styles from "./LegalScrollArrow.module.css";
 
 /** Bottom-left jump between the page and the legal footer. */
 export function LegalScrollArrow({ footerRef }: LegalScrollArrowProps) {
-  const footerVisibleHeight = useVisibleHeight(footerRef);
-  const atFooter = footerVisibleHeight > 0;
+  const { visibleHeight: footerVisibleHeight, ratio } = useVisibleHeight(footerRef);
+  const atFooter = ratio >= LEGAL_SCROLL_ARROW_FOOTER_RATIO;
 
   const onClick = () => {
     window.scrollTo({

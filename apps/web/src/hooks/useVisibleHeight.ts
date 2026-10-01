@@ -5,9 +5,17 @@ import { useEffect, useState, type RefObject } from "react";
 const THRESHOLD_STEPS = 40;
 const THRESHOLDS = Array.from({ length: THRESHOLD_STEPS + 1 }, (_, i) => i / THRESHOLD_STEPS);
 
-/** Pixel height of `ref`'s element currently inside the viewport (0 when off-screen). */
-export function useVisibleHeight(ref: RefObject<HTMLElement | null>): number {
-  const [visibleHeight, setVisibleHeight] = useState(0);
+export type ElementVisibility = {
+  /** Pixel height of the element inside the viewport (0 when off-screen). */
+  visibleHeight: number;
+  /** Share of the element inside the viewport, 0–1. */
+  ratio: number;
+};
+
+const HIDDEN: ElementVisibility = { visibleHeight: 0, ratio: 0 };
+
+export function useVisibleHeight(ref: RefObject<HTMLElement | null>): ElementVisibility {
+  const [visibility, setVisibility] = useState<ElementVisibility>(HIDDEN);
 
   useEffect(() => {
     const element = ref.current;
@@ -15,7 +23,14 @@ export function useVisibleHeight(ref: RefObject<HTMLElement | null>): number {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setVisibleHeight(entry.isIntersecting ? Math.round(entry.intersectionRect.height) : 0);
+        setVisibility(
+          entry.isIntersecting
+            ? {
+                visibleHeight: Math.round(entry.intersectionRect.height),
+                ratio: entry.intersectionRatio,
+              }
+            : HIDDEN,
+        );
       },
       { threshold: THRESHOLDS },
     );
@@ -23,5 +38,5 @@ export function useVisibleHeight(ref: RefObject<HTMLElement | null>): number {
     return () => observer.disconnect();
   }, [ref]);
 
-  return visibleHeight;
+  return visibility;
 }
