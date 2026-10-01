@@ -1,7 +1,6 @@
 import { fetchSharedHaikuByHash } from "@/api/shareLink";
 import { formatHaikuTitle } from "@/utils/strings";
-import { SharedHaikuLabels } from "./SharedHaikuLabels";
-import { SharedHaikuTyping } from "./SharedHaikuTyping";
+import { SharedHaikuLantern } from "./SharedHaikuLantern";
 import styles from "./styles.module.css";
 
 export default async function SharedHaikuPage({ params }: { params: Promise<{ shareHash: string }> }) {
@@ -28,13 +27,14 @@ export default async function SharedHaikuPage({ params }: { params: Promise<{ sh
   return (
     <div className={styles.page}>
       <div className={styles.contentContainer}>
-      <span className={styles.providedBy}>
-        A poem from <strong>{providerName}</strong>:
-      </span>
-      <article className={styles.card}>
-        <SharedHaikuTyping title={formatHaikuTitle(haiku, false)} body={haiku.body} />
-      </article>
-      {showLabels ? <SharedHaikuLabels labels={haiku.labels ?? []} /> : null}
+        <span className={styles.providedBy}>
+          A poem from <strong>{providerName}</strong>:
+        </span>
+        <SharedHaikuLantern
+          haiku={haiku}
+          showLabels={showLabels}
+          subject={formatHaikuTitle(haiku, false)}
+        />
       </div>
     </div>
   );
