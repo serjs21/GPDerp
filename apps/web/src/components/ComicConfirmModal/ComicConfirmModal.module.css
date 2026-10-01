@@ -70,7 +70,8 @@
   row-gap: 3.5rem;
   box-sizing: border-box;
   width: 100%;
-  padding: 2.5rem 2.25rem;
+  /* Thought-bubble scallops reach well past the text box; canvas clips at stage edges. */
+  padding: 4.5rem 2.25rem 2.5rem;
   overflow: visible;
 }
 
@@ -78,7 +79,7 @@
   grid-area: question;
   justify-self: center;
   width: fit-content;
-  max-width: 100%;
+  max-width: calc(100% - 4rem);
   overflow: visible;
 }
 
