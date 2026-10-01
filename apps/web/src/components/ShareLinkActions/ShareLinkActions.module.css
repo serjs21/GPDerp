@@ -79,11 +79,6 @@
   color: #fff;
 }
 
-.invertOnHover:hover:not(.disabled) .icon,
-.invertOnHover:focus-visible:not(.disabled) .icon {
-  filter: brightness(0) invert(1);
-}
-
 .invertOnHover:hover:not(.disabled) .caption,
 .invertOnHover:focus-visible:not(.disabled) .caption {
   color: #fff;

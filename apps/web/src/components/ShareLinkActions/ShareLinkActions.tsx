@@ -72,7 +72,7 @@ export function ShareLinkActions({
         ariaLabel={`Delete share link for ${subject}`}
         color={SHARE_LINK_ACTION_COLORS.delete.panel}
         hoverFill={SHARE_LINK_ACTION_COLORS.delete.hover}
-        invertIconOnHover
+        invertCaptionOnHover
         onSelect={onDelete}
       />
     </div>

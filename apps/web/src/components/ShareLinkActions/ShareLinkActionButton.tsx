@@ -20,7 +20,7 @@ export function ShareLinkActionButton({
   pressed = true,
   busy = false,
   inverted = false,
-  invertIconOnHover = false,
+  invertCaptionOnHover = false,
 }: ShareLinkActionButtonProps) {
   return (
     <ComicPagePanel
@@ -35,7 +35,7 @@ export function ShareLinkActionButton({
       className={[
         styles.action,
         inverted ? styles.inverted : "",
-        invertIconOnHover ? styles.invertOnHover : "",
+        invertCaptionOnHover ? styles.invertOnHover : "",
         disabled ? styles.disabled : "",
       ]
         .filter(Boolean)

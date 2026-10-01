@@ -31,5 +31,6 @@ export type ShareLinkActionButtonProps = {
   busy?: boolean;
   /** Light caption + inverted hover icon for dark panels. */
   inverted?: boolean;
-  invertIconOnHover?: boolean;
+  /** White caption on hover (for dark hover fills); the icon is never filtered. */
+  invertCaptionOnHover?: boolean;
 };
