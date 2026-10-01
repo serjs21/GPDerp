@@ -5,6 +5,7 @@ import {
   SHARE_LINK_ACTION_ICONS,
 } from "./consts/shareLinkActionsConsts";
 import { ShareLinkActionButton } from "./ShareLinkActionButton";
+import { ShareLinkUpdateAction } from "./ShareLinkUpdateAction";
 import type { ShareLinkActionsProps } from "./ShareLinkActions.types";
 import styles from "./ShareLinkActions.module.css";
 
@@ -43,15 +44,12 @@ export function ShareLinkActions({
         hoverFill={SHARE_LINK_ACTION_COLORS.preview.hover}
         onSelect={onPreview}
       />
-      <ShareLinkActionButton
-        src={SHARE_LINK_ACTION_ICONS.update}
-        caption="Update"
-        ariaLabel={`Update share link for ${subject}`}
-        color={SHARE_LINK_ACTION_COLORS.update.panel}
-        hoverFill={SHARE_LINK_ACTION_COLORS.update.hover}
-        disabled={!active || !canUpdate}
-        busy={updating}
-        onSelect={onUpdate}
+      <ShareLinkUpdateAction
+        subject={subject}
+        active={active}
+        canUpdate={canUpdate}
+        updating={updating}
+        onUpdate={onUpdate}
       />
       <ShareLinkActionButton
         src={showLabels ? SHARE_LINK_ACTION_ICONS.showLabels : SHARE_LINK_ACTION_ICONS.hideLabels}

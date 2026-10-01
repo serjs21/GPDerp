@@ -50,9 +50,14 @@ type Story = StoryObj<typeof meta>;
 /** Active link with pending limit changes — every action enabled. */
 export const Active: Story = {};
 
-/** Inactive link — Update is disabled. */
+/** Inactive link — Update is disabled; hover/click shows the bubble. */
 export const Inactive: Story = {
   args: { active: false, canUpdate: false },
+};
+
+/** Active link with nothing to change — Update is disabled. */
+export const Unchanged: Story = {
+  args: { active: true, canUpdate: false },
 };
 
 /** Labels hidden on the public page — black panel + hide icon. */

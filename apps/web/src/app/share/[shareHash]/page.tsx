@@ -27,6 +27,9 @@ export default async function SharedHaikuPage({ params }: { params: Promise<{ sh
   return (
     <div className={styles.page}>
       <div className={styles.contentContainer}>
+        <span className={styles.providedBy}>
+          A poem from <strong>{providerName}</strong>:
+        </span>
         <SharedHaikuLantern
           haiku={haiku}
           showLabels={showLabels}
