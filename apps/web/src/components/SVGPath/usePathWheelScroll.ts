@@ -8,7 +8,7 @@ export const PATH_WHEEL_DEBOUNCE_MS = 400;
 type Step = () => boolean;
 
 const isNextStepDirection = (event: WheelEvent) => {
-  if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) return event.deltaX > 0;
+  if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) return event.deltaX < 0;
   return event.deltaY < 0;
 }
 

@@ -26,7 +26,10 @@ import {
 import { SVGPathLantern } from "./SVGPathLantern";
 import { useSvgPathInput } from "./useSvgPathInput";
 import { useSvgPathScroll } from "./useSvgPathScroll";
+import { SVGPathNavigationArrows } from "./SVGPathNavigationArrows";
 import {
+  canStepBack,
+  canStepForward,
   catchUpStopForHaiku,
   creationFlyProgress,
   creationLanternTransformAtFlyT,
@@ -557,6 +560,14 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
               excludeLabelIds={excludeLabelIds}
               elevateAboveChrome={creationChromeOpen}
               guideBoxRef={svgAreaRef}
+            />
+          ) : null}
+          {!generatingDraft ? (
+            <SVGPathNavigationArrows
+              showBack={canStepBack(focusIndex)}
+              showForward={canStepForward(focusIndex, scrollCount)}
+              onStepBack={() => void stepBack()}
+              onStepForward={() => void stepForward()}
             />
           ) : null}
         </div>

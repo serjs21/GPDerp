@@ -24,8 +24,8 @@ export function useSvgPathInput(
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (!enabledRef.current) return;
-      if (event.key === "ArrowRight") stepForwardRef.current();
-      if (event.key === "ArrowLeft") stepBackRef.current();
+      if (event.key === "ArrowLeft") stepForwardRef.current();
+      if (event.key === "ArrowRight") stepBackRef.current();
     };
 
     window.addEventListener("keydown", onKeyDown);
