@@ -5,6 +5,7 @@ import { HoverHoldCallout } from "@/components/HoverHoldCallout";
 import {
   SHARE_LINK_ACTION_COLORS,
   SHARE_LINK_ACTION_ICONS,
+  SHARE_LINK_ACTION_LAYOUTS,
   SHARE_LINK_UPDATE_CALLOUT_POSITION,
   SHARE_LINK_UPDATE_DISABLED_MESSAGES,
 } from "./consts/shareLinkActionsConsts";
@@ -24,6 +25,7 @@ export function ShareLinkUpdateAction({
       <ShareLinkActionButton
         src={SHARE_LINK_ACTION_ICONS.update}
         caption="Update"
+        layout={SHARE_LINK_ACTION_LAYOUTS.update}
         ariaLabel={`Update share link for ${subject}`}
         color={SHARE_LINK_ACTION_COLORS.update.panel}
         hoverFill={SHARE_LINK_ACTION_COLORS.update.hover}
@@ -48,7 +50,7 @@ export function ShareLinkUpdateAction({
     >
       <ComicPagePanel
         background="solid"
-        color="white"
+        color="sky"
         flexWeight={1}
         contentAlign="start"
         isMotionBackground={false}

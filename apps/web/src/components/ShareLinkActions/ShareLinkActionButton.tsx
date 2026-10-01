@@ -2,12 +2,16 @@
 
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import type { ShareLinkActionButtonProps } from "./ShareLinkActionButton.types";
-import { shareLinkActionHoverStyle } from "./utils/shareLinkActionStyleUtils";
+import {
+  shareLinkActionHoverStyle,
+  shareLinkActionLayoutStyle,
+} from "./utils/shareLinkActionStyleUtils";
 import styles from "./ShareLinkActions.module.css";
 
 export function ShareLinkActionButton({
   src,
   caption,
+  layout,
   ariaLabel,
   onSelect,
   color,
@@ -36,7 +40,7 @@ export function ShareLinkActionButton({
       ]
         .filter(Boolean)
         .join(" ")}
-      style={shareLinkActionHoverStyle(hoverFill)}
+      style={{ ...shareLinkActionHoverStyle(hoverFill), ...shareLinkActionLayoutStyle(layout) }}
       ariaLabel={ariaLabel}
       onSelect={() => {
         if (disabled || busy) return;
