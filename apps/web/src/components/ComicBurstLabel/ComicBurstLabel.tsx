@@ -5,8 +5,10 @@ import {
   layoutComicBurstLabel,
   type ComicBurstShapeKind,
 } from "./comicBurstPath";
+import { useIsHydrated } from "@/hooks/useIsHydrated";
 import {
   burstDisplayFontSize,
+  estimateComicBurstTextWidth,
   measureComicBurstTextWidth,
 } from "./measureComicBurstText";
 import styles from "./ComicBurstLabel.module.css";
@@ -49,6 +51,7 @@ function resolveBurstLayout(params: {
   shapeKind: ComicBurstShapeKind;
   hasChildren: boolean;
   hasLeading: boolean;
+  canMeasure: boolean;
 }) {
   const {
     text,
@@ -61,13 +64,16 @@ function resolveBurstLayout(params: {
     shapeKind,
     hasChildren,
     hasLeading,
+    canMeasure,
   } = params;
   const fontSize = fontSizeProp ?? burstDisplayFontSize(text);
   // Icon/custom content: size from fontSize box, not lettering width.
   const leadingExtra = hasLeading ? fontSize * 1.2 : 0;
-  const textWidth = hasChildren
-    ? fontSize
-    : measureComicBurstTextWidth(text, fontSize) + leadingExtra;
+  // Canvas measuring only after hydration so SSR and first client render match.
+  const letteringWidth = canMeasure
+    ? measureComicBurstTextWidth(text, fontSize)
+    : estimateComicBurstTextWidth(text, fontSize);
+  const textWidth = hasChildren ? fontSize : letteringWidth + leadingExtra;
   const layout = layoutComicBurstLabel({
     textWidth,
     fontSize,
@@ -148,6 +154,7 @@ export const ComicBurstLabel = memo(function ComicBurstLabel(props: ComicBurstLa
   const children = props.children;
   const seedKey = props.seed ?? text;
   const { strokeLinejoin, strokeLinecap } = strokeCapsForShape(shapeKind);
+  const canMeasure = useIsHydrated();
 
   const { layout, fontSize, strokePx } = useMemo(
     () =>
@@ -162,8 +169,10 @@ export const ComicBurstLabel = memo(function ComicBurstLabel(props: ComicBurstLa
         shapeKind,
         hasChildren: Boolean(children),
         hasLeading: Boolean(leading),
+        canMeasure,
       }),
     [
+      canMeasure,
       text,
       props.fontSize,
       paddingX,

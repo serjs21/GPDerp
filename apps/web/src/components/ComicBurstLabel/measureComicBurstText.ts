@@ -22,6 +22,14 @@ function getMeasureContext(): CanvasRenderingContext2D | null {
   return canvas.getContext("2d");
 }
 
+/** Char-count width estimate; identical on server and client. */
+export function estimateComicBurstTextWidth(
+  text: string,
+  fontSize: number = COMIC_BURST_DEFAULT_FONT_SIZE,
+): number {
+  return Math.max(text.length * fontSize * 0.55, fontSize);
+}
+
 /**
  * Measure single-line text width with Bangers.
  * Falls back to a char-count estimate when canvas is unavailable (SSR).
@@ -33,7 +41,7 @@ export function measureComicBurstTextWidth(
 ): number {
   const ctx = getMeasureContext();
   if (!ctx) {
-    return Math.max(text.length * fontSize * 0.55, fontSize);
+    return estimateComicBurstTextWidth(text, fontSize);
   }
   const measureFamily = fontFamily.includes("var(")
     ? COMIC_BURST_MEASURE_FAMILY
