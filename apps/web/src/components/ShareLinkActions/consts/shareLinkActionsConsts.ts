@@ -89,8 +89,8 @@ export const SHARE_LINK_PREVIEW_LABELS_TOGGLE_LAYOUTS = {
 } as const;
 
 export const SHARE_LINK_UPDATE_DISABLED_MESSAGES = {
-  inactive: "What is yet to be started cannot be changed",
-  unchanged: "Everything is in it's right place",
+  inactive: "What is yet to begin - can't be changed",
+  unchanged: "Everything's in its right place",
 } as const;
 
 /** Bubble floats to the right of the Update panel (mirror of Tune in's left callout). */
