@@ -22,24 +22,23 @@ export const SHARE_LINK_ACTION_COLORS = {
 /** Absolute icon + caption placement per action panel (6.25rem wide column). */
 export const SHARE_LINK_ACTION_LAYOUTS = {
   preview: {
-    icon: { size: "1.9rem", top: "0.55rem", right: "3.95rem", rotateDeg: 0 },
-    caption: { top: "1.1rem", right: "0.45rem", rotateDeg: 0 },
+    icon: { size: "3.5rem", top: "0rem", right: "2.5rem", rotateDeg: 0 },
+    caption: { top: "6px", right: "4px", rotateDeg: 0 },
   },
   update: {
     icon: { size: "1.9rem", top: "0.55rem", right: "3.95rem", rotateDeg: 0 },
-    caption: { top: "1.1rem", right: "0.55rem", rotateDeg: 0 },
-  },
+    caption: { top: "6px", right: "4px", rotateDeg: 0 },
+    },
   showLabels: {
-    icon: { size: "1.9rem", top: "0.55rem", right: "3.95rem", rotateDeg: 0 },
-    caption: { top: "1.1rem", right: "0.7rem", rotateDeg: 0 },
-  },
+    icon: { size: "3.5rem", top: "0.55rem", right: "3.95rem", rotateDeg: 0 },
+    caption: { top: "6px", right: "4px", rotateDeg: 0 },  },
   hideLabels: {
-    icon: { size: "1.9rem", top: "0.55rem", right: "3.95rem", rotateDeg: 0 },
-    caption: { top: "1.1rem", right: "0.6rem", rotateDeg: 0 },
+    icon: { size: "3.5rem", top: "0rem", right: "3.95rem", rotateDeg: 0 },
+    caption: { top: "6px", right: "4px", rotateDeg: 0 },
   },
   delete: {
     icon: { size: "1.9rem", top: "0.55rem", right: "3.95rem", rotateDeg: 0 },
-    caption: { top: "1.1rem", right: "0.6rem", rotateDeg: 0 },
+    caption: { top: "6px", right: "4px", rotateDeg: 0 },
   },
 } as const satisfies Record<string, ShareLinkActionLayout>;
 
