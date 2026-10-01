@@ -10,6 +10,7 @@ import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import {
   SHARE_LINK_PREVIEW_LABELS_TOGGLE_LAYOUTS,
+  ShareLinkDoneAction,
   ShareLinkEditLabelsAction,
   ShareLinkGoToLinkAction,
   ShareLinkLabelsToggle,
@@ -78,6 +79,13 @@ export function ShareLinkPreviewModal({
                 subject={subject}
                 disabled={!haiku}
                 onEditLabels={() => setLabelsOpen(true)}
+                captionClassName={styles.footerCaption}
+              />
+            </div>
+            <div className={styles.footerAction}>
+              <ShareLinkDoneAction
+                subject={subject}
+                onDone={() => onOpenChange(false)}
                 captionClassName={styles.footerCaption}
               />
             </div>

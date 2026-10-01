@@ -6,4 +6,6 @@ export { ShareLinkGoToLinkAction } from "./ShareLinkGoToLinkAction";
 export type { ShareLinkGoToLinkActionProps } from "./ShareLinkGoToLinkAction.types";
 export { ShareLinkEditLabelsAction } from "./ShareLinkEditLabelsAction";
 export type { ShareLinkEditLabelsActionProps } from "./ShareLinkEditLabelsAction.types";
+export { ShareLinkDoneAction } from "./ShareLinkDoneAction";
+export type { ShareLinkDoneActionProps } from "./ShareLinkDoneAction.types";
 export { SHARE_LINK_PREVIEW_LABELS_TOGGLE_LAYOUTS } from "./consts/shareLinkActionsConsts";

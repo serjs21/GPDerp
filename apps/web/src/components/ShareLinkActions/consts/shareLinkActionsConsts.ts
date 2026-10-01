@@ -11,6 +11,7 @@ export const SHARE_LINK_ACTION_ICONS = {
   delete: "/share_link_actions/delete.svg",
   followLink: "/share_link_actions/follow_link.svg",
   editLabels: "/share_link_actions/edit_labels.svg",
+  done: "/share_link_actions/done.svg",
 } as const;
 
 export const SHARE_LINK_ACTION_COLORS = {
@@ -21,6 +22,7 @@ export const SHARE_LINK_ACTION_COLORS = {
   delete: { panel: "#ffaea8", hover: "var(--accent-red, #aa1f3f)" },
   followLink: { panel: "#c0d5ff", hover: "#ffc0c8" },
   editLabels: { panel: "#c9c9c9", hover: "#c0c4b0" },
+  done: { panel: "#c0ffc3", hover: "#6dfe73" },
 } as const satisfies Record<string, { panel: ComicPanelColor; hover: string }>;
 
 
@@ -37,10 +39,10 @@ export const SHARE_LINK_ACTION_LAYOUTS = {
     caption: { top: COMMON_CAPTION_TOP, right: COMMON_CAPTION_RIGHT, rotateDeg: 0 },
     },
   showLabels: {
-    icon: { size: "3.5rem", top: "0rem", right: "2.8rem", rotateDeg: 0 },
+    icon: { size: "3.5rem", bottom: "0rem", right: "2.8rem", rotateDeg: 0 },
     caption: { top: "10px", right: "0px", rotateDeg: 0 },  },
   hideLabels: {
-    icon: { size: "3.5rem", top: "0rem", right: "2.8rem", rotateDeg: 0 },
+    icon: { size: "3.5rem", bottom: "0rem", right: "2.8rem", rotateDeg: 0 },
     caption: { top: "10px", right: "0px", rotateDeg: 0 },
   },
   delete: {
@@ -54,30 +56,34 @@ const PREVIEW_CAPTION_TOP_RIGHT = { top: "0.5rem", right: "0.5rem", rotateDeg: 0
 /** Preview modal footer panels (8rem × 6rem): caption top-right, icon bottom-left. */
 export const SHARE_LINK_PREVIEW_ACTION_LAYOUTS = {
   followLink: {
-    icon: { size: "2.8rem", bottom: "0.4rem", left: "0.4rem", rotateDeg: 0 },
+    icon: { size: "3.5rem", bottom: "0rem", left: "0.4rem", rotateDeg: 0 },
     caption: PREVIEW_CAPTION_TOP_RIGHT,
   },
   showLabels: {
-    icon: { size: "3.5rem", bottom: "0.2rem", left: "0.2rem", rotateDeg: 0 },
+    icon: { size: "5rem", bottom: "0rem", left: "0.2rem", rotateDeg: 0 },
     caption: PREVIEW_CAPTION_TOP_RIGHT,
   },
   hideLabels: {
-    icon: { size: "3.5rem", bottom: "0.2rem", left: "0.2rem", rotateDeg: 0 },
+    icon: { size: "5rem", bottom: "0rem", left: "0.2rem", rotateDeg: 0 },
     caption: PREVIEW_CAPTION_TOP_RIGHT,
   },
   editLabels: {
-    icon: { size: "2.8rem", bottom: "0.4rem", left: "0.4rem", rotateDeg: 0 },
+    icon: { size: "3.5rem", bottom: "0rem", left: "0.4rem", rotateDeg: 0 },
+    caption: PREVIEW_CAPTION_TOP_RIGHT,
+  },
+  done: {
+    icon: { size: "3.5rem", bottom: "0rem", left: "0.4rem", rotateDeg: 0 },
     caption: PREVIEW_CAPTION_TOP_RIGHT,
   },
 } as const satisfies Record<string, ShareLinkActionLayout>;
 
 export const SHARE_LINK_PREVIEW_LABELS_TOGGLE_LAYOUTS = {
   show: {
-    icon: { size: "4.5rem", bottom: "0.2rem", left: "0.2rem", rotateDeg: 0 },
+    icon: { size: "4.5rem", bottom: "0rem", left: "0.2rem", rotateDeg: 0 },
     caption: PREVIEW_CAPTION_TOP_RIGHT,
   },
   hide: {
-    icon: { size: "4.5rem", bottom: "0.2rem", left: "0.2rem", rotateDeg: 0 },
+    icon: { size: "4.5rem", bottom: "0rem", left: "0.2rem", rotateDeg: 0 },
     caption: PREVIEW_CAPTION_TOP_RIGHT,
   },
 } as const;

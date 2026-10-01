@@ -53,7 +53,7 @@
   left: var(--share-link-action-icon-left, auto);
   display: block;
   width: var(--share-link-action-icon-size, 1.9rem);
-  height: var(--share-link-action-icon-size, 1.9rem);
+  height: auto;
   object-fit: contain;
   transform: rotate(var(--share-link-action-icon-rotate, 0deg));
   pointer-events: none;
