@@ -48,7 +48,8 @@
 .icon {
   position: absolute;
   top: var(--share-link-action-icon-top, 0);
-  right: var(--share-link-action-icon-right, 0);
+  right: var(--share-link-action-icon-right, auto);
+  left: var(--share-link-action-icon-left, auto);
   display: block;
   width: var(--share-link-action-icon-size, 1.9rem);
   height: var(--share-link-action-icon-size, 1.9rem);
@@ -61,7 +62,8 @@
 .caption {
   position: absolute;
   top: var(--share-link-action-caption-top, 0);
-  right: var(--share-link-action-caption-right, 0);
+  right: var(--share-link-action-caption-right, auto);
+  left: var(--share-link-action-caption-left, auto);
   margin: 0;
   transform: rotate(var(--share-link-action-caption-rotate, 0deg));
   color: var(--comic-ink, #2d2d2d);

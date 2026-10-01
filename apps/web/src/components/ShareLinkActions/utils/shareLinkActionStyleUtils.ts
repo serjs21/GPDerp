@@ -9,10 +9,12 @@ export function shareLinkActionLayoutStyle({ icon, caption }: ShareLinkActionLay
   return {
     "--share-link-action-icon-size": icon.size,
     "--share-link-action-icon-top": icon.top,
-    "--share-link-action-icon-right": icon.right,
+    "--share-link-action-icon-right": icon.right ?? "auto",
+    "--share-link-action-icon-left": icon.left ?? "auto",
     "--share-link-action-icon-rotate": `${icon.rotateDeg}deg`,
     "--share-link-action-caption-top": caption.top,
-    "--share-link-action-caption-right": caption.right,
+    "--share-link-action-caption-right": caption.right ?? "auto",
+    "--share-link-action-caption-left": caption.left ?? "auto",
     "--share-link-action-caption-rotate": `${caption.rotateDeg}deg`,
   } as CSSProperties;
 }
