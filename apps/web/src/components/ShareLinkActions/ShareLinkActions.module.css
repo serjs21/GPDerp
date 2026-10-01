@@ -48,6 +48,7 @@
 .icon {
   position: absolute;
   top: var(--share-link-action-icon-top, 0);
+  bottom: var(--share-link-action-icon-bottom, auto);
   right: var(--share-link-action-icon-right, auto);
   left: var(--share-link-action-icon-left, auto);
   display: block;
@@ -62,6 +63,7 @@
 .caption {
   position: absolute;
   top: var(--share-link-action-caption-top, 0);
+  bottom: var(--share-link-action-caption-bottom, auto);
   right: var(--share-link-action-caption-right, auto);
   left: var(--share-link-action-caption-left, auto);
   margin: 0;
@@ -79,6 +81,7 @@
 
 .captionLabels {
   white-space: break-spaces;
+  text-align: center;
   width: 2.5rem;
 }
 

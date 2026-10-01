@@ -101,6 +101,9 @@ export function LabelSlot({
   const committedRef = useRef<LabelPlacement>({ xPercent, yPercent, rotateDeg });
 
   useEffect(() => {
+    // #region agent log
+    fetch('http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'35906a'},body:JSON.stringify({sessionId:'35906a',runId:'run1',hypothesisId:'D',location:'LabelSlot.tsx:rotateDegEffect',message:'rotateDeg prop sync',data:{id,rotateDeg,draft:draftRotateRef.current},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
     draftRotateRef.current = rotateDeg;
     setDraftRotateDeg(rotateDeg);
   }, [rotateDeg]);
@@ -141,6 +144,9 @@ export function LabelSlot({
 
   const onFocusOut = (event: FocusEvent<HTMLDivElement>) => {
     const next = event.relatedTarget;
+    // #region agent log
+    fetch('http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'35906a'},body:JSON.stringify({sessionId:'35906a',runId:'run1',hypothesisId:'B',location:'LabelSlot.tsx:onFocusOut',message:'slot blur',data:{id,related:(next as HTMLElement | null)?.tagName ?? null,relatedInside:next instanceof Node && Boolean(rootRef.current?.contains(next))},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
     if (next instanceof Node && rootRef.current?.contains(next)) return;
     blurSelection();
   };
@@ -219,7 +225,10 @@ export function LabelSlot({
       onClick={() => {
         if (!disabled) setSelected(true);
       }}
-      onFocus={() => {
+      onFocus={(event) => {
+        // #region agent log
+        fetch('http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'35906a'},body:JSON.stringify({sessionId:'35906a',runId:'run1',hypothesisId:'B,C',location:'LabelSlot.tsx:onFocus',message:'slot focus',data:{id,target:(event.target as HTMLElement).tagName,selected},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
         if (!disabled) setSelected(true);
       }}
       onBlur={onFocusOut}
@@ -229,6 +238,10 @@ export function LabelSlot({
         className={styles.rotationTable}
         degrees={draftRotateDeg}
         onDegreesChange={(next) => {
+          // #region agent log
+          if ((globalThis as { __dbgDeg?: number }).__dbgDeg === undefined) (globalThis as { __dbgDeg?: number }).__dbgDeg = 0;
+          if (((globalThis as { __dbgDeg?: number }).__dbgDeg = ((globalThis as { __dbgDeg?: number }).__dbgDeg ?? 0) + 1) <= 120) fetch('http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'35906a'},body:JSON.stringify({sessionId:'35906a',runId:'run1',hypothesisId:'A,E',location:'LabelSlot.tsx:onDegreesChange',message:'onDegreesChange',data:{id,next,n:(globalThis as { __dbgDeg?: number }).__dbgDeg,evt:typeof window!=='undefined'?window.event?.type:null,selected,isRotateDragging,stack:new Error().stack?.split('\n').slice(2,9).join(' | ')},timestamp:Date.now()})}).catch(()=>{});
+          // #endregion
           setSelected(true);
           setIsRotateDragging(true);
           setDraft(next);

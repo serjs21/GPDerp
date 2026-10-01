@@ -9,6 +9,7 @@ import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import {
+  SHARE_LINK_PREVIEW_LABELS_TOGGLE_LAYOUTS,
   ShareLinkEditLabelsAction,
   ShareLinkGoToLinkAction,
   ShareLinkLabelsToggle,
@@ -64,6 +65,7 @@ export function ShareLinkPreviewModal({
                 showLabels={showLabels}
                 togglingLabels={togglingLabels}
                 onToggleLabels={onToggleLabels}
+                layouts={SHARE_LINK_PREVIEW_LABELS_TOGGLE_LAYOUTS}
               />
             </div>
             <div className={styles.footerAction}>

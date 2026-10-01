@@ -14,12 +14,12 @@
   transition: opacity 0.2s ease;
 }
 
-/* Same cell size as the ShareLinkActions column (6.25rem wide). */
+/* Icon/caption placement: SHARE_LINK_PREVIEW_ACTION_LAYOUTS. */
 .footerAction {
   display: flex;
   flex-direction: column;
-  width: 6.25rem;
-  height: 3.1rem;
+  width: 8rem;
+  height: 6rem;
 }
 
 .loader {

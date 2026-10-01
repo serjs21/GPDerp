@@ -3,7 +3,7 @@
 import {
   SHARE_LINK_ACTION_COLORS,
   SHARE_LINK_ACTION_ICONS,
-  SHARE_LINK_ACTION_LAYOUTS,
+  SHARE_LINK_PREVIEW_ACTION_LAYOUTS,
 } from "./consts/shareLinkActionsConsts";
 import { ShareLinkActionButton } from "./ShareLinkActionButton";
 import type { ShareLinkEditLabelsActionProps } from "./ShareLinkEditLabelsAction.types";
@@ -20,7 +20,7 @@ export function ShareLinkEditLabelsAction({
       src={SHARE_LINK_ACTION_ICONS.editLabels}
       caption="Edit labels"
       captionClassName={styles.captionLabels}
-      layout={SHARE_LINK_ACTION_LAYOUTS.editLabels}
+      layout={SHARE_LINK_PREVIEW_ACTION_LAYOUTS.editLabels}
       ariaLabel={`Edit labels for ${subject}`}
       color={SHARE_LINK_ACTION_COLORS.editLabels.panel}
       hoverFill={SHARE_LINK_ACTION_COLORS.editLabels.hover}

@@ -2,12 +2,13 @@ import type { ComicPagePanelProps } from "@/components/ComicPageLayout";
 
 /**
  * Absolute placement inside the action panel; lengths are CSS values.
- * Anchor horizontally from exactly one side: `right` or `left`.
+ * Anchor vertically from exactly one side (`top` or `bottom`) and
+ * horizontally from exactly one side (`right` or `left`).
  */
 export type ShareLinkActionPlacement = {
-  top: string;
   rotateDeg: number;
-} & ({ right: string; left?: never } | { left: string; right?: never });
+} & ({ top: string; bottom?: never } | { bottom: string; top?: never }) &
+  ({ right: string; left?: never } | { left: string; right?: never });
 
 export type ShareLinkActionIconPlacement = ShareLinkActionPlacement & {
   /** Icon box width and height (CSS length). */

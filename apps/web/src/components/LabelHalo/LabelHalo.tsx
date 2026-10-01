@@ -278,6 +278,9 @@ export function LabelHalo({
   const knownIdsRef = useRef<Set<string> | null>(null);
 
   useEffect(() => {
+    // #region agent log
+    fetch('http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'35906a'},body:JSON.stringify({sessionId:'35906a',runId:'run1',hypothesisId:'D',location:'LabelHalo.tsx:labelsEffect',message:'labels prop changed',data:{count:labels.length},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
     setDraft(labels);
     setRotateById((prev) => {
       const next = { ...prev };
