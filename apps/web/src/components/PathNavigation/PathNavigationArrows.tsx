@@ -1,6 +1,6 @@
 "use client";
 
-import { NAVIGATION_ARROW_SRC } from "./consts/pathNavigationConsts";
+import { NAVIGATION_ARROW_SRC } from "@/consts/navigation/navigationArrowConsts";
 import type { PathNavigationArrowsProps } from "./PathNavigation.types";
 import styles from "./PathNavigationArrows.module.css";
 

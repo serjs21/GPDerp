@@ -1,0 +1,59 @@
+/* --legal-scroll-arrow-lift: visible footer height (legalScrollArrowStyle) so the arrow rides above it. */
+.root {
+  position: fixed;
+  left: 1rem;
+  bottom: calc(1rem + var(--legal-scroll-arrow-lift, 0px));
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sumi-ink, #111);
+  cursor: pointer;
+  transition: bottom 0.12s linear;
+}
+
+.caption {
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* The SVG viewBox is mostly padding; negative margins trim it so the caption sits close to the arrow. */
+.icon {
+  display: block;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: -0.75rem 0 -0.75rem -0.75rem;
+  transform: rotate(90deg);
+  transition: transform 0.25s ease;
+  pointer-events: none;
+  user-select: none;
+}
+
+.atFooter .icon {
+  transform: rotate(-90deg);
+}
+
+.root:hover .icon,
+.root:focus-visible .icon {
+  transform: rotate(90deg) scale(1.08);
+}
+
+.atFooter:hover .icon,
+.atFooter:focus-visible .icon {
+  transform: rotate(-90deg) scale(1.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .icon {
+    transition: none;
+  }
+}

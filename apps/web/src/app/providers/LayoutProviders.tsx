@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import AxiosInit from "@/client.axios.setup";
 import { useMarkHydrated } from "@/hooks/useMarkHydrated";
 import styles from "./headerStyles.module.css";
@@ -7,6 +8,7 @@ import layoutStyles from "./layoutProviders.module.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthNavigation } from "@/components/AuthenticationNav/AuthNavigation";
 import { SiteFooter } from "@/components/SiteFooter/SiteFooter";
+import { LegalScrollArrow } from "@/components/LegalScrollArrow";
 import { CompleteRegistrationRedirect } from "@/components/AuthFlows/CompleteRegistrationRedirect";
 import { GoogleOAuthAvailabilityProvider } from "./GoogleOAuthAvailabilityProvider";
 import { AuthenticationVerificationProvider } from "./AuthenticationVerificationProvider";
@@ -26,6 +28,7 @@ export interface LayoutProviderProps {
 export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps): React.JSX.Element => {
   const clientId = googleClientId || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   useMarkHydrated();
+  const footerRef = useRef<HTMLElement>(null);
 
   const withAuthVerification = (
     <PaddleProvider>
@@ -40,11 +43,12 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
               <CelestialAppShell
                 className={layoutStyles.shell}
                 footer={
-                  <footer className={layoutStyles.footerSlot}>
+                  <footer ref={footerRef} className={layoutStyles.footerSlot}>
                     <SiteFooter />
                   </footer>
                 }
               >
+                <LegalScrollArrow footerRef={footerRef} />
                 <header className={styles.header}>
                   <div className={styles.headerBar}>
                     <AuthNavigation />
