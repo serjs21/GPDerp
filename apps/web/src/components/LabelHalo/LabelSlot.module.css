@@ -17,6 +17,10 @@
   cursor: grabbing;
 }
 
+.slot[aria-disabled="true"] {
+  cursor: default;
+}
+
 .rotationTable {
   max-width: 14rem;
 }
