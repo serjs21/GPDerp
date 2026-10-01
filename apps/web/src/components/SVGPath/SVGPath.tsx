@@ -15,6 +15,7 @@ import type { HaikuDto } from "@/api/haikus";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import type { LanternTransform } from "@/components/Lantern/lanternTransform";
 import { prefersReducedMotion } from "@/components/Lantern/simulateFlight";
+import { PathNavigationProvider } from "@/components/PathNavigation";
 import { useScrollBlocking } from "@/hooks/useScrollBlocking";
 import { ExitingPathLantern } from "./ExitingPathLantern";
 import {
@@ -26,7 +27,6 @@ import {
 import { SVGPathLantern } from "./SVGPathLantern";
 import { useSvgPathInput } from "./useSvgPathInput";
 import { useSvgPathScroll } from "./useSvgPathScroll";
-import { SVGPathNavigationArrows } from "./SVGPathNavigationArrows";
 import {
   canStepBack,
   canStepForward,
@@ -487,6 +487,23 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
   const hideListFocusStop =
     creationFlyT !== null && creationTransform != null && farPark;
 
+  const showNavBack = canStepBack(focusIndex);
+  const showNavForward = canStepForward(focusIndex, scrollCount);
+  const navigationEnabled = !generatingDraft;
+  // Stable between tween frames so lantern action panels don't re-render on every step frame.
+  const pathNavigation = useMemo(
+    () =>
+      navigationEnabled
+        ? {
+            showBack: showNavBack,
+            showForward: showNavForward,
+            onStepBack: () => void stepBack(),
+            onStepForward: () => void stepForward(),
+          }
+        : null,
+    [navigationEnabled, showNavBack, showNavForward, stepBack, stepForward],
+  );
+
   const viewportClass = [styles.viewport, className].filter(Boolean).join(" ");
   const exitingIds = useMemo(
     () => new Set(exitingLanterns.map((entry) => entry.haiku.id)),
@@ -494,84 +511,78 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
   );
 
   return (
-    <div ref={stageRef} className={viewportClass}>
-      <div className={styles.stage} aria-label="Lantern SVG path">
-        <div ref={svgAreaRef} className={styles.guideBox}>
-          {showGuides && splitPath ? (
-            <svg
-              className={styles.guide}
-              viewBox={`0 0 ${splitPath.parsed.viewBox.width} ${splitPath.parsed.viewBox.height}`}
-              preserveAspectRatio="none"
-              aria-hidden
-              dangerouslySetInnerHTML={{ __html: splitPath.guideInner }}
-            />
-          ) : null}
-          {visibleLanterns
-            .filter(({ haiku }) => !haiku || !exitingIds.has(haiku.id))
-            .map(({ haiku, haikuIndex, loading, transform, face }) => {
-              // Far-path: creation overlay owns stop-20; hide the list lantern underneath.
-              if (
-                hideListFocusStop &&
-                stopForHaikuIndex(haikuIndex, focusIndex) === SVG_PATH_FOCUS_STOP
-              ) {
-                return null;
-              }
-              const key = loading
-                ? "pagination-loader"
-                : (haiku?.id ?? `svg-path-${haikuIndex}`);
-              const onDeleted = haiku
-                ? (deleted: HaikuDto) => handleLanternDeleted(deleted, transform)
-                : undefined;
-              const packing = deletePack != null && deletePackT < 1;
+    <PathNavigationProvider value={pathNavigation}>
+      <div ref={stageRef} className={viewportClass}>
+        <div className={styles.stage} aria-label="Lantern SVG path">
+          <div ref={svgAreaRef} className={styles.guideBox}>
+            {showGuides && splitPath ? (
+              <svg
+                className={styles.guide}
+                viewBox={`0 0 ${splitPath.parsed.viewBox.width} ${splitPath.parsed.viewBox.height}`}
+                preserveAspectRatio="none"
+                aria-hidden
+                dangerouslySetInnerHTML={{ __html: splitPath.guideInner }}
+              />
+            ) : null}
+            {visibleLanterns
+              .filter(({ haiku }) => !haiku || !exitingIds.has(haiku.id))
+              .map(({ haiku, haikuIndex, loading, transform, face }) => {
+                // Far-path: creation overlay owns stop-20; hide the list lantern underneath.
+                if (
+                  hideListFocusStop &&
+                  stopForHaikuIndex(haikuIndex, focusIndex) === SVG_PATH_FOCUS_STOP
+                ) {
+                  return null;
+                }
+                const key = loading
+                  ? "pagination-loader"
+                  : (haiku?.id ?? `svg-path-${haikuIndex}`);
+                const onDeleted = haiku
+                  ? (deleted: HaikuDto) => handleLanternDeleted(deleted, transform)
+                  : undefined;
+                const packing = deletePack != null && deletePackT < 1;
 
-              return (
-                <SVGPathLantern
-                  key={key}
-                  haiku={haiku}
-                  loading={loading}
-                  transform={transform}
-                  face={face}
-                  isAnimating={isAnimating || packing}
-                  suppressReveal
-                  actionsAlwaysVisible={haikuIndex === focusIndex}
-                  excludeLabelIds={excludeLabelIds}
-                  onDeleted={onDeleted}
-                  onDeleteFailed={onHaikuDeleteFailed}
-                  onChanged={onHaikuChanged}
-                />
-              );
-            })}
-          {exitingLanterns.map(({ haiku, transform }) => (
-            <ExitingPathLantern
-              key={`exiting-${haiku.id}`}
-              haiku={haiku}
-              transform={transform}
-              excludeLabelIds={excludeLabelIds}
-              onPoseHold={handleExitPoseHold}
-              onComplete={handleLanternExitComplete}
-            />
-          ))}
-          {creationTransform && creationLayer ? (
-            <CreationPathLantern
-              transform={creationTransform}
-              overlayOpacity={creationOverlayOpacity}
-              generatingDraft={creationLayer.draft}
-              handoffHaiku={creationLayer.handoffHaiku}
-              excludeLabelIds={excludeLabelIds}
-              elevateAboveChrome={creationChromeOpen}
-              guideBoxRef={svgAreaRef}
-            />
-          ) : null}
-          {!generatingDraft ? (
-            <SVGPathNavigationArrows
-              showBack={canStepBack(focusIndex)}
-              showForward={canStepForward(focusIndex, scrollCount)}
-              onStepBack={() => void stepBack()}
-              onStepForward={() => void stepForward()}
-            />
-          ) : null}
+                return (
+                  <SVGPathLantern
+                    key={key}
+                    haiku={haiku}
+                    loading={loading}
+                    transform={transform}
+                    face={face}
+                    isAnimating={isAnimating || packing}
+                    suppressReveal
+                    actionsAlwaysVisible={haikuIndex === focusIndex}
+                    excludeLabelIds={excludeLabelIds}
+                    onDeleted={onDeleted}
+                    onDeleteFailed={onHaikuDeleteFailed}
+                    onChanged={onHaikuChanged}
+                  />
+                );
+              })}
+            {exitingLanterns.map(({ haiku, transform }) => (
+              <ExitingPathLantern
+                key={`exiting-${haiku.id}`}
+                haiku={haiku}
+                transform={transform}
+                excludeLabelIds={excludeLabelIds}
+                onPoseHold={handleExitPoseHold}
+                onComplete={handleLanternExitComplete}
+              />
+            ))}
+            {creationTransform && creationLayer ? (
+              <CreationPathLantern
+                transform={creationTransform}
+                overlayOpacity={creationOverlayOpacity}
+                generatingDraft={creationLayer.draft}
+                handoffHaiku={creationLayer.handoffHaiku}
+                excludeLabelIds={excludeLabelIds}
+                elevateAboveChrome={creationChromeOpen}
+                guideBoxRef={svgAreaRef}
+              />
+            ) : null}
+          </div>
         </div>
       </div>
-    </div>
+    </PathNavigationProvider>
   );
 });

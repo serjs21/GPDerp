@@ -19,6 +19,7 @@ import { CreateAddLabelsModal } from "@/components/CreateAddLabelsModal";
 import { ShareModal } from "@/components/ShareModal/ShareModal";
 import { Tooltip } from "@/components/StyledComponents";
 import { useLanternActionsDock } from "@/components/Lantern/LanternActionsDockContext";
+import { PathNavigationArrows, usePathNavigation } from "@/components/PathNavigation";
 import { useCopy } from "@/hooks/useCopy";
 import { useHaikuActionsOpenPreference } from "@/hooks/useHaikuActionsOpenPreference";
 import { formatHaikuPlainToText, formatHaikuTitle } from "@/utils/strings";
@@ -134,6 +135,7 @@ export const HaikuActions = (props: HaikuActionsProps) => {
   const toggleWrapRef = useRef<HTMLSpanElement | null>(null);
   const { copy } = useCopy();
   const dock = useLanternActionsDock();
+  const pathNavigation = usePathNavigation();
 
   const forcedHover = props.variant === "saved" ? props.forcedHover : undefined;
   const forcedOpen = props.variant === "saved" ? props.forcedOpen : undefined;
@@ -264,52 +266,60 @@ export const HaikuActions = (props: HaikuActionsProps) => {
     }
   };
 
+  const shell = (
+    <div className={styles.shell}>
+      <div
+        className={[styles.panel, panelHoverClass(activeHover)].filter(Boolean).join(" ")}
+        role="group"
+        aria-label="Haiku actions"
+      >
+        {ACTIONS.map((action) => (
+          <div key={action.id} className={`${styles.slot} ${action.slotClass}`}>
+            <button
+              type="button"
+              className={styles.panelButton}
+              aria-label={action.ariaLabel}
+              onMouseEnter={() => setHoverIfLive(action.id)}
+              onFocus={(event) =>
+                setHoverFromFocus(action.id, event.currentTarget)
+              }
+              onBlur={clearHoverFromBlur}
+              onClick={() => onActionClick(action.id)}
+            >
+              <SlotFace>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={action.iconSrc}
+                  alt=""
+                  className={styles.iconImg}
+                  width={18}
+                  height={18}
+                />
+              </SlotFace>
+              <SlotFace
+                enterFrom={action.enterFrom}
+                hidden={activeHover !== action.id}
+              >
+                <span className={styles.actionName}>{action.label}</span>
+              </SlotFace>
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
   const panel = (
     <div
       className={styles.anchor}
       data-haiku-actions-panel=""
       onMouseLeave={clearHover}
     >
-      <div className={styles.shell}>
-        <div
-          className={[styles.panel, panelHoverClass(activeHover)].filter(Boolean).join(" ")}
-          role="group"
-          aria-label="Haiku actions"
-        >
-          {ACTIONS.map((action) => (
-            <div key={action.id} className={`${styles.slot} ${action.slotClass}`}>
-              <button
-                type="button"
-                className={styles.panelButton}
-                aria-label={action.ariaLabel}
-                onMouseEnter={() => setHoverIfLive(action.id)}
-                onFocus={(event) =>
-                  setHoverFromFocus(action.id, event.currentTarget)
-                }
-                onBlur={clearHoverFromBlur}
-                onClick={() => onActionClick(action.id)}
-              >
-                <SlotFace>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={action.iconSrc}
-                    alt=""
-                    className={styles.iconImg}
-                    width={18}
-                    height={18}
-                  />
-                </SlotFace>
-                <SlotFace
-                  enterFrom={action.enterFrom}
-                  hidden={activeHover !== action.id}
-                >
-                  <span className={styles.actionName}>{action.label}</span>
-                </SlotFace>
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
+      {pathNavigation ? (
+        <PathNavigationArrows {...pathNavigation}>{shell}</PathNavigationArrows>
+      ) : (
+        shell
+      )}
     </div>
   );
 
