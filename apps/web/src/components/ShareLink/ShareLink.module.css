@@ -265,8 +265,8 @@
 }
 
 .stopButton {
-  background: #940000;
-  color: #fff;
+  background: #ff9999;
+  color: #ffffff;
 }
 
 .stopButton:hover:not(:disabled) {
@@ -275,8 +275,8 @@
 
 .actionIcon {
   display: block;
-  width: auto;
-  height: 1.25rem;
+  width: 2rem;
+  height: auto;
   object-fit: contain;
   pointer-events: none;
 }
