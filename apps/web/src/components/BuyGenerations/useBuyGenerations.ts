@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { comicToast } from "@/components/ComicToast";
-import { confirmPurchase, createCheckout, fetchCredits, GENERATION_CREDITS_UPDATED_EVENT, notifyGenerationCreditsUpdated, notifyGenerationPurchaseConfirmed, type GenerationCreditsUpdatedDetail } from "@/api/payments";
+import { confirmPurchase, createCheckout, notifyGenerationCreditsUpdated, notifyGenerationPurchaseConfirmed } from "@/api/payments";
 import {
   PADDLE_CHECKOUT_COMPLETED_EVENT,
   usePaddle,
@@ -26,8 +26,6 @@ export function useBuyGenerations() {
   const { user } = useAuthenticationState();
   const { requestAuthentication } = useAuthenticationVerification();
   const paddleEnv = readPaddleClientEnv();
-  const [credits, setCredits] = useState<number | null>(null);
-  const [loadingCredits, setLoadingCredits] = useState(true);
   const [startingCheckout, setStartingCheckout] = useState(false);
   const startingCheckoutRef = useRef(false);
   const confirmingRef = useRef(false);
@@ -37,7 +35,6 @@ export function useBuyGenerations() {
     confirmingRef.current = true;
     try {
       const data = await confirmPurchase(transactionId);
-      setCredits(data.credits);
       notifyGenerationCreditsUpdated(data.credits);
       notifyGenerationPurchaseConfirmed();
       comicToast.success(t("success"));
@@ -47,23 +44,6 @@ export function useBuyGenerations() {
       confirmingRef.current = false;
     }
   };
-
-  useEffect(() => {
-    let cancelled = false;
-    void fetchCredits()
-      .then((data) => {
-        if (!cancelled) setCredits(data.credits);
-      })
-      .catch(() => {
-        if (!cancelled) setCredits(null);
-      })
-      .finally(() => {
-        if (!cancelled) setLoadingCredits(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   useEffect(() => {
     const txn = readTxnFromLocation();
@@ -84,17 +64,8 @@ export function useBuyGenerations() {
       void applyConfirmedCredits(transactionId);
     };
 
-    const onCreditsUpdated = (event: Event) => {
-      const detail = (event as CustomEvent<GenerationCreditsUpdatedDetail>).detail;
-      if (typeof detail?.credits === "number") setCredits(detail.credits);
-    };
-
     window.addEventListener(PADDLE_CHECKOUT_COMPLETED_EVENT, onCompleted);
-    window.addEventListener(GENERATION_CREDITS_UPDATED_EVENT, onCreditsUpdated);
-    return () => {
-      window.removeEventListener(PADDLE_CHECKOUT_COMPLETED_EVENT, onCompleted);
-      window.removeEventListener(GENERATION_CREDITS_UPDATED_EVENT, onCreditsUpdated);
-    };
+    return () => window.removeEventListener(PADDLE_CHECKOUT_COMPLETED_EVENT, onCompleted);
   }, [t]);
 
   const buy = async () => {
@@ -129,8 +100,6 @@ export function useBuyGenerations() {
   };
 
   return {
-    credits,
-    loadingCredits,
     startingCheckout,
     initializing,
     checkoutReady: configured && ready && Boolean(paddle) && Boolean(paddleEnv.priceId),

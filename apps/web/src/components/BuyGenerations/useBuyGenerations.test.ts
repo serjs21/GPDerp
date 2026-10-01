@@ -1,4 +1,4 @@
-import { act, renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import { comicToast } from "@/components/ComicToast";
 import { createCheckout, fetchCredits } from "@/api/payments";
 import { openPaddleCheckoutWithFallback } from "@/app/providers/openPaddleCheckoutWithFallback";
@@ -76,7 +76,6 @@ describe("useBuyGenerations", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockedFetchCredits.mockResolvedValue({ credits: 4 });
     mockedCreateCheckout.mockResolvedValue({
       purchaseId,
       transactionId,
@@ -96,9 +95,13 @@ describe("useBuyGenerations", () => {
     });
   });
 
+  it("does not fetch credits on mount", () => {
+    renderHook(() => useBuyGenerations());
+    expect(mockedFetchCredits).not.toHaveBeenCalled();
+  });
+
   it("opens overlay checkout with a server-created transaction id", async () => {
     const { result } = renderHook(() => useBuyGenerations());
-    await waitFor(() => expect(result.current.loadingCredits).toBe(false));
 
     await act(async () => {
       await result.current.buy();
@@ -122,7 +125,6 @@ describe("useBuyGenerations", () => {
   it("opens the auth modal and does not create a purchase when logged out", async () => {
     mockRequestAuthentication.mockReturnValue(false);
     const { result } = renderHook(() => useBuyGenerations());
-    await waitFor(() => expect(result.current.loadingCredits).toBe(false));
 
     await act(async () => {
       await result.current.buy();
@@ -140,7 +142,6 @@ describe("useBuyGenerations", () => {
       configured: false,
     });
     const { result } = renderHook(() => useBuyGenerations());
-    await waitFor(() => expect(result.current.loadingCredits).toBe(false));
 
     await act(async () => {
       await result.current.buy();
@@ -153,7 +154,6 @@ describe("useBuyGenerations", () => {
   it("toasts when the checkout API fails", async () => {
     mockedCreateCheckout.mockRejectedValue(new Error("Unauthorized"));
     const { result } = renderHook(() => useBuyGenerations());
-    await waitFor(() => expect(result.current.loadingCredits).toBe(false));
 
     await act(async () => {
       await result.current.buy();

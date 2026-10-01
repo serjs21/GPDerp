@@ -6,6 +6,7 @@ import { ComicPageCtaAction, ComicPagePanel } from "@/components/ComicPageLayout
 import { IconUploader } from "@/components/IconUploader";
 import { useBuyGenerations } from "@/components/BuyGenerations";
 import { useProfile } from "@/app/settings/ProfileContext";
+import { useGenerationCredits } from "@/hooks/useGenerationCredits";
 import { useProfileI18n } from "@/hooks/useProfileI18n";
 import styles from "./LibraryCard.module.css";
 
@@ -23,8 +24,8 @@ export function LibraryCard() {
   const profile = useProfile();
   const { profileInfo } = useProfileI18n();
   const t = useTranslations("LibraryCard");
-  const { credits, loadingCredits, startingCheckout, initializing, checkoutReady, buy } =
-    useBuyGenerations();
+  const { credits, loadingCredits } = useGenerationCredits();
+  const { startingCheckout, initializing, checkoutReady, buy } = useBuyGenerations();
 
   const remainingLabel =
     loadingCredits || credits === null ? t("remainingUnknown") : t("remaining", { count: credits });
