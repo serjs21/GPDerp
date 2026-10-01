@@ -8,6 +8,7 @@ import { LabelHalo, toLabelHaloItems } from "@/components/LabelHalo";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { SakuraPetalLoader } from "@/components/Loaders";
+import { ShareLinkLabelsToggle } from "@/components/ShareLinkActions";
 import { useHaikuLabelPlacement } from "@/hooks/useHaikuLabelPlacement";
 import { SHARE_LINK_HAIKUS_QUERY_KEY } from "./useShareLinkHaikuEnrichment";
 import { shareLinkPreviewPanelStyle } from "./utils/shareLinkPreviewModalUtils";
@@ -49,11 +50,14 @@ export function ShareLinkPreviewModal({
         contentClassName={styles.dialog}
         ctaFooter={
           <>
-            <ComicPageCtaAction
-              label={showLabels ? "Hide labels" : "Show labels"}
-              busy={togglingLabels}
-              onClick={onToggleLabels}
-            />
+            <div className={styles.labelsToggle}>
+              <ShareLinkLabelsToggle
+                subject={subject}
+                showLabels={showLabels}
+                togglingLabels={togglingLabels}
+                onToggleLabels={onToggleLabels}
+              />
+            </div>
             <ComicPageCtaAction
               label="Edit labels"
               disabled={!haiku}

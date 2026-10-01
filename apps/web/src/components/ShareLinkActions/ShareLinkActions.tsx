@@ -6,6 +6,7 @@ import {
   SHARE_LINK_ACTION_LAYOUTS,
 } from "./consts/shareLinkActionsConsts";
 import { ShareLinkActionButton } from "./ShareLinkActionButton";
+import { ShareLinkLabelsToggle } from "./ShareLinkLabelsToggle";
 import { ShareLinkUpdateAction } from "./ShareLinkUpdateAction";
 import type { ShareLinkActionsProps } from "./ShareLinkActions.types";
 import styles from "./ShareLinkActions.module.css";
@@ -27,10 +28,6 @@ export function ShareLinkActions({
   onDelete,
   className,
 }: ShareLinkActionsProps) {
-  const labelsColors = showLabels
-    ? SHARE_LINK_ACTION_COLORS.showLabels
-    : SHARE_LINK_ACTION_COLORS.hideLabels;
-
   return (
     <div
       className={[styles.stack, className].filter(Boolean).join(" ")}
@@ -53,18 +50,11 @@ export function ShareLinkActions({
         updating={updating}
         onUpdate={onUpdate}
       />
-      <ShareLinkActionButton
-        src={showLabels ? SHARE_LINK_ACTION_ICONS.showLabels : SHARE_LINK_ACTION_ICONS.hideLabels}
-        caption={showLabels ? "Labels visible" : "Labels hidden"}
-        captionClassName={styles.captionLabels}
-        layout={showLabels ? SHARE_LINK_ACTION_LAYOUTS.showLabels : SHARE_LINK_ACTION_LAYOUTS.hideLabels}
-        ariaLabel={`Show labels on share link for ${subject}`}
-        color={labelsColors.panel}
-        hoverFill={labelsColors.hover}
-        pressed={showLabels}
-        busy={togglingLabels}
-        inverted={!showLabels}
-        onSelect={onToggleLabels}
+      <ShareLinkLabelsToggle
+        subject={subject}
+        showLabels={showLabels}
+        togglingLabels={togglingLabels}
+        onToggleLabels={onToggleLabels}
       />
       <ShareLinkActionButton
         src={SHARE_LINK_ACTION_ICONS.delete}
