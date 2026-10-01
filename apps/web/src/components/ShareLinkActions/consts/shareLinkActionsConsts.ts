@@ -13,8 +13,8 @@ export const SHARE_LINK_ACTION_ICONS = {
 
 export const SHARE_LINK_ACTION_COLORS = {
   preview: { panel: "#ffe9a8", hover: "#ffd35c" },
-  update: { panel: "#c0ffc3", hover: "#6dfe73" },
-  showLabels: { panel: "sky", hover: "#8fc3e6" },
+  update: { panel: "#c0d2ff", hover: "#8aabff" },
+  showLabels: { panel: "#ffffff", hover: "#d9d9da" },
   hideLabels: { panel: "#111111", hover: "#3a3a3a" },
   delete: { panel: "#ffaea8", hover: "var(--accent-red, #aa1f3f)" },
 } as const satisfies Record<string, { panel: ComicPanelColor; hover: string }>;
@@ -23,22 +23,22 @@ export const SHARE_LINK_ACTION_COLORS = {
 export const SHARE_LINK_ACTION_LAYOUTS = {
   preview: {
     icon: { size: "3.5rem", top: "0rem", right: "2.5rem", rotateDeg: 0 },
-    caption: { top: "6px", right: "4px", rotateDeg: 0 },
+    caption: { top: "14px", right: "4px", rotateDeg: 0 },
   },
   update: {
-    icon: { size: "1.9rem", top: "0.55rem", right: "3.95rem", rotateDeg: 0 },
-    caption: { top: "6px", right: "4px", rotateDeg: 0 },
+    icon: { size: "3em", top: "0rem", left: "0rem", rotateDeg: 0 },
+    caption: { top: "14px", right: "4px", rotateDeg: 0 },
     },
   showLabels: {
-    icon: { size: "3.5rem", top: "0.55rem", right: "3.95rem", rotateDeg: 0 },
-    caption: { top: "6px", right: "4px", rotateDeg: 0 },  },
+    icon: { size: "3.5rem", top: "0rem", right: "2.8rem", rotateDeg: 0 },
+    caption: { top: "10px", right: "0px", rotateDeg: 0 },  },
   hideLabels: {
-    icon: { size: "3.5rem", top: "0rem", right: "3.95rem", rotateDeg: 0 },
-    caption: { top: "6px", right: "4px", rotateDeg: 0 },
+    icon: { size: "3.5rem", top: "0rem", right: "2.8rem", rotateDeg: 0 },
+    caption: { top: "10px", right: "0px", rotateDeg: 0 },
   },
   delete: {
-    icon: { size: "1.9rem", top: "0.55rem", right: "3.95rem", rotateDeg: 0 },
-    caption: { top: "6px", right: "4px", rotateDeg: 0 },
+    icon: { size: "3rem", top: "0rem", right: "0rem", rotateDeg: 0 },
+    caption: { top: "14px", right: "4px", rotateDeg: 0 },
   },
 } as const satisfies Record<string, ShareLinkActionLayout>;
 

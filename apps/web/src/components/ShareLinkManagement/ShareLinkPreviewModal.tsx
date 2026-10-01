@@ -41,7 +41,6 @@ export function ShareLinkPreviewModal({
       <ComicPageDialog
         open={open}
         onOpenChange={onOpenChange}
-        title={subject}
         showClose
         className={styles.page}
         contentClassName={styles.dialog}
