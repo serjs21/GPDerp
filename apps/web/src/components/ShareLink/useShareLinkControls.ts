@@ -18,8 +18,8 @@ import {
 import { canStartShareLink, getRestartReason, isActiveShareLink, isExpired, isViewLimitReached } from "@/utils/shareLinkStatus";
 
 export const PAPER_PLANE_SRC = "/share_modal/link/paper_plane.svg";
-export const START_ICON_SRC = "/share_modal/link/start.svg";
-export const PAUSE_ICON_SRC = "/share_modal/link/pause.svg";
+export const START_ICON_SRC = "/share_link_actions/start.svg";
+export const PAUSE_ICON_SRC = "/share_link_actions/stop.svg";
 export const UPDATE_ICON_SRC = "/share_modal/link/update.svg";
 export const HEART_FILLED_SRC = "/share_modal/link/heart_filled.svg";
 export const HEART_SRC = "/share_modal/link/heart.svg";

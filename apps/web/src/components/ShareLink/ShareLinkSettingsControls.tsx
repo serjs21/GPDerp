@@ -214,11 +214,11 @@ export function ShareLinkSettingsControls({
             className={styles.actionButton}
             disabled={!formValid || isUpdating || busy}
             onClick={() => void onStart()}
-            aria-label="Start link"
+            aria-label="Launch link"
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- action icon asset */}
             <img src={START_ICON_SRC} alt="" className={styles.actionIcon} aria-hidden />
-            <span className={styles.actionLabel}>Start</span>
+            <span className={styles.actionLabel}>Launch</span>
           </button>
         )}
       </div>

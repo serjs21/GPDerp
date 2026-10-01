@@ -70,7 +70,7 @@ function ActivatingShareLinkStory() {
 
   useEffect(() => {
     const id = window.setTimeout(() => {
-      const btn = document.querySelector<HTMLButtonElement>('button[aria-label="Start link"]');
+      const btn = document.querySelector<HTMLButtonElement>('button[aria-label="Launch link"]');
       btn?.click();
     }, 400);
     return () => window.clearTimeout(id);
