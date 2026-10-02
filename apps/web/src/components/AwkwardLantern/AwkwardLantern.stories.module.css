@@ -1,0 +1,7 @@
+.stage {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: min(70vh, 32rem);
+  padding: 1rem;
+}
