@@ -50,7 +50,8 @@
 @keyframes notFoundLanternFlyIn {
   from {
     opacity: var(--not-found-fly-from-opacity, 0.5);
-    transform: translateY(100vh) scale(var(--not-found-fly-from-scale, 1.1));
+    transform: translate(var(--not-found-fly-from-x, 50vw), var(--not-found-fly-from-y, 100vh))
+      scale(var(--not-found-fly-from-scale, 1.1));
   }
   to {
     opacity: 1;
