@@ -136,7 +136,7 @@ export function LocaleBubbleSelector({
       renderTrigger={() => (
         <span className={styles.triggerInner} aria-label={mergedAriaLabel}>
           {SelectedFlag ? (
-            <SelectedFlag className={styles.flag} aria-hidden />
+            <SelectedFlag className={styles.triggerFlag} aria-hidden />
           ) : (
             <Languages className={styles.fallbackIcon} aria-hidden />
           )}

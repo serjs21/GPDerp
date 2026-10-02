@@ -80,11 +80,26 @@
   pointer-events: none;
 }
 
+/* TextBubbleDropdown's trigger button. */
+.root > button {
+  height: 40px;
+}
+
 .triggerInner {
   display: inline-flex;
   align-items: center;
+  height: 100%;
   font-size: 0;
   gap: 0.45rem;
+}
+
+/* Fills the 40px trigger; option-row flags keep `.flag` sizing. */
+.triggerFlag {
+  display: block;
+  width: auto;
+  height: 100%;
+  flex: 0 0 auto;
+  border: 1px solid #111111;
 }
 
 .triggerLabel {
