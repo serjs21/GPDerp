@@ -91,9 +91,6 @@ export function useRotationTablePointer({
 
   const handlePointerDown = useCallback(
     (event: ReactPointerEvent<HTMLElement>) => {
-      // #region agent log
-      fetch('http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'35906a'},body:JSON.stringify({sessionId:'35906a',runId:'run1',hypothesisId:'A',location:'useRotationTablePointer.ts:pointerDown',message:'rotate pointerdown',data:{disabled,valueMode,target:(event.target as HTMLElement).tagName},timestamp:Date.now()})}).catch(()=>{});
-      // #endregion
       if (disabled) return;
       if (stopPropagation) {
         event.stopPropagation();
