@@ -4,6 +4,13 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 import type { ReactNode } from "react";
 import { THEMES, type ThemeName } from "@/config/userConfiguration";
 
+/**
+ * React 19 warns when a `<script>` renders on the client. The theme script only needs to run from
+ * the server HTML, so client renders mark it inert (next-themes sets suppressHydrationWarning).
+ */
+const THEME_SCRIPT_PROPS =
+  typeof window === "undefined" ? undefined : ({ type: "application/json" } as const);
+
 export function ThemeProvider({
   children,
   initialTheme,
@@ -18,6 +25,7 @@ export function ThemeProvider({
       themes={Object.values(THEMES)}
       enableSystem={false}
       storageKey="gpderp-theme"
+      scriptProps={THEME_SCRIPT_PROPS}
     >
       {children}
     </NextThemesProvider>
