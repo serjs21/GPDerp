@@ -55,6 +55,7 @@ describe("getThemeAt", () => {
     expect(contrastRatio(theme.inkOnPaper, theme.paper)).toBeGreaterThanOrEqual(7);
     expect(contrastRatio(theme.highlightOnPaper, theme.paper)).toBeGreaterThanOrEqual(4.5);
     expect(contrastRatio(theme.inkOnSky, theme.skyMid)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(theme.highlightOnSky, theme.skyTop)).toBeGreaterThanOrEqual(4.5);
     // Noon sky should drive ink toward dark blue (low luminance).
     expect(relativeChannelSum(theme.inkOnSky)).toBeLessThan(relativeChannelSum(theme.moon));
   });
@@ -63,6 +64,7 @@ describe("getThemeAt", () => {
     const theme = getThemeAt(new Date("2026-06-21T00:00:00+07:00"), BANGKOK);
 
     expect(contrastRatio(theme.inkOnSky, theme.skyMid)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(theme.highlightOnSky, theme.skyTop)).toBeGreaterThanOrEqual(4.5);
     // Midnight sky should drive ink toward moon yellow (high luminance).
     expect(relativeChannelSum(theme.inkOnSky)).toBeGreaterThan(relativeChannelSum(SKY_INK_DAY));
   });

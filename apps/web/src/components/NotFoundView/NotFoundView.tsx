@@ -25,12 +25,15 @@ export function NotFoundView({ className }: NotFoundViewProps) {
 
   return (
     <section
-      className={[styles.root, className].filter(Boolean).join(" ")}
+      className={[styles.root, initialized && styles.animate, className].filter(Boolean).join(" ")}
       style={notFoundFlyInStyle()}
       aria-labelledby="not-found-copy"
     >
       <div className={styles.stack}>
-        <div className={styles.toast} role="status">
+        <div
+          className={[styles.toast, initialized && "magictime puffIn"].filter(Boolean).join(" ")}
+          role="status"
+        >
           <ComicDialogContent
             bubbleStyle={SUCCESS_TONE.bubbleStyle}
             backgroundColors={SUCCESS_TONE.backgroundColors}
@@ -50,7 +53,7 @@ export function NotFoundView({ className }: NotFoundViewProps) {
             className={[dialogStyles.previewStage, styles.bubbleStage].join(" ")}
             contentClassName={styles.text}
           >
-            <span id="not-found-copy" className={styles.text}>{NOT_FOUND_COPY}</span>
+            <span id="not-found-copy">{NOT_FOUND_COPY}</span>
           </ComicDialogContent>
         </div>
         {initialized && !isLoggedIn ? (

@@ -41,6 +41,8 @@ export type ThemeColors = Record<ThemeToken, string> & {
   highlightOnPaper: string;
   /** Accessible text/icon color for use on sky panel surfaces (skyMid). */
   inkOnSky: string;
+  /** Highlight hue lightened/darkened to stay readable on the page background (skyTop). */
+  highlightOnSky: string;
 };
 
 export interface GeoCoordinates {
@@ -359,6 +361,35 @@ function ensureMinimumContrast(
     : nearWhite;
 }
 
+const HUE_PRESERVING_CONTRAST_STEPS = 20;
+
+/** Like ensureMinimumContrast, but moves toward black/white only as far as needed to keep the hue. */
+export function ensureContrastKeepingHue(
+  foreground: string,
+  background: string,
+  minimumRatio: number,
+) {
+  if (contrastRatio(foreground, background) >= minimumRatio) {
+    return foreground;
+  }
+
+  const nearBlack = "#17131A";
+  const nearWhite = "#FFFDF8";
+  const target =
+    contrastRatio(nearBlack, background) >= contrastRatio(nearWhite, background)
+      ? nearBlack
+      : nearWhite;
+
+  for (let step = 1; step < HUE_PRESERVING_CONTRAST_STEPS; step += 1) {
+    const candidate = mixHexOklab(foreground, target, step / HUE_PRESERVING_CONTRAST_STEPS);
+    if (contrastRatio(candidate, background) >= minimumRatio) {
+      return candidate;
+    }
+  }
+
+  return target;
+}
+
 /** Dark-blue ink for bright/day sky panels. */
 export const SKY_INK_DAY = "#1A2744";
 
@@ -480,6 +511,7 @@ export function getThemeAt(date: Date, coordinates: GeoCoordinates): ThemeColors
       inkOnPaper: ensureMinimumContrast(fallback.ink, fallback.paper, 7),
       highlightOnPaper: ensureMinimumContrast(fallback.highlight, fallback.paper, 4.5),
       inkOnSky: resolveInkOnSky(fallback.skyMid, fallback.moon),
+      highlightOnSky: ensureContrastKeepingHue(fallback.highlight, fallback.skyTop, 4.5),
     };
   }
 
@@ -512,6 +544,7 @@ export function getThemeAt(date: Date, coordinates: GeoCoordinates): ThemeColors
     inkOnPaper: ensureMinimumContrast(colors.ink, colors.paper, 7),
     highlightOnPaper: ensureMinimumContrast(colors.highlight, colors.paper, 4.5),
     inkOnSky: resolveInkOnSky(colors.skyMid, colors.moon),
+    highlightOnSky: ensureContrastKeepingHue(colors.highlight, colors.skyTop, 4.5),
   };
 }
 
@@ -622,6 +655,7 @@ export function getSceneCssVariables(
     "--paper": theme.paper,
     "--ink": theme.inkOnPaper,
     "--highlight": theme.highlightOnPaper,
+    "--highlight-on-sky": theme.highlightOnSky,
     "--sun-color": theme.sun,
     "--moon-color": theme.moon,
     "--sun-x": formatCssPercent(layout.sun.x),

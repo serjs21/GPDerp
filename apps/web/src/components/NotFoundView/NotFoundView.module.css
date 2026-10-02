@@ -1,5 +1,6 @@
 /* Fly-in vars come from notFoundFlyInStyle(). */
 .root {
+  --not-found-toast-ms: 200ms;
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
@@ -21,11 +22,10 @@
   max-width: 100%;
 }
 
-/* Same enter motion as ComicToastItem, played on load alongside the fly-in. */
+/* magic.css puffIn on load; the lantern fly-in waits for it. */
 .toast {
   justify-self: start;
   max-width: 100%;
-  animation: notFoundToastIn 200ms cubic-bezier(0.45, 0.05, 0.55, 0.95) both;
 }
 
 /* Toast `.toastContent` type, single line. */
@@ -47,21 +47,44 @@
 
 .flyIn {
   transform-origin: center bottom;
-  animation: notFoundLanternFlyIn var(--not-found-fly-ms, 1500ms) cubic-bezier(0, 0, 0.58, 1) both;
 }
 
 .copy {
   display: flex;
   justify-content: center;
   width: 100%;
-  animation: notFoundCopyIn 300ms ease var(--not-found-fly-ms, 1500ms) both;
 }
 
 .signUp {
   display: flex;
   justify-content: center;
   max-width: 100%;
-  animation: notFoundCopyIn 300ms ease var(--not-found-fly-ms, 1500ms) both;
+}
+
+/* `.animate` is added once the app loader overlay is gone, so the entrance is not played underneath it. */
+@media (prefers-reduced-motion: no-preference) {
+  .root:not(.animate) .toast,
+  .root:not(.animate) .flyIn,
+  .root:not(.animate) .copy,
+  .root:not(.animate) .signUp {
+    opacity: 0;
+  }
+
+  /* Shortens magic.css `.magictime` (1s) on the toast's puffIn. */
+  .animate .toast {
+    animation-duration: var(--not-found-toast-ms);
+  }
+
+  .animate .flyIn {
+    animation: notFoundLanternFlyIn var(--not-found-fly-ms, 1500ms) cubic-bezier(0, 0, 0.58, 1)
+      var(--not-found-toast-ms) both;
+  }
+
+  .animate .copy,
+  .animate .signUp {
+    animation: notFoundCopyIn 300ms ease
+      calc(var(--not-found-toast-ms) + var(--not-found-fly-ms, 1500ms)) both;
+  }
 }
 
 /* Same proportions as the toast stage, without the toast's 9rem preview min-height. */
@@ -99,17 +122,6 @@
   }
 }
 
-@keyframes notFoundToastIn {
-  from {
-    opacity: 0;
-    transform: translateY(calc(-1 * var(--comic-toast-enter-offset, 0.75rem)));
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
 @keyframes notFoundCopyIn {
   from {
     opacity: 0;
@@ -118,14 +130,5 @@
   to {
     opacity: 1;
     transform: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .toast,
-  .flyIn,
-  .copy,
-  .signUp {
-    animation: none;
   }
 }
