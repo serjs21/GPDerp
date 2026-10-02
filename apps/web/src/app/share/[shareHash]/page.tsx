@@ -1,5 +1,5 @@
-import { notFound } from "next/navigation";
 import { fetchSharedHaikuByHash } from "@/api/shareLink";
+import { NotFoundView } from "@/components/NotFoundView";
 import { formatHaikuTitle } from "@/utils/strings";
 import { SharedHaikuLantern } from "./SharedHaikuLantern";
 import styles from "./styles.module.css";
@@ -8,8 +8,9 @@ export default async function SharedHaikuPage({ params }: { params: Promise<{ sh
   const { shareHash } = await params;
   const result = await fetchSharedHaikuByHash(shareHash);
 
+  /* Not `notFound()`: a throwing server component crashes React's dev perf logging (negative measure timestamp). */
   if (!result.ok) {
-    notFound();
+    return <NotFoundView />;
   }
 
   const { haiku, sharedByUserName, showLabels } = result.data;
