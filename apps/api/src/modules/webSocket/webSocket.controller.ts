@@ -14,9 +14,6 @@ const webSocketPluginImpl = async (app: FastifyInstance) => {
   app.server.on("upgrade", (_req, socket) => {
     socket.on("error", (err) => {
       app.log.warn({ err }, "WS upgrade socket error");
-      // #region agent log
-      fetch('http://127.0.0.1:7498/ingest/732c0002-567b-4a51-a696-ac38fea9237b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'725364'},body:JSON.stringify({sessionId:'725364',runId:'post-fix',hypothesisId:'D',location:'webSocket.controller.ts:upgradeError',message:'upgrade socket error handled',data:{code:(err as NodeJS.ErrnoException).code ?? null,message:err.message},timestamp:Date.now()})}).catch(()=>{});
-      // #endregion
     });
   });
 
