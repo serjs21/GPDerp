@@ -10,34 +10,6 @@
 }
 
 
-.card {
-  max-width: 36rem;
-  background: #ffffff66;
-  margin: 0 auto;
-  padding: 1.25rem;
-  border-radius: 8px;
-  border: 1px solid color-mix(in srgb, var(--text-color, #2c2c2c) 12%, transparent);
-}
-
-.errorTitle {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin: 0 0 0.5rem;
-  color: #d4380d;
-}
-
-.errorBody {
-  margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
-.errorHint {
-  margin: 0.65rem 0 0;
-  font-size: 0.85rem;
-  opacity: 0.75;
-}
-
 .providedBy {
   margin: 0 0 0.65rem;
   font-size: 1rem;
