@@ -4,7 +4,6 @@ import styles from "./page.module.css";
 import { HaikuDisplay } from "@/components/HaikuDisplay";
 import { CenteredAuthPrompt } from "@/components/AuthenticationNav/CenteredAuthPrompt";
 import { GoldenAgeTitle } from "@/components/GoldenAgeTitle";
-import { LegalScrollArrow } from "@/components/LegalScrollArrow";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 
 export function HomePageContent() {
@@ -22,7 +21,6 @@ export function HomePageContent() {
         <CenteredAuthPrompt />
         {initialized && isLoggedIn ? <HaikuDisplay /> : null}
       </main>
-      <LegalScrollArrow />
     </div>
   );
 }

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { SITE_FOOTER_ID } from "@/consts/layout/siteFooterConsts";
 import styles from "./SiteFooter.module.css";
 
 const PADDLE_BUYER_TERMS = "https://www.paddle.com/legal/checkout-buyer-terms";
@@ -12,7 +11,7 @@ function Sep() {
 
 export function SiteFooter() {
   return (
-    <footer id={SITE_FOOTER_ID} className={styles.footer}>
+    <footer className={styles.footer}>
       <nav className={styles.links} aria-label="Legal policies">
         <Link href="/terms">Terms of Service</Link>
         <Sep />
