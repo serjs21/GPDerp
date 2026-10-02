@@ -1,10 +1,17 @@
 "use client";
 
+import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
+import { useAuthenticationVerification } from "@/app/providers/AuthenticationVerificationProvider";
 import { AwkwardLantern } from "@/components/AwkwardLantern";
 import { ComicDialogContent } from "@/components/ComicDialogContent/ComicDialogContent";
 import dialogStyles from "@/components/ComicDialogContent/ComicDialogContent.module.css";
+import { ComicPageCtaAction } from "@/components/ComicPageLayout";
 import { COMIC_TOAST_TONE_PRESETS } from "@/components/ComicToast";
-import { NOT_FOUND_COPY, NOT_FOUND_TOAST_COPY } from "./consts/notFoundViewConsts";
+import {
+  NOT_FOUND_COPY,
+  NOT_FOUND_SIGN_UP_COPY,
+  NOT_FOUND_TOAST_COPY,
+} from "./consts/notFoundViewConsts";
 import type { NotFoundViewProps } from "./NotFoundView.types";
 import { notFoundFlyInStyle } from "./utils/notFoundFlyInUtils";
 import styles from "./NotFoundView.module.css";
@@ -13,6 +20,9 @@ const INFO_TONE = COMIC_TOAST_TONE_PRESETS.info;
 const SUCCESS_TONE = COMIC_TOAST_TONE_PRESETS.success;
 
 export function NotFoundView({ className }: NotFoundViewProps) {
+  const { initialized, isLoggedIn } = useAuthenticationState();
+  const { openAuthenticationModal } = useAuthenticationVerification();
+
   return (
     <section
       className={[styles.root, className].filter(Boolean).join(" ")}
@@ -43,6 +53,14 @@ export function NotFoundView({ className }: NotFoundViewProps) {
             <span id="not-found-copy" className={styles.text}>{NOT_FOUND_COPY}</span>
           </ComicDialogContent>
         </div>
+        {initialized && !isLoggedIn ? (
+          <div className={styles.signUp}>
+            <ComicPageCtaAction
+              label={NOT_FOUND_SIGN_UP_COPY}
+              onClick={() => openAuthenticationModal("register")}
+            />
+          </div>
+        ) : null}
       </div>
     </section>
   );
