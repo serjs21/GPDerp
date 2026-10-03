@@ -5,23 +5,17 @@
   width: 100%;
 }
 
-/* Shrink-wraps to the lantern so the toast can share its end edge. */
-.stack {
-  display: grid;
-  justify-items: center;
-  gap: 1rem;
-  width: fit-content;
-  max-width: 100%;
-}
-
 .flyIn {
   transform-origin: center bottom;
 }
 
-/* "Created by" toast: puffIn (magic.css) once typing has finished. */
+/* "Created by" toast, portaled to <body>: bottom-right corner, puffIn (magic.css) once typing has finished. */
 .createdBy {
-  justify-self: end;
-  max-width: 100%;
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 40;
+  max-width: calc(100vw - 3rem);
 }
 
 /* Same proportions as the toast stage, without the toast's 9rem preview min-height. */
@@ -51,11 +45,6 @@
 @media (prefers-reduced-motion: no-preference) {
   .root:not(.animate) .flyIn {
     opacity: 0;
-  }
-
-  /* Reserved in layout (no jump) but hidden until the last chunk has typed. */
-  .root:not(.typed) .createdBy {
-    visibility: hidden;
   }
 
   /* Hold TextTyping chunks (and their start delay) until the entrance runs. */

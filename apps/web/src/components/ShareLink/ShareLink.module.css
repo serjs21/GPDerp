@@ -281,6 +281,7 @@
 }
 
 .actionLabel {
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
   display: inline-flex;
   padding-bottom: 0.12rem;
   align-items: baseline;
