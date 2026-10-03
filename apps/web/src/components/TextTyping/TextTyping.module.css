@@ -1,9 +1,17 @@
+/* `--text-typing-delay` is inherited from an ancestor (e.g. wait for an entrance animation). */
 .chunk {
   opacity: 0;
   animation-name: revealChunk;
   animation-duration: 0.5s;
   animation-fill-mode: forwards;
-  animation-delay: calc(var(--chunk-index, 0) * 0.05s);
+  animation-delay: calc(var(--text-typing-delay, 0ms) + var(--chunk-index, 0) * 0.05s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chunk {
+    opacity: 1;
+    animation: none;
+  }
 }
 
 @keyframes revealChunk {

@@ -7,6 +7,8 @@ import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { formatCreatedAt } from "@/utils/date";
 import { parseHaikuBody } from "@/utils/parseHaikuBody";
 import { formatHaikuTitle } from "@/utils/strings";
+import { TextTyping } from "@/components/TextTyping/TextTyping";
+import { typingStartIndices } from "@/components/TextTyping/utils/textTypingUtils";
 import {
   LANTERN_ROTATED_WIDTH_REM,
   type LanternRotatedVariantId,
@@ -43,6 +45,11 @@ export type LanternProps = HaikuContainerProps & {
   ariaLabel?: string;
   /** LabelHalo on the rotated paper-face plane (same transform as content). */
   faceHalo?: LanternRotatedFaceHalo | null;
+  /**
+   * Chunk-by-chunk typing reveal of title, body, and author (TextTyping).
+   * Start can be deferred via the inherited `--text-typing-delay` CSS var.
+   */
+  typing?: boolean;
 };
 
 function resolveGeneratingContent(draft: GeneratingDraft) {
@@ -64,14 +71,37 @@ function resolveSavedContent(haiku: NonNullable<HaikuContainerProps["haiku"]>) {
   };
 }
 
-function LanternBodyLines({ body }: { body: string }) {
-  const { lines } = parseHaikuBody(body);
+/** Renders `text` as-is, or chunk-revealed from `startIndex` when typing. */
+function LanternText({
+  text,
+  typing,
+  startIndex,
+}: {
+  text: string;
+  typing: boolean;
+  startIndex: number;
+}) {
+  return typing ? <TextTyping text={text} startIndex={startIndex} /> : <>{text}</>;
+}
 
+function LanternBodyLines({
+  lines,
+  typing,
+  lineStarts,
+}: {
+  lines: string[];
+  typing: boolean;
+  lineStarts: number[];
+}) {
   return (
     <div className={styles.bodyLines} aria-label="Haiku">
       {lines.map((line, index) => (
         <p key={index} className={styles.bodyLine}>
-          {line || "\u00A0"}
+          {line ? (
+            <LanternText text={line} typing={typing} startIndex={lineStarts[index]} />
+          ) : (
+            "\u00A0"
+          )}
         </p>
       ))}
     </div>
@@ -83,31 +113,44 @@ function LanternContent({
   body,
   meta,
   bodyOnly,
+  typing,
   actions,
 }: {
   title?: string;
   body: string;
   meta?: string;
   bodyOnly: boolean;
+  typing: boolean;
   actions?: ReactNode;
 }) {
-  const { author } = parseHaikuBody(body);
+  const { lines, author } = parseHaikuBody(body);
+  const authorText = author ? `—${author}` : "";
+  // Title → body lines → author reveal as one continuous sequence.
+  const starts = typingStartIndices([title ?? "", ...lines, authorText]);
+  const lineStarts = starts.slice(1, 1 + lines.length);
+  const authorStart = starts[starts.length - 1];
 
-  if (bodyOnly) {
-    return (
-      <>
-        {title ? <p className={styles.title}>{title}</p> : null}
-        <LanternBodyLines body={body} />
-        {author ? <p className={styles.author}>—{author}</p> : null}
-      </>
-    );
-  }
+  const shared = (
+    <>
+      {title ? (
+        <p className={styles.title}>
+          <LanternText text={title} typing={typing} startIndex={0} />
+        </p>
+      ) : null}
+      <LanternBodyLines lines={lines} typing={typing} lineStarts={lineStarts} />
+      {authorText ? (
+        <p className={styles.author}>
+          <LanternText text={authorText} typing={typing} startIndex={authorStart} />
+        </p>
+      ) : null}
+    </>
+  );
+
+  if (bodyOnly) return shared;
 
   return (
     <>
-      {title ? <p className={styles.title}>{title}</p> : null}
-      <LanternBodyLines body={body} />
-      {author ? <p className={styles.author}>—{author}</p> : null}
+      {shared}
       {meta ? <p className={styles.meta}>{meta}</p> : null}
       {actions}
     </>
@@ -151,6 +194,7 @@ function resolveHaikuStack(
     style,
     bodyOnly = false,
     showActions = true,
+    typing = false,
     onDelete,
     onDeleted,
     onChanged,
@@ -177,6 +221,7 @@ function resolveHaikuStack(
           body={body}
           meta={meta}
           bodyOnly={bodyOnly}
+          typing={typing}
           actions={buildLanternActions(
             { bodyOnly, showActions, generatingDraft: noteProps.generatingDraft },
             "generating",
@@ -200,6 +245,7 @@ function resolveHaikuStack(
         body={body}
         meta={meta}
         bodyOnly={bodyOnly}
+        typing={typing}
         actions={buildLanternActions(
           { bodyOnly, showActions, haiku, onDelete, onDeleted, onChanged },
           "saved",

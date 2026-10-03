@@ -8,14 +8,14 @@ export const SHARE_LINK_UPDATE_ICONS = {
 } as const;
 
 export const SHARE_LINK_UPDATE_COLORS = {
-  panel: "#c0d2ff",
-  hover: "#8aabff",
+  panel: "#c0ffc6",
+  hover: "#98f1a0",
 } as const satisfies { panel: ComicPanelColor; hover: string };
 
 /** Absolute icon + caption placement inside the 6.25rem-wide Update panel. */
 export const SHARE_LINK_UPDATE_LAYOUT = {
   icon: { size: "5em", top: "0rem", left: "0rem", rotateDeg: 0 },
-  caption: { bottom: "0.5rem", right: "12px", rotateDeg: 0, fontSize: "1.2rem" },
+  caption: { bottom: "1rem", right: "1rem", rotateDeg: 0, fontSize: "1.2rem" },
 } as const satisfies ShareLinkActionLayout;
 
 export const SHARE_LINK_UPDATE_DISABLED_MESSAGES = {

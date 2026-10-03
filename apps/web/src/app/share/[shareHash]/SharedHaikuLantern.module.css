@@ -1,7 +1,29 @@
+/* Fly-in + typing-delay vars come from sharedHaikuFlyInStyle(). */
 .root {
   display: flex;
   justify-content: center;
   width: 100%;
+}
+
+.flyIn {
+  transform-origin: center bottom;
+}
+
+/* `.animate` is added once the app loader overlay is gone, so the entrance is not played underneath it. */
+@media (prefers-reduced-motion: no-preference) {
+  .root:not(.animate) .flyIn {
+    opacity: 0;
+  }
+
+  /* Hold TextTyping chunks (and their start delay) until the entrance runs. */
+  .root:not(.animate) [data-chunk-number] {
+    animation-play-state: paused;
+  }
+
+  .animate .flyIn {
+    animation: sharedHaikuLanternFlyIn var(--shared-haiku-fly-ms, 1500ms) cubic-bezier(0, 0, 0.58, 1)
+      var(--shared-haiku-fly-delay-ms, 0ms) both;
+  }
 }
 
 /* 19rem lantern + ~5rem halo pad per side overflows narrow screens. */
@@ -14,5 +36,17 @@
 @media (max-width: 26rem) {
   .root {
     zoom: 0.6;
+  }
+}
+
+@keyframes sharedHaikuLanternFlyIn {
+  from {
+    opacity: var(--shared-haiku-fly-from-opacity, 0.5);
+    transform: translate(var(--shared-haiku-fly-from-x, 50vw), var(--shared-haiku-fly-from-y, 100vh))
+      scale(var(--shared-haiku-fly-from-scale, 1.1));
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
