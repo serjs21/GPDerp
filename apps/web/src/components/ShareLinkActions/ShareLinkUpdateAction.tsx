@@ -3,15 +3,17 @@
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { HoverHoldCallout } from "@/components/HoverHoldCallout";
 import {
-  SHARE_LINK_ACTION_COLORS,
-  SHARE_LINK_ACTION_ICONS,
-  SHARE_LINK_ACTION_LAYOUTS,
   SHARE_LINK_UPDATE_CALLOUT_POSITION,
+  SHARE_LINK_UPDATE_CALLOUT_TIMING,
+  SHARE_LINK_UPDATE_COLORS,
   SHARE_LINK_UPDATE_DISABLED_MESSAGES,
-} from "./consts/shareLinkActionsConsts";
+  SHARE_LINK_UPDATE_ICONS,
+  SHARE_LINK_UPDATE_LAYOUT,
+} from "./consts/shareLinkUpdateActionConsts";
 import { ShareLinkActionButton } from "./ShareLinkActionButton";
 import type { ShareLinkUpdateActionProps } from "./ShareLinkUpdateAction.types";
-import styles from "./ShareLinkActions.module.css";
+import actionStyles from "./ShareLinkActions.module.css";
+import styles from "./ShareLinkUpdateAction.module.css";
 
 export function ShareLinkUpdateAction({
   subject,
@@ -23,12 +25,12 @@ export function ShareLinkUpdateAction({
   if (active && canUpdate) {
     return (
       <ShareLinkActionButton
-        src={SHARE_LINK_ACTION_ICONS.update}
+        src={SHARE_LINK_UPDATE_ICONS.enabled}
         caption="Update"
-        layout={SHARE_LINK_ACTION_LAYOUTS.update}
+        layout={SHARE_LINK_UPDATE_LAYOUT}
         ariaLabel={`Update share link for ${subject}`}
-        color={SHARE_LINK_ACTION_COLORS.update.panel}
-        hoverFill={SHARE_LINK_ACTION_COLORS.update.hover}
+        color={SHARE_LINK_UPDATE_COLORS.panel}
+        hoverFill={SHARE_LINK_UPDATE_COLORS.hover}
         busy={updating}
         onSelect={onUpdate}
       />
@@ -41,9 +43,9 @@ export function ShareLinkUpdateAction({
 
   return (
     <HoverHoldCallout
-      className={styles.updateCallout}
-      holdMs={3000}
-      fadeMs={200}
+      className={styles.callout}
+      holdMs={SHARE_LINK_UPDATE_CALLOUT_TIMING.holdMs}
+      fadeMs={SHARE_LINK_UPDATE_CALLOUT_TIMING.fadeMs}
       position={SHARE_LINK_UPDATE_CALLOUT_POSITION}
       callout={<div className={styles.speechBubble}>{message}</div>}
       calloutClassName={styles.speechBubbleSlot}
@@ -54,12 +56,12 @@ export function ShareLinkUpdateAction({
         flexWeight={1}
         contentAlign="start"
         isMotionBackground={false}
-        className={[styles.action, styles.updateDisabled].join(" ")}
+        className={[actionStyles.action, styles.disabled].join(" ")}
       >
         {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
         <img
           className={styles.iconFill}
-          src={SHARE_LINK_ACTION_ICONS.updateDisabled}
+          src={SHARE_LINK_UPDATE_ICONS.disabled}
           alt={`Update unavailable for ${subject}: ${message}`}
           draggable={false}
           decoding="async"

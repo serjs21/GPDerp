@@ -1,11 +1,8 @@
 import type { ComicPanelColor } from "@/components/ComicPageLayout";
-import type { CalloutPosition } from "@/components/HoverHoldCallout";
 import type { ShareLinkActionLayout } from "../ShareLinkActionButton.types";
 
 export const SHARE_LINK_ACTION_ICONS = {
   preview: "/share_link_actions/preview.svg",
-  update: "/share_link_actions/update.svg",
-  updateDisabled: "/share_link_actions/update_disabled.svg",
   showLabels: "/share_link_actions/show_labels.svg",
   hideLabels: "/share_link_actions/hide_labels.svg",
   delete: "/share_link_actions/delete.svg",
@@ -16,7 +13,6 @@ export const SHARE_LINK_ACTION_ICONS = {
 
 export const SHARE_LINK_ACTION_COLORS = {
   preview: { panel: "#ffe9a8", hover: "#ffd35c" },
-  update: { panel: "#c0d2ff", hover: "#8aabff" },
   showLabels: { panel: "#ffffff", hover: "#d9d9da" },
   hideLabels: { panel: "#111111", hover: "#3a3a3a" },
   delete: { panel: "#ffaea8", hover: "var(--accent-red, #aa1f3f)" },
@@ -34,10 +30,6 @@ export const SHARE_LINK_ACTION_LAYOUTS = {
     icon: { size: "3.5rem", top: "0rem", left: "0rem", rotateDeg: 0 },
     caption: { top: COMMON_CAPTION_TOP, right: "6px", rotateDeg: 0 },
   },
-  update: {
-    icon: { size: "3em", top: "0rem", left: "0rem", rotateDeg: 0 },
-    caption: { top: COMMON_CAPTION_TOP, right: COMMON_CAPTION_RIGHT, rotateDeg: 0 },
-    },
   followLink: {
     icon: { size: "3rem", top: "0rem", left: "0rem", rotateDeg: 0 },
     caption: { top: "20%", right: "6px", rotateDeg: 0 },
@@ -87,14 +79,3 @@ export const SHARE_LINK_PREVIEW_LABELS_TOGGLE_LAYOUTS = {
     caption: PREVIEW_CAPTION_TOP_RIGHT,
   },
 } as const;
-
-export const SHARE_LINK_UPDATE_DISABLED_MESSAGES = {
-  inactive: "What is yet to begin - can't be changed",
-  unchanged: "Everything's in its right place",
-} as const;
-
-/** Bubble floats to the right of the Update panel (mirror of Tune in's left callout). */
-export const SHARE_LINK_UPDATE_CALLOUT_POSITION = {
-  left: "calc(70% + 0.6rem)",
-  bottom: "0rem",
-} as const satisfies CalloutPosition;
