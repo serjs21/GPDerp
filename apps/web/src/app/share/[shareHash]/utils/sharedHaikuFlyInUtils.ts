@@ -1,7 +1,8 @@
 import type { CSSProperties } from "react";
-import { CREATION_ENTER_MS, SVG_PATH_EXIT_OPACITY } from "@/components/SVGPath";
+import { SVG_PATH_EXIT_OPACITY } from "@/components/SVGPath";
 import {
   SHARED_HAIKU_FLY_DELAY_MS,
+  SHARED_HAIKU_FLY_DURATION_MS,
   SHARED_HAIKU_FLY_FROM_SCALE,
   SHARED_HAIKU_FLY_FROM_X,
   SHARED_HAIKU_FLY_FROM_Y,
@@ -9,13 +10,13 @@ import {
 } from "../consts/sharedHaikuFlyInConsts";
 
 /**
- * Fly-in uses the path creation duration and exit opacity; the lantern's
+ * Fly-in uses the path exit opacity as its starting pose; the lantern's
  * TextTyping (`--text-typing-*`) starts together with the flight.
  */
 export function sharedHaikuFlyInStyle(): CSSProperties {
   return {
     "--shared-haiku-fly-delay-ms": `${SHARED_HAIKU_FLY_DELAY_MS}ms`,
-    "--shared-haiku-fly-ms": `${CREATION_ENTER_MS}ms`,
+    "--shared-haiku-fly-ms": `${SHARED_HAIKU_FLY_DURATION_MS}ms`,
     "--shared-haiku-fly-from-x": SHARED_HAIKU_FLY_FROM_X,
     "--shared-haiku-fly-from-y": SHARED_HAIKU_FLY_FROM_Y,
     "--shared-haiku-fly-from-scale": String(SHARED_HAIKU_FLY_FROM_SCALE),
