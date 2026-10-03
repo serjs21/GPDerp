@@ -15,9 +15,14 @@ export type ShareLinkActionIconPlacement = ShareLinkActionPlacement & {
   size: string;
 };
 
+export type ShareLinkActionCaptionPlacement = ShareLinkActionPlacement & {
+  /** Caption font size (CSS length); omitted keeps the stylesheet default. */
+  fontSize?: string;
+};
+
 export type ShareLinkActionLayout = {
   icon: ShareLinkActionIconPlacement;
-  caption: ShareLinkActionPlacement;
+  caption: ShareLinkActionCaptionPlacement;
 };
 
 export type ShareLinkActionButtonProps = {

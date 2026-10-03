@@ -26,6 +26,7 @@ export function shareLinkActionLayoutStyle(
     [`${prefix}-caption-right`]: caption.right ?? "auto",
     [`${prefix}-caption-left`]: caption.left ?? "auto",
     [`${prefix}-caption-rotate`]: `${caption.rotateDeg}deg`,
+    ...(caption.fontSize ? { [`${prefix}-caption-font-size`]: caption.fontSize } : {}),
   } as CSSProperties;
 }
 

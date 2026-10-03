@@ -70,7 +70,7 @@
   transform: rotate(var(--share-link-action-caption-rotate, 90deg));
   color: var(--comic-ink, #2d2d2d);
   font-family: var(--font-comic-label), "Bangers", sans-serif;
-  font-size: 0.8rem;
+  font-size: var(--share-link-action-caption-font-size, 0.8rem);
   font-weight: 400;
   letter-spacing: 0.05em;
   line-height: 1;
@@ -125,6 +125,7 @@
     right: var(--share-link-action-row-caption-right, var(--share-link-action-caption-right, auto));
     left: var(--share-link-action-row-caption-left, var(--share-link-action-caption-left, auto));
     transform: rotate(var(--share-link-action-row-caption-rotate, var(--share-link-action-caption-rotate, 0deg)));
+    font-size: var(--share-link-action-row-caption-font-size, var(--share-link-action-caption-font-size, 0.8rem));
   }
 
   .stack .captionLabels {
