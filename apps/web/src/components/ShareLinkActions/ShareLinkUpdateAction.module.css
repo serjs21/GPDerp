@@ -70,3 +70,12 @@
   border-left: 2.5px solid #111;
   background: #f7f4ef;
 }
+
+/* Inactive state: tail mirrored onto the right edge. */
+.speechBubbleTailRight::after {
+  left: auto;
+  right: -5px;
+  transform: rotate(35deg);
+  border-left: none;
+  border-right: 2.5px solid #111;
+}
