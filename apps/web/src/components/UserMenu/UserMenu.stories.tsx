@@ -48,10 +48,30 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  name: "On home page",
+  parameters: {
+    nextjs: {
+      navigation: {
+        pathname: "/",
+      },
+    },
+  },
+};
+
+export const OnOtherPage: Story = {
+  name: "Off home page (Go home + Settings)",
+  parameters: {
+    nextjs: {
+      navigation: {
+        pathname: "/manage_share_links",
+      },
+    },
+  },
+};
 
 export const OnSettingsPage: Story = {
-  name: "On settings (Go home)",
+  name: "On settings (Go home, no Settings)",
   parameters: {
     nextjs: {
       navigation: {

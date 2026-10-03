@@ -25,7 +25,13 @@ export function GoHome({ className, forceShow = false }: GoHomeProps) {
   const pathname = usePathname();
   const sharpShape = resolveComicLabelShapePreset("sharp");
 
-  if (!forceShow && (pathname === "/" || pathname.startsWith("/settings"))) return null;
+  // Share pages use the menu's "Go home" row instead.
+  if (
+    !forceShow &&
+    (pathname === "/" || pathname.startsWith("/settings") || pathname.startsWith("/share/"))
+  ) {
+    return null;
+  }
 
   return (
     <div

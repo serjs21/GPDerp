@@ -25,6 +25,16 @@
   min-height: 36px;
 }
 
+/* Go home: no burst icon; keep the row height of icon rows and indent past the arrow head. */
+.goHomeLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  max-width: 100%;
+  min-height: 36px;
+  padding-inline-start: calc(36px + 0.5rem);
+}
+
 .optionName {
   display: block;
   width: 8rem;

@@ -6,9 +6,10 @@ import { useAuthenticationVerification } from "@/app/providers/AuthenticationVer
 import { BrushMenu, type BrushMenuOption } from "@/components/BrushMenu";
 import { ComicConfirmModal } from "@/components/ComicConfirmModal";
 import type { UserObject } from "@/types";
+import { USER_MENU_GO_HOME, USER_MENU_TRIGGER_FILL } from "./consts/userMenuConsts";
 import { UserAvatar } from "./UserAvatar";
-import { UserMenuBurstFrame } from "./UserMenuBurstFrame";
-import frameStyles from "./UserMenuBurstFrame.module.css";
+import { UserMenuOptionIconLabel } from "./UserMenuOptionIconLabel";
+import { goHomeOption, isMainPage } from "./utils/userMenuOptionUtils";
 import styles from "./UserMenu.module.css";
 
 export type UserMenuProps = {
@@ -21,37 +22,11 @@ function resolveDisplayName(user: UserObject) {
   return user.userName || user.email || "User";
 }
 
-function OptionIconLabel({
-  src,
-  iconLabel,
-  text,
-}: {
-  src: string;
-  iconLabel: string;
-  text: string;
-}) {
-  return (
-    <span className={styles.optionLabel}>
-      <UserMenuBurstFrame label={iconLabel}>
-        {/* eslint-disable-next-line @next/next/no-img-element -- public SVG asset */}
-        <img
-          className={frameStyles.icon}
-          src={src}
-          alt=""
-          width={36}
-          height={36}
-          draggable={false}
-        />
-      </UserMenuBurstFrame>
-      <span className={styles.optionName}>{text}</span>
-    </span>
-  );
-}
-
 export function UserMenu({ user, onLogout, className }: UserMenuProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { openAuthenticationModal } = useAuthenticationVerification();
+  const onMainPage = isMainPage(pathname);
   const onSettingsPage = pathname.startsWith("/settings");
   const displayName = resolveDisplayName(user);
   const [logoutOpen, setLogoutOpen] = useState(false);
@@ -59,33 +34,26 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
 
   const options = useMemo<BrushMenuOption[]>(
     () => [
-      onSettingsPage
-        ? {
-            value: "go-home",
-            label: (
-              <OptionIconLabel
-                src="/nav/go_back.svg"
-                iconLabel="Go home"
-                text="Go home"
-              />
-            ),
-            backgroundColor: "#1ac3b0",
-          }
-        : {
-            value: "settings",
-            label: (
-              <OptionIconLabel
-                src="/nav/settings.svg"
-                iconLabel="Settings"
-                text="Settings"
-              />
-            ),
-            backgroundColor: "#1ac3b0",
-          },
+      ...(onMainPage ? [] : [goHomeOption()]),
+      ...(onSettingsPage
+        ? []
+        : [
+            {
+              value: "settings",
+              label: (
+                <UserMenuOptionIconLabel
+                  src="/nav/settings.svg"
+                  iconLabel="Settings"
+                  text="Settings"
+                />
+              ),
+              backgroundColor: "#1ac3b0",
+            },
+          ]),
       {
         value: "logout",
         label: (
-          <OptionIconLabel
+          <UserMenuOptionIconLabel
             src="/auth/logout.svg"
             iconLabel="Logout"
             text="Logout"
@@ -95,7 +63,7 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
         backgroundColor: "#0f8051",
       },
     ],
-    [onSettingsPage],
+    [onMainPage, onSettingsPage],
   );
 
   const handleChange = (key: string) => {
@@ -103,8 +71,8 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
       case "settings":
         router.push("/settings");
         break;
-      case "go-home":
-        router.push("/");
+      case USER_MENU_GO_HOME.value:
+        router.push(USER_MENU_GO_HOME.href);
         break;
       case "logout":
         setLogoutOpen(true);
@@ -139,8 +107,7 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
           <UserAvatar
             user={user}
             label={displayName}
-            /* Match SearchPanel / GoHome header chrome. */
-            frameFill="#f7f4ef"
+            frameFill={USER_MENU_TRIGGER_FILL}
           />
         )}
       />
