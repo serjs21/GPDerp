@@ -5,14 +5,57 @@
   width: 100%;
 }
 
+/* Shrink-wraps to the lantern so the toast can share its end edge. */
+.stack {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  width: fit-content;
+  max-width: 100%;
+}
+
 .flyIn {
   transform-origin: center bottom;
+}
+
+/* "Created by" toast: puffIn (magic.css) once typing has finished. */
+.createdBy {
+  justify-self: end;
+  max-width: 100%;
+}
+
+/* Same proportions as the toast stage, without the toast's 9rem preview min-height. */
+.bubbleStage {
+  min-height: auto;
+  padding: 1.5rem 2rem;
+}
+
+/* Toast `.toastContent` type, single line. */
+.createdByText {
+  display: block;
+  flex: none;
+  width: max-content;
+  max-width: min(calc(100vw - 6rem), 32rem);
+  margin: 0 auto;
+  padding: 0.85rem 1.35rem;
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 1.12rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: start;
+  white-space: nowrap;
+  color: var(--comic-ink, #2d2d2d);
 }
 
 /* `.animate` is added once the app loader overlay is gone, so the entrance is not played underneath it. */
 @media (prefers-reduced-motion: no-preference) {
   .root:not(.animate) .flyIn {
     opacity: 0;
+  }
+
+  /* Reserved in layout (no jump) but hidden until the last chunk has typed. */
+  .root:not(.typed) .createdBy {
+    visibility: hidden;
   }
 
   /* Hold TextTyping chunks (and their start delay) until the entrance runs. */

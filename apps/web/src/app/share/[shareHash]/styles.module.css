@@ -9,16 +9,8 @@
   align-items: center;
 }
 
-
-.providedBy {
-  margin: 0 0 0.65rem;
-  font-size: 1rem;
-  font-weight: 500;
-  line-height: 1.35;
-  color: rgb(0 0 0 / 45%);
-}
-
 .contentContainer {
+  margin-top: 5.5rem;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
