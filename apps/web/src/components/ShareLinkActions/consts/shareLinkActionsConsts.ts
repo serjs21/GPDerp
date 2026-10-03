@@ -38,6 +38,10 @@ export const SHARE_LINK_ACTION_LAYOUTS = {
     icon: { size: "3em", top: "0rem", left: "0rem", rotateDeg: 0 },
     caption: { top: COMMON_CAPTION_TOP, right: COMMON_CAPTION_RIGHT, rotateDeg: 0 },
     },
+  followLink: {
+    icon: { size: "3rem", top: "0rem", left: "0rem", rotateDeg: 0 },
+    caption: { top: "20%", right: "6px", rotateDeg: 0 },
+  },
   showLabels: {
     icon: { size: "3.5rem", bottom: "0rem", right: "2.8rem", rotateDeg: 0 },
     caption: { top: "10px", right: "0px", rotateDeg: 0 },  },
@@ -55,10 +59,6 @@ const PREVIEW_CAPTION_TOP_RIGHT = { top: "0.5rem", right: "0.5rem", rotateDeg: 0
 
 /** Preview modal footer panels (8rem × 6rem): caption top-right, icon bottom-left. */
 export const SHARE_LINK_PREVIEW_ACTION_LAYOUTS = {
-  followLink: {
-    icon: { size: "3.5rem", bottom: "0rem", left: "0.4rem", rotateDeg: 0 },
-    caption: PREVIEW_CAPTION_TOP_RIGHT,
-  },
   showLabels: {
     icon: { size: "5rem", bottom: "0rem", left: "0.2rem", rotateDeg: 0 },
     caption: PREVIEW_CAPTION_TOP_RIGHT,

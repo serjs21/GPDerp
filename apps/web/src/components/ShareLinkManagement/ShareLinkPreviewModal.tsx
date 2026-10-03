@@ -12,7 +12,6 @@ import {
   SHARE_LINK_PREVIEW_LABELS_TOGGLE_LAYOUTS,
   ShareLinkDoneAction,
   ShareLinkEditLabelsAction,
-  ShareLinkGoToLinkAction,
   ShareLinkLabelsToggle,
 } from "@/components/ShareLinkActions";
 import { useHaikuLabelPlacement } from "@/hooks/useHaikuLabelPlacement";
@@ -25,7 +24,6 @@ export function ShareLinkPreviewModal({
   open,
   onOpenChange,
   subject,
-  shareUrl,
   haiku,
   loading = false,
   showLabels,
@@ -57,13 +55,6 @@ export function ShareLinkPreviewModal({
         contentClassName={styles.dialog}
         ctaFooter={
           <div className={styles.footerActions}>
-            <div className={styles.footerAction}>
-              <ShareLinkGoToLinkAction
-                subject={subject}
-                shareUrl={shareUrl}
-                captionClassName={styles.footerCaption}
-              />
-            </div>
             <div className={styles.footerAction}>
               <ShareLinkLabelsToggle
                 subject={subject}

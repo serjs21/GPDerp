@@ -357,7 +357,6 @@
 .contentStart.contentStretch {
   flex: 1 1 auto;
   align-self: stretch;
-  min-height: inherit;
 }
 
 .panelTitle,

@@ -85,7 +85,7 @@
 .lanternPanel,
 .statsPanel,
 .settingsPanel {
-  min-height: 14rem;
+  min-height: 8rem;
   min-width: 0;
 }
 
@@ -103,6 +103,28 @@
 
 .settingsColumn > .settingsPanel {
   flex: 1 1 auto;
+}
+
+/* Fields on the left, Update action column on the right. */
+.settingsLayout {
+  display: flex;
+  align-items: stretch;
+  gap: var(--comic-page-gutter, 10px);
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+}
+
+.settingsLayout > .settingsBody {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.settingsUpdate {
+  display: flex;
+  flex: 0 0 6.25rem;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .lanternSlot {

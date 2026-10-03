@@ -26,19 +26,15 @@ const meta = {
   ],
   argTypes: {
     onPreview: { action: "onPreview" },
-    onUpdate: { action: "onUpdate" },
     onToggleLabels: { action: "onToggleLabels" },
     onDelete: { action: "onDelete" },
   },
   args: {
     subject: "Morning mist",
-    active: true,
-    canUpdate: true,
-    updating: false,
+    shareUrl: "https://example.com/share/demo-hash-active",
     showLabels: true,
     togglingLabels: false,
     onPreview: () => {},
-    onUpdate: () => {},
     onToggleLabels: () => {},
     onDelete: () => {},
   },
@@ -47,28 +43,13 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Active link with pending limit changes — every action enabled. */
-export const Active: Story = {};
-
-/** Inactive link — Update is disabled; hover/click shows the bubble. */
-export const Inactive: Story = {
-  args: { active: false, canUpdate: false },
-};
-
-/** Active link with nothing to change — Update is disabled. */
-export const Unchanged: Story = {
-  args: { active: true, canUpdate: false },
-};
+/** Labels shown on the public page. */
+export const Default: Story = {};
 
 /** Labels hidden on the public page — black panel + hide icon. */
 export const LabelsHidden: Story = {
   name: "Labels hidden",
   args: { showLabels: false },
-};
-
-/** Update request in flight. */
-export const Updating: Story = {
-  args: { updating: true },
 };
 
 function InteractiveActions(props: ShareLinkActionsProps) {

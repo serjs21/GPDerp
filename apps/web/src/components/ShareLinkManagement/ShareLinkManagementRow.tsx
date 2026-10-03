@@ -7,7 +7,7 @@ import type { HaikuDto } from "@/api/haikus";
 import { ComicConfirmModal } from "@/components/ComicConfirmModal";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { comicToast } from "@/components/ComicToast";
-import { ShareLinkActions } from "@/components/ShareLinkActions";
+import { ShareLinkActions, ShareLinkUpdateAction } from "@/components/ShareLinkActions";
 import { MfgDate } from "@/components/MfgDate";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
@@ -249,13 +249,10 @@ export function ShareLinkManagementRow({
 
       <ShareLinkActions
         subject={ctrl.subject}
-        active={ctrl.active}
-        canUpdate={ctrl.showUpdate && ctrl.formValid}
-        updating={ctrl.updatingLimits}
+        shareUrl={link.shareUrl}
         showLabels={showLabels}
         togglingLabels={ctrl.togglingLabels}
         onPreview={() => setPreviewOpen(true)}
-        onUpdate={() => void ctrl.onUpdateLimits()}
         onToggleLabels={() => void ctrl.onToggleLabels(!showLabels)}
         onDelete={() => setDeleteOpen(true)}
       />
@@ -268,27 +265,38 @@ export function ShareLinkManagementRow({
           className={styles.settingsPanel}
           ariaLabel={`Share link settings for ${ctrl.subject}`}
         >
-          <div className={styles.settingsBody}>
-            <ShareLinkSettingsControls
-              form={ctrl.form}
-              setForm={ctrl.setForm}
-              limitsLocked={ctrl.limitsLocked}
-              formValid={ctrl.formValid}
-              showUpdate={ctrl.showUpdate}
-              updatingLimits={ctrl.updatingLimits}
-              activating={ctrl.activating}
-              deactivating={ctrl.deactivating}
-              active={ctrl.active}
-              busy={ctrl.busy}
-              isUpdating={ctrl.isUpdating}
-              busyDots={ctrl.busyDots}
-              onUpdateLimits={ctrl.onUpdateLimits}
-              onStart={ctrl.onStart}
-              onStop={ctrl.onStop}
-              restartReason={ctrl.restartReason}
-              hideUpdate
-              hideLifecycleAction
-            />
+          <div className={styles.settingsLayout}>
+            <div className={styles.settingsBody}>
+              <ShareLinkSettingsControls
+                form={ctrl.form}
+                setForm={ctrl.setForm}
+                limitsLocked={ctrl.limitsLocked}
+                formValid={ctrl.formValid}
+                showUpdate={ctrl.showUpdate}
+                updatingLimits={ctrl.updatingLimits}
+                activating={ctrl.activating}
+                deactivating={ctrl.deactivating}
+                active={ctrl.active}
+                busy={ctrl.busy}
+                isUpdating={ctrl.isUpdating}
+                busyDots={ctrl.busyDots}
+                onUpdateLimits={ctrl.onUpdateLimits}
+                onStart={ctrl.onStart}
+                onStop={ctrl.onStop}
+                restartReason={ctrl.restartReason}
+                hideUpdate
+                hideLifecycleAction
+              />
+            </div>
+            <div className={styles.settingsUpdate}>
+              <ShareLinkUpdateAction
+                subject={ctrl.subject}
+                active={ctrl.active}
+                canUpdate={ctrl.showUpdate && ctrl.formValid}
+                updating={ctrl.updatingLimits}
+                onUpdate={() => void ctrl.onUpdateLimits()}
+              />
+            </div>
           </div>
         </ComicPagePanel>
         <ShareLinkLifecycleAction
@@ -310,7 +318,6 @@ export function ShareLinkManagementRow({
         open={previewOpen}
         onOpenChange={setPreviewOpen}
         subject={ctrl.subject}
-        shareUrl={link.shareUrl}
         haiku={haiku}
         loading={haikuLoading}
         showLabels={showLabels}

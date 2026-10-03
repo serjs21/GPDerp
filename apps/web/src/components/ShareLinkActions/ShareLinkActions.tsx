@@ -6,24 +6,21 @@ import {
   SHARE_LINK_ACTION_LAYOUTS,
 } from "./consts/shareLinkActionsConsts";
 import { ShareLinkActionButton } from "./ShareLinkActionButton";
+import { ShareLinkGoToLinkAction } from "./ShareLinkGoToLinkAction";
 import { ShareLinkLabelsToggle } from "./ShareLinkLabelsToggle";
-import { ShareLinkUpdateAction } from "./ShareLinkUpdateAction";
 import type { ShareLinkActionsProps } from "./ShareLinkActions.types";
 import styles from "./ShareLinkActions.module.css";
 
 /**
  * Stacked comic panel actions for a share-link row:
- * Preview → Update → Show/hide labels → Delete.
+ * Preview → Go to link → Show/hide labels → Delete.
  */
 export function ShareLinkActions({
   subject,
-  active,
-  canUpdate,
-  updating,
+  shareUrl,
   showLabels,
   togglingLabels,
   onPreview,
-  onUpdate,
   onToggleLabels,
   onDelete,
   className,
@@ -43,13 +40,7 @@ export function ShareLinkActions({
         hoverFill={SHARE_LINK_ACTION_COLORS.preview.hover}
         onSelect={onPreview}
       />
-      <ShareLinkUpdateAction
-        subject={subject}
-        active={active}
-        canUpdate={canUpdate}
-        updating={updating}
-        onUpdate={onUpdate}
-      />
+      <ShareLinkGoToLinkAction subject={subject} shareUrl={shareUrl} />
       <ShareLinkLabelsToggle
         subject={subject}
         showLabels={showLabels}

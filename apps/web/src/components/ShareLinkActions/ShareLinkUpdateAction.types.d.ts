@@ -1,6 +1,10 @@
-import type { ShareLinkActionsProps } from "./ShareLinkActions.types";
-
-export type ShareLinkUpdateActionProps = Pick<
-  ShareLinkActionsProps,
-  "subject" | "active" | "canUpdate" | "updating" | "onUpdate"
->;
+export type ShareLinkUpdateActionProps = {
+  /** Haiku subject, used in accessible labels. */
+  subject: string;
+  /** Update is disabled while the share link is not active. */
+  active: boolean;
+  /** Limits differ from the saved link and are valid. */
+  canUpdate: boolean;
+  updating: boolean;
+  onUpdate: () => void;
+};
