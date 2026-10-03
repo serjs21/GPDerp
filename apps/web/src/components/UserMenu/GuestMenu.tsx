@@ -35,9 +35,10 @@ export function GuestMenu({ className }: GuestMenuProps) {
             src={USER_MENU_LOGIN.iconSrc}
             iconLabel={USER_MENU_LOGIN.label}
             text={USER_MENU_LOGIN.label}
+            size={USER_MENU_LOGIN.iconSizePx}
           />
         ),
-        backgroundColor: "#1ac3b0",
+        backgroundColor: USER_MENU_LOGIN.iconFill,
       },
     ],
     [onMainPage],

@@ -1,21 +1,26 @@
 "use client";
 
-import { UserMenuBurstFrame } from "./UserMenuBurstFrame";
+import { UserMenuBurstFrame, USER_MENU_BURST_SIZE } from "./UserMenuBurstFrame";
 import type { UserMenuOptionIconLabelProps } from "./UserMenuOptionIconLabel.types";
 import frameStyles from "./UserMenuBurstFrame.module.css";
 import styles from "./UserMenu.module.css";
 
-export function UserMenuOptionIconLabel({ src, iconLabel, text }: UserMenuOptionIconLabelProps) {
+export function UserMenuOptionIconLabel({
+  src,
+  iconLabel,
+  text,
+  size = USER_MENU_BURST_SIZE,
+}: UserMenuOptionIconLabelProps) {
   return (
     <span className={styles.optionLabel}>
-      <UserMenuBurstFrame label={iconLabel}>
+      <UserMenuBurstFrame label={iconLabel} size={size}>
         {/* eslint-disable-next-line @next/next/no-img-element -- public SVG asset */}
         <img
           className={frameStyles.icon}
           src={src}
           alt=""
-          width={36}
-          height={36}
+          width={size}
+          height={size}
           draggable={false}
         />
       </UserMenuBurstFrame>

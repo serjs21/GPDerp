@@ -1,7 +1,8 @@
 .burst {
   display: block;
   line-height: 0;
-  height: 36px;
+  /* ComicBurstLabel sets --burst-font-size from the `size` prop. */
+  height: var(--burst-font-size, 36px);
   /* Frame is decorative; the BrushMenu button handles hits. */
   pointer-events: none;
   overflow: visible;

@@ -10,6 +10,9 @@ export const USER_MENU_LOGIN = {
   value: "login",
   iconSrc: "/nav/login.svg",
   label: "Login",
+  /** 4.5rem at the 16px root size. */
+  iconSizePx: 72,
+  iconFill: "#000000",
 } as const;
 
 export const GUEST_MENU_TRIGGER_SRC = "/nav/default_login.svg";
