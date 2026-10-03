@@ -92,7 +92,7 @@
     display: grid;
     grid-template-columns: clamp(9rem, 14vw, 13rem) minmax(0, 1fr);
     grid-template-rows: 100%;
-    gap: var(--comic-page-gutter, 10px);
+    gap: 1rem;
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;

@@ -251,7 +251,6 @@
 
 .actionButton:hover:not(:disabled) {
   background: color-mix(in srgb, var(--sumi-ink, #2d2d2d) 6%, #fff);
-  transform: scale(1.01);
 }
 
 .actionButton:focus-visible {

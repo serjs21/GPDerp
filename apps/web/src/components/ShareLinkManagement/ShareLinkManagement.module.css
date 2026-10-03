@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto minmax(0, 1fr);
-  gap: var(--comic-page-gutter, 10px);
+  gap: 1rem;
   width: 100%;
   min-height: 0;
   height: 100%;
