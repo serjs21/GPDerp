@@ -32,7 +32,13 @@
   justify-content: flex-start;
   max-width: 100%;
   min-height: 36px;
+  padding-block: 1rem;
   padding-inline-start: calc(36px + 0.5rem);
+}
+
+/* Go home row: shift the painted go_back_arrow.svg background (BrushPaintLayer svg) left. */
+.goHomeOption > svg:first-child {
+  margin-left: -1rem;
 }
 
 .optionName {
