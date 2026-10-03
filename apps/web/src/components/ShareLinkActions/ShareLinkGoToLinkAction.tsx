@@ -18,7 +18,7 @@ export function ShareLinkGoToLinkAction({
   return (
     <ShareLinkActionButton
       src={SHARE_LINK_ACTION_ICONS.followLink}
-      caption="Go to link"
+      caption="Follow the link"
       captionClassName={[styles.captionLabels, captionClassName].filter(Boolean).join(" ")}
       layout={SHARE_LINK_ACTION_LAYOUTS.followLink}
       ariaLabel={`Open share link for ${subject} in a new tab`}

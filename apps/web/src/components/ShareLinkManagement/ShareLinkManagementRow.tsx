@@ -258,14 +258,14 @@ export function ShareLinkManagementRow({
       />
 
       <div className={styles.settingsColumn}>
-        <ComicPagePanel
-          background="solid"
-          color="white"
-          contentAlign="start"
-          className={styles.settingsPanel}
-          ariaLabel={`Share link settings for ${ctrl.subject}`}
-        >
-          <div className={styles.settingsLayout}>
+        <div className={styles.settingsRow}>
+          <ComicPagePanel
+            background="solid"
+            color="white"
+            contentAlign="start"
+            className={styles.settingsPanel}
+            ariaLabel={`Share link settings for ${ctrl.subject}`}
+          >
             <div className={styles.settingsBody}>
               <ShareLinkSettingsControls
                 form={ctrl.form}
@@ -288,17 +288,17 @@ export function ShareLinkManagementRow({
                 hideLifecycleAction
               />
             </div>
-            <div className={styles.settingsUpdate}>
-              <ShareLinkUpdateAction
-                subject={ctrl.subject}
-                active={ctrl.active}
-                canUpdate={ctrl.showUpdate && ctrl.formValid}
-                updating={ctrl.updatingLimits}
-                onUpdate={() => void ctrl.onUpdateLimits()}
-              />
-            </div>
+          </ComicPagePanel>
+          <div className={styles.settingsUpdate}>
+            <ShareLinkUpdateAction
+              subject={ctrl.subject}
+              active={ctrl.active}
+              canUpdate={ctrl.showUpdate && ctrl.formValid}
+              updating={ctrl.updatingLimits}
+              onUpdate={() => void ctrl.onUpdateLimits()}
+            />
           </div>
-        </ComicPagePanel>
+        </div>
         <ShareLinkLifecycleAction
           formValid={ctrl.formValid}
           activating={ctrl.activating}

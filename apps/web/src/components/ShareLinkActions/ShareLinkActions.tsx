@@ -31,6 +31,7 @@ export function ShareLinkActions({
       role="group"
       aria-label={`Share link actions for ${subject}`}
     >
+      <ShareLinkGoToLinkAction subject={subject} shareUrl={shareUrl} />
       <ShareLinkActionButton
         src={SHARE_LINK_ACTION_ICONS.preview}
         caption="Preview"
@@ -40,7 +41,6 @@ export function ShareLinkActions({
         hoverFill={SHARE_LINK_ACTION_COLORS.preview.hover}
         onSelect={onPreview}
       />
-      <ShareLinkGoToLinkAction subject={subject} shareUrl={shareUrl} />
       <ShareLinkLabelsToggle
         subject={subject}
         showLabels={showLabels}
