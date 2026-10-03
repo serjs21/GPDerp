@@ -1,10 +1,16 @@
-/* `--text-typing-delay` is inherited from an ancestor (e.g. wait for an entrance animation). */
+/*
+ * Inherited from an ancestor:
+ * `--text-typing-delay` — start offset (e.g. sync with an entrance animation);
+ * `--text-typing-step` — gap between consecutive chunks (typing speed).
+ */
 .chunk {
   opacity: 0;
   animation-name: revealChunk;
   animation-duration: 0.5s;
   animation-fill-mode: forwards;
-  animation-delay: calc(var(--text-typing-delay, 0ms) + var(--chunk-index, 0) * 0.05s);
+  animation-delay: calc(
+    var(--text-typing-delay, 0ms) + var(--chunk-index, 0) * var(--text-typing-step, 50ms)
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {

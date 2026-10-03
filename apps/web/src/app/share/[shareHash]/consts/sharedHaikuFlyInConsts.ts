@@ -1,9 +1,12 @@
 /** Fly-in start offset from the lantern's resting spot (bottom-right, like the path exit stop). */
-export const SHARED_HAIKU_FLY_FROM_X = "-10vw";
-export const SHARED_HAIKU_FLY_FROM_Y = "-10vh";
+export const SHARED_HAIKU_FLY_FROM_X = "-5vw";
+export const SHARED_HAIKU_FLY_FROM_Y = "5vh";
 
-/** Pause before the lantern starts flying in. */
+/** Lantern scale at the start of the fly-in; animates to 1. */
+export const SHARED_HAIKU_FLY_FROM_SCALE = 0.5;
+
+/** Pause before the lantern starts flying in; typing starts at the same moment. */
 export const SHARED_HAIKU_FLY_DELAY_MS = 200;
 
-/** Extra pause after landing before the haiku starts typing. */
-export const SHARED_HAIKU_TYPING_AFTER_LAND_MS = 100;
+/** Typing speed: delay between consecutive 2–3 character chunks. */
+export const SHARED_HAIKU_TYPING_STEP_MS = 50;
