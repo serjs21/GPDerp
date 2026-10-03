@@ -28,6 +28,7 @@ export function ShareLinkUpdateAction({
       <ShareLinkActionButton
         src={SHARE_LINK_UPDATE_ICONS.enabled}
         caption="Update"
+        className={styles.enabled}
         layout={SHARE_LINK_UPDATE_LAYOUT}
         ariaLabel={`Update share link for ${subject}`}
         color={SHARE_LINK_UPDATE_COLORS.panel}

@@ -15,6 +15,20 @@
   min-height: 0;
 }
 
+/*
+ * Enabled Update keeps its sunburst + shine on hover: instead of the shared
+ * solid overlay, the hover fill recolors the panel base under the rays.
+ * Set on the children because the panel defines --comic-panel-base inline.
+ */
+.enabled::before {
+  display: none;
+}
+
+.enabled:hover > *,
+.enabled:focus-visible > * {
+  --comic-panel-base: var(--share-link-action-hover-fill);
+}
+
 .disabled {
   cursor: default;
 }

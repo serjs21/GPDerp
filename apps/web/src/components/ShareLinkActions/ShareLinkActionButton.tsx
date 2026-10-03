@@ -14,6 +14,7 @@ export function ShareLinkActionButton({
   src,
   caption,
   captionClassName,
+  className,
   layout,
   rowLayout,
   ariaLabel,
@@ -46,6 +47,7 @@ export function ShareLinkActionButton({
         inverted ? styles.inverted : "",
         invertCaptionOnHover ? styles.invertOnHover : "",
         disabled ? styles.disabled : "",
+        className,
       ]
         .filter(Boolean)
         .join(" ")}

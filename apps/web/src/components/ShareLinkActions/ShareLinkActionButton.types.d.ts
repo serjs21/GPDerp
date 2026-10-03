@@ -29,6 +29,8 @@ export type ShareLinkActionButtonProps = {
   src: string;
   caption: string;
   captionClassName?: string;
+  /** Extra class on the panel root. */
+  className?: string;
   layout: ShareLinkActionLayout;
   /** Placement used when the actions stack renders as a horizontal strip. */
   rowLayout?: ShareLinkActionLayout;
