@@ -38,6 +38,7 @@
 
 /* Go home row: shift the painted go_back_arrow.svg background (BrushPaintLayer svg) left. */
 .goHomeOption > svg:first-child {
+  width: calc(100% + 1rem);
   margin-left: -1rem;
 }
 
