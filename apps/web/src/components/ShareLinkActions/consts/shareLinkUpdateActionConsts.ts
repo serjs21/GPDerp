@@ -26,7 +26,7 @@ export const SHARE_LINK_UPDATE_DISABLED_MESSAGES = {
 /** Bubble floats to the right of the Update panel (mirror of Tune in's left callout). */
 export const SHARE_LINK_UPDATE_CALLOUT_POSITION = {
   right: "calc(70% + 0.6rem)",
-  bottom: "0rem",
+  bottom: "30%",
 } as const satisfies CalloutPosition;
 
 export const SHARE_LINK_UPDATE_CALLOUT_TIMING = {
