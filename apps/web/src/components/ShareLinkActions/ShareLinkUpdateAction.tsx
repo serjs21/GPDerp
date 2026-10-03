@@ -47,15 +47,7 @@ export function ShareLinkUpdateAction({
       holdMs={SHARE_LINK_UPDATE_CALLOUT_TIMING.holdMs}
       fadeMs={SHARE_LINK_UPDATE_CALLOUT_TIMING.fadeMs}
       position={SHARE_LINK_UPDATE_CALLOUT_POSITION}
-      callout={
-        <div
-          className={[styles.speechBubble, active ? "" : styles.speechBubbleTailRight]
-            .filter(Boolean)
-            .join(" ")}
-        >
-          {message}
-        </div>
-      }
+      callout={<div className={styles.speechBubble}>{message}</div>}
       calloutClassName={styles.speechBubbleSlot}
     >
       <ComicPagePanel

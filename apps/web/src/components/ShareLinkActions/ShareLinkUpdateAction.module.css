@@ -57,44 +57,28 @@
   white-space: normal;
 }
 
-/* Tail on the left edge near the top, pointing left toward the Update trigger. */
-.speechBubble::after {
-  content: "";
-  position: absolute;
-  top: 5px;
-  left: -5px;
-  width: 0.5rem;
-  height: 0.5rem;
-  transform: rotate(-35deg);
-  border-top: 2.5px solid #111;
-  border-left: 2.5px solid #111;
-  background: #f7f4ef;
-}
-
 /*
- * Inactive state: tail on the right edge, tip pointing down-right.
+ * Bubble opens to the left of the Update panel, so the tail sits on its right
+ * edge, tip aimed slightly upward at the center of the Update image.
  * ::before is the ink outline, ::after the fill; the fill starts inside the
  * bubble so it covers the right border + drop shadow at the tail base.
  */
-.speechBubbleTailRight::before,
-.speechBubbleTailRight::after {
+.speechBubble::before,
+.speechBubble::after {
   content: "";
   position: absolute;
   top: calc(50% - 6px);
-  right: auto;
   left: calc(100% - 1px);
   width: 15px;
-  height: 17px;
-  border: none;
-  transform: none;
+  height: 12px;
 }
 
-.speechBubbleTailRight::before {
+.speechBubble::before {
   background: #111;
-  clip-path: polygon(1px 0, 15px 17px, 1px 12px);
+  clip-path: polygon(1px 0, 15px 1.5px, 1px 12px);
 }
 
-.speechBubbleTailRight::after {
+.speechBubble::after {
   background: #f7f4ef;
-  clip-path: polygon(0 2.7px, 7.3px 11.6px, 0 9px);
+  clip-path: polygon(0 2.4px, 8.4px 3.3px, 0 9.6px);
 }
