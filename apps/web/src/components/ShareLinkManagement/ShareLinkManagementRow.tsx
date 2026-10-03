@@ -16,6 +16,7 @@ import { SakuraPetalLoader } from "@/components/Loaders";
 import { OverlayTitle } from "@/components/OverlayTitle";
 import { Sway } from "@/components/Sway";
 import shareStyles from "@/components/ShareLink/ShareLink.module.css";
+import { ShareLinkLifecycleAction } from "@/components/ShareLink/ShareLinkLifecycleAction";
 import { ShareLinkSettingsControls } from "@/components/ShareLink/ShareLinkSettingsControls";
 import {
   CLOCK_SRC,
@@ -259,36 +260,51 @@ export function ShareLinkManagementRow({
         onDelete={() => setDeleteOpen(true)}
       />
 
-      <ComicPagePanel
-        background="solid"
-        color="white"
-        contentAlign="start"
-        className={styles.settingsPanel}
-        ariaLabel={`Share link settings for ${ctrl.subject}`}
-      >
-        <div className={styles.settingsBody}>
-          <ShareLinkSettingsControls
-            form={ctrl.form}
-            setForm={ctrl.setForm}
-            limitsLocked={ctrl.limitsLocked}
-            formValid={ctrl.formValid}
-            showUpdate={ctrl.showUpdate}
-            updatingLimits={ctrl.updatingLimits}
-            activating={ctrl.activating}
-            deactivating={ctrl.deactivating}
-            active={ctrl.active}
-            busy={ctrl.busy}
-            isUpdating={ctrl.isUpdating}
-            busyDots={ctrl.busyDots}
-            onUpdateLimits={ctrl.onUpdateLimits}
-            onStart={ctrl.onStart}
-            onStop={ctrl.onStop}
-            stopButtonClassName={shareStyles.stopButton}
-            restartReason={ctrl.restartReason}
-            hideUpdate
-          />
-        </div>
-      </ComicPagePanel>
+      <div className={styles.settingsColumn}>
+        <ComicPagePanel
+          background="solid"
+          color="white"
+          contentAlign="start"
+          className={styles.settingsPanel}
+          ariaLabel={`Share link settings for ${ctrl.subject}`}
+        >
+          <div className={styles.settingsBody}>
+            <ShareLinkSettingsControls
+              form={ctrl.form}
+              setForm={ctrl.setForm}
+              limitsLocked={ctrl.limitsLocked}
+              formValid={ctrl.formValid}
+              showUpdate={ctrl.showUpdate}
+              updatingLimits={ctrl.updatingLimits}
+              activating={ctrl.activating}
+              deactivating={ctrl.deactivating}
+              active={ctrl.active}
+              busy={ctrl.busy}
+              isUpdating={ctrl.isUpdating}
+              busyDots={ctrl.busyDots}
+              onUpdateLimits={ctrl.onUpdateLimits}
+              onStart={ctrl.onStart}
+              onStop={ctrl.onStop}
+              restartReason={ctrl.restartReason}
+              hideUpdate
+              hideLifecycleAction
+            />
+          </div>
+        </ComicPagePanel>
+        <ShareLinkLifecycleAction
+          formValid={ctrl.formValid}
+          activating={ctrl.activating}
+          deactivating={ctrl.deactivating}
+          active={ctrl.active}
+          busy={ctrl.busy}
+          isUpdating={ctrl.isUpdating}
+          busyDots={ctrl.busyDots}
+          onStart={ctrl.onStart}
+          onStop={ctrl.onStop}
+          stopButtonClassName={shareStyles.stopButton}
+          restartReason={ctrl.restartReason}
+        />
+      </div>
 
       <ShareLinkPreviewModal
         open={previewOpen}

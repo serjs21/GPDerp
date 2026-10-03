@@ -3,14 +3,10 @@
 import dayjs from "dayjs";
 import type { Dispatch, SetStateAction } from "react";
 import { DatePicker, InputNumber } from "@/components/StyledComponents";
-import { RestartLinkButton, type RestartLinkReason } from "@/components/RestartLinkButton";
+import type { RestartLinkReason } from "@/components/RestartLinkButton";
 import styles from "./ShareLink.module.css";
-import {
-  PAUSE_ICON_SRC,
-  START_ICON_SRC,
-  UPDATE_ICON_SRC,
-  type LimitForm,
-} from "./useShareLinkControls";
+import { ShareLinkLifecycleAction } from "./ShareLinkLifecycleAction";
+import { UPDATE_ICON_SRC, type LimitForm } from "./useShareLinkControls";
 
 export type ShareLinkSettingsControlsProps = {
   form: LimitForm;
@@ -32,6 +28,8 @@ export type ShareLinkSettingsControlsProps = {
   restartReason?: RestartLinkReason | null;
   /** Omit the inline Update button (e.g. when a ShareLinkActions column owns it). */
   hideUpdate?: boolean;
+  /** Omit Launch/Stop/Restart (e.g. when the parent renders ShareLinkLifecycleAction elsewhere). */
+  hideLifecycleAction?: boolean;
 };
 
 function minTimeoutAt() {
@@ -77,7 +75,6 @@ function clampTimeout(value: dayjs.Dayjs | null) {
   return value.isBefore(min) ? min : value;
 }
 
-// eslint-disable-next-line max-lines-per-function -- mirrors share modal settings chrome
 export function ShareLinkSettingsControls({
   form,
   setForm,
@@ -97,6 +94,7 @@ export function ShareLinkSettingsControls({
   stopButtonClassName,
   restartReason = null,
   hideUpdate = false,
+  hideLifecycleAction = false,
 }: ShareLinkSettingsControlsProps) {
   return (
     <>
@@ -174,54 +172,21 @@ export function ShareLinkSettingsControls({
         ) : null}
       </div>
 
-      <div className={styles.actionRow}>
-        {activating ? (
-          <button type="button" className={styles.actionButton} disabled aria-live="polite">
-            <span className={styles.actionLabel}>
-              Activating
-              <span className={styles.activatingDots}>{busyDots}</span>
-            </span>
-          </button>
-        ) : deactivating ? (
-          <button type="button" className={styles.actionButton} disabled aria-live="polite">
-            <span className={styles.actionLabel}>
-              Stopping
-              <span className={styles.activatingDots}>{busyDots}</span>
-            </span>
-          </button>
-        ) : active ? (
-          <button
-            type="button"
-            className={[styles.actionButton, stopButtonClassName].filter(Boolean).join(" ")}
-            disabled={isUpdating || busy}
-            onClick={() => void onStop()}
-            aria-label="Stop link"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element -- action icon asset */}
-            <img src={PAUSE_ICON_SRC} alt="" className={styles.actionIcon} aria-hidden />
-            <span className={styles.actionLabel}>Stop</span>
-          </button>
-        ) : restartReason ? (
-          <RestartLinkButton
-            reason={restartReason}
-            disabled={!formValid || isUpdating || busy}
-            className={styles.restartButton}
-            onClick={() => void onStart()}
-          />
-        ) : (
-          <button
-            type="button"
-            className={styles.actionButton}
-            disabled={!formValid || isUpdating || busy}
-            onClick={() => void onStart()}
-            aria-label="Launch link"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element -- action icon asset */}
-            <img src={START_ICON_SRC} alt="" className={styles.actionIcon} aria-hidden />
-            <span className={styles.actionLabel}>Launch</span>
-          </button>
-        )}
-      </div>
+      {hideLifecycleAction ? null : (
+        <ShareLinkLifecycleAction
+          formValid={formValid}
+          activating={activating}
+          deactivating={deactivating}
+          active={active}
+          busy={busy}
+          isUpdating={isUpdating}
+          busyDots={busyDots}
+          onStart={onStart}
+          onStop={onStop}
+          stopButtonClassName={stopButtonClassName}
+          restartReason={restartReason}
+        />
+      )}
     </>
   );
 }
