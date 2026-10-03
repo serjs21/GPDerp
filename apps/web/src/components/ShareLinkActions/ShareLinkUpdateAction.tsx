@@ -9,6 +9,7 @@ import {
   SHARE_LINK_UPDATE_DISABLED_MESSAGES,
   SHARE_LINK_UPDATE_ICONS,
   SHARE_LINK_UPDATE_LAYOUT,
+  SHARE_LINK_UPDATE_NOT_STARTED_CALLOUT_POSITION,
 } from "./consts/shareLinkUpdateActionConsts";
 import { ShareLinkActionButton } from "./ShareLinkActionButton";
 import type { ShareLinkUpdateActionProps } from "./ShareLinkUpdateAction.types";
@@ -46,9 +47,19 @@ export function ShareLinkUpdateAction({
       className={styles.callout}
       holdMs={SHARE_LINK_UPDATE_CALLOUT_TIMING.holdMs}
       fadeMs={SHARE_LINK_UPDATE_CALLOUT_TIMING.fadeMs}
-      position={SHARE_LINK_UPDATE_CALLOUT_POSITION}
-      callout={<div className={styles.speechBubble}>{message}</div>}
-      calloutClassName={styles.speechBubbleSlot}
+      position={
+        active
+          ? SHARE_LINK_UPDATE_CALLOUT_POSITION
+          : SHARE_LINK_UPDATE_NOT_STARTED_CALLOUT_POSITION
+      }
+      callout={
+        <div className={active ? styles.speechBubble : styles.notStartedBubble}>
+          {message}
+        </div>
+      }
+      calloutClassName={
+        active ? styles.speechBubbleSlot : styles.notStartedBubbleSlot
+      }
     >
       <ComicPagePanel
         background="solid"
@@ -61,7 +72,11 @@ export function ShareLinkUpdateAction({
         {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
         <img
           className={styles.iconFill}
-          src={SHARE_LINK_UPDATE_ICONS.disabled}
+          src={
+            active
+              ? SHARE_LINK_UPDATE_ICONS.disabled
+              : SHARE_LINK_UPDATE_ICONS.notStarted
+          }
           alt={`Update unavailable for ${subject}: ${message}`}
           draggable={false}
           decoding="async"
