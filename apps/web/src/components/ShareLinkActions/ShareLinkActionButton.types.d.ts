@@ -25,6 +25,8 @@ export type ShareLinkActionButtonProps = {
   caption: string;
   captionClassName?: string;
   layout: ShareLinkActionLayout;
+  /** Placement used when the actions stack renders as a horizontal strip. */
+  rowLayout?: ShareLinkActionLayout;
   ariaLabel: string;
   onSelect: () => void;
   color: NonNullable<ComicPagePanelProps["color"]>;

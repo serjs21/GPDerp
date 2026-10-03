@@ -104,6 +104,35 @@
   opacity: 0;
 }
 
+/*
+ * Horizontal strip (ShareLinkManagement row ≤800px): swap to the
+ * `--share-link-action-row-*` vars from SHARE_LINK_ACTION_ROW_LAYOUTS.
+ * Falls back to the column vars for panels without a row layout.
+ */
+@media (max-width: 800px) {
+  .stack .icon {
+    top: var(--share-link-action-row-icon-top, var(--share-link-action-icon-top, 0));
+    bottom: var(--share-link-action-row-icon-bottom, var(--share-link-action-icon-bottom, auto));
+    right: var(--share-link-action-row-icon-right, var(--share-link-action-icon-right, auto));
+    left: var(--share-link-action-row-icon-left, var(--share-link-action-icon-left, auto));
+    width: var(--share-link-action-row-icon-size, var(--share-link-action-icon-size, 1.9rem));
+    transform: rotate(var(--share-link-action-row-icon-rotate, var(--share-link-action-icon-rotate, 0deg)));
+  }
+
+  .stack .caption {
+    top: var(--share-link-action-row-caption-top, var(--share-link-action-caption-top, 0));
+    bottom: var(--share-link-action-row-caption-bottom, var(--share-link-action-caption-bottom, auto));
+    right: var(--share-link-action-row-caption-right, var(--share-link-action-caption-right, auto));
+    left: var(--share-link-action-row-caption-left, var(--share-link-action-caption-left, auto));
+    transform: rotate(var(--share-link-action-row-caption-rotate, var(--share-link-action-caption-rotate, 0deg)));
+  }
+
+  .stack .captionLabels {
+    width: auto;
+    white-space: nowrap;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .action::before,
   .icon,

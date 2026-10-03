@@ -5,6 +5,7 @@ import {
   SHARE_LINK_ACTION_ICONS,
   SHARE_LINK_ACTION_LAYOUTS,
 } from "./consts/shareLinkActionsConsts";
+import { SHARE_LINK_ACTION_ROW_LAYOUTS } from "./consts/shareLinkActionRowConsts";
 import { ShareLinkActionButton } from "./ShareLinkActionButton";
 import type { ShareLinkGoToLinkActionProps } from "./ShareLinkGoToLinkAction.types";
 import styles from "./ShareLinkActions.module.css";
@@ -21,6 +22,7 @@ export function ShareLinkGoToLinkAction({
       caption="Follow the link"
       captionClassName={[styles.captionLabels, captionClassName].filter(Boolean).join(" ")}
       layout={SHARE_LINK_ACTION_LAYOUTS.followLink}
+      rowLayout={SHARE_LINK_ACTION_ROW_LAYOUTS.followLink}
       ariaLabel={`Open share link for ${subject} in a new tab`}
       color={SHARE_LINK_ACTION_COLORS.followLink.panel}
       hoverFill={SHARE_LINK_ACTION_COLORS.followLink.hover}

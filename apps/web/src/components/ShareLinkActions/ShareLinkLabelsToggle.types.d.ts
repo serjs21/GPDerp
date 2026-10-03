@@ -7,6 +7,8 @@ export type ShareLinkLabelsToggleProps = Pick<
 > & {
   /** Overrides the actions-column placement (e.g. preview modal footer). */
   layouts?: { show: ShareLinkActionLayout; hide: ShareLinkActionLayout };
+  /** Placement when the actions stack renders as a horizontal strip. */
+  rowLayouts?: { show: ShareLinkActionLayout; hide: ShareLinkActionLayout };
   /** Appended to the default caption class. */
   captionClassName?: ShareLinkActionButtonProps["captionClassName"];
 };

@@ -5,6 +5,7 @@ import {
   SHARE_LINK_ACTION_ICONS,
   SHARE_LINK_ACTION_LAYOUTS,
 } from "./consts/shareLinkActionsConsts";
+import { SHARE_LINK_ACTION_ROW_LAYOUTS } from "./consts/shareLinkActionRowConsts";
 import { ShareLinkActionButton } from "./ShareLinkActionButton";
 import { ShareLinkGoToLinkAction } from "./ShareLinkGoToLinkAction";
 import { ShareLinkLabelsToggle } from "./ShareLinkLabelsToggle";
@@ -36,6 +37,7 @@ export function ShareLinkActions({
         src={SHARE_LINK_ACTION_ICONS.preview}
         caption="Preview"
         layout={SHARE_LINK_ACTION_LAYOUTS.preview}
+        rowLayout={SHARE_LINK_ACTION_ROW_LAYOUTS.preview}
         ariaLabel={`Preview ${subject}`}
         color={SHARE_LINK_ACTION_COLORS.preview.panel}
         hoverFill={SHARE_LINK_ACTION_COLORS.preview.hover}
@@ -46,11 +48,16 @@ export function ShareLinkActions({
         showLabels={showLabels}
         togglingLabels={togglingLabels}
         onToggleLabels={onToggleLabels}
+        rowLayouts={{
+          show: SHARE_LINK_ACTION_ROW_LAYOUTS.showLabels,
+          hide: SHARE_LINK_ACTION_ROW_LAYOUTS.hideLabels,
+        }}
       />
       <ShareLinkActionButton
         src={SHARE_LINK_ACTION_ICONS.delete}
         caption="Delete"
         layout={SHARE_LINK_ACTION_LAYOUTS.delete}
+        rowLayout={SHARE_LINK_ACTION_ROW_LAYOUTS.delete}
         ariaLabel={`Delete share link for ${subject}`}
         color={SHARE_LINK_ACTION_COLORS.delete.panel}
         hoverFill={SHARE_LINK_ACTION_COLORS.delete.hover}

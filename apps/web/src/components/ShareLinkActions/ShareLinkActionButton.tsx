@@ -5,6 +5,7 @@ import type { ShareLinkActionButtonProps } from "./ShareLinkActionButton.types";
 import {
   shareLinkActionHoverStyle,
   shareLinkActionLayoutStyle,
+  shareLinkActionRowLayoutStyle,
 } from "./utils/shareLinkActionStyleUtils";
 import styles from "./ShareLinkActions.module.css";
 
@@ -13,6 +14,7 @@ export function ShareLinkActionButton({
   caption,
   captionClassName,
   layout,
+  rowLayout,
   ariaLabel,
   onSelect,
   color,
@@ -41,7 +43,11 @@ export function ShareLinkActionButton({
       ]
         .filter(Boolean)
         .join(" ")}
-      style={{ ...shareLinkActionHoverStyle(hoverFill), ...shareLinkActionLayoutStyle(layout) }}
+      style={{
+        ...shareLinkActionHoverStyle(hoverFill),
+        ...shareLinkActionLayoutStyle(layout),
+        ...shareLinkActionRowLayoutStyle(rowLayout),
+      }}
       ariaLabel={ariaLabel}
       onSelect={() => {
         if (disabled || busy) return;
