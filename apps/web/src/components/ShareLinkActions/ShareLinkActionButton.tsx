@@ -3,6 +3,7 @@
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import type { ShareLinkActionButtonProps } from "./ShareLinkActionButton.types";
 import {
+  shareLinkActionAccentStyle,
   shareLinkActionHoverStyle,
   shareLinkActionLayoutStyle,
   shareLinkActionRowLayoutStyle,
@@ -18,6 +19,10 @@ export function ShareLinkActionButton({
   ariaLabel,
   onSelect,
   color,
+  background = "solid",
+  isMotionBackground = false,
+  shine = false,
+  accentColor,
   hoverFill,
   disabled = false,
   pressed = true,
@@ -30,11 +35,12 @@ export function ShareLinkActionButton({
       selectable
       selected={pressed}
       loading={busy}
-      background="solid"
+      background={background}
       color={color}
       flexWeight={1}
       contentAlign="start"
-      isMotionBackground={false}
+      isMotionBackground={isMotionBackground}
+      shine={shine}
       className={[
         styles.action,
         inverted ? styles.inverted : "",
@@ -45,6 +51,7 @@ export function ShareLinkActionButton({
         .join(" ")}
       style={{
         ...shareLinkActionHoverStyle(hoverFill),
+        ...shareLinkActionAccentStyle(accentColor),
         ...shareLinkActionLayoutStyle(layout),
         ...shareLinkActionRowLayoutStyle(rowLayout),
       }}

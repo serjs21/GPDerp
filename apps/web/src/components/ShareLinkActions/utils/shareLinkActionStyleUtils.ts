@@ -30,6 +30,11 @@ export function shareLinkActionLayoutStyle(
   } as CSSProperties;
 }
 
+/** Overrides the panel accent (sunburst rays / speed lines); hex panel colors otherwise reuse the base. */
+export function shareLinkActionAccentStyle(accent: string | undefined): CSSProperties {
+  return accent ? ({ "--comic-panel-accent": accent } as CSSProperties) : {};
+}
+
 export function shareLinkActionRowLayoutStyle(layout: ShareLinkActionLayout | undefined): CSSProperties {
   return layout ? shareLinkActionLayoutStyle(layout, "--share-link-action-row") : {};
 }

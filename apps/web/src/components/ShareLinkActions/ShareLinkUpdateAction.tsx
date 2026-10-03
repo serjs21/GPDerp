@@ -31,6 +31,10 @@ export function ShareLinkUpdateAction({
         layout={SHARE_LINK_UPDATE_LAYOUT}
         ariaLabel={`Update share link for ${subject}`}
         color={SHARE_LINK_UPDATE_COLORS.panel}
+        accentColor={SHARE_LINK_UPDATE_COLORS.accent}
+        background="sunburst"
+        isMotionBackground={false}
+        shine
         hoverFill={SHARE_LINK_UPDATE_COLORS.hover}
         busy={updating}
         onSelect={onUpdate}

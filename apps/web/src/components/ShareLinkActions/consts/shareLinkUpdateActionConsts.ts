@@ -9,14 +9,16 @@ export const SHARE_LINK_UPDATE_ICONS = {
 } as const;
 
 export const SHARE_LINK_UPDATE_COLORS = {
-  panel: "#c0ffc6",
-  hover: "#98f1a0",
-} as const satisfies { panel: ComicPanelColor; hover: string };
+  panel: "#fbffd7",
+  /** Sunburst ray color. */
+  accent: "#f1e98f",
+  hover: "#faffc3",
+} as const satisfies { panel: ComicPanelColor; accent: string; hover: string };
 
 /** Absolute icon + caption placement inside the 6.25rem-wide Update panel. */
 export const SHARE_LINK_UPDATE_LAYOUT = {
-  icon: { size: "5em", top: "0rem", left: "0rem", rotateDeg: 0 },
-  caption: { bottom: "1rem", right: "1rem", rotateDeg: 0, fontSize: "1.2rem" },
+  icon: { size: "6em", top: "0rem", left: "0rem", rotateDeg: 0 },
+  caption: { bottom: "1rem", right: "1.5rem", rotateDeg: 0, fontSize: "1.2rem" },
 } as const satisfies ShareLinkActionLayout;
 
 export const SHARE_LINK_UPDATE_DISABLED_MESSAGES = {
@@ -32,8 +34,8 @@ export const SHARE_LINK_UPDATE_CALLOUT_POSITION = {
 
 /** Bubble placement for the not-started (inactive link) variation. */
 export const SHARE_LINK_UPDATE_NOT_STARTED_CALLOUT_POSITION = {
-  right: "calc(70% + 0.6rem)",
-  bottom: "30%",
+  right: "calc(100% + 0.6rem)",
+  bottom: "10%",
 } as const satisfies CalloutPosition;
 
 export const SHARE_LINK_UPDATE_CALLOUT_TIMING = {

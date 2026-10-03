@@ -35,6 +35,12 @@ export type ShareLinkActionButtonProps = {
   ariaLabel: string;
   onSelect: () => void;
   color: NonNullable<ComicPagePanelProps["color"]>;
+  background?: NonNullable<ComicPagePanelProps["background"]>;
+  isMotionBackground?: NonNullable<ComicPagePanelProps["isMotionBackground"]>;
+  /** Rotate sunburst rays (only with a sunburst background). */
+  shine?: NonNullable<ComicPagePanelProps["shine"]>;
+  /** Ray / speed-line color; needed for hex `color`s, whose accent otherwise equals the base. */
+  accentColor?: string;
   hoverFill: string;
   disabled?: boolean;
   /** Maps to the panel's `aria-pressed`; defaults to true (non-toggle actions). */
