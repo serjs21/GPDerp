@@ -3,7 +3,7 @@ export const SHARED_HAIKU_FLY_FROM_X = "0vw";
 export const SHARED_HAIKU_FLY_FROM_Y = "0vh";
 
 /** Lantern scale at the start of the fly-in; animates to 1. */
-export const SHARED_HAIKU_FLY_FROM_SCALE = 0.7;
+export const SHARED_HAIKU_FLY_FROM_SCALE = 0.9;
 
 /** Fly-in duration (matches the path creation fly-in by default). */
 export const SHARED_HAIKU_FLY_DURATION_MS = 2000;
