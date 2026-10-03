@@ -9,11 +9,14 @@
   transform-origin: center bottom;
 }
 
-/* "Created by" toast, portaled to <body>: bottom-right corner, puffIn (magic.css) once typing has finished. */
+/*
+ * "Created by" toast, portaled to <body>: bottom-right corner, puffIn (magic.css) once typing has finished.
+ * --shared-haiku-footer-overlap (visible footer px) keeps it above the site footer.
+ */
 .createdBy {
   position: fixed;
   right: 1.5rem;
-  bottom: 1.5rem;
+  bottom: calc(1.5rem + var(--shared-haiku-footer-overlap, 0px));
   z-index: 40;
   max-width: calc(100vw - 3rem);
 }

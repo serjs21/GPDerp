@@ -10,8 +10,11 @@ import { LabelHalo, toLabelHaloItems } from "@/components/LabelHalo";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { SVG_PATH_LANTERN_WIDTH_REM } from "@/components/SVGPath/consts/pathLanternLayoutConsts";
+import { useViewportBottomOverlap } from "@/hooks/useViewportBottomOverlap";
 import { SHARED_HAIKU_CREATED_BY_PREFIX } from "./consts/sharedHaikuCopyConsts";
+import { SHARED_HAIKU_FOOTER_SELECTOR } from "./consts/sharedHaikuCreatedByConsts";
 import type { SharedHaikuLanternProps } from "./SharedHaikuLantern.types";
+import { sharedHaikuCreatedByStyle } from "./utils/sharedHaikuCreatedByUtils";
 import { sharedHaikuFlyInStyle } from "./utils/sharedHaikuFlyInUtils";
 import styles from "./SharedHaikuLantern.module.css";
 
@@ -27,6 +30,7 @@ export function SharedHaikuLantern({ haiku, showLabels, subject, authorName }: S
   const reducedMotion =
     initialized && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const showCreatedBy = typed || reducedMotion;
+  const footerOverlap = useViewportBottomOverlap(SHARED_HAIKU_FOOTER_SELECTOR, showCreatedBy);
 
   // LabelHalo syncs `labels` into state on identity change — keep it stable.
   const labels = useMemo(
@@ -68,7 +72,11 @@ export function SharedHaikuLantern({ haiku, showLabels, subject, authorName }: S
       </div>
       {showCreatedBy
         ? createPortal(
-            <div className={`${styles.createdBy} magictime puffIn`} role="status">
+            <div
+              className={`${styles.createdBy} magictime puffIn`}
+              style={sharedHaikuCreatedByStyle(footerOverlap)}
+              role="status"
+            >
               <ComicDialogContent
                 bubbleStyle={SUCCESS_TONE.bubbleStyle}
                 backgroundColors={SUCCESS_TONE.backgroundColors}

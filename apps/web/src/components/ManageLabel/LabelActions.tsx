@@ -21,7 +21,7 @@ const TUNE_IN_DISABLED_CALLOUT_POSITION = {
   bottom: "0rem",
 } as const;
 
-const TUNE_IN_DISABLED_MESSAGE = "There's no use in searching for me";
+const TUNE_IN_DISABLED_MESSAGE = "Searching for me is useless.";
 
 export type LabelActionsProps = {
   labelName: string;

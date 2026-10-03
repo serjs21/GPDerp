@@ -12,7 +12,7 @@ export const SHARE_LINK_UPDATE_COLORS = {
   panel: "#fbffd7",
   /** Sunburst ray color. */
   accent: "#f1e98f",
-  hover: "#faffc3",
+  hover: "#f0ff6b",
 } as const satisfies { panel: ComicPanelColor; accent: string; hover: string };
 
 /** Absolute icon + caption placement inside the 6.25rem-wide Update panel. */
