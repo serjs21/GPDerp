@@ -82,6 +82,21 @@
   pointer-events: none;
 }
 
+/* Lantern + settings on top, actions as a horizontal strip below. */
+@media (max-width: 800px) {
+  .linkRow {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  /* Nested selector outranks ShareLinkActions' `.stack` column direction. */
+  .linkRow > .actionsCell {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    flex-direction: row;
+    height: 6rem;
+  }
+}
+
 .lanternPanel,
 .statsPanel,
 .settingsPanel {

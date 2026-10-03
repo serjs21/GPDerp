@@ -255,6 +255,7 @@ export function ShareLinkManagementRow({
         onPreview={() => setPreviewOpen(true)}
         onToggleLabels={() => void ctrl.onToggleLabels(!showLabels)}
         onDelete={() => setDeleteOpen(true)}
+        className={styles.actionsCell}
       />
 
       <div className={styles.settingsColumn}>
