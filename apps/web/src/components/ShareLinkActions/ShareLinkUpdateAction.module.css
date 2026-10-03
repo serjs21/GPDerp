@@ -72,7 +72,7 @@
 }
 
 /*
- * Inactive state: tail on the right edge, tip pointing up-right.
+ * Inactive state: tail on the right edge, tip pointing down-right.
  * ::before is the ink outline, ::after the fill; the fill starts inside the
  * bubble so it covers the right border + drop shadow at the tail base.
  */
@@ -80,7 +80,7 @@
 .speechBubbleTailRight::after {
   content: "";
   position: absolute;
-  top: calc(50% - 11px);
+  top: calc(50% - 6px);
   right: auto;
   left: calc(100% - 1px);
   width: 15px;
@@ -91,10 +91,10 @@
 
 .speechBubbleTailRight::before {
   background: #111;
-  clip-path: polygon(1px 5px, 15px 0, 1px 17px);
+  clip-path: polygon(1px 0, 15px 17px, 1px 12px);
 }
 
 .speechBubbleTailRight::after {
   background: #f7f4ef;
-  clip-path: polygon(0 8px, 7.3px 5.4px, 0 14.3px);
+  clip-path: polygon(0 2.7px, 7.3px 11.6px, 0 9px);
 }

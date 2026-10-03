@@ -92,8 +92,8 @@
   .linkRow > .actionsCell {
     grid-column: 1 / -1;
     grid-row: 2;
-    flex-direction: row;
-    height: 6rem;
+    flex-direction: row-reverse;
+    height: 3.2rem;
   }
 }
 
