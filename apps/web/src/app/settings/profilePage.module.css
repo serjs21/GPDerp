@@ -96,6 +96,11 @@
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+
+  .contentSlot.contentSlotWithSide::-webkit-scrollbar {
+    display: none;
   }
 
   .contentSlotWithSide > * {

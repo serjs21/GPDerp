@@ -36,13 +36,18 @@
   padding-inline-start: calc(36px + 0.5rem);
 }
 
-/* Go home row: shift the painted go_back_arrow.svg background (BrushPaintLayer svg) left. */
+.goHomeOption {
+  padding: 0;
+  margin-top: -0.5rem;
+}
+
 .goHomeOption > svg:first-child {
   width: calc(100% + 1rem);
-  margin-left: -1rem;
+  margin-left: -0.5rem;
 }
 
 .optionName {
+  padding: 0.5rem 0;
   display: block;
   width: 8rem;
   max-width: 100%;

@@ -73,7 +73,8 @@
 }
 
 .listScroll {
-  --manage-label-list-gap: 1.25rem;
+  padding-top: 1rem;
+  --manage-label-list-gap: 1.5rem;
   flex: 1 1 auto;
   box-sizing: border-box;
   display: flex;
@@ -82,7 +83,12 @@
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
+  scrollbar-width: none;
   gap: var(--manage-label-list-gap);
+}
+
+.listScroll::-webkit-scrollbar {
+  display: none;
 }
 
 .emptyLayout {

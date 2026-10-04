@@ -130,6 +130,7 @@
 
 /* Match BrushOption .label: span the full content width. */
 .expandLabel {
+  padding-top: 0.5rem;
   position: relative;
   z-index: 1;
   display: block;
