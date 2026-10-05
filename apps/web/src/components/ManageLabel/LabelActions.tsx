@@ -6,6 +6,7 @@ import {
   type ComicPanelBackground,
   type ComicPanelColor,
 } from "@/components/ComicPageLayout";
+import { ComicPressButton } from "@/components/ComicPressButton";
 import { HoverHoldCallout } from "@/components/HoverHoldCallout";
 import styles from "./LabelActions.module.css";
 
@@ -127,33 +128,38 @@ function LabelActionButton({
     );
 
   return (
-    <ComicPagePanel
-      selectable
-      selected={isSelected}
-      background={background}
-      color={color}
-      flexWeight={1}
-      contentAlign="start"
-      isMotionBackground={false}
-      className={[
-        styles.action,
-        invertIconOnHover ? styles.invertOnHover : "",
-        disabled ? styles.disabled : "",
-        disabled && (inkOnSkyIcon || layout === "iconFill")
-          ? styles.disabledPreserveBg
-          : "",
-      ]
-        .filter(Boolean)
-        .join(" ")}
-      style={style}
-      ariaLabel={ariaLabel}
-      onSelect={() => {
+    <ComicPressButton
+      className={styles.pressShell}
+      aria-label={ariaLabel}
+      aria-pressed={isSelected}
+      disabled={disabled}
+      onClick={() => {
         if (disabled) return;
         onSelect();
       }}
     >
-      <div className={[styles.row, rowLayoutClass(layout)].join(" ")}>{content}</div>
-    </ComicPagePanel>
+      <ComicPagePanel
+        background={background}
+        color={color}
+        flexWeight={1}
+        contentAlign="start"
+        isMotionBackground={false}
+        className={[
+          styles.action,
+          isSelected ? "" : styles.unpressed,
+          invertIconOnHover ? styles.invertOnHover : "",
+          disabled ? styles.disabled : "",
+          disabled && (inkOnSkyIcon || layout === "iconFill")
+            ? styles.disabledPreserveBg
+            : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        style={style}
+      >
+        <div className={[styles.row, rowLayoutClass(layout)].join(" ")}>{content}</div>
+      </ComicPagePanel>
+    </ComicPressButton>
   );
 }
 
