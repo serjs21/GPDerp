@@ -62,6 +62,12 @@ export const paymentsRepository = {
     return user?.generationCredits ?? null;
   },
 
+  countCompletedPurchases(userId: string): Promise<number> {
+    return prismaClient.generationPurchase.count({
+      where: { userId, status: GenerationPurchaseStatus.COMPLETED },
+    });
+  },
+
   /**
    * Atomically debit generation credits when the balance is high enough.
    * Safe under concurrent `/beer_me_haiku` requests.

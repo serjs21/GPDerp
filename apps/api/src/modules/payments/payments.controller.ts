@@ -4,6 +4,7 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { GENERATION_CREDITS_SOCKET_KIND } from "./constants";
 import { verifyPaddleWebhook } from "./paddleWebhook";
 import { paymentsService } from "./payments.service";
+import { purchaseConfirmedMessage } from "./utils/purchaseMessages";
 
 const toRawBodyString = (rawBody: string | Buffer | undefined): string | null => {
   if (typeof rawBody === "string" && rawBody.length > 0) return rawBody;
@@ -59,9 +60,14 @@ const paymentsPluginImpl = async (app: FastifyInstance) => {
         kind: GENERATION_CREDITS_SOCKET_KIND,
         data: { credits: result.credits },
       });
+      const purchasesCount = await paymentsService.countCompletedPurchases(userId);
       return res.send({
         ok: true,
-        data: { credits: result.credits, status: result.status },
+        data: {
+          credits: result.credits,
+          status: result.status,
+          message: purchaseConfirmedMessage(purchasesCount),
+        },
       });
     },
   );

@@ -18,7 +18,14 @@ export function clearPendingHaikuAfterPurchase() {
   window.localStorage.removeItem(PENDING_HAIKU_AFTER_PURCHASE_STORAGE_KEY);
 }
 
-export function openNoCreditsLeft(subject: string) {
+export type NoCreditsLeftDetail = {
+  subject: string;
+  message: string | null;
+};
+
+export function openNoCreditsLeft(subject: string, message: string | null) {
   savePendingHaikuAfterPurchase(subject);
-  window.dispatchEvent(new CustomEvent(NO_CREDITS_LEFT_EVENT, { detail: { subject } }));
+  window.dispatchEvent(
+    new CustomEvent<NoCreditsLeftDetail>(NO_CREDITS_LEFT_EVENT, { detail: { subject, message } }),
+  );
 }

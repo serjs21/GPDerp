@@ -13,6 +13,7 @@ export const STORY_LOGGED_IN_USER: UserObject = {
   avatarManuallySet: true,
   emailVerifiedAt: "2026-01-01T00:00:00.000Z",
   providers: [AuthProvider.LOCAL],
+  purchasesCount: 0,
 };
 
 export const STORY_LOGGED_IN_AUTH: AuthenticationResult = {

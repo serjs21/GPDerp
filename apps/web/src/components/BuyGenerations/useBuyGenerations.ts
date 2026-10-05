@@ -36,8 +36,7 @@ export function useBuyGenerations() {
     try {
       const data = await confirmPurchase(transactionId);
       notifyGenerationCreditsUpdated(data.credits);
-      notifyGenerationPurchaseConfirmed();
-      comicToast.success(t("success"));
+      notifyGenerationPurchaseConfirmed(data.message);
     } catch {
       comicToast.error(t("confirmError"));
     } finally {

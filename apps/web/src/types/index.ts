@@ -24,6 +24,8 @@ export type UserObject = {
   emailVerifiedAt: string | null;
   // Present on `/auth/me` (derived from AuthIdentity rows).
   providers: AuthProvider[];
+  // Present on `/auth/me` (count of completed generation purchases).
+  purchasesCount: number;
 };
 
 export type AccountObject = {

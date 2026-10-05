@@ -18,6 +18,11 @@ export type CreditsResponse = {
 export type ConfirmPurchaseResponse = {
   credits: number;
   status: "granted" | "duplicate" | "not_found";
+  message: string;
+};
+
+export type GenerationPurchaseConfirmedDetail = {
+  message: string;
 };
 
 export const GENERATION_CREDITS_UPDATED_EVENT = "generation-credits-updated";
@@ -36,9 +41,13 @@ export function notifyGenerationCreditsUpdated(credits: number) {
   );
 }
 
-export function notifyGenerationPurchaseConfirmed() {
+export function notifyGenerationPurchaseConfirmed(message: string) {
   if (typeof window === "undefined") return;
-  window.dispatchEvent(new Event(GENERATION_PURCHASE_CONFIRMED_EVENT));
+  window.dispatchEvent(
+    new CustomEvent<GenerationPurchaseConfirmedDetail>(GENERATION_PURCHASE_CONFIRMED_EVENT, {
+      detail: { message },
+    }),
+  );
 }
 
 type PurchaseApiResponse = { ok: true; data: PendingPurchaseResponse } | { ok: false; error: string };

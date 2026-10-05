@@ -29,6 +29,8 @@ export const PREFERENCE_HAIKU_ACTIONS_OPEN_STORAGE_KEY = "gpderp.profile.haikuAc
 export const POST_LOGIN_RETURN_STORAGE_KEY = "gpderp.auth.postLoginReturn";
 export const RESUME_PENDING_HAIKU_EVENT = "gpderp:resume-pending-haiku";
 export const NO_CREDITS_LEFT_EVENT = "gpderp:no-credits-left";
+/** Fired when the user dismisses the purchase-confirmed modal. */
+export const GENERATION_PURCHASE_ACKNOWLEDGED_EVENT = "gpderp:generation-purchase-acknowledged";
 export const HAIKU_ACTIONS_OPEN_EVENT = "gpderp:haiku-actions-open";
 
 export const isThemeName = (value: string): value is ThemeName =>

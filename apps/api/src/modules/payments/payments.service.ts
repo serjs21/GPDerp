@@ -52,6 +52,10 @@ export const paymentsService = {
     return { ok: true as const, credits };
   },
 
+  countCompletedPurchases(userId: string) {
+    return paymentsRepository.countCompletedPurchases(userId);
+  },
+
   /** Debit one generation credit for a successful haiku start (1 haiku = 1 token). */
   spendHaikuGenerationCredit(userId: string) {
     return paymentsRepository.trySpendGenerationCredit(userId, HAIKU_GENERATION_CREDIT_COST);

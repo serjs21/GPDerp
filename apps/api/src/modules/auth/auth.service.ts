@@ -18,6 +18,7 @@ import {
 } from "./utils";
 import { AuthError } from "./errors";
 import { userService } from "../user/user.service";
+import { paymentsRepository } from "../payments/payments.repository";
 import { sendVerificationEmail } from "./verificationEmail";
 import { resolveRequestCountryCode } from "../../utils/requestCountry";
 import { validateUsername } from "../../utils/usernameValidation";
@@ -586,6 +587,7 @@ export const authService = {
       });
       throw unauthorizedError();
     }
+    const purchasesCount = await paymentsRepository.countCompletedPurchases(user.id);
     return {
       user: {
         id: user.id,
@@ -597,6 +599,7 @@ export const authService = {
         avatarManuallySet: user.avatarManuallySet,
         emailVerifiedAt: user.emailVerifiedAt,
         providers: user.authIdentities.map((identity) => identity.provider),
+        purchasesCount,
       },
       account: user.memberships.map((membership) => ({
         membership: {

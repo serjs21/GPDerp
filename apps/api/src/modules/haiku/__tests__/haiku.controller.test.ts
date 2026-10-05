@@ -1,6 +1,7 @@
 import Fastify from "fastify";
 import type { FastifyRequest } from "fastify";
 import { haikuPlugin } from "../haiku.controller";
+import { noGenerationsLeftMessage } from "../../payments/utils/purchaseMessages";
 
 jest.mock("../../auth/repository", () => ({
   authRepository: {
@@ -11,6 +12,7 @@ jest.mock("../../auth/repository", () => ({
 jest.mock("../../payments/payments.service", () => ({
   paymentsService: {
     getCredits: jest.fn(),
+    countCompletedPurchases: jest.fn(),
   },
 }));
 
@@ -24,7 +26,7 @@ const { authRepository } = jest.requireMock("../../auth/repository") as {
   authRepository: { findAccountIdForUser: jest.Mock };
 };
 const { paymentsService } = jest.requireMock("../../payments/payments.service") as {
-  paymentsService: { getCredits: jest.Mock };
+  paymentsService: { getCredits: jest.Mock; countCompletedPurchases: jest.Mock };
 };
 const { haikuService } = jest.requireMock("../haiku.service") as {
   haikuService: { createHaikuStream: jest.Mock };
@@ -53,6 +55,7 @@ describe("haiku.controller POST /beer_me_haiku", () => {
 
   it("returns 402 when the user has no generation credits", async () => {
     paymentsService.getCredits.mockResolvedValue({ ok: true, credits: 0 });
+    paymentsService.countCompletedPurchases.mockResolvedValue(1);
     const app = await buildApp();
 
     const response = await app.inject({
@@ -62,7 +65,12 @@ describe("haiku.controller POST /beer_me_haiku", () => {
     });
 
     expect(response.statusCode).toBe(402);
-    expect(response.json()).toEqual({ ok: false, error: "insufficient_credits" });
+    expect(response.json()).toEqual({
+      ok: false,
+      error: "insufficient_credits",
+      message: noGenerationsLeftMessage(1),
+    });
+    expect(paymentsService.countCompletedPurchases).toHaveBeenCalledWith(sessionUserId);
     expect(haikuService.createHaikuStream).not.toHaveBeenCalled();
     await app.close();
   });

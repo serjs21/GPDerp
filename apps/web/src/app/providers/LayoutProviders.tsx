@@ -16,6 +16,7 @@ import { ComicToastProvider } from "@/components/ComicToast";
 import { HaikuFiltersProvider } from "./HaikuFiltersProvider";
 import { PaddleProvider } from "./PaddleProvider";
 import { NoCreditsLeftHost } from "@/components/NoCreditsLeft/NoCreditsLeftHost";
+import { PurchaseConfirmHost } from "@/components/NoCreditsLeft/PurchaseConfirmHost";
 import { ContinueGenerationOffer } from "@/components/NoCreditsLeft/ContinueGenerationOffer";
 import { GenerationCreditsSocket } from "@/hooks/useGenerationCreditsSocket";
 
@@ -38,6 +39,7 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
               <AxiosInit />
               <GenerationCreditsSocket />
               <NoCreditsLeftHost />
+              <PurchaseConfirmHost />
               <ContinueGenerationOffer />
               <CelestialAppShell
                 className={layoutStyles.shell}

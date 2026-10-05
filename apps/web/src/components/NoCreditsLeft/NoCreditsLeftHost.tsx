@@ -2,18 +2,23 @@
 
 import { useEffect, useState } from "react";
 import { useBuyGenerations } from "@/components/BuyGenerations";
+import {
+  NO_GENERATIONS_LEFT_FALLBACK_MESSAGE,
+  NoGenerationsLeftModal,
+} from "@/components/NoGenerationsLeftModal";
 import { NO_CREDITS_LEFT_EVENT } from "@/config/userConfiguration";
-import { NoCreditsLeft } from "./NoCreditsLeft";
-import { savePendingHaikuAfterPurchase } from "./pendingHaikuAfterPurchase";
+import { savePendingHaikuAfterPurchase, type NoCreditsLeftDetail } from "./pendingHaikuAfterPurchase";
 
 export function NoCreditsLeftHost() {
   const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState(NO_GENERATIONS_LEFT_FALLBACK_MESSAGE);
   const { buy, startingCheckout, initializing, checkoutReady } = useBuyGenerations();
 
   useEffect(() => {
     const onNeedCredits = (event: Event) => {
-      const subject = (event as CustomEvent<{ subject?: string }>).detail?.subject;
-      if (typeof subject === "string") savePendingHaikuAfterPurchase(subject);
+      const detail = (event as CustomEvent<Partial<NoCreditsLeftDetail>>).detail;
+      if (typeof detail?.subject === "string") savePendingHaikuAfterPurchase(detail.subject);
+      setMessage(detail?.message || NO_GENERATIONS_LEFT_FALLBACK_MESSAGE);
       setOpen(true);
     };
     window.addEventListener(NO_CREDITS_LEFT_EVENT, onNeedCredits);
@@ -21,9 +26,10 @@ export function NoCreditsLeftHost() {
   }, []);
 
   return (
-    <NoCreditsLeft
+    <NoGenerationsLeftModal
       open={open}
       onOpenChange={setOpen}
+      message={message}
       buying={startingCheckout || initializing}
       buyDisabled={!checkoutReady || startingCheckout || initializing}
       onBuy={() => void buy()}

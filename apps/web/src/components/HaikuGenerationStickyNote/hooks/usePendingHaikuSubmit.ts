@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import { isInsufficientCreditsError, runHaikuAgent } from "@/api/agents";
+import { insufficientCreditsMessage, isInsufficientCreditsError, runHaikuAgent } from "@/api/agents";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { PENDING_HAIKU_SUBJECT_STORAGE_KEY, RESUME_PENDING_HAIKU_EVENT } from "@/config/userConfiguration";
 import { openNoCreditsLeft } from "@/components/NoCreditsLeft/pendingHaikuAfterPurchase";
@@ -45,7 +45,7 @@ export function usePendingHaikuSubmit({
         console.error("Failed to send haiku agent request:", error);
         onError(error);
         if (isInsufficientCreditsError(error)) {
-          openNoCreditsLeft(subject);
+          openNoCreditsLeft(subject, insufficientCreditsMessage(error));
           return;
         }
       } finally {

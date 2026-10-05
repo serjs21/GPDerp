@@ -31,6 +31,7 @@ const EMPTY_USER: UserObject = {
   avatarManuallySet: false,
   emailVerifiedAt: null,
   providers: [],
+  purchasesCount: 0,
 };
 
 interface UnauthenticatedStateOptions {

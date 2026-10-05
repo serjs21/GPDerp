@@ -3,8 +3,11 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { ComicConfirmModal } from "@/components/ComicConfirmModal/ComicConfirmModal";
-import { GENERATION_PURCHASE_CONFIRMED_EVENT } from "@/api/payments";
-import { PENDING_HAIKU_SUBJECT_STORAGE_KEY, RESUME_PENDING_HAIKU_EVENT } from "@/config/userConfiguration";
+import {
+  GENERATION_PURCHASE_ACKNOWLEDGED_EVENT,
+  PENDING_HAIKU_SUBJECT_STORAGE_KEY,
+  RESUME_PENDING_HAIKU_EVENT,
+} from "@/config/userConfiguration";
 import {
   clearPendingHaikuAfterPurchase,
   readPendingHaikuAfterPurchase,
@@ -23,8 +26,8 @@ export function ContinueGenerationOffer() {
       setSubject(pending);
       setOpen(true);
     };
-    window.addEventListener(GENERATION_PURCHASE_CONFIRMED_EVENT, onConfirmed);
-    return () => window.removeEventListener(GENERATION_PURCHASE_CONFIRMED_EVENT, onConfirmed);
+    window.addEventListener(GENERATION_PURCHASE_ACKNOWLEDGED_EVENT, onConfirmed);
+    return () => window.removeEventListener(GENERATION_PURCHASE_ACKNOWLEDGED_EVENT, onConfirmed);
   }, []);
 
   return (
