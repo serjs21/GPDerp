@@ -1,0 +1,268 @@
+/*
+ * Comic restyle for the antd InputNumber / DatePicker limit fields and the
+ * DatePicker popup. Selectors double the module class so they outrank antd's
+ * runtime-injected `.ant-*` rules regardless of stylesheet order.
+ */
+
+/* Field shell */
+.comicField.comicField {
+  border: 2px solid var(--comic-ink, #2d2d2d);
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+  color: var(--comic-ink, #2d2d2d);
+  font-family: var(--font-lantern-script, cursive);
+}
+
+.comicField.comicField:hover {
+  border-color: var(--comic-ink, #2d2d2d);
+  background: #fff;
+}
+
+.comicField.comicField:focus-within,
+.comicField.comicField:global(.ant-picker-focused) {
+  border-color: var(--comic-ink, #2d2d2d);
+  box-shadow: none;
+  outline: 2px solid var(--comic-ink, #2d2d2d);
+  outline-offset: 1px;
+}
+
+.comicField.comicField:global(.ant-input-number-disabled),
+.comicField.comicField:global(.ant-picker-disabled) {
+  border-color: var(--comic-ink, #2d2d2d);
+  background: #ececec;
+  cursor: not-allowed;
+}
+
+/* Inner input text */
+.comicField.comicField :global(.ant-input-number-input),
+.comicField.comicField :global(.ant-picker-input > input) {
+  color: var(--comic-ink, #2d2d2d);
+  font-family: var(--font-lantern-script, cursive);
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+}
+
+.comicField.comicField :global(.ant-input-number-input)::placeholder,
+.comicField.comicField :global(.ant-picker-input > input)::placeholder {
+  color: color-mix(in srgb, var(--comic-ink, #2d2d2d) 45%, transparent);
+}
+
+.comicField.comicField :global(.ant-input-number-input):disabled,
+.comicField.comicField :global(.ant-picker-input > input):disabled {
+  color: color-mix(in srgb, var(--comic-ink, #2d2d2d) 55%, transparent);
+  cursor: not-allowed;
+}
+
+/* InputNumber step arrows */
+.comicField.comicField :global(.ant-input-number-handler-wrap) {
+  border-left: 2px solid var(--comic-ink, #2d2d2d);
+  border-radius: 0;
+  background: #fff;
+}
+
+.comicField.comicField :global(.ant-input-number-handler) {
+  border-color: var(--comic-ink, #2d2d2d);
+  border-radius: 0;
+  color: var(--comic-ink, #2d2d2d);
+}
+
+.comicField.comicField :global(.ant-input-number-handler-down) {
+  border-top: 2px solid var(--comic-ink, #2d2d2d);
+}
+
+.comicField.comicField :global(.ant-input-number-handler):hover {
+  background: color-mix(in srgb, var(--sumi-ink, #2d2d2d) 6%, #fff);
+}
+
+.comicField.comicField :global(.ant-input-number-handler) :global(.anticon),
+.comicField.comicField :global(.ant-input-number-handler):hover :global(.anticon) {
+  color: var(--comic-ink, #2d2d2d);
+}
+
+/* Picker icons */
+.comicField.comicField :global(.ant-picker-suffix),
+.comicField.comicField :global(.ant-picker-clear) {
+  color: var(--comic-ink, #2d2d2d);
+}
+
+.comicField.comicField :global(.ant-picker-clear) {
+  background: #fff;
+}
+
+/* Popup panel */
+.datePopup.datePopup :global(.ant-picker-panel-container) {
+  border: 2px solid var(--comic-ink, #2d2d2d);
+  border-radius: 0;
+  background: #fff;
+  box-shadow: 0.15rem 0.15rem 0 var(--comic-ink, #2d2d2d);
+  color: var(--comic-ink, #2d2d2d);
+  font-family: var(--font-lantern-script, cursive);
+}
+
+.datePopup.datePopup :global(.ant-picker-panel),
+.datePopup.datePopup :global(.ant-picker-date-panel),
+.datePopup.datePopup :global(.ant-picker-time-panel) {
+  border-color: var(--comic-ink, #2d2d2d);
+}
+
+.datePopup.datePopup :global(.ant-picker-header) {
+  border-bottom: 2px solid var(--comic-ink, #2d2d2d);
+  color: var(--comic-ink, #2d2d2d);
+}
+
+.datePopup.datePopup :global(.ant-picker-header) button {
+  color: var(--comic-ink, #2d2d2d);
+}
+
+.datePopup.datePopup :global(.ant-picker-header-view),
+.datePopup.datePopup :global(.ant-picker-header-view) button {
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.datePopup.datePopup :global(.ant-picker-header-view) button:hover {
+  color: var(--comic-ink, #2d2d2d);
+  text-decoration: underline;
+}
+
+.datePopup.datePopup :global(.ant-picker-content) th {
+  color: var(--comic-ink, #2d2d2d);
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-weight: 400;
+}
+
+/* Date cells */
+.datePopup.datePopup :global(.ant-picker-cell) {
+  color: color-mix(in srgb, var(--comic-ink, #2d2d2d) 40%, transparent);
+}
+
+.datePopup.datePopup :global(.ant-picker-cell-in-view) {
+  color: var(--comic-ink, #2d2d2d);
+}
+
+.datePopup.datePopup :global(.ant-picker-cell .ant-picker-cell-inner) {
+  border-radius: 0;
+}
+
+.datePopup.datePopup
+  :global(.ant-picker-cell:not(.ant-picker-cell-disabled):not(.ant-picker-cell-selected))
+  :global(.ant-picker-cell-inner):hover {
+  background: color-mix(in srgb, var(--sumi-ink, #2d2d2d) 6%, #fff);
+}
+
+.datePopup.datePopup :global(.ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner)::before {
+  border: 2px solid var(--comic-ink, #2d2d2d);
+  border-radius: 0;
+}
+
+.datePopup.datePopup :global(.ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner) {
+  background: var(--comic-ink, #2d2d2d);
+  color: #fff;
+}
+
+.datePopup.datePopup :global(.ant-picker-cell-disabled) {
+  color: color-mix(in srgb, var(--comic-ink, #2d2d2d) 25%, transparent);
+}
+
+/* Time columns */
+.datePopup.datePopup :global(.ant-picker-time-panel) {
+  border-inline-start: 2px solid var(--comic-ink, #2d2d2d);
+}
+
+.datePopup.datePopup :global(.ant-picker-time-panel .ant-picker-header) {
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+}
+
+.datePopup.datePopup :global(.ant-picker-time-panel-column + .ant-picker-time-panel-column) {
+  border-inline-start: 2px solid var(--comic-ink, #2d2d2d);
+}
+
+.datePopup.datePopup :global(.ant-picker-time-panel-cell .ant-picker-time-panel-cell-inner) {
+  border-radius: 0;
+  color: var(--comic-ink, #2d2d2d);
+}
+
+.datePopup.datePopup :global(.ant-picker-time-panel-cell .ant-picker-time-panel-cell-inner):hover {
+  background: color-mix(in srgb, var(--sumi-ink, #2d2d2d) 6%, #fff);
+}
+
+.datePopup.datePopup
+  :global(.ant-picker-time-panel-cell-selected .ant-picker-time-panel-cell-inner) {
+  background: var(--comic-ink, #2d2d2d);
+  color: #fff;
+}
+
+.datePopup.datePopup
+  :global(.ant-picker-time-panel-cell-selected .ant-picker-time-panel-cell-inner):hover {
+  background: var(--comic-ink, #2d2d2d);
+}
+
+.datePopup.datePopup :global(.ant-picker-time-panel-cell-disabled .ant-picker-time-panel-cell-inner) {
+  color: color-mix(in srgb, var(--comic-ink, #2d2d2d) 25%, transparent);
+}
+
+/* Footer + press buttons (mirrors ComicPressButton) */
+.datePopup.datePopup :global(.ant-picker-footer) {
+  border-top: 2px solid var(--comic-ink, #2d2d2d);
+}
+
+.datePopup.datePopup :global(.ant-picker-ranges) {
+  align-items: center;
+  padding-block: 0.4rem;
+}
+
+.datePopup.datePopup :global(.ant-picker-ok .ant-btn),
+.datePopup.datePopup :global(.ant-picker-now-btn) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  padding: 0.15rem 0.65rem;
+  border: 2px solid var(--comic-ink, #2d2d2d);
+  border-radius: 0;
+  background: #fff;
+  box-shadow: 0.15rem 0.15rem 0 var(--comic-ink, #2d2d2d);
+  color: var(--comic-ink, #2d2d2d);
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.datePopup.datePopup :global(.ant-picker-ok .ant-btn):hover:not(:disabled),
+.datePopup.datePopup :global(.ant-picker-now-btn):hover {
+  border-color: var(--comic-ink, #2d2d2d);
+  background: color-mix(in srgb, var(--sumi-ink, #2d2d2d) 6%, #fff);
+  color: var(--comic-ink, #2d2d2d);
+}
+
+.datePopup.datePopup :global(.ant-picker-ok .ant-btn):active:not(:disabled),
+.datePopup.datePopup :global(.ant-picker-now-btn):active {
+  transform: translate(0.15rem, 0.15rem);
+  box-shadow: 0 0 0 var(--comic-ink, #2d2d2d);
+}
+
+.datePopup.datePopup :global(.ant-picker-ok .ant-btn):disabled {
+  border-color: color-mix(in srgb, var(--comic-ink, #2d2d2d) 45%, transparent);
+  background: #ececec;
+  box-shadow: none;
+  color: color-mix(in srgb, var(--comic-ink, #2d2d2d) 55%, transparent);
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .datePopup.datePopup :global(.ant-picker-ok .ant-btn),
+  .datePopup.datePopup :global(.ant-picker-now-btn) {
+    transition: none;
+  }
+}

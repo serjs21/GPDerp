@@ -193,15 +193,16 @@
   font-weight: 600;
   line-height: 1.2;
   cursor: pointer;
+  /* transform + box-shadow timing match the ComicPressButton press. */
   transition:
     background-color 0.15s ease,
     opacity 0.15s ease,
-    transform 0.15s ease;
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .updateButton:hover:not(:disabled) {
   background: color-mix(in srgb, var(--sumi-ink, #2d2d2d) 6%, #fff);
-  transform: scale(1.01);
 }
 
 .updateButton:focus-visible {
@@ -305,8 +306,4 @@
     transition: none;
   }
 
-  .actionButton:hover:not(:disabled),
-  .updateButton:hover:not(:disabled) {
-    transform: none;
-  }
 }

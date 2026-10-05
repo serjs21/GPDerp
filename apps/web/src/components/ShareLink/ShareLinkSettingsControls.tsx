@@ -2,9 +2,11 @@
 
 import dayjs from "dayjs";
 import type { Dispatch, SetStateAction } from "react";
+import { ComicPressButton } from "@/components/ComicPressButton";
 import { DatePicker, InputNumber } from "@/components/StyledComponents";
 import type { RestartLinkReason } from "@/components/RestartLinkButton";
 import styles from "./ShareLink.module.css";
+import limitStyles from "./ShareLinkLimitFields.module.css";
 import { ShareLinkLifecycleAction } from "./ShareLinkLifecycleAction";
 import { UPDATE_ICON_SRC, type LimitForm } from "./useShareLinkControls";
 
@@ -116,7 +118,7 @@ export function ShareLinkSettingsControls({
                     maxViews: typeof v === "number" ? v : null,
                   }))
                 }
-                className={styles.limitInput}
+                className={[styles.limitInput, limitStyles.comicField].join(" ")}
               />
             </span>
           </label>
@@ -141,15 +143,15 @@ export function ShareLinkSettingsControls({
                     expiresAt: clampTimeout(v),
                   }))
                 }
-                className={styles.limitDate}
+                className={[styles.limitDate, limitStyles.comicField].join(" ")}
+                classNames={{ popup: { root: limitStyles.datePopup } }}
               />
             </span>
           </label>
         </div>
 
         {showUpdate && !hideUpdate ? (
-          <button
-            type="button"
+          <ComicPressButton
             className={styles.updateButton}
             disabled={!formValid || isUpdating || busy}
             onClick={() => void onUpdateLimits()}
@@ -168,7 +170,7 @@ export function ShareLinkSettingsControls({
                 <span className={styles.actionLabel}>Update</span>
               </>
             )}
-          </button>
+          </ComicPressButton>
         ) : null}
       </div>
 
