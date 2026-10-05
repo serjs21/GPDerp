@@ -99,6 +99,8 @@ export function ManageLabelsPanel({
   const [exitingById, setExitingById] = useState<Record<string, LabelDto>>({});
   const searchRef = useRef<HTMLInputElement>(null);
   const knownIdsRef = useRef<Set<string> | null>(null);
+  /** Rows arriving from a next-page load are existing labels, not new ones. */
+  const loadingMoreRef = useRef(false);
   const displayOrderRef = useRef<string[]>([]);
   const queryClient = useQueryClient();
 
@@ -143,12 +145,17 @@ export function ManageLabelsPanel({
     includeConnectedHaikus: true,
   });
 
+  const loadMore = useCallback(() => {
+    loadingMoreRef.current = true;
+    void fetchNextPage();
+  }, [fetchNextPage]);
+
   // When a sort is selected but more pages remain, finish loading so we can sort in memory.
   useEffect(() => {
     if (!active || !sort.categoryId) return;
     if (!hasNextPage || isFetchingNextPage) return;
-    void fetchNextPage();
-  }, [active, sort.categoryId, hasNextPage, isFetchingNextPage, fetchNextPage]);
+    loadMore();
+  }, [active, sort.categoryId, hasNextPage, isFetchingNextPage, loadMore]);
 
   const orderedLabels = useMemo(() => {
     if (!sort.categoryId || hasNextPage) return pagedLabels;
@@ -188,12 +195,19 @@ export function ManageLabelsPanel({
       return;
     }
 
+    if (loadingMoreRef.current) {
+      if (isFetchingNextPage) return;
+      loadingMoreRef.current = false;
+      knownIdsRef.current = currentSet;
+      return;
+    }
+
     const addedInListOrder = currentIds.filter((id) => !knownIdsRef.current!.has(id));
     if (addedInListOrder.length > 0) {
       scheduleEnterAnimations(addedInListOrder);
     }
     knownIdsRef.current = currentSet;
-  }, [active, isPagedLoading, pagedLabels, scheduleEnterAnimations]);
+  }, [active, isPagedLoading, isFetchingNextPage, pagedLabels, scheduleEnterAnimations]);
 
   const refresh = useCallback(() => {
     void queryClient.invalidateQueries({
@@ -231,7 +245,7 @@ export function ManageLabelsPanel({
     const remaining = el.scrollHeight - el.scrollTop - el.clientHeight;
     if (remaining > 80) return;
     if (!hasNextPage || isFetchingNextPage) return;
-    void fetchNextPage();
+    loadMore();
   };
 
   const searchInputProps = {
