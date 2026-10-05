@@ -139,8 +139,9 @@
 }
 
 .settingsUpdate {
+  width: 8rem;
   display: flex;
-  flex: 0 0 6.25rem;
+  flex: 0 0 7rem;
   flex-direction: column;
   min-height: 0;
 }
