@@ -9,3 +9,17 @@
   gap: 0.5rem;
   overflow: visible;
 }
+
+/* Caption fills the space right of the icon, centered both ways. */
+.strip .caption {
+  top: 50%;
+  right: 0;
+  bottom: auto;
+  left: 4.5rem;
+  width: auto;
+  max-width: calc(100% - 4.5rem);
+  font-size: 1rem;
+  text-align: center;
+  white-space: normal;
+  transform: translateY(-50%);
+}

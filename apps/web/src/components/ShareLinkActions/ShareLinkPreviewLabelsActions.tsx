@@ -29,6 +29,7 @@ export function ShareLinkPreviewLabelsActions({
       <ShareLinkActionButton
         src={SHARE_LINK_ACTION_ICONS.preview}
         caption="Preview"
+        captionClassName={styles.caption}
         layout={SHARE_LINK_ACTION_ROW_LAYOUTS.preview}
         ariaLabel={`Preview ${subject}`}
         color={SHARE_LINK_ACTION_COLORS.preview.panel}
@@ -41,6 +42,7 @@ export function ShareLinkPreviewLabelsActions({
         showLabels={showLabels}
         togglingLabels={togglingLabels}
         onToggleLabels={onToggleLabels}
+        captionClassName={styles.caption}
         layouts={{
           show: SHARE_LINK_ACTION_ROW_LAYOUTS.showLabels,
           hide: SHARE_LINK_ACTION_ROW_LAYOUTS.hideLabels,
