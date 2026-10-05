@@ -44,7 +44,8 @@
   grid-row: 2;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  --share-link-list-gap: 1.75rem;
+  gap: var(--share-link-list-gap);
   min-height: 0;
   overflow: auto;
   overscroll-behavior: contain;
@@ -86,8 +87,46 @@
   align-items: stretch;
 }
 
-.linkRowVanishing {
+.linkRowInactive {
+  background: #e2e2e2;
+}
+
+/* Collapse target for the delete exit (height + trailing gap → 0). */
+.linkRowShell {
+  flex: 0 0 auto;
+}
+
+.linkRowShellExiting {
+  position: relative;
+  z-index: 3;
   pointer-events: none;
+}
+
+/* Same softened boingOutDown as ManageLabel rows. */
+@keyframes shareLinkBoingOut {
+  0% {
+    opacity: 1;
+    transform-origin: 50% 100%;
+    transform: perspective(800px) rotateX(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform-origin: 50% 100%;
+    transform: perspective(800px) rotateX(52deg);
+  }
+}
+
+.boingOutDown {
+  animation-name: shareLinkBoingOut;
+  animation-duration: 0.55s;
+  animation-timing-function: ease-in;
+  animation-fill-mode: both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boingOutDown {
+    animation: none;
+  }
 }
 
 /* Lantern + settings on top, actions as a horizontal strip below. */
