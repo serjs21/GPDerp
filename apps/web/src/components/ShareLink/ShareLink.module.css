@@ -244,10 +244,12 @@
   font-weight: 600;
   line-height: 1.2;
   cursor: pointer;
+  /* transform + box-shadow timing match the ComicPressButton press. */
   transition:
     background-color 0.15s ease,
     opacity 0.15s ease,
-    transform 0.15s ease;
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .actionButton:hover:not(:disabled) {
@@ -268,7 +270,6 @@
   background: #ff9999;
   border-color: #940000;
   color: #ffffff;
-  box-shadow: 0.15rem 0.15rem var(--comic-ink, #2d2d2d);
 }
 
 .stopButton:hover:not(:disabled) {

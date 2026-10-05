@@ -1,4 +1,5 @@
-.button {
+/* Reset at zero specificity so consumer classes (border, background, padding) always win. */
+:where(.button) {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -9,10 +10,14 @@
   text-align: inherit;
   appearance: none;
   cursor: pointer;
-  box-shadow: 0.15rem 0.15rem var(--comic-ink, #2d2d2d);
+  /* Consumers that set their own `transition` must include transform + box-shadow 0.2s. */
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
+}
+
+.button {
+  box-shadow: 0.15rem 0.15rem var(--comic-ink, #2d2d2d);
 }
 
 /* Mouse down presses into the shadow; releasing plays the transition back. */
@@ -28,6 +33,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .button {
-    transition: none;
+    transition: none !important;
   }
 }

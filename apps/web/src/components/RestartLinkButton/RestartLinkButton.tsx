@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useRef, useState, type CSSProperties, type FocusEvent } from "react";
+import { ComicPressButton } from "@/components/ComicPressButton";
 import styles from "./RestartLinkButton.module.css";
 import {
   useRestartLinkButtonAnimation,
@@ -187,8 +188,7 @@ export function RestartLinkButton({
   const showRevive = reason === "expired";
 
   return (
-    <button
-      type="button"
+    <ComicPressButton
       className={[styles.root, className].filter(Boolean).join(" ")}
       style={showRevive ? reviveBannerStyle(reviveTextX, reviveTextY, reviveTextRotate) : undefined}
       disabled={disabled}
@@ -209,6 +209,6 @@ export function RestartLinkButton({
         filterIcon={filterIcon}
       />
       {showRevive ? <ReviveLockup lockupRef={reviveLockup} bannerRef={reviveBanner} /> : null}
-    </button>
+    </ComicPressButton>
   );
 }
