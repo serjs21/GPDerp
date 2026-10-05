@@ -2,6 +2,7 @@
 
 import AxiosInit from "@/client.axios.setup";
 import { useMarkHydrated } from "@/hooks/useMarkHydrated";
+import { useScrollTopOnRouteChange } from "@/hooks/useScrollTopOnRouteChange";
 import styles from "./headerStyles.module.css";
 import layoutStyles from "./layoutProviders.module.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
@@ -26,6 +27,7 @@ export interface LayoutProviderProps {
 export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps): React.JSX.Element => {
   const clientId = googleClientId || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   useMarkHydrated();
+  useScrollTopOnRouteChange();
 
   const withAuthVerification = (
     <PaddleProvider>
