@@ -9,6 +9,8 @@ export const USER_MENU_GO_HOME = {
 export const USER_MENU_LOGIN = {
   value: "login",
   iconSrc: "/nav/login.svg",
+  /** Go-home arrow, mirrored in CSS. */
+  backgroundSrc: USER_MENU_GO_HOME.backgroundSrc,
   label: "Login",
   /** 4.5rem at the 16px root size. */
   iconSizePx: 72,

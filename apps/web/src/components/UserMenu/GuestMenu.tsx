@@ -39,6 +39,8 @@ export function GuestMenu({ className }: GuestMenuProps) {
           />
         ),
         backgroundColor: USER_MENU_LOGIN.iconFill,
+        iconSrc: USER_MENU_LOGIN.backgroundSrc,
+        className: styles.loginOption,
       },
     ],
     [onMainPage],

@@ -46,6 +46,12 @@
   margin-left: -0.5rem;
 }
 
+.loginOption > svg:first-child {
+  width: calc(100% + 1rem);
+  margin-left: -0.5rem;
+  transform: rotateY(180deg);
+}
+
 .optionName {
   padding: 0.5rem 0;
   display: block;
