@@ -324,6 +324,7 @@ export function ComicLabelPickerPanel({
             text={formatComicLabelText(footerLabel)}
             fill={canSave ? SAVE_FILL : SAVE_DISABLED_FILL}
             shapeKind="rect"
+            stretch
           />
         </ComicPressButton>
       </div>

@@ -11,6 +11,7 @@ import {
   estimateComicBurstTextWidth,
   measureComicBurstTextWidth,
 } from "./measureComicBurstText";
+import { stretchPathProps, stretchSvgProps } from "./utils/stretchUtils";
 import styles from "./ComicBurstLabel.module.css";
 
 export type ComicBurstLabelProps = {
@@ -34,6 +35,11 @@ export type ComicBurstLabelProps = {
   leading?: ReactNode;
   /** When set, replaces lettering with custom content (e.g. an avatar icon). */
   children?: ReactNode;
+  /**
+   * Let the SVG silhouette stretch to the box CSS gives it (no aspect lock,
+   * constant stroke). Meant for `rect`; spiky shapes would distort.
+   */
+  stretch?: boolean;
 };
 
 const DEFAULT_FILL = "#f4511e";
@@ -204,6 +210,7 @@ export const ComicBurstLabel = memo(function ComicBurstLabel(props: ComicBurstLa
         width={layout.width}
         height={layout.height}
         viewBox={`0 0 ${layout.width} ${layout.height}`}
+        {...stretchSvgProps(props.stretch)}
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden
       >
@@ -214,6 +221,7 @@ export const ComicBurstLabel = memo(function ComicBurstLabel(props: ComicBurstLa
           strokeWidth={strokeWidth}
           strokeLinejoin={strokeLinejoin}
           strokeLinecap={strokeLinecap}
+          {...stretchPathProps(props.stretch)}
         />
       </svg>
       <BurstOverlay text={text} textColor={textColor} leading={leading}>

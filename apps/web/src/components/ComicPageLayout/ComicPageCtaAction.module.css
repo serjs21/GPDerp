@@ -1,4 +1,8 @@
-/* Hug the rect burst so the ComicPressButton shadow traces its edges. */
+/*
+ * Hug the rect burst so the ComicPressButton shadow traces its edges.
+ * Width is intrinsic by default; containers (e.g. the dialog CTA footer)
+ * may widen the button and the stretched burst follows.
+ */
 .action {
   display: block;
   margin: 0;
@@ -20,10 +24,11 @@
 
 .burst {
   display: block;
+  width: 100%;
 }
 
 .burst svg {
   display: block;
-  width: auto;
+  width: 100%;
   height: 3.35rem;
 }

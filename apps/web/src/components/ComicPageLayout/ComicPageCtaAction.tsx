@@ -41,6 +41,7 @@ export function ComicPageCtaAction({
     <ComicPressButton
       type={type}
       className={styles.action}
+      data-comic-cta
       disabled={!canPress}
       aria-busy={busy || undefined}
       aria-label={ariaLabel ?? label}
@@ -62,6 +63,7 @@ export function ComicPageCtaAction({
         paddingX={CTA_PADDING_X}
         paddingY={CTA_PADDING_Y}
         strokeWidth={3}
+        stretch
       />
     </ComicPressButton>
   );

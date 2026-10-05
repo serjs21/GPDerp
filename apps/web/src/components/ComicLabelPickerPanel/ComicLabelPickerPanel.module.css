@@ -70,14 +70,15 @@
 .footerRow {
   flex: 0 0 auto;
   width: 100%;
+  margin-top: auto;
   padding-top: 0.15rem;
 }
 
-/* Hug the rect burst so the ComicPressButton shadow traces its edges. */
+/* Full-width button; the stretched rect burst fills it so the shadow traces its edges. */
 .saveButton {
   display: block;
-  width: fit-content;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   padding: 0;
   border: none;
   background: transparent;
@@ -96,10 +97,11 @@
 
 .saveBurst {
   display: block;
+  width: 100%;
 }
 
 .saveBurst svg {
   display: block;
-  width: auto;
+  width: 100%;
   height: 3.35rem;
 }

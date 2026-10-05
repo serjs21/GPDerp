@@ -346,6 +346,7 @@ export function ComicLabelCreationModal({
                 paddingX={48}
                 paddingY={10}
                 strokeWidth={3}
+                stretch
               />
             </ComicPressButton>
           </span>

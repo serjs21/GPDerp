@@ -251,6 +251,8 @@
   display: flex;
   justify-content: center;
   width: 100%;
+  /* Pin to the bottom when the page is taller than its content (full-screen dialogs). */
+  margin-top: auto;
   padding: 0.35rem 0 0.15rem;
   background: #fff;
 }
@@ -262,4 +264,10 @@
   justify-content: center;
   gap: 0.75rem;
   width: 100%;
+}
+
+/* CTA bursts share the full footer width. */
+.ctaFooterInner > [data-comic-cta] {
+  flex: 1 1 0;
+  min-width: 0;
 }
