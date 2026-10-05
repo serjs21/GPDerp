@@ -8,7 +8,7 @@ const ROW_CAPTION = { top: "0.4rem", left: "50%", rotateDeg: 0, width: "3rem" } 
  * (≈3.2rem tall, wider than tall): icon left, caption right.
  */
 export const SHARE_LINK_ACTION_ROW_LAYOUTS = {
-  preview: { icon: { size: "3.5rem", top: "0.2rem", left: "0.4rem", rotateDeg: 0 }, caption: { top: "10px", right: "10px", rotateDeg: 0 },
+  preview: { icon: { size: "3.5rem", bottom: "0rem", left: "0.4rem", rotateDeg: 0 }, caption: ROW_CAPTION,
 },
   followLink: { icon: ROW_ICON, caption: ROW_CAPTION },
   showLabels: {

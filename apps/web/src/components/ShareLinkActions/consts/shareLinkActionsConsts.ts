@@ -27,7 +27,7 @@ const COMMON_CAPTION_RIGHT = "12px"
 /** Absolute icon + caption placement per action panel (6.25rem wide column). */
 export const SHARE_LINK_ACTION_LAYOUTS = {
   preview: {
-    icon: { size: "3.5rem", top: "0rem", left: "0rem", rotateDeg: 0 },
+    icon: { size: "3.5rem", top: "0.4rem", left: "0rem", rotateDeg: 0 },
     caption: { top: COMMON_CAPTION_TOP, right: "6px", rotateDeg: 0 },
   },
   followLink: {
