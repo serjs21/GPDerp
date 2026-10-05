@@ -82,17 +82,9 @@ type Story = StoryObj<typeof meta>;
 
 export const IncludeOnly: Story = {};
 
-export const ExcludeOnly: Story = {
+export const NoSelection: Story = {
   args: {
     includeIds: [],
-    excludeIds: ["00000000-0000-4000-8000-000000000203"],
-  },
-};
-
-export const IncludeAndExclude: Story = {
-  args: {
-    includeIds: ["00000000-0000-4000-8000-000000000201"],
-    excludeIds: ["00000000-0000-4000-8000-000000000204"],
   },
 };
 
