@@ -69,6 +69,7 @@
   left: var(--share-link-action-icon-left, auto);
   display: block;
   width: var(--share-link-action-icon-size, 1.9rem);
+  max-width: 50%;
   height: auto;
   object-fit: contain;
   transform: rotate(var(--share-link-action-icon-rotate, 0deg));
@@ -99,6 +100,7 @@
 
 .captionLabels {
   white-space: break-spaces;
+  max-width: 50%;
   text-align: var(--share-link-action-caption-text-align, center);
   width: var(--share-link-action-caption-width, 3rem);
 }
@@ -150,7 +152,9 @@
 
   .stack .captionLabels {
     width: auto;
-    white-space: nowrap;
+    white-space: break-spaces;
+    max-width: 50%;
+    text-align: center;
   }
 }
 

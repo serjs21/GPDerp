@@ -22,7 +22,7 @@ export const SHARE_LINK_ACTION_COLORS = {
 } as const satisfies Record<string, { panel: ComicPanelColor; hover: string }>;
 
 
-const COMMON_CAPTION_TOP = "35%"
+const COMMON_CAPTION_TOP = "0.5rem"
 const COMMON_CAPTION_RIGHT = "12px"
 /** Absolute icon + caption placement per action panel (6.25rem wide column). */
 export const SHARE_LINK_ACTION_LAYOUTS = {
@@ -31,23 +31,23 @@ export const SHARE_LINK_ACTION_LAYOUTS = {
     caption: { top: COMMON_CAPTION_TOP, right: "6px", rotateDeg: 0 },
   },
   followLink: {
-    icon: { size: "3rem", top: "0rem", left: "0rem", rotateDeg: 0 },
-    caption: { top: "20%", right: "6px", rotateDeg: 0 },
+    icon: { size: "3rem", top: "0.4rem", left: "0rem", rotateDeg: 0 },
+    caption: { top: COMMON_CAPTION_TOP, right: "6px", rotateDeg: 0 },
   },
   showLabels: {
     icon: { size: "3.5rem", bottom: "0rem", right: "2.8rem", rotateDeg: 0 },
-    caption: { top: "10px", right: "0px", rotateDeg: 0 },  },
+    caption: { top: COMMON_CAPTION_TOP, right: "0px", rotateDeg: 0 },  },
   hideLabels: {
     icon: { size: "3.5rem", bottom: "0rem", right: "2.8rem", rotateDeg: 0 },
-    caption: { top: "10px", right: "0px", rotateDeg: 0 },
+    caption: { top: COMMON_CAPTION_TOP, right: "0px", rotateDeg: 0 },
   },
   delete: {
-    icon: { size: "2.8rem", top: "0.1rem", left: "0rem", rotateDeg: 0 },
+    icon: { size: "2.8rem", top: "0.4rem", left: "0rem", rotateDeg: 0 },
     caption: { top: COMMON_CAPTION_TOP, right: COMMON_CAPTION_RIGHT, rotateDeg: 0 },
   },
 } as const satisfies Record<string, ShareLinkActionLayout>;
 
-const PREVIEW_CAPTION_TOP_RIGHT = { top: "0.5rem", right: "0.5rem", rotateDeg: 0 } as const;
+const PREVIEW_CAPTION_TOP_RIGHT = { top: "0.4rem", right: "0.5rem", rotateDeg: 0 } as const;
 
 /** Preview modal footer panels (8rem × 6rem): caption top-right, icon bottom-left. */
 export const SHARE_LINK_PREVIEW_ACTION_LAYOUTS = {

@@ -79,7 +79,7 @@
   display: grid;
   padding: 0.75rem;
   background: var(--comic-page-background, #fff);
-  border: 1px solid var(--comic-ink, #2d2d2d);
+  border: 1px dashed var(--comic-ink, #2d2d2d);
   grid-template-columns: 1fr 6.25rem 1fr;
   gap: var(--comic-page-gutter, 10px);
   flex: 0 0 auto;
