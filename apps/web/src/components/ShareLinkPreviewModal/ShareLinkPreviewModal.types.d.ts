@@ -11,4 +11,6 @@ export type ShareLinkPreviewModalProps = {
   showLabels: boolean;
   togglingLabels: boolean;
   onToggleLabels: () => void;
+  /** Refetch the haiku after label placement / label edits. */
+  onHaikuChanged: () => void;
 };

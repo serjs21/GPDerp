@@ -50,6 +50,18 @@
   height: 100%;
 }
 
+.linkScroll {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  padding: 0.15rem 0.1rem 0.5rem;
+}
+
+.linkScroll::-webkit-scrollbar {
+  display: none;
+}
+
 .contentPanel {
   --share-email-content-height: 100%;
   min-height: 0;

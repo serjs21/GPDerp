@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useReducedMotion } from "motion/react";
 import { useRef, useState, type CSSProperties } from "react";
 import { deleteShareLink, type ShareLinkListItem } from "@/api/shareLinks";
@@ -28,7 +29,8 @@ import {
 import { MAGIC_EXIT_COLLAPSE_MS } from "@/components/ManageLabel/consts/magicAnimationConsts";
 import { useCollapseExit } from "@/hooks/useCollapseExit";
 import type { HitsMeterDisplay, TimeMeterDisplay } from "@/utils/shareLinkDisplay";
-import { ShareLinkPreviewModal } from "./ShareLinkPreviewModal";
+import { ShareLinkPreviewModal } from "@/components/ShareLinkPreviewModal";
+import { SHARE_LINK_HAIKUS_QUERY_KEY } from "./useShareLinkHaikuEnrichment";
 import styles from "./ShareLinkManagement.module.css";
 
 const DELETE_QUESTION = "Do you want to magically erase this link from existance?";
@@ -101,6 +103,7 @@ export function ShareLinkManagementRow({
   onChanged,
 }: ShareLinkManagementRowProps) {
   const reduceMotion = useReducedMotion();
+  const queryClient = useQueryClient();
   // Optimistic until the list refetch catches up (`base` stops matching the link).
   const [labelsOverride, setLabelsOverride] = useState<{ base: boolean; value: boolean } | null>(
     null,
@@ -335,6 +338,9 @@ export function ShareLinkManagementRow({
           showLabels={showLabels}
           togglingLabels={ctrl.togglingLabels}
           onToggleLabels={() => void ctrl.onToggleLabels(!showLabels)}
+          onHaikuChanged={() =>
+            void queryClient.invalidateQueries({ queryKey: [SHARE_LINK_HAIKUS_QUERY_KEY] })
+          }
         />
 
         <ComicConfirmModal

@@ -1,7 +1,6 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ComicPageDialog, ComicPagePanel } from "@/components/ComicPageLayout";
 import { CreateAddLabelsModal } from "@/components/CreateAddLabelsModal";
 import { LabelHalo, toLabelHaloItems } from "@/components/LabelHalo";
@@ -15,7 +14,6 @@ import {
   ShareLinkLabelsToggle,
 } from "@/components/ShareLinkActions";
 import { useHaikuLabelPlacement } from "@/hooks/useHaikuLabelPlacement";
-import { SHARE_LINK_HAIKUS_QUERY_KEY } from "./useShareLinkHaikuEnrichment";
 import { shareLinkPreviewPanelStyle } from "./utils/shareLinkPreviewModalUtils";
 import type { ShareLinkPreviewModalProps } from "./ShareLinkPreviewModal.types";
 import styles from "./ShareLinkPreviewModal.module.css";
@@ -29,18 +27,14 @@ export function ShareLinkPreviewModal({
   showLabels,
   togglingLabels,
   onToggleLabels,
+  onHaikuChanged,
 }: ShareLinkPreviewModalProps) {
-  const queryClient = useQueryClient();
   const [labelsOpen, setLabelsOpen] = useState(false);
-
-  const refreshHaiku = useCallback(() => {
-    void queryClient.invalidateQueries({ queryKey: [SHARE_LINK_HAIKUS_QUERY_KEY] });
-  }, [queryClient]);
 
   const { onPlacementCommit } = useHaikuLabelPlacement({
     haikuId: haiku?.id,
     enabled: Boolean(haiku),
-    onChanged: refreshHaiku,
+    onChanged: onHaikuChanged,
   });
 
   const haloLabels = useMemo(() => toLabelHaloItems(haiku?.labels ?? []), [haiku?.labels]);
@@ -119,7 +113,7 @@ export function ShareLinkPreviewModal({
           haiku={haiku}
           initialTab="add"
           onClose={() => setLabelsOpen(false)}
-          onSaved={refreshHaiku}
+          onSaved={onHaikuChanged}
         />
       ) : null}
     </>

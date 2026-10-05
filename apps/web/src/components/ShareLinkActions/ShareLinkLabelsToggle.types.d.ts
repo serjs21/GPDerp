@@ -11,4 +11,5 @@ export type ShareLinkLabelsToggleProps = Pick<
   rowLayouts?: { show: ShareLinkActionLayout; hide: ShareLinkActionLayout };
   /** Appended to the default caption class. */
   captionClassName?: ShareLinkActionButtonProps["captionClassName"];
+  disabled?: ShareLinkActionButtonProps["disabled"];
 };

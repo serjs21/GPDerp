@@ -180,14 +180,16 @@ export function ShareModal({
                 </Typography.Paragraph>
               </ComicPagePanel>
             ) : (
-              <ShareLink
-                link={shareLink}
-                haikuId={haikuId}
-                haikuSubject={haikuSubject}
-                haiku={haiku}
-                onChanged={() => undefined}
-                onLinkUpdate={setShareLink}
-              />
+              <div className={styles.linkScroll}>
+                <ShareLink
+                  link={shareLink}
+                  haikuId={haikuId}
+                  haikuSubject={haikuSubject}
+                  haiku={haiku}
+                  onChanged={() => undefined}
+                  onLinkUpdate={setShareLink}
+                />
+              </div>
             )
           ) : (
             <ComicPagePanel span="full" color="white" contentAlign="start" className={styles.contentPanel}>

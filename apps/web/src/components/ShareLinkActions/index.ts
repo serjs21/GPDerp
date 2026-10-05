@@ -4,6 +4,8 @@ export { ShareLinkUpdateAction } from "./ShareLinkUpdateAction";
 export type { ShareLinkUpdateActionProps } from "./ShareLinkUpdateAction.types";
 export { ShareLinkLabelsToggle } from "./ShareLinkLabelsToggle";
 export type { ShareLinkLabelsToggleProps } from "./ShareLinkLabelsToggle.types";
+export { ShareLinkPreviewLabelsActions } from "./ShareLinkPreviewLabelsActions";
+export type { ShareLinkPreviewLabelsActionsProps } from "./ShareLinkPreviewLabelsActions.types";
 export { ShareLinkGoToLinkAction } from "./ShareLinkGoToLinkAction";
 export type { ShareLinkGoToLinkActionProps } from "./ShareLinkGoToLinkAction.types";
 export { ShareLinkEditLabelsAction } from "./ShareLinkEditLabelsAction";

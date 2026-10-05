@@ -9,6 +9,29 @@
   color: var(--comic-ink, #2d2d2d);
 }
 
+/* Same frame as ShareLinkManagement `.linkRow`, stacked: lantern → actions → settings. */
+.card {
+  box-sizing: border-box;
+  gap: var(--comic-page-gutter, 10px);
+  height: auto;
+  padding: 0.75rem;
+  background: var(--comic-page-background, #fff);
+  border: 1px dashed var(--comic-ink, #2d2d2d);
+}
+
+.card > * {
+  flex: 0 0 auto;
+}
+
+.cardInactive {
+  background: #e2e2e2;
+}
+
+/* Definite height so the copy button / lantern panel can fill it (`height: 100%`). */
+.card > .panelShell {
+  height: 14rem;
+}
+
 .panelShell {
   flex: 1 1 auto;
   min-width: 0;

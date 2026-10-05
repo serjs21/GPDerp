@@ -1,10 +1,16 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useState, type CSSProperties } from "react";
 import type { ShareLinkListItem } from "@/api/shareLinks";
-import type { HaikuDto } from "@/api/haikus";
+import { haikuQueryKeys, type HaikuDto } from "@/api/haikus";
 import * as shareLinksApi from "@/api/shareLinks";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
+import {
+  ShareLinkPreviewLabelsActions,
+  ShareLinkUpdateAction,
+} from "@/components/ShareLinkActions";
+import { ShareLinkPreviewModal } from "@/components/ShareLinkPreviewModal";
 import { MfgDate } from "@/components/MfgDate";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
@@ -14,6 +20,7 @@ import { Sway } from "@/components/Sway";
 import managementStyles from "@/components/ShareLinkManagement/ShareLinkManagement.module.css";
 import type { HitsMeterDisplay, TimeMeterDisplay } from "@/utils/shareLinkDisplay";
 import styles from "./ShareLink.module.css";
+import { ShareLinkLifecycleAction } from "./ShareLinkLifecycleAction";
 import { ShareLinkSettingsControls } from "./ShareLinkSettingsControls";
 import {
   CLOCK_SRC,
@@ -65,7 +72,9 @@ function PreviewLanternStats({
             aria-hidden
           />
         ) : (
-          <span className={managementStyles.previewStatValue}>{hits.count}</span>
+          <span className={managementStyles.previewStatValue}>
+            {hits.count}/{hits.total}
+          </span>
         )}
       </span>
       <span className={managementStyles.previewStat} aria-label={timeLabel}>
@@ -124,22 +133,21 @@ export function ShareLink({
     refreshShareLinkFn,
   });
 
+  const queryClient = useQueryClient();
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const showLabels = link?.showLabels ?? false;
+
   const previewBody = haiku?.body ?? "";
   const createdAt = haiku?.createdAt ?? link?.createdAt ?? null;
-  const previewFooter =
-    ctrl.active || createdAt ? (
-      <div className={managementStyles.previewFooter}>
-        {ctrl.active ? (
-          <PreviewLanternStats
-            hits={ctrl.hits}
-            time={ctrl.time}
-            hitsLabel={ctrl.hitsLabel}
-            timeLabel={ctrl.timeLabel}
-          />
-        ) : null}
-        {createdAt ? <MfgDate date={createdAt} /> : null}
-      </div>
-    ) : undefined;
+  const lanternStats = ctrl.active ? (
+    <PreviewLanternStats
+      hits={ctrl.hits}
+      time={ctrl.time}
+      hitsLabel={ctrl.hitsLabel}
+      timeLabel={ctrl.timeLabel}
+    />
+  ) : undefined;
+  const previewFooter = createdAt ? <MfgDate date={createdAt} /> : undefined;
 
   const lanternContent = haiku ? (
     <Lantern
@@ -172,6 +180,7 @@ export function ShareLink({
       span="full"
       background="halftone"
       color="sky"
+      title={lanternStats}
       footer={previewFooter}
       contentAlign="center"
       className={[
@@ -201,7 +210,11 @@ export function ShareLink({
   );
 
   return (
-    <article className={styles.root}>
+    <article
+      className={[styles.root, styles.card, ctrl.grayscale ? styles.cardInactive : ""]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <div
         className={[
           styles.panelShell,
@@ -228,23 +241,81 @@ export function ShareLink({
         )}
       </div>
 
-      <ShareLinkSettingsControls
-        form={ctrl.form}
-        setForm={ctrl.setForm}
-        limitsLocked={ctrl.limitsLocked}
-        formValid={ctrl.formValid}
-        showUpdate={ctrl.showUpdate}
-        updatingLimits={ctrl.updatingLimits}
-        activating={ctrl.activating}
-        deactivating={ctrl.deactivating}
-        active={ctrl.active}
-        busy={ctrl.busy}
-        isUpdating={ctrl.isUpdating}
-        busyDots={ctrl.busyDots}
-        onUpdateLimits={ctrl.onUpdateLimits}
-        onStart={ctrl.onStart}
-        onStop={ctrl.onStop}
-        restartReason={ctrl.restartReason}
+      <ShareLinkPreviewLabelsActions
+        subject={ctrl.subject}
+        showLabels={showLabels}
+        togglingLabels={ctrl.togglingLabels}
+        disabled={!link}
+        onPreview={() => setPreviewOpen(true)}
+        onToggleLabels={() => void ctrl.onToggleLabels(!showLabels)}
+      />
+
+      <div className={managementStyles.settingsColumn}>
+        <div className={managementStyles.settingsRow}>
+          <ComicPagePanel
+            background="solid"
+            color="white"
+            contentAlign="start"
+            className={managementStyles.settingsPanel}
+            ariaLabel={`Share link settings for ${ctrl.subject}`}
+          >
+            <div className={managementStyles.settingsBody}>
+              <ShareLinkSettingsControls
+                form={ctrl.form}
+                setForm={ctrl.setForm}
+                limitsLocked={ctrl.limitsLocked}
+                formValid={ctrl.formValid}
+                showUpdate={ctrl.showUpdate}
+                updatingLimits={ctrl.updatingLimits}
+                activating={ctrl.activating}
+                deactivating={ctrl.deactivating}
+                active={ctrl.active}
+                busy={ctrl.busy}
+                isUpdating={ctrl.isUpdating}
+                busyDots={ctrl.busyDots}
+                onUpdateLimits={ctrl.onUpdateLimits}
+                onStart={ctrl.onStart}
+                onStop={ctrl.onStop}
+                restartReason={ctrl.restartReason}
+                hideUpdate
+                hideLifecycleAction
+              />
+            </div>
+          </ComicPagePanel>
+          <div className={managementStyles.settingsUpdate}>
+            <ShareLinkUpdateAction
+              subject={ctrl.subject}
+              active={ctrl.active}
+              canUpdate={ctrl.showUpdate && ctrl.formValid}
+              updating={ctrl.updatingLimits}
+              onUpdate={() => void ctrl.onUpdateLimits()}
+            />
+          </div>
+        </div>
+        <ShareLinkLifecycleAction
+          formValid={ctrl.formValid}
+          activating={ctrl.activating}
+          deactivating={ctrl.deactivating}
+          active={ctrl.active}
+          busy={ctrl.busy}
+          isUpdating={ctrl.isUpdating}
+          busyDots={ctrl.busyDots}
+          onStart={ctrl.onStart}
+          onStop={ctrl.onStop}
+          stopButtonClassName={styles.stopButton}
+          restartReason={ctrl.restartReason}
+        />
+      </div>
+
+      <ShareLinkPreviewModal
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        subject={ctrl.subject}
+        haiku={haiku ?? undefined}
+        showLabels={showLabels}
+        togglingLabels={ctrl.togglingLabels}
+        onToggleLabels={() => void ctrl.onToggleLabels(!showLabels)}
+        onHaikuChanged={() => void queryClient.invalidateQueries({ queryKey: haikuQueryKeys.all })}
       />
     </article>
   );

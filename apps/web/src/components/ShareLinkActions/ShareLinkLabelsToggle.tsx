@@ -18,6 +18,7 @@ export function ShareLinkLabelsToggle({
   layouts = { show: SHARE_LINK_ACTION_LAYOUTS.showLabels, hide: SHARE_LINK_ACTION_LAYOUTS.hideLabels },
   rowLayouts,
   captionClassName,
+  disabled = false,
 }: ShareLinkLabelsToggleProps) {
   const colors = showLabels
     ? SHARE_LINK_ACTION_COLORS.showLabels
@@ -36,6 +37,7 @@ export function ShareLinkLabelsToggle({
       pressed={showLabels}
       busy={togglingLabels}
       inverted={!showLabels}
+      disabled={disabled}
       onSelect={onToggleLabels}
     />
   );
