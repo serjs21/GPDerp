@@ -1,0 +1,33 @@
+.button {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  appearance: none;
+  cursor: pointer;
+  box-shadow: 0.15rem 0.15rem var(--comic-ink, #2d2d2d);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Mouse down presses into the shadow; releasing plays the transition back. */
+.button:active:not(:disabled) {
+  transform: translate(0.15rem, 0.15rem);
+  box-shadow: 0 0 var(--comic-ink, #2d2d2d);
+}
+
+.button:disabled {
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}

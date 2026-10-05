@@ -25,7 +25,7 @@
 }
 
 .enabled:hover > *,
-.enabled:focus-visible > * {
+:focus-visible > .enabled > * {
   --comic-panel-base: var(--share-link-action-hover-fill);
 }
 
