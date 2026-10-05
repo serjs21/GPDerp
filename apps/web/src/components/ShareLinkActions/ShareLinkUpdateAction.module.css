@@ -24,6 +24,11 @@
   display: none;
 }
 
+/* Lift the shared action icon's 50% width cap. */
+.enabled img {
+  max-width: none;
+}
+
 .enabled:hover > *,
 :focus-visible > .enabled > * {
   --comic-panel-base: var(--share-link-action-hover-fill);
