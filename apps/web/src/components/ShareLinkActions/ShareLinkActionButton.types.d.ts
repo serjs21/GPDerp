@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { ComicPagePanelProps } from "@/components/ComicPageLayout";
 
 /**
@@ -18,6 +19,9 @@ export type ShareLinkActionIconPlacement = ShareLinkActionPlacement & {
 export type ShareLinkActionCaptionPlacement = ShareLinkActionPlacement & {
   /** Caption font size (CSS length); omitted keeps the stylesheet default. */
   fontSize?: string;
+  /** Caption box width (CSS length); omitted keeps the stylesheet default. */
+  width?: string;
+  textAlign?: CSSProperties["textAlign"];
 };
 
 export type ShareLinkActionLayout = {

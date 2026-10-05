@@ -87,6 +87,8 @@
   color: var(--comic-ink, #2d2d2d);
   font-family: var(--font-comic-label), "Bangers", sans-serif;
   font-size: var(--share-link-action-caption-font-size, 0.8rem);
+  width: var(--share-link-action-caption-width, auto);
+  text-align: var(--share-link-action-caption-text-align, start);
   font-weight: 400;
   letter-spacing: 0.05em;
   line-height: 1;
@@ -97,8 +99,8 @@
 
 .captionLabels {
   white-space: break-spaces;
-  text-align: center;
-  width: 3rem;
+  text-align: var(--share-link-action-caption-text-align, center);
+  width: var(--share-link-action-caption-width, 3rem);
 }
 
 .inverted .caption {
@@ -142,6 +144,8 @@
     left: var(--share-link-action-row-caption-left, var(--share-link-action-caption-left, auto));
     transform: rotate(var(--share-link-action-row-caption-rotate, var(--share-link-action-caption-rotate, 0deg)));
     font-size: var(--share-link-action-row-caption-font-size, var(--share-link-action-caption-font-size, 0.8rem));
+    width: var(--share-link-action-row-caption-width, var(--share-link-action-caption-width, auto));
+    text-align: var(--share-link-action-row-caption-text-align, var(--share-link-action-caption-text-align, start));
   }
 
   .stack .captionLabels {

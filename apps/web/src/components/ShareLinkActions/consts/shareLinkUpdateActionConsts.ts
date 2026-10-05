@@ -15,10 +15,9 @@ export const SHARE_LINK_UPDATE_COLORS = {
   hover: "#f0ff6b",
 } as const satisfies { panel: ComicPanelColor; accent: string; hover: string };
 
-/** Absolute icon + caption placement inside the 6.25rem-wide Update panel. */
 export const SHARE_LINK_UPDATE_LAYOUT = {
-  icon: { size: "6em", top: "0rem", left: "0rem", rotateDeg: 0 },
-  caption: { bottom: "1rem", right: "1.5rem", rotateDeg: 0, fontSize: "1.2rem" },
+  icon: { size: "100%", top: "0rem", left: "0rem", rotateDeg: 0 },
+  caption: { bottom: "1rem", right: "0", rotateDeg: 0, fontSize: "1.2rem", width: "100%", textAlign: "center" },
 } as const satisfies ShareLinkActionLayout;
 
 export const SHARE_LINK_UPDATE_DISABLED_MESSAGES = {

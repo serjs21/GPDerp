@@ -26,8 +26,20 @@ export function shareLinkActionLayoutStyle(
     [`${prefix}-caption-right`]: caption.right ?? "auto",
     [`${prefix}-caption-left`]: caption.left ?? "auto",
     [`${prefix}-caption-rotate`]: `${caption.rotateDeg}deg`,
-    ...(caption.fontSize ? { [`${prefix}-caption-font-size`]: caption.fontSize } : {}),
+    ...captionTextStyle(caption, prefix),
   } as CSSProperties;
+}
+
+/** Optional caption text vars; omitted keys keep the stylesheet defaults. */
+function captionTextStyle(
+  { fontSize, width, textAlign }: ShareLinkActionLayout["caption"],
+  prefix: string,
+): Record<string, string> {
+  return {
+    ...(fontSize ? { [`${prefix}-caption-font-size`]: fontSize } : {}),
+    ...(width ? { [`${prefix}-caption-width`]: width } : {}),
+    ...(textAlign ? { [`${prefix}-caption-text-align`]: textAlign } : {}),
+  };
 }
 
 /** Overrides the panel accent (sunburst rays / speed lines); hex panel colors otherwise reuse the base. */
