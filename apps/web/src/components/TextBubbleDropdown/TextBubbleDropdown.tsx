@@ -12,6 +12,7 @@ import {
   type RefObject,
 } from "react";
 import { ComicBubbleStage } from "@/components/ComicConfirmModal/ComicBubbleStage";
+import { ComicPressButton } from "@/components/ComicPressButton";
 import stageStyles from "@/components/ComicConfirmModal/comicBubbleStage.module.css";
 import {
   stagePaddingClassForDirection,
@@ -441,8 +442,7 @@ function TextBubbleDropdownInner({
 
   return (
     <div ref={rootRef} className={rootClass}>
-      <button
-        type="button"
+      <ComicPressButton
         className={styles.trigger}
         aria-expanded={open}
         aria-haspopup="listbox"
@@ -451,7 +451,7 @@ function TextBubbleDropdownInner({
         onClick={toggle}
       >
         {triggerContent}
-      </button>
+      </ComicPressButton>
 
       {stageMounted ? (
         <TextBubbleStage
