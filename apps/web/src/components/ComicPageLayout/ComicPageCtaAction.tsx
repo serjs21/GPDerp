@@ -2,6 +2,7 @@
 
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
+import { ComicPressButton } from "@/components/ComicPressButton";
 import styles from "./ComicPageCtaAction.module.css";
 
 const CTA_FILL = "#17131A";
@@ -37,7 +38,7 @@ export function ComicPageCtaAction({
   const burstFill = canPress ? (fill ?? CTA_FILL) : CTA_DISABLED_FILL;
 
   return (
-    <button
+    <ComicPressButton
       type={type}
       className={styles.action}
       disabled={!canPress}
@@ -62,6 +63,6 @@ export function ComicPageCtaAction({
         paddingY={CTA_PADDING_Y}
         strokeWidth={3}
       />
-    </button>
+    </ComicPressButton>
   );
 }

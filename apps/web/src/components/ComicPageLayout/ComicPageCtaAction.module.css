@@ -1,7 +1,8 @@
+/* Hug the rect burst so the ComicPressButton shadow traces its edges. */
 .action {
   display: block;
   margin: 0;
-  padding: 0.15rem 0;
+  padding: 0;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -22,6 +23,7 @@
 }
 
 .burst svg {
+  display: block;
   width: auto;
   height: 3.35rem;
 }

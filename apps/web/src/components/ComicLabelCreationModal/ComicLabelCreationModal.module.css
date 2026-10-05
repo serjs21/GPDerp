@@ -256,11 +256,12 @@
   width: 100%;
 }
 
+/* Hug the rect burst so the ComicPressButton shadow traces its edges. */
 .saveButton {
   display: block;
-  width: 100%;
-  margin: 0;
-  padding: 0.15rem 0;
+  width: fit-content;
+  margin: 0 auto;
+  padding: 0;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -278,11 +279,11 @@
 
 .saveBurst {
   display: block;
-  width: 100%;
 }
 
 .saveBurst svg {
-  width: 100%;
+  display: block;
+  width: auto;
   height: 3.35rem;
 }
 

@@ -10,6 +10,7 @@ import {
 } from "react";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
+import { ComicPressButton } from "@/components/ComicPressButton";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import { ComicModalSearchPanel } from "@/components/ComicModalInput";
 import {
@@ -308,7 +309,7 @@ export function ComicLabelPickerPanel({
       </div>
 
       <div className={styles.footerRow}>
-        <button
+        <ComicPressButton
           type="submit"
           className={styles.saveButton}
           disabled={!canSave}
@@ -324,7 +325,7 @@ export function ComicLabelPickerPanel({
             fill={canSave ? SAVE_FILL : SAVE_DISABLED_FILL}
             shapeKind="rect"
           />
-        </button>
+        </ComicPressButton>
       </div>
     </div>
   );

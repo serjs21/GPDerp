@@ -12,6 +12,7 @@ import { HexColorPicker } from "react-colorful";
 import type { LabelDto } from "@/api/labels";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
+import { ComicPressButton } from "@/components/ComicPressButton";
 import { ComicModalInput } from "@/components/ComicModalInput";
 import {
   ComicPageDialog,
@@ -323,7 +324,7 @@ export function ComicLabelCreationModal({
       <div className={styles.footerRow}>
         <Tooltip title={disabledReason ?? ""}>
           <span className={styles.tooltipWrap}>
-            <button
+            <ComicPressButton
               type="submit"
               className={styles.saveButton}
               disabled={!canSave}
@@ -346,7 +347,7 @@ export function ComicLabelCreationModal({
                 paddingY={10}
                 strokeWidth={3}
               />
-            </button>
+            </ComicPressButton>
           </span>
         </Tooltip>
       </div>
