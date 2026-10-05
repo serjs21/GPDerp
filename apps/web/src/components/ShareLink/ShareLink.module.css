@@ -160,7 +160,10 @@
 }
 
 .limitControl {
-  flex: 1 1 0;
+  display: flex;
+  flex: 0 0 auto;
+  align-self: stretch;
+  width: 100%;
   min-width: 0;
   max-width: 100%;
 }

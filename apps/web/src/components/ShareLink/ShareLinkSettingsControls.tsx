@@ -103,7 +103,7 @@ export function ShareLinkSettingsControls({
       <div className={styles.limitsRow}>
         <div className={styles.limitFields}>
           <label className={styles.limitField}>
-            <span className={styles.limitLabel}>Hits</span>
+            <span className={styles.limitLabel}>Hits limit:</span>
             <span className={styles.limitControl}>
               <InputNumber
                 min={1}
@@ -124,12 +124,12 @@ export function ShareLinkSettingsControls({
           </label>
 
           <label className={styles.limitField}>
-            <span className={styles.limitLabel}>Timeout</span>
+            <span className={styles.limitLabel}>Timeout at:</span>
             <span className={styles.limitControl}>
               <DatePicker
                 showTime
                 allowClear
-                placeholder="∞"
+                placeholder="End of times"
                 value={form.expiresAt}
                 disabled={limitsLocked}
                 minDate={minTimeoutAt()}

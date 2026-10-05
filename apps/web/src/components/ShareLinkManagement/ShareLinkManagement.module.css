@@ -170,6 +170,7 @@
   align-items: stretch;
   gap: var(--comic-page-gutter, 10px);
   min-width: 0;
+  container: share-link-settings-row / inline-size;
 }
 
 .settingsRow > .settingsPanel {
@@ -178,11 +179,19 @@
 }
 
 .settingsUpdate {
-  width: 8rem;
   display: flex;
-  flex: 0 0 7rem;
+  flex: 0 0 8rem;
   flex-direction: column;
+  min-width: 6rem;
+  max-width: 8rem;
   min-height: 0;
+}
+
+/* Only a narrow settings row may squeeze the Update panel (down to min-width). */
+@container share-link-settings-row (max-width: 16rem) {
+  .settingsUpdate {
+    flex-shrink: 1;
+  }
 }
 
 .lanternSlot {
