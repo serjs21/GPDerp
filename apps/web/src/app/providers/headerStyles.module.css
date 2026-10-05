@@ -7,7 +7,8 @@
     position: sticky;
     top: 0;
     z-index: 500;
-    background: transparent;
+    /* #ffffffbd scaled by --site-header-overlap (0 → transparent; unset on most pages). */
+    background: rgb(255 255 255 / calc(0.741 * var(--site-header-overlap, 0)));
     /* Empty chrome passes through to LabelHalo / path under the sticky band. */
     pointer-events: none;
 }

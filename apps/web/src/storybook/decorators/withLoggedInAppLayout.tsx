@@ -104,7 +104,7 @@ export const withLoggedInAppLayout: Decorator = (Story, { parameters }) => {
                   </footer>
                 }
               >
-                <header className={headerStyles.header}>
+                <header className={headerStyles.header} data-site-header>
                   <div className={headerStyles.headerBar}>
                     <AuthNavigation />
                   </div>

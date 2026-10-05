@@ -45,7 +45,7 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
                   </footer>
                 }
               >
-                <header className={styles.header}>
+                <header className={styles.header} data-site-header>
                   <div className={styles.headerBar}>
                     <AuthNavigation />
                   </div>

@@ -39,6 +39,7 @@ import {
 } from "@/components/ComicPanelTabs";
 import { useManageLabelsAccount } from "@/hooks/useAccountLabels";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useSiteHeaderOverlap } from "@/hooks/useSiteHeaderOverlap";
 import { SETTINGS_SIDE_PANEL_QUERY } from "@/consts/settings/settingsLayoutConsts";
 import { ProfileProvider, type ProfileContextValue } from "./ProfileContext";
 import { ProfileInfoTab } from "./components/ProfileInfoTab";
@@ -112,6 +113,8 @@ export default function ProfilePage() {
   const [resendingEmailChange, setResendingEmailChange] = useState(false);
   const [savingAvatar, setSavingAvatar] = useState(false);
   const [sideNode, setSideNode] = useState<HTMLElement | null>(null);
+  const [pageNode, setPageNode] = useState<HTMLElement | null>(null);
+  useSiteHeaderOverlap(pageNode);
   const sidePanelWide = useMediaQuery(SETTINGS_SIDE_PANEL_QUERY);
   const { setTheme } = useTheme();
   const { setLocale } = useLocale();
@@ -336,7 +339,7 @@ export default function ProfilePage() {
   const sidePanelTarget = showSidePanel ? sideNode : null;
 
   return (
-    <main className={styles.page}>
+    <main ref={setPageNode} className={styles.page}>
       <ProfileProvider value={profileContextValue}>
         <ComicPageLayout className={styles.layout}>
           <div className={styles.body}>
