@@ -74,7 +74,7 @@
 
 .listScroll {
   padding-top: 1rem;
-  --manage-label-list-gap: 1.5rem;
+  --manage-label-list-gap: 1.75rem;
   flex: 1 1 auto;
   box-sizing: border-box;
   display: flex;
