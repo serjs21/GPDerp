@@ -55,6 +55,16 @@
   min-height: 0;
 }
 
+.dialogPopup .page {
+  padding: 2rem 1rem;
+}
+
+/* Close button sits inside the top gutter strip. */
+.dialogPopup .closeButton {
+  width: 2rem;
+  height: 2rem;
+}
+
 /* Opening / closing: fly a comic sheet onto / off the stack */
 .dialogPopup[data-starting-style],
 .dialogPopup[data-ending-style] {
