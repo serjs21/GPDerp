@@ -10,13 +10,19 @@
   min-height: 6.5rem;
 }
 
+/* Tall enough for the stacked ShareLink card without an inner scroll. */
+.dialogContent {
+  max-height: min(94vh, 52rem);
+}
+
 /*
- * Fixed shell height so Link / Email / sent states share one modal size
- * without filler spacers. Sized for method row + content + email send row.
+ * Shared shell height so Link / Email / sent states are one modal size.
+ * Content height fits the ShareLink card; the email tab splits it between
+ * the message panel and the send row.
  */
 .body {
   --share-modal-method-height: 6.5rem;
-  --share-modal-content-height: 20rem;
+  --share-modal-content-height: 36rem;
   --share-modal-send-height: 5.5rem;
   --share-modal-gap: var(--comic-page-gutter, 10px);
 
@@ -25,13 +31,8 @@
   flex-direction: column;
   gap: var(--share-modal-gap);
   width: 100%;
-  height: calc(
-    var(--share-modal-method-height) + var(--share-modal-content-height) + var(--share-modal-send-height) +
-      (2 * var(--share-modal-gap))
-  );
   min-height: calc(
-    var(--share-modal-method-height) + var(--share-modal-content-height) + var(--share-modal-send-height) +
-      (2 * var(--share-modal-gap))
+    var(--share-modal-method-height) + var(--share-modal-content-height) + var(--share-modal-gap)
   );
 }
 
@@ -48,18 +49,6 @@
   flex: 1 1 auto;
   min-height: 0;
   height: 100%;
-}
-
-.linkScroll {
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: none;
-  padding: 0.15rem 0.1rem 0.5rem;
-}
-
-.linkScroll::-webkit-scrollbar {
-  display: none;
 }
 
 .contentPanel {

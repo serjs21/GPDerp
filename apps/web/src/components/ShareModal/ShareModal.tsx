@@ -110,6 +110,7 @@ export function ShareModal({
     <ComicPageDialog
       open={open}
       showClose
+      contentClassName={styles.dialogContent}
       onOpenChange={(nextOpen) => {
         if (!nextOpen) onClose();
       }}
@@ -180,16 +181,14 @@ export function ShareModal({
                 </Typography.Paragraph>
               </ComicPagePanel>
             ) : (
-              <div className={styles.linkScroll}>
-                <ShareLink
-                  link={shareLink}
-                  haikuId={haikuId}
-                  haikuSubject={haikuSubject}
-                  haiku={haiku}
-                  onChanged={() => undefined}
-                  onLinkUpdate={setShareLink}
-                />
-              </div>
+              <ShareLink
+                link={shareLink}
+                haikuId={haikuId}
+                haikuSubject={haikuSubject}
+                haiku={haiku}
+                onChanged={() => undefined}
+                onLinkUpdate={setShareLink}
+              />
             )
           ) : (
             <ComicPagePanel span="full" color="white" contentAlign="start" className={styles.contentPanel}>

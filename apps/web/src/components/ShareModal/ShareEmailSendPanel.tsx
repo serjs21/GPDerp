@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import { Tooltip } from "@/components/StyledComponents";
 import { ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
+import { ComicPressButton } from "@/components/ComicPressButton";
 import styles from "./ShareEmailSendPanel.module.css";
 
 export type ShareEmailSendPanelProps = {
@@ -33,37 +34,41 @@ export function ShareEmailSendPanel({
     <ComicPageRow className={styles.sendRow}>
       <Tooltip title={tooltipTitle}>
         <span className={styles.tooltipWrap}>
-          <ComicPagePanel
-            span="full"
-            selectable
-            selected={active}
-            loading={sendingEmail}
-            onSelect={handleSelect}
-            background={active ? "halftone" : "solid"}
-            color={active ? "teal" : "white"}
-            ariaLabel="Send email"
-            className={styles.sendPanel}
+          <ComicPressButton
+            className={styles.pressShell}
+            aria-label="Send email"
+            aria-busy={sendingEmail}
+            disabled={!ready}
+            onClick={handleSelect}
           >
-            <motion.span
-              className={styles.iconWrap}
-              animate={
-                isFlying
-                  ? {
-                      x: [0, 3, -2, 4, 1, 0],
-                      y: [0, -4, -7, -5, -2, 0],
-                      rotate: [0, -5, 4, -3, 2, 0],
-                    }
-                  : { x: 0, y: 0, rotate: 0 }
-              }
-              transition={
-                isFlying
-                  ? { duration: 1.4, repeat: Infinity, ease: "easeInOut" }
-                  : { duration: 0.2 }
-              }
+            <ComicPagePanel
+              span="full"
+              loading={sendingEmail}
+              background={active ? "halftone" : "solid"}
+              color={active ? "teal" : "white"}
+              className={styles.sendPanel}
             >
-              <img src="/share_modal/email_send.svg" alt="" className={styles.icon} />
-            </motion.span>
-          </ComicPagePanel>
+              <motion.span
+                className={styles.iconWrap}
+                animate={
+                  isFlying
+                    ? {
+                        x: [0, 3, -2, 4, 1, 0],
+                        y: [0, -4, -7, -5, -2, 0],
+                        rotate: [0, -5, 4, -3, 2, 0],
+                      }
+                    : { x: 0, y: 0, rotate: 0 }
+                }
+                transition={
+                  isFlying
+                    ? { duration: 1.4, repeat: Infinity, ease: "easeInOut" }
+                    : { duration: 0.2 }
+                }
+              >
+                <img src="/share_modal/email_send.svg" alt="" className={styles.icon} />
+              </motion.span>
+            </ComicPagePanel>
+          </ComicPressButton>
         </span>
       </Tooltip>
     </ComicPageRow>

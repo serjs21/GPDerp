@@ -7,7 +7,22 @@
   width: 100%;
 }
 
+/* ComicPressButton shell (shadow + press); the panel fills it. */
+.pressShell {
+  display: flex;
+  width: 100%;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Let the tooltip wrapper receive hover while the button is disabled. */
+.pressShell:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .sendPanel {
+  flex: 1 1 auto;
   min-height: 5rem;
   transition-duration: 0.3s;
 }
