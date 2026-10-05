@@ -46,6 +46,11 @@
   margin-left: -0.5rem;
 }
 
+.loginOption {
+  padding: 0;
+  margin-top: -0.5rem;
+}
+
 .loginOption > svg:first-child {
   width: calc(100% + 1rem);
   margin-left: -0.5rem;

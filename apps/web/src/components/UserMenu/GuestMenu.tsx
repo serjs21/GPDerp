@@ -13,7 +13,7 @@ import {
 } from "./consts/userMenuConsts";
 import type { GuestMenuProps } from "./GuestMenu.types";
 import { UserMenuBurstFrame } from "./UserMenuBurstFrame";
-import { UserMenuOptionIconLabel } from "./UserMenuOptionIconLabel";
+import { GoHomeOptionLabel } from "./GoHomeOptionLabel";
 import { goHomeOption, isMainPage } from "./utils/userMenuOptionUtils";
 import frameStyles from "./UserMenuBurstFrame.module.css";
 import styles from "./UserMenu.module.css";
@@ -30,15 +30,7 @@ export function GuestMenu({ className }: GuestMenuProps) {
       ...(onMainPage ? [] : [goHomeOption()]),
       {
         value: USER_MENU_LOGIN.value,
-        label: (
-          <UserMenuOptionIconLabel
-            src={USER_MENU_LOGIN.iconSrc}
-            iconLabel={USER_MENU_LOGIN.label}
-            text={USER_MENU_LOGIN.label}
-            size={USER_MENU_LOGIN.iconSizePx}
-          />
-        ),
-        backgroundColor: USER_MENU_LOGIN.iconFill,
+        label: <GoHomeOptionLabel text={USER_MENU_LOGIN.label} />,
         iconSrc: USER_MENU_LOGIN.backgroundSrc,
         className: styles.loginOption,
       },
