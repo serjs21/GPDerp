@@ -22,6 +22,15 @@
   );
 }
 
+/* Full-screen dialog: fill the page so the footer CTA sits at its bottom. */
+@media (max-width: 1024px) {
+  .body {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+  }
+}
+
 .methodRow {
   position: relative;
   z-index: 3;
