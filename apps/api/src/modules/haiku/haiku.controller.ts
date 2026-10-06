@@ -14,6 +14,19 @@ import { insufficientCreditsBody } from "../payments/utils/purchaseResponses";
 import { haikuService, type HaikuStreamYield } from "./haiku.service";
 import { readShareHaikuEmailRequest } from "./utils/shareHaikuEmailRequest";
 
+type ShareEmailFailureReason = Extract<
+  Awaited<ReturnType<typeof haikuService.shareHaikuByEmailForUser>>,
+  { ok: false }
+>["reason"];
+
+const SHARE_EMAIL_FAILURES: Record<ShareEmailFailureReason, { status: number; error: string }> = {
+  not_found: { status: 404, error: "Haiku not found" },
+  forbidden: { status: 403, error: "Unauthorized" },
+  invalid_recipients: { status: 400, error: "One or more recipient emails are invalid" },
+  message_too_long: { status: 400, error: "The message does not fit on the postcard" },
+  enqueue_failed: { status: 500, error: "Could not queue the postcards" },
+};
+
 const haikuPluginImpl = async (app: FastifyInstance) => {
   app.get(
     "/haiku/manage_labels/account",
@@ -365,7 +378,7 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
         res.code(parsed.status).send({ ok: false, error: parsed.error });
         return;
       }
-      const { haikuId, emails, message, postcard } = parsed.value;
+      const { haikuId, emails, message, front } = parsed.value;
 
       if (!isUuid(haikuId)) {
         res.code(400).send({ ok: false, error: "Invalid haikuId" });
@@ -382,23 +395,16 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
         haikuId,
         recipients: emails,
         personalMessage: message,
-        postcard,
+        front,
       });
 
       if (!result.ok) {
-        if (result.reason === "not_found") {
-          res.code(404).send({ ok: false, error: "Haiku not found" });
-          return;
-        }
-        if (result.reason === "invalid_recipients") {
-          res.code(400).send({ ok: false, error: "One or more recipient emails are invalid" });
-          return;
-        }
-        res.code(403).send({ ok: false, error: "Unauthorized" });
+        const failure = SHARE_EMAIL_FAILURES[result.reason];
+        res.code(failure.status).send({ ok: false, error: failure.error });
         return;
       }
 
-      res.send({ ok: true, data: { sentCount: result.sentCount } });
+      res.code(202).send({ ok: true, data: { queuedCount: result.queuedCount } });
     },
   );
 

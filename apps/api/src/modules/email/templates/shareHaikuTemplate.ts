@@ -16,8 +16,8 @@ export const buildShareHaikuEmail = (params: {
   personalMessage: string;
   title: string;
   body: string;
-  /** Front/back PNGs are attached with cids POSTCARD_FRONT_CID / POSTCARD_BACK_CID. */
-  hasPostcard?: boolean;
+  /** Back PNG is attached with cid POSTCARD_BACK_CID; the front (POSTCARD_FRONT_CID) only when `hasFront`. */
+  postcard?: { hasFront: boolean };
 }) => {
   const senderName = params.senderName.trim() || "Someone";
   const personal = params.personalMessage.trim();
@@ -36,10 +36,10 @@ export const buildShareHaikuEmail = (params: {
 
   const postcardImage = (cid: string, alt: string) =>
     `<img src="cid:${cid}" alt="${escapeHtml(alt)}" width="600" style="display:block;width:100%;max-width:600px;height:auto;margin:0 0 12px;border:0;border-radius:8px;" />`;
-  const postcardSection = params.hasPostcard
+  const postcardSection = params.postcard
     ? `
     <div style="margin:0 0 16px;">
-      ${postcardImage(POSTCARD_FRONT_CID, `Postcard front: ${title}`)}
+      ${params.postcard.hasFront ? postcardImage(POSTCARD_FRONT_CID, `Postcard front: ${title}`) : ""}
       ${postcardImage(POSTCARD_BACK_CID, `Postcard back: message from ${senderName}`)}
     </div>`
     : "";
@@ -65,9 +65,11 @@ export const buildShareHaikuEmail = (params: {
 </table>
 `.trim();
 
-  const postcardNote = params.hasPostcard
-    ? "\nYour postcard (front and back) is attached as postcard-front.png and postcard-back.png.\n"
-    : "";
+  const postcardNote = !params.postcard
+    ? ""
+    : params.postcard.hasFront
+      ? "\nYour postcard (front and back) is attached as postcard-front.png and postcard-back.png.\n"
+      : "\nYour postcard is attached as postcard-back.png.\n";
 
   const text = `A poem from ${senderName}:
 ${postcardNote}

@@ -10,7 +10,6 @@ import { ShareLinkLabelsToggle } from "./ShareLinkLabelsToggle";
 import type { ShareLinkPreviewLabelsActionsProps } from "./ShareLinkPreviewLabelsActions.types";
 import styles from "./ShareLinkPreviewLabelsActions.module.css";
 
-/** Horizontal Preview + Show/hide labels strip (share modal). */
 export function ShareLinkPreviewLabelsActions({
   subject,
   showLabels,

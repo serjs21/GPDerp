@@ -250,13 +250,13 @@ export function ShareLink({
         onToggleLabels={() => void ctrl.onToggleLabels(!showLabels)}
       />
 
-      <div className={managementStyles.settingsColumn}>
-        <div className={managementStyles.settingsRow}>
+      <div className={`${managementStyles.settingsColumn} ${styles.settingsColumn}`}>
+        <div className={`${managementStyles.settingsRow} ${styles.settingsRow}`}>
           <ComicPagePanel
             background="solid"
             color="white"
             contentAlign="start"
-            className={managementStyles.settingsPanel}
+            className={`${managementStyles.settingsPanel} ${styles.settingsPanel}`}
             ariaLabel={`Share link settings for ${ctrl.subject}`}
           >
             <div className={managementStyles.settingsBody}>
@@ -282,7 +282,7 @@ export function ShareLink({
               />
             </div>
           </ComicPagePanel>
-          <div className={managementStyles.settingsUpdate}>
+          <div className={`${managementStyles.settingsUpdate} ${styles.settingsUpdate}`}>
             <ShareLinkUpdateAction
               subject={ctrl.subject}
               active={ctrl.active}

@@ -15,6 +15,8 @@ import {
   isPurchaseMessagesDevRouteEnabled,
   purchaseMessagesDevPlugin,
 } from "./modules/payments/purchaseMessagesDev.controller";
+import { startPostcardQueue, stopPostcardQueue } from "./modules/postcard/postcardQueue";
+import { isPostcardDevRouteEnabled, postcardDevPlugin } from "./modules/postcard/postcardDev.controller";
 
 const app = Fastify({
   logger: true,
@@ -57,12 +59,20 @@ async function run() {
   if (isPurchaseMessagesDevRouteEnabled()) {
     await app.register(purchaseMessagesDevPlugin);
   }
+  if (isPostcardDevRouteEnabled()) {
+    await app.register(postcardDevPlugin);
+  }
 
   /* ------------------------------ Routes ------------------------------ */
 
   app.get("/health", async () => ({ ok: true }));
 
   console.log(app.printRoutes());
+
+  /* ------------------------------ Queue ------------------------------ */
+
+  await startPostcardQueue();
+  app.addHook("onClose", stopPostcardQueue);
 
   /* ------------------------------ Listen ------------------------------ */
 
@@ -73,6 +83,20 @@ async function run() {
 
   console.log(`Server ready on http://localhost:${port}`);
 }
+
+/** Let in-flight postcard jobs finish (graceful pg-boss stop via onClose) before exiting. */
+const shutdown = (signal: NodeJS.Signals) => {
+  console.log(`${signal} received, shutting down...`);
+  app
+    .close()
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error("Shutdown failed:", err);
+      process.exit(1);
+    });
+};
+process.once("SIGTERM", shutdown);
+process.once("SIGINT", shutdown);
 
 /* --------------------------- Entrypoint --------------------------- */
 

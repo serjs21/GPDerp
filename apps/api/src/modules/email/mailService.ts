@@ -6,6 +6,10 @@ const transporter = nodemailer.createTransport({
   host: env.SMTP_HOST,
   port: env.SMTP_PORT,
   secure: env.SMTP_SECURE,
+  // Fail a hung attempt fast so the postcard queue can retry it.
+  connectionTimeout: 10_000,
+  greetingTimeout: 10_000,
+  socketTimeout: 30_000,
   auth:
     env.SMTP_USER && env.SMTP_PASS
       ? {

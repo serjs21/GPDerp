@@ -63,6 +63,13 @@
   min-height: var(--share-modal-send-height);
 }
 
+/* Full-screen dialog: both tabs fill the page so their CTAs sit at the bottom. */
+@media (max-width: 1024px) {
+  .body {
+    flex: 1 0 auto;
+  }
+}
+
 .successBlock {
   display: flex;
   flex-direction: column;

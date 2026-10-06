@@ -63,6 +63,7 @@ model User {
   suspiciousRegistrationAttempts SuspiciousRegistrationAttempt[]
   configuration                  UserConfiguration?
   generationPurchases            GenerationPurchase[]
+  postcardShareBatches           PostcardShareBatch[]
 }
 
 model UserConfiguration {
@@ -347,4 +348,27 @@ model GenerationPurchase {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, status])
+}
+
+/// One "share by email" send: shared front PNG + per-recipient pg-boss jobs that render the back and email it.
+model PostcardShareBatch {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @db.Uuid
+  /// Snapshot fields; the haiku may change or be deleted while emails are still queued.
+  haikuId        String   @db.Uuid
+  haikuTitle     String
+  haikuBody      String
+  senderName     String
+  senderEmail    String
+  message        String
+  /// Browser-rendered front; cleared once every recipient is sent or failed.
+  frontPng       Bytes?
+  recipientCount Int
+  sentCount      Int      @default(0)
+  failedCount    Int      @default(0)
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
 }

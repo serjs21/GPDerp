@@ -9,30 +9,10 @@ import type { HaikuLinkedLabel } from "./haikuLabelPlacement";
 import { HAIKU_LABELS_MAX } from "./haikuLabelPlacement";
 import { labelRepository } from "../label/label.repository";
 import { normalizeLabelShape } from "../label/labelShape";
-import { mailService } from "../email/mailService";
-import { buildShareHaikuEmail } from "../email/templates/shareHaikuTemplate";
-import { POSTCARD_BACK_CID, POSTCARD_FRONT_CID } from "../../consts/postcard";
-import { normalizeShareRecipient, type SharePostcardImages } from "./utils/shareHaikuEmailRequest";
-
-/** Inline via cid in the HTML body; nodemailer also lists them as downloadable files. */
-const buildPostcardAttachments = (postcard: SharePostcardImages, recipient: string) => {
-  const back = postcard.backs.get(recipient);
-  if (!back) throw new Error(`Missing postcard back for recipient ${recipient}`);
-  return [
-    {
-      filename: "postcard-front.png",
-      content: postcard.front,
-      contentType: "image/png",
-      cid: POSTCARD_FRONT_CID,
-    },
-    {
-      filename: "postcard-back.png",
-      content: back,
-      contentType: "image/png",
-      cid: POSTCARD_BACK_CID,
-    },
-  ];
-};
+import { postcardBatchRepository } from "../postcard/postcardBatch.repository";
+import { enqueuePostcardEmails } from "../postcard/postcardQueue";
+import { postcardMessageFits } from "../postcard/postcardTextWrap";
+import { normalizeShareRecipient } from "./utils/shareHaikuEmailRequest";
 
 const chunkToString = (chunk: string | Buffer): string =>
   typeof chunk === "string" ? chunk : Buffer.from(chunk).toString("utf-8");
@@ -476,19 +456,22 @@ export const haikuService = {
     haikuId: string;
     recipients: string[];
     personalMessage: string;
-    /** Shared front + per-recipient back PNGs; shown inline (cid) and attached. */
-    postcard?: SharePostcardImages;
+    /** Browser-rendered postcard front shared by all recipients; backs are rendered per recipient by the queue. */
+    front?: Buffer;
   }): Promise<
-    | { ok: true; sentCount: number }
-    | { ok: false; reason: "not_found" | "forbidden" | "invalid_recipients" }
+    | { ok: true; queuedCount: number }
+    | {
+        ok: false;
+        reason: "not_found" | "forbidden" | "invalid_recipients" | "message_too_long" | "enqueue_failed";
+      }
   > {
     const normalizedRecipients = [...new Set(params.recipients.map(normalizeShareRecipient))].filter(Boolean);
     if (normalizedRecipients.length === 0 || !normalizedRecipients.every((email) => EMAIL_REGEX.test(email))) {
       return { ok: false, reason: "invalid_recipients" };
     }
-    const { postcard } = params;
-    if (postcard && !normalizedRecipients.every((email) => postcard.backs.has(email))) {
-      return { ok: false, reason: "invalid_recipients" };
+    const personalMessage = params.personalMessage.trim();
+    if (!postcardMessageFits(personalMessage)) {
+      return { ok: false, reason: "message_too_long" };
     }
 
     const haiku = await haikuRepository.findFullById(params.haikuId);
@@ -499,29 +482,25 @@ export const haikuService = {
     const sender = await authRepository.findUserById(params.userId);
     if (!sender) return { ok: false, reason: "forbidden" };
 
-    const senderName = resolveSenderName(sender);
-    const emailPayload = buildShareHaikuEmail({
-      senderName,
-      personalMessage: params.personalMessage,
-      title: haiku.title,
-      body: haiku.body,
-      hasPostcard: !!postcard,
+    const batch = await postcardBatchRepository.create({
+      userId: params.userId,
+      haikuId: params.haikuId,
+      haikuTitle: haiku.title,
+      haikuBody: haiku.body,
+      senderName: resolveSenderName(sender),
+      senderEmail: sender.email,
+      message: personalMessage,
+      frontPng: params.front,
+      recipientCount: normalizedRecipients.length,
     });
-
-    await Promise.all(
-      normalizedRecipients.map((to) =>
-        mailService.sendEmail({
-          to,
-          subject: emailPayload.subject,
-          text: emailPayload.text,
-          html: emailPayload.html,
-          replyTo: sender.email,
-          attachments: postcard ? buildPostcardAttachments(postcard, to) : undefined,
-        }),
-      ),
-    );
-
-    return { ok: true, sentCount: normalizedRecipients.length };
+    try {
+      const queuedCount = await enqueuePostcardEmails(batch.id, normalizedRecipients);
+      return { ok: true, queuedCount };
+    } catch (err) {
+      console.error("[shareHaikuByEmail] enqueue failed", err);
+      await postcardBatchRepository.deleteById(batch.id);
+      return { ok: false, reason: "enqueue_failed" };
+    }
   },
 };
 

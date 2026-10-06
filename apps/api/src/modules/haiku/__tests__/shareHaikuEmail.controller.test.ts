@@ -22,7 +22,16 @@ const { haikuService } = jest.requireMock("../haiku.service") as {
 
 const HAIKU_ID = "11111111-1111-4111-8111-111111111111";
 const BOUNDARY = "----postcard-test-boundary";
-const fakePng = (marker: string) => Buffer.concat([PNG_SIGNATURE, Buffer.from(marker)]);
+
+/** Signature + IHDR chunk header with the given size (enough for the size check). */
+const fakePng = (width = 2400, height = 1600) => {
+  const ihdr = Buffer.alloc(16);
+  ihdr.writeUInt32BE(13, 0);
+  ihdr.write("IHDR", 4, "ascii");
+  ihdr.writeUInt32BE(width, 8);
+  ihdr.writeUInt32BE(height, 12);
+  return Buffer.concat([PNG_SIGNATURE, ihdr, Buffer.from("rest")]);
+};
 
 type Part =
   | { name: string; value: string }
@@ -48,23 +57,18 @@ const multipartBody = (parts: Part[]): Buffer => {
   return Buffer.concat(chunks);
 };
 
-const postcardParts = (overrides: Partial<Record<"front" | "back", Part | null>> = {}): Part[] => {
-  const front: Part | null =
-    overrides.front === undefined
-      ? { name: "postcardFront", filename: "postcard-front.png", contentType: "image/png", content: fakePng("front") }
-      : overrides.front;
-  const back: Part | null =
-    overrides.back === undefined
-      ? { name: "postcardBack", filename: "postcard-back.png", contentType: "image/png", content: fakePng("back") }
-      : overrides.back;
-  return [
-    { name: "haikuId", value: HAIKU_ID },
-    { name: "emails", value: JSON.stringify(["friend@example.com"]) },
-    { name: "message", value: "Wish you were here" },
-    ...(front ? [front] : []),
-    ...(back ? [back] : []),
-  ];
-};
+const frontPart = (content: Buffer = fakePng()): Part => ({
+  name: "postcardFront",
+  filename: "postcard-front.png",
+  contentType: "image/png",
+  content,
+});
+
+const fields = (emails: string[] = ["friend@example.com"]): Part[] => [
+  { name: "haikuId", value: HAIKU_ID },
+  { name: "emails", value: JSON.stringify(emails) },
+  { name: "message", value: "Wish you were here" },
+];
 
 describe("haiku.controller POST /share_haiku_email", () => {
   const buildApp = async () => {
@@ -93,10 +97,10 @@ describe("haiku.controller POST /share_haiku_email", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    haikuService.shareHaikuByEmailForUser.mockResolvedValue({ ok: true, sentCount: 1 });
+    haikuService.shareHaikuByEmailForUser.mockResolvedValue({ ok: true, queuedCount: 1 });
   });
 
-  it("keeps the JSON body path without postcard images", async () => {
+  it("queues from a JSON body without a front", async () => {
     const app = await buildApp();
     const res = await app.inject({
       method: "POST",
@@ -105,86 +109,57 @@ describe("haiku.controller POST /share_haiku_email", () => {
     });
     await app.close();
 
-    expect(res.statusCode).toBe(200);
+    expect(res.statusCode).toBe(202);
+    expect(res.json()).toEqual({ ok: true, data: { queuedCount: 1 } });
     expect(haikuService.shareHaikuByEmailForUser).toHaveBeenCalledWith({
       userId: "user-1",
       haikuId: HAIKU_ID,
       recipients: ["friend@example.com"],
       personalMessage: "hi",
-      postcard: undefined,
+      front: undefined,
     });
   });
 
-  it("passes both postcard PNGs from multipart form data", async () => {
-    const res = await postMultipart(postcardParts());
+  it("passes the front PNG from multipart form data and replies 202", async () => {
+    haikuService.shareHaikuByEmailForUser.mockResolvedValue({ ok: true, queuedCount: 2 });
+    const res = await postMultipart([...fields(["a@example.com", "b@example.com"]), frontPart()]);
 
-    expect(res.statusCode).toBe(200);
+    expect(res.statusCode).toBe(202);
+    expect(res.json()).toEqual({ ok: true, data: { queuedCount: 2 } });
     const call = haikuService.shareHaikuByEmailForUser.mock.calls[0][0];
-    expect(call.recipients).toEqual(["friend@example.com"]);
+    expect(call.recipients).toEqual(["a@example.com", "b@example.com"]);
     expect(call.personalMessage).toBe("Wish you were here");
-    expect(call.postcard.front.equals(fakePng("front"))).toBe(true);
-    expect(call.postcard.backs.get("friend@example.com").equals(fakePng("back"))).toBe(true);
+    expect(call.front.equals(fakePng())).toBe(true);
   });
 
-  it("pairs one postcard back per recipient in emails order", async () => {
-    const backPart = (marker: string): Part => ({
-      name: "postcardBack",
-      filename: `postcard-back-${marker}.png`,
-      contentType: "image/png",
-      content: fakePng(marker),
-    });
-    const parts = postcardParts({ back: null })
-      .map((part) =>
-        part.name === "emails" ? { name: "emails", value: JSON.stringify(["A@example.com", "b@example.com"]) } : part,
-      )
-      .concat([backPart("back-a"), backPart("back-b")]);
-
-    const res = await postMultipart(parts);
-
-    expect(res.statusCode).toBe(200);
-    const { backs } = haikuService.shareHaikuByEmailForUser.mock.calls[0][0].postcard;
-    expect(backs.size).toBe(2);
-    expect(backs.get("a@example.com").equals(fakePng("back-a"))).toBe(true);
-    expect(backs.get("b@example.com").equals(fakePng("back-b"))).toBe(true);
-  });
-
-  it("rejects multipart requests whose back count does not match the recipients", async () => {
-    const parts = postcardParts().map((part) =>
-      part.name === "emails" ? { name: "emails", value: JSON.stringify(["a@example.com", "b@example.com"]) } : part,
-    );
-
-    const res = await postMultipart(parts);
+  it("rejects postcard back parts", async () => {
+    const res = await postMultipart([
+      ...fields(),
+      frontPart(),
+      { name: "postcardBack", filename: "postcard-back.png", contentType: "image/png", content: fakePng() },
+    ]);
 
     expect(res.statusCode).toBe(400);
-    expect(res.json()).toEqual({ ok: false, error: "Each recipient needs exactly one postcard back image" });
+    expect(res.json().error).toMatch(/rendered by the server/);
     expect(haikuService.shareHaikuByEmailForUser).not.toHaveBeenCalled();
   });
 
-  it("rejects multipart requests missing a postcard side", async () => {
-    const res = await postMultipart(postcardParts({ back: null }));
+  it("rejects a front that is not a PNG", async () => {
+    const res = await postMultipart([...fields(), frontPart(Buffer.from("not really a png"))]);
 
     expect(res.statusCode).toBe(400);
-    expect(res.json()).toEqual({ ok: false, error: "Both postcard images are required" });
+    expect(res.json()).toEqual({ ok: false, error: "Postcard front must be a PNG" });
+  });
+
+  it("rejects a front with the wrong dimensions", async () => {
+    const res = await postMultipart([...fields(), frontPart(fakePng(1200, 800))]);
+
+    expect(res.statusCode).toBe(400);
+    expect(res.json().error).toBe("Postcard front must be 2400x1600 (got 1200x800)");
     expect(haikuService.shareHaikuByEmailForUser).not.toHaveBeenCalled();
   });
 
-  it("rejects files that are not PNG", async () => {
-    const res = await postMultipart(
-      postcardParts({
-        front: {
-          name: "postcardFront",
-          filename: "postcard-front.png",
-          contentType: "image/png",
-          content: Buffer.from("not really a png"),
-        },
-      }),
-    );
-
-    expect(res.statusCode).toBe(400);
-    expect(res.json()).toEqual({ ok: false, error: "Postcard images must be PNG" });
-  });
-
-  it("rejects messages longer than the postcard limit", async () => {
+  it("rejects messages longer than the postcard character limit", async () => {
     const app = await buildApp();
     const res = await app.inject({
       method: "POST",
@@ -199,5 +174,16 @@ describe("haiku.controller POST /share_haiku_email", () => {
 
     expect(res.statusCode).toBe(400);
     expect(haikuService.shareHaikuByEmailForUser).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["message_too_long", 400, "The message does not fit on the postcard"],
+    ["enqueue_failed", 500, "Could not queue the postcards"],
+  ])("maps service failure %s to %i", async (reason, status, error) => {
+    haikuService.shareHaikuByEmailForUser.mockResolvedValue({ ok: false, reason });
+    const res = await postMultipart([...fields(), frontPart()]);
+
+    expect(res.statusCode).toBe(status);
+    expect(res.json()).toEqual({ ok: false, error });
   });
 });

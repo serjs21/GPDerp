@@ -8,7 +8,9 @@ import {
   type ShareLinkListItem,
 } from "@/api/shareLinks";
 import type { ShareMethod } from "./types";
-import { useSharePostcardImages } from "./useSharePostcardImages";
+import { useSharePostcardFront } from "./useSharePostcardFront";
+
+const POSTCARDS_QUEUED_MESSAGE = "Postcards were placed in the mail box";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 const EMPTY_EMAIL_RECIPIENTS: string[] = [];
@@ -72,7 +74,7 @@ export function useShareModalController({
   const [emailRecipients, setEmailRecipients] = useState<string[]>([]);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
-  const { preparingPostcard, preparePostcard } = useSharePostcardImages(haiku);
+  const { preparingPostcard, preparePostcardFront } = useSharePostcardFront(haiku);
 
   useEffect(() => {
     if (!open) return;
@@ -149,11 +151,11 @@ export function useShareModalController({
     setSendingEmail(true);
     const message = emailMessage.trim();
     try {
-      const postcard = await preparePostcard(message, normalizedEmails);
-      if (postcard === null) return;
-      const sentCount = await shareHaikuByEmail({ haikuId, emails: normalizedEmails, message, postcard });
+      const front = await preparePostcardFront();
+      if (front === null) return;
+      await shareHaikuByEmail({ haikuId, emails: normalizedEmails, message, postcard: front && { front } });
       setEmailSent(true);
-      comicToast.success(sentCount === 1 ? "Your haiku has been sent" : `Your haikus have been sent (${sentCount})`);
+      comicToast.success(POSTCARDS_QUEUED_MESSAGE);
     } catch (e) {
       comicToast.error(getAxiosErrorMessage(e, "Could not send email"));
     } finally {

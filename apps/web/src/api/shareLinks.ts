@@ -208,39 +208,43 @@ export type ShareHaikuEmailBody = {
   emails: string[];
   message?: string;
   /**
-   * Shared front + one back per recipient. When present the request is sent as multipart
-   * form data and `emails` is taken from the backs so the two lists stay aligned.
+   * Browser-rendered postcard front shared by all recipients; when present the request is
+   * multipart form data. Backs are rendered per recipient by the API.
    */
-  postcard?: { front: Blob; backs: Array<{ recipient: string; blob: Blob }> };
+  postcard?: { front: Blob };
 };
 
-type ShareHaikuEmailResponse = { ok: true; data: { sentCount: number } } | { ok: false; error: string };
+type ShareHaikuEmailResponse = { ok: true; data: { queuedCount: number } } | { ok: false; error: string };
+
+/** The front PNG is a few MB; give the upload its own bound instead of the global default. */
+const SHARE_EMAIL_UPLOAD_TIMEOUT_MS = 60_000;
 
 const buildShareHaikuEmailFormData = (
-  body: Omit<ShareHaikuEmailBody, "emails"> & { postcard: NonNullable<ShareHaikuEmailBody["postcard"]> },
+  body: ShareHaikuEmailBody & { postcard: NonNullable<ShareHaikuEmailBody["postcard"]> },
 ): FormData => {
   const form = new FormData();
   form.append("haikuId", body.haikuId);
-  form.append("emails", JSON.stringify(body.postcard.backs.map((back) => back.recipient)));
+  form.append("emails", JSON.stringify(body.emails));
   form.append("message", body.message ?? "");
   form.append("postcardFront", body.postcard.front, "postcard-front.png");
-  body.postcard.backs.forEach((back, index) => {
-    form.append("postcardBack", back.blob, `postcard-back-${index + 1}.png`);
-  });
   return form;
 };
 
+/** Queues one postcard email per recipient; resolves with the number queued. */
 export const shareHaikuByEmail = async ({ postcard, ...json }: ShareHaikuEmailBody): Promise<number> => {
   const { data } = postcard
     ? await axios.post<ShareHaikuEmailResponse>(
         "/share_haiku_email",
         buildShareHaikuEmailFormData({ ...json, postcard }),
-        // Overrides the global JSON content type; the browser sets the multipart boundary.
-        { headers: { "Content-Type": "multipart/form-data" } },
+        {
+          // Overrides the global JSON content type; the browser sets the multipart boundary.
+          headers: { "Content-Type": "multipart/form-data" },
+          timeout: SHARE_EMAIL_UPLOAD_TIMEOUT_MS,
+        },
       )
     : await axios.post<ShareHaikuEmailResponse>("/share_haiku_email", json);
   if (!data.ok) {
     throw new Error(data.error || "Could not send email");
   }
-  return data.data.sentCount;
+  return data.data.queuedCount;
 };

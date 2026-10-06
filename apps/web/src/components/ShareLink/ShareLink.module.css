@@ -31,6 +31,33 @@
   height: 14rem;
 }
 
+/*
+ * Full-screen share modal: settings take the leftover height so the lifecycle
+ * CTA lands at the bottom; controls cap at 30rem and Update fills the rest.
+ */
+@media (max-width: 1024px) {
+  .card > .settingsColumn {
+    flex: 1 1 auto;
+  }
+
+  .card .settingsRow > .settingsPanel {
+    flex: 2 1 0;
+    max-width: 30rem;
+  }
+
+  .card .settingsRow > .settingsUpdate {
+    flex: 1 1 0;
+    min-width: 8rem;
+    max-width: none;
+  }
+
+  .card .settingsUpdate img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
 .panelShell {
   flex: 1 1 auto;
   min-width: 0;
