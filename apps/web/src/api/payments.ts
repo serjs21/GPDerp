@@ -63,7 +63,14 @@ type CheckoutApiResponse =
     }
   | { ok: false; error: string };
 type CreditsApiResponse = { ok: true; data: CreditsResponse } | { ok: false; error: string };
-type ConfirmApiResponse = { ok: true; data: ConfirmPurchaseResponse } | { ok: false; error: string };
+export type ConfirmApiResponse =
+  | { ok: true; data: ConfirmPurchaseResponse }
+  | { ok: false; error: string };
+
+export function readConfirmPurchaseResponse(body: ConfirmApiResponse): ConfirmPurchaseResponse {
+  if (!body.ok) throw new Error(body.error ?? "Failed to confirm purchase");
+  return body.data;
+}
 
 export async function createPendingPurchase(): Promise<PendingPurchaseResponse> {
   const { data } = await axios.post<PurchaseApiResponse>("/payments/purchase");
@@ -94,6 +101,5 @@ export async function fetchCredits(): Promise<CreditsResponse> {
 
 export async function confirmPurchase(transactionId: string): Promise<ConfirmPurchaseResponse> {
   const { data } = await axios.post<ConfirmApiResponse>("/payments/confirm", { transactionId });
-  if (!data.ok) throw new Error(data.error ?? "Failed to confirm purchase");
-  return data.data;
+  return readConfirmPurchaseResponse(data);
 }

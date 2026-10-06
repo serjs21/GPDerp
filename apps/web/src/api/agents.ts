@@ -13,10 +13,15 @@ export function isInsufficientCreditsError(error: unknown): boolean {
   return body?.error === "insufficient_credits";
 }
 
+/** Reads `message` from a 402 `insufficient_credits` response body. */
+export function readInsufficientCreditsMessage(body: unknown): string | null {
+  const message = (body as { message?: unknown } | null | undefined)?.message;
+  return typeof message === "string" ? message : null;
+}
+
 export function insufficientCreditsMessage(error: unknown): string | null {
   if (!axios.isAxiosError(error)) return null;
-  const body = error.response?.data as { message?: unknown } | undefined;
-  return typeof body?.message === "string" ? body.message : null;
+  return readInsufficientCreditsMessage(error.response?.data);
 }
 
 export const runHaikuAgent = async (subject: string): Promise<RunHaikuAgentResponse> => {

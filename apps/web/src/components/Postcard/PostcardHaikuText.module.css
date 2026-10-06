@@ -1,0 +1,54 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  padding: 8px 4px 0;
+  box-sizing: border-box;
+  text-align: center;
+  color: var(--lantern-ink, #2c2924);
+  font-family: var(--font-lantern-script, "Zen Kurenaido", cursive);
+  overflow: hidden;
+}
+
+.title {
+  margin: 0 0 6px;
+  max-width: 100%;
+  font-size: var(--postcard-title-size);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.line {
+  margin: 0;
+  font-size: var(--postcard-body-size);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.author {
+  align-self: stretch;
+  margin: 8px 12px 0;
+  font-size: var(--postcard-author-size);
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+  text-align: right;
+  color: var(--lantern-ink-soft, rgba(44, 41, 36, 0.62));
+  overflow-wrap: anywhere;
+}

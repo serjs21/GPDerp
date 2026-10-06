@@ -18,6 +18,21 @@ const config: StorybookConfig = {
   }),
   "staticDirs": [
     "../public"
-  ]
+  ],
+  // Dev-only API access for stories (e.g. GET /dev/purchase-messages) without touching API CORS.
+  viteFinal: (config) => ({
+    ...config,
+    server: {
+      ...config.server,
+      proxy: {
+        ...config.server?.proxy,
+        "/dev-api": {
+          target: process.env.STORYBOOK_API_URL ?? "http://localhost:4000",
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/dev-api/, ""),
+        },
+      },
+    },
+  }),
 };
 export default config;

@@ -1,6 +1,18 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import { Button } from "@/components/StyledComponents";
+import { PurchaseMessagePicker } from "@/storybook/purchaseMessages/PurchaseMessagePicker";
+import {
+  loadDevPurchaseMessages,
+  type DevPurchaseMessage,
+  type DevPurchaseMessages,
+} from "@/storybook/purchaseMessages/devPurchaseMessages";
+import { PurchaseMessagePicker } from "@/storybook/purchaseMessages/PurchaseMessagePicker";
+import {
+  loadDevPurchaseMessages,
+  type DevPurchaseMessage,
+  type DevPurchaseMessages,
+} from "@/storybook/purchaseMessages/devPurchaseMessages";
 import { NoGenerationsLeftModal } from "./NoGenerationsLeftModal";
 
 const meta = {
@@ -71,4 +83,68 @@ function InteractiveNoGenerationsLeftDemo() {
 export const Interactive: Story = {
   args: { open: false },
   render: () => <InteractiveNoGenerationsLeftDemo />,
+};
+
+function ApiMessagesNoGenerationsLeftDemo({ messages }: { messages: DevPurchaseMessages }) {
+  const [picked, setPicked] = useState<DevPurchaseMessage | null>(null);
+
+  return (
+    <>
+      <PurchaseMessagePicker
+        title="Out of generations — API messages"
+        items={messages.ok ? messages.noGenerationsLeft : null}
+        error={messages.ok ? undefined : messages.error}
+        onPick={setPicked}
+      />
+      <NoGenerationsLeftModal
+        open={picked !== null}
+        onOpenChange={(next) => {
+          if (!next) setPicked(null);
+        }}
+        message={picked?.message ?? ""}
+        onBuy={() => setPicked(null)}
+      />
+    </>
+  );
+}
+
+/** Messages from the dev-only `GET /dev/purchase-messages` route (requires the local API). */
+export const FromApi: Story = {
+  args: { open: false },
+  loaders: [async () => ({ messages: await loadDevPurchaseMessages() })],
+  render: (_args, { loaded }) => (
+    <ApiMessagesNoGenerationsLeftDemo messages={loaded.messages as DevPurchaseMessages} />
+  ),
+};
+
+function NoGenerationsLeftFromApiDemo({ messages }: { messages: DevPurchaseMessages }) {
+  const [picked, setPicked] = useState<DevPurchaseMessage | null>(null);
+
+  return (
+    <>
+      <PurchaseMessagePicker
+        title="Out-of-generations messages (dev API)"
+        items={messages.ok ? messages.noGenerationsLeft : null}
+        error={messages.ok ? undefined : messages.error}
+        onPick={setPicked}
+      />
+      <NoGenerationsLeftModal
+        open={picked !== null}
+        onOpenChange={(next) => {
+          if (!next) setPicked(null);
+        }}
+        message={picked?.message ?? ""}
+        onBuy={() => setPicked(null)}
+      />
+    </>
+  );
+}
+
+/** Requires the API running locally (`GET /dev/purchase-messages`). */
+export const FromApi: Story = {
+  args: { open: false },
+  loaders: [async () => ({ messages: await loadDevPurchaseMessages() })],
+  render: (_args, { loaded }) => (
+    <NoGenerationsLeftFromApiDemo messages={loaded.messages as DevPurchaseMessages} />
+  ),
 };

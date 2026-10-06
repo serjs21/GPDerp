@@ -11,6 +11,10 @@ import { shareLinkPlugin } from "./modules/shareLinks/shareLink.controller";
 import { userPlugin } from "./modules/user/user.controller";
 import { iconUploadPlugin } from "./modules/iconUpload/iconUpload.controller";
 import { paymentsPlugin } from "./modules/payments/payments.controller";
+import {
+  isPurchaseMessagesDevRouteEnabled,
+  purchaseMessagesDevPlugin,
+} from "./modules/payments/purchaseMessagesDev.controller";
 
 const app = Fastify({
   logger: true,
@@ -50,6 +54,9 @@ async function run() {
   await app.register(shareLinkPlugin);
   await app.register(userPlugin);
   await app.register(iconUploadPlugin);
+  if (isPurchaseMessagesDevRouteEnabled()) {
+    await app.register(purchaseMessagesDevPlugin);
+  }
 
   /* ------------------------------ Routes ------------------------------ */
 

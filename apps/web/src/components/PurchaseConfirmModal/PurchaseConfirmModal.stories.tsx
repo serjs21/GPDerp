@@ -1,6 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import { Button } from "@/components/StyledComponents";
+import { PurchaseMessagePicker } from "@/storybook/purchaseMessages/PurchaseMessagePicker";
+import {
+  loadDevPurchaseMessages,
+  type DevPurchaseMessage,
+  type DevPurchaseMessages,
+} from "@/storybook/purchaseMessages/devPurchaseMessages";
 import { PurchaseConfirmModal } from "./PurchaseConfirmModal";
 
 const meta = {
@@ -62,4 +68,35 @@ function InteractivePurchaseConfirmDemo() {
 export const Interactive: Story = {
   args: { open: false },
   render: () => <InteractivePurchaseConfirmDemo />,
+};
+
+function ApiMessagesPurchaseConfirmDemo({ messages }: { messages: DevPurchaseMessages }) {
+  const [picked, setPicked] = useState<DevPurchaseMessage | null>(null);
+
+  return (
+    <>
+      <PurchaseMessagePicker
+        title="Purchase confirmed — API messages"
+        items={messages.ok ? messages.purchaseConfirmed : null}
+        error={messages.ok ? undefined : messages.error}
+        onPick={setPicked}
+      />
+      <PurchaseConfirmModal
+        open={picked !== null}
+        onOpenChange={(next) => {
+          if (!next) setPicked(null);
+        }}
+        message={picked?.message ?? ""}
+      />
+    </>
+  );
+}
+
+/** Messages from the dev-only `GET /dev/purchase-messages` route (requires the local API). */
+export const FromApi: Story = {
+  args: { open: false },
+  loaders: [async () => ({ messages: await loadDevPurchaseMessages() })],
+  render: (_args, { loaded }) => (
+    <ApiMessagesPurchaseConfirmDemo messages={loaded.messages as DevPurchaseMessages} />
+  ),
 };

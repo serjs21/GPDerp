@@ -1,6 +1,7 @@
 import { PURCHASE_MESSAGES } from "../constants";
 
-const NO_GENERATIONS_LEFT_LAST_INDEX = Object.keys(PURCHASE_MESSAGES.noGenerationsLeft).length - 1;
+export const NO_GENERATIONS_LEFT_MESSAGE_COUNT = Object.keys(PURCHASE_MESSAGES.noGenerationsLeft).length;
+const NO_GENERATIONS_LEFT_LAST_INDEX = NO_GENERATIONS_LEFT_MESSAGE_COUNT - 1;
 export const STATIC_PURCHASE_CONFIRMED_COUNT = Object.keys(PURCHASE_MESSAGES.purchaseConfirmed).length;
 
 /** Copy for the web NoGenerationsLeftModal; repeats the last entry once the user has bought that many times. */

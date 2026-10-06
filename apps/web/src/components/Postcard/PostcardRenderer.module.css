@@ -1,0 +1,43 @@
+.root {
+  position: relative;
+  width: var(--postcard-width, 1200px);
+  height: var(--postcard-height, 800px);
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  isolation: isolate;
+}
+
+/* Deterministic capture: freeze every animation/transition in the composition. */
+.root *,
+.root *::before,
+.root *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+.lanternSlot {
+  position: absolute;
+  z-index: 3;
+  top: var(--postcard-lantern-top, 96px);
+  left: 50%;
+  transform: translateX(-50%);
+  line-height: 0;
+}
+
+.lanternSlot > * {
+  line-height: normal;
+}
+
+.date {
+  position: absolute;
+  z-index: 3;
+  right: 32px;
+  bottom: 24px;
+  margin: 0;
+  font-family: var(--font-noto-serif), serif;
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  color: #fffaf0;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+}

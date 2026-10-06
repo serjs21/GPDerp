@@ -1,0 +1,30 @@
+.root {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 12px;
+  max-width: 1280px;
+  margin: 96px auto 48px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(20, 18, 16, 0.85);
+  color: #f5f1e8;
+}
+
+.heading {
+  margin: 0;
+  font-size: 22px;
+}
+
+.hint {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.select {
+  justify-self: start;
+  min-width: 280px;
+  padding: 6px 8px;
+  font: inherit;
+}

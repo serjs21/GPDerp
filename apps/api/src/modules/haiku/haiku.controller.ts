@@ -10,7 +10,7 @@ import { isUuid } from "../../utils/uuid";
 import { authRepository } from "../auth/repository";
 import { GENERATION_CREDITS_SOCKET_KIND, HAIKU_GENERATION_CREDIT_COST } from "../payments/constants";
 import { paymentsService } from "../payments/payments.service";
-import { noGenerationsLeftMessage } from "../payments/utils/purchaseMessages";
+import { insufficientCreditsBody } from "../payments/utils/purchaseResponses";
 import { haikuService, type HaikuStreamYield } from "./haiku.service";
 
 const haikuPluginImpl = async (app: FastifyInstance) => {
@@ -431,11 +431,7 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
       }
       if (credits.credits < HAIKU_GENERATION_CREDIT_COST) {
         const purchasesCount = await paymentsService.countCompletedPurchases(userId);
-        res.code(402).send({
-          ok: false,
-          error: "insufficient_credits",
-          message: noGenerationsLeftMessage(purchasesCount),
-        });
+        res.code(402).send(insufficientCreditsBody(purchasesCount));
         return;
       }
 

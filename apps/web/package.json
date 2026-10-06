@@ -53,6 +53,7 @@
     "comicaljs": "^0.4.1",
     "country-flag-icons": "^1.6.16",
     "dayjs": "^1.11.13",
+    "html-to-image": "^1.11.13",
     "jose": "^6.2.2",
     "js-cookie": "^3.0.5",
     "lethargy-ts": "^0.1.0",
