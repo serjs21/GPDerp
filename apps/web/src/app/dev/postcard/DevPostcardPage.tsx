@@ -1,18 +1,48 @@
 "use client";
 
 import { useState } from "react";
+import { generatePostcardImage } from "@/components/Postcard/generatePostcardImage";
+import { generatePostcardMessageImage } from "@/components/Postcard/generatePostcardMessageImage";
+import { PostcardMessage } from "@/components/Postcard/PostcardMessage";
 import { PostcardPreview } from "@/components/Postcard/PostcardPreview";
-import { POSTCARD_DEV_SAMPLE_HAIKU } from "@/components/Postcard/consts/postcardDevConsts";
+import { PostcardRenderer } from "@/components/Postcard/PostcardRenderer";
+import { postcardFilename } from "@/components/Postcard/postcardDevDownload";
+import {
+  POSTCARD_DEV_SAMPLE_HAIKU,
+  POSTCARD_DEV_SAMPLE_MESSAGE,
+  POSTCARD_DEV_SAMPLE_RECIPIENTS,
+} from "@/components/Postcard/consts/postcardDevConsts";
+import { POSTCARD_MESSAGE_MAX_CHARS } from "@/components/Postcard/consts/postcardMessageConsts";
+import { clampPostcardMessage } from "@/components/Postcard/utils/postcardMessageFit";
 import { useInfiniteHaikusQuery } from "@/hooks/useInfiniteHaikusQuery";
+import { usePostcardMessageFit } from "@/hooks/usePostcardMessageFit";
 import { usePostcardTheme } from "@/hooks/usePostcardTheme";
+import { DevPostcardGenerateBoth } from "./DevPostcardGenerateBoth";
 import styles from "./DevPostcardPage.module.css";
+
+const parseRecipients = (value: string) =>
+  value
+    .split(/[,\s]+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
 
 export function DevPostcardPage() {
   const theme = usePostcardTheme();
   const { haikus, isLoggedIn } = useInfiniteHaikusQuery();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [message, setMessage] = useState(POSTCARD_DEV_SAMPLE_MESSAGE);
+  const [senderName, setSenderName] = useState("Aki");
+  const [recipientsText, setRecipientsText] = useState(POSTCARD_DEV_SAMPLE_RECIPIENTS.join(", "));
+  const fit = usePostcardMessageFit(message);
   const haiku =
     haikus.find((item) => item.id === selectedId) ?? haikus[0] ?? POSTCARD_DEV_SAMPLE_HAIKU;
+  const recipients = parseRecipients(recipientsText);
+
+  const onMessageChange = (raw: string) => {
+    const next = clampPostcardMessage(raw);
+    if (next.length > message.length && !fit.accepts(next)) return;
+    setMessage(next);
+  };
 
   return (
     <main className={styles.root}>
@@ -37,7 +67,58 @@ export function DevPostcardPage() {
           ))}
         </select>
       ) : null}
-      <PostcardPreview theme={theme} haiku={haiku} scale={0.5} />
+
+      <h2 className={styles.subheading}>Front</h2>
+      <PostcardPreview
+        generate={() => generatePostcardImage({ theme, haiku })}
+        filename={postcardFilename(haiku.id, "front")}
+        scale={0.5}
+      >
+        <PostcardRenderer theme={theme} haiku={haiku} />
+      </PostcardPreview>
+
+      <h2 className={styles.subheading}>Back (message side)</h2>
+      <div className={styles.fields}>
+        <label className={styles.field}>
+          Message ({fit.linesLeft} lines left)
+          <textarea
+            className={styles.textarea}
+            value={message}
+            maxLength={POSTCARD_MESSAGE_MAX_CHARS}
+            onChange={(event) => onMessageChange(event.target.value)}
+            rows={4}
+          />
+        </label>
+        <label className={styles.field}>
+          Sender name
+          <input value={senderName} onChange={(event) => setSenderName(event.target.value)} />
+        </label>
+        <label className={styles.field}>
+          Recipients (comma separated)
+          <input value={recipientsText} onChange={(event) => setRecipientsText(event.target.value)} />
+        </label>
+      </div>
+      <PostcardPreview
+        generate={() => generatePostcardMessageImage({ theme, message, senderName, recipients })}
+        filename={postcardFilename(haiku.id, "back")}
+        scale={0.5}
+        label="Live message side"
+      >
+        <PostcardMessage
+          theme={theme}
+          message={message}
+          senderName={senderName}
+          recipients={recipients}
+        />
+      </PostcardPreview>
+
+      <DevPostcardGenerateBoth
+        theme={theme}
+        haiku={haiku}
+        message={message}
+        senderName={senderName}
+        recipients={recipients}
+      />
     </main>
   );
 }

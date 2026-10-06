@@ -2,7 +2,7 @@ import type { Preview } from '@storybook/nextjs-vite'
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { NextIntlClientProvider } from 'next-intl';
 import localFont from 'next/font/local';
-import { Bangers, Geist, Geist_Mono, Noto_Serif_JP, Press_Start_2P, Zen_Kurenaido } from 'next/font/google';
+import { Bangers, Geist, Geist_Mono, Noto_Serif_JP, Patrick_Hand, Press_Start_2P, Zen_Kurenaido } from 'next/font/google';
 import { createElement } from 'react';
 import enMessages from '../messages/en.json';
 import '@/theme/globals.css';
@@ -30,6 +30,12 @@ const notoSerifJP = Noto_Serif_JP({
 
 const zenKurenaido = Zen_Kurenaido({
   variable: '--font-zen-kurenaido',
+  subsets: ['latin'],
+  weight: '400',
+});
+
+const patrickHand = Patrick_Hand({
+  variable: '--font-postcard-hand',
   subsets: ['latin'],
   weight: '400',
 });
@@ -63,6 +69,7 @@ const storybookFontVariableClass = [
   pressStart2P.variable,
   bangers.variable,
   flacucho.variable,
+  patrickHand.variable,
 ].join(' ');
 
 const preview: Preview = {

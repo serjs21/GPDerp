@@ -11,6 +11,24 @@ import { labelRepository } from "../label/label.repository";
 import { normalizeLabelShape } from "../label/labelShape";
 import { mailService } from "../email/mailService";
 import { buildShareHaikuEmail } from "../email/templates/shareHaikuTemplate";
+import { POSTCARD_BACK_CID, POSTCARD_FRONT_CID } from "../../consts/postcard";
+import type { SharePostcardImages } from "./utils/shareHaikuEmailRequest";
+
+/** Inline via cid in the HTML body; nodemailer also lists them as downloadable files. */
+const buildPostcardAttachments = (postcard: SharePostcardImages) => [
+  {
+    filename: "postcard-front.png",
+    content: postcard.front,
+    contentType: "image/png",
+    cid: POSTCARD_FRONT_CID,
+  },
+  {
+    filename: "postcard-back.png",
+    content: postcard.back,
+    contentType: "image/png",
+    cid: POSTCARD_BACK_CID,
+  },
+];
 
 const chunkToString = (chunk: string | Buffer): string =>
   typeof chunk === "string" ? chunk : Buffer.from(chunk).toString("utf-8");
@@ -454,6 +472,8 @@ export const haikuService = {
     haikuId: string;
     recipients: string[];
     personalMessage: string;
+    /** Front/back postcard PNGs; shown inline (cid) and attached. */
+    postcard?: SharePostcardImages;
   }): Promise<
     | { ok: true; sentCount: number }
     | { ok: false; reason: "not_found" | "forbidden" | "invalid_recipients" }
@@ -477,7 +497,9 @@ export const haikuService = {
       personalMessage: params.personalMessage,
       title: haiku.title,
       body: haiku.body,
+      hasPostcard: !!params.postcard,
     });
+    const attachments = params.postcard ? buildPostcardAttachments(params.postcard) : undefined;
 
     await Promise.all(
       normalizedRecipients.map((to) =>
@@ -487,6 +509,7 @@ export const haikuService = {
           text: emailPayload.text,
           html: emailPayload.html,
           replyTo: sender.email,
+          attachments,
         }),
       ),
     );

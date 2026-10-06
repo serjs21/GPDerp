@@ -31,6 +31,10 @@ export function MockAuthenticationProvider({
   );
 }
 
+/** Like useAuthenticationState, but returns null outside AuthenticationProvider. */
+export const useOptionalAuthenticationState = (): AuthenticationResult | null =>
+  useContext(AuthenticationContext) ?? null;
+
 export const useAuthenticationState = (): AuthenticationResult => {
   const authState = useContext(AuthenticationContext);
   if (!authState) {

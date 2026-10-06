@@ -6,6 +6,26 @@ export {
   generatePostcardImage,
   type GeneratePostcardImageInput,
 } from "./generatePostcardImage";
+export { PostcardMessage } from "./PostcardMessage";
+export type { PostcardMessageProps } from "./PostcardMessage.types";
+export {
+  generatePostcardMessageImage,
+  type GeneratePostcardMessageImageInput,
+} from "./generatePostcardMessageImage";
+export {
+  generatePostcardImages,
+  type GeneratePostcardImagesInput,
+  type PostcardImages,
+} from "./generatePostcardImages";
+export {
+  clampPostcardMessage,
+  postcardRecipientLines,
+  resolvePostcardSenderName,
+} from "./utils/postcardMessageFit";
+export {
+  POSTCARD_MESSAGE_MAX_CHARS,
+  POSTCARD_MESSAGE_MAX_LINES,
+} from "./consts/postcardMessageConsts";
 export { waitForPostcardAssets } from "./utils/waitForPostcardAssets";
 export { postcardThemeFromCelestial, type PostcardTheme } from "./utils/postcardTheme";
 export {

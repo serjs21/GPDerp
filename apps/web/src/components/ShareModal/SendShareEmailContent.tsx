@@ -2,6 +2,9 @@
 
 import { useRef } from "react";
 import { Select, Typography } from "@/components/StyledComponents";
+import { POSTCARD_MESSAGE_MAX_CHARS } from "@/components/Postcard/consts/postcardMessageConsts";
+import { clampPostcardMessage } from "@/components/Postcard/utils/postcardMessageFit";
+import { usePostcardMessageFit } from "@/hooks/usePostcardMessageFit";
 import { NotebookPageRough } from "./NotebookPageRough";
 import {
   notebookStyleVars,
@@ -26,6 +29,14 @@ export const SendShareEmailContent = ({
   disabled = false,
 }: SendShareEmailContentProps) => {
   const notebookRef = useRef<HTMLDivElement>(null);
+  const fit = usePostcardMessageFit(message);
+
+  const handleMessageChange = (raw: string) => {
+    const next = clampPostcardMessage(raw);
+    const growing = next.length > message.length;
+    if (growing && !fit.accepts(next)) return;
+    onMessageChange(next);
+  };
 
   return (
     <div className={styles.root}>
@@ -56,13 +67,24 @@ export const SendShareEmailContent = ({
           className={styles.message}
           data-notebook-row="message"
           value={message}
-          onChange={(e) => onMessageChange(e.target.value)}
+          onChange={(e) => handleMessageChange(e.target.value)}
           placeholder="I wanted to share with you..."
-          maxLength={250}
+          maxLength={POSTCARD_MESSAGE_MAX_CHARS}
           disabled={disabled}
           aria-label="Email message"
+          aria-describedby="postcard-message-fit"
         />
       </div>
+      <Typography.Text
+        id="postcard-message-fit"
+        type={fit.linesLeft === 0 ? "warning" : "secondary"}
+        className={styles.fitHint}
+        aria-live="polite"
+      >
+        {fit.linesLeft === 0
+          ? "The postcard is full"
+          : `${fit.linesLeft} ${fit.linesLeft === 1 ? "line" : "lines"} left on the postcard`}
+      </Typography.Text>
       {invalidEmails.length > 0 ? (
         <Typography.Text type="danger" className={styles.validation}>
           Invalid emails: {invalidEmails.join(", ")}

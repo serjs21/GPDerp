@@ -9,20 +9,30 @@ import styles from "./ShareEmailSendPanel.module.css";
 export type ShareEmailSendPanelProps = {
   canSendEmail: boolean;
   sendingEmail: boolean;
+  /** Postcard images are being generated (part of the sending phase). */
+  preparingPostcard?: boolean;
   emailCtaHint: string;
   onSendEmail: () => void;
+};
+
+const PREPARING_POSTCARD_LABEL = "Preparing postcard…";
+
+const getSendTooltipTitle = (preparingPostcard: boolean, ready: boolean, emailCtaHint: string) => {
+  if (preparingPostcard) return PREPARING_POSTCARD_LABEL;
+  return ready ? "" : emailCtaHint;
 };
 
 export function ShareEmailSendPanel({
   canSendEmail,
   sendingEmail,
+  preparingPostcard = false,
   emailCtaHint,
   onSendEmail,
 }: ShareEmailSendPanelProps) {
   const reduceMotion = useReducedMotion();
   const ready = canSendEmail && !sendingEmail;
   const active = canSendEmail || sendingEmail;
-  const tooltipTitle = ready ? "" : emailCtaHint;
+  const tooltipTitle = getSendTooltipTitle(preparingPostcard, ready, emailCtaHint);
   const isFlying = sendingEmail && !reduceMotion;
 
   const handleSelect = () => {
@@ -32,11 +42,11 @@ export function ShareEmailSendPanel({
 
   return (
     <ComicPageRow className={styles.sendRow}>
-      <Tooltip title={tooltipTitle}>
+      <Tooltip title={tooltipTitle} open={preparingPostcard || undefined}>
         <span className={styles.tooltipWrap}>
           <ComicPressButton
             className={styles.pressShell}
-            aria-label="Send email"
+            aria-label={preparingPostcard ? PREPARING_POSTCARD_LABEL : "Send email"}
             aria-busy={sendingEmail}
             disabled={!ready}
             onClick={handleSelect}

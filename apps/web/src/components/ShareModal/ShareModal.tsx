@@ -65,6 +65,7 @@ export function ShareModal({
     emailRecipients,
     setEmailRecipients,
     sendingEmail,
+    preparingPostcard,
     emailSent,
     invalidEmails,
     canSendEmail,
@@ -73,6 +74,7 @@ export function ShareModal({
   } = useShareModalController({
     open,
     haikuId,
+    haiku,
     haikuSubject,
     initialCreatedUrl,
     initialCreatedLink,
@@ -209,6 +211,7 @@ export function ShareModal({
             <ShareEmailSendPanel
               canSendEmail={canSendEmail}
               sendingEmail={sendingEmail}
+              preparingPostcard={preparingPostcard}
               emailCtaHint={emailCtaHint}
               onSendEmail={() => void onSendEmail()}
             />

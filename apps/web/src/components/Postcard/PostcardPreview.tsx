@@ -1,21 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { generatePostcardImage } from "./generatePostcardImage";
-import { PostcardRenderer } from "./PostcardRenderer";
 import type { PostcardPreviewProps } from "./PostcardPreview.types";
-import {
-  downloadPostcardBlob,
-  openPostcardBlob,
-  postcardFilename,
-} from "./postcardDevDownload";
+import { downloadPostcardBlob, openPostcardBlob } from "./postcardDevDownload";
 import { buildPostcardPreviewStyle } from "./utils/postcardStyleUtils";
 import styles from "./PostcardPreview.module.css";
 
 type GeneratedPostcard = { blob: Blob; url: string; ms: number };
 
-/** Dev-only: live scaled renderer next to the captured PNG, with download/open actions. */
-export function PostcardPreview({ theme, haiku, fontScale, scale = 0.5 }: PostcardPreviewProps) {
+/** Dev-only: live scaled side next to its captured PNG, with download/open actions. */
+export function PostcardPreview({
+  children,
+  generate,
+  filename,
+  scale = 0.5,
+  label = "Live renderer",
+}: PostcardPreviewProps) {
   const [generated, setGenerated] = useState<GeneratedPostcard | null>(null);
   const [pngSize, setPngSize] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -27,12 +27,12 @@ export function PostcardPreview({ theme, haiku, fontScale, scale = 0.5 }: Postca
     };
   }, [generated]);
 
-  const generate = async () => {
+  const runGenerate = async () => {
     setBusy(true);
     setError(null);
     try {
       const started = performance.now();
-      const blob = await generatePostcardImage({ theme, haiku, fontScale });
+      const blob = await generate();
       setPngSize(null);
       setGenerated({ blob, url: URL.createObjectURL(blob), ms: performance.now() - started });
     } catch (cause) {
@@ -56,12 +56,12 @@ export function PostcardPreview({ theme, haiku, fontScale, scale = 0.5 }: Postca
   return (
     <div className={styles.root}>
       <div className={styles.toolbar}>
-        <button type="button" onClick={generate} disabled={busy} data-testid="postcard-generate">
+        <button type="button" onClick={runGenerate} disabled={busy} data-testid="postcard-generate">
           {busy ? "Generating…" : "Generate PNG"}
         </button>
         <button
           type="button"
-          onClick={() => generated && downloadPostcardBlob(generated.blob, postcardFilename(haiku.id))}
+          onClick={() => generated && downloadPostcardBlob(generated.blob, filename)}
           disabled={!generated}
         >
           Download PNG
@@ -79,11 +79,9 @@ export function PostcardPreview({ theme, haiku, fontScale, scale = 0.5 }: Postca
 
       <div className={styles.panes}>
         <figure className={styles.pane}>
-          <figcaption>Live renderer</figcaption>
+          <figcaption>{label}</figcaption>
           <div className={styles.frame} style={previewStyle}>
-            <div className={styles.scaled}>
-              <PostcardRenderer theme={theme} haiku={haiku} fontScale={fontScale} />
-            </div>
+            <div className={styles.scaled}>{children}</div>
           </div>
         </figure>
         <figure className={styles.pane}>

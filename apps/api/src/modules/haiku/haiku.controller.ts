@@ -12,6 +12,7 @@ import { GENERATION_CREDITS_SOCKET_KIND, HAIKU_GENERATION_CREDIT_COST } from "..
 import { paymentsService } from "../payments/payments.service";
 import { insufficientCreditsBody } from "../payments/utils/purchaseResponses";
 import { haikuService, type HaikuStreamYield } from "./haiku.service";
+import { readShareHaikuEmailRequest } from "./utils/shareHaikuEmailRequest";
 
 const haikuPluginImpl = async (app: FastifyInstance) => {
   app.get(
@@ -359,22 +360,18 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
         return;
       }
 
-      const body =
-        (req.body as
-          | {
-              haikuId?: string;
-              emails?: string[];
-              message?: string;
-            }
-          | undefined) ?? {};
+      const parsed = await readShareHaikuEmailRequest(req);
+      if (!parsed.ok) {
+        res.code(parsed.status).send({ ok: false, error: parsed.error });
+        return;
+      }
+      const { haikuId, emails, message, postcard } = parsed.value;
 
-      const haikuId = (body.haikuId ?? "").trim();
       if (!isUuid(haikuId)) {
         res.code(400).send({ ok: false, error: "Invalid haikuId" });
         return;
       }
 
-      const emails = Array.isArray(body.emails) ? body.emails : [];
       if (emails.length === 0) {
         res.code(400).send({ ok: false, error: "At least one recipient email is required" });
         return;
@@ -384,7 +381,8 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
         userId,
         haikuId,
         recipients: emails,
-        personalMessage: (body.message ?? "").trim(),
+        personalMessage: message,
+        postcard,
       });
 
       if (!result.ok) {

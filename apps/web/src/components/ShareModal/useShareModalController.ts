@@ -1,12 +1,14 @@
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { comicToast } from "@/components/ComicToast";
+import type { HaikuDto } from "@/api/haikus";
 import {
   fetchShareLinkForHaiku,
   shareHaikuByEmail,
   type ShareLinkListItem,
 } from "@/api/shareLinks";
 import type { ShareMethod } from "./types";
+import { useSharePostcardImages } from "./useSharePostcardImages";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 const EMPTY_EMAIL_RECIPIENTS: string[] = [];
@@ -48,11 +50,14 @@ type UseShareModalControllerParams = {
   initialEmptyLink?: boolean;
   initialMethod?: ShareMethod;
   initialEmailRecipients?: string[];
+  /** Full haiku; when present (with a celestial theme) the email includes postcard images. */
+  haiku?: HaikuDto | null;
 };
 
 export function useShareModalController({
   open,
   haikuId,
+  haiku = null,
   haikuSubject = "Haiku",
   initialCreatedUrl = null,
   initialCreatedLink = null,
@@ -67,6 +72,7 @@ export function useShareModalController({
   const [emailRecipients, setEmailRecipients] = useState<string[]>([]);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const { preparingPostcard, preparePostcard } = useSharePostcardImages(haiku);
 
   useEffect(() => {
     if (!open) return;
@@ -141,12 +147,11 @@ export function useShareModalController({
   const onSendEmail = async () => {
     if (!canSendEmail) return;
     setSendingEmail(true);
+    const message = emailMessage.trim();
     try {
-      const sentCount = await shareHaikuByEmail({
-        haikuId,
-        emails: normalizedEmails,
-        message: emailMessage.trim(),
-      });
+      const postcard = await preparePostcard(message, normalizedEmails);
+      if (postcard === null) return;
+      const sentCount = await shareHaikuByEmail({ haikuId, emails: normalizedEmails, message, postcard });
       setEmailSent(true);
       comicToast.success(sentCount === 1 ? "Your haiku has been sent" : `Your haikus have been sent (${sentCount})`);
     } catch (e) {
@@ -167,6 +172,7 @@ export function useShareModalController({
     emailRecipients,
     setEmailRecipients,
     sendingEmail,
+    preparingPostcard,
     emailSent,
     invalidEmails,
     canSendEmail,

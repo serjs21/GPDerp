@@ -3,8 +3,8 @@
  * Postcard barrel; production callers should consume the Blob directly.
  */
 
-export function postcardFilename(haikuId: string): string {
-  return `postcard-${haikuId}.png`;
+export function postcardFilename(haikuId: string, side: "front" | "back" = "front"): string {
+  return `postcard-${haikuId}-${side}.png`;
 }
 
 export function downloadPostcardBlob(blob: Blob, filename: string): void {

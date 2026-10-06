@@ -207,12 +207,33 @@ export type ShareHaikuEmailBody = {
   haikuId: string;
   emails: string[];
   message?: string;
+  /** Front/back PNGs; when present the request is sent as multipart form data. */
+  postcard?: { front: Blob; back: Blob };
 };
 
 type ShareHaikuEmailResponse = { ok: true; data: { sentCount: number } } | { ok: false; error: string };
 
-export const shareHaikuByEmail = async (body: ShareHaikuEmailBody): Promise<number> => {
-  const { data } = await axios.post<ShareHaikuEmailResponse>("/share_haiku_email", body);
+const buildShareHaikuEmailFormData = (
+  body: ShareHaikuEmailBody & { postcard: { front: Blob; back: Blob } },
+): FormData => {
+  const form = new FormData();
+  form.append("haikuId", body.haikuId);
+  form.append("emails", JSON.stringify(body.emails));
+  form.append("message", body.message ?? "");
+  form.append("postcardFront", body.postcard.front, "postcard-front.png");
+  form.append("postcardBack", body.postcard.back, "postcard-back.png");
+  return form;
+};
+
+export const shareHaikuByEmail = async ({ postcard, ...json }: ShareHaikuEmailBody): Promise<number> => {
+  const { data } = postcard
+    ? await axios.post<ShareHaikuEmailResponse>(
+        "/share_haiku_email",
+        buildShareHaikuEmailFormData({ ...json, postcard }),
+        // Overrides the global JSON content type; the browser sets the multipart boundary.
+        { headers: { "Content-Type": "multipart/form-data" } },
+      )
+    : await axios.post<ShareHaikuEmailResponse>("/share_haiku_email", json);
   if (!data.ok) {
     throw new Error(data.error || "Could not send email");
   }

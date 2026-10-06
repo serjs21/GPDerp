@@ -1,4 +1,5 @@
 import { env } from "../../../env";
+import { POSTCARD_BACK_CID, POSTCARD_FRONT_CID } from "../../../consts/postcard";
 
 const escapeHtml = (value: string): string =>
   value
@@ -15,6 +16,8 @@ export const buildShareHaikuEmail = (params: {
   personalMessage: string;
   title: string;
   body: string;
+  /** Front/back PNGs are attached with cids POSTCARD_FRONT_CID / POSTCARD_BACK_CID. */
+  hasPostcard?: boolean;
 }) => {
   const senderName = params.senderName.trim() || "Someone";
   const personal = params.personalMessage.trim();
@@ -31,12 +34,23 @@ export const buildShareHaikuEmail = (params: {
     </div>`
       : "";
 
+  const postcardImage = (cid: string, alt: string) =>
+    `<img src="cid:${cid}" alt="${escapeHtml(alt)}" width="600" style="display:block;width:100%;max-width:600px;height:auto;margin:0 0 12px;border:0;border-radius:8px;" />`;
+  const postcardSection = params.hasPostcard
+    ? `
+    <div style="margin:0 0 16px;">
+      ${postcardImage(POSTCARD_FRONT_CID, `Postcard front: ${title}`)}
+      ${postcardImage(POSTCARD_BACK_CID, `Postcard back: message from ${senderName}`)}
+    </div>`
+    : "";
+
   const html = `
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0;padding:0;border-collapse:collapse;">
   <tr>
     <td style="padding:24px;color:#2c2c2c;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;background-color:background: linear-gradient(135deg, #ff7c68, #2c1e1e);background-image:linear-gradient(160deg,#0000 60%,#00000008 60%,#0000000f 100%),linear-gradient(200deg,#0000 75%,#0000000a 75%,#00000005 100%);background-repeat:no-repeat,no-repeat;background-size:cover,cover;background-position:center center,center center;">
       <div style="max-width:640px;margin:0 auto;">
       <p style="margin:0 0 12px;font-size:16px;line-height:1.4;color:rgb(0 0 0 / 65%);">A poem from ${escapeHtml(senderName)}:</p>
+    ${postcardSection}
     ${personalSection}
     <div style="background:rgba(255,255,255,0.88);border:1px solid rgba(44,44,44,0.14);border-radius:10px;padding:18px 20px;">
       <h2 style="margin:0 0 8px;font-size:20px;line-height:1.3;color:#1f1f1f;">${escapeHtml(title)}</h2>
@@ -51,8 +65,12 @@ export const buildShareHaikuEmail = (params: {
 </table>
 `.trim();
 
-  const text = `A poem from ${senderName}:
+  const postcardNote = params.hasPostcard
+    ? "\nYour postcard (front and back) is attached as postcard-front.png and postcard-back.png.\n"
+    : "";
 
+  const text = `A poem from ${senderName}:
+${postcardNote}
 ${personal ? `Few words from ${senderName}:\n${personal}\n` : ""}
 ${title}
 ${poemText}

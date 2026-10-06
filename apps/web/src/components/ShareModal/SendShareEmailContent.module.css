@@ -177,6 +177,14 @@
   opacity: 0.55;
 }
 
+.fitHint {
+  display: block;
+  flex: 0 0 auto;
+  margin: 0;
+  font-size: 0.8rem;
+  text-align: right;
+}
+
 .validation {
   display: block;
   flex: 0 0 auto;

@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Bangers, Geist, Geist_Mono, Noto_Serif_JP, Press_Start_2P, Zen_Kurenaido } from "next/font/google";
+import {
+  Bangers,
+  Geist,
+  Geist_Mono,
+  Noto_Serif_JP,
+  Patrick_Hand,
+  Press_Start_2P,
+  Zen_Kurenaido,
+} from "next/font/google";
 import "@/theme/globals.css";
 import "magic.css/dist/magic.min.css";
 import "@/theme/themes/tokyo-dusk.css";
@@ -38,6 +46,13 @@ const notoSerifJP = Noto_Serif_JP({
 // Handwritten brush script for lantern haiku text
 const zenKurenaido = Zen_Kurenaido({
   variable: "--font-zen-kurenaido",
+  subsets: ["latin"],
+  weight: "400",
+});
+
+// Marker-style handwriting for the postcard message side
+const patrickHand = Patrick_Hand({
+  variable: "--font-postcard-hand",
   subsets: ["latin"],
   weight: "400",
 });
@@ -93,7 +108,7 @@ export default async function RootLayout({
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? process.env.GOOGLE_CLIENT_ID;
   
   return (
-    <html lang={initialLocale} data-theme={initialTheme} className={`${notoSerifJP.variable} ${zenKurenaido.variable} ${geistSans.variable} ${geistMono.variable} ${pressStart2P.variable} ${bangers.variable} ${flacucho.variable}`}>
+    <html lang={initialLocale} data-theme={initialTheme} className={`${notoSerifJP.variable} ${zenKurenaido.variable} ${geistSans.variable} ${geistMono.variable} ${pressStart2P.variable} ${bangers.variable} ${flacucho.variable} ${patrickHand.variable}`}>
       <body>
         <AntdRegistry>
           <HtmlLoader />
