@@ -1,4 +1,4 @@
-import opentype from "opentype.js";
+import * as opentype from "opentype.js";
 import {
   POSTCARD_MESSAGE_BOX_WIDTH_PX,
   POSTCARD_MESSAGE_FONT_PX,

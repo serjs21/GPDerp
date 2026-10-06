@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { fetchServerPostcardBack } from "@/api/postcardDev";
 import { generatePostcardImage } from "@/components/Postcard/generatePostcardImage";
-import { generatePostcardMessageImage } from "@/components/Postcard/generatePostcardMessageImage";
 import { PostcardMessage } from "@/components/Postcard/PostcardMessage";
 import { PostcardPreview } from "@/components/Postcard/PostcardPreview";
 import { PostcardRenderer } from "@/components/Postcard/PostcardRenderer";
@@ -17,7 +17,6 @@ import { clampPostcardMessage } from "@/components/Postcard/utils/postcardMessag
 import { useInfiniteHaikusQuery } from "@/hooks/useInfiniteHaikusQuery";
 import { usePostcardMessageFit } from "@/hooks/usePostcardMessageFit";
 import { usePostcardTheme } from "@/hooks/usePostcardTheme";
-import { DevPostcardGenerateBoth } from "./DevPostcardGenerateBoth";
 import styles from "./DevPostcardPage.module.css";
 
 const parseRecipients = (value: string) =>
@@ -100,21 +99,13 @@ export function DevPostcardPage() {
         </label>
       </div>
       <PostcardPreview
-        generate={() => generatePostcardMessageImage({ message, senderName, recipient: previewRecipient })}
+        generate={() => fetchServerPostcardBack({ message, senderName, recipient: previewRecipient })}
         filename={postcardFilename(haiku.id, "back")}
         scale={0.5}
-        label="Live message side"
+        label="Live message side (server PNG on the right)"
       >
         <PostcardMessage message={message} senderName={senderName} recipient={previewRecipient} />
       </PostcardPreview>
-
-      <DevPostcardGenerateBoth
-        theme={theme}
-        haiku={haiku}
-        message={message}
-        senderName={senderName}
-        recipients={recipients}
-      />
     </main>
   );
 }

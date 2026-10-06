@@ -168,7 +168,7 @@ export function ShareModal({
             <ComicPagePanel span="full" color="white" contentAlign="start" className={styles.contentPanel}>
               <div className={styles.successBlock}>
                 <Typography.Paragraph className={styles.success}>
-                  Your haikus have been sent.
+                  Postcards were placed in the mail box.
                 </Typography.Paragraph>
                 <Button type="primary" onClick={onClose}>
                   Done
