@@ -14,4 +14,4 @@ export const POSTCARD_DEV_SAMPLE_HAIKU: HaikuDto = {
 export const POSTCARD_DEV_SAMPLE_MESSAGE =
   "I saw this lantern & had to send it to you!\nRemember our trip to Kyoto?\nWish you were here.";
 
-export const POSTCARD_DEV_SAMPLE_RECIPIENTS = ["tony.kim@example.com"];
+export const POSTCARD_DEV_SAMPLE_RECIPIENTS = ["tony.kim@example.com", "mei.lin@example.com"];

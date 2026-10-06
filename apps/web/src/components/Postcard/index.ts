@@ -15,11 +15,11 @@ export {
 export {
   generatePostcardImages,
   type GeneratePostcardImagesInput,
+  type PostcardBackImage,
   type PostcardImages,
 } from "./generatePostcardImages";
 export {
   clampPostcardMessage,
-  postcardRecipientLines,
   resolvePostcardSenderName,
 } from "./utils/postcardMessageFit";
 export {

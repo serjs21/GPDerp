@@ -37,6 +37,7 @@ export function DevPostcardPage() {
   const haiku =
     haikus.find((item) => item.id === selectedId) ?? haikus[0] ?? POSTCARD_DEV_SAMPLE_HAIKU;
   const recipients = parseRecipients(recipientsText);
+  const previewRecipient = recipients[0] ?? "";
 
   const onMessageChange = (raw: string) => {
     const next = clampPostcardMessage(raw);
@@ -77,7 +78,7 @@ export function DevPostcardPage() {
         <PostcardRenderer theme={theme} haiku={haiku} />
       </PostcardPreview>
 
-      <h2 className={styles.subheading}>Back (message side)</h2>
+      <h2 className={styles.subheading}>Back (message side, previewed for the first recipient)</h2>
       <div className={styles.fields}>
         <label className={styles.field}>
           Message ({fit.linesLeft} lines left)
@@ -99,17 +100,12 @@ export function DevPostcardPage() {
         </label>
       </div>
       <PostcardPreview
-        generate={() => generatePostcardMessageImage({ theme, message, senderName, recipients })}
+        generate={() => generatePostcardMessageImage({ message, senderName, recipient: previewRecipient })}
         filename={postcardFilename(haiku.id, "back")}
         scale={0.5}
         label="Live message side"
       >
-        <PostcardMessage
-          theme={theme}
-          message={message}
-          senderName={senderName}
-          recipients={recipients}
-        />
+        <PostcardMessage message={message} senderName={senderName} recipient={previewRecipient} />
       </PostcardPreview>
 
       <DevPostcardGenerateBoth

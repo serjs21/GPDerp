@@ -1,42 +1,26 @@
 "use client";
 
-import { CelestialThemeProvider } from "@/app/providers/CelestialThemeProvider";
-import { usePostcardTheme } from "@/hooks/usePostcardTheme";
 import { generatePostcardMessageImage } from "./generatePostcardMessageImage";
 import { PostcardMessage } from "./PostcardMessage";
 import type { PostcardMessageStoryStageProps } from "./PostcardMessageStoryStage.types";
 import { postcardFilename } from "./postcardDevDownload";
 import { PostcardPreview } from "./PostcardPreview";
 
-function PostcardMessageStoryStageInner({
+/** Storybook stage: postcard back (message side) live render + generated PNG. */
+export function PostcardMessageStoryStage({
   message,
   senderName,
-  recipients,
+  recipient,
   scale,
-}: Omit<PostcardMessageStoryStageProps, "slot">) {
-  const theme = usePostcardTheme();
+}: PostcardMessageStoryStageProps) {
   return (
     <PostcardPreview
-      generate={() => generatePostcardMessageImage({ theme, message, senderName, recipients })}
+      generate={() => generatePostcardMessageImage({ message, senderName, recipient })}
       filename={postcardFilename("story", "back")}
       scale={scale}
       label="Live message side"
     >
-      <PostcardMessage
-        theme={theme}
-        message={message}
-        senderName={senderName}
-        recipients={recipients}
-      />
+      <PostcardMessage message={message} senderName={senderName} recipient={recipient} />
     </PostcardPreview>
-  );
-}
-
-/** Storybook stage: fixed celestial slot → postcard back (message side) preview. */
-export function PostcardMessageStoryStage({ slot, ...rest }: PostcardMessageStoryStageProps) {
-  return (
-    <CelestialThemeProvider key={slot} initialSlot={slot}>
-      <PostcardMessageStoryStageInner {...rest} />
-    </CelestialThemeProvider>
   );
 }

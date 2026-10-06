@@ -8,9 +8,8 @@ import {
 } from "../consts/postcardMessageConsts";
 import { POSTCARD_HEIGHT, POSTCARD_WIDTH } from "../consts/postcardConsts";
 
-export function buildPostcardMessageRootStyle(sceneVars: Record<string, string>): CSSProperties {
+export function buildPostcardMessageRootStyle(): CSSProperties {
   return {
-    ...sceneVars,
     "--postcard-width": `${POSTCARD_WIDTH}px`,
     "--postcard-height": `${POSTCARD_HEIGHT}px`,
     "--postcard-message-width": `${POSTCARD_MESSAGE_BOX_WIDTH_PX}px`,

@@ -207,21 +207,26 @@ export type ShareHaikuEmailBody = {
   haikuId: string;
   emails: string[];
   message?: string;
-  /** Front/back PNGs; when present the request is sent as multipart form data. */
-  postcard?: { front: Blob; back: Blob };
+  /**
+   * Shared front + one back per recipient. When present the request is sent as multipart
+   * form data and `emails` is taken from the backs so the two lists stay aligned.
+   */
+  postcard?: { front: Blob; backs: Array<{ recipient: string; blob: Blob }> };
 };
 
 type ShareHaikuEmailResponse = { ok: true; data: { sentCount: number } } | { ok: false; error: string };
 
 const buildShareHaikuEmailFormData = (
-  body: ShareHaikuEmailBody & { postcard: { front: Blob; back: Blob } },
+  body: Omit<ShareHaikuEmailBody, "emails"> & { postcard: NonNullable<ShareHaikuEmailBody["postcard"]> },
 ): FormData => {
   const form = new FormData();
   form.append("haikuId", body.haikuId);
-  form.append("emails", JSON.stringify(body.emails));
+  form.append("emails", JSON.stringify(body.postcard.backs.map((back) => back.recipient)));
   form.append("message", body.message ?? "");
   form.append("postcardFront", body.postcard.front, "postcard-front.png");
-  form.append("postcardBack", body.postcard.back, "postcard-back.png");
+  body.postcard.backs.forEach((back, index) => {
+    form.append("postcardBack", back.blob, `postcard-back-${index + 1}.png`);
+  });
   return form;
 };
 

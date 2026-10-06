@@ -8,9 +8,11 @@ import {
 import { downloadPostcardBlob, postcardFilename } from "@/components/Postcard/postcardDevDownload";
 import styles from "./DevPostcardPage.module.css";
 
-type BothSidesResult = { frontKb: number; backKb: number; ms: number };
+type BothSidesResult = { frontKb: number; backKbs: number[]; ms: number };
 
-/** Dev-only: run the same two-sided generation the share email uses, then download both. */
+const toKb = (blob: Blob) => Math.round(blob.size / 1024);
+
+/** Dev-only: run the same generation the share email uses (front + a back per recipient), then download all. */
 export function DevPostcardGenerateBoth(input: GeneratePostcardImagesInput) {
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<BothSidesResult | null>(null);
@@ -21,14 +23,16 @@ export function DevPostcardGenerateBoth(input: GeneratePostcardImagesInput) {
     setError(null);
     try {
       const started = performance.now();
-      const { front, back } = await generatePostcardImages(input);
+      const { front, backs } = await generatePostcardImages(input);
       setResult({
-        frontKb: Math.round(front.size / 1024),
-        backKb: Math.round(back.size / 1024),
+        frontKb: toKb(front),
+        backKbs: backs.map((back) => toKb(back.blob)),
         ms: Math.round(performance.now() - started),
       });
       downloadPostcardBlob(front, postcardFilename(input.haiku.id, "front"));
-      downloadPostcardBlob(back, postcardFilename(input.haiku.id, "back"));
+      backs.forEach((back, index) => {
+        downloadPostcardBlob(back.blob, postcardFilename(`${input.haiku.id}-${index + 1}`, "back"));
+      });
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : String(cause));
     } finally {
@@ -39,11 +43,11 @@ export function DevPostcardGenerateBoth(input: GeneratePostcardImagesInput) {
   return (
     <div className={styles.bothRow}>
       <button type="button" onClick={run} disabled={busy} data-testid="postcard-generate-both">
-        {busy ? "Generating both…" : "Generate both sides + download"}
+        {busy ? "Generating…" : "Generate front + back per recipient + download"}
       </button>
       {result ? (
         <span data-testid="postcard-both-meta">
-          {`Front ${result.frontKb} KB · Back ${result.backKb} KB · same size verified · ${result.ms} ms`}
+          {`Front ${result.frontKb} KB · ${result.backKbs.length} backs (${result.backKbs.join(", ")} KB) · same size verified · ${result.ms} ms`}
         </span>
       ) : null}
       {error ? <span className={styles.error}>{error}</span> : null}

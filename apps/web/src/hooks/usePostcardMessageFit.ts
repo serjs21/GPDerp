@@ -16,11 +16,12 @@ export function usePostcardMessageFit(message: string): PostcardMessageFit {
   const [fontsVersion, setFontsVersion] = useState(0);
 
   useEffect(() => {
-    if (typeof document === "undefined" || !document.fonts) return;
     let active = true;
     const bump = () => {
       if (active) setFontsVersion((value) => value + 1);
     };
+    bump();
+    if (!document.fonts) return;
     void document.fonts.ready.then(bump);
     document.fonts.addEventListener("loadingdone", bump);
     return () => {
@@ -30,9 +31,9 @@ export function usePostcardMessageFit(message: string): PostcardMessageFit {
   }, []);
 
   const lines = useMemo(
-    () => measurePostcardMessageLines(message),
+    // DOM measurement only after mount so SSR and the first client render agree.
+    () => (fontsVersion === 0 ? 0 : measurePostcardMessageLines(message)),
     // fontsVersion re-measures after the handwriting font finishes loading.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [message, fontsVersion],
   );
 

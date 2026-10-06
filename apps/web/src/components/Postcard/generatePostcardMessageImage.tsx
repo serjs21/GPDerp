@@ -9,26 +9,20 @@ import { renderOffscreenPng } from "./utils/renderOffscreenPng";
 
 export type GeneratePostcardMessageImageInput = Pick<
   PostcardMessageProps,
-  "theme" | "message" | "senderName" | "recipients"
+  "message" | "senderName" | "recipient"
 >;
 
-/** Render the postcard back (message side) offscreen at the same size as the front. */
+/** Render the postcard back (message side) for one recipient, at the same size as the front. */
 export function generatePostcardMessageImage({
-  theme,
   message,
   senderName,
-  recipients,
+  recipient,
 }: GeneratePostcardMessageImageInput): Promise<Blob> {
   const clamped = clampPostcardMessage(message);
   if (measurePostcardMessageLines(clamped) > POSTCARD_MESSAGE_MAX_LINES) {
     return Promise.reject(new Error("The message does not fit on the postcard"));
   }
   return renderOffscreenPng(
-    <PostcardMessage
-      theme={theme}
-      message={clamped}
-      senderName={senderName}
-      recipients={recipients}
-    />,
+    <PostcardMessage message={clamped} senderName={senderName} recipient={recipient} />,
   );
 }

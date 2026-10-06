@@ -12,23 +12,27 @@ import { normalizeLabelShape } from "../label/labelShape";
 import { mailService } from "../email/mailService";
 import { buildShareHaikuEmail } from "../email/templates/shareHaikuTemplate";
 import { POSTCARD_BACK_CID, POSTCARD_FRONT_CID } from "../../consts/postcard";
-import type { SharePostcardImages } from "./utils/shareHaikuEmailRequest";
+import { normalizeShareRecipient, type SharePostcardImages } from "./utils/shareHaikuEmailRequest";
 
 /** Inline via cid in the HTML body; nodemailer also lists them as downloadable files. */
-const buildPostcardAttachments = (postcard: SharePostcardImages) => [
-  {
-    filename: "postcard-front.png",
-    content: postcard.front,
-    contentType: "image/png",
-    cid: POSTCARD_FRONT_CID,
-  },
-  {
-    filename: "postcard-back.png",
-    content: postcard.back,
-    contentType: "image/png",
-    cid: POSTCARD_BACK_CID,
-  },
-];
+const buildPostcardAttachments = (postcard: SharePostcardImages, recipient: string) => {
+  const back = postcard.backs.get(recipient);
+  if (!back) throw new Error(`Missing postcard back for recipient ${recipient}`);
+  return [
+    {
+      filename: "postcard-front.png",
+      content: postcard.front,
+      contentType: "image/png",
+      cid: POSTCARD_FRONT_CID,
+    },
+    {
+      filename: "postcard-back.png",
+      content: back,
+      contentType: "image/png",
+      cid: POSTCARD_BACK_CID,
+    },
+  ];
+};
 
 const chunkToString = (chunk: string | Buffer): string =>
   typeof chunk === "string" ? chunk : Buffer.from(chunk).toString("utf-8");
@@ -472,14 +476,18 @@ export const haikuService = {
     haikuId: string;
     recipients: string[];
     personalMessage: string;
-    /** Front/back postcard PNGs; shown inline (cid) and attached. */
+    /** Shared front + per-recipient back PNGs; shown inline (cid) and attached. */
     postcard?: SharePostcardImages;
   }): Promise<
     | { ok: true; sentCount: number }
     | { ok: false; reason: "not_found" | "forbidden" | "invalid_recipients" }
   > {
-    const normalizedRecipients = [...new Set(params.recipients.map((v) => v.trim().toLowerCase()))].filter(Boolean);
+    const normalizedRecipients = [...new Set(params.recipients.map(normalizeShareRecipient))].filter(Boolean);
     if (normalizedRecipients.length === 0 || !normalizedRecipients.every((email) => EMAIL_REGEX.test(email))) {
+      return { ok: false, reason: "invalid_recipients" };
+    }
+    const { postcard } = params;
+    if (postcard && !normalizedRecipients.every((email) => postcard.backs.has(email))) {
       return { ok: false, reason: "invalid_recipients" };
     }
 
@@ -497,9 +505,8 @@ export const haikuService = {
       personalMessage: params.personalMessage,
       title: haiku.title,
       body: haiku.body,
-      hasPostcard: !!params.postcard,
+      hasPostcard: !!postcard,
     });
-    const attachments = params.postcard ? buildPostcardAttachments(params.postcard) : undefined;
 
     await Promise.all(
       normalizedRecipients.map((to) =>
@@ -509,7 +516,7 @@ export const haikuService = {
           text: emailPayload.text,
           html: emailPayload.html,
           replyTo: sender.email,
-          attachments,
+          attachments: postcard ? buildPostcardAttachments(postcard, to) : undefined,
         }),
       ),
     );

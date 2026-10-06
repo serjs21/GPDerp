@@ -4,18 +4,19 @@
 
   position: relative;
   box-sizing: border-box;
+  display: flex;
   width: var(--postcard-width, 1200px);
   height: var(--postcard-height, 800px);
-  padding: 44px 52px 56px 44px;
+  padding: 56px 60px 48px 64px;
   overflow: hidden;
+  border: 6px solid var(--postcard-line);
+  background: #fffdf8;
+  color: var(--postcard-ink);
+  font-family: var(--postcard-message-family, cursive);
+  font-weight: 400;
+  letter-spacing: normal;
   pointer-events: none;
   user-select: none;
-  background: linear-gradient(
-    180deg,
-    var(--sky-top, #2b2a4a) 0%,
-    var(--sky-mid, #4a3f6b) 55%,
-    var(--sky-horizon, #8a6f8f) 100%
-  );
 }
 
 .root *,
@@ -25,41 +26,23 @@
   transition: none !important;
 }
 
-.card {
-  position: relative;
-  box-sizing: border-box;
-  display: flex;
-  width: 100%;
-  height: 100%;
-  padding: 44px 44px 40px 52px;
-  border: 6px solid var(--postcard-line);
-  border-radius: 10px;
-  background: #fffdf8;
-  box-shadow: 14px 16px 0 rgba(0, 0, 0, 0.28);
-  transform: rotate(-0.6deg);
-  color: var(--postcard-ink);
-  font-family: var(--postcard-message-family, cursive);
-  font-weight: 400;
-  letter-spacing: normal;
-}
-
 .left {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: var(--postcard-message-width, 520px);
+  width: var(--postcard-message-width, 560px);
   flex-shrink: 0;
 }
 
 .message {
   box-sizing: border-box;
-  width: var(--postcard-message-width, 520px);
-  height: var(--postcard-message-height, 416px);
+  width: var(--postcard-message-width, 560px);
+  height: var(--postcard-message-height, 496px);
   margin: 0;
   overflow: hidden;
   font-family: inherit;
-  font-size: var(--postcard-message-font, 40px);
-  line-height: var(--postcard-message-line, 52px);
+  font-size: var(--postcard-message-font, 46px);
+  line-height: var(--postcard-message-line, 62px);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -67,9 +50,9 @@
 .signature {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 0 0 4px 120px;
-  font-size: 40px;
+  gap: 14px;
+  margin: 0 0 6px 130px;
+  font-size: 46px;
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
@@ -78,13 +61,13 @@
 }
 
 .heart {
-  font-size: 34px;
+  font-size: 38px;
 }
 
 .divider {
   flex-shrink: 0;
-  width: 5px;
-  margin: 70px 40px 10px;
+  width: 6px;
+  margin: 24px 44px 8px;
   border-radius: 3px;
   background: var(--postcard-line);
 }
@@ -102,29 +85,29 @@
   position: absolute;
   top: 0;
   right: 0;
-  width: 170px;
-  height: 170px;
+  width: 210px;
+  height: 210px;
   transform: rotate(3deg);
 }
 
 .address {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding-bottom: 20px;
+  gap: 24px;
+  padding-bottom: 16px;
 }
 
 .toLabel {
-  font-size: 32px;
+  font-size: 36px;
   line-height: 1;
   opacity: 0.8;
 }
 
 .addressLine {
   margin: 0;
-  padding: 0 4px 6px;
-  border-bottom: 5px solid var(--postcard-line);
-  font-size: 34px;
+  padding: 0 4px 8px;
+  border-bottom: 6px solid var(--postcard-line);
+  font-size: 38px;
   line-height: 1.25;
   white-space: nowrap;
   overflow: hidden;

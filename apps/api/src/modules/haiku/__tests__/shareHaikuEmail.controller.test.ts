@@ -123,7 +123,41 @@ describe("haiku.controller POST /share_haiku_email", () => {
     expect(call.recipients).toEqual(["friend@example.com"]);
     expect(call.personalMessage).toBe("Wish you were here");
     expect(call.postcard.front.equals(fakePng("front"))).toBe(true);
-    expect(call.postcard.back.equals(fakePng("back"))).toBe(true);
+    expect(call.postcard.backs.get("friend@example.com").equals(fakePng("back"))).toBe(true);
+  });
+
+  it("pairs one postcard back per recipient in emails order", async () => {
+    const backPart = (marker: string): Part => ({
+      name: "postcardBack",
+      filename: `postcard-back-${marker}.png`,
+      contentType: "image/png",
+      content: fakePng(marker),
+    });
+    const parts = postcardParts({ back: null })
+      .map((part) =>
+        part.name === "emails" ? { name: "emails", value: JSON.stringify(["A@example.com", "b@example.com"]) } : part,
+      )
+      .concat([backPart("back-a"), backPart("back-b")]);
+
+    const res = await postMultipart(parts);
+
+    expect(res.statusCode).toBe(200);
+    const { backs } = haikuService.shareHaikuByEmailForUser.mock.calls[0][0].postcard;
+    expect(backs.size).toBe(2);
+    expect(backs.get("a@example.com").equals(fakePng("back-a"))).toBe(true);
+    expect(backs.get("b@example.com").equals(fakePng("back-b"))).toBe(true);
+  });
+
+  it("rejects multipart requests whose back count does not match the recipients", async () => {
+    const parts = postcardParts().map((part) =>
+      part.name === "emails" ? { name: "emails", value: JSON.stringify(["a@example.com", "b@example.com"]) } : part,
+    );
+
+    const res = await postMultipart(parts);
+
+    expect(res.statusCode).toBe(400);
+    expect(res.json()).toEqual({ ok: false, error: "Each recipient needs exactly one postcard back image" });
+    expect(haikuService.shareHaikuByEmailForUser).not.toHaveBeenCalled();
   });
 
   it("rejects multipart requests missing a postcard side", async () => {

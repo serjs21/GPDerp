@@ -4,7 +4,6 @@ import {
 } from "../consts/postcardMessageConsts";
 import {
   clampPostcardMessage,
-  postcardRecipientLines,
   resolvePostcardSenderName,
 } from "./postcardMessageFit";
 
@@ -30,16 +29,6 @@ describe("clampPostcardMessage", () => {
     const result = clampPostcardMessage(input);
     expect(result.split("\n")).toHaveLength(POSTCARD_MESSAGE_MAX_LINES);
     expect(result).not.toContain("\r");
-  });
-});
-
-describe("postcardRecipientLines", () => {
-  it("returns trimmed recipients when they fit", () => {
-    expect(postcardRecipientLines([" a@x.com ", "", "b@x.com"], 3)).toEqual(["a@x.com", "b@x.com"]);
-  });
-
-  it("collapses overflow into a +N more line", () => {
-    expect(postcardRecipientLines(["a", "b", "c", "d", "e"], 3)).toEqual(["a", "b", "+3 more"]);
   });
 });
 
