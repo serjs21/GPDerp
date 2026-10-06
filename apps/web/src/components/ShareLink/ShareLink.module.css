@@ -81,7 +81,7 @@
   /* Title beside its control; a shared label column keeps every input starting at the same x. */
   .card .limitFields {
     display: grid;
-    grid-template-columns: max-content minmax(0, 1fr);
+    grid-template-columns: 6rem minmax(0, 1fr);
     gap: 0.5rem;
   }
 

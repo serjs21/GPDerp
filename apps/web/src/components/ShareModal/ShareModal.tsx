@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { Button, Typography } from "@/components/StyledComponents";
+import { Typography } from "@/components/StyledComponents";
 import {
   ComicPageDialog,
   ComicPagePanel,
@@ -66,7 +66,6 @@ export function ShareModal({
     setEmailRecipients,
     sendingEmail,
     preparingPostcard,
-    emailSent,
     invalidEmails,
     canSendEmail,
     emailCtaHint,
@@ -81,6 +80,7 @@ export function ShareModal({
     initialEmptyLink,
     initialMethod,
     initialEmailRecipients,
+    onEmailQueued: onClose,
   });
 
   const onShareLinkSocketUpdate = useCallback(
@@ -106,8 +106,6 @@ export function ShareModal({
     onShareLinkDeleted: onShareLinkSocketDeleted,
   });
 
-  const showMethodRow = !emailSent;
-
   return (
     <ComicPageDialog
       open={open}
@@ -118,64 +116,51 @@ export function ShareModal({
       }}
     >
       <div className={styles.body}>
-        {showMethodRow ? (
-          <ComicPanelTabs
-            className={styles.methodRow}
-            panelClassName={styles.methodPanel}
-            value={method}
-            onChange={setMethod}
-            tabs={[
-              {
-                id: "link",
-                panel: {
-                  background: "sunburst",
-                  color: "teal",
-                  title: "Link",
-                  ariaLabel: "Share by link",
-                },
-                content: (
-                  <ShareMethodIcon
-                    src="/share_modal/link.svg"
-                    bubbleStyle="pointedArcs"
-                    sourceDirection="none"
-                    active={method === "link"}
-                  />
-                ),
+        <ComicPanelTabs
+          className={styles.methodRow}
+          panelClassName={styles.methodPanel}
+          value={method}
+          onChange={setMethod}
+          tabs={[
+            {
+              id: "link",
+              panel: {
+                background: "sunburst",
+                color: "teal",
+                title: "Link",
+                ariaLabel: "Share by link",
               },
-              {
-                id: "email",
-                panel: {
-                  background: "halftone",
-                  color: "orange",
-                  title: "Email",
-                  ariaLabel: "Share via email",
-                },
-                content: (
-                  <ShareMethodIcon
-                    src="/share_modal/email.svg"
-                    bubbleStyle="rectangle"
-                    sourceDirection="none"
-                    active={method === "email"}
-                  />
-                ),
+              content: (
+                <ShareMethodIcon
+                  src="/share_modal/link.svg"
+                  bubbleStyle="pointedArcs"
+                  sourceDirection="none"
+                  active={method === "link"}
+                />
+              ),
+            },
+            {
+              id: "email",
+              panel: {
+                background: "halftone",
+                color: "orange",
+                title: "Email",
+                ariaLabel: "Share via email",
               },
-            ]}
-          />
-        ) : null}
+              content: (
+                <ShareMethodIcon
+                  src="/share_modal/email.svg"
+                  bubbleStyle="rectangle"
+                  sourceDirection="none"
+                  active={method === "email"}
+                />
+              ),
+            },
+          ]}
+        />
 
         <div className={styles.contentSlot}>
-          {emailSent ? (
-            <ComicPagePanel span="full" color="white" contentAlign="start" className={styles.contentPanel}>
-              <div className={styles.successBlock}>
-                <Typography.Paragraph className={styles.success}>
-                  Postcards were placed in the mail box.
-                </Typography.Paragraph>
-                <Button type="primary" onClick={onClose}>
-                  Done
-                </Button>
-              </div>
-            </ComicPagePanel>
-          ) : method === "link" ? (
+          {method === "link" ? (
             loadingLink ? (
               <ComicPagePanel span="full" color="white" contentAlign="center" className={styles.contentPanel}>
                 <Typography.Paragraph type="secondary" style={{ margin: 0 }}>
@@ -206,7 +191,7 @@ export function ShareModal({
           )}
         </div>
 
-        {method === "email" && !emailSent ? (
+        {method === "email" ? (
           <div className={styles.sendRow}>
             <ShareEmailSendPanel
               canSendEmail={canSendEmail}

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "predev": "pnpm env:check",
+    "predev": "pnpm env:check && prisma generate",
     "dev": "tsx watch src/index.ts",
     "env:check": "tsx src/checkEnv.ts",
     "dev:sanity": "pnpm env:check && pnpm build",

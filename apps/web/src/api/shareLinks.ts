@@ -214,7 +214,10 @@ export type ShareHaikuEmailBody = {
   postcard?: { front: Blob };
 };
 
-type ShareHaikuEmailResponse = { ok: true; data: { queuedCount: number } } | { ok: false; error: string };
+/** `sentCount` is the first recipient, emailed during the request; the rest are queued. */
+type ShareHaikuEmailResponse =
+  | { ok: true; data: { sentCount: number; queuedCount: number } }
+  | { ok: false; error: string };
 
 /** The front PNG is a few MB; give the upload its own bound instead of the global default. */
 const SHARE_EMAIL_UPLOAD_TIMEOUT_MS = 60_000;
@@ -230,7 +233,7 @@ const buildShareHaikuEmailFormData = (
   return form;
 };
 
-/** Queues one postcard email per recipient; resolves with the number queued. */
+/** Emails the first recipient and queues the rest; resolves with the total accepted. */
 export const shareHaikuByEmail = async ({ postcard, ...json }: ShareHaikuEmailBody): Promise<number> => {
   const { data } = postcard
     ? await axios.post<ShareHaikuEmailResponse>(
@@ -246,5 +249,5 @@ export const shareHaikuByEmail = async ({ postcard, ...json }: ShareHaikuEmailBo
   if (!data.ok) {
     throw new Error(data.error || "Could not send email");
   }
-  return data.data.queuedCount;
+  return data.data.sentCount + data.data.queuedCount;
 };

@@ -10,9 +10,13 @@ export type PostcardEmailJobOutcome = "sent" | "failed_permanently";
 
 const LOG_PREFIX = "[postcardEmail]";
 
-/** SMTP 5xx (e.g. 550 mailbox unavailable) will not succeed on retry. */
+/**
+ * SMTP 5xx (e.g. 550 mailbox unavailable) will not succeed on retry. Auth failures (535,
+ * `EAUTH`) are our own misconfiguration, so they keep retrying until credentials are fixed.
+ */
 export const isPermanentSmtpError = (err: unknown): boolean => {
   if (!err || typeof err !== "object") return false;
+  if ((err as { code?: unknown }).code === "EAUTH") return false;
   const code = (err as { responseCode?: unknown }).responseCode;
   return typeof code === "number" && code >= 500 && code < 600;
 };

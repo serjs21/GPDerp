@@ -188,7 +188,7 @@
 /* Mirrors the postcard back signature (handwriting font, slight tilt), pinned to the textarea's bottom-right corner. */
 .signature {
   position: absolute;
-  right: 2rem;
+  right: 4rem;
   bottom: 2rem;
   z-index: 1;
   display: flex;

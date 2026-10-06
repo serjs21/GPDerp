@@ -89,6 +89,15 @@ describe("processPostcardEmailJob", () => {
     await expect(processPostcardEmailJob(job)).rejects.toThrow("timeout");
   });
 
+  it("retries SMTP auth failures (our credentials, not the recipient)", async () => {
+    mailService.sendEmail.mockRejectedValue(
+      Object.assign(new Error("Invalid login"), { code: "EAUTH", responseCode: 535 }),
+    );
+
+    await expect(processPostcardEmailJob(job)).rejects.toThrow("Invalid login");
+    expect(postcardBatchRepository.markFailed).not.toHaveBeenCalled();
+  });
+
   it("completes without retry on a permanent SMTP rejection", async () => {
     mailService.sendEmail.mockRejectedValue(Object.assign(new Error("no such user"), { responseCode: 550 }));
 

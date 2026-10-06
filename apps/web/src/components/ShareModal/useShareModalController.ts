@@ -54,6 +54,8 @@ type UseShareModalControllerParams = {
   initialEmailRecipients?: string[];
   /** Full haiku; when present (with a celestial theme) the email includes postcard images. */
   haiku?: HaikuDto | null;
+  /** Called once the postcards are queued (the modal closes). */
+  onEmailQueued?: () => void;
 };
 
 export function useShareModalController({
@@ -66,6 +68,7 @@ export function useShareModalController({
   initialEmptyLink = false,
   initialMethod = "link",
   initialEmailRecipients = EMPTY_EMAIL_RECIPIENTS,
+  onEmailQueued,
 }: UseShareModalControllerParams) {
   const [method, setMethod] = useState<ShareMethod>("link");
   const [shareLink, setShareLink] = useState<ShareLinkListItem | null>(null);
@@ -73,7 +76,6 @@ export function useShareModalController({
   const [emailMessage, setEmailMessage] = useState("");
   const [emailRecipients, setEmailRecipients] = useState<string[]>([]);
   const [sendingEmail, setSendingEmail] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
   const { preparingPostcard, preparePostcardFront } = useSharePostcardFront(haiku);
 
   useEffect(() => {
@@ -82,8 +84,6 @@ export function useShareModalController({
     setEmailMessage("");
     setEmailRecipients(initialEmailRecipients);
     setSendingEmail(false);
-    setEmailSent(false);
-
     if (initialCreatedLink) {
       setShareLink(initialCreatedLink);
       setLoadingLink(false);
@@ -154,8 +154,8 @@ export function useShareModalController({
       const front = await preparePostcardFront();
       if (front === null) return;
       await shareHaikuByEmail({ haikuId, emails: normalizedEmails, message, postcard: front && { front } });
-      setEmailSent(true);
       comicToast.success(POSTCARDS_QUEUED_MESSAGE);
+      onEmailQueued?.();
     } catch (e) {
       comicToast.error(getAxiosErrorMessage(e, "Could not send email"));
     } finally {
@@ -175,7 +175,6 @@ export function useShareModalController({
     setEmailRecipients,
     sendingEmail,
     preparingPostcard,
-    emailSent,
     invalidEmails,
     canSendEmail,
     emailCtaHint,
