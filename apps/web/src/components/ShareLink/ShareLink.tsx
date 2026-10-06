@@ -259,7 +259,7 @@ export function ShareLink({
             className={`${managementStyles.settingsPanel} ${styles.settingsPanel}`}
             ariaLabel={`Share link settings for ${ctrl.subject}`}
           >
-            <div className={managementStyles.settingsBody}>
+            <div className={`${managementStyles.settingsBody} ${styles.settingsBody}`}>
               <ShareLinkSettingsControls
                 form={ctrl.form}
                 setForm={ctrl.setForm}

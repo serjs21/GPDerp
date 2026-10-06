@@ -31,23 +31,51 @@
   height: 14rem;
 }
 
+/* Tab spacing: 1.5rem between stacked blocks, 1rem between side-by-side ones. */
+.card .settingsColumn {
+  gap: 1.5rem;
+}
+
+.card .settingsRow {
+  gap: 1rem;
+}
+
 /*
  * Full-screen share modal: settings take the leftover height so the lifecycle
- * CTA lands at the bottom; controls cap at 30rem and Update fills the rest.
+ * CTA lands at the bottom. Update keeps the disabled SVG's aspect ratio; the
+ * settings panel fills the remaining width with its controls capped at 30rem.
  */
 @media (max-width: 1024px) {
   .card > .settingsColumn {
     flex: 1 1 auto;
   }
 
+  /* Height comes from the leftover space (not content) so `cqh` can size Update. */
+  .card .settingsRow {
+    flex: 1 1 0;
+    min-height: 10rem;
+    container-type: size;
+  }
+
   .card .settingsRow > .settingsPanel {
-    flex: 2 1 0;
+    flex: 1 1 0;
+    min-width: 10rem;
+    max-width: none;
+  }
+
+  .card .settingsBody > * {
+    width: 100%;
     max-width: 30rem;
   }
 
+  /* Full row height at the SVG ratio, narrowed (ratio kept) when the panel needs its 10rem + gap. */
   .card .settingsRow > .settingsUpdate {
-    flex: 1 1 0;
-    min-width: 8rem;
+    flex: 0 0 auto;
+    align-self: center;
+    width: min(100cqh * 1615.36 / 1837.3, 100cqw - 11rem);
+    height: auto;
+    aspect-ratio: 1615.36 / 1837.3;
+    min-width: 0;
     max-width: none;
   }
 
