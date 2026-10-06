@@ -25,8 +25,9 @@ export const buildShareHaikuEmail = (params: {
   const poemText = params.body.trim();
   const siteUrl = env.WEB_APP_URL;
   const subject = `Is it a bird? Is it spam? It's ${senderName} pondering the meaning of "${title}"`;
+  // The postcard images already show the message and the haiku, so the text versions are only for postcard-less emails.
   const personalSection =
-    personal.length > 0
+    !params.postcard && personal.length > 0
       ? `
     <div style="margin:0 0 12px;padding:10px 12px;border-left:3px solid #bc002d;background:rgba(255,255,255,0.68);border-radius:6px;">
       <p style="margin:0 0 4px;font-size:13px;line-height:1.35;color:#4a4a4a;">Few words from ${escapeHtml(senderName)}:</p>
@@ -44,6 +45,14 @@ export const buildShareHaikuEmail = (params: {
     </div>`
     : "";
 
+  const poemSection = !params.postcard
+    ? `
+    <div style="background:rgba(255,255,255,0.88);border:1px solid rgba(44,44,44,0.14);border-radius:10px;padding:18px 20px;">
+      <h2 style="margin:0 0 8px;font-size:20px;line-height:1.3;color:#1f1f1f;">${escapeHtml(title)}</h2>
+      <p style="margin:0;font-size:18px;line-height:1.6;font-style:italic;white-space:normal;">${toHtmlPoem(poemText)}</p>
+    </div>`
+    : "";
+
   const html = `
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0;padding:0;border-collapse:collapse;">
   <tr>
@@ -52,10 +61,7 @@ export const buildShareHaikuEmail = (params: {
       <p style="margin:0 0 12px;font-size:16px;line-height:1.4;color:rgb(0 0 0 / 65%);">A poem from ${escapeHtml(senderName)}:</p>
     ${postcardSection}
     ${personalSection}
-    <div style="background:rgba(255,255,255,0.88);border:1px solid rgba(44,44,44,0.14);border-radius:10px;padding:18px 20px;">
-      <h2 style="margin:0 0 8px;font-size:20px;line-height:1.3;color:#1f1f1f;">${escapeHtml(title)}</h2>
-      <p style="margin:0;font-size:18px;line-height:1.6;font-style:italic;white-space:normal;">${toHtmlPoem(poemText)}</p>
-    </div>
+    ${poemSection}
     <p style="margin:18px 0 0;font-size:14px;line-height:1.5;">
       <a href="${escapeHtml(siteUrl)}" style="color:#bc002d;text-decoration:none;font-weight:600;">Create your own poem</a>
     </p>
@@ -65,16 +71,11 @@ export const buildShareHaikuEmail = (params: {
 </table>
 `.trim();
 
-  const postcardNote = !params.postcard
-    ? `${personal ? `Few words from ${senderName}:\n${personal}\n` : ""}
-    ${title}\n
-    ${poemText}\n`
-    : ""
+  const textBody = !params.postcard
+    ? `${personal ? `Few words from ${senderName}:\n${personal}\n\n` : ""}${title}\n\n${poemText}\n\n`
+    : "";
 
-  const text = `
-${postcardNote}
-
-Create your own poem: ${siteUrl}`;
+  const text = `${textBody}Create your own poem: ${siteUrl}`;
 
   return {
     subject,
