@@ -20,14 +20,17 @@ export function useBackgroundSceneMaskLayout(
     const element = containerRef.current;
     if (!element) return;
 
-    const update = () => {
-      const width = element.getBoundingClientRect().width;
+    // Layout width (not getBoundingClientRect) so ancestor transforms, e.g. a scaled
+    // postcard preview, don't shrink the mask relative to the art it masks.
+    const update = (width: number) => {
       if (width <= 0) return;
       setLayout(backgroundSceneMaskLayout(width));
     };
 
-    update();
-    const observer = new ResizeObserver(update);
+    update(element.offsetWidth);
+    const observer = new ResizeObserver(([entry]) => {
+      update(entry.borderBoxSize?.[0]?.inlineSize ?? element.offsetWidth);
+    });
     observer.observe(element);
     return () => observer.disconnect();
   }, [containerRef]);

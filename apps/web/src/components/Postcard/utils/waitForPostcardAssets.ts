@@ -6,8 +6,17 @@ const IMAGE_STYLE_PROPS = [
   "border-image-source",
 ] as const;
 
+const FRAME_FALLBACK_MS = 50;
+
+/** rAF is throttled or paused in hidden tabs; fall back to a timer so capture can't stall. */
 function nextFrame(): Promise<void> {
-  return new Promise((resolve) => requestAnimationFrame(() => resolve()));
+  return new Promise((resolve) => {
+    const timer = setTimeout(resolve, FRAME_FALLBACK_MS);
+    requestAnimationFrame(() => {
+      clearTimeout(timer);
+      resolve();
+    });
+  });
 }
 
 function collectCssImageUrls(root: HTMLElement): string[] {
