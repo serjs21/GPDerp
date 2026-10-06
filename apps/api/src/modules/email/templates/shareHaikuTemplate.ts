@@ -24,7 +24,7 @@ export const buildShareHaikuEmail = (params: {
   const title = params.title.trim() || "Haiku";
   const poemText = params.body.trim();
   const siteUrl = env.WEB_APP_URL;
-  const subject = `${senderName} shared a poem with you`;
+  const subject = `Is it a bird? Is it spam? It's ${senderName} pondering the meaning of "${title}"`;
   const personalSection =
     personal.length > 0
       ? `
@@ -66,16 +66,13 @@ export const buildShareHaikuEmail = (params: {
 `.trim();
 
   const postcardNote = !params.postcard
-    ? ""
-    : params.postcard.hasFront
-      ? "\nYour postcard (front and back) is attached as postcard-front.png and postcard-back.png.\n"
-      : "\nYour postcard is attached as postcard-back.png.\n";
+    ? `${personal ? `Few words from ${senderName}:\n${personal}\n` : ""}
+    ${title}\n
+    ${poemText}\n`
+    : ""
 
-  const text = `A poem from ${senderName}:
+  const text = `
 ${postcardNote}
-${personal ? `Few words from ${senderName}:\n${personal}\n` : ""}
-${title}
-${poemText}
 
 Create your own poem: ${siteUrl}`;
 
