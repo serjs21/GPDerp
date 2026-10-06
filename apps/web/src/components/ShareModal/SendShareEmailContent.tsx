@@ -81,9 +81,6 @@ export const SendShareEmailContent = ({
         className={styles.fitHint}
         aria-live="polite"
       >
-        {fit.linesLeft === 0
-          ? "The postcard is full"
-          : `${fit.linesLeft} ${fit.linesLeft === 1 ? "line" : "lines"} left on the postcard`}
       </Typography.Text>
       {invalidEmails.length > 0 ? (
         <Typography.Text type="danger" className={styles.validation}>
