@@ -185,23 +185,27 @@
   opacity: 0.55;
 }
 
-/* Mirrors the postcard back signature: indented, handwriting font, slight tilt. */
+/* Mirrors the postcard back signature (handwriting font, slight tilt), pinned to the textarea's bottom-right corner. */
 .signature {
+  position: absolute;
+  right: 0;
+  bottom: calc(var(--notebook-line-height) * var(--notebook-spare-lines));
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: 0.35rem;
+  max-width: 100%;
   height: var(--notebook-line-height);
   margin: 0;
-  padding-left: calc(2rem + 23%);
   overflow: hidden;
+  font-size: 1.5rem;
   font-family: var(--notebook-signature-family, inherit);
-  font-size: 1.15rem;
   letter-spacing: normal;
   line-height: var(--notebook-line-height);
   white-space: nowrap;
   text-overflow: ellipsis;
   transform: rotate(-4deg);
-  transform-origin: left center;
+  transform-origin: right center;
   pointer-events: none;
   user-select: none;
 }
