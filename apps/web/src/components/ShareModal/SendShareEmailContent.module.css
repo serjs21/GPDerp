@@ -29,7 +29,6 @@
   font-size: 1rem;
   font-weight: 500;
   letter-spacing: 0.04em;
-  --notebook-message-lines: 4;
 }
 
 .paperArt {
@@ -141,15 +140,24 @@
   line-height: var(--notebook-line-height) !important;
 }
 
-.message {
+/* Postcard line cap + spare rows; rules are drawn for this whole box. */
+.messageArea {
   position: relative;
   z-index: 1;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  height: calc(var(--notebook-line-height) * (var(--notebook-message-lines) + var(--notebook-spare-lines)));
+  line-height: var(--notebook-line-height);
+}
+
+.message {
+  position: relative;
   box-sizing: border-box;
   display: block;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   width: 100%;
-  min-height: 0;
-  height: 100%;
+  height: calc(var(--notebook-line-height) * var(--notebook-message-lines));
   margin: 0;
   padding: 0 0 0 2rem;
   border: none;
@@ -175,6 +183,31 @@
 
 .message:disabled {
   opacity: 0.55;
+}
+
+/* Mirrors the postcard back signature: indented, handwriting font, slight tilt. */
+.signature {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: var(--notebook-line-height);
+  margin: 0;
+  padding-left: calc(2rem + 23%);
+  overflow: hidden;
+  font-family: var(--notebook-signature-family, inherit);
+  font-size: 1.15rem;
+  letter-spacing: normal;
+  line-height: var(--notebook-line-height);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  transform: rotate(-4deg);
+  transform-origin: left center;
+  pointer-events: none;
+  user-select: none;
+}
+
+.heart {
+  font-size: 0.95rem;
 }
 
 .fitHint {

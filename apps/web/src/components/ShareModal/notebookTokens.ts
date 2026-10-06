@@ -1,11 +1,17 @@
 import type { CSSProperties } from "react";
 import { PAPER_COLORS, PAPER_ROUGH_DEFAULTS } from "@/components/PaperModal/paperTokens";
+import {
+  POSTCARD_MESSAGE_FONT_FAMILY,
+  POSTCARD_MESSAGE_MAX_LINES,
+} from "@/components/Postcard/consts/postcardMessageConsts";
 
 export const NOTEBOOK_LINE_HEIGHT = "1.75rem";
 export const NOTEBOOK_PAD_X = "1rem";
 export const NOTEBOOK_PAD_Y = "0.65rem";
 export const NOTEBOOK_MARGIN_X = "2.5rem";
 export const NOTEBOOK_VISIBLE_MESSAGE_LINES = 4;
+/** Ruled rows under the message textarea; the "From" signature sits on the first one. */
+export const NOTEBOOK_SPARE_LINES = 6;
 export const NOTEBOOK_ROUGH_SEED = 84;
 /** Cool white-gray paper (not warm cream). */
 export const NOTEBOOK_PAPER = "#f2f4f7";
@@ -28,6 +34,9 @@ export function notebookStyleVars(): CSSProperties {
     "--notebook-paper": NOTEBOOK_PAPER,
     "--notebook-ink": PAPER_COLORS.ink,
     "--notebook-ink-soft": PAPER_COLORS.inkSoft,
+    "--notebook-message-lines": POSTCARD_MESSAGE_MAX_LINES,
+    "--notebook-spare-lines": NOTEBOOK_SPARE_LINES,
+    "--notebook-signature-family": POSTCARD_MESSAGE_FONT_FAMILY,
   } as CSSProperties;
 }
 

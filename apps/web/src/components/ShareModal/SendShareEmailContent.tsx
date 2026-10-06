@@ -1,9 +1,13 @@
 "use client";
 
 import { useRef } from "react";
+import { useOptionalAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { Select, Typography } from "@/components/StyledComponents";
 import { POSTCARD_MESSAGE_MAX_CHARS } from "@/components/Postcard/consts/postcardMessageConsts";
-import { clampPostcardMessage } from "@/components/Postcard/utils/postcardMessageFit";
+import {
+  clampPostcardMessage,
+  resolvePostcardSenderName,
+} from "@/components/Postcard/utils/postcardMessageFit";
 import { usePostcardMessageFit } from "@/hooks/usePostcardMessageFit";
 import { NotebookPageRough } from "./NotebookPageRough";
 import {
@@ -30,6 +34,8 @@ export const SendShareEmailContent = ({
 }: SendShareEmailContentProps) => {
   const notebookRef = useRef<HTMLDivElement>(null);
   const fit = usePostcardMessageFit(message);
+  const auth = useOptionalAuthenticationState();
+  const senderName = resolvePostcardSenderName(auth?.user ?? {});
 
   const handleMessageChange = (raw: string) => {
     const next = clampPostcardMessage(raw);
@@ -63,17 +69,24 @@ export const SendShareEmailContent = ({
           />
         </div>
         <div className={styles.lineSpacer} data-notebook-row="spacer" aria-hidden />
-        <textarea
-          className={styles.message}
-          data-notebook-row="message"
-          value={message}
-          onChange={(e) => handleMessageChange(e.target.value)}
-          placeholder="I wanted to share with you..."
-          maxLength={POSTCARD_MESSAGE_MAX_CHARS}
-          disabled={disabled}
-          aria-label="Email message"
-          aria-describedby="postcard-message-fit"
-        />
+        <div className={styles.messageArea} data-notebook-row="message">
+          <textarea
+            className={styles.message}
+            value={message}
+            onChange={(e) => handleMessageChange(e.target.value)}
+            placeholder="I wanted to share with you..."
+            maxLength={POSTCARD_MESSAGE_MAX_CHARS}
+            disabled={disabled}
+            aria-label="Email message"
+            aria-describedby="postcard-message-fit"
+          />
+          <p className={styles.signature}>
+            <span className={styles.heart} aria-hidden>
+              ♥
+            </span>
+            {`From: ${senderName}`}
+          </p>
+        </div>
       </div>
       <Typography.Text
         id="postcard-message-fit"
