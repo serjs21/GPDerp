@@ -1,4 +1,5 @@
 import { POSTCARD_BACK_CID, POSTCARD_FRONT_CID } from "../../consts/postcard";
+import { isPngBuffer } from "../../utils/postcardImage";
 import { mailService } from "../email/mailService";
 import { buildShareHaikuEmail } from "../email/templates/shareHaikuTemplate";
 import { PostcardMessageTooLongError, renderPostcardBackPng } from "./postcardBackRenderer";
@@ -21,10 +22,18 @@ export const isPermanentSmtpError = (err: unknown): boolean => {
   return typeof code === "number" && code >= 500 && code < 600;
 };
 
+const buildFrontAttachment = (front: Buffer) => {
+  const isPng = isPngBuffer(front);
+  return {
+    filename: isPng ? "postcard-front.png" : "postcard-front.jpg",
+    content: front,
+    contentType: isPng ? "image/png" : "image/jpeg",
+    cid: POSTCARD_FRONT_CID,
+  };
+};
+
 const buildAttachments = (batch: PostcardBatchForSend, back: Buffer) => [
-  ...(batch.frontPng
-    ? [{ filename: "postcard-front.png", content: batch.frontPng, contentType: "image/png", cid: POSTCARD_FRONT_CID }]
-    : []),
+  ...(batch.frontPng ? [buildFrontAttachment(batch.frontPng)] : []),
   { filename: "postcard-back.png", content: back, contentType: "image/png", cid: POSTCARD_BACK_CID },
 ];
 
@@ -56,7 +65,6 @@ export async function processPostcardEmailJob(data: PostcardEmailJobData): Promi
     if (err instanceof PostcardMessageTooLongError) return failPermanently(data, "message_too_long", err);
     throw err;
   }
-
   const email = buildShareHaikuEmail({
     senderName: batch.senderName,
     personalMessage: batch.message,
@@ -78,7 +86,6 @@ export async function processPostcardEmailJob(data: PostcardEmailJobData): Promi
     if (isPermanentSmtpError(err)) return failPermanently(data, "smtp_rejected", err);
     throw err;
   }
-
   await postcardBatchRepository.markSent(data.batchId);
   return "sent";
 }

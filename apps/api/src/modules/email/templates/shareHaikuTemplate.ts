@@ -58,7 +58,6 @@ export const buildShareHaikuEmail = (params: {
   <tr>
     <td style="padding:24px;color:#2c2c2c;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;background-color:background: linear-gradient(135deg, #ff7c68, #2c1e1e);background-image:linear-gradient(160deg,#0000 60%,#00000008 60%,#0000000f 100%),linear-gradient(200deg,#0000 75%,#0000000a 75%,#00000005 100%);background-repeat:no-repeat,no-repeat;background-size:cover,cover;background-position:center center,center center;">
       <div style="max-width:640px;margin:0 auto;">
-      <p style="margin:0 0 12px;font-size:16px;line-height:1.4;color:rgb(0 0 0 / 65%);">A poem from ${escapeHtml(senderName)}:</p>
     ${postcardSection}
     ${personalSection}
     ${poemSection}

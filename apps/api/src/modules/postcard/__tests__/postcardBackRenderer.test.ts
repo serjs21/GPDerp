@@ -1,5 +1,5 @@
 import { POSTCARD_MESSAGE_MAX_LINES, POSTCARD_PNG_HEIGHT, POSTCARD_PNG_WIDTH } from "../../../consts/postcard";
-import { readPngSize } from "../../haiku/utils/shareHaikuEmailRequest";
+import { readPngSize } from "../../../utils/postcardImage";
 import { PostcardMessageTooLongError, renderPostcardBackPng } from "../postcardBackRenderer";
 
 describe("renderPostcardBackPng", () => {

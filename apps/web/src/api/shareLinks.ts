@@ -229,7 +229,7 @@ const buildShareHaikuEmailFormData = (
   form.append("haikuId", body.haikuId);
   form.append("emails", JSON.stringify(body.emails));
   form.append("message", body.message ?? "");
-  form.append("postcardFront", body.postcard.front, "postcard-front.png");
+  form.append("postcardFront", body.postcard.front, "postcard-front.jpg");
   return form;
 };
 

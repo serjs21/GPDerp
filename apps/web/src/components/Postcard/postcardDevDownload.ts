@@ -4,7 +4,7 @@
  */
 
 export function postcardFilename(haikuId: string, side: "front" | "back" = "front"): string {
-  return `postcard-${haikuId}-${side}.png`;
+  return `postcard-${haikuId}-${side}.${side === "front" ? "jpg" : "png"}`;
 }
 
 export function downloadPostcardBlob(blob: Blob, filename: string): void {
@@ -23,7 +23,7 @@ export function openPostcardBlob(blob: Blob): void {
   const opened = window.open(url, "_blank", "noopener");
   if (!opened) {
     URL.revokeObjectURL(url);
-    throw new Error("Popup blocked: allow popups to open the postcard PNG");
+    throw new Error("Popup blocked: allow popups to open the postcard image");
   }
   setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }

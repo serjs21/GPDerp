@@ -398,7 +398,6 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
         personalMessage: message,
         front,
       });
-
       if (!result.ok) {
         const failure = SHARE_EMAIL_FAILURES[result.reason];
         res.code(failure.status).send({ ok: false, error: failure.error });

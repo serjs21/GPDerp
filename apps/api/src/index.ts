@@ -35,7 +35,7 @@ async function run() {
       // Allow non-browser requests (no `Origin` header).
       if (!origin) return cb(null, true);
       if (env.CORS_ORIGIN.includes(origin)) return cb(null, true);
-      return cb(new Error("CORS origin not allowed"), false);
+      return cb(Object.assign(new Error("CORS origin not allowed"), { statusCode: 403 }), false);
     },
     credentials: env.CORS_CREDENTIALS,
     methods: env.CORS_METHODS,

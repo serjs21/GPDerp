@@ -33,6 +33,18 @@ const fakePng = (width = 2400, height = 1600) => {
   return Buffer.concat([PNG_SIGNATURE, ihdr, Buffer.from("rest")]);
 };
 
+/** SOI + APP0 segment + SOF0 header with the given size (enough for the size check). */
+const fakeJpeg = (width = 2400, height = 1600) => {
+  const app0 = Buffer.from([0xff, 0xe0, 0x00, 0x04, 0x00, 0x00]);
+  const sof0 = Buffer.alloc(11);
+  sof0.writeUInt16BE(0xffc0, 0);
+  sof0.writeUInt16BE(11, 2);
+  sof0.writeUInt8(8, 4);
+  sof0.writeUInt16BE(height, 5);
+  sof0.writeUInt16BE(width, 7);
+  return Buffer.concat([Buffer.from([0xff, 0xd8]), app0, sof0, Buffer.from("rest")]);
+};
+
 type Part =
   | { name: string; value: string }
   | { name: string; filename: string; contentType: string; content: Buffer };
@@ -132,6 +144,26 @@ describe("haiku.controller POST /share_haiku_email", () => {
     expect(call.front.equals(fakePng())).toBe(true);
   });
 
+  it("passes a JPEG front from multipart form data", async () => {
+    const res = await postMultipart([
+      ...fields(),
+      { name: "postcardFront", filename: "postcard-front.jpg", contentType: "image/jpeg", content: fakeJpeg() },
+    ]);
+
+    expect(res.statusCode).toBe(200);
+    expect(haikuService.shareHaikuByEmailForUser.mock.calls[0][0].front.equals(fakeJpeg())).toBe(true);
+  });
+
+  it("rejects a JPEG front with the wrong dimensions", async () => {
+    const res = await postMultipart([
+      ...fields(),
+      { name: "postcardFront", filename: "postcard-front.jpg", contentType: "image/jpeg", content: fakeJpeg(1200, 800) },
+    ]);
+
+    expect(res.statusCode).toBe(400);
+    expect(res.json().error).toBe("Postcard front must be 2400x1600 (got 1200x800)");
+  });
+
   it("rejects postcard back parts", async () => {
     const res = await postMultipart([
       ...fields(),
@@ -144,11 +176,11 @@ describe("haiku.controller POST /share_haiku_email", () => {
     expect(haikuService.shareHaikuByEmailForUser).not.toHaveBeenCalled();
   });
 
-  it("rejects a front that is not a PNG", async () => {
+  it("rejects a front that is not a JPEG or PNG", async () => {
     const res = await postMultipart([...fields(), frontPart(Buffer.from("not really a png"))]);
 
     expect(res.statusCode).toBe(400);
-    expect(res.json()).toEqual({ ok: false, error: "Postcard front must be a PNG" });
+    expect(res.json()).toEqual({ ok: false, error: "Postcard front must be a JPEG or PNG" });
   });
 
   it("rejects a front with the wrong dimensions", async () => {

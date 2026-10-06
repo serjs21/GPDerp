@@ -3,9 +3,12 @@
 import type { ReactElement } from "react";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
-import { toBlob } from "html-to-image";
+import { toCanvas } from "html-to-image";
 import {
+  POSTCARD_CAPTURE_BACKGROUND,
   POSTCARD_HEIGHT,
+  POSTCARD_IMAGE_TYPE,
+  POSTCARD_JPEG_QUALITY,
   POSTCARD_PIXEL_RATIO,
   POSTCARD_WIDTH,
 } from "../consts/postcardConsts";
@@ -38,11 +41,10 @@ async function resolveFontEmbedCSS(node: HTMLElement): Promise<string> {
 }
 
 /**
- * Mount `element` offscreen at the postcard size and capture it as a PNG
- * (POSTCARD_WIDTH×POSTCARD_HEIGHT at POSTCARD_PIXEL_RATIO). Shared by both sides
- * so front and back always use identical capture settings.
+ * Mount `element` offscreen at the postcard size and capture it as a JPEG
+ * (POSTCARD_WIDTH×POSTCARD_HEIGHT at POSTCARD_PIXEL_RATIO).
  */
-export async function renderOffscreenPng(element: ReactElement): Promise<Blob> {
+export async function renderOffscreenImage(element: ReactElement): Promise<Blob> {
   if (typeof document === "undefined") {
     throw new Error("Postcard images must be generated in the browser");
   }
@@ -61,14 +63,18 @@ export async function renderOffscreenPng(element: ReactElement): Promise<Blob> {
     await waitForPostcardAssets(node);
     const fontEmbedCSS = await resolveFontEmbedCSS(node);
 
-    const blob = await toBlob(node, {
+    // html-to-image's toBlob drops `type`/`quality` (always PNG), so encode the canvas here.
+    const canvas = await toCanvas(node, {
       width: POSTCARD_WIDTH,
       height: POSTCARD_HEIGHT,
       pixelRatio: POSTCARD_PIXEL_RATIO,
       cacheBust: true,
-      type: "image/png",
+      backgroundColor: POSTCARD_CAPTURE_BACKGROUND,
       fontEmbedCSS,
     });
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, POSTCARD_IMAGE_TYPE, POSTCARD_JPEG_QUALITY),
+    );
     if (!blob) {
       throw new Error("Postcard capture failed");
     }

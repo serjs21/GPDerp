@@ -1,12 +1,13 @@
 import type { FastifyRequest } from "fastify";
 import {
-  PNG_SIGNATURE,
   POSTCARD_BACK_FIELD,
   POSTCARD_FRONT_FIELD,
+  POSTCARD_FRONT_MIME_TYPES,
   POSTCARD_MESSAGE_MAX_CHARS,
   POSTCARD_PNG_HEIGHT,
   POSTCARD_PNG_WIDTH,
 } from "../../../consts/postcard";
+import { readPostcardImageInfo } from "../../../utils/postcardImage";
 
 export type ShareHaikuEmailRequest = {
   haikuId: string;
@@ -20,19 +21,9 @@ export type ShareHaikuEmailRequestResult =
   | { ok: true; value: ShareHaikuEmailRequest }
   | { ok: false; status: 400 | 413; error: string };
 
-/** Signature (8) + IHDR length (4) + "IHDR" (4) + width (4) + height (4). */
-const PNG_IHDR_END = 24;
+const FRONT_TYPE_ERROR = "Postcard front must be a JPEG or PNG";
 
 export const normalizeShareRecipient = (email: string): string => email.trim().toLowerCase();
-
-export const isPngBuffer = (buffer: Buffer): boolean =>
-  buffer.length > PNG_SIGNATURE.length && buffer.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE);
-
-export const readPngSize = (buffer: Buffer): { width: number; height: number } | null => {
-  if (!isPngBuffer(buffer) || buffer.length < PNG_IHDR_END) return null;
-  if (buffer.toString("ascii", 12, 16) !== "IHDR") return null;
-  return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
-};
 
 const parseEmailsField = (value: unknown): string[] => {
   if (Array.isArray(value)) return value.filter((v): v is string => typeof v === "string");
@@ -46,8 +37,8 @@ const parseEmailsField = (value: unknown): string[] => {
 };
 
 const validateFront = (front: Buffer): string | null => {
-  const size = readPngSize(front);
-  if (!size) return "Postcard front must be a PNG";
+  const size = readPostcardImageInfo(front);
+  if (!size) return FRONT_TYPE_ERROR;
   if (size.width !== POSTCARD_PNG_WIDTH || size.height !== POSTCARD_PNG_HEIGHT) {
     return `Postcard front must be ${POSTCARD_PNG_WIDTH}x${POSTCARD_PNG_HEIGHT} (got ${size.width}x${size.height})`;
   }
@@ -86,7 +77,7 @@ const isFileTooLarge = (err: unknown): boolean =>
 
 /**
  * Read /share_haiku_email input from JSON or multipart form data. Multipart carries one
- * optional `postcardFront` PNG (2400x1600); backs are rendered by the server.
+ * optional `postcardFront` JPEG or PNG (2400x1600); backs are rendered by the server.
  */
 export async function readShareHaikuEmailRequest(
   req: FastifyRequest,
@@ -113,8 +104,8 @@ export async function readShareHaikuEmailRequest(
         await part.toBuffer();
         continue;
       }
-      if (part.mimetype !== "image/png") {
-        return { ok: false, status: 400, error: "Postcard front must be a PNG" };
+      if (!POSTCARD_FRONT_MIME_TYPES.includes(part.mimetype)) {
+        return { ok: false, status: 400, error: FRONT_TYPE_ERROR };
       }
       front = await part.toBuffer();
     }

@@ -12,16 +12,17 @@ const config: StorybookConfig = {
     "@storybook/addon-docs"
   ],
   "framework": "@storybook/nextjs-vite",
-  "env": (config) => ({
-    ...config,
-    NEXT_PUBLIC_WS_DISABLED: "true",
-  }),
   "staticDirs": [
     "../public"
   ],
   // Dev-only API access for stories (e.g. GET /dev/purchase-messages) without touching API CORS.
   viteFinal: (config) => ({
     ...config,
+    // The nextjs-vite framework only defines NEXT_PUBLIC_* from .env files, so `env` above never reaches the bundle.
+    define: {
+      ...config.define,
+      "process.env.NEXT_PUBLIC_WS_DISABLED": JSON.stringify("true"),
+    },
     server: {
       ...config.server,
       proxy: {
