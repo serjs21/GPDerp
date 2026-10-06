@@ -1,9 +1,18 @@
 import { EventName, type EventEntity, type TransactionNotification } from "@paddle/paddle-node-sdk";
 import { env } from "../../env";
 import { isUuid } from "../../utils/uuid";
-import { HAIKU_GENERATION_CREDIT_COST, PURCHASE_REFERENCE_CUSTOM_DATA_KEY } from "./constants";
+import {
+  HAIKU_GENERATION_CREDIT_COST,
+  PURCHASE_CONFIRMED_FALLBACK_MESSAGE,
+  PURCHASE_REFERENCE_CUSTOM_DATA_KEY,
+} from "./constants";
 import { getPaddle } from "./paddleWebhook";
 import { paymentsRepository } from "./payments.repository";
+import { generatePurchaseConfirmation } from "./purchaseConfirmationAgent";
+import {
+  lastStaticPurchaseConfirmedMessage,
+  staticPurchaseConfirmedMessage,
+} from "./utils/purchaseMessages";
 
 const PAID_STATUSES = new Set(["paid", "completed"]);
 
@@ -96,13 +105,40 @@ export const paymentsService = {
     });
 
     if (result.status === "granted") {
-      return { ok: true as const, status: result.status, credits: result.credits };
+      return { ok: true as const, status: result.status, credits: result.credits, purchaseId: purchase.id };
     }
 
     const credits = await paymentsRepository.getCredits(userId);
     if (credits === null) return { ok: false as const, reason: "not_found" as const };
 
-    return { ok: true as const, status: result.status, credits };
+    return { ok: true as const, status: result.status, credits, purchaseId: purchase.id };
+  },
+
+  /**
+   * Copy for the web PurchaseConfirmModal. Written messages cover the first purchases;
+   * later ones are generated from the previous stored message. Stored per purchase,
+   * so repeat confirms (or a webhook fulfilling first) return the same text.
+   */
+  async confirmationMessageFor(
+    purchaseId: string,
+    onGenerationError?: (error: unknown) => void,
+  ): Promise<string> {
+    const context = await paymentsRepository.findConfirmationContext(purchaseId);
+    if (!context) return PURCHASE_CONFIRMED_FALLBACK_MESSAGE;
+    if (context.confirmationMessage) return context.confirmationMessage;
+
+    let message = staticPurchaseConfirmedMessage(context.ordinal);
+    if (!message) {
+      try {
+        message = await generatePurchaseConfirmation(
+          context.previousMessage ?? lastStaticPurchaseConfirmedMessage(),
+        );
+      } catch (error) {
+        onGenerationError?.(error);
+        message = PURCHASE_CONFIRMED_FALLBACK_MESSAGE;
+      }
+    }
+    return paymentsRepository.saveConfirmationMessage(purchaseId, message);
   },
 
   async handleVerifiedEvent(event: EventEntity) {

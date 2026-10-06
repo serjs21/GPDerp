@@ -7,7 +7,16 @@ export const HAIKU_GENERATION_CREDIT_COST = 1;
 export const NEW_USER_FREE_GENERATION_CREDITS = 5;
 export const GENERATION_CREDITS_SOCKET_KIND = "generation_credits";
 
-export const PURCHASE_MESSAGES = {
+/** Shown (and stored) for purchases past the written sequence when generating the next message fails. */
+export const PURCHASE_CONFIRMED_FALLBACK_MESSAGE =
+  "Payment received. Another 100 haikus are ready whenever you are.\n"
+  + "I had something new prepared for this moment, but it appears to have wandered off somewhere between the payment system and me.\n"
+  + "I suspect you came partly to hear what I would say. For now, all I have is that it's good to see you again.";
+
+export const PURCHASE_MESSAGES: {
+  noGenerationsLeft: Record<string, string>;
+  purchaseConfirmed: Record<string, string>;
+} = {
   noGenerationsLeft: {
   "0": "That's all the free credits I can give out.\n"
     + "If you really want to, you can buy 100 more. That should more than satisfy your curiosity.\n"

@@ -12,6 +12,15 @@ export type FulfillCompletedPurchaseResult =
   | { status: "duplicate" }
   | { status: "not_found" };
 
+export type ConfirmationContext = {
+  /** Already-stored copy; when set, the other fields are not computed. */
+  confirmationMessage: string | null;
+  /** 1-based position of this purchase among the user's completed purchases. */
+  ordinal: number;
+  /** Most recent stored copy from an earlier purchase. */
+  previousMessage: string | null;
+};
+
 export async function trySpendGenerationCreditWithTx(
   tx: Prisma.TransactionClient,
   userId: string,
@@ -66,6 +75,60 @@ export const paymentsRepository = {
     return prismaClient.generationPurchase.count({
       where: { userId, status: GenerationPurchaseStatus.COMPLETED },
     });
+  },
+
+  /** `null` unless the purchase exists and is COMPLETED. */
+  async findConfirmationContext(purchaseId: string): Promise<ConfirmationContext | null> {
+    const purchase = await prismaClient.generationPurchase.findUnique({
+      where: { id: purchaseId },
+      select: { userId: true, status: true, completedAt: true, confirmationMessage: true },
+    });
+    if (!purchase || purchase.status !== GenerationPurchaseStatus.COMPLETED || !purchase.completedAt) {
+      return null;
+    }
+    if (purchase.confirmationMessage) {
+      return { confirmationMessage: purchase.confirmationMessage, ordinal: 0, previousMessage: null };
+    }
+
+    const [ordinal, previous] = await Promise.all([
+      prismaClient.generationPurchase.count({
+        where: {
+          userId: purchase.userId,
+          status: GenerationPurchaseStatus.COMPLETED,
+          completedAt: { lte: purchase.completedAt },
+        },
+      }),
+      prismaClient.generationPurchase.findFirst({
+        where: {
+          userId: purchase.userId,
+          id: { not: purchaseId },
+          status: GenerationPurchaseStatus.COMPLETED,
+          completedAt: { lte: purchase.completedAt },
+          confirmationMessage: { not: null },
+        },
+        orderBy: { completedAt: "desc" },
+        select: { confirmationMessage: true },
+      }),
+    ]);
+
+    return {
+      confirmationMessage: null,
+      ordinal,
+      previousMessage: previous?.confirmationMessage ?? null,
+    };
+  },
+
+  /** First writer wins; returns whatever is stored afterwards. */
+  async saveConfirmationMessage(purchaseId: string, message: string): Promise<string> {
+    await prismaClient.generationPurchase.updateMany({
+      where: { id: purchaseId, confirmationMessage: null },
+      data: { confirmationMessage: message },
+    });
+    const stored = await prismaClient.generationPurchase.findUnique({
+      where: { id: purchaseId },
+      select: { confirmationMessage: true },
+    });
+    return stored?.confirmationMessage ?? message;
   },
 
   /**

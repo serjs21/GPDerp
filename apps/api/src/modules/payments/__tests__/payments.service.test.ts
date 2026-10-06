@@ -183,6 +183,7 @@ describe("paymentsService.confirmCompletedCheckout", () => {
       ok: true,
       status: "granted",
       credits: 140,
+      purchaseId: purchaseReference,
     });
     expect(paymentsRepository.fulfillCompletedPurchase).toHaveBeenCalledWith({
       purchaseReference,
