@@ -10,7 +10,6 @@ import { HAIKU_LABELS_MAX } from "./haikuLabelPlacement";
 import { labelRepository } from "../label/label.repository";
 import { normalizeLabelShape } from "../label/labelShape";
 import { postcardBatchRepository } from "../postcard/postcardBatch.repository";
-import { processPostcardEmailJob } from "../postcard/postcardEmail.worker";
 import { enqueuePostcardEmails } from "../postcard/postcardQueue";
 import { postcardMessageFits } from "../postcard/postcardTextWrap";
 import { normalizeShareRecipient } from "./utils/shareHaikuEmailRequest";
@@ -460,7 +459,7 @@ export const haikuService = {
     /** Browser-rendered postcard front shared by all recipients; backs are rendered per recipient. */
     front?: Buffer;
   }): Promise<
-    | { ok: true; sentCount: 1; queuedCount: number }
+    | { ok: true; queuedCount: number }
     | {
         ok: false;
         reason:
@@ -468,7 +467,6 @@ export const haikuService = {
           | "forbidden"
           | "invalid_recipients"
           | "message_too_long"
-          | "send_failed"
           | "enqueue_failed";
       }
   > {
@@ -501,21 +499,9 @@ export const haikuService = {
       recipientCount: normalizedRecipients.length,
     });
 
-    // The first recipient is sent inline so the confirmation reflects a real delivery; the rest are queued.
-    const [firstRecipient, ...restRecipients] = normalizedRecipients;
     try {
-      const outcome = await processPostcardEmailJob({ batchId: batch.id, recipient: firstRecipient });
-      if (outcome !== "sent") throw new Error(`First postcard not sent (${outcome})`);
-    } catch (err) {
-      console.error("[shareHaikuByEmail] first send failed", err);
-      await postcardBatchRepository.deleteById(batch.id);
-      return { ok: false, reason: "send_failed" };
-    }
-
-    if (restRecipients.length === 0) return { ok: true, sentCount: 1, queuedCount: 0 };
-    try {
-      const queuedCount = await enqueuePostcardEmails(batch.id, restRecipients);
-      return { ok: true, sentCount: 1, queuedCount };
+      const queuedCount = await enqueuePostcardEmails(batch.id, normalizedRecipients);
+      return { ok: true, queuedCount };
     } catch (err) {
       console.error("[shareHaikuByEmail] enqueue failed", err);
       await postcardBatchRepository.deleteById(batch.id);

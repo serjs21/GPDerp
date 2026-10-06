@@ -70,13 +70,12 @@ describe("haikuService.shareHaikuByEmailForUser (queued postcards)", () => {
     postcardMessageFits.mockReturnValue(true);
     postcardBatchRepository.create.mockResolvedValue({ id: "batch-1" });
     enqueuePostcardEmails.mockImplementation(async (_id: string, recipients: string[]) => recipients.length);
-    processPostcardEmailJob.mockResolvedValue("sent");
   });
 
-  it("sends the first recipient inline and queues the rest", async () => {
+  it("queues every recipient without sending inline", async () => {
     const result = await share();
 
-    expect(result).toEqual({ ok: true, sentCount: 1, queuedCount: 1 });
+    expect(result).toEqual({ ok: true, queuedCount: 2 });
     expect(postcardBatchRepository.create).toHaveBeenCalledWith({
       userId: "user-1",
       haikuId: "haiku-1",
@@ -88,25 +87,13 @@ describe("haikuService.shareHaikuByEmailForUser (queued postcards)", () => {
       frontPng: front,
       recipientCount: 2,
     });
-    expect(processPostcardEmailJob).toHaveBeenCalledWith({ batchId: "batch-1", recipient: "a@example.com" });
-    expect(enqueuePostcardEmails).toHaveBeenCalledWith("batch-1", ["b@example.com"]);
+    expect(enqueuePostcardEmails).toHaveBeenCalledWith("batch-1", ["a@example.com", "b@example.com"]);
+    expect(processPostcardEmailJob).not.toHaveBeenCalled();
   });
 
-  it("does not touch the queue for a single recipient", async () => {
-    expect(await share({ recipients: ["a@example.com"] })).toEqual({ ok: true, sentCount: 1, queuedCount: 0 });
-    expect(enqueuePostcardEmails).not.toHaveBeenCalled();
-  });
-
-  it.each([
-    ["throws", () => processPostcardEmailJob.mockRejectedValue(new Error("smtp down"))],
-    ["fails permanently", () => processPostcardEmailJob.mockResolvedValue("failed_permanently")],
-  ])("reports send_failed and queues nothing when the first send %s", async (_label, arrange) => {
-    arrange();
-    jest.spyOn(console, "error").mockImplementation(() => undefined);
-
-    expect(await share()).toEqual({ ok: false, reason: "send_failed" });
-    expect(enqueuePostcardEmails).not.toHaveBeenCalled();
-    expect(postcardBatchRepository.deleteById).toHaveBeenCalledWith("batch-1");
+  it("queues a single recipient", async () => {
+    expect(await share({ recipients: ["a@example.com"] })).toEqual({ ok: true, queuedCount: 1 });
+    expect(enqueuePostcardEmails).toHaveBeenCalledWith("batch-1", ["a@example.com"]);
   });
 
   it("rejects a message that wraps past the postcard line limit", async () => {

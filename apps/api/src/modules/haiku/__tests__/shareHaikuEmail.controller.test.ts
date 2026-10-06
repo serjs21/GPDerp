@@ -109,7 +109,7 @@ describe("haiku.controller POST /share_haiku_email", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    haikuService.shareHaikuByEmailForUser.mockResolvedValue({ ok: true, sentCount: 1, queuedCount: 0 });
+    haikuService.shareHaikuByEmailForUser.mockResolvedValue({ ok: true, queuedCount: 1 });
   });
 
   it("sends from a JSON body without a front", async () => {
@@ -122,7 +122,7 @@ describe("haiku.controller POST /share_haiku_email", () => {
     await app.close();
 
     expect(res.statusCode).toBe(200);
-    expect(res.json()).toEqual({ ok: true, data: { sentCount: 1, queuedCount: 0 } });
+    expect(res.json()).toEqual({ ok: true, data: { queuedCount: 1 } });
     expect(haikuService.shareHaikuByEmailForUser).toHaveBeenCalledWith({
       userId: "user-1",
       haikuId: HAIKU_ID,
@@ -133,11 +133,11 @@ describe("haiku.controller POST /share_haiku_email", () => {
   });
 
   it("passes the front PNG from multipart form data", async () => {
-    haikuService.shareHaikuByEmailForUser.mockResolvedValue({ ok: true, sentCount: 1, queuedCount: 1 });
+    haikuService.shareHaikuByEmailForUser.mockResolvedValue({ ok: true, queuedCount: 2 });
     const res = await postMultipart([...fields(["a@example.com", "b@example.com"]), frontPart()]);
 
     expect(res.statusCode).toBe(200);
-    expect(res.json()).toEqual({ ok: true, data: { sentCount: 1, queuedCount: 1 } });
+    expect(res.json()).toEqual({ ok: true, data: { queuedCount: 2 } });
     const call = haikuService.shareHaikuByEmailForUser.mock.calls[0][0];
     expect(call.recipients).toEqual(["a@example.com", "b@example.com"]);
     expect(call.personalMessage).toBe("Wish you were here");
@@ -210,7 +210,6 @@ describe("haiku.controller POST /share_haiku_email", () => {
 
   it.each([
     ["message_too_long", 400, "The message does not fit on the postcard"],
-    ["send_failed", 502, "Could not send the postcard email"],
     ["enqueue_failed", 500, "Could not queue the postcards"],
   ])("maps service failure %s to %i", async (reason, status, error) => {
     haikuService.shareHaikuByEmailForUser.mockResolvedValue({ ok: false, reason });

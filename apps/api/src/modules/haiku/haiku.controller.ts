@@ -24,7 +24,6 @@ const SHARE_EMAIL_FAILURES: Record<ShareEmailFailureReason, { status: number; er
   forbidden: { status: 403, error: "Unauthorized" },
   invalid_recipients: { status: 400, error: "One or more recipient emails are invalid" },
   message_too_long: { status: 400, error: "The message does not fit on the postcard" },
-  send_failed: { status: 502, error: "Could not send the postcard email" },
   enqueue_failed: { status: 500, error: "Could not queue the postcards" },
 };
 
@@ -404,7 +403,7 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
         return;
       }
 
-      res.send({ ok: true, data: { sentCount: result.sentCount, queuedCount: result.queuedCount } });
+      res.send({ ok: true, data: { queuedCount: result.queuedCount } });
     },
   );
 
