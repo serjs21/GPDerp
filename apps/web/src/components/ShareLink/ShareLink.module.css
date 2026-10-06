@@ -68,6 +68,23 @@
     max-width: 30rem;
   }
 
+  /* Title beside its control instead of above it. */
+  .card .limitField {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .card .limitLabel {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .card .limitControl {
+    flex: 1 1 0;
+    width: auto;
+  }
+
   /* Full row height at the SVG ratio, narrowed (ratio kept) when the panel needs its 10rem + gap. */
   .card .settingsRow > .settingsUpdate {
     flex: 0 0 auto;
