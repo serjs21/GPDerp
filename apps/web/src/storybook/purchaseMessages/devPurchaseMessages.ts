@@ -26,6 +26,12 @@ export type DevPurchaseMessages =
     }
   | { ok: false; error: string };
 
+/** The last out-of-generations message repeats for every higher purchase count. */
+function noGenerationsLeftLabel(purchasesCount: number, isLast: boolean) {
+  const plural = purchasesCount === 1 && !isLast ? "purchase" : "purchases";
+  return `${purchasesCount}${isLast ? "+" : ""} ${plural}`;
+}
+
 /** Storybook loader: fetches the API's written messages and parses them like the real flow does. */
 export async function loadDevPurchaseMessages(): Promise<DevPurchaseMessages> {
   try {
@@ -34,8 +40,8 @@ export async function loadDevPurchaseMessages(): Promise<DevPurchaseMessages> {
     const { data } = (await res.json()) as DevPurchaseMessagesResponse;
     return {
       ok: true,
-      noGenerationsLeft: data.noGenerationsLeft.map((item) => ({
-        label: `${item.purchasesCount} purchases`,
+      noGenerationsLeft: data.noGenerationsLeft.map((item, index, all) => ({
+        label: noGenerationsLeftLabel(item.purchasesCount, index === all.length - 1),
         message: readInsufficientCreditsMessage(item.response) ?? "",
       })),
       purchaseConfirmed: [
