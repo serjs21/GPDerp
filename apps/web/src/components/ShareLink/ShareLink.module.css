@@ -68,20 +68,35 @@
     max-width: 30rem;
   }
 
-  /* Title beside its control instead of above it. */
-  .card .limitField {
-    flex-direction: row;
-    align-items: center;
+  .card .settingsBody {
+    padding-right: 1.5rem;
+  }
+
+  /* Limit inputs run to the panel's end (minus its right padding). */
+  .card .settingsBody > .limitsRow {
+    max-width: none;
+    padding-right: 0;
+  }
+
+  /* Title beside its control; a shared label column keeps every input starting at the same x. */
+  .card .limitFields {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
     gap: 0.5rem;
   }
 
+  .card .limitField {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    align-items: center;
+  }
+
   .card .limitLabel {
-    flex: 0 0 auto;
     white-space: nowrap;
   }
 
   .card .limitControl {
-    flex: 1 1 0;
     width: auto;
   }
 
@@ -100,6 +115,24 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+}
+
+/* Narrow phones: titles back above their controls. */
+@media (max-width: 600px) {
+  .card .limitFields {
+    display: flex;
+  }
+
+  .card .limitField {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+  }
+
+  .card .limitControl {
+    width: 100%;
   }
 }
 
