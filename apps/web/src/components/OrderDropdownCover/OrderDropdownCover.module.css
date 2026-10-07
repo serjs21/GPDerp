@@ -1,0 +1,65 @@
+.root {
+  display: inline-block;
+  box-sizing: content-box;
+  padding: var(--odc-pad-top) var(--odc-pad-right) var(--odc-pad-bottom) var(--odc-pad-left);
+  border: none;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.root:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+.root:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.stage {
+  position: relative;
+  display: block;
+  width: var(--odc-stage-width);
+  height: var(--odc-stage-height);
+}
+
+.gavel,
+.base {
+  position: absolute;
+  left: 0;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+.gavel {
+  top: 0;
+  width: 100%;
+  height: var(--odc-gavel-height);
+  transform-origin: var(--odc-origin-x) var(--odc-origin-y);
+  transform: rotate(var(--odc-raised-deg));
+  transition: transform var(--odc-return-ms) ease-out;
+}
+
+.root[data-pressed="true"] .gavel {
+  transform: rotate(0deg);
+  transition-duration: var(--odc-strike-ms);
+  transition-timing-function: ease-in;
+}
+
+.base {
+  top: var(--odc-base-top);
+  width: var(--odc-base-width);
+  height: var(--odc-base-height);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gavel,
+  .root[data-pressed="true"] .gavel {
+    transition: none;
+  }
+}
