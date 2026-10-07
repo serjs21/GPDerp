@@ -21,8 +21,9 @@ export const GAVEL_RETURN_MS = 100;
 
 export const ORDER_DROPDOWN_COVER_WIDTH_REM = 4;
 
-/** Square comic label framing the button. */
-export const ORDER_COVER_LABEL_FILL = "#ffffff";
+/** Comic label framing the button; same sharp frame as the other header buttons. */
+export const ORDER_COVER_LABEL_SHAPE = "sharp";
+export const ORDER_COVER_LABEL_FILL = "#f7f4ef";
 export const ORDER_COVER_LABEL_STROKE = "#000000";
 export const ORDER_COVER_LABEL_STROKE_WIDTH = 3;
 export const ORDER_COVER_LABEL_SEED = "order-dropdown-cover";

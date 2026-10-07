@@ -9,6 +9,7 @@ import {
   type TransitionEvent,
 } from "react";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel";
+import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import {
   GAVEL_BASE_SRC,
   GAVEL_SRC,
@@ -16,6 +17,7 @@ import {
   OPEN_SOUND_SRC,
   ORDER_COVER_LABEL_FILL,
   ORDER_COVER_LABEL_SEED,
+  ORDER_COVER_LABEL_SHAPE,
   ORDER_COVER_LABEL_STROKE,
   ORDER_COVER_LABEL_STROKE_WIDTH,
   ORDER_DROPDOWN_COVER_WIDTH_REM,
@@ -55,6 +57,7 @@ export function OrderDropdownCover({
   const [sounds, setSounds] = useState<OpenSound[]>([]);
   const soundIdRef = useRef(0);
   const style = useMemo(() => buildOrderDropdownCoverStyle(widthRem), [widthRem]);
+  const labelShape = resolveComicLabelShapePreset(ORDER_COVER_LABEL_SHAPE);
 
   const showSound = () => {
     // Drop the oldest effects until the new one is under the limit and has a free spot.
@@ -122,7 +125,9 @@ export function OrderDropdownCover({
       <span className={styles.label} aria-hidden>
         <ComicBurstLabel
           text=""
-          shapeKind="square"
+          shapeKind={labelShape.kind}
+          spikeCount={labelShape.spikeCount}
+          randomness={labelShape.randomness}
           fill={ORDER_COVER_LABEL_FILL}
           stroke={ORDER_COVER_LABEL_STROKE}
           strokeWidth={ORDER_COVER_LABEL_STROKE_WIDTH}
