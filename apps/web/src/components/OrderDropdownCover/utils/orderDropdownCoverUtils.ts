@@ -9,6 +9,7 @@ import {
   GAVEL_VIEWBOX,
   ORDER_COVER_ART_EDGE_MARGIN,
   ORDER_COVER_ART_SCALE,
+  ORDER_COVER_ART_SHIFT_X_RATIO,
   ORDER_COVER_LABEL_PAD_RATIO,
   ORDER_COVER_LABEL_STROKE_WIDTH,
   ORDER_DROPDOWN_COVER_STAGE,
@@ -96,11 +97,13 @@ const shiftInto = (start: number, end: number, min: number, max: number) => {
 };
 
 /**
- * Translation (stage units) applied after scaling so the whole base sits inside the
- * label, ORDER_COVER_ART_EDGE_MARGIN away from its edges; the gavel may still overflow.
+ * Translation (stage units) applied after scaling: nudged right by ORDER_COVER_ART_SHIFT_X_RATIO
+ * of the label width, then corrected so the whole base sits inside the label,
+ * ORDER_COVER_ART_EDGE_MARGIN away from its edges; the gavel may still overflow.
  */
 export function coverArtOffset() {
   const box = coverLabelBox();
+  const nudgeX = (box.right - box.left) * ORDER_COVER_ART_SHIFT_X_RATIO;
   const baseLeft = ORDER_DROPDOWN_COVER_STAGE.width * GAVEL_BASE_LEFT_RATIO;
   const topLeft = scaleAboutOrigin({ x: baseLeft, y: GAVEL_VIEWBOX.height });
   const bottomRight = scaleAboutOrigin({
@@ -109,7 +112,9 @@ export function coverArtOffset() {
   });
   const margin = ORDER_COVER_ART_EDGE_MARGIN;
   return {
-    x: shiftInto(topLeft.x, bottomRight.x, box.left + margin, box.right - margin),
+    x:
+      nudgeX +
+      shiftInto(topLeft.x + nudgeX, bottomRight.x + nudgeX, box.left + margin, box.right - margin),
     y: shiftInto(topLeft.y, bottomRight.y, box.top + margin, box.bottom - margin),
   };
 }

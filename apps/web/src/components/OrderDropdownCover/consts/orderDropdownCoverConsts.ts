@@ -30,11 +30,13 @@ export const ORDER_COVER_LABEL_SEED = "order-dropdown-cover";
 /** Gap between the gavel and the label edge, as a fraction of the stage width. */
 export const ORDER_COVER_LABEL_PAD_RATIO = 0.12;
 /** Gavel + base drawn larger than the layout reserves, scaled about the label centre; the label clips the overflow. */
-export const ORDER_COVER_ART_SCALE = 1.4;
+export const ORDER_COVER_ART_SCALE = 1.3;
 /** Base offset from the stage's left edge, as a fraction of the stage width. */
 export const GAVEL_BASE_LEFT_RATIO = -0.05;
 /** Minimum space (stage units) kept between the scaled base and the label edge. */
 export const ORDER_COVER_ART_EDGE_MARGIN = 20;
+/** Horizontal nudge of the scaled art, as a fraction of the label width (positive = right). */
+export const ORDER_COVER_ART_SHIFT_X_RATIO = 0.1;
 
 export const OPEN_SOUND_SRC = "/nav/open_sound.svg";
 export const OPEN_SOUND_VIEWBOX = { width: 377, height: 243 } as const;
