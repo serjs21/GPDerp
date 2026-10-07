@@ -8,11 +8,16 @@ import {
   type PointerEvent,
   type TransitionEvent,
 } from "react";
+import { ComicBurstLabel } from "@/components/ComicBurstLabel";
 import {
   GAVEL_BASE_SRC,
   GAVEL_SRC,
   OPEN_SOUND_MAX_COUNT,
   OPEN_SOUND_SRC,
+  ORDER_COVER_LABEL_FILL,
+  ORDER_COVER_LABEL_SEED,
+  ORDER_COVER_LABEL_STROKE,
+  ORDER_COVER_LABEL_STROKE_WIDTH,
   ORDER_DROPDOWN_COVER_WIDTH_REM,
 } from "./consts/orderDropdownCoverConsts";
 import type { OrderDropdownCoverProps } from "./OrderDropdownCover.types";
@@ -41,6 +46,9 @@ export function OrderDropdownCover({
   disabled = false,
   className,
   "aria-label": ariaLabel = "Change order",
+  "aria-expanded": ariaExpanded,
+  "aria-controls": ariaControls,
+  "aria-haspopup": ariaHasPopup,
   onClick,
 }: OrderDropdownCoverProps) {
   const [pressed, setPressed] = useState(false);
@@ -99,6 +107,9 @@ export function OrderDropdownCover({
       data-pressed={pressed}
       disabled={disabled}
       aria-label={ariaLabel}
+      aria-expanded={ariaExpanded}
+      aria-controls={ariaControls}
+      aria-haspopup={ariaHasPopup}
       onClick={onClick}
       onPointerDown={onPointerDown}
       onPointerUp={release}
@@ -108,6 +119,17 @@ export function OrderDropdownCover({
       onKeyUp={onKeyUp}
       onBlur={release}
     >
+      <span className={styles.label} aria-hidden>
+        <ComicBurstLabel
+          text=""
+          shapeKind="square"
+          fill={ORDER_COVER_LABEL_FILL}
+          stroke={ORDER_COVER_LABEL_STROKE}
+          strokeWidth={ORDER_COVER_LABEL_STROKE_WIDTH}
+          seed={ORDER_COVER_LABEL_SEED}
+          stretch
+        />
+      </span>
       <span className={styles.stage} aria-hidden>
         {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
         <img

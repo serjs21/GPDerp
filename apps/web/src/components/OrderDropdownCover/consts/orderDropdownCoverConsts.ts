@@ -21,6 +21,14 @@ export const GAVEL_RETURN_MS = 100;
 
 export const ORDER_DROPDOWN_COVER_WIDTH_REM = 4;
 
+/** Square comic label framing the button. */
+export const ORDER_COVER_LABEL_FILL = "#ffffff";
+export const ORDER_COVER_LABEL_STROKE = "#000000";
+export const ORDER_COVER_LABEL_STROKE_WIDTH = 3;
+export const ORDER_COVER_LABEL_SEED = "order-dropdown-cover";
+/** Gap between the gavel and the label edge, as a fraction of the stage width. */
+export const ORDER_COVER_LABEL_PAD_RATIO = 0.12;
+
 export const OPEN_SOUND_SRC = "/nav/open_sound.svg";
 export const OPEN_SOUND_VIEWBOX = { width: 377, height: 243 } as const;
 /** Sound effect width in stage units (the gavel is 783.12 wide). */

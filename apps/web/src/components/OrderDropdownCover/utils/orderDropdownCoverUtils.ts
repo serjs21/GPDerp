@@ -6,6 +6,7 @@ import {
   GAVEL_RETURN_MS,
   GAVEL_STRIKE_MS,
   GAVEL_VIEWBOX,
+  ORDER_COVER_LABEL_PAD_RATIO,
   ORDER_DROPDOWN_COVER_STAGE,
 } from "../consts/orderDropdownCoverConsts";
 
@@ -55,6 +56,7 @@ export function buildOrderDropdownCoverStyle(widthRem: number): CSSProperties {
     "--odc-pad-right": rem(overflow.right * scale),
     "--odc-pad-bottom": rem(overflow.bottom * scale),
     "--odc-pad-left": rem(overflow.left * scale),
+    "--odc-label-pad": rem(widthRem * ORDER_COVER_LABEL_PAD_RATIO),
     "--odc-origin-x": `${(GAVEL_PIVOT.x / GAVEL_VIEWBOX.width) * 100}%`,
     "--odc-origin-y": `${(GAVEL_PIVOT.y / GAVEL_VIEWBOX.height) * 100}%`,
     "--odc-raised-deg": `${GAVEL_RAISED_DEG}deg`,
