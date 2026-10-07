@@ -163,6 +163,31 @@
   fill: currentColor;
 }
 
+/* Full-color artwork: authored colors, no tint. */
+.iconImage {
+  top: auto;
+}
+
+.iconTop.iconImage {
+  top: 9%;
+}
+
+.iconBottom.iconImage {
+  bottom: 9%;
+}
+
+.iconCenter.iconImage {
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.iconImage img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .baseWrap,
   .iconMask,

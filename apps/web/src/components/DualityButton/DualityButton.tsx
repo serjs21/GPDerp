@@ -24,6 +24,7 @@ export type DualityButtonProps = {
   /**
    * `mask` — mono tint (black/white swap on flip).
    * `strokeInvert` — only black ink flips; light fills stay as authored.
+   * `image` — full-color artwork drawn as authored (no tint, no flip swap).
    */
   iconTone?: DualityIconTone;
   /** Controlled flip state. When omitted, the button manages its own state. */

@@ -4,14 +4,14 @@ import type { CSSProperties } from "react";
 import { useStrokeInvertSvg } from "./utils/strokeInvertSvg";
 import styles from "./DualityButton.module.css";
 
-export type DualityIconTone = "mask" | "strokeInvert";
+export type DualityIconTone = "mask" | "strokeInvert" | "image";
 
 export type DualityFaceIconPosition = "top" | "bottom" | "center";
 
 export type DualityFaceIconProps = {
   src: string;
   position: DualityFaceIconPosition;
-  /** `mask` tints the whole glyph; `strokeInvert` only flips black ink. */
+  /** `mask` tints the whole glyph; `strokeInvert` only flips black ink; `image` keeps authored colors. */
   tone?: DualityIconTone;
   /** Size multiplier vs the default end icons (center time glyph uses 2). */
   scale?: number;
@@ -37,6 +37,15 @@ export function DualityFaceIcon({
           "--duality-icon-scale": String(scale),
         } as CSSProperties)
       : undefined;
+
+  if (tone === "image") {
+    return (
+      <span className={[styles.icon, styles.iconImage, placeClass].join(" ")} style={sizeStyle} aria-hidden>
+        {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
+        <img src={src} alt="" draggable={false} decoding="async" />
+      </span>
+    );
+  }
 
   if (tone === "strokeInvert") {
     return (
