@@ -50,7 +50,7 @@
   pointer-events: none;
 }
 
-/* Same box as .stage, scaled about the label centre. */
+/* Same box as .stage, scaled about the label centre, then shifted so the base stays in view. */
 .art {
   position: absolute;
   left: calc(var(--odc-pad-left) - var(--odc-label-stroke) / 2);
@@ -58,7 +58,7 @@
   display: block;
   width: var(--odc-stage-width);
   height: var(--odc-stage-height);
-  transform: scale(var(--odc-art-scale));
+  transform: translate(var(--odc-art-shift-x), var(--odc-art-shift-y)) scale(var(--odc-art-scale));
   transform-origin: var(--odc-art-origin-x) var(--odc-art-origin-y);
 }
 
@@ -71,7 +71,7 @@
   user-select: none;
 }
 .base {
-  left: -5%;
+  left: var(--odc-base-left);
 }
 
 .gavel {

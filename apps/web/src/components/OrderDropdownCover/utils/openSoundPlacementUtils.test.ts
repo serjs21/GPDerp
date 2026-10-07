@@ -1,6 +1,12 @@
-import { OPEN_SOUND_MAX_COUNT, ORDER_DROPDOWN_COVER_STAGE } from "../consts/orderDropdownCoverConsts";
+import {
+  GAVEL_BASE_LEFT_RATIO,
+  GAVEL_BASE_VIEWBOX,
+  GAVEL_VIEWBOX,
+  OPEN_SOUND_MAX_COUNT,
+  ORDER_DROPDOWN_COVER_STAGE,
+} from "../consts/orderDropdownCoverConsts";
 import { pickOpenSoundPlacement, type OpenSoundPlacement } from "./openSoundPlacementUtils";
-import { coverLabelBox, coverLabelPadding } from "./orderDropdownCoverUtils";
+import { coverLabelBox, coverLabelPadding, scaleArtPoint } from "./orderDropdownCoverUtils";
 
 function seededRandom(seed: number) {
   let state = seed;
@@ -16,6 +22,22 @@ describe("coverLabelPadding", () => {
     const width = ORDER_DROPDOWN_COVER_STAGE.width + padding.left + padding.right;
     const height = ORDER_DROPDOWN_COVER_STAGE.height + padding.top + padding.bottom;
     expect(width).toBeCloseTo(height, 6);
+  });
+});
+
+describe("coverArtOffset", () => {
+  it("keeps the whole scaled base inside the label", () => {
+    const box = coverLabelBox();
+    const baseLeft = ORDER_DROPDOWN_COVER_STAGE.width * GAVEL_BASE_LEFT_RATIO;
+    const topLeft = scaleArtPoint({ x: baseLeft, y: GAVEL_VIEWBOX.height });
+    const bottomRight = scaleArtPoint({
+      x: baseLeft + GAVEL_BASE_VIEWBOX.width,
+      y: GAVEL_VIEWBOX.height + GAVEL_BASE_VIEWBOX.height,
+    });
+    expect(topLeft.x).toBeGreaterThanOrEqual(box.left);
+    expect(topLeft.y).toBeGreaterThanOrEqual(box.top);
+    expect(bottomRight.x).toBeLessThanOrEqual(box.right);
+    expect(bottomRight.y).toBeLessThanOrEqual(box.bottom);
   });
 });
 

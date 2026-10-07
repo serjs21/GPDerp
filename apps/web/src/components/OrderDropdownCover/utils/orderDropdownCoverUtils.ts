@@ -1,11 +1,13 @@
 import type { CSSProperties } from "react";
 import {
+  GAVEL_BASE_LEFT_RATIO,
   GAVEL_BASE_VIEWBOX,
   GAVEL_PIVOT,
   GAVEL_RAISED_DEG,
   GAVEL_RETURN_MS,
   GAVEL_STRIKE_MS,
   GAVEL_VIEWBOX,
+  ORDER_COVER_ART_EDGE_MARGIN,
   ORDER_COVER_ART_SCALE,
   ORDER_COVER_LABEL_PAD_RATIO,
   ORDER_COVER_LABEL_STROKE_WIDTH,
@@ -78,13 +80,45 @@ export function coverArtOrigin() {
   return { x: (box.left + box.right) / 2, y: (box.top + box.bottom) / 2 };
 }
 
-/** Where a stage point is drawn once the art is scaled by ORDER_COVER_ART_SCALE. */
-export function scaleArtPoint(point: { x: number; y: number }) {
+const scaleAboutOrigin = (point: { x: number; y: number }) => {
   const origin = coverArtOrigin();
   return {
     x: origin.x + (point.x - origin.x) * ORDER_COVER_ART_SCALE,
     y: origin.y + (point.y - origin.y) * ORDER_COVER_ART_SCALE,
   };
+};
+
+/** Shift between two bounds `[min, max]` needed to bring `[start, end]` inside them (0 when it already fits). */
+const shiftInto = (start: number, end: number, min: number, max: number) => {
+  if (start < min) return min - start;
+  if (end > max) return max - end;
+  return 0;
+};
+
+/**
+ * Translation (stage units) applied after scaling so the whole base sits inside the
+ * label, ORDER_COVER_ART_EDGE_MARGIN away from its edges; the gavel may still overflow.
+ */
+export function coverArtOffset() {
+  const box = coverLabelBox();
+  const baseLeft = ORDER_DROPDOWN_COVER_STAGE.width * GAVEL_BASE_LEFT_RATIO;
+  const topLeft = scaleAboutOrigin({ x: baseLeft, y: GAVEL_VIEWBOX.height });
+  const bottomRight = scaleAboutOrigin({
+    x: baseLeft + GAVEL_BASE_VIEWBOX.width,
+    y: GAVEL_VIEWBOX.height + GAVEL_BASE_VIEWBOX.height,
+  });
+  const margin = ORDER_COVER_ART_EDGE_MARGIN;
+  return {
+    x: shiftInto(topLeft.x, bottomRight.x, box.left + margin, box.right - margin),
+    y: shiftInto(topLeft.y, bottomRight.y, box.top + margin, box.bottom - margin),
+  };
+}
+
+/** Where a stage point is drawn once the art is scaled and shifted. */
+export function scaleArtPoint(point: { x: number; y: number }) {
+  const scaled = scaleAboutOrigin(point);
+  const offset = coverArtOffset();
+  return { x: scaled.x + offset.x, y: scaled.y + offset.y };
 }
 
 const rem = (value: number) => `${value}rem`;
@@ -93,8 +127,12 @@ export function buildOrderDropdownCoverStyle(widthRem: number): CSSProperties {
   const scale = widthRem / ORDER_DROPDOWN_COVER_STAGE.width;
   const padding = coverLabelPadding();
   const artOrigin = coverArtOrigin();
+  const artOffset = coverArtOffset();
   return {
     "--odc-art-scale": String(ORDER_COVER_ART_SCALE),
+    "--odc-art-shift-x": rem(artOffset.x * scale),
+    "--odc-art-shift-y": rem(artOffset.y * scale),
+    "--odc-base-left": `${GAVEL_BASE_LEFT_RATIO * 100}%`,
     "--odc-art-origin-x": rem(artOrigin.x * scale),
     "--odc-art-origin-y": rem(artOrigin.y * scale),
     "--odc-label-stroke": `${ORDER_COVER_LABEL_STROKE_WIDTH}px`,
