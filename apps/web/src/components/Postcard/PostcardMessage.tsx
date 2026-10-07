@@ -7,6 +7,7 @@ import {
   POSTCARD_STAMP_SRC,
 } from "./consts/postcardMessageConsts";
 import { buildPostcardMessageRootStyle } from "./utils/postcardMessageStyleUtils";
+import { buildPostcardSignatureStyle } from "./utils/postcardSignatureUtils";
 import styles from "./PostcardMessage.module.css";
 
 /** Static full-bleed 1200×800 back side of the postcard (capture target, no interactivity). */
@@ -25,11 +26,11 @@ export function PostcardMessage({
     <div ref={ref} className={rootClass} style={buildPostcardMessageRootStyle()} data-postcard-root="">
       <div className={styles.left}>
         <p className={styles.message}>{message}</p>
-        <p className={styles.signature}>
+        <p className={styles.signature} style={buildPostcardSignatureStyle(senderName)}>
           <span className={styles.heart} aria-hidden>
             ♥
           </span>
-          {`From: ${senderName}`}
+          <span className={styles.signatureText}>{`From: ${senderName.trim()}`}</span>
         </p>
       </div>
       <div className={styles.divider} aria-hidden />

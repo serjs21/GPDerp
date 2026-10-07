@@ -8,8 +8,10 @@ import {
   POSTCARD_MESSAGE_FONT_PX,
   POSTCARD_MESSAGE_LINE_HEIGHT_PX,
   POSTCARD_MESSAGE_MAX_LINES,
+  POSTCARD_SIGNATURE_HEART_GAP_PX,
   POSTCARD_WIDTH,
 } from "../../consts/postcard";
+import { postcardSignatureLayout } from "../../utils/postcardSignature";
 
 /** Minimal React-element shape Satori accepts; avoids a React dependency in the API. */
 export type PostcardNode = {
@@ -54,26 +56,28 @@ const messageLines = (lines: string[]): PostcardNode =>
     ),
   );
 
-const signature = (senderName: string): PostcardNode =>
-  el(
+const signature = (senderName: string): PostcardNode => {
+  const layout = postcardSignatureLayout(senderName);
+  return el(
     "div",
     {
       display: "flex",
       alignItems: "center",
-      margin: "0 0 6px 130px",
-      fontSize: 46,
+      margin: `0 0 6px ${layout.indentPx}px`,
+      fontSize: layout.fontPx,
       lineHeight: 1.2,
       transform: "rotate(-4deg)",
     },
     [
-      el("span", { fontSize: 38, marginRight: 14 }, "♥"),
+      el("span", { fontSize: layout.heartFontPx, marginRight: POSTCARD_SIGNATURE_HEART_GAP_PX }, "♥"),
       el(
         "span",
-        { maxWidth: 400, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" },
-        `From: ${senderName}`,
+        { maxWidth: layout.textMaxWidthPx, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" },
+        layout.text,
       ),
     ],
   );
+};
 
 const addressLine = (text: string): PostcardNode =>
   el(

@@ -35,4 +35,8 @@ export const LongSenderName: Story = {
   args: { senderName: "Akira Tanaka-Nakamura" },
 };
 
+export const VeryLongSenderName: Story = {
+  args: { senderName: "Maximiliana Alexandrova-Fitzgerald" },
+};
+
 export const Empty: Story = { args: { message: "" } };
