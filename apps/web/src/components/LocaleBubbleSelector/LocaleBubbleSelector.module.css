@@ -82,7 +82,7 @@
 
 /* TextBubbleDropdown's trigger button. */
 .root > button {
-  height: 4rem;
+  height: 3.2rem;
 }
 
 .triggerInner {
