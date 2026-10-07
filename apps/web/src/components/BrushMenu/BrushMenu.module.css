@@ -9,7 +9,7 @@
   overflow: visible;
   --brush-option-min-width: 12rem;
   --brush-row-padding: 0.55rem 1.1rem 0.55rem 0;
-  --brush-avatar-slot: 36px;
+  --brush-avatar-slot: 4rem;
   --brush-stack-gap: 0.2rem;
 }
 
@@ -72,7 +72,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  /* Let comic-burst spikes / drop-shadow paint outside the 36px box. */
+  /* Let comic-burst spikes / drop-shadow paint outside the avatar box. */
   overflow: visible;
 }
 

@@ -4,7 +4,7 @@
   display: inline-flex;
   align-items: flex-start;
   align-self: flex-start;
-  height: 36px;
+  height: 4rem;
   line-height: 0;
 }
 
@@ -12,7 +12,7 @@
   position: relative;
   display: inline-block;
   box-sizing: border-box;
-  height: 36px;
+  height: 4rem;
   line-height: 0;
   vertical-align: middle;
 }

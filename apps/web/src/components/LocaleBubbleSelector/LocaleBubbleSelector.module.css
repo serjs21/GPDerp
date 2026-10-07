@@ -82,7 +82,7 @@
 
 /* TextBubbleDropdown's trigger button. */
 .root > button {
-  height: 40px;
+  height: 4rem;
 }
 
 .triggerInner {
@@ -93,7 +93,7 @@
   gap: 0.45rem;
 }
 
-/* Fills the 40px trigger; option-row flags keep `.flag` sizing. */
+/* Fills the trigger height; option-row flags keep `.flag` sizing. */
 .triggerFlag {
   display: block;
   width: auto;

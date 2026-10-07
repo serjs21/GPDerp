@@ -2,7 +2,7 @@
   display: block;
   line-height: 0;
   /* ComicBurstLabel sets --burst-font-size from the `size` prop. */
-  height: var(--burst-font-size, 36px);
+  height: var(--burst-font-size, 4rem);
   /* Frame is decorative; the BrushMenu button handles hits. */
   pointer-events: none;
   overflow: visible;

@@ -3,9 +3,10 @@
 import type { ReactNode } from "react";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
+import { HEADER_NAV_ICON_SIZE_PX } from "@/consts/header/siteHeaderConsts";
 import styles from "./UserMenuBurstFrame.module.css";
 
-export const USER_MENU_BURST_SIZE = 36;
+export const USER_MENU_BURST_SIZE = HEADER_NAV_ICON_SIZE_PX;
 
 export type UserMenuBurstFrameProps = {
   /** Burst seed / a11y context text. */

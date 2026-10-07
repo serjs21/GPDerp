@@ -12,7 +12,7 @@ import {
   USER_MENU_TRIGGER_FILL,
 } from "./consts/userMenuConsts";
 import type { GuestMenuProps } from "./GuestMenu.types";
-import { UserMenuBurstFrame } from "./UserMenuBurstFrame";
+import { UserMenuBurstFrame, USER_MENU_BURST_SIZE } from "./UserMenuBurstFrame";
 import { GoHomeOptionLabel } from "./GoHomeOptionLabel";
 import { goHomeOption, isMainPage } from "./utils/userMenuOptionUtils";
 import frameStyles from "./UserMenuBurstFrame.module.css";
@@ -67,8 +67,8 @@ export function GuestMenu({ className }: GuestMenuProps) {
             className={frameStyles.icon}
             src={GUEST_MENU_TRIGGER_SRC}
             alt=""
-            width={36}
-            height={36}
+            width={USER_MENU_BURST_SIZE}
+            height={USER_MENU_BURST_SIZE}
             draggable={false}
           />
         </UserMenuBurstFrame>

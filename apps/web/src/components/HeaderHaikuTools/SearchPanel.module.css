@@ -2,8 +2,8 @@
   position: relative;
   display: inline-block;
   box-sizing: border-box;
-  /* Match UserMenu avatar comic frame (36px). */
-  height: 36px;
+  /* Match UserMenu avatar comic frame. */
+  height: 4rem;
   line-height: 0;
   vertical-align: middle;
 }
@@ -180,7 +180,7 @@
   display: inline-flex;
   align-items: flex-start;
   align-self: flex-start;
-  height: 36px;
+  height: 4rem;
   line-height: 0;
 }
 

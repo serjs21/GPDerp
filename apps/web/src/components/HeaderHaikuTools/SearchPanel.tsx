@@ -10,14 +10,15 @@ import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import { LabelsFilterModal } from "@/components/LabelsFilterModal";
+import { HEADER_NAV_ICON_SIZE_PX } from "@/consts/header/siteHeaderConsts";
 import { useHeaderHaikuLabelManage } from "./useHeaderHaikuLabelManage";
 import { useHeaderHaikuSearch } from "./useHeaderHaikuSearch";
 import { useHeaderSettingsSearch } from "./useHeaderSettingsSearch";
 import toolStyles from "./HeaderHaikuTools.module.css";
 import styles from "./SearchPanel.module.css";
 
-/** Match UserMenu trigger comic-label height (36px avatar frame). */
-const PANEL_HEIGHT_PX = 36;
+/** Match UserMenu trigger comic-label height. */
+const PANEL_HEIGHT_PX = HEADER_NAV_ICON_SIZE_PX;
 
 type HoverTarget = "filter" | "search" | null;
 

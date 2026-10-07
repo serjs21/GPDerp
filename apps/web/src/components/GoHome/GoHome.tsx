@@ -4,10 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
+import { HEADER_NAV_ICON_SIZE_PX } from "@/consts/header/siteHeaderConsts";
 import styles from "./GoHome.module.css";
 
 /** Match UserMenu / SearchPanel comic frame height. */
-const PANEL_HEIGHT_PX = 36;
+const PANEL_HEIGHT_PX = HEADER_NAV_ICON_SIZE_PX;
 
 const GO_BACK_ICON_SRC = "/nav/go_back.svg";
 
