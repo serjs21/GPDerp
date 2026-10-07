@@ -3,7 +3,6 @@ import axios from "axios";
 export type ServerPostcardBackParams = {
   message: string;
   senderName: string;
-  recipient: string;
 };
 
 /** Dev-only API route (disabled in production) returning the server-rendered postcard back PNG. */

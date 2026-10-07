@@ -3,6 +3,7 @@
 import type { PostcardMessageProps } from "./PostcardMessage.types";
 import {
   POSTCARD_ADDRESS_LINE_COUNT,
+  POSTCARD_ADDRESSEE,
   POSTCARD_STAMP_SRC,
 } from "./consts/postcardMessageConsts";
 import { buildPostcardMessageRootStyle } from "./utils/postcardMessageStyleUtils";
@@ -12,12 +13,11 @@ import styles from "./PostcardMessage.module.css";
 export function PostcardMessage({
   message,
   senderName,
-  recipient,
   className,
   ref,
 }: PostcardMessageProps) {
   const addressLines = Array.from({ length: POSTCARD_ADDRESS_LINE_COUNT }, (_, index) =>
-    index === 0 ? recipient.trim() : "",
+    index === 0 ? POSTCARD_ADDRESSEE : "",
   );
   const rootClass = [styles.root, className].filter(Boolean).join(" ");
 

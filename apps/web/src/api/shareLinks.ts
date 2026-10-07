@@ -209,7 +209,7 @@ export type ShareHaikuEmailBody = {
   message?: string;
   /**
    * Browser-rendered postcard front shared by all recipients; when present the request is
-   * multipart form data. Backs are rendered per recipient by the API.
+   * multipart form data. The back is rendered by the API.
    */
   postcard?: { front: Blob };
 };

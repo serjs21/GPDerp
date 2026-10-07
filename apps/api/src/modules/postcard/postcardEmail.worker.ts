@@ -44,7 +44,7 @@ const failPermanently = async (data: PostcardEmailJobData, reason: string, err?:
 };
 
 /**
- * Render one recipient's back and email it with the shared front. Throws on transient
+ * Render the batch's back and email it with the shared front to one recipient. Throws on transient
  * errors so pg-boss retries; permanent errors are recorded and the job completes.
  */
 export async function processPostcardEmailJob(data: PostcardEmailJobData): Promise<PostcardEmailJobOutcome> {
@@ -59,7 +59,6 @@ export async function processPostcardEmailJob(data: PostcardEmailJobData): Promi
     back = await renderPostcardBackPng({
       message: batch.message,
       senderName: batch.senderName,
-      recipient: data.recipient,
     });
   } catch (err) {
     if (err instanceof PostcardMessageTooLongError) return failPermanently(data, "message_too_long", err);

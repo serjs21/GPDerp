@@ -5,6 +5,8 @@ export const POSTCARD_MESSAGE_BOX_WIDTH_PX = 560;
 export const POSTCARD_MESSAGE_FONT_PX = 46;
 export const POSTCARD_MESSAGE_LINE_HEIGHT_PX = 62;
 export const POSTCARD_ADDRESS_LINE_COUNT = 3;
+/** Written on the first address line; every recipient gets the same back. */
+export const POSTCARD_ADDRESSEE = "you!";
 
 /** Layout size (CSS px) and the PNG size both sides are delivered at (pixel ratio 2). */
 export const POSTCARD_WIDTH = 1200;
@@ -16,7 +18,7 @@ export const POSTCARD_HAND_FONT_FAMILY = "Patrick Hand";
 export const POSTCARD_FALLBACK_FONT_FAMILY = "Zen Kurenaido";
 
 export const POSTCARD_FRONT_FIELD = "postcardFront";
-/** No longer accepted: backs are rendered per recipient on the server. */
+/** No longer accepted: backs are rendered on the server. */
 export const POSTCARD_BACK_FIELD = "postcardBack";
 export const POSTCARD_FRONT_CID = "postcard-front";
 export const POSTCARD_BACK_CID = "postcard-back";

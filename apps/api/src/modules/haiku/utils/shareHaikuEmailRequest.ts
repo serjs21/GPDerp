@@ -13,7 +13,7 @@ export type ShareHaikuEmailRequest = {
   haikuId: string;
   emails: string[];
   message: string;
-  /** Browser-rendered postcard front; backs are rendered per recipient on the server. */
+  /** Browser-rendered postcard front; the back is rendered on the server. */
   front?: Buffer;
 };
 

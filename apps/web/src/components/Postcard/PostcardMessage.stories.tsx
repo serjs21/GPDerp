@@ -21,7 +21,6 @@ const meta: Meta<typeof PostcardMessage> = {
   args: {
     message: SHORT_MESSAGE,
     senderName: "Aki",
-    recipient: "tony.kim@example.com",
   },
 };
 
@@ -32,8 +31,8 @@ export const Default: Story = {};
 
 export const AtCharacterLimit: Story = { args: { message: AT_LIMIT_MESSAGE } };
 
-export const LongRecipient: Story = {
-  args: { recipient: "a.very.long.recipient.name@some-company.example.com" },
+export const LongSenderName: Story = {
+  args: { senderName: "Akira Tanaka-Nakamura" },
 };
 
 export const Empty: Story = { args: { message: "" } };

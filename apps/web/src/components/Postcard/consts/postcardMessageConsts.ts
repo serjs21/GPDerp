@@ -12,6 +12,8 @@ export const POSTCARD_MESSAGE_FONT_FAMILY =
 export const POSTCARD_MESSAGE_BOX_HEIGHT_PX =
   POSTCARD_MESSAGE_LINE_HEIGHT_PX * POSTCARD_MESSAGE_MAX_LINES;
 
-/** Ruled address lines; the recipient's email goes on the first one. */
+/** Ruled address lines; POSTCARD_ADDRESSEE goes on the first one. */
 export const POSTCARD_ADDRESS_LINE_COUNT = 3;
+/** Every recipient gets the same back. */
+export const POSTCARD_ADDRESSEE = "you!";
 export const POSTCARD_STAMP_SRC = "/postcard/postcard_stamp.svg";

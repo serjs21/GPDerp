@@ -10,7 +10,6 @@ import { postcardFilename } from "@/components/Postcard/postcardDevDownload";
 import {
   POSTCARD_DEV_SAMPLE_HAIKU,
   POSTCARD_DEV_SAMPLE_MESSAGE,
-  POSTCARD_DEV_SAMPLE_RECIPIENTS,
 } from "@/components/Postcard/consts/postcardDevConsts";
 import { POSTCARD_MESSAGE_MAX_CHARS } from "@/components/Postcard/consts/postcardMessageConsts";
 import { clampPostcardMessage } from "@/components/Postcard/utils/postcardMessageFit";
@@ -19,25 +18,15 @@ import { usePostcardMessageFit } from "@/hooks/usePostcardMessageFit";
 import { usePostcardTheme } from "@/hooks/usePostcardTheme";
 import styles from "./DevPostcardPage.module.css";
 
-const parseRecipients = (value: string) =>
-  value
-    .split(/[,\s]+/)
-    .map((item) => item.trim())
-    .filter(Boolean);
-
 export function DevPostcardPage() {
   const theme = usePostcardTheme();
   const { haikus, isLoggedIn } = useInfiniteHaikusQuery();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [message, setMessage] = useState(POSTCARD_DEV_SAMPLE_MESSAGE);
   const [senderName, setSenderName] = useState("Aki");
-  const [recipientsText, setRecipientsText] = useState(POSTCARD_DEV_SAMPLE_RECIPIENTS.join(", "));
   const fit = usePostcardMessageFit(message);
   const haiku =
     haikus.find((item) => item.id === selectedId) ?? haikus[0] ?? POSTCARD_DEV_SAMPLE_HAIKU;
-  const recipients = parseRecipients(recipientsText);
-  const previewRecipient = recipients[0] ?? "";
-
   const onMessageChange = (raw: string) => {
     const next = clampPostcardMessage(raw);
     if (next.length > message.length && !fit.accepts(next)) return;
@@ -77,7 +66,7 @@ export function DevPostcardPage() {
         <PostcardRenderer theme={theme} haiku={haiku} />
       </PostcardPreview>
 
-      <h2 className={styles.subheading}>Back (message side, previewed for the first recipient)</h2>
+      <h2 className={styles.subheading}>Back (message side, same for every recipient)</h2>
       <div className={styles.fields}>
         <label className={styles.field}>
           Message ({fit.linesLeft} lines left)
@@ -93,18 +82,14 @@ export function DevPostcardPage() {
           Sender name
           <input value={senderName} onChange={(event) => setSenderName(event.target.value)} />
         </label>
-        <label className={styles.field}>
-          Recipients (comma separated)
-          <input value={recipientsText} onChange={(event) => setRecipientsText(event.target.value)} />
-        </label>
       </div>
       <PostcardPreview
-        generate={() => fetchServerPostcardBack({ message, senderName, recipient: previewRecipient })}
+        generate={() => fetchServerPostcardBack({ message, senderName })}
         filename={postcardFilename(haiku.id, "back")}
         scale={0.5}
         label="Live message side (server PNG on the right)"
       >
-        <PostcardMessage message={message} senderName={senderName} recipient={previewRecipient} />
+        <PostcardMessage message={message} senderName={senderName} />
       </PostcardPreview>
     </main>
   );

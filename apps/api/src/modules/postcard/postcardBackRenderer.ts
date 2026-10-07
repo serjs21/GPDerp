@@ -48,11 +48,10 @@ const getStampSrc = (): string => {
   return stampSrc;
 };
 
-/** Render one recipient's postcard back as a POSTCARD_PNG_WIDTH x POSTCARD_PNG_HEIGHT PNG. */
+/** Render the postcard back (same for every recipient) as a POSTCARD_PNG_WIDTH x POSTCARD_PNG_HEIGHT PNG. */
 export async function renderPostcardBackPng(params: {
   message: string;
   senderName: string;
-  recipient: string;
 }): Promise<Buffer> {
   const lines = wrapPostcardMessage(params.message.trim());
   if (lines.length > POSTCARD_MESSAGE_MAX_LINES) throw new PostcardMessageTooLongError(lines.length);
@@ -60,7 +59,6 @@ export async function renderPostcardBackPng(params: {
   const tree = buildPostcardBackTree({
     lines,
     senderName: params.senderName.trim() || "Someone",
-    recipient: params.recipient,
     stampSrc: getStampSrc(),
   });
   const svg = await satori(tree as unknown as Parameters<typeof satori>[0], {

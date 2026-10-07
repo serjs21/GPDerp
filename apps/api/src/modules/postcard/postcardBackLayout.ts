@@ -1,5 +1,6 @@
 import {
   POSTCARD_ADDRESS_LINE_COUNT,
+  POSTCARD_ADDRESSEE,
   POSTCARD_FALLBACK_FONT_FAMILY,
   POSTCARD_HAND_FONT_FAMILY,
   POSTCARD_HEIGHT,
@@ -91,17 +92,16 @@ const addressLine = (text: string): PostcardNode =>
   );
 
 /**
- * Server mirror of apps/web PostcardMessage (full-bleed 1200x800 back side), addressed to one recipient.
+ * Server mirror of apps/web PostcardMessage (full-bleed 1200x800 back side).
  * `lines` are already wrapped by `wrapPostcardMessage`.
  */
 export function buildPostcardBackTree(params: {
   lines: string[];
   senderName: string;
-  recipient: string;
   stampSrc: string;
 }): PostcardNode {
   const addressLines = Array.from({ length: POSTCARD_ADDRESS_LINE_COUNT }, (_, index) =>
-    index === 0 ? params.recipient.trim() : "",
+    index === 0 ? POSTCARD_ADDRESSEE : "",
   );
 
   return el(

@@ -91,6 +91,34 @@ describe("haikuService.shareHaikuByEmailForUser (queued postcards)", () => {
     expect(processPostcardEmailJob).not.toHaveBeenCalled();
   });
 
+  it("signs the postcard with the saved full name over the nickname", async () => {
+    authRepository.findUserById.mockResolvedValue({
+      userName: "aki",
+      firstName: " Akira ",
+      lastName: "Tanaka",
+      email: "aki@example.com",
+    });
+
+    await share();
+    expect(postcardBatchRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ senderName: "Akira Tanaka" }),
+    );
+  });
+
+  it("falls back to the nickname when no full name is saved", async () => {
+    authRepository.findUserById.mockResolvedValue({
+      userName: "aki",
+      firstName: "",
+      lastName: "",
+      email: "aki@example.com",
+    });
+
+    await share();
+    expect(postcardBatchRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ senderName: "aki" }),
+    );
+  });
+
   it("queues a single recipient", async () => {
     expect(await share({ recipients: ["a@example.com"] })).toEqual({ ok: true, queuedCount: 1 });
     expect(enqueuePostcardEmails).toHaveBeenCalledWith("batch-1", ["a@example.com"]);

@@ -5,7 +5,7 @@ import { generatePostcardImage } from "@/components/Postcard/generatePostcardIma
 import { useOptionalPostcardTheme } from "@/hooks/usePostcardTheme";
 
 /**
- * Renders the postcard front once for the share email (backs are rendered per recipient by the API).
+ * Renders the postcard front once for the share email (the back is rendered by the API).
  * Resolves undefined when no haiku/theme is available, null when rendering failed (already toasted).
  */
 export function useSharePostcardFront(haiku: HaikuDto | null) {

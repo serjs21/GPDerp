@@ -25,10 +25,10 @@ const resolveSenderName = (user: {
   lastName?: string;
   email?: string;
 }) => {
-  const userName = user.userName?.trim();
-  if (userName) return userName;
   const fullName = `${user.firstName?.trim() ?? ""} ${user.lastName?.trim() ?? ""}`.trim();
   if (fullName) return fullName;
+  const userName = user.userName?.trim();
+  if (userName) return userName;
   const emailPrefix = user.email?.split("@")[0]?.trim();
   return emailPrefix || "Someone";
 };
@@ -458,7 +458,7 @@ export const haikuService = {
     haikuId: string;
     recipients: string[];
     personalMessage: string;
-    /** Browser-rendered postcard front shared by all recipients; backs are rendered per recipient. */
+    /** Browser-rendered postcard front shared by all recipients; the back is rendered on the server. */
     front?: Buffer;
   }): Promise<
     | { ok: true; queuedCount: number }

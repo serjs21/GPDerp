@@ -48,13 +48,12 @@ describe("processPostcardEmailJob", () => {
     mailService.sendEmail.mockResolvedValue(undefined);
   });
 
-  it("renders the recipient's back and sends it with the shared front", async () => {
+  it("renders the batch's back and sends it with the shared front", async () => {
     expect(await processPostcardEmailJob(job)).toBe("sent");
 
     expect(renderer.renderPostcardBackPng).toHaveBeenCalledWith({
       message: "Wish you were here",
       senderName: "Aki",
-      recipient: "a@example.com",
     });
     const mail = mailService.sendEmail.mock.calls[0][0];
     expect(mail.to).toBe("a@example.com");
