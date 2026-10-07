@@ -35,6 +35,9 @@
   pointer-events: none;
   user-select: none;
 }
+.base {
+  left: -5%;
+}
 
 .gavel {
   top: 0;
@@ -55,6 +58,27 @@
   top: var(--odc-base-top);
   width: var(--odc-base-width);
   height: var(--odc-base-height);
+}
+
+.sound {
+  position: absolute;
+  left: var(--odc-sound-left);
+  top: var(--odc-sound-top);
+  width: var(--odc-sound-width);
+  height: auto;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  animation: odcSoundFade var(--odc-sound-fade-ms) ease-out var(--odc-sound-hold-ms) forwards;
+}
+
+@keyframes odcSoundFade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
