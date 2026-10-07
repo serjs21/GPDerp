@@ -41,6 +41,27 @@
   height: var(--odc-stage-height);
 }
 
+/* Clips the enlarged gavel art to the inside of the label border. */
+.artClip {
+  position: absolute;
+  inset: calc(var(--odc-label-stroke) / 2);
+  display: block;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Same box as .stage, scaled about the label centre. */
+.art {
+  position: absolute;
+  left: calc(var(--odc-pad-left) - var(--odc-label-stroke) / 2);
+  top: calc(var(--odc-pad-top) - var(--odc-label-stroke) / 2);
+  display: block;
+  width: var(--odc-stage-width);
+  height: var(--odc-stage-height);
+  transform: scale(var(--odc-art-scale));
+  transform-origin: var(--odc-art-origin-x) var(--odc-art-origin-y);
+}
+
 .gavel,
 .base {
   position: absolute;

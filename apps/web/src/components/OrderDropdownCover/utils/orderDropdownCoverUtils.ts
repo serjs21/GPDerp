@@ -6,7 +6,9 @@ import {
   GAVEL_RETURN_MS,
   GAVEL_STRIKE_MS,
   GAVEL_VIEWBOX,
+  ORDER_COVER_ART_SCALE,
   ORDER_COVER_LABEL_PAD_RATIO,
+  ORDER_COVER_LABEL_STROKE_WIDTH,
   ORDER_DROPDOWN_COVER_STAGE,
 } from "../consts/orderDropdownCoverConsts";
 
@@ -70,12 +72,32 @@ export function coverLabelBox() {
   };
 }
 
+/** Centre of the label box (stage coordinates); the gavel art scales about this point. */
+export function coverArtOrigin() {
+  const box = coverLabelBox();
+  return { x: (box.left + box.right) / 2, y: (box.top + box.bottom) / 2 };
+}
+
+/** Where a stage point is drawn once the art is scaled by ORDER_COVER_ART_SCALE. */
+export function scaleArtPoint(point: { x: number; y: number }) {
+  const origin = coverArtOrigin();
+  return {
+    x: origin.x + (point.x - origin.x) * ORDER_COVER_ART_SCALE,
+    y: origin.y + (point.y - origin.y) * ORDER_COVER_ART_SCALE,
+  };
+}
+
 const rem = (value: number) => `${value}rem`;
 
 export function buildOrderDropdownCoverStyle(widthRem: number): CSSProperties {
   const scale = widthRem / ORDER_DROPDOWN_COVER_STAGE.width;
   const padding = coverLabelPadding();
+  const artOrigin = coverArtOrigin();
   return {
+    "--odc-art-scale": String(ORDER_COVER_ART_SCALE),
+    "--odc-art-origin-x": rem(artOrigin.x * scale),
+    "--odc-art-origin-y": rem(artOrigin.y * scale),
+    "--odc-label-stroke": `${ORDER_COVER_LABEL_STROKE_WIDTH}px`,
     "--odc-stage-width": rem(widthRem),
     "--odc-stage-height": rem(ORDER_DROPDOWN_COVER_STAGE.height * scale),
     "--odc-gavel-height": rem(GAVEL_VIEWBOX.height * scale),

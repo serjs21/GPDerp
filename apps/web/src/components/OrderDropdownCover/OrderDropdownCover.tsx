@@ -141,18 +141,22 @@ export function OrderDropdownCover({
           stretch
         />
       </span>
+      <span className={styles.artClip} aria-hidden>
+        <span className={styles.art}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
+          <img
+            className={styles.gavel}
+            src={GAVEL_SRC}
+            alt=""
+            draggable={false}
+            decoding="async"
+            onTransitionEnd={onGavelTransitionEnd}
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
+          <img className={styles.base} src={GAVEL_BASE_SRC} alt="" draggable={false} decoding="async" />
+        </span>
+      </span>
       <span className={styles.stage} aria-hidden>
-        {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
-        <img
-          className={styles.gavel}
-          src={GAVEL_SRC}
-          alt=""
-          draggable={false}
-          decoding="async"
-          onTransitionEnd={onGavelTransitionEnd}
-        />
-        {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
-        <img className={styles.base} src={GAVEL_BASE_SRC} alt="" draggable={false} decoding="async" />
         {sounds.map((sound) => (
           // eslint-disable-next-line @next/next/no-img-element -- static public SVG
           <img

@@ -11,7 +11,7 @@ import {
   OPEN_SOUND_WIDTH,
   ORDER_DROPDOWN_COVER_STAGE,
 } from "../consts/orderDropdownCoverConsts";
-import { coverLabelBox } from "./orderDropdownCoverUtils";
+import { coverLabelBox, scaleArtPoint } from "./orderDropdownCoverUtils";
 
 /** Centre (stage units) and clockwise rotation of one sound effect. */
 export type OpenSoundPlacement = { cx: number; cy: number; deg: number };
@@ -58,9 +58,19 @@ const LABEL_BOX_POLYGON = rectCorners(
   0,
 );
 
+/** Struck gavel as drawn: scaled about the label centre, then cropped by the label. */
+const GAVEL_TOP_LEFT = scaleArtPoint({ x: 0, y: 0 });
+const GAVEL_BOTTOM_RIGHT = scaleArtPoint({ x: GAVEL_VIEWBOX.width, y: GAVEL_VIEWBOX.height });
+const VISIBLE_GAVEL = {
+  left: Math.max(GAVEL_TOP_LEFT.x, LABEL_BOX.left),
+  top: Math.max(GAVEL_TOP_LEFT.y, LABEL_BOX.top),
+  right: Math.min(GAVEL_BOTTOM_RIGHT.x, LABEL_BOX.right),
+  bottom: Math.min(GAVEL_BOTTOM_RIGHT.y, LABEL_BOX.bottom),
+};
+
 const nearestGavelPoint = (p: Point): Point => ({
-  x: Math.min(Math.max(p.x, 0), GAVEL_VIEWBOX.width),
-  y: Math.min(Math.max(p.y, 0), GAVEL_VIEWBOX.height),
+  x: Math.min(Math.max(p.x, VISIBLE_GAVEL.left), VISIBLE_GAVEL.right),
+  y: Math.min(Math.max(p.y, VISIBLE_GAVEL.top), VISIBLE_GAVEL.bottom),
 });
 
 const distanceToLabelBox = (p: Point) =>
@@ -90,9 +100,10 @@ export function pickOpenSoundPlacement(
 ): OpenSoundPlacement | null {
   const reach = SOUND_HEIGHT / 2 + OPEN_SOUND_GAP + OPEN_SOUND_NEAR;
   const leftMaxY = (LABEL_BOX.top + LABEL_BOX.bottom) / 2;
+  const headRight = Math.min(scaleArtPoint({ x: GAVEL_HEAD_RIGHT, y: 0 }).x, LABEL_BOX.right);
   for (let attempt = 0; attempt < OPEN_SOUND_PLACEMENT_ATTEMPTS; attempt += 1) {
     const center = {
-      x: LABEL_BOX.left - reach + random() * (GAVEL_HEAD_RIGHT - LABEL_BOX.left + reach),
+      x: LABEL_BOX.left - reach + random() * (headRight - LABEL_BOX.left + reach),
       y: LABEL_BOX.top - reach + random() * (leftMaxY - LABEL_BOX.top + reach),
     };
     if (center.x >= LABEL_BOX.left && center.y >= LABEL_BOX.top) continue;
