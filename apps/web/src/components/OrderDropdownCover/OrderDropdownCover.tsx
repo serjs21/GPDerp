@@ -10,6 +10,7 @@ import {
 } from "react";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
+import { useSvgText } from "@/hooks/useSvgText";
 import {
   GAVEL_BASE_SRC,
   GAVEL_SRC,
@@ -24,6 +25,7 @@ import {
 } from "./consts/orderDropdownCoverConsts";
 import type { OrderDropdownCoverProps } from "./OrderDropdownCover.types";
 import styles from "./OrderDropdownCover.module.css";
+import { buildColoredOpenSoundSrc, pickOpenSoundColor } from "./utils/openSoundColorUtils";
 import {
   buildOpenSoundStyle,
   pickOpenSoundPlacement,
@@ -36,7 +38,7 @@ const isPressKey = (event: KeyboardEvent) => event.key === " " || event.key === 
 const prefersReducedMotion = () =>
   typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-type OpenSound = { id: number; placement: OpenSoundPlacement };
+type OpenSound = { id: number; placement: OpenSoundPlacement; src: string };
 
 /**
  * Gavel resting raised above its base; pressing strikes it down onto the base,
@@ -56,6 +58,7 @@ export function OrderDropdownCover({
   const [pressed, setPressed] = useState(false);
   const [sounds, setSounds] = useState<OpenSound[]>([]);
   const soundIdRef = useRef(0);
+  const soundSvgText = useSvgText(OPEN_SOUND_SRC);
   const style = useMemo(() => buildOrderDropdownCoverStyle(widthRem), [widthRem]);
   const labelShape = resolveComicLabelShapePreset(ORDER_COVER_LABEL_SHAPE);
 
@@ -69,7 +72,10 @@ export function OrderDropdownCover({
     }
     if (!placement) return;
     soundIdRef.current += 1;
-    setSounds([...kept, { id: soundIdRef.current, placement }]);
+    const src = soundSvgText
+      ? buildColoredOpenSoundSrc(soundSvgText, pickOpenSoundColor())
+      : OPEN_SOUND_SRC;
+    setSounds([...kept, { id: soundIdRef.current, placement, src }]);
   };
 
   const removeSound = (id: number) => {
@@ -153,7 +159,7 @@ export function OrderDropdownCover({
             key={sound.id}
             className={styles.sound}
             style={buildOpenSoundStyle(sound.placement, widthRem)}
-            src={OPEN_SOUND_SRC}
+            src={sound.src}
             alt=""
             draggable={false}
             decoding="async"

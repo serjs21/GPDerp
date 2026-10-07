@@ -40,11 +40,41 @@ export function raisedGavelOverflow(deg = GAVEL_RAISED_DEG): Insets {
   };
 }
 
+/**
+ * Button padding (stage units) around the stage: raised-gavel headroom plus the label gap,
+ * with the shorter side padded out evenly so the label box is square.
+ */
+export function coverLabelPadding(): Insets {
+  const overflow = raisedGavelOverflow();
+  const gap = ORDER_DROPDOWN_COVER_STAGE.width * ORDER_COVER_LABEL_PAD_RATIO;
+  const width = ORDER_DROPDOWN_COVER_STAGE.width + overflow.left + overflow.right + gap * 2;
+  const height = ORDER_DROPDOWN_COVER_STAGE.height + overflow.top + overflow.bottom + gap * 2;
+  const extraX = Math.max(0, height - width) / 2;
+  const extraY = Math.max(0, width - height) / 2;
+  return {
+    top: overflow.top + gap + extraY,
+    right: overflow.right + gap + extraX,
+    bottom: overflow.bottom + gap + extraY,
+    left: overflow.left + gap + extraX,
+  };
+}
+
+/** Square label box edges in stage coordinates (the stage origin is the struck gavel's top-left). */
+export function coverLabelBox() {
+  const padding = coverLabelPadding();
+  return {
+    left: -padding.left,
+    top: -padding.top,
+    right: ORDER_DROPDOWN_COVER_STAGE.width + padding.right,
+    bottom: ORDER_DROPDOWN_COVER_STAGE.height + padding.bottom,
+  };
+}
+
 const rem = (value: number) => `${value}rem`;
 
 export function buildOrderDropdownCoverStyle(widthRem: number): CSSProperties {
   const scale = widthRem / ORDER_DROPDOWN_COVER_STAGE.width;
-  const overflow = raisedGavelOverflow();
+  const padding = coverLabelPadding();
   return {
     "--odc-stage-width": rem(widthRem),
     "--odc-stage-height": rem(ORDER_DROPDOWN_COVER_STAGE.height * scale),
@@ -52,11 +82,10 @@ export function buildOrderDropdownCoverStyle(widthRem: number): CSSProperties {
     "--odc-base-top": rem(GAVEL_VIEWBOX.height * scale),
     "--odc-base-width": rem(GAVEL_BASE_VIEWBOX.width * scale),
     "--odc-base-height": rem(GAVEL_BASE_VIEWBOX.height * scale),
-    "--odc-pad-top": rem(overflow.top * scale),
-    "--odc-pad-right": rem(overflow.right * scale),
-    "--odc-pad-bottom": rem(overflow.bottom * scale),
-    "--odc-pad-left": rem(overflow.left * scale),
-    "--odc-label-pad": rem(widthRem * ORDER_COVER_LABEL_PAD_RATIO),
+    "--odc-pad-top": rem(padding.top * scale),
+    "--odc-pad-right": rem(padding.right * scale),
+    "--odc-pad-bottom": rem(padding.bottom * scale),
+    "--odc-pad-left": rem(padding.left * scale),
     "--odc-origin-x": `${(GAVEL_PIVOT.x / GAVEL_VIEWBOX.width) * 100}%`,
     "--odc-origin-y": `${(GAVEL_PIVOT.y / GAVEL_VIEWBOX.height) * 100}%`,
     "--odc-raised-deg": `${GAVEL_RAISED_DEG}deg`,

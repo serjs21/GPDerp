@@ -5,13 +5,13 @@ import {
   OPEN_SOUND_FADE_MS,
   OPEN_SOUND_GAP,
   OPEN_SOUND_HOLD_MS,
-  OPEN_SOUND_LEFT_MAX_Y,
   OPEN_SOUND_NEAR,
   OPEN_SOUND_PLACEMENT_ATTEMPTS,
   OPEN_SOUND_VIEWBOX,
   OPEN_SOUND_WIDTH,
   ORDER_DROPDOWN_COVER_STAGE,
 } from "../consts/orderDropdownCoverConsts";
+import { coverLabelBox } from "./orderDropdownCoverUtils";
 
 /** Centre (stage units) and clockwise rotation of one sound effect. */
 export type OpenSoundPlacement = { cx: number; cy: number; deg: number };
@@ -49,11 +49,12 @@ function polygonsOverlap(a: Point[], b: Point[]): boolean {
   return true;
 }
 
-const GAVEL_POLYGON = rectCorners(
-  GAVEL_VIEWBOX.width / 2,
-  GAVEL_VIEWBOX.height / 2,
-  GAVEL_VIEWBOX.width,
-  GAVEL_VIEWBOX.height,
+const LABEL_BOX = coverLabelBox();
+const LABEL_BOX_POLYGON = rectCorners(
+  (LABEL_BOX.left + LABEL_BOX.right) / 2,
+  (LABEL_BOX.top + LABEL_BOX.bottom) / 2,
+  LABEL_BOX.right - LABEL_BOX.left,
+  LABEL_BOX.bottom - LABEL_BOX.top,
   0,
 );
 
@@ -61,6 +62,12 @@ const nearestGavelPoint = (p: Point): Point => ({
   x: Math.min(Math.max(p.x, 0), GAVEL_VIEWBOX.width),
   y: Math.min(Math.max(p.y, 0), GAVEL_VIEWBOX.height),
 });
+
+const distanceToLabelBox = (p: Point) =>
+  Math.hypot(
+    Math.max(LABEL_BOX.left - p.x, 0, p.x - LABEL_BOX.right),
+    Math.max(LABEL_BOX.top - p.y, 0, p.y - LABEL_BOX.bottom),
+  );
 
 const placementPolygon = (placement: OpenSoundPlacement, inflate = 0) =>
   rectCorners(
@@ -72,29 +79,31 @@ const placementPolygon = (placement: OpenSoundPlacement, inflate = 0) =>
   );
 
 /**
- * Random spot above the gavel head or left of its upper half, rotated so the sound
- * effect's bottom points at the nearest point of the struck gavel. Keeps OPEN_SOUND_GAP
- * from the gavel and from every `existing` effect; null when no free spot was found.
+ * Random spot outside the square label, above the gavel head or left of the label's upper
+ * half, rotated so the sound effect's bottom points at the nearest point of the struck gavel.
+ * Keeps OPEN_SOUND_GAP from the label and from every `existing` effect; null when no free
+ * spot was found.
  */
 export function pickOpenSoundPlacement(
   existing: OpenSoundPlacement[],
   random: () => number = Math.random,
 ): OpenSoundPlacement | null {
   const reach = SOUND_HEIGHT / 2 + OPEN_SOUND_GAP + OPEN_SOUND_NEAR;
+  const leftMaxY = (LABEL_BOX.top + LABEL_BOX.bottom) / 2;
   for (let attempt = 0; attempt < OPEN_SOUND_PLACEMENT_ATTEMPTS; attempt += 1) {
     const center = {
-      x: -reach + random() * (GAVEL_HEAD_RIGHT + reach),
-      y: -reach + random() * (OPEN_SOUND_LEFT_MAX_Y + reach),
+      x: LABEL_BOX.left - reach + random() * (GAVEL_HEAD_RIGHT - LABEL_BOX.left + reach),
+      y: LABEL_BOX.top - reach + random() * (leftMaxY - LABEL_BOX.top + reach),
     };
-    if (center.x >= 0 && center.y >= 0) continue;
+    if (center.x >= LABEL_BOX.left && center.y >= LABEL_BOX.top) continue;
+    if (distanceToLabelBox(center) > reach) continue;
     const target = nearestGavelPoint(center);
     const dx = target.x - center.x;
     const dy = target.y - center.y;
-    if (Math.hypot(dx, dy) > reach) continue;
     // CSS rotate(θ) turns the local "down" (0, 1) into (-sin θ, cos θ); aim it at the target.
     const placement = { cx: center.x, cy: center.y, deg: (Math.atan2(-dx, dy) * 180) / Math.PI };
     const footprint = placementPolygon(placement, OPEN_SOUND_GAP);
-    if (polygonsOverlap(footprint, GAVEL_POLYGON)) continue;
+    if (polygonsOverlap(footprint, LABEL_BOX_POLYGON)) continue;
     if (existing.some((other) => polygonsOverlap(footprint, placementPolygon(other)))) continue;
     return placement;
   }

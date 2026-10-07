@@ -2,10 +2,7 @@
   position: relative;
   display: inline-block;
   box-sizing: content-box;
-  padding: calc(var(--odc-pad-top) + var(--odc-label-pad))
-    calc(var(--odc-pad-right) + var(--odc-label-pad))
-    calc(var(--odc-pad-bottom) + var(--odc-label-pad))
-    calc(var(--odc-pad-left) + var(--odc-label-pad));
+  padding: var(--odc-pad-top) var(--odc-pad-right) var(--odc-pad-bottom) var(--odc-pad-left);
   border: none;
   background: none;
   cursor: pointer;
