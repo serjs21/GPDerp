@@ -33,7 +33,7 @@ export const OPEN_SOUND_NEAR = 140;
 export const GAVEL_HEAD_RIGHT = 367;
 /** Placements left of the gavel stay beside its upper half. */
 export const OPEN_SOUND_LEFT_MAX_Y = GAVEL_VIEWBOX.height / 2;
-export const OPEN_SOUND_MAX_COUNT = 3;
+export const OPEN_SOUND_MAX_COUNT = 5;
 export const OPEN_SOUND_PLACEMENT_ATTEMPTS = 60;
 export const OPEN_SOUND_HOLD_MS = 500;
 export const OPEN_SOUND_FADE_MS = 250;

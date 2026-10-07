@@ -49,9 +49,13 @@ export function OrderDropdownCover({
   const style = useMemo(() => buildOrderDropdownCoverStyle(widthRem), [widthRem]);
 
   const showSound = () => {
-    // At the limit the oldest effect makes room for the new one.
-    const kept = sounds.length >= OPEN_SOUND_MAX_COUNT ? sounds.slice(1) : sounds;
-    const placement = pickOpenSoundPlacement(kept.map((sound) => sound.placement));
+    // Drop the oldest effects until the new one is under the limit and has a free spot.
+    let kept = sounds.slice(Math.max(0, sounds.length - OPEN_SOUND_MAX_COUNT + 1));
+    let placement = pickOpenSoundPlacement(kept.map((sound) => sound.placement));
+    while (!placement && kept.length > 0) {
+      kept = kept.slice(1);
+      placement = pickOpenSoundPlacement(kept.map((sound) => sound.placement));
+    }
     if (!placement) return;
     soundIdRef.current += 1;
     setSounds([...kept, { id: soundIdRef.current, placement }]);
