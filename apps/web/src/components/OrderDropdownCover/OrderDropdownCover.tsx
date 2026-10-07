@@ -11,6 +11,7 @@ import {
 import {
   GAVEL_BASE_SRC,
   GAVEL_SRC,
+  OPEN_SOUND_MAX_COUNT,
   OPEN_SOUND_SRC,
   ORDER_DROPDOWN_COVER_WIDTH_REM,
 } from "./consts/orderDropdownCoverConsts";
@@ -18,22 +19,22 @@ import type { OrderDropdownCoverProps } from "./OrderDropdownCover.types";
 import styles from "./OrderDropdownCover.module.css";
 import {
   buildOpenSoundStyle,
-  buildOrderDropdownCoverStyle,
-  pickOpenSoundPosition,
-  type OpenSoundPosition,
-} from "./utils/orderDropdownCoverUtils";
+  pickOpenSoundPlacement,
+  type OpenSoundPlacement,
+} from "./utils/openSoundPlacementUtils";
+import { buildOrderDropdownCoverStyle } from "./utils/orderDropdownCoverUtils";
 
 const isPressKey = (event: KeyboardEvent) => event.key === " " || event.key === "Enter";
 
 const prefersReducedMotion = () =>
   typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-type OpenSound = { id: number; position: OpenSoundPosition };
+type OpenSound = { id: number; placement: OpenSoundPlacement };
 
 /**
  * Gavel resting raised above its base; pressing strikes it down onto the base,
  * releasing (or leaving) swings it back up. Each landed strike pops a sound effect
- * at a random spot top/left of the gavel.
+ * at a random free spot top/left of the gavel, up to OPEN_SOUND_MAX_COUNT at once.
  */
 export function OrderDropdownCover({
   widthRem = ORDER_DROPDOWN_COVER_WIDTH_REM,
@@ -43,13 +44,21 @@ export function OrderDropdownCover({
   onClick,
 }: OrderDropdownCoverProps) {
   const [pressed, setPressed] = useState(false);
-  const [sound, setSound] = useState<OpenSound | null>(null);
+  const [sounds, setSounds] = useState<OpenSound[]>([]);
   const soundIdRef = useRef(0);
   const style = useMemo(() => buildOrderDropdownCoverStyle(widthRem), [widthRem]);
 
   const showSound = () => {
+    // At the limit the oldest effect makes room for the new one.
+    const kept = sounds.length >= OPEN_SOUND_MAX_COUNT ? sounds.slice(1) : sounds;
+    const placement = pickOpenSoundPlacement(kept.map((sound) => sound.placement));
+    if (!placement) return;
     soundIdRef.current += 1;
-    setSound({ id: soundIdRef.current, position: pickOpenSoundPosition() });
+    setSounds([...kept, { id: soundIdRef.current, placement }]);
+  };
+
+  const removeSound = (id: number) => {
+    setSounds((current) => current.filter((sound) => sound.id !== id));
   };
 
   const press = () => {
@@ -107,19 +116,19 @@ export function OrderDropdownCover({
         />
         {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
         <img className={styles.base} src={GAVEL_BASE_SRC} alt="" draggable={false} decoding="async" />
-        {sound ? (
+        {sounds.map((sound) => (
           // eslint-disable-next-line @next/next/no-img-element -- static public SVG
           <img
             key={sound.id}
             className={styles.sound}
-            style={buildOpenSoundStyle(sound.position, widthRem)}
+            style={buildOpenSoundStyle(sound.placement, widthRem)}
             src={OPEN_SOUND_SRC}
             alt=""
             draggable={false}
             decoding="async"
-            onAnimationEnd={() => setSound((current) => (current?.id === sound.id ? null : current))}
+            onAnimationEnd={() => removeSound(sound.id)}
           />
-        ) : null}
+        ))}
       </span>
     </button>
   );

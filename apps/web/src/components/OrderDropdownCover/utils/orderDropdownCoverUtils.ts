@@ -5,14 +5,7 @@ import {
   GAVEL_RAISED_DEG,
   GAVEL_RETURN_MS,
   GAVEL_STRIKE_MS,
-  GAVEL_HEAD_RIGHT,
   GAVEL_VIEWBOX,
-  OPEN_SOUND_FADE_MS,
-  OPEN_SOUND_GAP,
-  OPEN_SOUND_HOLD_MS,
-  OPEN_SOUND_LEFT_MAX_Y,
-  OPEN_SOUND_VIEWBOX,
-  OPEN_SOUND_WIDTH,
   ORDER_DROPDOWN_COVER_STAGE,
 } from "../consts/orderDropdownCoverConsts";
 
@@ -47,34 +40,6 @@ export function raisedGavelOverflow(deg = GAVEL_RAISED_DEG): Insets {
 }
 
 const rem = (value: number) => `${value}rem`;
-
-export type OpenSoundPosition = { x: number; y: number };
-
-/**
- * Random top-left corner (stage units) for the sound effect, either above the gavel head
- * or left of the gavel. Its box always ends OPEN_SOUND_GAP short of the struck gavel's box.
- */
-export function pickOpenSoundPosition(random: () => number = Math.random): OpenSoundPosition {
-  const width = OPEN_SOUND_WIDTH;
-  const height = (OPEN_SOUND_WIDTH * OPEN_SOUND_VIEWBOX.height) / OPEN_SOUND_VIEWBOX.width;
-  if (random() < 0.5) {
-    const right = -OPEN_SOUND_GAP + random() * (GAVEL_HEAD_RIGHT + OPEN_SOUND_GAP);
-    return { x: right - width, y: -OPEN_SOUND_GAP - height };
-  }
-  const bottom = -OPEN_SOUND_GAP + random() * (OPEN_SOUND_LEFT_MAX_Y + OPEN_SOUND_GAP);
-  return { x: -OPEN_SOUND_GAP - width, y: bottom - height };
-}
-
-export function buildOpenSoundStyle(position: OpenSoundPosition, widthRem: number): CSSProperties {
-  const scale = widthRem / ORDER_DROPDOWN_COVER_STAGE.width;
-  return {
-    "--odc-sound-left": rem(position.x * scale),
-    "--odc-sound-top": rem(position.y * scale),
-    "--odc-sound-width": rem(OPEN_SOUND_WIDTH * scale),
-    "--odc-sound-hold-ms": `${OPEN_SOUND_HOLD_MS}ms`,
-    "--odc-sound-fade-ms": `${OPEN_SOUND_FADE_MS}ms`,
-  } as CSSProperties;
-}
 
 export function buildOrderDropdownCoverStyle(widthRem: number): CSSProperties {
   const scale = widthRem / ORDER_DROPDOWN_COVER_STAGE.width;

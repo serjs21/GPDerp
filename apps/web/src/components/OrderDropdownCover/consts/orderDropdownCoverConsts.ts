@@ -25,11 +25,15 @@ export const OPEN_SOUND_SRC = "/nav/open_sound.svg";
 export const OPEN_SOUND_VIEWBOX = { width: 377, height: 243 } as const;
 /** Sound effect width in stage units (the gavel is 783.12 wide). */
 export const OPEN_SOUND_WIDTH = 340;
-/** Minimum clearance (stage units) between the sound effect and the gavel. */
+/** Minimum clearance (stage units) between a sound effect and the gavel or another sound effect. */
 export const OPEN_SOUND_GAP = 30;
-/** Right edge of the gavel head; "above" placements stay over the head, not the handle. */
+/** Extra distance (stage units) beyond OPEN_SOUND_GAP a sound effect may sit from the gavel. */
+export const OPEN_SOUND_NEAR = 140;
+/** Right edge of the gavel head; placements above the gavel stay over the head, not the handle. */
 export const GAVEL_HEAD_RIGHT = 367;
-/** "Left" placements stay beside the upper half of the gavel. */
+/** Placements left of the gavel stay beside its upper half. */
 export const OPEN_SOUND_LEFT_MAX_Y = GAVEL_VIEWBOX.height / 2;
+export const OPEN_SOUND_MAX_COUNT = 3;
+export const OPEN_SOUND_PLACEMENT_ATTEMPTS = 60;
 export const OPEN_SOUND_HOLD_MS = 500;
 export const OPEN_SOUND_FADE_MS = 250;

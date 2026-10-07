@@ -65,7 +65,9 @@
   left: var(--odc-sound-left);
   top: var(--odc-sound-top);
   width: var(--odc-sound-width);
-  height: auto;
+  height: var(--odc-sound-height);
+  transform: rotate(var(--odc-sound-rotate));
+  transform-origin: center;
   display: block;
   pointer-events: none;
   user-select: none;
