@@ -1,5 +1,4 @@
-/** Header nav icon height in px (3.2rem); CSS modules use `3.2rem` for the same size. */
-export const HEADER_NAV_ICON_SIZE_PX = 51.2;
+export const HEADER_NAV_ICON_SIZE_PX = 45;
 
 /** Marks the sticky app header (LayoutProviders + Storybook app layout). */
 export const SITE_HEADER_SELECTOR = "[data-site-header]";

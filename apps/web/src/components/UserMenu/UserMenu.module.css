@@ -21,8 +21,7 @@
   justify-content: flex-start;
   gap: 0.5rem;
   max-width: 100%;
-  /* Match trigger avatar box (3.2rem) so row content shares the same start column. */
-  min-height: 3.2rem;
+  min-height: 2.813rem;
 }
 
 /* Go home: no burst icon; keep the row height of icon rows and indent past the arrow head. */
@@ -31,9 +30,9 @@
   align-items: center;
   justify-content: flex-start;
   max-width: 100%;
-  min-height: 3.2rem;
+  min-height: 2.813rem;
   padding-block: 1rem;
-  padding-inline-start: calc(3.2rem + 0.5rem);
+  padding-inline-start: calc(2.813rem + 0.5rem);
 }
 
 .goHomeOption {
