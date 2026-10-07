@@ -231,12 +231,17 @@ export function BrushMenu({
   const labelElsRef = useRef<(HTMLSpanElement | null)[]>([]);
   const { open, setOpen } = useOpenState(openProp, defaultOpen, onOpenChange);
   const [closing, setClosing] = useState(false);
+  /** Options as they were when closing started; navigation must not swap rows mid-animation. */
+  const [closingOptions, setClosingOptions] = useState<BrushMenuOption[] | null>(
+    null,
+  );
   const [paintOpenHeightPx, setPaintOpenHeightPx] = useState<number | null>(
     null,
   );
   const reducedMotion = useReducedMotion() ?? false;
 
   const panelMounted = open || closing;
+  const displayedOptions = closing && closingOptions ? closingOptions : options;
   const drawPhase: BrushMenuDrawPhase | null = closing
     ? "closing"
     : open
@@ -286,7 +291,7 @@ export function BrushMenu({
       "[data-brush-option]",
     );
     if (option) setPaintOpenHeightPx(option.offsetHeight);
-  }, [triggerBrush, panelMounted, options]);
+  }, [triggerBrush, panelMounted, displayedOptions]);
 
   const requestClose = useCallback(() => {
     if (disabled || closing || !open) return;
@@ -295,12 +300,14 @@ export function BrushMenu({
       setPaintOpenHeightPx(null);
       return;
     }
+    setClosingOptions(options);
     setClosing(true);
     setOpen(false);
-  }, [closing, disabled, open, reducedMotion, setOpen]);
+  }, [closing, disabled, open, options, reducedMotion, setOpen]);
 
   const handleCloseComplete = useCallback(() => {
     setClosing(false);
+    setClosingOptions(null);
     setPaintOpenHeightPx(null);
     triggerBrushPathsRef.current = null;
     brushPathsRef.current = [];
@@ -389,7 +396,7 @@ export function BrushMenu({
     onCloseComplete: handleCloseComplete,
   });
 
-  const triggerLabel = resolveTriggerLabel(options, value, placeholder);
+  const triggerLabel = resolveTriggerLabel(displayedOptions, value, placeholder);
 
   const handleSelect = (nextValue: string) => {
     onChange?.(nextValue);
@@ -471,7 +478,7 @@ export function BrushMenu({
       {panelMounted ? (
         <BrushOptionList
           listId={listId}
-          options={options}
+          options={displayedOptions}
           value={value}
           disabled={disabled}
           placeholder={placeholder}
