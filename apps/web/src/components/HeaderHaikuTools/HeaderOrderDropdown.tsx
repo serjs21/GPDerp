@@ -7,13 +7,13 @@ import {
   ORDER_SORT_DEFAULT_VALUE,
   type OrderSortValue,
 } from "@/components/OrderDropdown";
-import { coverWidthRemForLabelSize } from "@/components/OrderDropdownCover";
-import { HEADER_NAV_ICON_SIZE_PX } from "@/consts/header/siteHeaderConsts";
+import { coverWidthRemForLabelWidth } from "@/components/OrderDropdownCover";
+import { HEADER_TOOL_WIDTH_REM } from "./consts/headerToolConsts";
 import type { HeaderOrderDropdownProps } from "./HeaderOrderDropdown.types";
 import styles from "./HeaderToolButton.module.css";
 
-/** Square gavel label sized to the other header tools. */
-const HEADER_ORDER_COVER_WIDTH_REM = coverWidthRemForLabelSize(HEADER_NAV_ICON_SIZE_PX / 16);
+/** Gavel label as wide as the other header tools. */
+const HEADER_ORDER_COVER_WIDTH_REM = coverWidthRemForLabelWidth(HEADER_TOOL_WIDTH_REM);
 
 /** Header gavel that opens the haiku sort column (UI only — not wired to the feed yet). */
 export function HeaderOrderDropdown({ className }: HeaderOrderDropdownProps) {

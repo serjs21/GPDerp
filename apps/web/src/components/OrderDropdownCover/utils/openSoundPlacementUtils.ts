@@ -1,5 +1,7 @@
 import type { CSSProperties } from "react";
 import {
+  GAVEL_BASE_LEFT_RATIO,
+  GAVEL_BASE_VIEWBOX,
   GAVEL_HEAD_RIGHT,
   GAVEL_VIEWBOX,
   OPEN_SOUND_FADE_MS,
@@ -58,20 +60,31 @@ const LABEL_BOX_POLYGON = rectCorners(
   0,
 );
 
-/** Struck gavel as drawn: scaled about the label centre, then cropped by the label. */
-const GAVEL_TOP_LEFT = scaleArtPoint({ x: 0, y: 0 });
-const GAVEL_BOTTOM_RIGHT = scaleArtPoint({ x: GAVEL_VIEWBOX.width, y: GAVEL_VIEWBOX.height });
-const VISIBLE_GAVEL = {
-  left: Math.max(GAVEL_TOP_LEFT.x, LABEL_BOX.left),
-  top: Math.max(GAVEL_TOP_LEFT.y, LABEL_BOX.top),
-  right: Math.min(GAVEL_BOTTOM_RIGHT.x, LABEL_BOX.right),
-  bottom: Math.min(GAVEL_BOTTOM_RIGHT.y, LABEL_BOX.bottom),
+/** Struck gavel + base as drawn: scaled about the label centre, then cropped by the label. */
+const BASE_LEFT = ORDER_DROPDOWN_COVER_STAGE.width * GAVEL_BASE_LEFT_RATIO;
+const ART_TOP_LEFT = scaleArtPoint({ x: Math.min(0, BASE_LEFT), y: 0 });
+const ART_BOTTOM_RIGHT = scaleArtPoint({
+  x: Math.max(GAVEL_VIEWBOX.width, BASE_LEFT + GAVEL_BASE_VIEWBOX.width),
+  y: ORDER_DROPDOWN_COVER_STAGE.height,
+});
+const VISIBLE_ART = {
+  left: Math.max(ART_TOP_LEFT.x, LABEL_BOX.left),
+  top: Math.max(ART_TOP_LEFT.y, LABEL_BOX.top),
+  right: Math.min(ART_BOTTOM_RIGHT.x, LABEL_BOX.right),
+  bottom: Math.min(ART_BOTTOM_RIGHT.y, LABEL_BOX.bottom),
 };
 
-const nearestGavelPoint = (p: Point): Point => ({
-  x: Math.min(Math.max(p.x, VISIBLE_GAVEL.left), VISIBLE_GAVEL.right),
-  y: Math.min(Math.max(p.y, VISIBLE_GAVEL.top), VISIBLE_GAVEL.bottom),
+const nearestArtPoint = (p: Point): Point => ({
+  x: Math.min(Math.max(p.x, VISIBLE_ART.left), VISIBLE_ART.right),
+  y: Math.min(Math.max(p.y, VISIBLE_ART.top), VISIBLE_ART.bottom),
 });
+
+/** Keeps lettering readable: turns a placement half a turn when it would be upside down. */
+const uprightDeg = (deg: number) => {
+  if (deg > 90) return deg - 180;
+  if (deg < -90) return deg + 180;
+  return deg;
+};
 
 const distanceToLabelBox = (p: Point) =>
   Math.hypot(
@@ -89,30 +102,31 @@ const placementPolygon = (placement: OpenSoundPlacement, inflate = 0) =>
   );
 
 /**
- * Random spot outside the square label, above the gavel head or left of the label's upper
- * half, rotated so the sound effect's bottom points at the nearest point of the struck gavel.
- * Keeps OPEN_SOUND_GAP from the label and from every `existing` effect; null when no free
- * spot was found.
+ * Random spot outside the label, below the gavel head or left of the label's lower half,
+ * rotated so the sound effect's bottom (or top, when the bottom would leave it upside down)
+ * faces the nearest point of the struck gavel and base. Keeps OPEN_SOUND_GAP from the label
+ * and from every `existing` effect; null when no free spot was found.
  */
 export function pickOpenSoundPlacement(
   existing: OpenSoundPlacement[],
   random: () => number = Math.random,
 ): OpenSoundPlacement | null {
   const reach = SOUND_HEIGHT / 2 + OPEN_SOUND_GAP + OPEN_SOUND_NEAR;
-  const leftMaxY = (LABEL_BOX.top + LABEL_BOX.bottom) / 2;
+  const leftMinY = (LABEL_BOX.top + LABEL_BOX.bottom) / 2;
   const headRight = Math.min(scaleArtPoint({ x: GAVEL_HEAD_RIGHT, y: 0 }).x, LABEL_BOX.right);
   for (let attempt = 0; attempt < OPEN_SOUND_PLACEMENT_ATTEMPTS; attempt += 1) {
     const center = {
       x: LABEL_BOX.left - reach + random() * (headRight - LABEL_BOX.left + reach),
-      y: LABEL_BOX.top - reach + random() * (leftMaxY - LABEL_BOX.top + reach),
+      y: leftMinY + random() * (LABEL_BOX.bottom + reach - leftMinY),
     };
-    if (center.x >= LABEL_BOX.left && center.y >= LABEL_BOX.top) continue;
+    if (center.x >= LABEL_BOX.left && center.y <= LABEL_BOX.bottom) continue;
     if (distanceToLabelBox(center) > reach) continue;
-    const target = nearestGavelPoint(center);
+    const target = nearestArtPoint(center);
     const dx = target.x - center.x;
     const dy = target.y - center.y;
     // CSS rotate(θ) turns the local "down" (0, 1) into (-sin θ, cos θ); aim it at the target.
-    const placement = { cx: center.x, cy: center.y, deg: (Math.atan2(-dx, dy) * 180) / Math.PI };
+    const deg = uprightDeg((Math.atan2(-dx, dy) * 180) / Math.PI);
+    const placement = { cx: center.x, cy: center.y, deg };
     const footprint = placementPolygon(placement, OPEN_SOUND_GAP);
     if (polygonsOverlap(footprint, LABEL_BOX_POLYGON)) continue;
     if (existing.some((other) => polygonsOverlap(footprint, placementPolygon(other)))) continue;

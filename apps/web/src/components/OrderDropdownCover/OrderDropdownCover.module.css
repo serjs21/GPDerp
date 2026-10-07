@@ -96,6 +96,7 @@
 }
 
 .sound {
+  z-index: 3;
   position: absolute;
   left: var(--odc-sound-left);
   top: var(--odc-sound-top);
@@ -128,7 +129,7 @@
   user-select: none;
   pointer-events: none;
   opacity: 0;
-  transform: translateY(-110%);
+  transform: translateY(110%);
   transition:
     transform 200ms ease,
     opacity 200ms ease;

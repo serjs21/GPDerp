@@ -10,6 +10,7 @@ import {
   ORDER_COVER_ART_EDGE_MARGIN,
   ORDER_COVER_ART_SCALE,
   ORDER_COVER_ART_SHIFT_X_RATIO,
+  ORDER_COVER_LABEL_ASPECT,
   ORDER_COVER_LABEL_PAD_RATIO,
   ORDER_COVER_LABEL_STROKE_WIDTH,
   ORDER_DROPDOWN_COVER_STAGE,
@@ -47,15 +48,15 @@ export function raisedGavelOverflow(deg = GAVEL_RAISED_DEG): Insets {
 
 /**
  * Button padding (stage units) around the stage: raised-gavel headroom plus the label gap,
- * with the shorter side padded out evenly so the label box is square.
+ * with the short side padded out evenly so the label box has ORDER_COVER_LABEL_ASPECT.
  */
 export function coverLabelPadding(): Insets {
   const overflow = raisedGavelOverflow();
   const gap = ORDER_DROPDOWN_COVER_STAGE.width * ORDER_COVER_LABEL_PAD_RATIO;
   const width = ORDER_DROPDOWN_COVER_STAGE.width + overflow.left + overflow.right + gap * 2;
   const height = ORDER_DROPDOWN_COVER_STAGE.height + overflow.top + overflow.bottom + gap * 2;
-  const extraX = Math.max(0, height - width) / 2;
-  const extraY = Math.max(0, width - height) / 2;
+  const extraX = Math.max(0, height * ORDER_COVER_LABEL_ASPECT - width) / 2;
+  const extraY = Math.max(0, width / ORDER_COVER_LABEL_ASPECT - height) / 2;
   return {
     top: overflow.top + gap + extraY,
     right: overflow.right + gap + extraX,
@@ -64,7 +65,7 @@ export function coverLabelPadding(): Insets {
   };
 }
 
-/** Square label box edges in stage coordinates (the stage origin is the struck gavel's top-left). */
+/** Label box edges in stage coordinates (the stage origin is the struck gavel's top-left). */
 export function coverLabelBox() {
   const padding = coverLabelPadding();
   return {
@@ -75,10 +76,10 @@ export function coverLabelBox() {
   };
 }
 
-/** Stage `widthRem` that renders the square label `labelSizeRem` on a side. */
-export function coverWidthRemForLabelSize(labelSizeRem: number): number {
+/** Stage `widthRem` that renders the label `labelWidthRem` wide. */
+export function coverWidthRemForLabelWidth(labelWidthRem: number): number {
   const box = coverLabelBox();
-  return (labelSizeRem * ORDER_DROPDOWN_COVER_STAGE.width) / (box.right - box.left);
+  return (labelWidthRem * ORDER_DROPDOWN_COVER_STAGE.width) / (box.right - box.left);
 }
 
 /** Centre of the label box (stage coordinates); the gavel art scales about this point. */

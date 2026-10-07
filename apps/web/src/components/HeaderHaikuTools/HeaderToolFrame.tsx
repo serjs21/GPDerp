@@ -3,11 +3,7 @@
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import { HEADER_NAV_ICON_SIZE_PX } from "@/consts/header/siteHeaderConsts";
-import {
-  HEADER_TOOL_FRAME_FILL,
-  HEADER_TOOL_FRAME_STROKE_WIDTH,
-  HEADER_TOOL_PADDING_X,
-} from "./consts/headerToolConsts";
+import { HEADER_TOOL_FRAME_FILL, HEADER_TOOL_FRAME_STROKE_WIDTH } from "./consts/headerToolConsts";
 import type { HeaderToolFrameProps } from "./HeaderToolFrame.types";
 import styles from "./HeaderToolButton.module.css";
 
@@ -30,12 +26,12 @@ export function HeaderToolFrame({
         randomness={sharpShape.randomness}
         seed={sharpShape.id}
         fontSize={HEADER_NAV_ICON_SIZE_PX}
-        paddingX={HEADER_TOOL_PADDING_X}
+        paddingX={0}
         paddingY={0}
         strokeWidth={HEADER_TOOL_FRAME_STROKE_WIDTH}
         fill={HEADER_TOOL_FRAME_FILL}
+        stretch
       >
-        {/* Tight layout sizer; interactive controls overlay in `.panel`. */}
         <span aria-hidden />
       </ComicBurstLabel>
 

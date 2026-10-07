@@ -3,6 +3,7 @@ import {
   GAVEL_BASE_VIEWBOX,
   GAVEL_VIEWBOX,
   OPEN_SOUND_MAX_COUNT,
+  ORDER_COVER_LABEL_ASPECT,
   ORDER_DROPDOWN_COVER_STAGE,
 } from "../consts/orderDropdownCoverConsts";
 import { pickOpenSoundPlacement, type OpenSoundPlacement } from "./openSoundPlacementUtils";
@@ -17,11 +18,11 @@ function seededRandom(seed: number) {
 }
 
 describe("coverLabelPadding", () => {
-  it("pads the button into a square", () => {
+  it("pads the button to the label aspect ratio", () => {
     const padding = coverLabelPadding();
     const width = ORDER_DROPDOWN_COVER_STAGE.width + padding.left + padding.right;
     const height = ORDER_DROPDOWN_COVER_STAGE.height + padding.top + padding.bottom;
-    expect(width).toBeCloseTo(height, 6);
+    expect(width / height).toBeCloseTo(ORDER_COVER_LABEL_ASPECT, 6);
   });
 });
 
@@ -42,8 +43,9 @@ describe("coverArtOffset", () => {
 });
 
 describe("pickOpenSoundPlacement", () => {
-  it("places up to the max count of sound effects outside the label, top/left of it", () => {
+  it("places up to the max count of upright sound effects outside the label, bottom/left of it", () => {
     const box = coverLabelBox();
+    const midY = (box.top + box.bottom) / 2;
     const random = seededRandom(7);
     const placed: OpenSoundPlacement[] = [];
     for (let i = 0; i < OPEN_SOUND_MAX_COUNT; i += 1) {
@@ -51,8 +53,10 @@ describe("pickOpenSoundPlacement", () => {
       if (placement) placed.push(placement);
     }
     expect(placed.length).toBeGreaterThan(0);
-    for (const { cx, cy } of placed) {
-      expect(cx < box.left || cy < box.top).toBe(true);
+    for (const { cx, cy, deg } of placed) {
+      expect(cx < box.left || cy > box.bottom).toBe(true);
+      expect(cy).toBeGreaterThanOrEqual(midY);
+      expect(Math.abs(deg)).toBeLessThanOrEqual(90);
     }
   });
 });

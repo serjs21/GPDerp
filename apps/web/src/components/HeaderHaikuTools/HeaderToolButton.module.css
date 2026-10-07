@@ -12,17 +12,27 @@
   position: relative;
   display: inline-block;
   box-sizing: border-box;
-  /* Match UserMenu avatar comic frame. */
+  /* Width shared with the order gavel (HEADER_TOOL_WIDTH_REM); height matches UserMenu avatar frame. */
+  width: 4rem;
   height: 2.813rem;
   line-height: 0;
   vertical-align: middle;
 }
 
+/* Stretched sharp frame filling the fixed shell. */
 .frame {
+  position: absolute;
+  inset: 0;
   display: block;
   line-height: 0;
   /* Decorative only — interactive panel sits on top. */
   pointer-events: none;
+}
+
+.shell > .frame,
+.shell > .frame svg {
+  width: 100%;
+  height: 100%;
 }
 
 .panel {

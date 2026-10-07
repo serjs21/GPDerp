@@ -30,6 +30,8 @@ export const ORDER_COVER_LABEL_FILL = "#f7f4ef";
 export const ORDER_COVER_LABEL_STROKE = "#000000";
 export const ORDER_COVER_LABEL_STROKE_WIDTH = 3;
 export const ORDER_COVER_LABEL_SEED = "order-dropdown-cover";
+/** Label width ÷ height; matches the 4rem × 45px header tool buttons. */
+export const ORDER_COVER_LABEL_ASPECT = 64 / 45;
 /** Gap between the gavel and the label edge, as a fraction of the stage width. */
 export const ORDER_COVER_LABEL_PAD_RATIO = 0.12;
 /** Gavel + base drawn larger than the layout reserves, scaled about the label centre; the label clips the overflow. */
@@ -44,7 +46,7 @@ export const ORDER_COVER_ART_SHIFT_X_RATIO = 0.1;
 export const OPEN_SOUND_SRC = "/nav/open_sound.svg";
 export const OPEN_SOUND_VIEWBOX = { width: 377, height: 243 } as const;
 /** Sound effect width in stage units (the gavel is 783.12 wide). */
-export const OPEN_SOUND_WIDTH = 640;
+export const OPEN_SOUND_WIDTH = 840;
 /** Minimum clearance (stage units) between a sound effect and the label or another sound effect. */
 export const OPEN_SOUND_GAP = 30;
 /** Extra distance (stage units) beyond OPEN_SOUND_GAP a sound effect may sit from the label. */
