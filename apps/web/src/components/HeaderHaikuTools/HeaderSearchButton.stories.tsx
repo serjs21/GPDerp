@@ -2,11 +2,11 @@
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { withLoggedInAppLayout } from "@/storybook/decorators/withLoggedInAppLayout";
-import { SearchPanel } from "./SearchPanel";
+import { HeaderSearchButton } from "./HeaderSearchButton";
 
 const meta = {
-  title: "Haiku/SearchPanel",
-  component: SearchPanel,
+  title: "Haiku/HeaderSearchButton",
+  component: HeaderSearchButton,
   tags: ["autodocs"],
   decorators: [withLoggedInAppLayout],
   parameters: {
@@ -18,22 +18,16 @@ const meta = {
       },
     },
   },
-} satisfies Meta<typeof SearchPanel>;
+} satisfies Meta<typeof HeaderSearchButton>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Idle: Story = {};
 
-export const HoverFilter: Story = {
+export const Hover: Story = {
   args: {
-    forcedHover: "filter",
-  },
-};
-
-export const HoverSearch: Story = {
-  args: {
-    forcedHover: "search",
+    forcedHover: true,
   },
 };
 

@@ -1,3 +1,13 @@
+.anchor {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: flex-start;
+  align-self: flex-start;
+  height: 2.813rem;
+  line-height: 0;
+}
+
 .shell {
   position: relative;
   display: inline-block;
@@ -16,71 +26,32 @@
 }
 
 .panel {
-  --search-panel-motion: 200ms ease;
+  --header-tool-motion: 200ms ease;
 
   position: absolute;
   inset: 0;
   z-index: 1;
   box-sizing: border-box;
-  display: flex;
-  align-items: stretch;
-  justify-content: stretch;
-  gap: 0;
   margin: 0;
   padding: 0;
+  overflow: hidden;
   /* Re-enable hits inside ComicBurstLabel's pointer-events: none overlay. */
   pointer-events: auto;
 }
 
-.slot {
-  position: relative;
-  flex: 1 1 0;
-  width: auto;
-  min-width: 0;
-  height: 100%;
-  overflow: hidden;
-  box-sizing: border-box;
-  transition: flex-grow var(--search-panel-motion);
-}
-
-.slotLabels {
-  border-right: 1.5px solid #111;
+.panelFilter {
   background-color: var(--hanko-red, #bc002d);
 }
 
-.slotSearch {
-  border-left: 1.5px solid #111;
+.panelSearch {
   background-color: #1a5fb4;
 }
 
-.slotSearchLabels {
+.panelSearchLabels {
   background-color: #ffda86;
 }
 
-.panelSearchOnly .slotSearch {
-  border-left: none;
-}
-
-.panelHoverLabels .slotLabels {
-  flex-grow: 7;
-}
-
-.panelHoverLabels .slotSearch {
-  flex-grow: 3;
-  /* Let the oversized icon keep full size in the compressed slot. */
-  overflow: hidden;
-}
-
-.panelHoverSearch .slotSearch {
-  flex-grow: 7;
-}
-
-.panelHoverSearch .slotLabels {
-  flex-grow: 3;
-  overflow: hidden;
-}
-
-.panelButton {
+.button {
   appearance: none;
   position: relative;
   box-sizing: border-box;
@@ -97,42 +68,42 @@
   pointer-events: auto;
 }
 
-.panelButton:disabled {
+.button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
 
-.panelButton:focus-visible {
+.button:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--accent-red, #c44) 65%, #f7f4ef 30%);
   outline-offset: 1px;
 }
 
-.slotFace {
+.face {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   transition:
-    transform var(--search-panel-motion),
-    opacity var(--search-panel-motion);
+    transform var(--header-tool-motion),
+    opacity var(--header-tool-motion);
 }
 
-.slotFaceFromLeft,
-.slotFaceFromRight {
+.faceFromLeft,
+.faceFromRight {
   z-index: 1;
 }
 
-.slotFaceHidden {
+.faceHidden {
   opacity: 0;
   pointer-events: none;
 }
 
-.slotFaceFromLeft.slotFaceHidden {
+.faceFromLeft.faceHidden {
   transform: translateX(-110%);
 }
 
-.slotFaceFromRight.slotFaceHidden {
+.faceFromRight.faceHidden {
   transform: translateX(110%);
 }
 
@@ -169,27 +140,12 @@
   pointer-events: none;
 }
 
-.iconImgLight {
-  /* tag_white_fill.svg → dark ink on cream label */
-  /* filter: invert(1); */
-}
-
-.searchAnchor {
-  position: relative;
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: flex-start;
-  align-self: flex-start;
-  height: 2.813rem;
-  line-height: 0;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .panel {
-    --search-panel-motion: 0ms;
+    --header-tool-motion: 0ms;
   }
 
-  .slotFaceHidden {
+  .faceHidden {
     transform: none;
   }
 }

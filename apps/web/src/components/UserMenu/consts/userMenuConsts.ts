@@ -17,5 +17,5 @@ export const GUEST_MENU_TRIGGER_SRC = "/nav/default_login.svg";
 
 export const GUEST_MENU_LABEL = "Guest";
 
-/** Cream burst fill matching SearchPanel / GoHome header chrome. */
+/** Cream burst fill matching header tool buttons / GoHome header chrome. */
 export const USER_MENU_TRIGGER_FILL = "#f7f4ef";

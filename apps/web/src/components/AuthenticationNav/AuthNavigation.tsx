@@ -3,7 +3,11 @@
 import { usePathname } from "next/navigation";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { GoHome } from "@/components/GoHome";
-import { SearchPanel } from "@/components/HeaderHaikuTools";
+import {
+  HeaderFilterButton,
+  HeaderOrderDropdown,
+  HeaderSearchButton,
+} from "@/components/HeaderHaikuTools";
 import { GuestMenu } from "@/components/UserMenu";
 import { HeaderPreferences } from "./HeaderPreferences";
 import { LoggedInUserNav } from "./LoggedInUserNav";
@@ -23,7 +27,9 @@ export const AuthNavigation = () => {
           <div className={toolStyles.toolsSlot}>
             <LoggedInUserNav user={user} onLogout={logout} />
             <GoHome />
-            <SearchPanel />
+            <HeaderFilterButton />
+            <HeaderOrderDropdown />
+            <HeaderSearchButton />
           </div>
         ) : onSharePage ? (
           <div className={toolStyles.toolsSlot}>

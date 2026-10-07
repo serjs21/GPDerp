@@ -75,6 +75,12 @@ export function coverLabelBox() {
   };
 }
 
+/** Stage `widthRem` that renders the square label `labelSizeRem` on a side. */
+export function coverWidthRemForLabelSize(labelSizeRem: number): number {
+  const box = coverLabelBox();
+  return (labelSizeRem * ORDER_DROPDOWN_COVER_STAGE.width) / (box.right - box.left);
+}
+
 /** Centre of the label box (stage coordinates); the gavel art scales about this point. */
 export function coverArtOrigin() {
   const box = coverLabelBox();

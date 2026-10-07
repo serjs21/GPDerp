@@ -35,7 +35,7 @@
 }
 
 /*
- * In-flow box that tweens open/closed size (pushes SearchPanel).
+ * In-flow box that tweens open/closed size (pushes the header tools).
  * Holds a fixed avatar slot so the absolute trigger can leave flow.
  */
 .shell {

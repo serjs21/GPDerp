@@ -270,7 +270,7 @@ export function useBrushMenuDrawAnimation(options: {
 
       prepareLabelsHidden(labels);
 
-      // In-flow shell: width only (real width pushes SearchPanel).
+      // In-flow shell: width only (real width pushes the header tools).
       if (sizeEl) {
         sizeEl.style.width = `${closedSize.width}px`;
         sizeEl.style.height = `${closedSize.height}px`;
