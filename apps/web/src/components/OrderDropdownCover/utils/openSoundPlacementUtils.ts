@@ -2,7 +2,6 @@ import type { CSSProperties } from "react";
 import {
   GAVEL_BASE_LEFT_RATIO,
   GAVEL_BASE_VIEWBOX,
-  GAVEL_HEAD_RIGHT,
   GAVEL_VIEWBOX,
   OPEN_SOUND_FADE_MS,
   OPEN_SOUND_GAP,
@@ -86,12 +85,6 @@ const uprightDeg = (deg: number) => {
   return deg;
 };
 
-const distanceToLabelBox = (p: Point) =>
-  Math.hypot(
-    Math.max(LABEL_BOX.left - p.x, 0, p.x - LABEL_BOX.right),
-    Math.max(LABEL_BOX.top - p.y, 0, p.y - LABEL_BOX.bottom),
-  );
-
 const placementPolygon = (placement: OpenSoundPlacement, inflate = 0) =>
   rectCorners(
     placement.cx,
@@ -102,25 +95,21 @@ const placementPolygon = (placement: OpenSoundPlacement, inflate = 0) =>
   );
 
 /**
- * Random spot outside the label, below the gavel head or left of the label's lower half,
- * rotated so the sound effect's bottom (or top, when the bottom would leave it upside down)
- * faces the nearest point of the struck gavel and base. Keeps OPEN_SOUND_GAP from the label
- * and from every `existing` effect; null when no free spot was found.
+ * Random spot left of the label, within its height, rotated so the sound effect's bottom
+ * (or top, when the bottom would leave it upside down) faces the nearest point of the
+ * struck gavel and base. Keeps OPEN_SOUND_GAP from the label and from every `existing`
+ * effect; null when no free spot was found.
  */
 export function pickOpenSoundPlacement(
   existing: OpenSoundPlacement[],
   random: () => number = Math.random,
 ): OpenSoundPlacement | null {
   const reach = SOUND_HEIGHT / 2 + OPEN_SOUND_GAP + OPEN_SOUND_NEAR;
-  const leftMinY = (LABEL_BOX.top + LABEL_BOX.bottom) / 2;
-  const headRight = Math.min(scaleArtPoint({ x: GAVEL_HEAD_RIGHT, y: 0 }).x, LABEL_BOX.right);
   for (let attempt = 0; attempt < OPEN_SOUND_PLACEMENT_ATTEMPTS; attempt += 1) {
     const center = {
-      x: LABEL_BOX.left - reach + random() * (headRight - LABEL_BOX.left + reach),
-      y: leftMinY + random() * (LABEL_BOX.bottom + reach - leftMinY),
+      x: LABEL_BOX.left - reach + random() * reach,
+      y: LABEL_BOX.top + random() * (LABEL_BOX.bottom - LABEL_BOX.top),
     };
-    if (center.x >= LABEL_BOX.left && center.y <= LABEL_BOX.bottom) continue;
-    if (distanceToLabelBox(center) > reach) continue;
     const target = nearestArtPoint(center);
     const dx = target.x - center.x;
     const dy = target.y - center.y;

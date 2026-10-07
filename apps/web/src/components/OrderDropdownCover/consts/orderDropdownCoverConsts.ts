@@ -48,8 +48,6 @@ export const OPEN_SOUND_WIDTH = 840;
 export const OPEN_SOUND_GAP = 30;
 /** Extra distance (stage units) beyond OPEN_SOUND_GAP a sound effect may sit from the label. */
 export const OPEN_SOUND_NEAR = 140;
-/** Right edge of the gavel head; placements above the label stay over the head, not the handle. */
-export const GAVEL_HEAD_RIGHT = 367;
 export const OPEN_SOUND_MAX_COUNT = 5;
 /** Random hue per sound effect; saturation/lightness keep it vivid on light and dark headers. */
 export const OPEN_SOUND_SATURATION = 85;

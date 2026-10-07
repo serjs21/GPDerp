@@ -27,6 +27,8 @@ export type LabelSortProps = {
   categories?: LabelSortCategory[];
   sizeRem?: number;
   disabled?: boolean;
+  /** Panel title (defaults to "Sort by"). */
+  title?: string;
   /** Horizontal (unrotated) title with the sort coins stacked in a column. */
   rotated?: boolean;
   color?: ComicPanelColor;
@@ -46,6 +48,7 @@ export function LabelSort({
   categories: categoriesProp,
   sizeRem = LABEL_SORT_SIZE_REM,
   disabled = false,
+  title = "Sort by",
   rotated = false,
   color = "white",
   background = "solid",
@@ -58,7 +61,7 @@ export function LabelSort({
   const coinSizeRem = rotatedSortCoinSizeRem(clusterWidth, sizeRem);
   return (
     <ComicPagePanel
-      title="Sort by"
+      title={title}
       titleDirection={rotated ? "horizontal" : "vertical"}
       background={background}
       color={color}

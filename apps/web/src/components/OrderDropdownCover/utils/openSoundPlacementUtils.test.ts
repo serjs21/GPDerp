@@ -43,9 +43,8 @@ describe("coverArtOffset", () => {
 });
 
 describe("pickOpenSoundPlacement", () => {
-  it("places up to the max count of upright sound effects outside the label, bottom/left of it", () => {
+  it("places upright sound effects only left of the label", () => {
     const box = coverLabelBox();
-    const midY = (box.top + box.bottom) / 2;
     const random = seededRandom(7);
     const placed: OpenSoundPlacement[] = [];
     for (let i = 0; i < OPEN_SOUND_MAX_COUNT; i += 1) {
@@ -54,8 +53,9 @@ describe("pickOpenSoundPlacement", () => {
     }
     expect(placed.length).toBeGreaterThan(0);
     for (const { cx, cy, deg } of placed) {
-      expect(cx < box.left || cy > box.bottom).toBe(true);
-      expect(cy).toBeGreaterThanOrEqual(midY);
+      expect(cx).toBeLessThan(box.left);
+      expect(cy).toBeGreaterThanOrEqual(box.top);
+      expect(cy).toBeLessThanOrEqual(box.bottom);
       expect(Math.abs(deg)).toBeLessThanOrEqual(90);
     }
   });

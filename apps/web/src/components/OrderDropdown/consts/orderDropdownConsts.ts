@@ -1,5 +1,7 @@
 import type { LabelSortCategory, LabelSortValue } from "@/components/LabelSort";
 
+export const ORDER_SORT_TITLE = "Order by";
+
 export const ORDER_SORT_CATEGORIES: LabelSortCategory[] = [
   {
     id: "creationDate",

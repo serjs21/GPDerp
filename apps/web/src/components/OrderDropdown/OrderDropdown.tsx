@@ -4,7 +4,7 @@ import { useCallback, useId, useRef, useState } from "react";
 import { LabelSort } from "@/components/LabelSort";
 import { OrderDropdownCover } from "@/components/OrderDropdownCover";
 import { useDismissOnOutside } from "@/hooks/useDismissOnOutside";
-import { ORDER_SORT_CATEGORIES } from "./consts/orderDropdownConsts";
+import { ORDER_SORT_CATEGORIES, ORDER_SORT_TITLE } from "./consts/orderDropdownConsts";
 import type { OrderDropdownProps } from "./OrderDropdown.types";
 import styles from "./OrderDropdown.module.css";
 
@@ -44,6 +44,7 @@ export function OrderDropdown({
             value={value}
             onChange={onChange}
             categories={ORDER_SORT_CATEGORIES}
+            title={ORDER_SORT_TITLE}
             rotated
             aria-label={ariaLabel}
           />
