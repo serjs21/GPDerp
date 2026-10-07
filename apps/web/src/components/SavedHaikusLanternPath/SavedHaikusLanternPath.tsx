@@ -6,7 +6,15 @@ import { SVGPath, type SVGPathHandle } from "@/components/SVGPath";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { useHaikuDeleteController } from "@/hooks/useHaikuDeleteController";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useInfiniteHaikusQuery } from "@/hooks/useInfiniteHaikusQuery";
+import { HAIKU_SEARCH_DEBOUNCE_MS } from "./consts/haikuSearchConsts";
+import {
+  filterHaikusByLabels,
+  haikuMatchesSearch,
+  mergeHaikuSearchResults,
+  normalizeHaikuSearch,
+} from "./utils/haikuSearchUtils";
 import styles from "@/components/Lantern/LanternPath/LanternPath.module.css";
 
 export type SavedHaikusLanternPathProps = {
@@ -41,35 +49,45 @@ export const SavedHaikusLanternPath = forwardRef<
     refetch,
   } = useInfiniteHaikusQuery();
 
-  const filteredHaikus = useMemo(() => {
-    let result = haikus;
-    
-    if (searchString) {
-      const lowerSearch = searchString.toLowerCase();
-      result = result.filter((haiku) => haiku.title.toLowerCase().includes(lowerSearch));
-    }
-    
-    if (selectedLabelIds.length > 0) {
-      result = result.filter((haiku) =>
-        haiku.labels.some((label) => selectedLabelIds.includes(label.id)),
-      );
-    }
+  const trimmedSearch = searchString.trim();
+  const isSearching = trimmedSearch !== "";
+  const debouncedSearch = useDebouncedValue(trimmedSearch, HAIKU_SEARCH_DEBOUNCE_MS);
+  const searchQuery = useInfiniteHaikusQuery({
+    q: debouncedSearch,
+    enabled: initialized && isLoggedIn && debouncedSearch !== "",
+  });
 
-    if (excludedLabelIds.length > 0) {
-      result = result.filter(
-        (haiku) =>
-          !haiku.labels.some((label) => excludedLabelIds.includes(label.id)),
-      );
-    }
-    
-    return result;
-  }, [haikus, searchString, selectedLabelIds, excludedLabelIds]);
+  const filteredHaikus = useMemo(() => {
+    if (!isSearching) return filterHaikusByLabels(haikus, selectedLabelIds, excludedLabelIds);
+    const normalizedSearch = normalizeHaikuSearch(trimmedSearch);
+    const matches = (list: typeof haikus) => list.filter((haiku) => haikuMatchesSearch(haiku, normalizedSearch));
+    // API results may still belong to the previous debounced term; re-check them against the current one.
+    const searchResults = debouncedSearch ? matches(searchQuery.haikus) : [];
+    return filterHaikusByLabels(
+      mergeHaikuSearchResults(matches(haikus), searchResults),
+      selectedLabelIds,
+      excludedLabelIds,
+    );
+  }, [haikus, isSearching, trimmedSearch, debouncedSearch, searchQuery.haikus, selectedLabelIds, excludedLabelIds]);
+
+  const searchPending =
+    isSearching && (debouncedSearch !== trimmedSearch || searchQuery.isInitialLoading);
+  const showSearchLoader = searchPending && filteredHaikus.length === 0;
+
+  const pagedQuery = isSearching
+    ? {
+        hasNextPage: searchQuery.hasNextPage,
+        isFetchingNextPage: searchQuery.isFetchingNextPage,
+        fetchNextPage: searchQuery.fetchNextPage,
+      }
+    : { hasNextPage, isFetchingNextPage, fetchNextPage };
 
   const { onHaikuDeleted, onHaikuDeleteFailed, deleteFailedModal } = useHaikuDeleteController();
 
+  const fetchVisibleNextPage = pagedQuery.fetchNextPage;
   const handleVacantQueueSlot = useCallback(() => {
-    fetchNextPage();
-  }, [fetchNextPage]);
+    fetchVisibleNextPage();
+  }, [fetchVisibleNextPage]);
 
   const handleHaikuChanged = useCallback(() => {
     invalidate();
@@ -98,6 +116,14 @@ export const SavedHaikusLanternPath = forwardRef<
     );
   }
 
+  if (showSearchLoader) {
+    return (
+      <div className={styles.flightPathLoader} aria-busy="true" aria-label="Searching haikus">
+        <SakuraPetalLoader />
+      </div>
+    );
+  }
+
   return (
     <>
       <SVGPath
@@ -105,8 +131,8 @@ export const SavedHaikusLanternPath = forwardRef<
         haikus={filteredHaikus}
         generatingDraft={generatingDraft}
         creationChromeOpen={creationChromeOpen}
-        hasNextPage={hasNextPage}
-        isFetchingNextPage={isFetchingNextPage}
+        hasNextPage={pagedQuery.hasNextPage}
+        isFetchingNextPage={pagedQuery.isFetchingNextPage}
         onVacantQueueSlot={handleVacantQueueSlot}
         onHaikuDeleted={onHaikuDeleted}
         onHaikuDeleteFailed={onHaikuDeleteFailed}

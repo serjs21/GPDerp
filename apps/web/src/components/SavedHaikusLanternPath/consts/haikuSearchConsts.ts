@@ -1,0 +1,1 @@
+export const HAIKU_SEARCH_DEBOUNCE_MS = 250;

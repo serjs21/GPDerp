@@ -1,3 +1,4 @@
+import type { Prisma } from "../../generated/prisma";
 import { prismaClient } from "../../lib/prisma";
 import { HAIKU_GENERATION_CREDIT_COST } from "../payments/constants";
 import { trySpendGenerationCreditWithTx } from "../payments/payments.repository";
@@ -48,6 +49,14 @@ type HaikuRowWithLinks = {
     label: { id: string; name: string; color: string; shape: string };
   }>;
 };
+
+function accountsHaikuWhere(accountIds: string[], q?: string): Prisma.HaikuWhereInput {
+  const trimmed = q?.trim();
+  return {
+    accountId: { in: accountIds },
+    ...(trimmed ? { title: { contains: trimmed, mode: "insensitive" as const } } : null),
+  };
+}
 
 function toHaikuWithLabels<T extends HaikuRowWithLinks>(row: T): Omit<T, "haikuLabels"> & {
   labels: HaikuLinkedLabel[];
@@ -122,12 +131,12 @@ export const haikuRepository = {
     });
   },
 
-  async listForAccounts(accountIds: string[], take: number, skip: number) {
+  async listForAccounts(accountIds: string[], take: number, skip: number, q?: string) {
     if (accountIds.length === 0) {
       return [];
     }
     const rows = await prismaClient.haiku.findMany({
-      where: { accountId: { in: accountIds } },
+      where: accountsHaikuWhere(accountIds, q),
       orderBy: { createdAt: "desc" },
       take,
       skip,
@@ -136,12 +145,12 @@ export const haikuRepository = {
     return rows.map(toHaikuWithLabels);
   },
 
-  countForAccounts(accountIds: string[]) {
+  countForAccounts(accountIds: string[], q?: string) {
     if (accountIds.length === 0) {
       return Promise.resolve(0);
     }
     return prismaClient.haiku.count({
-      where: { accountId: { in: accountIds } },
+      where: accountsHaikuWhere(accountIds, q),
     });
   },
 

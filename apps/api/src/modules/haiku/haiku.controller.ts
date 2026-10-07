@@ -290,6 +290,7 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
         accountIdParam,
         pageSize,
         offset,
+        q: q.q?.trim() || undefined,
       });
 
       if (!result.ok) {

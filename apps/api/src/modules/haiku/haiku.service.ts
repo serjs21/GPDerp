@@ -276,6 +276,8 @@ export const haikuService = {
     accountIdParam: string | undefined;
     pageSize: number;
     offset: number;
+    /** Case-insensitive title substring filter. */
+    q?: string;
   }): Promise<
     | { ok: false; reason: "forbidden" }
     | {
@@ -286,7 +288,7 @@ export const haikuService = {
         offset: number;
       }
   > {
-    const { userId, accountIdParam, pageSize, offset } = params;
+    const { userId, accountIdParam, pageSize, offset, q } = params;
 
     let accountIds: string[];
 
@@ -306,8 +308,8 @@ export const haikuService = {
     }
 
     const [items, total] = await Promise.all([
-      haikuRepository.listForAccounts(accountIds, pageSize, offset),
-      haikuRepository.countForAccounts(accountIds),
+      haikuRepository.listForAccounts(accountIds, pageSize, offset, q),
+      haikuRepository.countForAccounts(accountIds, q),
     ]);
 
     return { ok: true, items, total, pageSize, offset };

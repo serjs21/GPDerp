@@ -45,18 +45,21 @@ export type FetchHaikusParams = {
   offset: number;
   pageSize?: number;
   accountId?: string;
+  /** Case-insensitive title search on the API. */
+  q?: string;
 };
 
 /**
  * GET /haiku — authenticated; lists haikus across the user’s workspaces (or filtered by accountId).
  */
 export async function fetchHaikusPage(params: FetchHaikusParams): Promise<HaikuListSuccess> {
-  const { offset, pageSize = HAIKU_LIST_PAGE_SIZE, accountId } = params;
+  const { offset, pageSize = HAIKU_LIST_PAGE_SIZE, accountId, q } = params;
   const { data } = await axios.get<HaikuListResponse>("/haiku", {
     params: {
       offset,
       pageSize,
       ...(accountId !== undefined && accountId !== "" ? { accountId } : {}),
+      ...(q ? { q } : {}),
     },
   });
 
@@ -92,6 +95,9 @@ export async function deleteHaiku(haikuId: string): Promise<void> {
 export const haikuQueryKeys = {
   all: ["haikus"] as const,
   infiniteList: (pageSize: number) => [...haikuQueryKeys.all, "infinite", pageSize] as const,
+  /** Kept apart from `infiniteList` so prepending new haikus only touches the unfiltered list. */
+  searchLists: () => [...haikuQueryKeys.all, "search"] as const,
+  searchList: (pageSize: number, q: string) => [...haikuQueryKeys.searchLists(), pageSize, q] as const,
 };
 
 /**
@@ -151,29 +157,34 @@ export function prependHaikuToInfiniteCache(
   );
 }
 
-/** Remove a haiku from the infinite list cache (optimistic delete). */
+/** Remove a haiku from the infinite list and any search result caches (optimistic delete). */
 export function removeHaikuFromInfiniteCache(
   queryClient: QueryClient,
   pageSize: number,
   haikuId: string,
 ): void {
+  const removeFrom = (old: InfiniteData<HaikuListSuccess, number> | undefined) => {
+    if (!old?.pages?.length) return old;
+    const removed = old.pages.some((page) => page.data.haikus.some((h) => h.id === haikuId));
+    if (!removed) return old;
+    return {
+      ...old,
+      pages: old.pages.map((page) => ({
+        ...page,
+        data: {
+          ...page.data,
+          haikus: page.data.haikus.filter((h) => h.id !== haikuId),
+          total: Math.max(0, page.data.total - 1),
+        },
+      })),
+    };
+  };
   queryClient.setQueryData<InfiniteData<HaikuListSuccess, number>>(
     haikuQueryKeys.infiniteList(pageSize),
-    (old) => {
-      if (!old?.pages?.length) return old;
-      const removed = old.pages.some((page) => page.data.haikus.some((h) => h.id === haikuId));
-      if (!removed) return old;
-      return {
-        ...old,
-        pages: old.pages.map((page) => ({
-          ...page,
-          data: {
-            ...page.data,
-            haikus: page.data.haikus.filter((h) => h.id !== haikuId),
-            total: Math.max(0, page.data.total - 1),
-          },
-        })),
-      };
-    },
+    removeFrom,
+  );
+  queryClient.setQueriesData<InfiniteData<HaikuListSuccess, number>>(
+    { queryKey: haikuQueryKeys.searchLists() },
+    removeFrom,
   );
 }
