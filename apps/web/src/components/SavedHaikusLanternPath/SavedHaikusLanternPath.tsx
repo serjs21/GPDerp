@@ -74,13 +74,16 @@ export const SavedHaikusLanternPath = forwardRef<
     isSearching && (debouncedSearch !== trimmedSearch || searchQuery.isInitialLoading);
   const showSearchLoader = searchPending && filteredHaikus.length === 0;
 
-  const pagedQuery = isSearching
-    ? {
-        hasNextPage: searchQuery.hasNextPage,
-        isFetchingNextPage: searchQuery.isFetchingNextPage,
-        fetchNextPage: searchQuery.fetchNextPage,
-      }
-    : { hasNextPage, isFetchingNextPage, fetchNextPage };
+  // No paging until the debounced term catches up, so typing never triggers list requests.
+  const pagedQuery = !isSearching
+    ? { hasNextPage, isFetchingNextPage, fetchNextPage }
+    : searchPending
+      ? { hasNextPage: false, isFetchingNextPage: false, fetchNextPage: () => {} }
+      : {
+          hasNextPage: searchQuery.hasNextPage,
+          isFetchingNextPage: searchQuery.isFetchingNextPage,
+          fetchNextPage: searchQuery.fetchNextPage,
+        };
 
   const { onHaikuDeleted, onHaikuDeleteFailed, deleteFailedModal } = useHaikuDeleteController();
 

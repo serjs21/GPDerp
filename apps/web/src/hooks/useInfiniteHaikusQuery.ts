@@ -14,21 +14,22 @@ import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 export type UseInfiniteHaikusQueryOptions = {
   pageSize?: number;
   enabled?: boolean;
-  /** Title search sent to the API; empty lists every haiku. */
+  /** Title search sent to the API. Passing it (even empty) uses a separate search cache entry. */
   q?: string;
 };
 
 export function useInfiniteHaikusQuery({
   pageSize = HAIKU_LIST_PAGE_SIZE,
   enabled: enabledOverride,
-  q = "",
+  q,
 }: UseInfiniteHaikusQueryOptions = {}) {
   const { isLoggedIn, initialized } = useAuthenticationState();
   const queryClient = useQueryClient();
   const enabled = enabledOverride ?? (initialized && isLoggedIn);
 
   const query = useInfiniteQuery({
-    queryKey: q ? haikuQueryKeys.searchList(pageSize, q) : haikuQueryKeys.infiniteList(pageSize),
+    queryKey:
+      q !== undefined ? haikuQueryKeys.searchList(pageSize, q) : haikuQueryKeys.infiniteList(pageSize),
     queryFn: ({ pageParam }) =>
       fetchHaikusPage({ offset: pageParam as number, pageSize, q: q || undefined }),
     initialPageParam: 0,
