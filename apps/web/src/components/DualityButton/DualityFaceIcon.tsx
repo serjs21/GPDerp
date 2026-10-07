@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
+import { useInvertedSvgUrl } from "./useInvertedSvgUrl";
 import { useStrokeInvertSvg } from "./utils/strokeInvertSvg";
 import styles from "./DualityButton.module.css";
 
@@ -30,6 +31,7 @@ export function DualityFaceIcon({
   scale = 1,
 }: DualityFaceIconProps) {
   const strokeMarkup = useStrokeInvertSvg(tone === "strokeInvert" ? src : "");
+  const invertedSrc = useInvertedSvgUrl(tone === "image" ? src : "");
   const placeClass = positionClass(position);
   const sizeStyle =
     scale !== 1
@@ -42,7 +44,11 @@ export function DualityFaceIcon({
     return (
       <span className={[styles.icon, styles.iconImage, placeClass].join(" ")} style={sizeStyle} aria-hidden>
         {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
-        <img src={src} alt="" draggable={false} decoding="async" />
+        <img className={styles.imageOnLight} src={src} alt="" draggable={false} decoding="async" />
+        {invertedSrc ? (
+          // eslint-disable-next-line @next/next/no-img-element -- generated SVG data URL
+          <img className={styles.imageOnDark} src={invertedSrc} alt="" draggable={false} decoding="async" />
+        ) : null}
       </span>
     );
   }
