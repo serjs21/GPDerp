@@ -109,6 +109,42 @@
   animation: odcSoundFade var(--odc-sound-fade-ms) ease-out var(--odc-sound-hold-ms) forwards;
 }
 
+/* Matches the header tool buttons' hover name; hidden while striking so the gavel shows. */
+.hoverName {
+  position: absolute;
+  inset: calc(var(--odc-label-stroke) / 2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #111;
+  color: #fff;
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: 0.92rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-110%);
+  transition:
+    transform 200ms ease,
+    opacity 200ms ease;
+}
+
+.root:not(:disabled):hover .hoverName,
+.root:focus-visible .hoverName {
+  opacity: 1;
+  transform: none;
+}
+
+.root[data-pressed="true"] .hoverName {
+  opacity: 0;
+  transform: none;
+}
+
 @keyframes odcSoundFade {
   from {
     opacity: 1;
@@ -121,6 +157,11 @@
 @media (prefers-reduced-motion: reduce) {
   .gavel,
   .root[data-pressed="true"] .gavel {
+    transition: none;
+  }
+
+  .hoverName {
+    transform: none;
     transition: none;
   }
 }

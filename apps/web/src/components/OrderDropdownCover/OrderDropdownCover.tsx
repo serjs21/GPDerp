@@ -16,6 +16,7 @@ import {
   GAVEL_SRC,
   OPEN_SOUND_MAX_COUNT,
   OPEN_SOUND_SRC,
+  ORDER_COVER_HOVER_TEXT,
   ORDER_COVER_LABEL_FILL,
   ORDER_COVER_LABEL_SEED,
   ORDER_COVER_LABEL_SHAPE,
@@ -155,6 +156,9 @@ export function OrderDropdownCover({
           {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
           <img className={styles.base} src={GAVEL_BASE_SRC} alt="" draggable={false} decoding="async" />
         </span>
+      </span>
+      <span className={styles.hoverName} aria-hidden>
+        {ORDER_COVER_HOVER_TEXT}
       </span>
       <span className={styles.stage} aria-hidden>
         {sounds.map((sound) => (

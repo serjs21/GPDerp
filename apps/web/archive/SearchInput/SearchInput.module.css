@@ -1,6 +1,7 @@
 .searchInput {
   min-width: 200px;
   border-radius: 8px;
+  height: 3rem;
 }
 
 .icon {

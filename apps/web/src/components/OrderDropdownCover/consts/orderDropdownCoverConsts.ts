@@ -21,6 +21,9 @@ export const GAVEL_RETURN_MS = 100;
 
 export const ORDER_DROPDOWN_COVER_WIDTH_REM = 4;
 
+/** Action name shown over the label on hover / keyboard focus. */
+export const ORDER_COVER_HOVER_TEXT = "Order";
+
 /** Comic label framing the button; same sharp frame as the other header buttons. */
 export const ORDER_COVER_LABEL_SHAPE = "sharp";
 export const ORDER_COVER_LABEL_FILL = "#f7f4ef";
