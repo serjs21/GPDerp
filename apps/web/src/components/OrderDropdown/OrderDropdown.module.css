@@ -12,6 +12,11 @@
   transform: translateX(-50%);
 }
 
+/* Hidden but laid out, so the coin column keeps its measured size; not focusable or clickable. */
+.menuClosed {
+  visibility: hidden;
+}
+
 /* LabelSort rotated column (gap 1.75rem, bottom padding 0.75rem) plus 1rem each. */
 .menu .cluster {
   gap: 2.75rem;

@@ -38,19 +38,24 @@ export function OrderDropdown({
         aria-haspopup="true"
         onClick={() => setOpen((current) => !current)}
       />
-      {open && !disabled ? (
-        <div id={menuId} className={styles.menu}>
-          <LabelSort
-            value={value}
-            onChange={onChange}
-            categories={ORDER_SORT_CATEGORIES}
-            title={ORDER_SORT_TITLE}
-            clusterClassName={styles.cluster}
-            rotated
-            aria-label={ariaLabel}
-          />
-        </div>
-      ) : null}
+      {/* Stays mounted while closed so the coins keep their pose instead of replaying it on reopen. */}
+      <div
+        id={menuId}
+        className={[styles.menu, open && !disabled ? "" : styles.menuClosed]
+          .filter(Boolean)
+          .join(" ")}
+      >
+        <LabelSort
+          value={value}
+          onChange={onChange}
+          categories={ORDER_SORT_CATEGORIES}
+          title={ORDER_SORT_TITLE}
+          clusterClassName={styles.cluster}
+          rotated
+          disabled={disabled}
+          aria-label={ariaLabel}
+        />
+      </div>
     </div>
   );
 }
