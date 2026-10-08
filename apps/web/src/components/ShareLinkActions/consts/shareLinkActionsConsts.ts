@@ -68,8 +68,8 @@ export const SHARE_LINK_PREVIEW_ACTION_LAYOUTS = {
     caption: PREVIEW_CAPTION_TOP_RIGHT,
   },
   done: {
-    icon: { size: "3.5rem", bottom: "0rem", left: "0.4rem", rotateDeg: 0 },
-    caption: PREVIEW_CAPTION_TOP_RIGHT,
+    icon: { size: "5rem", bottom: "0rem", right: "50%", rotateDeg: 0 },
+    caption: { top: "0.4rem", right: "40%", rotateDeg: 0, fontSize: "1.5rem" },
   },
 } as const satisfies Record<string, ShareLinkActionLayout>;
 
