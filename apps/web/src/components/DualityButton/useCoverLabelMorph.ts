@@ -123,9 +123,11 @@ export function useCoverLabelMorph(
       return () => stopAll(anims);
     }
 
-    if (!expanded && !primedRef.current) {
-      snap(false, cue, titleLine, charCount);
+    // First pose is snapped: the morph only plays on a later open/close, not on mount.
+    if (!primedRef.current) {
+      snap(expanded, cue, titleLine, charCount);
       primedRef.current = true;
+      if (expanded) settledRef.current?.();
       return () => stopAll(anims);
     }
 

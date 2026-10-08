@@ -85,8 +85,10 @@ export function CoverState({
   const [opening, setOpening] = useState(false);
   const [closing, setClosing] = useState(false);
   const [labelMounted, setLabelMounted] = useState(true);
-  /** Matches DualityButton baseWrap clockwise turns after uncover. */
-  const [baseRotateDeg, setBaseRotateDeg] = useState(0);
+  /** Matches DualityButton baseWrap clockwise turns after uncover; starts flipped when mounted open + flipped. */
+  const [baseRotateDeg, setBaseRotateDeg] = useState(() =>
+    uncovered && Boolean(dualityProps.flipped) ? 180 : 0,
+  );
   const prevUncoveredRef = useRef(uncovered);
 
   const snapCovered = useCallback(() => {
