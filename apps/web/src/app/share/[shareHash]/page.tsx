@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { fetchSharedHaikuByHash } from "@/api/shareLink";
 import { NotFoundView } from "@/components/NotFoundView";
 import { formatHaikuTitle } from "@/utils/strings";
@@ -6,7 +7,8 @@ import styles from "./styles.module.css";
 
 export default async function SharedHaikuPage({ params }: { params: Promise<{ shareHash: string }> }) {
   const { shareHash } = await params;
-  const result = await fetchSharedHaikuByHash(shareHash);
+  const accessToken = (await cookies()).get("access_token")?.value;
+  const result = await fetchSharedHaikuByHash(shareHash, accessToken);
 
   /* Not `notFound()`: a throwing server component crashes React's dev perf logging (negative measure timestamp). */
   if (!result.ok) {

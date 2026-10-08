@@ -425,7 +425,11 @@ export const shareLinkService = {
     };
   },
 
-  async resolveSharedHaiku(shareToken: string): Promise<
+  /** `viewerUserId` (optional, from the viewer's session): the creator's own visits are not counted. */
+  async resolveSharedHaiku(
+    shareToken: string,
+    options: { viewerUserId?: string } = {},
+  ): Promise<
     | {
         ok: true;
         haiku: ReturnType<typeof haikuPayload>;
@@ -474,7 +478,8 @@ export const shareLinkService = {
       };
     }
 
-    const updated = await prismaClient.$transaction(async (tx) => {
+    const isCreatorView = options.viewerUserId === row.createdByUserId;
+    const updated = isCreatorView ? row : await prismaClient.$transaction(async (tx) => {
       const current = await tx.shareLink.findUnique({ where: { id: row.id } });
       if (!current) return null;
       if (current.disabled) return null;

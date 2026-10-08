@@ -424,6 +424,22 @@ describe("shareLinkService.resolveSharedHaiku labels", () => {
     }
   });
 
+  it("does not count the creator's own visit", async () => {
+    mockResolve(true);
+    const result = await shareLinkService.resolveSharedHaiku("abc", { viewerUserId: "user-1" });
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.shareLink.viewCount).toBe(0);
+    expect(prismaClient.$transaction).not.toHaveBeenCalled();
+  });
+
+  it("counts visits from other users", async () => {
+    mockResolve(true);
+    const result = await shareLinkService.resolveSharedHaiku("abc", { viewerUserId: "user-2" });
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.shareLink.viewCount).toBe(1);
+    expect(prismaClient.$transaction).toHaveBeenCalledTimes(1);
+  });
+
   it("strips labels when showLabels is off", async () => {
     mockResolve(false);
     const result = await shareLinkService.resolveSharedHaiku("abc");

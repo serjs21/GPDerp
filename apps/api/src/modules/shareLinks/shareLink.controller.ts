@@ -1,6 +1,7 @@
 import fp from "fastify-plugin";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { isUuid } from "../../utils/uuid";
+import { diagnoseAccessTokenFromRequest } from "../auth/verifyAccessToken";
 import { shareLinkService, type ShareLinkListItem } from "./shareLink.service";
 import {
   parseShareLinkSortCategoryId,
@@ -354,7 +355,11 @@ const shareLinkPluginImpl = async (app: FastifyInstance) => {
       return;
     }
 
-    const result = await shareLinkService.resolveSharedHaiku(token);
+    // Public route: a session is optional and only used to skip counting the creator's own visits.
+    const viewer = await diagnoseAccessTokenFromRequest(req);
+    const result = await shareLinkService.resolveSharedHaiku(token, {
+      viewerUserId: viewer.ok ? viewer.userId : undefined,
+    });
     if (result.shareLink && result.createdByUserId) {
       broadcastShareLink(app, result.createdByUserId, result.shareLink);
     }

@@ -17,9 +17,14 @@ const apiBaseUrl = (): string =>
   process.env.NEXT_PUBLIC_API_BASE_URL ??
   (typeof process.env.API_BASE_URL === "string" ? process.env.API_BASE_URL : "http://localhost:4000");
 
-export const fetchSharedHaikuByHash = async (shareHash: string): Promise<FetchSharedHaikuResult> => {
+/** `accessToken` (the viewer's `access_token` cookie) lets the API skip counting the creator's own visits. */
+export const fetchSharedHaikuByHash = async (
+  shareHash: string,
+  accessToken?: string,
+): Promise<FetchSharedHaikuResult> => {
   const res = await fetch(`${apiBaseUrl()}/share_link/${encodeURIComponent(shareHash)}`, {
     cache: "no-store",
+    headers: accessToken ? { cookie: `access_token=${encodeURIComponent(accessToken)}` } : undefined,
   });
 
   const raw: unknown = await res.json().catch(() => null);
