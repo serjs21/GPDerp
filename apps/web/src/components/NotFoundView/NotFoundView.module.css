@@ -13,7 +13,6 @@
   overflow-x: clip;
 }
 
-/* Shrink-wraps to the copy bubble (widest child) so the toast can share its start edge. */
 .stack {
   display: grid;
   justify-items: center;
@@ -22,13 +21,11 @@
   max-width: 100%;
 }
 
-/* Same enter as ComicToast items; the lantern fly-in waits for it. */
 .toast {
   justify-self: start;
   max-width: 100%;
 }
 
-/* Toast `.toastContent` type, single line. */
 .toastText {
   display: block;
   flex: none;

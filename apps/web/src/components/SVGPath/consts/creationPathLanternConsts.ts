@@ -20,4 +20,4 @@ export const CREATION_PATH_LANTERN_ABOVE_CHROME_Z_INDEX = 1001;
  * Near-path list scroll-back to creation focus and creation lantern fly-in share
  * this duration and start together (same tween progress).
  */
-export const CREATION_ENTER_MS = 1500;
+export const CREATION_ENTER_MS = 2500;
