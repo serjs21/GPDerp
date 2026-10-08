@@ -21,6 +21,11 @@ export type ComicDialogContentProps = {
   contentClassName?: string;
   style?: CSSProperties;
   backgroundColors?: string[];
+  /**
+   * Change to re-measure the bubble. ResizeObserver misses transform changes, so a bubble
+   * mounted mid scale-animation keeps a wrong frame until this changes.
+   */
+  layoutKey?: string | number;
 };
 
 const ComicDialogContentInner = forwardRef<HTMLDivElement, ComicDialogContentProps>(
@@ -56,6 +61,7 @@ export const ComicDialogContent = forwardRef<HTMLDivElement, ComicDialogContentP
       contentClassName,
       style,
       backgroundColors,
+      layoutKey,
     },
     ref,
   ) {
@@ -106,7 +112,7 @@ export const ComicDialogContent = forwardRef<HTMLDivElement, ComicDialogContentP
       <ComicBubbleStage
         ref={stageRef}
         active
-        targetsKey={`dialog:${bubbleStyle}:${sourceDirection}:${labelKey}`}
+        targetsKey={`dialog:${bubbleStyle}:${sourceDirection}:${labelKey}:${layoutKey ?? ""}`}
         getTargets={getTargets}
         className={[stageStyles.stage, styles.stageStandalone, stagePaddingClass, className]
           .filter(Boolean)
