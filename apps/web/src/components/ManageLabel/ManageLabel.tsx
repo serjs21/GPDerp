@@ -15,6 +15,7 @@ import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLa
 import { ComicLabelCreationModal } from "@/components/ComicLabelCreationModal";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import { ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
+import { ComicPressButton } from "@/components/ComicPressButton";
 import { comicToast } from "@/components/ComicToast";
 import { MfgDate } from "@/components/MfgDate";
 import { OverlayTitle } from "@/components/OverlayTitle";
@@ -253,8 +254,7 @@ export function ManageLabel({
           <ComicPageRow className={styles.strip}>
             <div className={styles.labelSlot}>
               <OverlayTitle title="Edit" direction="bottom">
-                <button
-                  type="button"
+                <ComicPressButton
                   className={styles.overlayAction}
                   onClick={() => setEditOpen(true)}
                   aria-label={`Edit label ${label.name}`}
@@ -281,21 +281,20 @@ export function ManageLabel({
                       </div>
                     </div>
                   </ComicPagePanel>
-                </button>
+                </ComicPressButton>
               </OverlayTitle>
             </div>
 
             <div className={styles.connectedSlot}>
               {hasConnections ? (
                 <OverlayTitle title="Tune in" direction="bottom">
-                  <button
-                    type="button"
+                  <ComicPressButton
                     className={styles.overlayAction}
                     onClick={handleTuneIn}
                     aria-label={`Tune in to haikus labeled ${label.name}`}
                   >
                     {connectedPanel}
-                  </button>
+                  </ComicPressButton>
                 </OverlayTitle>
               ) : (
                 connectedPanel

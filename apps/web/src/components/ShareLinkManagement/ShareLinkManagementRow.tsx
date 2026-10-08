@@ -7,6 +7,7 @@ import { deleteShareLink, type ShareLinkListItem } from "@/api/shareLinks";
 import type { HaikuDto } from "@/api/haikus";
 import { ComicConfirmModal } from "@/components/ComicConfirmModal";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
+import { ComicPressButton } from "@/components/ComicPressButton";
 import { comicToast } from "@/components/ComicToast";
 import { ShareLinkActions, ShareLinkUpdateAction } from "@/components/ShareLinkActions";
 import { MfgDate } from "@/components/MfgDate";
@@ -248,14 +249,13 @@ export function ShareLinkManagementRow({
       >
         {ctrl.copyEnabled ? (
           <OverlayTitle title="Copy link!" direction="bottom" className={styles.lanternSlot}>
-            <button
-              type="button"
+            <ComicPressButton
               className={styles.lanternCopy}
               onClick={ctrl.onCopy}
               aria-label={`Copy share link for ${ctrl.subject}`}
             >
               {lanternPanel}
-            </button>
+            </ComicPressButton>
           </OverlayTitle>
         ) : (
           lanternPanel
