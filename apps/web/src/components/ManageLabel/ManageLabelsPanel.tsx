@@ -98,9 +98,8 @@ export function ManageLabelsPanel({
   /** Keep deleted rows mounted through boingOutDown after query invalidation. */
   const [exitingById, setExitingById] = useState<Record<string, LabelDto>>({});
   const searchRef = useRef<HTMLInputElement>(null);
-  const knownIdsRef = useRef<Set<string> | null>(null);
-  /** Rows arriving from a next-page load are existing labels, not new ones. */
-  const loadingMoreRef = useRef(false);
+  /** Labels created here that haven't reached the list yet; only these get the enter animation + scroll. */
+  const pendingCreatedIdsRef = useRef<Set<string>>(new Set());
   const displayOrderRef = useRef<string[]>([]);
   const queryClient = useQueryClient();
 
@@ -116,7 +115,7 @@ export function ManageLabelsPanel({
     if (!active) {
       setSearchInput("");
       setDebouncedQ("");
-      knownIdsRef.current = null;
+      pendingCreatedIdsRef.current.clear();
       displayOrderRef.current = [];
       setEnterDelays({});
       setExitingById({});
@@ -146,7 +145,6 @@ export function ManageLabelsPanel({
   });
 
   const loadMore = useCallback(() => {
-    loadingMoreRef.current = true;
     void fetchNextPage();
   }, [fetchNextPage]);
 
@@ -186,28 +184,15 @@ export function ManageLabelsPanel({
   }, []);
 
   useEffect(() => {
-    if (!active || isPagedLoading) return;
-    const currentIds = pagedLabels.map((label) => label.id);
-    const currentSet = new Set(currentIds);
-
-    if (knownIdsRef.current == null) {
-      knownIdsRef.current = currentSet;
-      return;
-    }
-
-    if (loadingMoreRef.current) {
-      if (isFetchingNextPage) return;
-      loadingMoreRef.current = false;
-      knownIdsRef.current = currentSet;
-      return;
-    }
-
-    const addedInListOrder = currentIds.filter((id) => !knownIdsRef.current!.has(id));
-    if (addedInListOrder.length > 0) {
-      scheduleEnterAnimations(addedInListOrder);
-    }
-    knownIdsRef.current = currentSet;
-  }, [active, isPagedLoading, isFetchingNextPage, pagedLabels, scheduleEnterAnimations]);
+    const pending = pendingCreatedIdsRef.current;
+    if (!active || isPagedLoading || pending.size === 0) return;
+    const arrivedInListOrder = pagedLabels
+      .map((label) => label.id)
+      .filter((id) => pending.has(id));
+    if (arrivedInListOrder.length === 0) return;
+    for (const id of arrivedInListOrder) pending.delete(id);
+    scheduleEnterAnimations(arrivedInListOrder);
+  }, [active, isPagedLoading, pagedLabels, scheduleEnterAnimations]);
 
   const refresh = useCallback(() => {
     void queryClient.invalidateQueries({
@@ -215,6 +200,14 @@ export function ManageLabelsPanel({
     });
     void fetch(true);
   }, [accountId, fetch, queryClient]);
+
+  const handleCreated = useCallback(
+    (label: LabelDto) => {
+      pendingCreatedIdsRef.current.add(label.id);
+      refresh();
+    },
+    [refresh],
+  );
 
   const clearEnterAnimation = useCallback((labelId: string) => {
     setEnterDelays((prev) => {
@@ -271,7 +264,7 @@ export function ManageLabelsPanel({
     showCreate && !isPagedLoading ? (
       <ManageLabelCreatePanel
         accountId={accountId}
-        onCreated={() => refresh()}
+        onCreated={handleCreated}
         stretch={showSort}
         className={createClassName}
       />
