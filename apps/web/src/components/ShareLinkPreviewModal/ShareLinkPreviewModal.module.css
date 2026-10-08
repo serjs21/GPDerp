@@ -6,6 +6,16 @@
 /* Height comes from shareLinkPreviewPanelStyle(). */
 .panel {
   flex: 0 0 auto;
+  height: var(--share-link-preview-panel-height);
+}
+
+/* Full-screen dialog (ComicPageDialog ≤1024px): panel fills the space above the footer. */
+@media (max-width: 1024px) {
+  .panel {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: var(--share-link-preview-panel-height);
+  }
 }
 
 /* Preview-only: labels stay placeable but read as hidden on the public page. */
@@ -15,7 +25,8 @@
 }
 
 .footerActions {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
   width: 100%;
 }
@@ -23,10 +34,13 @@
 /* Icon/caption placement: SHARE_LINK_PREVIEW_ACTION_LAYOUTS. */
 .footerAction {
   display: flex;
-  flex: 1 1 0;
   flex-direction: column;
   min-width: 0;
   height: 6rem;
+}
+
+.footerActionWide {
+  grid-column: 1 / -1;
 }
 
 /* Nested selector outranks the default `.caption` / `.captionLabels` rules. */

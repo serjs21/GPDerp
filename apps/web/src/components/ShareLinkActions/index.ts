@@ -12,4 +12,7 @@ export { ShareLinkEditLabelsAction } from "./ShareLinkEditLabelsAction";
 export type { ShareLinkEditLabelsActionProps } from "./ShareLinkEditLabelsAction.types";
 export { ShareLinkDoneAction } from "./ShareLinkDoneAction";
 export type { ShareLinkDoneActionProps } from "./ShareLinkDoneAction.types";
-export { SHARE_LINK_PREVIEW_LABELS_TOGGLE_LAYOUTS } from "./consts/shareLinkActionsConsts";
+export {
+  SHARE_LINK_PREVIEW_ACTION_LAYOUTS,
+  SHARE_LINK_PREVIEW_LABELS_TOGGLE_LAYOUTS,
+} from "./consts/shareLinkActionsConsts";

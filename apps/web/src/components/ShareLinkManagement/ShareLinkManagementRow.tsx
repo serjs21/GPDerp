@@ -333,6 +333,7 @@ export function ShareLinkManagementRow({
           open={previewOpen}
           onOpenChange={setPreviewOpen}
           subject={ctrl.subject}
+          shareUrl={link.shareUrl}
           haiku={haiku}
           loading={haikuLoading}
           showLabels={showLabels}

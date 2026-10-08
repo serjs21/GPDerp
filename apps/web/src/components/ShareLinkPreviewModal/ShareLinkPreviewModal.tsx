@@ -8,9 +8,11 @@ import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import {
+  SHARE_LINK_PREVIEW_ACTION_LAYOUTS,
   SHARE_LINK_PREVIEW_LABELS_TOGGLE_LAYOUTS,
   ShareLinkDoneAction,
   ShareLinkEditLabelsAction,
+  ShareLinkGoToLinkAction,
   ShareLinkLabelsToggle,
 } from "@/components/ShareLinkActions";
 import { useHaikuLabelPlacement } from "@/hooks/useHaikuLabelPlacement";
@@ -22,6 +24,7 @@ export function ShareLinkPreviewModal({
   open,
   onOpenChange,
   subject,
+  shareUrl,
   haiku,
   loading = false,
   showLabels,
@@ -68,6 +71,15 @@ export function ShareLinkPreviewModal({
               />
             </div>
             <div className={styles.footerAction}>
+              <ShareLinkGoToLinkAction
+                subject={subject}
+                shareUrl={shareUrl ?? ""}
+                disabled={!shareUrl}
+                layout={SHARE_LINK_PREVIEW_ACTION_LAYOUTS.followLink}
+                captionClassName={styles.footerCaption}
+              />
+            </div>
+            <div className={[styles.footerAction, styles.footerActionWide].join(" ")}>
               <ShareLinkDoneAction
                 subject={subject}
                 onDone={() => onOpenChange(false)}

@@ -63,6 +63,10 @@ export const SHARE_LINK_PREVIEW_ACTION_LAYOUTS = {
     icon: { size: "3.5rem", bottom: "0rem", left: "0.4rem", rotateDeg: 0 },
     caption: PREVIEW_CAPTION_TOP_RIGHT,
   },
+  followLink: {
+    icon: { size: "3.5rem", bottom: "0rem", left: "0.4rem", rotateDeg: 0 },
+    caption: PREVIEW_CAPTION_TOP_RIGHT,
+  },
   done: {
     icon: { size: "3.5rem", bottom: "0rem", left: "0.4rem", rotateDeg: 0 },
     caption: PREVIEW_CAPTION_TOP_RIGHT,

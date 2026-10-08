@@ -15,13 +15,16 @@ export function ShareLinkGoToLinkAction({
   subject,
   shareUrl,
   captionClassName,
+  layout = SHARE_LINK_ACTION_LAYOUTS.followLink,
+  disabled,
 }: ShareLinkGoToLinkActionProps) {
   return (
     <ShareLinkActionButton
       src={SHARE_LINK_ACTION_ICONS.followLink}
       caption="Follow the link"
       captionClassName={[styles.captionLabels, captionClassName].filter(Boolean).join(" ")}
-      layout={SHARE_LINK_ACTION_LAYOUTS.followLink}
+      layout={layout}
+      disabled={disabled}
       rowLayout={SHARE_LINK_ACTION_ROW_LAYOUTS.followLink}
       ariaLabel={`Open share link for ${subject} in a new tab`}
       color={SHARE_LINK_ACTION_COLORS.followLink.panel}

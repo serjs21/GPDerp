@@ -311,6 +311,7 @@ export function ShareLink({
         open={previewOpen}
         onOpenChange={setPreviewOpen}
         subject={ctrl.subject}
+        shareUrl={link?.shareUrl}
         haiku={haiku ?? undefined}
         showLabels={showLabels}
         togglingLabels={ctrl.togglingLabels}
