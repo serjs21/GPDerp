@@ -1,7 +1,7 @@
 "use client";
 
 import { animate } from "animejs";
-import { useEffect, useRef, type RefObject } from "react";
+import { useLayoutEffect, useRef, type RefObject } from "react";
 import { COVER_LABEL_MORPH_MS } from "./consts/dualityButtonConsts";
 import {
   coverLabelArrowRestDeg,
@@ -108,7 +108,8 @@ export function useCoverLabelMorph(
   const settledRef = useRef(onSettled);
   settledRef.current = onSettled;
 
-  useEffect(() => {
+  // Layout effect so the snapped first pose is in place before the first paint.
+  useLayoutEffect(() => {
     const anims: AnimLike[] = [];
     const cue = cueRef.current;
     const titleLine = titleLineRef.current;

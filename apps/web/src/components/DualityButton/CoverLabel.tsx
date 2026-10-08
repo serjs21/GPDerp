@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   COVER_LABEL_ARC_GAP_REM,
   DUALITY_BUTTON_DIRECTION_SRC,
@@ -55,6 +55,13 @@ export function CoverLabel({
   const chars = Array.from(title);
   const angles = coverLabelCharAngles(chars.length);
   const fontSizeRem = coverLabelFontSizeRem(chars.length, sizeRem);
+  // Arrow transform transition stays off until after the first frame so the mount pose never tweens.
+  const [trackingReady, setTrackingReady] = useState(false);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => setTrackingReady(true));
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
 
   useCoverLabelMorph(
     expanded,
@@ -100,7 +107,7 @@ export function CoverLabel({
         <span
           className={[
             styles.arrowSlot,
-            followBaseRotate ? styles.arrowSlotTracking : "",
+            followBaseRotate && trackingReady ? styles.arrowSlotTracking : "",
           ]
             .filter(Boolean)
             .join(" ")}
