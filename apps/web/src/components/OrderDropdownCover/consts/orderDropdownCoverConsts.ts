@@ -25,7 +25,7 @@ export const ORDER_DROPDOWN_COVER_WIDTH_REM = 4;
 export const ORDER_COVER_LABEL_SHAPE = "sharp";
 export const ORDER_COVER_LABEL_FILL = "#f7f4ef";
 export const ORDER_COVER_LABEL_STROKE = "#000000";
-export const ORDER_COVER_LABEL_STROKE_WIDTH = 3;
+export const ORDER_COVER_LABEL_STROKE_WIDTH = 2;
 export const ORDER_COVER_LABEL_SEED = "order-dropdown-cover";
 /** Label width ÷ height; matches the 4rem × 45px header tool buttons. */
 export const ORDER_COVER_LABEL_ASPECT = 64 / 45;
