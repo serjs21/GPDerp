@@ -559,16 +559,16 @@
       "editAriaLabel": "Edit label {name}",
       "tuneIn": "Tune in",
       "tuneInAriaLabel": "Tune in to haikus labeled {name}",
-      "deleteQuestion": "Delete this label?",
-      "cancel": "Not yet",
-      "confirmDelete": "Delete"
+      "deleteQuestion": "What's the plan?",
+      "cancel": "How did I get here?",
+      "confirmDelete": "Make it quick"
     },
     "createPanel": {
       "ariaLabel": "Create new label",
       "create": "Create"
     },
     "connectedHaikus": {
-      "connected": "{total} connected",
+      "connected": "{total, plural, one {# connection} other {# connections}}",
       "ariaLabel": "Haikus labeled {name}"
     },
     "labelActions": {
