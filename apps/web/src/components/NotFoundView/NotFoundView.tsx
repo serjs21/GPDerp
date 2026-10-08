@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { useAuthenticationVerification } from "@/app/providers/AuthenticationVerificationProvider";
@@ -25,8 +24,6 @@ export function NotFoundView({ className }: NotFoundViewProps) {
   const t = useTranslations("NotFoundView");
   const { initialized, isLoggedIn } = useAuthenticationState();
   const { openAuthenticationModal } = useAuthenticationVerification();
-  const [toastSettled, setToastSettled] = useState(false);
-
   return (
     <section
       className={[styles.root, initialized && styles.animate, className].filter(Boolean).join(" ")}
@@ -34,19 +31,12 @@ export function NotFoundView({ className }: NotFoundViewProps) {
       aria-labelledby="not-found-copy"
     >
       <div className={styles.stack}>
-        <div
-          className={[styles.toast, initialized && "magictime puffIn"].filter(Boolean).join(" ")}
-          role="status"
-          onAnimationEnd={(event) => {
-            if (event.target === event.currentTarget) setToastSettled(true);
-          }}
-        >
+        <div className={styles.toast} role="status">
           <ComicDialogContent
             bubbleStyle={SUCCESS_TONE.bubbleStyle}
             backgroundColors={SUCCESS_TONE.backgroundColors}
             className={[dialogStyles.previewStage, styles.bubbleStage].join(" ")}
             contentClassName={styles.toastText}
-            layoutKey={toastSettled ? "settled" : "entering"}
           >
             {t(NOT_FOUND_TOAST_COPY)}
           </ComicDialogContent>
