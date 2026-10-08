@@ -29,6 +29,8 @@ export type CoverStateProps = {
   iconSrc: string;
   /** Title in the direction-arrow slot; morphs into the arrow on open. */
   title: string;
+  /** Fixed title font size (rem) so sibling coins can share one size. */
+  titleFontSizeRem?: number;
   /**
    * Face + CoverIcon diameter in rem. CoverIcon and DualityButton share this
    * via `--duality-face-size` (default 4.25).
@@ -65,6 +67,7 @@ function prefersReducedMotion() {
 export function CoverState({
   iconSrc,
   title,
+  titleFontSizeRem,
   sizeRem = DUALITY_BUTTON_SIZE_REM,
   uncovered: uncoveredProp,
   defaultUncovered = false,
@@ -260,6 +263,7 @@ export function CoverState({
           title={title}
           expanded={labelExpanded}
           sizeRem={sizeRem}
+          fontSizeRem={titleFontSizeRem}
           uncoverMs={labelMorphMs}
           baseRotateDeg={labelBaseRotateDeg}
           baseRotateMs={DUALITY_BUTTON_FLIP_MS}

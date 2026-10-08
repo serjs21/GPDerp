@@ -2,7 +2,7 @@ import type { ShareLinkDeactivationReason } from "../../generated/prisma";
 
 export type ShareLinkSortCategoryId =
   | "creationDate"
-  | "alpacabeth"
+  | "alpacabet"
   | "hitsLeft"
   | "timeLeft";
 
@@ -89,7 +89,7 @@ function compareAsc(
   switch (categoryId) {
     case "creationDate":
       return compareCreatedAtAsc(a, b);
-    case "alpacabeth":
+    case "alpacabet":
       return a.haikuSubject.localeCompare(b.haikuSubject, undefined, {
         sensitivity: "base",
       });
@@ -154,7 +154,7 @@ export function sortShareLinkRows<T extends ShareLinkSortableRow>(
 
 export const SHARE_LINK_SORT_CATEGORY_IDS = [
   "creationDate",
-  "alpacabeth",
+  "alpacabet",
   "hitsLeft",
   "timeLeft",
 ] as const satisfies readonly ShareLinkSortCategoryId[];

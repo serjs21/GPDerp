@@ -20,6 +20,8 @@ export type CoverLabelProps = {
   expanded: boolean;
   /** Face diameter in rem — used to size the concentric title arc. */
   sizeRem?: number;
+  /** Fixed title font size (rem); defaults to fitting this title's length on the arc. */
+  fontSizeRem?: number;
   uncoverMs?: number;
   onMorphComplete?: () => void;
   /**
@@ -43,6 +45,7 @@ export function CoverLabel({
   title,
   expanded,
   sizeRem = DUALITY_BUTTON_SIZE_REM,
+  fontSizeRem: fontSizeRemProp,
   uncoverMs,
   onMorphComplete,
   baseRotateDeg = 0,
@@ -54,7 +57,7 @@ export function CoverLabel({
   const titleLineRef = useRef<HTMLSpanElement>(null);
   const chars = Array.from(title);
   const angles = coverLabelCharAngles(chars.length);
-  const fontSizeRem = coverLabelFontSizeRem(chars.length, sizeRem);
+  const fontSizeRem = fontSizeRemProp ?? coverLabelFontSizeRem(chars.length, sizeRem);
   // Arrow transform transition stays off until after the first frame so the mount pose never tweens.
   const [trackingReady, setTrackingReady] = useState(false);
 

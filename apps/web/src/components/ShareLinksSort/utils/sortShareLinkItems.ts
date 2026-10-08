@@ -69,7 +69,7 @@ function compareAsc(
   switch (categoryId) {
     case "creationDate":
       return compareCreatedAtAsc(a, b);
-    case "alpacabeth":
+    case "alpacabet":
       return a.haikuSubject.localeCompare(b.haikuSubject, undefined, {
         sensitivity: "base",
       });

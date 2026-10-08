@@ -23,7 +23,7 @@ const FILTER_SET = new Set<ShareLinkFilter>(ALL_SHARE_LINK_FILTERS);
 
 const SORT_CATEGORY_IDS = new Set([
   "creationDate",
-  "alpacabeth",
+  "alpacabet",
   "hitsLeft",
   "timeLeft",
 ]);

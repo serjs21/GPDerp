@@ -34,13 +34,13 @@ export const SHARE_LINKS_SORT_CATEGORIES: ShareLinksSortCategory[] = [
     ariaLabelKey: "creationDateAriaLabel",
   },
   {
-    id: "alpacabeth",
-    titleKey: "alpacabeth",
+    id: "alpacabet",
+    titleKey: "alpacabet",
     coverSrc: "/sort_button/alpacabeth_cover.svg",
     topIconSrc: "/sort_button/alpabeth_start.svg",
     bottomIconSrc: "/sort_button/alpabeth_end.svg",
     iconTone: "mask",
-    ariaLabelKey: "alpacabethAriaLabel",
+    ariaLabelKey: "alpacabetAriaLabel",
   },
   {
     id: "hitsLeft",

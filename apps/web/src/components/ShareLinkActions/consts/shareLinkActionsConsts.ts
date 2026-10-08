@@ -13,11 +13,11 @@ export const SHARE_LINK_ACTION_ICONS = {
 
 export const SHARE_LINK_ACTION_COLORS = {
   preview: { panel: "#ffe9a8", hover: "#ffd35c" },
-  showLabels: { panel: "#ffffff", hover: "#d9d9da" },
+  showLabels: { panel: "#ffffff", hover: "#f5f4f9" },
   hideLabels: { panel: "#111111", hover: "#3a3a3a" },
   delete: { panel: "#ffaea8", hover: "var(--accent-red, #aa1f3f)" },
   followLink: { panel: "#c0d5ff", hover: "#ffc0c8" },
-  editLabels: { panel: "#c9c9c9", hover: "#c0c4b0" },
+  editLabels: { panel: "#e9beff", hover: "#e4b1fd" },
   done: { panel: "#c0ffc3", hover: "#6dfe73" },
 } as const satisfies Record<string, { panel: ComicPanelColor; hover: string }>;
 
@@ -52,19 +52,19 @@ const PREVIEW_CAPTION_TOP_RIGHT = { top: "0.4rem", right: "0.5rem", rotateDeg: 0
 /** Preview modal footer panels (8rem × 6rem): caption top-right, icon bottom-left. */
 export const SHARE_LINK_PREVIEW_ACTION_LAYOUTS = {
   showLabels: {
-    icon: { size: "5rem", bottom: "0rem", left: "0.2rem", rotateDeg: 0 },
+    icon: { size: "8rem", bottom: "0rem", left: "0.2rem", rotateDeg: 0 },
     caption: PREVIEW_CAPTION_TOP_RIGHT,
   },
   hideLabels: {
-    icon: { size: "5rem", bottom: "0rem", left: "0.2rem", rotateDeg: 0 },
+    icon: { size: "8rem", bottom: "0rem", left: "0.2rem", rotateDeg: 0 },
     caption: PREVIEW_CAPTION_TOP_RIGHT,
   },
   editLabels: {
-    icon: { size: "3.5rem", bottom: "0rem", left: "0.4rem", rotateDeg: 0 },
+    icon: { size: "5rem", bottom: "0.1rem", left: "0.4rem", rotateDeg: 0 },
     caption: PREVIEW_CAPTION_TOP_RIGHT,
   },
   followLink: {
-    icon: { size: "3.5rem", bottom: "0rem", left: "0.4rem", rotateDeg: 0 },
+    icon: { size: "5rem", bottom: "0rem", left: "0.4rem", rotateDeg: 0 },
     caption: PREVIEW_CAPTION_TOP_RIGHT,
   },
   done: {

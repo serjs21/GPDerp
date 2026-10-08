@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
-import { CoverState } from "@/components/DualityButton";
+import { CoverState, coverLabelSharedFontSizeRem } from "@/components/DualityButton";
 import { useElementWidth } from "@/hooks/useElementWidth";
 import { useLocale } from "@/hooks/useLocale";
 import {
@@ -20,11 +20,9 @@ import styles from "./ShareLinksSort.module.css";
 export type ShareLinksSortProps = {
   value: ShareLinksSortValue;
   onChange: (next: ShareLinksSortValue) => void;
-  /** Override category list (defaults to Creation date / Alpacabeth / Hits left / Time left). */
   categories?: ShareLinksSortCategory[];
   sizeRem?: number;
   disabled?: boolean;
-  /** Horizontal (unrotated) title with the sort coins stacked in a column. */
   rotated?: boolean;
   className?: string;
   "aria-label"?: string;
@@ -51,6 +49,10 @@ export function ShareLinksSort({
   const categories = categoriesProp ?? resolveShareLinksSortCategories(locale);
   const [clusterRef, clusterWidth] = useElementWidth<HTMLDivElement>(rotated);
   const coinSizeRem = rotatedSortCoinSizeRem(clusterWidth, sizeRem);
+  const titleFontSizeRem = coverLabelSharedFontSizeRem(
+    categories.map((category) => t(`categories.${category.titleKey}`)),
+    coinSizeRem,
+  );
   return (
     <ComicPagePanel
       title={t("title")}
@@ -83,6 +85,7 @@ export function ShareLinksSort({
               iconSrc={category.coverSrc}
               coverMirrored={category.coverMirrored}
               title={title}
+              titleFontSizeRem={titleFontSizeRem}
               sizeRem={coinSizeRem}
               uncovered={selected}
               onUncoveredChange={(open) => {

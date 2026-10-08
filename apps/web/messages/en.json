@@ -796,13 +796,13 @@
     },
     "row": {
       "deleteQuestion": "Do you want to magically erase this link from existance?",
-      "deleteCancel": "Not yet",
-      "deleteConfirm": "Erase",
+      "deleteCancel": "No",
+      "deleteConfirm": "Yes",
       "erased": "Share link erased",
-      "eraseError": "Could not erase share link",
+      "eraseError": "It failed. The universe remains unchanged.",
       "statsAriaLabel": "Share link stats",
       "lanternAriaLabel": "Haiku lantern: {subject}",
-      "copyTitle": "Copy link!",
+      "copyTitle": "Copy share link!",
       "copyAriaLabel": "Copy share link for {subject}",
       "settingsAriaLabel": "Share link settings for {subject}"
     }
@@ -820,8 +820,8 @@
     "categories": {
       "creationDate": "Creation date",
       "creationDateAriaLabel": "Sort by creation date",
-      "alpacabeth": "Alpacabeth",
-      "alpacabethAriaLabel": "Sort alphabetically",
+      "alpacabet": "Alpacabet",
+      "alpacabetAriaLabel": "Sort alpacabetically",
       "hitsLeft": "Hits left",
       "hitsLeftAriaLabel": "Sort by hits left",
       "timeLeft": "Time left",

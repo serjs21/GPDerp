@@ -125,9 +125,7 @@ export async function fetchShareLinksPaged(params: {
   /** @deprecated use `filters` */
   filter?: ShareLinkFilter;
   search?: string;
-  /** Sort category id from ShareLinksSort (creationDate / alpacabeth / hitsLeft / timeLeft). */
   sort?: string;
-  /** Sort direction; ignored when `sort` is omitted. */
   dir?: "asc" | "desc";
 }): Promise<{ items: ShareLinkListItem[]; total: number; pageSize: number; offset: number }> {
   const filters =

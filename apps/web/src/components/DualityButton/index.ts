@@ -7,6 +7,7 @@ export {
 export { CoverState, type CoverStateProps } from "./CoverState";
 export { CoverIcon, type CoverIconProps } from "./CoverIcon";
 export { CoverLabel, type CoverLabelProps } from "./CoverLabel";
+export { coverLabelSharedFontSizeRem } from "./utils/coverLabelArcUtils";
 export {
   DUALITY_BUTTON_BASE_SRC,
   DUALITY_BUTTON_DIRECTION_SRC,

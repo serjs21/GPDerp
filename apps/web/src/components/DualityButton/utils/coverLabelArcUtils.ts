@@ -79,3 +79,12 @@ export function coverLabelFontSizeRem(
     Math.max(COVER_LABEL_FONT_MIN_REM, fit),
   );
 }
+
+/** One font size for a set of titles, fitted to the longest so every title matches. */
+export function coverLabelSharedFontSizeRem(
+  titles: readonly string[],
+  faceSizeRem = DUALITY_BUTTON_SIZE_REM,
+): number {
+  const maxChars = titles.reduce((max, title) => Math.max(max, Array.from(title).length), 0);
+  return coverLabelFontSizeRem(maxChars, faceSizeRem);
+}

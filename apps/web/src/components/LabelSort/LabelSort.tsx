@@ -6,7 +6,7 @@ import type {
   ComicPanelBackground,
   ComicPanelColor,
 } from "@/components/ComicPageLayout/comicPagePresets";
-import { CoverState } from "@/components/DualityButton";
+import { CoverState, coverLabelSharedFontSizeRem } from "@/components/DualityButton";
 import { useElementWidth } from "@/hooks/useElementWidth";
 import { useLocale } from "@/hooks/useLocale";
 import {
@@ -65,6 +65,10 @@ export function LabelSort({
   const categories = categoriesProp ?? resolveLabelSortCategories(locale, t);
   const [clusterRef, clusterWidth] = useElementWidth<HTMLDivElement>(rotated);
   const coinSizeRem = rotatedSortCoinSizeRem(clusterWidth, sizeRem);
+  const titleFontSizeRem = coverLabelSharedFontSizeRem(
+    categories.map((category) => category.title),
+    coinSizeRem,
+  );
   return (
     <ComicPagePanel
       title={title ?? t("title")}
@@ -96,6 +100,7 @@ export function LabelSort({
               iconSrc={category.coverSrc}
               coverMirrored={category.coverMirrored}
               title={category.title}
+              titleFontSizeRem={titleFontSizeRem}
               sizeRem={coinSizeRem}
               uncovered={selected}
               onUncoveredChange={(open) => {
