@@ -2,11 +2,16 @@
 
 import { useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useAuthenticationVerification } from "@/app/providers/AuthenticationVerificationProvider";
 import { BrushMenu, type BrushMenuOption } from "@/components/BrushMenu";
 import { ComicConfirmModal } from "@/components/ComicConfirmModal";
 import type { UserObject } from "@/types";
-import { USER_MENU_GO_HOME, USER_MENU_TRIGGER_FILL } from "./consts/userMenuConsts";
+import {
+  USER_MENU_BURST_SEED_IDS,
+  USER_MENU_GO_HOME,
+  USER_MENU_TRIGGER_FILL,
+} from "./consts/userMenuConsts";
 import { UserAvatar } from "./UserAvatar";
 import { UserMenuOptionIconLabel } from "./UserMenuOptionIconLabel";
 import { goHomeOption, isMainPage } from "./utils/userMenuOptionUtils";
@@ -18,23 +23,24 @@ export type UserMenuProps = {
   className?: string;
 };
 
-function resolveDisplayName(user: UserObject) {
-  return user.userName || user.email || "User";
+function resolveDisplayName(user: UserObject, fallback: string) {
+  return user.userName || user.email || fallback;
 }
 
 export function UserMenu({ user, onLogout, className }: UserMenuProps) {
+  const t = useTranslations("UserMenu");
   const router = useRouter();
   const pathname = usePathname();
   const { openAuthenticationModal } = useAuthenticationVerification();
   const onMainPage = isMainPage(pathname);
   const onSettingsPage = pathname.startsWith("/settings");
-  const displayName = resolveDisplayName(user);
+  const displayName = resolveDisplayName(user, t("fallbackName"));
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
   const options = useMemo<BrushMenuOption[]>(
     () => [
-      ...(onMainPage ? [] : [goHomeOption()]),
+      ...(onMainPage ? [] : [goHomeOption(t)]),
       ...(onSettingsPage
         ? []
         : [
@@ -43,8 +49,9 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
               label: (
                 <UserMenuOptionIconLabel
                   src="/nav/settings.svg"
-                  iconLabel="Settings"
-                  text="Settings"
+                  iconLabel={t("settings")}
+                  seedId={USER_MENU_BURST_SEED_IDS.settings}
+                  text={t("settings")}
                 />
               ),
               backgroundColor: "#1ac3b0",
@@ -55,15 +62,16 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
         label: (
           <UserMenuOptionIconLabel
             src="/auth/logout.svg"
-            iconLabel="Logout"
-            text="Logout"
+            iconLabel={t("logout")}
+            seedId={USER_MENU_BURST_SEED_IDS.logout}
+            text={t("logout")}
           />
         ),
         color: "rgb(255 110 110)",
         backgroundColor: "#0f8051",
       },
     ],
-    [onMainPage, onSettingsPage],
+    [onMainPage, onSettingsPage, t],
   );
 
   const handleChange = (key: string) => {
@@ -118,9 +126,9 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
           if (loggingOut) return;
           setLogoutOpen(open);
         }}
-        question="Did you have enough fun?"
-        cancelLabel="Not yet"
-        confirmLabel="Yes"
+        question={t("logoutQuestion")}
+        cancelLabel={t("logoutCancel")}
+        confirmLabel={t("logoutConfirm")}
         confirming={loggingOut}
         closeOnSelect={false}
         onConfirm={() => {

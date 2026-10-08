@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { useTranslations } from "next-intl";
 import type { HaikuDto } from "@/api/haikus";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { computeVisibleLanterns } from "./computeVisibleLanterns";
@@ -33,6 +34,7 @@ export function LanternPath({
   className,
   showGuides = false,
 }: LanternPathProps) {
+  const t = useTranslations("Lantern.lanternPath");
   const stageRef = useRef<HTMLDivElement>(null);
   const {
     focusIndex,
@@ -55,10 +57,14 @@ export function LanternPath({
 
   const focusHaiku = haikus[focusIndex];
   const hudLabel = generatingDraft
-    ? `Generating: ${generatingDraft.subject}`
+    ? t("generating", { subject: generatingDraft.subject })
     : focusHaiku
-      ? `${focusHaiku.title || "Haiku"} · ${focusIndex + 1} / ${haikus.length}`
-      : "No haikus";
+      ? t("focusPosition", {
+          title: focusHaiku.title || t("untitled"),
+          position: focusIndex + 1,
+          total: haikus.length,
+        })
+      : t("empty");
 
   return (
     <LanternPathStage
@@ -71,7 +77,7 @@ export function LanternPath({
           <button
             type="button"
             className={styles.flightPathControlButton}
-            aria-label="Previous haiku"
+            aria-label={t("previous")}
             disabled={!canStepBack}
             onClick={stepBack}
           >
@@ -83,7 +89,7 @@ export function LanternPath({
           <button
             type="button"
             className={styles.flightPathControlButton}
-            aria-label="Next haiku"
+            aria-label={t("next")}
             disabled={!canStepForward}
             onClick={stepForward}
           >

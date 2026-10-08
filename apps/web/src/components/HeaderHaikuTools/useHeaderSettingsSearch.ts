@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 const SEARCH_DEBOUNCE_MS = 200;
 
@@ -14,18 +15,18 @@ function parseSearchableTab(value: string | null): SettingsSearchTab | null {
 
 const COPY: Record<
   SettingsSearchTab,
-  { placeholder: string; ariaLabel: string; buttonAriaLabel: string; iconSrc: string }
+  { placeholderKey: string; ariaLabelKey: string; buttonAriaLabelKey: string; iconSrc: string }
 > = {
   "share-links": {
-    placeholder: "Search links",
-    ariaLabel: "Search by title",
-    buttonAriaLabel: "Search share links",
+    placeholderKey: "shareLinks.placeholder",
+    ariaLabelKey: "shareLinks.ariaLabel",
+    buttonAriaLabelKey: "shareLinks.buttonAriaLabel",
     iconSrc: "/profile/search_links.svg",
   },
   labels: {
-    placeholder: "Search labels",
-    ariaLabel: "Search labels by name",
-    buttonAriaLabel: "Search labels",
+    placeholderKey: "labels.placeholder",
+    ariaLabelKey: "labels.ariaLabel",
+    buttonAriaLabelKey: "labels.buttonAriaLabel",
     iconSrc: "/profile/seach_label.svg",
   },
 };
@@ -35,6 +36,7 @@ const COPY: Record<
  * Open by default; collapses only when the search icon is toggled (not on blur).
  */
 export function useHeaderSettingsSearch() {
+  const t = useTranslations("HeaderHaikuTools.settingsSearch");
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -95,9 +97,9 @@ export function useHeaderSettingsSearch() {
     searchString: draft,
     setSearchString: setDraft,
     inputRef,
-    placeholder: copy.placeholder,
-    ariaLabel: copy.ariaLabel,
-    buttonAriaLabel: copy.buttonAriaLabel,
+    placeholder: t(copy.placeholderKey),
+    ariaLabel: t(copy.ariaLabelKey),
+    buttonAriaLabel: t(copy.buttonAriaLabelKey),
     iconSrc: copy.iconSrc,
   };
 }

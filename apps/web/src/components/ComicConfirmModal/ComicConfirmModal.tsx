@@ -1,6 +1,7 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { ComicButton } from "@/components/ComicButton/ComicButton";
 import { ComicDialogContent } from "@/components/ComicDialogContent/ComicDialogContent";
@@ -18,8 +19,6 @@ import styles from "./ComicConfirmModal.module.css";
 const DEFAULT_QUESTION_FILL = COMIC_PANEL_COLORS.cream.base;
 const DEFAULT_CONFIRM_FILL = COMIC_PANEL_COLORS.red.base;
 const DEFAULT_CANCEL_FILL = "#ffffff";
-const DEFAULT_CANCEL_LABEL = "Cancel";
-const DEFAULT_CONFIRM_LABEL = "Confirm";
 const DEFAULT_QUESTION_STYLE: ComicBubbleStyle = "thought";
 const DEFAULT_CANCEL_STYLE: ComicBubbleStyle = "speech";
 const DEFAULT_CONFIRM_STYLE: ComicBubbleStyle = "pointedArcs";
@@ -56,8 +55,8 @@ export function ComicConfirmModal({
   question,
   onConfirm,
   onCancel,
-  confirmLabel = DEFAULT_CONFIRM_LABEL,
-  cancelLabel = DEFAULT_CANCEL_LABEL,
+  confirmLabel: confirmLabelProp,
+  cancelLabel: cancelLabelProp,
   questionFill = DEFAULT_QUESTION_FILL,
   confirmFill = DEFAULT_CONFIRM_FILL,
   cancelFill = DEFAULT_CANCEL_FILL,
@@ -69,6 +68,9 @@ export function ComicConfirmModal({
   confirming = false,
   className,
 }: ComicConfirmModalProps) {
+  const t = useTranslations("ComicConfirmModal");
+  const confirmLabel = confirmLabelProp ?? t("confirm");
+  const cancelLabel = cancelLabelProp ?? t("cancel");
   const allowOutsideDismiss = closeOnOverlayClick && !confirming;
   const [busyDots, setBusyDots] = useState<(typeof ACTIVATING_DOT_CYCLE)[number]>("");
   const { questionRef, cancelRef, confirmRef, getTargets, targetsKey } = useComicConfirmStage({
@@ -134,7 +136,7 @@ export function ComicConfirmModal({
           <div className={[styles.panel, className].filter(Boolean).join(" ")}>
             <Dialog.Title className={styles.visuallyHidden}>{question}</Dialog.Title>
             <Dialog.Description className={styles.visuallyHidden}>
-              Choose confirm or cancel.
+              {t("description")}
             </Dialog.Description>
 
             <ComicBubbleStage

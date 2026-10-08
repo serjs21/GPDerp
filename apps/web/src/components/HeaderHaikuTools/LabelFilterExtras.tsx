@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
@@ -9,10 +10,11 @@ import toolStyles from "./HeaderHaikuTools.module.css";
 
 /** Active label filter chips under the header plus the labels filter modal. */
 export function LabelFilterExtras({ labels, onModalClose }: LabelFilterExtrasProps) {
+  const t = useTranslations("HeaderHaikuTools.filter");
   return (
     <>
       {labels.chips.length > 0 || labels.excludeChips.length > 0 ? (
-        <div className={toolStyles.filterChips} aria-label="Active label filters">
+        <div className={toolStyles.filterChips} aria-label={t("activeFiltersAriaLabel")}>
           {labels.chips.map((label) => {
             const shape = resolveComicLabelShapePreset(label.shape);
             return (
@@ -30,7 +32,7 @@ export function LabelFilterExtras({ labels, onModalClose }: LabelFilterExtrasPro
                 <button
                   type="button"
                   className={toolStyles.filterChipRemove}
-                  aria-label={`Remove filter ${label.name}`}
+                  aria-label={t("removeFilterAriaLabel", { name: label.name })}
                   onClick={() => labels.removeLabelId(label.id)}
                 >
                   ×
@@ -59,7 +61,7 @@ export function LabelFilterExtras({ labels, onModalClose }: LabelFilterExtrasPro
                 <button
                   type="button"
                   className={toolStyles.filterChipRemove}
-                  aria-label={`Remove exclude filter ${label.name}`}
+                  aria-label={t("removeExcludeFilterAriaLabel", { name: label.name })}
                   onClick={() => labels.removeExcludedLabelId(label.id)}
                 >
                   ×

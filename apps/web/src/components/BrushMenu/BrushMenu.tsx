@@ -12,6 +12,7 @@ import {
   type RefObject,
 } from "react";
 import { useReducedMotion } from "motion/react";
+import { useTranslations } from "next-intl";
 import { BrushOption, type BrushOptionBrushPaths } from "./BrushOption";
 import { BrushPaintLayer } from "./BrushPaintLayer";
 import { BRUSH_OPTION_MIN_WIDTH_REM } from "./brushRevealPaths";
@@ -209,7 +210,7 @@ export function BrushMenu({
   open: openProp,
   defaultOpen = false,
   onOpenChange,
-  placeholder = "Select",
+  placeholder: placeholderProp,
   disabled = false,
   className,
   triggerClassName,
@@ -217,6 +218,8 @@ export function BrushMenu({
   expandLabel,
   renderTrigger,
 }: BrushMenuProps) {
+  const t = useTranslations("BrushMenu");
+  const placeholder = placeholderProp ?? t("placeholder");
   const listId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const shellRef = useRef<HTMLDivElement>(null);

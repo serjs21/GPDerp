@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
+import { useTranslations } from "next-intl";
 import type { LabelConnectedHaikuPreview } from "@/api/labels";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
@@ -38,10 +39,11 @@ export type ConnectedLanternStackProps = {
 };
 
 export function ConnectedLanternStack({ accountId, items }: ConnectedLanternStackProps) {
+  const t = useTranslations("ManageLabel.lanternStack");
   if (items.length === 0) {
     return (
       <div className={styles.emptyState} data-count={0}>
-        <p className={styles.emptyCaption}>not connected</p>
+        <p className={styles.emptyCaption}>{t("notConnected")}</p>
         <span
           className={styles.emptyIcon}
           role="img"
@@ -77,7 +79,7 @@ export function ConnectedLanternStack({ accountId, items }: ConnectedLanternStac
             className={styles.previewLantern}
             style={previewLanternBodyStyle(haiku.body, haiku.title)}
             widthRem={LANTERN_WIDTH_REM}
-            ariaLabel={`Haiku lantern: ${haiku.title}`}
+            ariaLabel={t("lanternAriaLabel", { title: haiku.title })}
           />
         );
 
@@ -94,7 +96,7 @@ export function ConnectedLanternStack({ accountId, items }: ConnectedLanternStac
               lantern
             ) : (
               <LanternFrame
-                ariaLabel={`Haiku lantern: ${haiku.title}`}
+                ariaLabel={t("lanternAriaLabel", { title: haiku.title })}
                 className={styles.lanternFrame}
                 widthRem={LANTERN_WIDTH_REM}
               >

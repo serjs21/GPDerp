@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import type { LabelDto } from "@/api/labels";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { ComicLabelCreationModal } from "@/components/ComicLabelCreationModal";
@@ -23,6 +24,7 @@ export function ManageLabelCreatePanel({
   stretch = false,
   className,
 }: ManageLabelCreatePanelProps) {
+  const t = useTranslations("ManageLabel.createPanel");
   const [open, setOpen] = useState(false);
   const [stageRef, stageSize] = useElementSize<HTMLSpanElement>();
   const faceStyle = buildTicketFaceStyle(
@@ -41,7 +43,7 @@ export function ManageLabelCreatePanel({
         background="halftone"
         color="yellow"
         isMotionBackground={false}
-        ariaLabel="Create new label"
+        ariaLabel={t("ariaLabel")}
         className={styles.panel}
       >
         <span ref={stageRef} className={styles.stage}>
@@ -54,7 +56,7 @@ export function ManageLabelCreatePanel({
               draggable={false}
             />
             <span className={styles.ticketContent}>
-              {formatComicLabelText("Create")}
+              {formatComicLabelText(t("create"))}
             </span>
           </span>
         </span>

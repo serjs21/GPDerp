@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { getTranslations } from "next-intl/server";
 import { fetchSharedHaikuByHash } from "@/api/shareLink";
 import { NotFoundView } from "@/components/NotFoundView";
 import { formatHaikuTitle } from "@/utils/strings";
@@ -16,7 +17,8 @@ export default async function SharedHaikuPage({ params }: { params: Promise<{ sh
   }
 
   const { haiku, sharedByUserName, showLabels } = result.data;
-  const providerName = sharedByUserName?.trim() || "Unknown author";
+  const t = await getTranslations("SharedHaikuPage");
+  const providerName = sharedByUserName?.trim() || t("unknownAuthor");
 
   return (
     <div className={styles.page}>

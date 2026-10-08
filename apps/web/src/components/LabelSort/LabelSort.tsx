@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import type {
   ComicPanelBackground,
@@ -50,21 +51,23 @@ export function LabelSort({
   categories: categoriesProp,
   sizeRem = LABEL_SORT_SIZE_REM,
   disabled = false,
-  title = "Sort by",
+  title,
   rotated = false,
   color = "white",
   background = "solid",
   className,
   clusterClassName,
-  "aria-label": ariaLabel = "Sort labels",
+  "aria-label": ariaLabelProp,
 }: LabelSortProps) {
+  const t = useTranslations("LabelSort");
+  const ariaLabel = ariaLabelProp ?? t("ariaLabel");
   const { locale } = useLocale();
-  const categories = categoriesProp ?? resolveLabelSortCategories(locale);
+  const categories = categoriesProp ?? resolveLabelSortCategories(locale, t);
   const [clusterRef, clusterWidth] = useElementWidth<HTMLDivElement>(rotated);
   const coinSizeRem = rotatedSortCoinSizeRem(clusterWidth, sizeRem);
   return (
     <ComicPagePanel
-      title={title}
+      title={title ?? t("title")}
       titleDirection={rotated ? "horizontal" : "vertical"}
       background={background}
       color={color}
@@ -117,7 +120,7 @@ export function LabelSort({
               iconTone={category.iconTone}
               disabled={disabled}
               aria-label={category.ariaLabel}
-              coverAriaLabel={`Select ${category.title}`}
+              coverAriaLabel={t("selectCategory", { title: category.title })}
             />
           );
         })}

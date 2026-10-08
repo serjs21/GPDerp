@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { useTranslations } from "next-intl";
 import { useOptionalAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { Select, Typography } from "@/components/StyledComponents";
 import { POSTCARD_MESSAGE_MAX_CHARS } from "@/components/Postcard/consts/postcardMessageConsts";
@@ -32,6 +33,7 @@ export const SendShareEmailContent = ({
   onEmailsChange,
   disabled = false,
 }: SendShareEmailContentProps) => {
+  const t = useTranslations("ShareModal.email");
   const notebookRef = useRef<HTMLDivElement>(null);
   const fit = usePostcardMessageFit(message);
   const auth = useOptionalAuthenticationState();
@@ -54,7 +56,7 @@ export const SendShareEmailContent = ({
         <NotebookPageRough hostRef={notebookRef} className={styles.paperArt} />
         <div className={styles.toRow} data-notebook-row="to">
           <span className={styles.toPrefix} aria-hidden>
-            TO:
+            {t("toPrefix")}
           </span>
           <Select
             mode="tags"
@@ -62,7 +64,7 @@ export const SendShareEmailContent = ({
             value={emails}
             onChange={onEmailsChange}
             tokenSeparators={[",", " "]}
-            placeholder="Recipient emails (press Enter after each)"
+            placeholder={t("recipientsPlaceholder")}
             className={styles.toInput}
             disabled={disabled}
             autoFocus
@@ -74,17 +76,17 @@ export const SendShareEmailContent = ({
             className={styles.message}
             value={message}
             onChange={(e) => handleMessageChange(e.target.value)}
-            placeholder="I wanted to share with you..."
+            placeholder={t("messagePlaceholder")}
             maxLength={POSTCARD_MESSAGE_MAX_CHARS}
             disabled={disabled}
-            aria-label="Email message"
+            aria-label={t("messageAriaLabel")}
             aria-describedby="postcard-message-fit"
           />
           <p className={styles.signature}>
             <span className={styles.heart} aria-hidden>
               ♥
             </span>
-            {`From: ${senderName}`}
+            {t("signature", { name: senderName })}
           </p>
         </div>
       </div>
@@ -97,7 +99,7 @@ export const SendShareEmailContent = ({
       </Typography.Text>
       {invalidEmails.length > 0 ? (
         <Typography.Text type="danger" className={styles.validation}>
-          Invalid emails: {invalidEmails.join(", ")}
+          {t("invalidEmails", { emails: invalidEmails.join(", ") })}
         </Typography.Text>
       ) : null}
     </div>

@@ -8,6 +8,7 @@ import {
   type AnimationEvent,
 } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import type { LabelDto } from "@/api/labels";
 import { useHaikuFilters } from "@/app/providers/HaikuFiltersProvider";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
@@ -57,6 +58,7 @@ export function ManageLabel({
   enterDelayMs = 0,
   onEnterAnimationEnd,
 }: ManageLabelProps) {
+  const t = useTranslations("ManageLabel.manageLabel");
   const router = useRouter();
   const { setSelectedLabelIds } = useHaikuFilters();
   const [editOpen, setEditOpen] = useState(false);
@@ -187,19 +189,19 @@ export function ManageLabel({
       await deleteLabel({
         labelId: label.id,
         onSuccess: async () => {
-          comicToast.success("Label deleted");
+          comicToast.success(t("deleted"));
           setDeleteOpen(false);
           onExitStart?.();
           setExiting(true);
         },
         onError: async () => {
-          comicToast.error("Could not delete label");
+          comicToast.error(t("deleteError"));
         },
       });
     } finally {
       setDeleting(false);
     }
-  }, [deleteLabel, label.id, onExitStart]);
+  }, [deleteLabel, label.id, onExitStart, t]);
 
   const handleTuneIn = useCallback(() => {
     setSelectedLabelIds([label.id]);
@@ -253,11 +255,11 @@ export function ManageLabel({
         >
           <ComicPageRow className={styles.strip}>
             <div className={styles.labelSlot}>
-              <OverlayTitle title="Edit" direction="bottom">
+              <OverlayTitle title={t("edit")} direction="bottom">
                 <ComicPressButton
                   className={styles.overlayAction}
                   onClick={() => setEditOpen(true)}
-                  aria-label={`Edit label ${label.name}`}
+                  aria-label={t("editAriaLabel", { name: label.name })}
                 >
                   <ComicPagePanel
                     background="solid"
@@ -287,11 +289,11 @@ export function ManageLabel({
 
             <div className={styles.connectedSlot}>
               {hasConnections ? (
-                <OverlayTitle title="Tune in" direction="bottom">
+                <OverlayTitle title={t("tuneIn")} direction="bottom">
                   <ComicPressButton
                     className={styles.overlayAction}
                     onClick={handleTuneIn}
-                    aria-label={`Tune in to haikus labeled ${label.name}`}
+                    aria-label={t("tuneInAriaLabel", { name: label.name })}
                   >
                     {connectedPanel}
                   </ComicPressButton>
@@ -328,9 +330,9 @@ export function ManageLabel({
         onOpenChange={setDeleteOpen}
         onConfirm={handleDeleteConfirm}
         confirming={deleting || exiting}
-        question="Delete this label?"
-        cancelLabel="Not yet"
-        confirmLabel="Delete"
+        question={t("deleteQuestion")}
+        cancelLabel={t("cancel")}
+        confirmLabel={t("confirmDelete")}
       />
     </>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ALL_SHARE_LINK_FILTERS, type ShareLinkFilter } from "@/api/shareLinks";
 import { ComicPagePanel, type ComicPanelColor } from "@/components/ComicPageLayout";
 import { LabelMethodIcon } from "@/components/LabelMethodIcon";
@@ -8,48 +9,43 @@ import styles from "./ShareLinkFilterPanels.module.css";
 
 const FILTER_OPTIONS: Array<{
   id: ShareLinkFilter;
-  title: string;
+  messageKey: "active" | "inactive" | "expired" | "viewLimitReached";
   iconSrc: string;
   background: "sunburst" | "halftone" | "solid";
   color: ComicPanelColor;
   bubbleStyle: "circle" | "diamond" | "thought" | "rectangle";
-  ariaLabel: string;
 }> = [
   {
     id: "active",
-    title: "Active",
+    messageKey: "active",
     iconSrc: "/share_links_filter/active.svg",
     background: "sunburst",
     color: "green",
     bubbleStyle: "circle",
-    ariaLabel: "Show active share links",
   },
   {
     id: "inactive",
-    title: "Inactive",
+    messageKey: "inactive",
     iconSrc: "/share_links_filter/inactive.svg",
     background: "halftone",
     color: "blue",
     bubbleStyle: "rectangle",
-    ariaLabel: "Show inactive share links",
   },
   {
     id: "expired",
-    title: "Expired",
+    messageKey: "expired",
     iconSrc: "/share_links_filter/expired.svg",
     background: "solid",
     color: "#ceaf82",
     bubbleStyle: "diamond",
-    ariaLabel: "Show expired share links",
   },
   {
     id: "view_limit_reached",
-    title: "0 hits left",
+    messageKey: "viewLimitReached",
     iconSrc: "/share_links_filter/limit_reached.svg",
     background: "solid",
     color: "#7f87de",
     bubbleStyle: "thought",
-    ariaLabel: "Show share links that reached their view limit",
   },
 ];
 
@@ -65,6 +61,7 @@ export function ShareLinkFilterPanels({
   onChange,
   columns = 4,
 }: ShareLinkFilterPanelsProps) {
+  const t = useTranslations("ShareLinkManagement.filters");
   const selectedSet = new Set(selected);
 
   const toggle = (id: ShareLinkFilter) => {
@@ -80,15 +77,15 @@ export function ShareLinkFilterPanels({
         .filter(Boolean)
         .join(" ")}
       role="group"
-      aria-label="Filter share links by status"
+      aria-label={t("groupAriaLabel")}
     >
       {FILTER_OPTIONS.map((option) => {
         const checked = selectedSet.has(option.id);
-        const action = checked ? "Hide" : "Show";
+        const title = t(`options.${option.messageKey}.title`);
         return (
           <OverlayTitle
             key={option.id}
-            title={`${action}\r\n ${option.title}`}
+            title={checked ? t("hideTitle", { title }) : t("showTitle", { title })}
             direction="bottom"
             active={checked}
             className={[styles.slot, checked ? styles.slotChecked : ""].filter(Boolean).join(" ")}
@@ -102,7 +99,9 @@ export function ShareLinkFilterPanels({
               isMotionBackground={false}
               flexWeight={1}
               ariaLabel={
-                checked ? option.ariaLabel.replace(/^Show/, "Hide") : option.ariaLabel
+                checked
+                  ? t(`options.${option.messageKey}.hideAriaLabel`)
+                  : t(`options.${option.messageKey}.showAriaLabel`)
               }
               className={[styles.panel, checked ? styles.panelChecked : styles.panelUnchecked].join(
                 " ",

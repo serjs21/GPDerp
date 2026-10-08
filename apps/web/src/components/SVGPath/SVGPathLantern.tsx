@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, type CSSProperties, type ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import type { HaikuDto } from "@/api/haikus";
 import { LabelHalo } from "@/components/LabelHalo/LabelHalo";
 import { toLabelHaloItems } from "@/components/LabelHalo/utils/toLabelHaloItems";
@@ -170,6 +171,7 @@ function LanternWithHalo({
   onChanged?: () => void;
   children: ReactNode;
 }) {
+  const t = useTranslations("SVGPath.svgPathLantern");
   const { onPlacementCommit } = useHaikuLabelPlacement({
     haikuId: haiku.id,
     enabled: interactive,
@@ -196,7 +198,7 @@ function LanternWithHalo({
         interactive={interactive}
         labels={haloLabels}
         onPlacementCommit={interactive ? onPlacementCommit : undefined}
-        ariaLabel={`${ariaLabel} labels`}
+        ariaLabel={t("labels", { label: ariaLabel })}
       >
         <LanternFrame
           transform={IDENTITY_TRANSFORM}
@@ -240,6 +242,7 @@ function RotatedLanternWithHalo({
   onDelete?: () => Promise<void>;
   onChanged?: () => void;
 }) {
+  const t = useTranslations("SVGPath.svgPathLantern");
   const { onPlacementCommit } = useHaikuLabelPlacement({
     haikuId: haiku.id,
     enabled: interactive,
@@ -269,7 +272,7 @@ function RotatedLanternWithHalo({
           labels: haloLabels,
           interactive,
           onPlacementCommit: interactive ? onPlacementCommit : undefined,
-          ariaLabel: `${ariaLabel} labels`,
+          ariaLabel: t("labels", { label: ariaLabel }),
         }}
       />
     </RotatedPathAnchor>
@@ -291,6 +294,7 @@ export function SVGPathLantern({
   onExitComplete,
   onChanged,
 }: SVGPathLanternProps) {
+  const t = useTranslations("SVGPath.svgPathLantern");
   if ((transform.opacity ?? 1) <= 0.01 || transform.scale <= 0) {
     return null;
   }
@@ -299,10 +303,10 @@ export function SVGPathLantern({
     .filter(Boolean)
     .join(" ");
   const ariaLabel = loading
-    ? "Loading more haikus"
+    ? t("loadingMore")
     : generatingDraft
-      ? `Generating haiku: ${generatingDraft.subject}`
-      : `Haiku lantern: ${haiku?.title ?? ""}`;
+      ? t("generating", { subject: generatingDraft.subject })
+      : t("haikuLantern", { title: haiku?.title ?? "" });
   const showActions = !isAnimating && !loading && actionsAlwaysVisible;
 
   if (haiku) {

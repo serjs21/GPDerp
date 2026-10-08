@@ -1,6 +1,7 @@
 "use client";
 
 import { Dialog } from "@base-ui/react/dialog";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import {
   COMIC_PAGE_BORDER_PX,
@@ -18,6 +19,7 @@ export type ComicPageLayoutProps = {
 };
 
 export function ComicPageLayout({ children, title, className, showClose = false }: ComicPageLayoutProps) {
+  const t = useTranslations("ComicPageLayout");
   return (
     <div
       className={[styles.page, className].filter(Boolean).join(" ")}
@@ -31,7 +33,7 @@ export function ComicPageLayout({ children, title, className, showClose = false 
       }
     >
       {showClose ? (
-        <Dialog.Close className={styles.closeButton} aria-label="Close">
+        <Dialog.Close className={styles.closeButton} aria-label={t("close")}>
           ×
         </Dialog.Close>
       ) : null}

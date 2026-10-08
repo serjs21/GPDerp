@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { useAuthenticationVerification } from "@/app/providers/AuthenticationVerificationProvider";
 import { AwkwardLantern } from "@/components/AwkwardLantern";
@@ -20,6 +21,7 @@ const INFO_TONE = COMIC_TOAST_TONE_PRESETS.info;
 const SUCCESS_TONE = COMIC_TOAST_TONE_PRESETS.success;
 
 export function NotFoundView({ className }: NotFoundViewProps) {
+  const t = useTranslations("NotFoundView");
   const { initialized, isLoggedIn } = useAuthenticationState();
   const { openAuthenticationModal } = useAuthenticationVerification();
 
@@ -40,7 +42,7 @@ export function NotFoundView({ className }: NotFoundViewProps) {
             className={[dialogStyles.previewStage, styles.bubbleStage].join(" ")}
             contentClassName={styles.toastText}
           >
-            {NOT_FOUND_TOAST_COPY}
+            {t(NOT_FOUND_TOAST_COPY)}
           </ComicDialogContent>
         </div>
         <div className={styles.flyIn}>
@@ -53,13 +55,13 @@ export function NotFoundView({ className }: NotFoundViewProps) {
             className={[dialogStyles.previewStage, styles.bubbleStage].join(" ")}
             contentClassName={styles.text}
           >
-            <span id="not-found-copy">{NOT_FOUND_COPY}</span>
+            <span id="not-found-copy">{t(NOT_FOUND_COPY)}</span>
           </ComicDialogContent>
         </div>
         {initialized && !isLoggedIn ? (
           <div className={styles.signUp}>
             <ComicPageCtaAction
-              label={NOT_FOUND_SIGN_UP_COPY}
+              label={t(NOT_FOUND_SIGN_UP_COPY)}
               onClick={() => openAuthenticationModal("register")}
             />
           </div>

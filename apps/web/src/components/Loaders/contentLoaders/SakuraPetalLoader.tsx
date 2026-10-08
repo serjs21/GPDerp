@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { useTranslations } from "next-intl";
 
 import styles from "./SakuraPetalLoader.module.css";
 
@@ -29,6 +30,7 @@ export const SakuraPetalLoader = ({
   compact = false,
   scale = 1,
 }: SakuraPetalLoaderProps) => {
+  const t = useTranslations("Loaders.sakuraPetalLoader");
   const fadeStyle: CSSProperties | undefined = compact
     ? {
         transform: `scale(${COMPACT_FIT_SCALE * scale})`,
@@ -42,7 +44,7 @@ export const SakuraPetalLoader = ({
     <div
       className={[styles.root, compact ? styles.compact : "", className].filter(Boolean).join(" ")}
       role="status"
-      aria-label="Loading"
+      aria-label={t("ariaLabel")}
     >
       <div className={styles.fadeShell} style={fadeStyle}>
         <div className={styles.cluster}>

@@ -1,12 +1,13 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { HoverHoldCallout } from "@/components/HoverHoldCallout";
 import {
   SHARE_LINK_UPDATE_CALLOUT_POSITION,
   SHARE_LINK_UPDATE_CALLOUT_TIMING,
   SHARE_LINK_UPDATE_COLORS,
-  SHARE_LINK_UPDATE_DISABLED_MESSAGES,
+  SHARE_LINK_UPDATE_DISABLED_MESSAGE_KEYS,
   SHARE_LINK_UPDATE_ICONS,
   SHARE_LINK_UPDATE_LAYOUT,
   SHARE_LINK_UPDATE_NOT_STARTED_CALLOUT_POSITION,
@@ -23,14 +24,15 @@ export function ShareLinkUpdateAction({
   updating,
   onUpdate,
 }: ShareLinkUpdateActionProps) {
+  const t = useTranslations("ShareLinkActions.update");
   if (active && canUpdate) {
     return (
       <ShareLinkActionButton
         src={SHARE_LINK_UPDATE_ICONS.enabled}
-        caption="Update"
+        caption={t("caption")}
         className={styles.enabled}
         layout={SHARE_LINK_UPDATE_LAYOUT}
-        ariaLabel={`Update share link for ${subject}`}
+        ariaLabel={t("ariaLabel", { subject })}
         color={SHARE_LINK_UPDATE_COLORS.panel}
         accentColor={SHARE_LINK_UPDATE_COLORS.accent}
         background="sunburst"
@@ -43,9 +45,11 @@ export function ShareLinkUpdateAction({
     );
   }
 
-  const message = active
-    ? SHARE_LINK_UPDATE_DISABLED_MESSAGES.unchanged
-    : SHARE_LINK_UPDATE_DISABLED_MESSAGES.inactive;
+  const message = t(
+    active
+      ? SHARE_LINK_UPDATE_DISABLED_MESSAGE_KEYS.unchanged
+      : SHARE_LINK_UPDATE_DISABLED_MESSAGE_KEYS.inactive,
+  );
 
   return (
     <HoverHoldCallout
@@ -82,7 +86,7 @@ export function ShareLinkUpdateAction({
               ? SHARE_LINK_UPDATE_ICONS.disabled
               : SHARE_LINK_UPDATE_ICONS.notStarted
           }
-          alt={`Update unavailable for ${subject}: ${message}`}
+          alt={t("unavailableAlt", { subject, message })}
           draggable={false}
           decoding="async"
         />

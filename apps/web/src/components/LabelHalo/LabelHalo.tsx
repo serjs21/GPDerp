@@ -10,6 +10,7 @@ import {
   type ReactNode,
   type RefObject,
 } from "react";
+import { useTranslations } from "next-intl";
 import {
   LABEL_HALO_DROP_PAD_EXTRA_REM,
   LABEL_HALO_DROP_PAD_REM,
@@ -259,10 +260,11 @@ export function LabelHalo({
   onPlacementCommit,
   className,
   style,
-  ariaLabel = "Label halo",
+  ariaLabel,
   layout = "wrap",
   interactive = true,
 }: LabelHaloProps) {
+  const t = useTranslations("LabelHalo.halo");
   const dropRef = useRef<HTMLDivElement | null>(null);
   const outlineRef = useRef<SVGSVGElement | null>(null);
   const activeDragIdsRef = useRef<Set<string>>(new Set());
@@ -386,7 +388,7 @@ export function LabelHalo({
         } as CSSProperties
       }
       role="region"
-      aria-label={ariaLabel}
+      aria-label={ariaLabel ?? t("ariaLabel")}
     >
       <div
         className={[

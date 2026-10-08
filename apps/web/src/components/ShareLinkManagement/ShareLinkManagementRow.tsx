@@ -2,6 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useReducedMotion } from "motion/react";
+import { useTranslations } from "next-intl";
 import { useRef, useState, type CSSProperties } from "react";
 import { deleteShareLink, type ShareLinkListItem } from "@/api/shareLinks";
 import type { HaikuDto } from "@/api/haikus";
@@ -34,8 +35,6 @@ import { ShareLinkPreviewModal } from "@/components/ShareLinkPreviewModal";
 import { SHARE_LINK_HAIKUS_QUERY_KEY } from "./useShareLinkHaikuEnrichment";
 import styles from "./ShareLinkManagement.module.css";
 
-const DELETE_QUESTION = "Do you want to magically erase this link from existance?";
-
 function previewLanternBodyStyle(body: string, title?: string): CSSProperties {
   return buildPreviewLanternTypographyStyle(body, {
     title,
@@ -57,8 +56,9 @@ function PreviewLanternStats({
   hitsLabel: string;
   timeLabel: string;
 }) {
+  const t = useTranslations("ShareLinkManagement.row");
   return (
-    <div className={styles.previewStats} aria-label="Share link stats">
+    <div className={styles.previewStats} aria-label={t("statsAriaLabel")}>
       <span className={styles.previewStat} aria-label={hitsLabel}>
         {/* eslint-disable-next-line @next/next/no-img-element -- pixel meter icons */}
         <img
@@ -103,6 +103,7 @@ export function ShareLinkManagementRow({
   haikuLoading = false,
   onChanged,
 }: ShareLinkManagementRowProps) {
+  const t = useTranslations("ShareLinkManagement.row");
   const reduceMotion = useReducedMotion();
   const queryClient = useQueryClient();
   // Optimistic until the list refetch catches up (`base` stops matching the link).
@@ -131,11 +132,11 @@ export function ShareLinkManagementRow({
   const eraseLink = async () => {
     try {
       await deleteShareLink(link.id);
-      comicToast.success("Share link erased");
+      comicToast.success(t("erased"));
       onChanged();
     } catch {
       setExiting(false);
-      comicToast.error("Could not erase share link");
+      comicToast.error(t("eraseError"));
     }
   };
 
@@ -220,7 +221,7 @@ export function ShareLinkManagementRow({
           amplitude={3.25}
         >
           <LanternFrame
-            ariaLabel={`Haiku lantern: ${ctrl.subject}`}
+            ariaLabel={t("lanternAriaLabel", { subject: ctrl.subject })}
             className={styles.lanternFrame}
             widthRem={9}
           >
@@ -248,11 +249,11 @@ export function ShareLinkManagementRow({
           .join(" ")}
       >
         {ctrl.copyEnabled ? (
-          <OverlayTitle title="Copy link!" direction="bottom" className={styles.lanternSlot}>
+          <OverlayTitle title={t("copyTitle")} direction="bottom" className={styles.lanternSlot}>
             <ComicPressButton
               className={styles.lanternCopy}
               onClick={ctrl.onCopy}
-              aria-label={`Copy share link for ${ctrl.subject}`}
+              aria-label={t("copyAriaLabel", { subject: ctrl.subject })}
             >
               {lanternPanel}
             </ComicPressButton>
@@ -279,7 +280,7 @@ export function ShareLinkManagementRow({
               color="white"
               contentAlign="start"
               className={styles.settingsPanel}
-              ariaLabel={`Share link settings for ${ctrl.subject}`}
+              ariaLabel={t("settingsAriaLabel", { subject: ctrl.subject })}
             >
               <div className={styles.settingsBody}>
                 <ShareLinkSettingsControls
@@ -347,9 +348,9 @@ export function ShareLinkManagementRow({
         <ComicConfirmModal
           open={deleteOpen}
           onOpenChange={setDeleteOpen}
-          question={DELETE_QUESTION}
-          cancelLabel="Not yet"
-          confirmLabel="Erase"
+          question={t("deleteQuestion")}
+          cancelLabel={t("deleteCancel")}
+          confirmLabel={t("deleteConfirm")}
           onConfirm={handleDeleteConfirm}
         />
       </div>

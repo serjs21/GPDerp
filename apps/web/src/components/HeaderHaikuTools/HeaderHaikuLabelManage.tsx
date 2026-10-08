@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
@@ -8,6 +9,7 @@ import { useHeaderHaikuLabelManage } from "./useHeaderHaikuLabelManage";
 import styles from "./HeaderHaikuTools.module.css";
 
 export function HeaderHaikuLabelManage() {
+  const t = useTranslations("HeaderHaikuTools.filter");
   const {
     enabled,
     accountId,
@@ -31,7 +33,7 @@ export function HeaderHaikuLabelManage() {
         <button
           type="button"
           className={styles.iconButton}
-          aria-label="Filter haikus by labels"
+          aria-label={t("buttonAriaLabel")}
           aria-expanded={modalOpen}
           onClick={() => setModalOpen(true)}
           disabled={!canOpen}
@@ -48,7 +50,7 @@ export function HeaderHaikuLabelManage() {
       </div>
 
       {chips.length > 0 || excludeChips.length > 0 ? (
-        <div className={styles.filterChips} aria-label="Active label filters">
+        <div className={styles.filterChips} aria-label={t("activeFiltersAriaLabel")}>
           {chips.map((label) => {
             const shape = resolveComicLabelShapePreset(label.shape);
             return (
@@ -66,7 +68,7 @@ export function HeaderHaikuLabelManage() {
                 <button
                   type="button"
                   className={styles.filterChipRemove}
-                  aria-label={`Remove filter ${label.name}`}
+                  aria-label={t("removeFilterAriaLabel", { name: label.name })}
                   onClick={() => removeLabelId(label.id)}
                 >
                   ×
@@ -98,7 +100,7 @@ export function HeaderHaikuLabelManage() {
                 <button
                   type="button"
                   className={styles.filterChipRemove}
-                  aria-label={`Remove exclude filter ${label.name}`}
+                  aria-label={t("removeExcludeFilterAriaLabel", { name: label.name })}
                   onClick={() => removeExcludedLabelId(label.id)}
                 >
                   ×

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import type { HaikuDto } from "@/api/haikus";
 import type { LabelDto } from "@/api/labels";
 import { ComicLabelCreationModal } from "@/components/ComicLabelCreationModal";
@@ -39,6 +40,7 @@ export function CreateAddLabelsModal({
   onSaved,
   onCreated,
 }: CreateAddLabelsModalProps) {
+  const t = useTranslations("CreateAddLabelsModal");
   const [tab, setTab] = useState<CreateAddLabelsTab>(initialTab);
   /** Bump when a label is created so Add picker re-seeds / refreshes. */
   const [addEpoch, setAddEpoch] = useState(0);
@@ -82,7 +84,7 @@ export function CreateAddLabelsModal({
     (ids: string[], options?: { closeOnSuccess?: boolean }) => {
       const capped = ids.slice(0, HAIKU_LABELS_MAX);
       if (capped.length < ids.length) {
-        comicToast.error(`A haiku can have at most ${HAIKU_LABELS_MAX} labels`);
+        comicToast.error(t("maxLabels", { max: HAIKU_LABELS_MAX }));
       }
       if (sameIdSet(capped, addSeedIds)) {
         if (options?.closeOnSuccess) onClose();
@@ -96,17 +98,17 @@ export function CreateAddLabelsModal({
         haikuId: haiku.id,
         labelIds: capped,
         onSuccess: async () => {
-          comicToast.success("Labels saved");
+          comicToast.success(t("saved"));
           onSaved?.();
           if (options?.closeOnSuccess) onClose();
         },
         onError: async () => {
           clearLabelBeltPuffIn();
-          comicToast.error("Could not save labels");
+          comicToast.error(t("saveError"));
         },
       });
     },
-    [addSeedIds, haiku.id, onClose, onSaved, setHaikuLabels],
+    [addSeedIds, haiku.id, onClose, onSaved, setHaikuLabels, t],
   );
 
   const handleCreated = (label: LabelDto) => {
@@ -156,8 +158,8 @@ export function CreateAddLabelsModal({
               panel: {
                 background: "sunburst",
                 color: "purple",
-                title: "Create",
-                ariaLabel: "Create a new one",
+                title: t("createTitle"),
+                ariaLabel: t("createAriaLabel"),
               },
               content: (
                 <LabelMethodIcon
@@ -173,8 +175,8 @@ export function CreateAddLabelsModal({
               panel: {
                 background: "halftone",
                 color: "darkGreen",
-                title: "Add",
-                ariaLabel: "Add labels to this haiku",
+                title: t("addTitle"),
+                ariaLabel: t("addAriaLabel"),
               },
               content: (
                 <LabelMethodIcon
@@ -204,7 +206,7 @@ export function CreateAddLabelsModal({
               accountId={accountId}
               seedLabelIds={draftIds}
               knownLabels={knownAddLabels}
-              footerLabel="Save"
+              footerLabel={t("save")}
               onFooter={submitAdd}
               onSelectionChange={setDraftIds}
               footerBusy={isSettingLabels}

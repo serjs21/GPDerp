@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import type { HaikuDto } from "@/api/haikus";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternDeleteExit } from "@/components/Lantern/LanternDeleteExit";
@@ -51,6 +52,7 @@ export function CreationModal({
   onHaikuDeleteFailed,
   onHaikuChanged,
 }: CreationModalProps) {
+  const t = useTranslations("CreationModal");
   // Keep the lantern mounted for flight after parent clears haiku / closes open.
   const [exitingHaiku, setExitingHaiku] = useState<HaikuDto | null>(null);
   const activeHaiku = haiku ?? exitingHaiku;
@@ -61,10 +63,10 @@ export function CreationModal({
   }, [open, haiku]);
 
   const ariaLabel = generatingDraft
-    ? `Generating haiku: ${generatingDraft.subject}`
+    ? t("generating", { subject: generatingDraft.subject })
     : activeHaiku
-      ? `Haiku lantern: ${activeHaiku.title ?? ""}`
-      : "Haiku creation";
+      ? t("haikuLantern", { title: activeHaiku.title ?? "" })
+      : t("creation");
 
   // Prefer session key so draft→saved does not remount .flyIn.
   const flyInKey =

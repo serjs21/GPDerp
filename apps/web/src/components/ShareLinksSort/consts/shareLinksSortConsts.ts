@@ -9,10 +9,10 @@ export type ShareLinksSortValue = {
 
 export type ShareLinksSortCategory = {
   id: string;
-  title: string;
+  titleKey: string;
   coverSrc: string;
   coverMirrored?: boolean;
-  ariaLabel: string;
+  ariaLabelKey: string;
   topIconSrc?: string;
   bottomIconSrc?: string;
   centerIconSrc?: string;
@@ -27,37 +27,37 @@ export const SHARE_LINKS_CREATION_DATE_COVER_JA =
 export const SHARE_LINKS_SORT_CATEGORIES: ShareLinksSortCategory[] = [
   {
     id: "creationDate",
-    title: "Creation date",
+    titleKey: "creationDate",
     coverSrc: "/sort_button/time_cover.svg",
     topIconSrc: "/sort_button/time_new.svg",
     bottomIconSrc: "/sort_button/time_old.svg",
-    ariaLabel: "Sort by creation date",
+    ariaLabelKey: "creationDateAriaLabel",
   },
   {
     id: "alpacabeth",
-    title: "Alpacabeth",
+    titleKey: "alpacabeth",
     coverSrc: "/sort_button/alpacabeth_cover.svg",
     topIconSrc: "/sort_button/alpabeth_start.svg",
     bottomIconSrc: "/sort_button/alpabeth_end.svg",
     iconTone: "mask",
-    ariaLabel: "Sort alphabetically",
+    ariaLabelKey: "alpacabethAriaLabel",
   },
   {
     id: "hitsLeft",
-    title: "Hits left",
+    titleKey: "hitsLeft",
     coverSrc: "/sort_button/hitpoints_cover.svg",
     topIconSrc: "/sort_button/hitpoints_high.svg",
     bottomIconSrc: "/sort_button/hitpoints_low.svg",
-    ariaLabel: "Sort by hits left",
+    ariaLabelKey: "hitsLeftAriaLabel",
   },
   {
     id: "timeLeft",
-    title: "Time left",
+    titleKey: "timeLeft",
     coverSrc: "/sort_button/time_left_cover.svg",
     centerIconSrc: "/sort_button/time_left.svg",
     centerIconScale: 2,
     iconTone: "strokeInvert",
-    ariaLabel: "Sort by time left",
+    ariaLabelKey: "timeLeftAriaLabel",
   },
 ];
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, type KeyboardEvent } from "react";
 import {
   CELESTIAL_FIXED_DATE,
@@ -48,12 +49,14 @@ export const CelestialThemeClock = forwardRef<
     coordinates,
     motionLayoutIdPrefix,
     motionInstant = false,
-    ariaLabel = "Time of day",
+    ariaLabel: ariaLabelProp,
     className,
     hideNavStar = false,
   },
   ref,
 ) {
+  const t = useTranslations("CelestialThemeClock");
+  const ariaLabel = ariaLabelProp ?? t("ariaLabel");
   const inputRef = useRef<HTMLInputElement>(null);
   const timeLabel = formatClockLabel(value);
   const layout = useMemo(

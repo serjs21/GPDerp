@@ -11,6 +11,7 @@ import {
   type UIEvent,
 } from "react";
 import { createPortal } from "react-dom";
+import { useTranslations } from "next-intl";
 import { labelQueryKeys, type LabelDto } from "@/api/labels";
 import { ComicModalInput, ComicModalSearchPanel } from "@/components/ComicModalInput";
 import {
@@ -89,6 +90,7 @@ export function ManageLabelsPanel({
   showSort = false,
   sidePanelTarget = null,
 }: ManageLabelsPanelProps) {
+  const t = useTranslations("ManageLabel.panel");
   const headerDriven = searchVariant === "none";
   const [sort, setSort] = useState<LabelSortValue>(LABEL_SORT_DEFAULT_VALUE);
   const [searchInput, setSearchInput] = useState("");
@@ -246,8 +248,8 @@ export function ManageLabelsPanel({
     type: "search" as const,
     value: searchInput,
     onChange: (e: ChangeEvent<HTMLInputElement>) => setSearchInput(e.target.value),
-    placeholder: "Search labels…",
-    "aria-label": "Search labels by name",
+    placeholder: t("searchPlaceholder"),
+    "aria-label": t("searchAriaLabel"),
     autoComplete: "off" as const,
     spellCheck: false,
   };
@@ -323,7 +325,7 @@ export function ManageLabelsPanel({
             {showEmpty ? (
               <div className={styles.emptyLayout}>
                 <p className={styles.empty}>
-                  {resolvedQ ? "No labels found" : "No labels yet."}
+                  {resolvedQ ? t("noResults") : t("empty")}
                 </p>
               </div>
             ) : (

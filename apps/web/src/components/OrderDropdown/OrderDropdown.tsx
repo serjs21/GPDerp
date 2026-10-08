@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useId, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
+import { useCallback, useId, useMemo, useRef, useState } from "react";
 import { LabelSort } from "@/components/LabelSort";
 import { OrderDropdownCover } from "@/components/OrderDropdownCover";
 import { useDismissOnOutside } from "@/hooks/useDismissOnOutside";
@@ -18,8 +19,19 @@ export function OrderDropdown({
   widthRem,
   disabled = false,
   className,
-  "aria-label": ariaLabel = "Sort haikus",
+  "aria-label": ariaLabelProp,
 }: OrderDropdownProps) {
+  const t = useTranslations("OrderDropdown");
+  const ariaLabel = ariaLabelProp ?? t("ariaLabel");
+  const categories = useMemo(
+    () =>
+      ORDER_SORT_CATEGORIES.map((category) => ({
+        ...category,
+        title: t(category.title),
+        ariaLabel: t(category.ariaLabel),
+      })),
+    [t],
+  );
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
@@ -48,8 +60,8 @@ export function OrderDropdown({
         <LabelSort
           value={value}
           onChange={onChange}
-          categories={ORDER_SORT_CATEGORIES}
-          title={ORDER_SORT_TITLE}
+          categories={categories}
+          title={t(ORDER_SORT_TITLE)}
           clusterClassName={styles.cluster}
           rotated
           disabled={disabled}

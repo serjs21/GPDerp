@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   SHARE_LINK_ACTION_COLORS,
   SHARE_LINK_ACTION_ICONS,
@@ -18,15 +19,16 @@ export function ShareLinkGoToLinkAction({
   layout = SHARE_LINK_ACTION_LAYOUTS.followLink,
   disabled,
 }: ShareLinkGoToLinkActionProps) {
+  const t = useTranslations("ShareLinkActions.goToLink");
   return (
     <ShareLinkActionButton
       src={SHARE_LINK_ACTION_ICONS.followLink}
-      caption="Follow the link"
+      caption={t("caption")}
       captionClassName={[styles.captionLabels, captionClassName].filter(Boolean).join(" ")}
       layout={layout}
       disabled={disabled}
       rowLayout={SHARE_LINK_ACTION_ROW_LAYOUTS.followLink}
-      ariaLabel={`Open share link for ${subject} in a new tab`}
+      ariaLabel={t("ariaLabel", { subject })}
       color={SHARE_LINK_ACTION_COLORS.followLink.panel}
       hoverFill={SHARE_LINK_ACTION_COLORS.followLink.hover}
       onSelect={() => window.open(shareUrl, "_blank", "noopener,noreferrer")}

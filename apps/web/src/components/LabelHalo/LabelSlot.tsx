@@ -8,6 +8,7 @@ import {
   type FocusEvent,
   type KeyboardEvent,
 } from "react";
+import { useTranslations } from "next-intl";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
@@ -85,6 +86,7 @@ export function LabelSlot({
   style,
   rootRef: rootRefProp,
 }: LabelSlotProps) {
+  const t = useTranslations("LabelHalo.slot");
   const rootRef = useRef<HTMLDivElement | null>(null);
   const draftRotateRef = useRef(rotateDeg);
   const xPercentRef = useRef(xPercent);
@@ -184,7 +186,7 @@ export function LabelSlot({
       type="button"
       className={styles.rotateControl}
       tabIndex={controlsVisible && !disabled ? 0 : -1}
-      aria-label="Rotate label — drag around the label to adjust"
+      aria-label={t("rotateAriaLabel")}
       aria-hidden={!controlsVisible}
       disabled={disabled}
     >
@@ -214,7 +216,7 @@ export function LabelSlot({
       style={style}
       role="group"
       tabIndex={disabled ? -1 : 0}
-      aria-label={`${name} label, ${Math.round(draftRotateDeg)} degrees`}
+      aria-label={t("ariaLabel", { name, degrees: Math.round(draftRotateDeg) })}
       aria-disabled={disabled || undefined}
       onClick={() => {
         if (!disabled) setSelected(true);

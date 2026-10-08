@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
+import { useTranslations } from "next-intl";
 import { Tooltip } from "@/components/StyledComponents";
 import { ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
 import { ComicPressButton } from "@/components/ComicPressButton";
@@ -15,10 +16,13 @@ export type ShareEmailSendPanelProps = {
   onSendEmail: () => void;
 };
 
-const PREPARING_POSTCARD_LABEL = "Preparing postcard…";
-
-const getSendTooltipTitle = (preparingPostcard: boolean, ready: boolean, emailCtaHint: string) => {
-  if (preparingPostcard) return PREPARING_POSTCARD_LABEL;
+const getSendTooltipTitle = (
+  preparingPostcard: boolean,
+  ready: boolean,
+  emailCtaHint: string,
+  preparingPostcardLabel: string,
+) => {
+  if (preparingPostcard) return preparingPostcardLabel;
   return ready ? "" : emailCtaHint;
 };
 
@@ -29,10 +33,12 @@ export function ShareEmailSendPanel({
   emailCtaHint,
   onSendEmail,
 }: ShareEmailSendPanelProps) {
+  const t = useTranslations("ShareModal.sendPanel");
+  const preparingPostcardLabel = t("preparingPostcard");
   const reduceMotion = useReducedMotion();
   const ready = canSendEmail && !sendingEmail;
   const active = canSendEmail || sendingEmail;
-  const tooltipTitle = getSendTooltipTitle(preparingPostcard, ready, emailCtaHint);
+  const tooltipTitle = getSendTooltipTitle(preparingPostcard, ready, emailCtaHint, preparingPostcardLabel);
   const isFlying = sendingEmail && !reduceMotion;
 
   const handleSelect = () => {
@@ -46,7 +52,7 @@ export function ShareEmailSendPanel({
         <span className={styles.tooltipWrap}>
           <ComicPressButton
             className={styles.pressShell}
-            aria-label={preparingPostcard ? PREPARING_POSTCARD_LABEL : "Send email"}
+            aria-label={preparingPostcard ? preparingPostcardLabel : t("sendEmail")}
             aria-busy={sendingEmail}
             disabled={!ready}
             onClick={handleSelect}

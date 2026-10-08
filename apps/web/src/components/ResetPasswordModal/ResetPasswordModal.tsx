@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import axios from "axios";
+import { useTranslations } from "next-intl";
 import { AuthField } from "@/components/AuthFlows/AuthFlowChrome";
 import { ComicModalInput } from "@/components/ComicModalInput";
 import { ComicPageCtaAction, ComicPageDialog } from "@/components/ComicPageLayout";
@@ -32,6 +33,7 @@ export function ResetPasswordModal({
   onRequestDone,
   onConfirmSuccess,
 }: ResetPasswordModalProps) {
+  const t = useTranslations("ResetPasswordModal");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -50,19 +52,19 @@ export function ResetPasswordModal({
   const submitRequest = async () => {
     const trimmed = email.trim().toLowerCase();
     if (!isValidEmail(trimmed)) {
-      setError("Enter a valid email");
+      setError(t("invalidEmail"));
       return;
     }
     setError(null);
     setSubmitting(true);
     try {
       await axios.post("/auth/reset/request", { email: trimmed });
-      comicToast.success("If an account exists for that email, we sent reset instructions.");
+      comicToast.success(t("requestSent"));
       setEmail("");
       onRequestDone?.();
       onClose();
     } catch {
-      comicToast.error("Request failed. Try again.");
+      comicToast.error(t("requestFailed"));
     } finally {
       setSubmitting(false);
     }
@@ -70,31 +72,31 @@ export function ResetPasswordModal({
 
   const submitConfirm = async () => {
     if (!token) {
-      comicToast.error("Reset link is missing or invalid.");
+      comicToast.error(t("linkInvalid"));
       return;
     }
     if (!password || password.length < 8) {
-      setError("Password must be at least 8 characters");
+      setError(t("passwordTooShort"));
       return;
     }
     if (password !== confirm) {
-      setError("Passwords do not match");
+      setError(t("passwordsDoNotMatch"));
       return;
     }
     setError(null);
     setSubmitting(true);
     try {
       await axios.post("/auth/reset/confirm", { token, password });
-      comicToast.success("Password updated. You can sign in now.");
+      comicToast.success(t("confirmSuccess"));
       onConfirmSuccess?.();
       onClose();
     } catch (e: unknown) {
       if (axios.isAxiosError(e) && e.response?.data) {
         const data = e.response.data as { error?: string };
-        comicToast.error(data.error ?? "Reset failed");
+        comicToast.error(data.error ?? t("confirmFailed"));
         return;
       }
-      comicToast.error("Reset failed");
+      comicToast.error(t("confirmFailed"));
     } finally {
       setSubmitting(false);
     }
@@ -109,8 +111,8 @@ export function ResetPasswordModal({
     void submitConfirm();
   };
 
-  const title = mode === "request" ? "Reset password" : "New password";
-  const ctaLabel = mode === "request" ? "Send reset link" : "Update password";
+  const title = mode === "request" ? t("requestTitle") : t("confirmTitle");
+  const ctaLabel = mode === "request" ? t("requestCta") : t("confirmCta");
 
   return (
     <ComicPageDialog
@@ -139,11 +141,9 @@ export function ResetPasswordModal({
       <div className={styles.body}>
         <h2 className={styles.title}>{title}</h2>
         {mode === "request" ? (
-          <p className={styles.lead}>
-            Enter your email and we will send a link if an account exists.
-          </p>
+          <p className={styles.lead}>{t("requestLead")}</p>
         ) : (
-          <p className={styles.lead}>Choose a new password for your account.</p>
+          <p className={styles.lead}>{t("confirmLead")}</p>
         )}
 
         <form className={styles.form} onSubmit={onFormSubmit} noValidate>
@@ -158,8 +158,8 @@ export function ResetPasswordModal({
                   setEmail(e.target.value);
                   setError(null);
                 }}
-                placeholder="Email"
-                aria-label="Email"
+                placeholder={t("emailPlaceholder")}
+                aria-label={t("emailPlaceholder")}
               />
             </AuthField>
           ) : (
@@ -174,8 +174,8 @@ export function ResetPasswordModal({
                     setPassword(e.target.value);
                     setError(null);
                   }}
-                  placeholder="New password"
-                  aria-label="New password"
+                  placeholder={t("newPasswordPlaceholder")}
+                  aria-label={t("newPasswordPlaceholder")}
                 />
               </AuthField>
               <AuthField>
@@ -188,8 +188,8 @@ export function ResetPasswordModal({
                     setConfirm(e.target.value);
                     setError(null);
                   }}
-                  placeholder="Confirm password"
-                  aria-label="Confirm password"
+                  placeholder={t("confirmPasswordPlaceholder")}
+                  aria-label={t("confirmPasswordPlaceholder")}
                 />
               </AuthField>
             </>

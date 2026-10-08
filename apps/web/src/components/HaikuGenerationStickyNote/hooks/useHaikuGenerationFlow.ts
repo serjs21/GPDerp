@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { comicToast } from "@/components/ComicToast";
 import type { HaikuDto } from "@/api/haikus";
 import {
@@ -19,6 +20,7 @@ export type UseHaikuGenerationFlowOptions = {
 
 export function useHaikuGenerationFlow(options?: UseHaikuGenerationFlowOptions) {
   const { onHaikuSaved: onHaikuSavedExtra } = options ?? {};
+  const t = useTranslations("HaikuGenerationStickyNote.generationFlow");
   const queryClient = useQueryClient();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -36,13 +38,12 @@ export function useHaikuGenerationFlow(options?: UseHaikuGenerationFlowOptions) 
   const onError = useCallback(
     (error?: unknown) => {
       if (isInsufficientCreditsError(error)) return;
-      comicToast.error("Don't panic, but something went wrong", {
-        description:
-          "Our slaves are working hard on fixing this issue. We will dispatch someone to hit them harder soon.\nPlease try again later.",
+      comicToast.error(t("errorTitle"), {
+        description: t("errorDescription"),
         duration: 3000,
       });
     },
-    [],
+    [t],
   );
 
   const { savePendingSubject, clearPendingSubject, runAgent } = usePendingHaikuSubmit({

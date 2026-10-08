@@ -9,6 +9,7 @@ import {
   type MouseEvent,
 } from "react";
 import { HexColorPicker } from "react-colorful";
+import { useTranslations } from "next-intl";
 import type { LabelDto } from "@/api/labels";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
@@ -63,6 +64,7 @@ export function ComicLabelCreationModal({
   embedded = false,
   className,
 }: ComicLabelCreationModalProps) {
+  const t = useTranslations("ComicLabelCreationModal");
   const [name, setName] = useState("");
   const [color, setColor] = useState(getRandomLabelColor);
   const [shapeId, setShapeId] = useState<ComicLabelShapeId>("classic");
@@ -79,7 +81,7 @@ export function ComicLabelCreationModal({
   const shape = resolveComicLabelShapePreset(shapeId);
   const previewText =
     trimmedName.length > 0 ? formatComicLabelText(trimmedName) : formatComicLabelText("__");
-  const saveText = formatComicLabelText(label ? "Save" : "Create");
+  const saveText = formatComicLabelText(label ? t("save") : t("create"));
   const previewBackground = isFineLabelText(trimmedName) ? "fine" : "solid";
 
   const isShort = trimmedName.length > 0 && trimmedName.length < COMIC_LABEL_NAME_MIN;
@@ -89,13 +91,13 @@ export function ComicLabelCreationModal({
       (!label || l.id !== label.id),
   );
   const disabledReason = isLoading
-    ? "Loading labels..."
+    ? t("loadingLabels")
     : trimmedName.length === 0
-      ? "Enter a label name"
+      ? t("enterName")
       : isShort
-        ? `Name should be at least ${COMIC_LABEL_NAME_MIN} characters`
+        ? t("nameTooShort", { min: COMIC_LABEL_NAME_MIN })
         : exists
-          ? "Label already exists in this account"
+          ? t("alreadyExists")
           : null;
   const canSave = !disabledReason && !isCreating && !isUpdating;
   const busy = isCreating || isUpdating;
@@ -150,12 +152,12 @@ export function ComicLabelCreationModal({
         color,
         shape: shapeId,
         onSuccess: async (updated) => {
-          comicToast.success("Label updated");
+          comicToast.success(t("updated"));
           onUpdated?.(updated);
           onClose();
         },
         onError: async () => {
-          comicToast.error("Could not update label");
+          comicToast.error(t("updateError"));
         },
       });
       return;
@@ -165,7 +167,7 @@ export function ComicLabelCreationModal({
       color,
       shape: shapeId,
       onSuccess: async (created) => {
-        comicToast.success("Label created");
+        comicToast.success(t("created"));
         onCreated?.(created);
         setName("");
         setColor(getRandomLabelColor());
@@ -174,7 +176,7 @@ export function ComicLabelCreationModal({
         if (!embedded) onClose();
       },
       onError: async () => {
-        comicToast.error("Could not create label");
+        comicToast.error(t("createError"));
       },
     });
   };
@@ -192,10 +194,10 @@ export function ComicLabelCreationModal({
           color="white"
           contentAlign="center"
           className={styles.previewPanel}
-          title="This is"
+          title={t("previewTitle")}
           footer={
             trimmedName.length >= 0 && trimmedName.length < COMIC_LABEL_NAME_MIN
-              ? `Min ${COMIC_LABEL_NAME_MIN} chars`
+              ? t("minChars", { min: COMIC_LABEL_NAME_MIN })
               : undefined
           }
         >
@@ -214,7 +216,7 @@ export function ComicLabelCreationModal({
                 className={styles.previewInput}
                 value={name}
                 maxLength={COMIC_LABEL_NAME_MAX}
-                aria-label="Label name"
+                aria-label={t("nameAriaLabel")}
                 placeholder=""
                 autoComplete="off"
                 spellCheck={false}
@@ -228,7 +230,7 @@ export function ComicLabelCreationModal({
           <ComicPagePanel
             title={
               <span className={styles.colorTitle}>
-                Color
+                {t("color")}
                 {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG asset */}
                 <img
                   className={styles.fineDog}
@@ -246,7 +248,7 @@ export function ComicLabelCreationModal({
             className={[styles.colorPanel, pickerOpen ? styles.colorPanelOpen : ""]
               .filter(Boolean)
               .join(" ")}
-            ariaLabel="Label color"
+            ariaLabel={t("colorAriaLabel")}
             style={colorPanelStyle}
           >
             {pickerOpen ? null : (
@@ -254,7 +256,7 @@ export function ComicLabelCreationModal({
                 type="button"
                 className={styles.colorBody}
                 onClick={openPicker}
-                aria-label="Open color picker"
+                aria-label={t("openColorPicker")}
               >
                 <span className={styles.brushPad}>
                   {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG asset */}
@@ -292,7 +294,7 @@ export function ComicLabelCreationModal({
                     overflowVisible
                     flexWeight={1}
                     className={styles.shapePanel}
-                    ariaLabel={`${preset.label} shape`}
+                    ariaLabel={t("shapeAriaLabel", { shape: t(preset.labelKey) })}
                     style={
                       selected
                         ? ({ "--comic-panel-base": color } as CSSProperties)
@@ -329,7 +331,7 @@ export function ComicLabelCreationModal({
               className={styles.saveButton}
               disabled={!canSave}
               aria-busy={busy || undefined}
-              aria-label={label ? "Save label" : "Create label"}
+              aria-label={label ? t("saveAriaLabel") : t("createAriaLabel")}
               onClick={(event) => {
                 event.preventDefault();
                 if (!canSave) return;

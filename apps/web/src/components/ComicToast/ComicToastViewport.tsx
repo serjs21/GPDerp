@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { COMIC_TOAST_MAX_VISIBLE } from "./comicToastPresets";
@@ -14,6 +15,7 @@ export type ComicToastViewportProps = {
 };
 
 export function ComicToastViewport({ toasts, onDismiss, onRemove }: ComicToastViewportProps) {
+  const t = useTranslations("ComicToast");
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -24,7 +26,7 @@ export function ComicToastViewport({ toasts, onDismiss, onRemove }: ComicToastVi
   const visible = toasts.slice(-COMIC_TOAST_MAX_VISIBLE);
 
   return createPortal(
-    <div className={styles.viewport} aria-label="Notifications">
+    <div className={styles.viewport} aria-label={t("notifications")}>
       {visible.map((toast) => (
         <ComicToastItem key={toast.id} toast={toast} onDismiss={onDismiss} onRemove={onRemove} />
       ))}

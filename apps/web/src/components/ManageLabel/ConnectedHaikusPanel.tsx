@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type { LabelConnectedHaikuPreview } from "@/api/labels";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { ConnectedLanternStack } from "./ConnectedLanternStack";
@@ -18,9 +19,10 @@ export function ConnectedHaikusPanel({
   items,
   total,
 }: ConnectedHaikusPanelProps) {
+  const t = useTranslations("ManageLabel.connectedHaikus");
   const footer =
   total > 0 ? (
-      <div >{`${total} connected`}
+      <div >{t("connected", { total })}
       </div>
     ) : undefined;
 
@@ -32,7 +34,7 @@ export function ConnectedHaikusPanel({
       contentAlign="center"
       footer={footer}
       className={styles.connectedPanel}
-      ariaLabel={`Haikus labeled ${labelName}`}
+      ariaLabel={t("ariaLabel", { name: labelName })}
     >
       <ConnectedLanternStack accountId={accountId} items={items} />
     </ComicPagePanel>

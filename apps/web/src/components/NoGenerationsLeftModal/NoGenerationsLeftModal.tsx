@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ComicPageCtaAction, ComicPageDialog } from "@/components/ComicPageLayout";
 import {
   NO_GENERATIONS_LEFT_BUY_LABEL,
@@ -17,6 +18,7 @@ export function NoGenerationsLeftModal({
   buying = false,
   buyDisabled = false,
 }: NoGenerationsLeftModalProps) {
+  const t = useTranslations("NoGenerationsLeftModal");
   return (
     <ComicPageDialog
       open={open}
@@ -26,12 +28,12 @@ export function NoGenerationsLeftModal({
       ctaFooter={
         <>
           <ComicPageCtaAction
-            label={NO_GENERATIONS_LEFT_DISMISS_LABEL}
+            label={t(NO_GENERATIONS_LEFT_DISMISS_LABEL)}
             disabled={buying}
             onClick={() => onOpenChange(false)}
           />
           <ComicPageCtaAction
-            label={NO_GENERATIONS_LEFT_BUY_LABEL}
+            label={t(NO_GENERATIONS_LEFT_BUY_LABEL)}
             busy={buying}
             disabled={buyDisabled}
             onClick={onBuy}
@@ -40,7 +42,7 @@ export function NoGenerationsLeftModal({
       }
     >
       <div className={styles.body}>
-        <h2 className={styles.title}>{NO_GENERATIONS_LEFT_TITLE}</h2>
+        <h2 className={styles.title}>{t(NO_GENERATIONS_LEFT_TITLE)}</h2>
         <p className={styles.message}>{message}</p>
       </div>
     </ComicPageDialog>

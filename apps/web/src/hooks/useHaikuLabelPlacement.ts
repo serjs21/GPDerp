@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { useTranslations } from "next-intl";
 import { updateHaikuLabelPlacement } from "@/api/labels";
 import type { LabelPlacement } from "@/components/LabelHalo/consts/labelHaloConsts";
 import { comicToast } from "@/components/ComicToast";
@@ -19,6 +20,7 @@ export function useHaikuLabelPlacement({
   enabled = true,
   onChanged,
 }: UseHaikuLabelPlacementOptions) {
+  const t = useTranslations("LabelHooks");
   const [saving, setSaving] = useState(false);
 
   const onPlacementCommit = useCallback(
@@ -34,12 +36,12 @@ export function useHaikuLabelPlacement({
         });
         onChanged?.();
       } catch {
-        comicToast.error("Could not save label placement");
+        comicToast.error(t("placementError"));
       } finally {
         setSaving(false);
       }
     },
-    [enabled, haikuId, onChanged],
+    [enabled, haikuId, onChanged, t],
   );
 
   return { onPlacementCommit, saving };

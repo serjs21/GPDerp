@@ -11,6 +11,8 @@ export const USER_MENU_BURST_SIZE = HEADER_NAV_ICON_SIZE_PX;
 export type UserMenuBurstFrameProps = {
   /** Burst seed / a11y context text. */
   label: string;
+  /** Overrides `label` as the burst shape seed. */
+  seedId?: string;
   className?: string;
   size?: number;
   /** Silhouette fill — cream for header chrome, white for option icons. */
@@ -21,6 +23,7 @@ export type UserMenuBurstFrameProps = {
 /** Sharp comic-burst frame matching the UserMenu avatar trigger. */
 export function UserMenuBurstFrame({
   label,
+  seedId,
   className,
   size = USER_MENU_BURST_SIZE,
   fill = "var(--brush-option-icon-fill, #ffffff)",
@@ -35,7 +38,7 @@ export function UserMenuBurstFrame({
       shapeKind={sharpShape.kind}
       spikeCount={sharpShape.spikeCount}
       randomness={sharpShape.randomness}
-      seed={`${sharpShape.id}-${label}`}
+      seed={`${sharpShape.id}-${seedId ?? label}`}
       fontSize={size}
       paddingX={0}
       paddingY={0}

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import axios from "axios";
+import { useTranslations } from "next-intl";
 import { flushAuthRequestQueue } from "@/axios.setup";
 import authStyles from "../auth.shared.module.css";
 import { useAuthenticationState } from "../providers/AuthenticationProvider";
@@ -17,6 +18,7 @@ import {
 } from "@/utils/auth/postLoginReturn";
 
 const LoginPage = () => {
+  const t = useTranslations("LoginPage");
   const router = useRouter();
   const { checkAuthentication } = useAuthenticationState();
   const { openResetPasswordModal } = useAuthenticationVerification();
@@ -34,24 +36,24 @@ const LoginPage = () => {
 
   return (
     <div className={authStyles.authPage}>
-      <Card className={authStyles.card} title="Sign in">
+      <Card className={authStyles.card} title={t("title")}>
         <LoginFlow
           onSuccess={onLoginSuccess}
           showGoogle
           onGoogleSignupRequired={() => {
-            comicToast.info("Complete account setup on the registration page.");
+            comicToast.info(t("completeSetupOnRegistration"));
             router.push("/register");
           }}
         />
         <Typography.Paragraph type="secondary" className={authStyles.footerLinks}>
-          <Link href="/register">Create an account</Link>
+          <Link href="/register">{t("createAccountLink")}</Link>
           {" · "}
           <button
             type="button"
             className={authStyles.textLinkButton}
             onClick={() => openResetPasswordModal({ mode: "request" })}
           >
-            Forgot password?
+            {t("forgotPassword")}
           </button>
         </Typography.Paragraph>
       </Card>

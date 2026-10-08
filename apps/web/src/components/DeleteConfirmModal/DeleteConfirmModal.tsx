@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ComicConfirmModal } from "@/components/ComicConfirmModal";
 
 export type DeleteConfirmModalProps = {
@@ -12,26 +13,23 @@ export type DeleteConfirmModalProps = {
   confirmLabel?: string;
 };
 
-const DEFAULT_QUESTION = "Did you mean to do that?";
-const DEFAULT_CANCEL = "Nope";
-const DEFAULT_CONFIRM = "Yep";
-
 export function DeleteConfirmModal({
   open,
   onOpenChange,
   onConfirm,
   confirming = false,
-  question = DEFAULT_QUESTION,
-  cancelLabel = DEFAULT_CANCEL,
-  confirmLabel = DEFAULT_CONFIRM,
+  question,
+  cancelLabel,
+  confirmLabel,
 }: DeleteConfirmModalProps) {
+  const t = useTranslations("DeleteConfirmModal");
   return (
     <ComicConfirmModal
       open={open}
       onOpenChange={onOpenChange}
-      question={question}
-      cancelLabel={cancelLabel}
-      confirmLabel={confirmLabel}
+      question={question ?? t("question")}
+      cancelLabel={cancelLabel ?? t("cancel")}
+      confirmLabel={confirmLabel ?? t("confirm")}
       confirming={confirming}
       closeOnSelect={false}
       onConfirm={() => {

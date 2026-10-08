@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { Button, Card, Typography } from "@/components/StyledComponents";
 
 export type VerifyEmailUiState = "verifying" | "alreadyValidated" | "tokenExpired";
@@ -17,35 +18,35 @@ export function VerifyEmailCard({
   resendDone = false,
   onResend,
 }: VerifyEmailCardProps) {
+  const t = useTranslations("VerifyEmail");
+
   if (state === "verifying") {
     return (
-      <Card title="Verifying your email">
-        <Typography.Paragraph>Please wait while we validate your link.</Typography.Paragraph>
+      <Card title={t("verifyingTitle")}>
+        <Typography.Paragraph>{t("verifyingBody")}</Typography.Paragraph>
       </Card>
     );
   }
 
   if (state === "alreadyValidated") {
     return (
-      <Card title="Email already verified">
+      <Card title={t("alreadyVerifiedTitle")}>
         <Typography.Paragraph>
-          Your email is already validated. Redirecting to the home page in {countdownSeconds} seconds.
+          {t("alreadyVerifiedBody", { seconds: countdownSeconds })}
         </Typography.Paragraph>
       </Card>
     );
   }
 
   return (
-    <Card title={resendDone ? "Verification email sent" : "Verification link expired"}>
+    <Card title={resendDone ? t("resentTitle") : t("expiredTitle")}>
       {resendDone ? (
-        <Typography.Paragraph>
-          We sent a new verification email. Please check your inbox and use the latest link.
-        </Typography.Paragraph>
+        <Typography.Paragraph>{t("resentBody")}</Typography.Paragraph>
       ) : (
         <>
-          <Typography.Paragraph>This verification link has expired.</Typography.Paragraph>
+          <Typography.Paragraph>{t("expiredBody")}</Typography.Paragraph>
           <Button type="link" onClick={onResend} disabled={resendPending}>
-            {resendPending ? "Sending..." : "Resend verification email"}
+            {resendPending ? t("resending") : t("resend")}
           </Button>
         </>
       )}

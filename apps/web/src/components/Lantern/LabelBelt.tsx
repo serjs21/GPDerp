@@ -10,6 +10,7 @@ import {
   type AnimationEvent,
   type CSSProperties,
 } from "react";
+import { useTranslations } from "next-intl";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
@@ -122,6 +123,7 @@ export const LabelBelt = memo(function LabelBelt({
   maxVisible = LABEL_BELT_MAX_VISIBLE,
   className,
 }: LabelBeltProps) {
+  const t = useTranslations("Lantern.labelBelt");
   const [rotationOffset, setRotationOffset] = useState(0);
   const [transition, setTransition] = useState<PortalTransition | null>(null);
   const [puffDelays, setPuffDelays] = useState<Record<string, number>>({});
@@ -229,7 +231,7 @@ export const LabelBelt = memo(function LabelBelt({
   return (
     <div
       className={[styles.overlay, className].filter(Boolean).join(" ")}
-      aria-label="Haiku label belt"
+      aria-label={t("ariaLabel")}
     >
       {slots.map((slot) => {
         const rotating = Boolean(slot.inn);
@@ -307,7 +309,7 @@ export const LabelBelt = memo(function LabelBelt({
           <button
             type="button"
             className={[styles.navButton, styles.navPrev].join(" ")}
-            aria-label="Previous labels"
+            aria-label={t("previous")}
             disabled={busy || Boolean(transition)}
             onClick={() => step(-1)}
           >
@@ -317,7 +319,7 @@ export const LabelBelt = memo(function LabelBelt({
           <button
             type="button"
             className={[styles.navButton, styles.navNext].join(" ")}
-            aria-label="Next labels"
+            aria-label={t("next")}
             disabled={busy || Boolean(transition)}
             onClick={() => step(1)}
           >

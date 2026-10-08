@@ -7,10 +7,10 @@ export function isMainPage(pathname: string): boolean {
   return pathname === "/";
 }
 
-export function goHomeOption(): BrushMenuOption {
+export function goHomeOption(t: (key: typeof USER_MENU_GO_HOME.labelKey) => string): BrushMenuOption {
   return {
     value: USER_MENU_GO_HOME.value,
-    label: <GoHomeOptionLabel text={USER_MENU_GO_HOME.label} />,
+    label: <GoHomeOptionLabel text={t(USER_MENU_GO_HOME.labelKey)} />,
     iconSrc: USER_MENU_GO_HOME.backgroundSrc,
     className: styles.goHomeOption,
   };

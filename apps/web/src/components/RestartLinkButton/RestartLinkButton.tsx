@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useRef, useState, type CSSProperties, type FocusEvent } from "react";
+import { useTranslations } from "next-intl";
 import { ComicPressButton } from "@/components/ComicPressButton";
 import styles from "./RestartLinkButton.module.css";
 import {
@@ -31,13 +32,13 @@ const FILTER_ICON_SRC: Record<RestartLinkReason, string> = {
 };
 
 const IDLE_LABEL: Record<RestartLinkReason, string> = {
-  expired: "Expired",
-  limit_reached: "0 hits left",
+  expired: "expired",
+  limit_reached: "limitReached",
 };
 
 const HOVER_LABEL: Record<RestartLinkReason, string> = {
-  expired: "Revive!",
-  limit_reached: "Resurrect!",
+  expired: "revive",
+  limit_reached: "resurrect",
 };
 
 const HIPOINTS_SRC = "/profile/re-hipoints.svg";
@@ -89,12 +90,13 @@ function ReviveLockup({
   lockupRef: RestartLinkButtonAnimationRefs["reviveLockup"];
   bannerRef: RestartLinkButtonAnimationRefs["reviveBanner"];
 }) {
+  const t = useTranslations("RestartLinkButton");
   return (
     <span ref={lockupRef} className={styles.reviveLockup} aria-hidden>
       {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
       <img src={RE_EXPIRED_SRC} alt="" className={styles.reviveEmblem} />
       <span ref={bannerRef} className={styles.reviveBanner}>
-        <span className={styles.reviveText}>Revive!</span>
+        <span className={styles.reviveText}>{t("revive")}</span>
       </span>
     </span>
   );
@@ -117,6 +119,7 @@ function ButtonFace({
   hipoints: RestartLinkButtonAnimationRefs["hipoints"];
   filterIcon: RestartLinkButtonAnimationRefs["filterIcon"];
 }) {
+  const t = useTranslations("RestartLinkButton");
   return (
     <span
       ref={idleFace}
@@ -132,10 +135,10 @@ function ButtonFace({
         </span>
       </span>
       <span className={styles.labelSlot}>
-        <CharLine text={IDLE_LABEL[reason]} className={styles.labelLine} lineRef={idleChars} />
+        <CharLine text={t(IDLE_LABEL[reason])} className={styles.labelLine} lineRef={idleChars} />
         {showHipoints ? (
           <CharLine
-            text={HOVER_LABEL.limit_reached}
+            text={t(HOVER_LABEL.limit_reached)}
             className={[styles.labelLine, styles.labelLineHover].join(" ")}
             lineRef={hoverChars}
           />
@@ -155,6 +158,7 @@ export function RestartLinkButton({
   reviveTextY = 80,
   reviveTextRotate = -3,
 }: RestartLinkButtonProps) {
+  const t = useTranslations("RestartLinkButton");
   const idleFace = useRef<HTMLElement | null>(null);
   const idleChars = useRef<HTMLElement | null>(null);
   const hoverChars = useRef<HTMLElement | null>(null);
@@ -192,7 +196,7 @@ export function RestartLinkButton({
       className={[styles.root, className].filter(Boolean).join(" ")}
       style={showRevive ? reviveBannerStyle(reviveTextX, reviveTextY, reviveTextRotate) : undefined}
       disabled={disabled}
-      aria-label={HOVER_LABEL[reason]}
+      aria-label={t(HOVER_LABEL[reason])}
       onClick={onClick}
       onMouseEnter={() => setPointerInside(true)}
       onMouseLeave={() => setPointerInside(false)}

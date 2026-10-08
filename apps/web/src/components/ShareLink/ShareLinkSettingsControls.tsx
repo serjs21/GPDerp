@@ -1,6 +1,7 @@
 "use client";
 
 import dayjs from "dayjs";
+import { useTranslations } from "next-intl";
 import type { Dispatch, SetStateAction } from "react";
 import { ComicPressButton } from "@/components/ComicPressButton";
 import { DatePicker, InputNumber } from "@/components/StyledComponents";
@@ -98,12 +99,13 @@ export function ShareLinkSettingsControls({
   hideUpdate = false,
   hideLifecycleAction = false,
 }: ShareLinkSettingsControlsProps) {
+  const t = useTranslations("ShareLink.settings");
   return (
     <>
       <div className={styles.limitsRow}>
         <div className={styles.limitFields}>
           <label className={styles.limitField}>
-            <span className={styles.limitLabel}>Hits limit:</span>
+            <span className={styles.limitLabel}>{t("hitsLimit")}</span>
             <span className={styles.limitControl}>
               <InputNumber
                 min={1}
@@ -124,12 +126,12 @@ export function ShareLinkSettingsControls({
           </label>
 
           <label className={styles.limitField}>
-            <span className={styles.limitLabel}>Timeout at:</span>
+            <span className={styles.limitLabel}>{t("timeoutAt")}</span>
             <span className={styles.limitControl}>
               <DatePicker
                 showTime
                 allowClear
-                placeholder="End of times"
+                placeholder={t("timeoutPlaceholder")}
                 value={form.expiresAt}
                 disabled={limitsLocked}
                 minDate={minTimeoutAt()}
@@ -155,19 +157,19 @@ export function ShareLinkSettingsControls({
             className={styles.updateButton}
             disabled={!formValid || isUpdating || busy}
             onClick={() => void onUpdateLimits()}
-            aria-label="Update link"
+            aria-label={t("updateAriaLabel")}
             aria-live="polite"
           >
             {updatingLimits ? (
               <span className={styles.actionLabel}>
-                Updating
+                {t("updating")}
                 <span className={styles.activatingDots}>{busyDots}</span>
               </span>
             ) : (
               <>
                 {/* eslint-disable-next-line @next/next/no-img-element -- action icon asset */}
                 <img src={UPDATE_ICON_SRC} alt="" className={styles.actionIcon} aria-hidden />
-                <span className={styles.actionLabel}>Update</span>
+                <span className={styles.actionLabel}>{t("update")}</span>
               </>
             )}
           </ComicPressButton>

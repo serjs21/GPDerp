@@ -9,6 +9,7 @@ import {
   type AnimationEvent,
   type CSSProperties,
 } from "react";
+import { useTranslations } from "next-intl";
 import {
   COVER_ICON_EXIT_MS,
   COVER_LABEL_MORPH_MS,
@@ -79,6 +80,7 @@ export function CoverState({
   onFlippedChange,
   ...dualityProps
 }: CoverStateProps) {
+  const t = useTranslations("DualityButton.coverState");
   const isControlled = uncoveredProp != null;
   const [uncoveredInternal, setUncoveredInternal] = useState(defaultUncovered);
   const uncovered = isControlled ? uncoveredProp! : uncoveredInternal;
@@ -269,7 +271,7 @@ export function CoverState({
         <button
           type="button"
           className={styles.hit}
-          aria-label={coverAriaLabel ?? `Reveal ${title}`}
+          aria-label={coverAriaLabel ?? t("reveal", { title })}
           disabled={disabled || opening || closing}
           onClick={onCoverClick}
         />

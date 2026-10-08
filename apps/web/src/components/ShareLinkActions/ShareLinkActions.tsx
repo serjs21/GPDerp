@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   SHARE_LINK_ACTION_COLORS,
   SHARE_LINK_ACTION_ICONS,
@@ -26,19 +27,20 @@ export function ShareLinkActions({
   onDelete,
   className,
 }: ShareLinkActionsProps) {
+  const t = useTranslations("ShareLinkActions.actions");
   return (
     <div
       className={[styles.stack, className].filter(Boolean).join(" ")}
       role="group"
-      aria-label={`Share link actions for ${subject}`}
+      aria-label={t("groupAriaLabel", { subject })}
     >
       <ShareLinkGoToLinkAction subject={subject} shareUrl={shareUrl} />
       <ShareLinkActionButton
         src={SHARE_LINK_ACTION_ICONS.preview}
-        caption="Preview"
+        caption={t("preview")}
         layout={SHARE_LINK_ACTION_LAYOUTS.preview}
         rowLayout={SHARE_LINK_ACTION_ROW_LAYOUTS.preview}
-        ariaLabel={`Preview ${subject}`}
+        ariaLabel={t("previewAriaLabel", { subject })}
         color={SHARE_LINK_ACTION_COLORS.preview.panel}
         hoverFill={SHARE_LINK_ACTION_COLORS.preview.hover}
         onSelect={onPreview}
@@ -55,10 +57,10 @@ export function ShareLinkActions({
       />
       <ShareLinkActionButton
         src={SHARE_LINK_ACTION_ICONS.delete}
-        caption="Delete"
+        caption={t("delete")}
         layout={SHARE_LINK_ACTION_LAYOUTS.delete}
         rowLayout={SHARE_LINK_ACTION_ROW_LAYOUTS.delete}
-        ariaLabel={`Delete share link for ${subject}`}
+        ariaLabel={t("deleteAriaLabel", { subject })}
         color={SHARE_LINK_ACTION_COLORS.delete.panel}
         hoverFill={SHARE_LINK_ACTION_COLORS.delete.hover}
         invertCaptionOnHover

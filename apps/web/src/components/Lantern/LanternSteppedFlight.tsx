@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 import type { HaikuDto } from "@/api/haikus";
 import {
   SteppedTransition,
@@ -46,6 +47,7 @@ export function LanternSteppedFlight({
   onComplete,
   onPoseHold,
 }: LanternSteppedFlightProps) {
+  const t = useTranslations("Lantern.lanternSteppedFlight");
   const reducedMotion = reducedMotionProp ?? prefersReducedMotion();
   const flightInput = useMemo(
     () => lanternTransformToFlightInput(transform),
@@ -84,7 +86,7 @@ export function LanternSteppedFlight({
             style={flightStyle}
             flightExiting
             widthRem={widthRem}
-            ariaLabel={`Deleting haiku: ${haiku.title ?? ""}`}
+            ariaLabel={t("deleting", { title: haiku.title ?? "" })}
             haikuLabels={haiku.labels}
             excludeLabelIds={excludeLabelIds}
           >

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
 import { LabelHalo } from "@/components/LabelHalo/LabelHalo";
 import {
@@ -41,6 +42,7 @@ export function LanternPathLantern({
   onChanged,
   ...contentProps
 }: LanternPathLanternProps) {
+  const t = useTranslations("Lantern.lanternPathLantern");
   const transform = resolveLanternAtPathStop(pathStop);
   const isFocused = Math.abs(pathStop - LANTERN_PATH_FOCUS_STOP) < 0.5;
   const haiku = "haiku" in contentProps ? contentProps.haiku : undefined;
@@ -57,10 +59,10 @@ export function LanternPathLantern({
 
   const ariaLabel =
     "generatingDraft" in contentProps && contentProps.generatingDraft
-      ? `Generating haiku: ${contentProps.generatingDraft.subject}`
+      ? t("generating", { subject: contentProps.generatingDraft.subject })
       : haiku
-        ? `Haiku lantern: ${haiku.title}`
-        : "Haiku lantern";
+        ? t("haikuLantern", { title: haiku.title })
+        : t("lantern");
 
   const lanternClassName = [
     styles.flightPathLantern,
@@ -101,7 +103,7 @@ export function LanternPathLantern({
         interactive={isFocused}
         labels={haloLabels}
         onPlacementCommit={isFocused ? onPlacementCommit : undefined}
-        ariaLabel={`${ariaLabel} labels`}
+        ariaLabel={t("labels", { label: ariaLabel })}
       >
         <LanternFrame
           transform={IDENTITY_TRANSFORM}

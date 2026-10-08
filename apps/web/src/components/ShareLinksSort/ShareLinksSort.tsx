@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { CoverState } from "@/components/DualityButton";
 import { useElementWidth } from "@/hooks/useElementWidth";
@@ -42,15 +43,17 @@ export function ShareLinksSort({
   disabled = false,
   rotated = false,
   className,
-  "aria-label": ariaLabel = "Sort share links",
+  "aria-label": ariaLabelProp,
 }: ShareLinksSortProps) {
+  const t = useTranslations("ShareLinksSort");
+  const ariaLabel = ariaLabelProp ?? t("ariaLabel");
   const { locale } = useLocale();
   const categories = categoriesProp ?? resolveShareLinksSortCategories(locale);
   const [clusterRef, clusterWidth] = useElementWidth<HTMLDivElement>(rotated);
   const coinSizeRem = rotatedSortCoinSizeRem(clusterWidth, sizeRem);
   return (
     <ComicPagePanel
-      title="Sort by"
+      title={t("title")}
       titleDirection={rotated ? "horizontal" : "vertical"}
       background="solid"
       color="#58adff"
@@ -72,13 +75,14 @@ export function ShareLinksSort({
       >
         {categories.map((category) => {
           const selected = category.id === value.categoryId;
+          const title = t(`categories.${category.titleKey}`);
           return (
             <CoverState
               key={category.id}
               className={styles.coin}
               iconSrc={category.coverSrc}
               coverMirrored={category.coverMirrored}
-              title={category.title}
+              title={title}
               sizeRem={coinSizeRem}
               uncovered={selected}
               onUncoveredChange={(open) => {
@@ -102,8 +106,8 @@ export function ShareLinksSort({
               centerIconScale={category.centerIconScale}
               iconTone={category.iconTone}
               disabled={disabled}
-              aria-label={category.ariaLabel}
-              coverAriaLabel={`Select ${category.title}`}
+              aria-label={t(`categories.${category.ariaLabelKey}`)}
+              coverAriaLabel={t("coverAriaLabel", { title })}
             />
           );
         })}

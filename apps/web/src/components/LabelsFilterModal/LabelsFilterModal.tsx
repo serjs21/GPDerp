@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ComicLabelPickerPanel } from "@/components/ComicLabelPickerPanel";
 import { ComicPageDialog } from "@/components/ComicPageLayout";
 import styles from "./LabelsFilterModal.module.css";
@@ -33,6 +34,7 @@ export function LabelsFilterModal({
   excludeIds,
   onApply,
 }: LabelsFilterModalProps) {
+  const t = useTranslations("LabelsFilterModal");
   const [draftIncludeIds, setDraftIncludeIds] = useState<string[]>(includeIds);
   const [prevOpen, setPrevOpen] = useState(open);
 
@@ -77,7 +79,7 @@ export function LabelsFilterModal({
               active={open}
               accountId={accountId}
               seedLabelIds={draftIncludeIds}
-              footerLabel="Filter"
+              footerLabel={t("filter")}
               onFooter={submitFilter}
               onSelectionChange={setDraftIncludeIds}
             />

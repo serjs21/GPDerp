@@ -8,6 +8,7 @@ import {
   type FormEvent,
 } from "react";
 import axios from "axios";
+import { useTranslations } from "next-intl";
 import authStyles from "@/app/auth.shared.module.css";
 import { useGoogleOAuthAvailability } from "@/app/providers/GoogleOAuthAvailabilityProvider";
 import { AuthField, GoogleSquareButton } from "@/components/AuthFlows/AuthFlowChrome";
@@ -38,6 +39,8 @@ type GoogleSignupRequiredResponse = {
   code?: string;
 };
 
+type LoginTranslator = ReturnType<typeof useTranslations>;
+
 const logAuthDebug = (event: string, data: Record<string, unknown>) => {
   if (process.env.NODE_ENV === "production") return;
   console.info(`[auth-debug] ${event}`, data);
@@ -56,23 +59,24 @@ const logAxiosAuthError = (event: string, endpoint: string, error: unknown) => {
   logAuthDebug(event, { endpoint, nonAxiosError: true });
 };
 
-const notifyPasswordLoginError = (error: unknown) => {
+const notifyPasswordLoginError = (error: unknown, t: LoginTranslator) => {
   if (axios.isAxiosError(error) && error.response?.data) {
     const data = error.response.data as { error?: string; code?: string };
     if (data.code === "USE_GOOGLE") {
-      comicToast.warning(data.error ?? "This account uses Google sign-in.");
+      comicToast.warning(data.error ?? t("useGoogleSignIn"));
       return;
     }
     if (error.response.status === 429) {
-      comicToast.error(data.error ?? "Too many attempts. Try again later.");
+      comicToast.error(data.error ?? t("tooManyAttempts"));
       return;
     }
   }
-  comicToast.error("Invalid email or password");
+  comicToast.error(t("invalidCredentials"));
 };
 
 const notifyGoogleLoginError = (
   error: unknown,
+  t: LoginTranslator,
   onGoogleSignupRequired?: () => void,
 ) => {
   if (axios.isAxiosError(error) && error.response?.status === 409) {
@@ -81,12 +85,12 @@ const notifyGoogleLoginError = (
       if (onGoogleSignupRequired) {
         onGoogleSignupRequired();
       } else {
-        comicToast.info("Complete account setup on the registration page.");
+        comicToast.info(t("completeSetupOnRegistration"));
       }
       return;
     }
   }
-  comicToast.error("Google sign-in failed");
+  comicToast.error(t("googleSignInFailed"));
 };
 
 function isValidEmail(value: string) {
@@ -103,6 +107,7 @@ export const LoginFlow = forwardRef<AuthFlowHandle, LoginFlowProps>(function Log
   },
   ref,
 ) {
+  const t = useTranslations("AuthFlows.login");
   const googleOAuthEnabled = useGoogleOAuthAvailability();
   const canShowGoogle = showGoogle && googleOAuthEnabled;
   const [email, setEmail] = useState("");
@@ -123,7 +128,7 @@ export const LoginFlow = forwardRef<AuthFlowHandle, LoginFlowProps>(function Log
       onSuccess();
     } catch (e: unknown) {
       logAxiosAuthError("password_login_request_error", "/auth/login", e);
-      notifyPasswordLoginError(e);
+      notifyPasswordLoginError(e, t);
     } finally {
       setSubmitting(false);
     }
@@ -132,11 +137,11 @@ export const LoginFlow = forwardRef<AuthFlowHandle, LoginFlowProps>(function Log
   const validateAndSubmit = () => {
     const trimmedEmail = email.trim();
     if (!trimmedEmail || !isValidEmail(trimmedEmail)) {
-      setError("Enter a valid email");
+      setError(t("invalidEmail"));
       return;
     }
     if (!password) {
-      setError("Password is required");
+      setError(t("passwordRequired"));
       return;
     }
     setError(null);
@@ -157,7 +162,7 @@ export const LoginFlow = forwardRef<AuthFlowHandle, LoginFlowProps>(function Log
       onSuccess();
     } catch (e: unknown) {
       logAxiosAuthError("google_login_request_error", "/auth/google/login", e);
-      notifyGoogleLoginError(e, onGoogleSignupRequired);
+      notifyGoogleLoginError(e, t, onGoogleSignupRequired);
     }
   };
 
@@ -173,9 +178,9 @@ export const LoginFlow = forwardRef<AuthFlowHandle, LoginFlowProps>(function Log
           <GoogleSquareButton
             text="signin_with"
             onSuccess={(credential) => void onGoogleCredential(credential)}
-            onError={() => comicToast.error("Google sign-in failed")}
+            onError={() => comicToast.error(t("googleSignInFailed"))}
           />
-          <div className={authStyles.divider}>or sign in with email</div>
+          <div className={authStyles.divider}>{t("divider")}</div>
         </div>
       ) : null}
 
@@ -190,8 +195,8 @@ export const LoginFlow = forwardRef<AuthFlowHandle, LoginFlowProps>(function Log
               setEmail(e.target.value);
               setError(null);
             }}
-            placeholder="Email"
-            aria-label="Email"
+            placeholder={t("emailPlaceholder")}
+            aria-label={t("emailPlaceholder")}
           />
         </AuthField>
         <AuthField>
@@ -204,15 +209,15 @@ export const LoginFlow = forwardRef<AuthFlowHandle, LoginFlowProps>(function Log
               setPassword(e.target.value);
               setError(null);
             }}
-            placeholder="Password"
-            aria-label="Password"
+            placeholder={t("passwordPlaceholder")}
+            aria-label={t("passwordPlaceholder")}
           />
         </AuthField>
         {error ? <p className={authStyles.fieldError}>{error}</p> : null}
         {!hideCta ? (
           <div className={authStyles.submitItem}>
             <ComicPageCtaAction
-              label={submitting ? "Signing in" : "Sign in"}
+              label={submitting ? t("submitting") : t("submit")}
               type="submit"
               busy={submitting}
               disabled={submitting}

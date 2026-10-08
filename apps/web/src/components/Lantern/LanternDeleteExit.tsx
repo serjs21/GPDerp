@@ -8,6 +8,7 @@ import {
   type CSSProperties,
   type ReactNode,
 } from "react";
+import { useTranslations } from "next-intl";
 import type { HaikuDto } from "@/api/haikus";
 import { deleteHaiku } from "@/api/haikus";
 import { comicToast } from "@/components/ComicToast";
@@ -53,6 +54,7 @@ export function LanternDeleteExit({
   excludeLabelIds,
   children,
 }: LanternDeleteExitProps) {
+  const t = useTranslations("Lantern.lanternDeleteExit");
   const [flightExiting, setFlightExiting] = useState(false);
   const [flightActive, setFlightActive] = useState(true);
   const [flightStyle] = useState<CSSProperties>(() =>
@@ -79,13 +81,13 @@ export function LanternDeleteExit({
 
     try {
       await deleteHaiku(snapshot.id);
-      comicToast.success("Haiku deleted");
+      comicToast.success(t("deleted"));
     } catch (error) {
       animatingRef.current = false;
       if (axios.isAxiosError(error) && error.response?.status === 403) {
-        comicToast.error("You are not allowed to delete this haiku.");
+        comicToast.error(t("deleteForbidden"));
       } else {
-        comicToast.error("Could not delete haiku.");
+        comicToast.error(t("deleteFailed"));
       }
       throw error;
     }
@@ -126,7 +128,7 @@ export function LanternDeleteExit({
       flightResolveRef.current = null;
       animatingRef.current = false;
     })();
-  }, [haiku, onDeleted, onExitComplete]);
+  }, [haiku, onDeleted, onExitComplete, t]);
 
   if (flightExiting) {
     return (

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { LoginLantern } from "./LoginLantern";
 import { RegisterLantern } from "./RegisterLantern";
 import styles from "./AuthLanternEntry.module.css";
@@ -21,12 +22,13 @@ export function AuthLanternEntry({
   className,
   compact = false,
 }: AuthLanternEntryProps) {
+  const t = useTranslations("AuthLanterns");
   const rootClass = [styles.root, compact ? styles.compact : null, className]
     .filter(Boolean)
     .join(" ");
 
   return (
-    <div className={rootClass} aria-label="Account">
+    <div className={rootClass} aria-label={t("entryGroupLabel")}>
       <LoginLantern onClick={onLoginClick} />
       <RegisterLantern className={styles.register} onClick={onRegisterClick} />
     </div>

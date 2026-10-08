@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
+import { useTranslations } from "next-intl";
 import {
   colorBalanceToMatrix,
   useBackgroundSceneThemeBalance,
@@ -66,13 +67,14 @@ export function PostSignInput({
   onSubmit,
   isLoading = false,
   inputRef,
-  placeholder = "題 Subject",
-  submitLabel = "詠む Compose",
+  placeholder,
+  submitLabel,
   widthRem = POST_SIGN_INPUT_WIDTH_REM,
   sticky = false,
   stickyBottomPx = 20,
   stickyStopMarginPx = 0,
 }: PostSignInputProps) {
+  const t = useTranslations("PostSignInput");
   const filterId = useId().replace(/:/g, "");
   const { global } = useBackgroundSceneThemeBalance();
   const colorMatrix = colorBalanceToMatrix(global);
@@ -98,7 +100,7 @@ export function PostSignInput({
     <article
       className={[styles.root, sticky ? styles.rootSticky : null].filter(Boolean).join(" ")}
       style={rootStyle}
-      aria-label="Haiku subject sign"
+      aria-label={t("signAriaLabel")}
     >
       <svg className={styles.filterDefs} aria-hidden>
         <defs>
@@ -132,14 +134,14 @@ export function PostSignInput({
           disabled={isLoading}
           autoComplete="off"
           autoFocus
-          placeholder={placeholder}
-          aria-label="Haiku subject"
+          placeholder={placeholder ?? t("placeholder")}
+          aria-label={t("inputAriaLabel")}
         />
         <LanternSubmit
           className={styles.submit}
           disabled={!canSubmit}
           active={canSubmit}
-          aria-label={submitLabel}
+          aria-label={submitLabel ?? t("submitLabel")}
         />
       </form>
     </article>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ComicPressButton } from "@/components/ComicPressButton";
 import { RestartLinkButton } from "@/components/RestartLinkButton";
 import type { ShareLinkLifecycleActionProps } from "./ShareLinkLifecycleAction.types";
@@ -21,19 +22,20 @@ export function ShareLinkLifecycleAction({
   restartReason = null,
   className,
 }: ShareLinkLifecycleActionProps) {
+  const t = useTranslations("ShareLink.lifecycle");
   return (
     <div className={[styles.actionRow, className].filter(Boolean).join(" ")}>
       {activating ? (
         <ComicPressButton className={styles.actionButton} disabled aria-live="polite">
           <span className={styles.actionLabel}>
-            Activating
+            {t("activating")}
             <span className={styles.activatingDots}>{busyDots}</span>
           </span>
         </ComicPressButton>
       ) : deactivating ? (
         <ComicPressButton className={styles.actionButton} disabled aria-live="polite">
           <span className={styles.actionLabel}>
-            Stopping
+            {t("stopping")}
             <span className={styles.activatingDots}>{busyDots}</span>
           </span>
         </ComicPressButton>
@@ -42,11 +44,11 @@ export function ShareLinkLifecycleAction({
           className={[styles.actionButton, stopButtonClassName].filter(Boolean).join(" ")}
           disabled={isUpdating || busy}
           onClick={() => void onStop()}
-          aria-label="Stop link"
+          aria-label={t("stopAriaLabel")}
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- action icon asset */}
           <img src={PAUSE_ICON_SRC} alt="" className={styles.actionIcon} aria-hidden />
-          <span className={styles.actionLabel}>Stop</span>
+          <span className={styles.actionLabel}>{t("stop")}</span>
         </ComicPressButton>
       ) : restartReason ? (
         <RestartLinkButton
@@ -60,11 +62,11 @@ export function ShareLinkLifecycleAction({
           className={styles.actionButton}
           disabled={!formValid || isUpdating || busy}
           onClick={() => void onStart()}
-          aria-label="Launch link"
+          aria-label={t("launchAriaLabel")}
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- action icon asset */}
           <img src={START_ICON_SRC} alt="" className={styles.actionIcon} aria-hidden />
-          <span className={styles.actionLabel}>Launch</span>
+          <span className={styles.actionLabel}>{t("launch")}</span>
         </ComicPressButton>
       )}
     </div>

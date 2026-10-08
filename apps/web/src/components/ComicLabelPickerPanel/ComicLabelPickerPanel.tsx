@@ -8,6 +8,7 @@ import {
   type CSSProperties,
   type UIEvent,
 } from "react";
+import { useTranslations } from "next-intl";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { ComicPressButton } from "@/components/ComicPressButton";
@@ -88,6 +89,7 @@ export function ComicLabelPickerPanel({
   disabledIds = [],
   className,
 }: ComicLabelPickerPanelProps) {
+  const t = useTranslations("ComicLabelPickerPanel");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchInput, setSearchInput] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
@@ -237,8 +239,8 @@ export function ComicLabelPickerPanel({
         ref={searchRef}
         value={searchInput}
         onChange={(e) => setSearchInput(e.target.value)}
-        placeholder="Filter labels…"
-        aria-label="Filter labels"
+        placeholder={t("filterPlaceholder")}
+        aria-label={t("filterAriaLabel")}
         autoComplete="off"
         spellCheck={false}
       />
@@ -249,7 +251,7 @@ export function ComicLabelPickerPanel({
             <SakuraPetalLoader />
           </div>
         ) : displayLabels.length === 0 ? (
-          <p className={styles.empty}>No labels found</p>
+          <p className={styles.empty}>{t("empty")}</p>
         ) : (
           <div className={styles.labelRows}>
             {rows.map((row, rowIndex) => (
@@ -279,7 +281,7 @@ export function ComicLabelPickerPanel({
                       style={selected ? selectedPanelStyle(label.color) : undefined}
                       ariaLabel={
                         disabled
-                          ? `${label.name} (already used in the other filter)`
+                          ? t("disabledAriaLabel", { name: label.name })
                           : label.name
                       }
                     >

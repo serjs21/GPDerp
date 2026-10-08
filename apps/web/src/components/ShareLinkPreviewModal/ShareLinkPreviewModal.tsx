@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { ComicPageDialog, ComicPagePanel } from "@/components/ComicPageLayout";
 import { CreateAddLabelsModal } from "@/components/CreateAddLabelsModal";
@@ -32,6 +33,7 @@ export function ShareLinkPreviewModal({
   onToggleLabels,
   onHaikuChanged,
 }: ShareLinkPreviewModalProps) {
+  const t = useTranslations("ShareLinkPreviewModal");
   const [labelsOpen, setLabelsOpen] = useState(false);
 
   const { onPlacementCommit } = useHaikuLabelPlacement({
@@ -96,16 +98,16 @@ export function ShareLinkPreviewModal({
           overflowVisible
           className={styles.panel}
           style={shareLinkPreviewPanelStyle()}
-          ariaLabel={`Shared lantern: ${subject}`}
+          ariaLabel={t("panelAriaLabel", { subject })}
         >
           {haiku ? (
             <LabelHalo
               labels={haloLabels}
               onPlacementCommit={(labelId, placement) => void onPlacementCommit(labelId, placement)}
-              ariaLabel={`${subject} labels`}
+              ariaLabel={t("labelsAriaLabel", { subject })}
               className={showLabels ? undefined : styles.labelsHidden}
             >
-              <LanternFrame ariaLabel={`Haiku lantern: ${subject}`} showLabelBelt={false}>
+              <LanternFrame ariaLabel={t("lanternAriaLabel", { subject })} showLabelBelt={false}>
                 <Lantern haiku={haiku} showActions={false} bodyOnly />
               </LanternFrame>
             </LabelHalo>
@@ -114,7 +116,7 @@ export function ShareLinkPreviewModal({
               <SakuraPetalLoader />
             </div>
           ) : (
-            <p className={styles.empty}>This haiku is no longer available.</p>
+            <p className={styles.empty}>{t("unavailable")}</p>
           )}
         </ComicPagePanel>
       </ComicPageDialog>

@@ -126,7 +126,7 @@ export const LocaleSelector = ({
     [onChange],
   );
 
-  const mergedAriaLabel = ariaLabel ?? `${t("language")}: ${selectedLabel}`;
+  const mergedAriaLabel = ariaLabel ?? t("languageAriaLabel", { language: selectedLabel });
 
   return (
     <div className={`${styles.wrap}${className ? ` ${className}` : ""}`}>

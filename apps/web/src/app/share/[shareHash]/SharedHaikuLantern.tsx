@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type AnimationEvent } from "react";
 import { createPortal } from "react-dom";
+import { useTranslations } from "next-intl";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 import { ComicDialogContent } from "@/components/ComicDialogContent/ComicDialogContent";
 import dialogStyles from "@/components/ComicDialogContent/ComicDialogContent.module.css";
@@ -11,7 +12,7 @@ import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { SVG_PATH_LANTERN_WIDTH_REM } from "@/components/SVGPath/consts/pathLanternLayoutConsts";
 import { useViewportBottomOverlap } from "@/hooks/useViewportBottomOverlap";
-import { SHARED_HAIKU_CREATED_BY_PREFIX } from "./consts/sharedHaikuCopyConsts";
+import { SHARED_HAIKU_CREATED_BY_KEY } from "./consts/sharedHaikuCopyConsts";
 import { SHARED_HAIKU_FOOTER_SELECTOR } from "./consts/sharedHaikuCreatedByConsts";
 import type { SharedHaikuLanternProps } from "./SharedHaikuLantern.types";
 import { sharedHaikuCreatedByStyle } from "./utils/sharedHaikuCreatedByUtils";
@@ -21,6 +22,7 @@ import styles from "./SharedHaikuLantern.module.css";
 const SUCCESS_TONE = COMIC_TOAST_TONE_PRESETS.success;
 
 export function SharedHaikuLantern({ haiku, showLabels, subject, authorName }: SharedHaikuLanternProps) {
+  const t = useTranslations("SharedHaikuPage");
   // App loader overlay hides once auth is initialized — don't play the entrance underneath it.
   const { initialized } = useAuthenticationState();
   const [typed, setTyped] = useState(false);
@@ -47,7 +49,7 @@ export function SharedHaikuLantern({ haiku, showLabels, subject, authorName }: S
 
   const lantern = (
     <LanternFrame
-      ariaLabel={`Haiku lantern: ${subject}`}
+      ariaLabel={t("lanternAriaLabel", { subject })}
       widthRem={SVG_PATH_LANTERN_WIDTH_REM}
       showLabelBelt={false}
     >
@@ -63,7 +65,7 @@ export function SharedHaikuLantern({ haiku, showLabels, subject, authorName }: S
     >
       <div className={styles.flyIn}>
         {labels.length > 0 ? (
-          <LabelHalo labels={labels} interactive={false} ariaLabel={`${subject} labels`}>
+          <LabelHalo labels={labels} interactive={false} ariaLabel={t("labelsAriaLabel", { subject })}>
             {lantern}
           </LabelHalo>
         ) : (
@@ -83,7 +85,7 @@ export function SharedHaikuLantern({ haiku, showLabels, subject, authorName }: S
                 className={[dialogStyles.previewStage, styles.bubbleStage].join(" ")}
                 contentClassName={styles.createdByText}
               >
-                {SHARED_HAIKU_CREATED_BY_PREFIX} {authorName}
+                {t(SHARED_HAIKU_CREATED_BY_KEY, { authorName })}
               </ComicDialogContent>
             </div>,
             document.body,

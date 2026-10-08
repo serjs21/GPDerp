@@ -1,4 +1,5 @@
 import { useEffect, useState, type ChangeEvent, type DragEvent } from "react";
+import { useTranslations } from "next-intl";
 import { processImageForUpload } from "@/utils/processImageForUpload";
 import { uploadProcessedIcon, type UploadedIconPayload } from "@/api/iconUpload";
 
@@ -8,6 +9,7 @@ type UseFileUploadArgs = {
 };
 
 export function useFileUpload({ disabled = false, onUploaded }: UseFileUploadArgs) {
+  const t = useTranslations("LabelHooks");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -47,10 +49,10 @@ export function useFileUpload({ disabled = false, onUploaded }: UseFileUploadArg
         processed,
         onProgress: setProgress,
       });
-      setSuccess("Upload complete");
+      setSuccess(t("uploadComplete"));
       onUploaded(uploaded);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to upload image");
+      setError(err instanceof Error ? err.message : t("uploadFailed"));
     } finally {
       setIsUploading(false);
     }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 import {
   deleteHaiku,
@@ -17,6 +18,7 @@ export function useHaikuDeleteController(): {
   onHaikuDeleteFailed: (haiku: HaikuDto) => void;
   deleteFailedModal: ReactNode;
 } {
+  const t = useTranslations("HaikuHooks.deleteController");
   const queryClient = useQueryClient();
   const [failedHaiku, setFailedHaiku] = useState<HaikuDto | null>(null);
   const [retrying, setRetrying] = useState(false);
@@ -37,14 +39,14 @@ export function useHaikuDeleteController(): {
     setRetrying(true);
     try {
       await deleteHaiku(failedHaiku.id);
-      comicToast.success("Haiku deleted");
+      comicToast.success(t("deleted"));
       setFailedHaiku(null);
     } catch {
-      comicToast.error("Could not delete haiku.");
+      comicToast.error(t("deleteFailed"));
     } finally {
       setRetrying(false);
     }
-  }, [failedHaiku]);
+  }, [failedHaiku, t]);
 
   const onLeaveItBe = useCallback(() => {
     if (failedHaiku) {

@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
+import { useTranslations } from "next-intl";
 import type { HaikuDto } from "@/api/haikus";
 import { deleteHaiku } from "@/api/haikus";
 import { comicToast } from "@/components/ComicToast";
@@ -48,32 +49,32 @@ const CLAP_FADE_MS = 200;
 const ACTIONS = [
   {
     id: "delete" as const,
-    label: "Delete",
-    ariaLabel: "Delete haiku",
+    label: "deleteLabel",
+    ariaLabel: "deleteAriaLabel",
     iconSrc: "/lantern_actions/delete.svg",
     slotClass: styles.slotDelete,
     enterFrom: "left" as const,
   },
   {
     id: "share" as const,
-    label: "Share",
-    ariaLabel: "Share haiku",
+    label: "shareLabel",
+    ariaLabel: "shareAriaLabel",
     iconSrc: "/lantern_actions/share.svg",
     slotClass: styles.slotShare,
     enterFrom: "left" as const,
   },
   {
     id: "label" as const,
-    label: "Label",
-    ariaLabel: "Add label",
+    label: "labelLabel",
+    ariaLabel: "labelAriaLabel",
     iconSrc: "/lantern_actions/label.svg",
     slotClass: styles.slotLabel,
     enterFrom: "right" as const,
   },
   {
     id: "copy" as const,
-    label: "Copy",
-    ariaLabel: "Copy to clipboard",
+    label: "copyLabel",
+    ariaLabel: "copyAriaLabel",
     iconSrc: "/lantern_actions/copy.svg",
     slotClass: styles.slotCopy,
     enterFrom: "right" as const,
@@ -121,6 +122,7 @@ function panelHoverClass(hover: HoverTarget): string {
 }
 
 export const HaikuActions = (props: HaikuActionsProps) => {
+  const t = useTranslations("HaikuContainer.haikuActions");
   const [shareOpen, setShareOpen] = useState(false);
   const [labelsOpen, setLabelsOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -218,7 +220,7 @@ export const HaikuActions = (props: HaikuActionsProps) => {
         return;
       }
       await deleteHaiku(haiku.id);
-      comicToast.success("Haiku deleted");
+      comicToast.success(t("deleted"));
       onDeleted?.();
       setDeleteOpen(false);
     } catch (e) {
@@ -227,18 +229,18 @@ export const HaikuActions = (props: HaikuActionsProps) => {
         return;
       }
       if (axios.isAxiosError(e) && e.response?.status === 403) {
-        comicToast.error("You are not allowed to delete this haiku.");
+        comicToast.error(t("deleteForbidden"));
       } else {
-        comicToast.error("Could not delete haiku.");
+        comicToast.error(t("deleteFailed"));
       }
     } finally {
       setDeleting(false);
     }
-  }, [haiku, onDelete, onDeleted]);
+  }, [haiku, onDelete, onDeleted, t]);
 
   if (props.variant === "generating") {
     return (
-      <Tooltip title="Saving this haiku…">
+      <Tooltip title={t("saving")}>
         <span className={styles.loaderWrap}>
           <SakuraPetalLoader compact />
         </span>
@@ -271,14 +273,14 @@ export const HaikuActions = (props: HaikuActionsProps) => {
       <div
         className={[styles.panel, panelHoverClass(activeHover)].filter(Boolean).join(" ")}
         role="group"
-        aria-label="Haiku actions"
+        aria-label={t("groupAriaLabel")}
       >
         {ACTIONS.map((action) => (
           <div key={action.id} className={`${styles.slot} ${action.slotClass}`}>
             <button
               type="button"
               className={styles.panelButton}
-              aria-label={action.ariaLabel}
+              aria-label={t(action.ariaLabel)}
               onMouseEnter={() => setHoverIfLive(action.id)}
               onFocus={(event) =>
                 setHoverFromFocus(action.id, event.currentTarget)
@@ -300,7 +302,7 @@ export const HaikuActions = (props: HaikuActionsProps) => {
                 enterFrom={action.enterFrom}
                 hidden={activeHover !== action.id}
               >
-                <span className={styles.actionName}>{action.label}</span>
+                <span className={styles.actionName}>{t(action.label)}</span>
               </SlotFace>
             </button>
           </div>
@@ -353,7 +355,7 @@ export const HaikuActions = (props: HaikuActionsProps) => {
         <button
           type="button"
           className={styles.toggle}
-          aria-label={isOpen ? "Hide haiku actions" : "Show haiku actions"}
+          aria-label={isOpen ? t("hideActions") : t("showActions")}
           aria-expanded={isOpen}
           onClick={handleToggle}
         >

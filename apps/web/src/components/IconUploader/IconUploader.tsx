@@ -2,6 +2,7 @@
 
 import { EditOutlined, LoadingOutlined } from "@ant-design/icons";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { useId, useState } from "react";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import styles from "./IconUploader.module.css";
@@ -27,15 +28,16 @@ type IconUploaderProps = {
 };
 
 export function IconUploader({
-  label = "Change profile picture",
+  label,
   iconUrl,
-  alt = "Current icon",
+  alt,
   fallbackChar,
   disabled = false,
   className,
   size = DEFAULT_SIZE_PX,
   onUploaded,
 }: IconUploaderProps) {
+  const t = useTranslations("IconUploader");
   const inputId = useId();
   const [failedRemoteImageUrl, setFailedRemoteImageUrl] = useState<string | null>(null);
   const { previewUrl, error, success, isUploading, isDragActive, progress, onInputChange, onDragOver, onDragLeave, onDrop } =
@@ -56,7 +58,7 @@ export function IconUploader({
       {showPreviewImage && displayUrl ? (
         <Image
           src={displayUrl}
-          alt={alt}
+          alt={alt ?? t("alt")}
           className={styles.iconImage}
           width={size}
           height={size}
@@ -65,7 +67,7 @@ export function IconUploader({
       ) : showRemoteImage && displayUrl ? (
         <Image
           src={displayUrl}
-          alt={alt}
+          alt={alt ?? t("alt")}
           className={styles.iconImage}
           width={size}
           height={size}
@@ -102,7 +104,7 @@ export function IconUploader({
         accept="image/png,image/jpeg,image/jpg,image/webp"
         onChange={(event) => void onInputChange(event)}
         disabled={inputDisabled}
-        aria-label={label}
+        aria-label={label ?? t("label")}
       />
 
       {interactive ? (
@@ -124,7 +126,7 @@ export function IconUploader({
           <div className={styles.progressTrack}>
             <div className={styles.progressBar} style={{ width: `${progress}%` }} />
           </div>
-          <div className={styles.meta}>Uploading: {progress}%</div>
+          <div className={styles.meta}>{t("uploading", { progress })}</div>
         </div>
       ) : null}
 

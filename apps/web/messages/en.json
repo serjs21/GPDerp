@@ -8,7 +8,34 @@
     "languageNoMatches": "No matching languages",
     "languageCurrent": "Current",
     "preferencesGroupLabel": "Display and language",
-    "preferencesSaveError": "Could not save your preferences"
+    "preferencesSaveError": "Could not save your preferences",
+    "languageAriaLabel": "Language: {language}",
+    "userFallback": "User",
+    "sortAndFilter": "Sort and filter",
+    "tabs": {
+      "profile": {
+        "ariaLabel": "Profile information"
+      },
+      "shareLinks": {
+        "title": "Share Links",
+        "ariaLabel": "Manage share links"
+      },
+      "labels": {
+        "title": "Labels",
+        "ariaLabel": "Manage labels"
+      }
+    },
+    "toasts": {
+      "loadError": "Could not load profile",
+      "updateSuccess": "Profile updated",
+      "updateError": "Could not update profile",
+      "emailChangeSent": "Email change verification sent",
+      "emailChangeError": "Could not create email change request",
+      "verificationSent": "Verification email sent",
+      "verificationError": "Could not resend verification email",
+      "avatarSaved": "Profile picture saved",
+      "avatarError": "Could not save profile picture to your account"
+    }
   },
   "BuyGenerations": {
     "title": "Haiku generations",
@@ -28,7 +55,8 @@
     "belongsTo": "This card belongs to",
     "remaining": "{count} Generations left",
     "remainingUnknown": "Generations left will appear here.",
-    "buyMore": "Buy more"
+    "buyMore": "Buy more",
+    "profileIconAlt": "{name} profile icon"
   },
   "ProfileInfo": {
     "firstName": "First name",
@@ -62,6 +90,759 @@
       "de": "German",
       "it": "Italian",
       "pt": "Portuguese"
+    }
+  },
+  "RootLayout": {
+    "description": "AI, but useless"
+  },
+  "LegalPages": {
+    "back": "← Back",
+    "terms": {
+      "title": "Terms of Service",
+      "description": "Terms governing use of the Haiku generation service, billing via Paddle, and related policies."
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "description": "How we collect, use, and protect data for the Haiku generation service, including payments via Paddle."
+    },
+    "refund": {
+      "title": "Refund Policy",
+      "description": "Refunds, subscription cancellation, and billing for the Haiku generation service via Paddle."
+    },
+    "cookies": {
+      "title": "Cookie Policy",
+      "description": "How the Haiku generation service uses cookies and similar technologies."
+    },
+    "acceptableUse": {
+      "title": "Acceptable Use Policy",
+      "description": "Rules for fair use of the Haiku generation service."
+    }
+  },
+  "SiteFooter": {
+    "legalPolicies": "Legal policies",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "refund": "Refund Policy",
+    "acceptableUse": "Acceptable Use",
+    "cookies": "Cookie Policy",
+    "paddleNotice": "Payments are processed by <buyerTerms>Paddle</buyerTerms> as merchant of record. Paddle's <refund>buyer refund policy</refund>, <checkout>checkout terms</checkout>, and <privacy>privacy notice</privacy> apply at purchase."
+  },
+  "NoCreditsLeft": {
+    "continueGenerationOffer": {
+      "questionWithSubject": "Continue generating “{subject}”?",
+      "question": "Continue generating?",
+      "confirm": "Continue",
+      "cancel": "Not now"
+    }
+  },
+  "NoGenerationsLeftModal": {
+    "title": "Out of generations",
+    "dismiss": "Not now",
+    "buy": "Buy 100 generations",
+    "fallbackMessage": "Buy more generations to keep writing. Credits are added after payment is confirmed."
+  },
+  "PurchaseConfirmModal": {
+    "title": "Purchase confirmed",
+    "done": "Done"
+  },
+  "CelestialThemeClock": {
+    "ariaLabel": "Time of day"
+  },
+  "CelestialThemeSelector": {
+    "ariaLabel": "Theme time of day"
+  },
+  "ComicPageLayout": {
+    "close": "Close"
+  },
+  "ComicToast": {
+    "notifications": "Notifications"
+  },
+  "PaperModal": {
+    "dialog": "Dialog",
+    "close": "Close"
+  },
+  "ComicConfirmModal": {
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "description": "Choose confirm or cancel."
+  },
+  "OrderDropdown": {
+    "ariaLabel": "Sort haikus",
+    "title": "Order by",
+    "categories": {
+      "creationDate": {
+        "title": "Creation date",
+        "ariaLabel": "Sort by creation date"
+      },
+      "alpacabet": {
+        "title": "Alpacabet",
+        "ariaLabel": "Sort alphabetically"
+      }
+    }
+  },
+  "OrderDropdownCover": {
+    "ariaLabel": "Change order"
+  },
+  "TextBubbleDropdown": {
+    "placeholder": "Select option"
+  },
+  "DualityButton": {
+    "coverState": {
+      "reveal": "Reveal {title}"
+    }
+  },
+  "BrushMenu": {
+    "placeholder": "Select"
+  },
+  "AuthFlows": {
+    "login": {
+      "emailPlaceholder": "Email",
+      "passwordPlaceholder": "Password",
+      "invalidEmail": "Enter a valid email",
+      "passwordRequired": "Password is required",
+      "divider": "or sign in with email",
+      "submit": "Sign in",
+      "submitting": "Signing in",
+      "useGoogleSignIn": "This account uses Google sign-in.",
+      "tooManyAttempts": "Too many attempts. Try again later.",
+      "invalidCredentials": "Invalid email or password",
+      "completeSetupOnRegistration": "Complete account setup on the registration page.",
+      "googleSignInFailed": "Google sign-in failed"
+    },
+    "register": {
+      "emailPlaceholder": "Email",
+      "passwordPlaceholder": "Password",
+      "confirmPasswordPlaceholder": "Confirm password",
+      "invalidEmail": "Enter a valid email",
+      "passwordRequired": "Password is required",
+      "passwordTooShort": "At least 8 characters",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "divider": "or register with email",
+      "submit": "Create account",
+      "submitting": "Creating account",
+      "googleSignUpFailed": "Google sign-up failed"
+    },
+    "chrome": {
+      "signInWithGoogle": "Sign in with Google",
+      "signUpWithGoogle": "Sign up with Google"
+    }
+  },
+  "AuthGateModal": {
+    "signIn": "Sign in",
+    "createAccount": "Create account",
+    "signInTab": "Sign in",
+    "registerTab": "Register",
+    "forgotPassword": "Forgot password?"
+  },
+  "AuthLanterns": {
+    "login": "Login",
+    "register": "Register",
+    "entryGroupLabel": "Account"
+  },
+  "ResetPasswordModal": {
+    "requestTitle": "Reset password",
+    "confirmTitle": "New password",
+    "requestCta": "Send reset link",
+    "confirmCta": "Update password",
+    "requestLead": "Enter your email and we will send a link if an account exists.",
+    "confirmLead": "Choose a new password for your account.",
+    "emailPlaceholder": "Email",
+    "newPasswordPlaceholder": "New password",
+    "confirmPasswordPlaceholder": "Confirm password",
+    "invalidEmail": "Enter a valid email",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "requestSent": "If an account exists for that email, we sent reset instructions.",
+    "requestFailed": "Request failed. Try again.",
+    "linkInvalid": "Reset link is missing or invalid.",
+    "confirmSuccess": "Password updated. You can sign in now.",
+    "confirmFailed": "Reset failed"
+  },
+  "VerifyEmail": {
+    "verifyingTitle": "Verifying your email",
+    "verifyingBody": "Please wait while we validate your link.",
+    "alreadyVerifiedTitle": "Email already verified",
+    "alreadyVerifiedBody": "Your email is already validated. Redirecting to the home page in {seconds} seconds.",
+    "resentTitle": "Verification email sent",
+    "expiredTitle": "Verification link expired",
+    "resentBody": "We sent a new verification email. Please check your inbox and use the latest link.",
+    "expiredBody": "This verification link has expired.",
+    "resending": "Sending...",
+    "resend": "Resend verification email"
+  },
+  "UserMenu": {
+    "fallbackName": "User",
+    "settings": "Settings",
+    "logout": "Logout",
+    "goHome": "Go home",
+    "login": "Login",
+    "guest": "Guest",
+    "logoutQuestion": "Did you have enough fun?",
+    "logoutCancel": "Not yet",
+    "logoutConfirm": "Yes"
+  },
+  "LoginPage": {
+    "title": "Sign in",
+    "completeSetupOnRegistration": "Complete account setup on the registration page.",
+    "createAccountLink": "Create an account",
+    "forgotPassword": "Forgot password?"
+  },
+  "RegisterPage": {
+    "title": "Create account",
+    "haveAccount": "Already have an account? <link>Sign in</link>"
+  },
+  "CompleteRegistrationPage": {
+    "title": "Complete registration",
+    "loading": "Loading…",
+    "lead": "Choose a username to finish setting up your account.",
+    "usernameLabel": "Username",
+    "usernamePlaceholder": "your_handle",
+    "usernameRequired": "Choose a username",
+    "usernameTooShort": "At least {min} characters",
+    "usernamePattern": "Letters, numbers, and underscores only",
+    "usernameUnavailable": "Username is not available",
+    "usernameTaken": "Username taken",
+    "saveFailed": "Could not save username",
+    "success": "You’re all set",
+    "continue": "Continue",
+    "backHome": "Back to home"
+  },
+  "AuthHooks": {
+    "registrationSent": "If this email can be used for a new account, we sent a verification link. Check your inbox.",
+    "registrationFailed": "Registration failed",
+    "usernameUnavailable": "Username is not available",
+    "googleSignInFailed": "Google sign-in failed"
+  },
+  "HaikuContainer": {
+    "haikuActions": {
+      "deleteLabel": "Delete",
+      "deleteAriaLabel": "Delete haiku",
+      "shareLabel": "Share",
+      "shareAriaLabel": "Share haiku",
+      "labelLabel": "Label",
+      "labelAriaLabel": "Add label",
+      "copyLabel": "Copy",
+      "copyAriaLabel": "Copy to clipboard",
+      "deleted": "Haiku deleted",
+      "deleteForbidden": "You are not allowed to delete this haiku.",
+      "deleteFailed": "Could not delete haiku.",
+      "saving": "Saving this haiku…",
+      "groupAriaLabel": "Haiku actions",
+      "hideActions": "Hide haiku actions",
+      "showActions": "Show haiku actions"
+    }
+  },
+  "HaikuGenerationStickyNote": {
+    "generationFlow": {
+      "errorTitle": "Don't panic, but something went wrong",
+      "errorDescription": "Our slaves are working hard on fixing this issue. We will dispatch someone to hit them harder soon.\nPlease try again later."
+    }
+  },
+  "Lantern": {
+    "lantern": {
+      "bodyAriaLabel": "Haiku",
+      "haikuLantern": "Haiku lantern: {title}",
+      "generating": "Generating haiku: {subject}",
+      "rotatedLantern": "Rotated haiku lantern"
+    },
+    "labelBelt": {
+      "ariaLabel": "Haiku label belt",
+      "previous": "Previous labels",
+      "next": "Next labels"
+    },
+    "lanternDeleteExit": {
+      "deleted": "Haiku deleted",
+      "deleteForbidden": "You are not allowed to delete this haiku.",
+      "deleteFailed": "Could not delete haiku."
+    },
+    "lanternSteppedFlight": {
+      "deleting": "Deleting haiku: {title}"
+    },
+    "lanternRotatedShell": {
+      "labels": "{label} labels"
+    },
+    "lanternPath": {
+      "generating": "Generating: {subject}",
+      "focusPosition": "{title} · {position} / {total}",
+      "untitled": "Haiku",
+      "empty": "No haikus",
+      "previous": "Previous haiku",
+      "next": "Next haiku"
+    },
+    "lanternPathLantern": {
+      "generating": "Generating haiku: {subject}",
+      "haikuLantern": "Haiku lantern: {title}",
+      "lantern": "Haiku lantern",
+      "labels": "{label} labels"
+    },
+    "lanternPathStage": {
+      "ariaLabel": "Lantern flight path"
+    }
+  },
+  "LanternSubmit": {
+    "ariaLabel": "詠む Compose"
+  },
+  "SVGPath": {
+    "svgPath": {
+      "stageAriaLabel": "Lantern SVG path"
+    },
+    "svgPathLantern": {
+      "loadingMore": "Loading more haikus",
+      "generating": "Generating haiku: {subject}",
+      "haikuLantern": "Haiku lantern: {title}",
+      "labels": "{label} labels"
+    }
+  },
+  "SavedHaikusLanternPath": {
+    "loading": "Loading haikus",
+    "loadError": "Could not load saved haikus.",
+    "retry": "Try again",
+    "searching": "Searching haikus"
+  },
+  "PathNavigation": {
+    "pathNavigationArrows": {
+      "next": "Next lantern",
+      "previous": "Previous lantern"
+    }
+  },
+  "PathOverlay": {
+    "pathOverlay": {
+      "title": "Overlay",
+      "continueJourney": "Continue the journey",
+      "goBackToStart": "Go back to the start"
+    },
+    "overlayNextLabel": {
+      "label": "Continue the journey"
+    },
+    "overlayPrevLabel": {
+      "label": "Go back to the start"
+    }
+  },
+  "PostSignInput": {
+    "signAriaLabel": "Haiku subject sign",
+    "placeholder": "題 Subject",
+    "inputAriaLabel": "Haiku subject",
+    "submitLabel": "詠む Compose"
+  },
+  "CreationModal": {
+    "generating": "Generating haiku: {subject}",
+    "haikuLantern": "Haiku lantern: {title}",
+    "creation": "Haiku creation"
+  },
+  "DeleteConfirmModal": {
+    "question": "Did you mean to do that?",
+    "cancel": "Nope",
+    "confirm": "Yep"
+  },
+  "DeleteFailedModal": {
+    "title": "Deletion failed",
+    "leaveItBe": "Leave it be",
+    "retry": "Retry",
+    "body": "We couldn't delete this haiku. You can try again, or leave it in your list."
+  },
+  "AwkwardLantern": {
+    "title": "Well, this is awkward..."
+  },
+  "RestartLinkButton": {
+    "expired": "Expired",
+    "limitReached": "0 hits left",
+    "revive": "Revive!",
+    "resurrect": "Resurrect!"
+  },
+  "GoHome": {
+    "label": "Go home"
+  },
+  "NotFoundView": {
+    "toast": "That link has ceased to be",
+    "signUp": "Sign up to send your own dead links",
+    "copy": "Looks like someone sent you a link that does't work. \nMaybe it was a typo. Maybe there are some trust issues to be addressed here.\nAnyway, this link is no more."
+  },
+  "Loaders": {
+    "sakuraPetalLoader": {
+      "ariaLabel": "Loading"
+    }
+  },
+  "MfgDate": {
+    "defaultLabel": "Created"
+  },
+  "GoldenAgeTitle": {
+    "subtitle": "THE HAIKU GENERATOR",
+    "tagline": "AI, BUT IMPRACTICAL!"
+  },
+  "HaikuHooks": {
+    "deleteController": {
+      "deleted": "Haiku deleted",
+      "deleteFailed": "Could not delete haiku."
+    }
+  },
+  "ComicLabelCreationModal": {
+    "save": "Save",
+    "create": "Create",
+    "loadingLabels": "Loading labels...",
+    "enterName": "Enter a label name",
+    "nameTooShort": "Name should be at least {min} characters",
+    "alreadyExists": "Label already exists in this account",
+    "updated": "Label updated",
+    "updateError": "Could not update label",
+    "created": "Label created",
+    "createError": "Could not create label",
+    "previewTitle": "This is",
+    "minChars": "Min {min} chars",
+    "nameAriaLabel": "Label name",
+    "color": "Color",
+    "colorAriaLabel": "Label color",
+    "openColorPicker": "Open color picker",
+    "shapeAriaLabel": "{shape} shape",
+    "saveAriaLabel": "Save label",
+    "createAriaLabel": "Create label",
+    "shapes": {
+      "classic": "Classic",
+      "sharp": "Sharp",
+      "soft": "Soft",
+      "circle": "Circle",
+      "square": "Square",
+      "thought": "Thought"
+    }
+  },
+  "ComicLabelPickerPanel": {
+    "filterPlaceholder": "Filter labels…",
+    "filterAriaLabel": "Filter labels",
+    "empty": "No labels found",
+    "disabledAriaLabel": "{name} (already used in the other filter)"
+  },
+  "CreateAddLabelsModal": {
+    "maxLabels": "A haiku can have at most {max} labels",
+    "saved": "Labels saved",
+    "saveError": "Could not save labels",
+    "createTitle": "Create",
+    "createAriaLabel": "Create a new one",
+    "addTitle": "Add",
+    "addAriaLabel": "Add labels to this haiku",
+    "save": "Save"
+  },
+  "LabelHalo": {
+    "halo": {
+      "ariaLabel": "Label halo"
+    },
+    "slot": {
+      "rotateAriaLabel": "Rotate label — drag around the label to adjust",
+      "ariaLabel": "{name} label, {degrees} degrees"
+    }
+  },
+  "LabelSort": {
+    "title": "Sort by",
+    "ariaLabel": "Sort labels",
+    "selectCategory": "Select {title}",
+    "categories": {
+      "creationDate": {
+        "title": "Creation date",
+        "ariaLabel": "Sort by creation date"
+      },
+      "alpacabet": {
+        "title": "Alpacabet",
+        "ariaLabel": "Sort alphabetically"
+      },
+      "connection": {
+        "title": "Connections",
+        "ariaLabel": "Sort by connection"
+      }
+    }
+  },
+  "LabelsFilterModal": {
+    "filter": "Filter"
+  },
+  "ManageLabel": {
+    "manageLabel": {
+      "deleted": "Label deleted",
+      "deleteError": "Could not delete label",
+      "edit": "Edit",
+      "editAriaLabel": "Edit label {name}",
+      "tuneIn": "Tune in",
+      "tuneInAriaLabel": "Tune in to haikus labeled {name}",
+      "deleteQuestion": "Delete this label?",
+      "cancel": "Not yet",
+      "confirmDelete": "Delete"
+    },
+    "createPanel": {
+      "ariaLabel": "Create new label",
+      "create": "Create"
+    },
+    "connectedHaikus": {
+      "connected": "{total} connected",
+      "ariaLabel": "Haikus labeled {name}"
+    },
+    "labelActions": {
+      "tuneInDisabled": "Searching for me is useless.",
+      "tuneIn": "Tune in",
+      "tuneInAriaLabel": "Tune in to haikus labeled {name}",
+      "noHaikusAriaLabel": "No haikus labeled {name}",
+      "groupAriaLabel": "Actions for {name}",
+      "edit": "Edit",
+      "editAriaLabel": "Edit {name}",
+      "delete": "Delete",
+      "deleteAriaLabel": "Delete {name}"
+    },
+    "lanternStack": {
+      "notConnected": "not connected",
+      "lanternAriaLabel": "Haiku lantern: {title}"
+    },
+    "panel": {
+      "searchPlaceholder": "Search labels…",
+      "searchAriaLabel": "Search labels by name",
+      "noResults": "No labels found",
+      "empty": "No labels yet."
+    }
+  },
+  "HeaderHaikuTools": {
+    "search": {
+      "buttonAriaLabel": "Search haikus",
+      "placeholder": "Search titles…",
+      "inputAriaLabel": "Search haiku titles",
+      "actionName": "Search"
+    },
+    "filter": {
+      "buttonAriaLabel": "Filter haikus by labels",
+      "actionName": "Filter",
+      "activeFiltersAriaLabel": "Active label filters",
+      "removeFilterAriaLabel": "Remove filter {name}",
+      "removeExcludeFilterAriaLabel": "Remove exclude filter {name}"
+    },
+    "settingsSearch": {
+      "shareLinks": {
+        "placeholder": "Search links",
+        "ariaLabel": "Search by title",
+        "buttonAriaLabel": "Search share links"
+      },
+      "labels": {
+        "placeholder": "Search labels",
+        "ariaLabel": "Search labels by name",
+        "buttonAriaLabel": "Search labels"
+      }
+    }
+  },
+  "IconUploader": {
+    "label": "Change profile picture",
+    "alt": "Current icon",
+    "uploading": "Uploading: {progress}%"
+  },
+  "ManageLabelsPage": {
+    "unresolvedAccount": "Unable to resolve account."
+  },
+  "LabelHooks": {
+    "placementError": "Could not save label placement",
+    "uploadComplete": "Upload complete",
+    "uploadFailed": "Failed to upload image"
+  },
+  "ShareModal": {
+    "modal": {
+      "defaultSubject": "Haiku",
+      "linkTabTitle": "Link",
+      "linkTabAriaLabel": "Share by link",
+      "emailTabTitle": "Email",
+      "emailTabAriaLabel": "Share via email",
+      "loading": "Loading…"
+    },
+    "controller": {
+      "defaultSubject": "Haiku",
+      "postcardsQueued": "Postcards were placed in the mail box",
+      "loadLinkError": "Could not load share link",
+      "sendEmailError": "Could not send email",
+      "addRecipientHint": "Add at least one recipient email",
+      "fixInvalidHint": "Fix invalid recipient emails"
+    },
+    "email": {
+      "toPrefix": "TO:",
+      "recipientsPlaceholder": "Recipient emails (press Enter after each)",
+      "messagePlaceholder": "I wanted to share with you...",
+      "messageAriaLabel": "Email message",
+      "signature": "From: {name}",
+      "invalidEmails": "Invalid emails: {emails}"
+    },
+    "sendPanel": {
+      "preparingPostcard": "Preparing postcard…",
+      "sendEmail": "Send email"
+    },
+    "postcardFront": {
+      "prepareError": "Could not prepare the postcard image"
+    }
+  },
+  "Postcard": {
+    "renderer": {
+      "ariaLabel": "Haiku postcard",
+      "ariaLabelWithTitle": "Haiku postcard: {title}"
+    }
+  },
+  "SharedHaikuPage": {
+    "unknownAuthor": "Unknown author",
+    "lanternAriaLabel": "Haiku lantern: {subject}",
+    "labelsAriaLabel": "{subject} labels",
+    "createdBy": "Created by {authorName}"
+  },
+  "CommonHooks": {
+    "useCopy": {
+      "copied": "Copied to clipboard",
+      "copyError": "Could not copy"
+    }
+  },
+  "ShareLink": {
+    "card": {
+      "statsAriaLabel": "Share link stats",
+      "panelAriaLabel": "Share link for {subject}",
+      "lanternAriaLabel": "Haiku lantern: {subject}",
+      "copyTitle": "Copy link!",
+      "copyAriaLabel": "Copy share link for {subject}",
+      "settingsAriaLabel": "Share link settings for {subject}"
+    },
+    "lifecycle": {
+      "activating": "Activating",
+      "stopping": "Stopping",
+      "stopAriaLabel": "Stop link",
+      "stop": "Stop",
+      "launchAriaLabel": "Launch link",
+      "launch": "Launch"
+    },
+    "settings": {
+      "hitsLimit": "Hits limit:",
+      "timeoutAt": "Timeout at:",
+      "timeoutPlaceholder": "End of times",
+      "updateAriaLabel": "Update link",
+      "updating": "Updating",
+      "update": "Update"
+    },
+    "controls": {
+      "stopped": "Share link stopped",
+      "stopError": "Could not stop share link",
+      "started": "Share link started",
+      "startError": "Could not start share link",
+      "updated": "Share link updated",
+      "updateError": "Could not update share link",
+      "labelsError": "Could not update label visibility",
+      "hitsUnlimited": "Unlimited visits",
+      "hitsEmpty": "No visits left",
+      "hitsRemaining": "{count, plural, one {# visit left} other {# visits left}}",
+      "timeUnlimited": "No expiration",
+      "timeLeftWithValue": "Time left {time}",
+      "timeLeft": "Time left"
+    }
+  },
+  "ShareLinkActions": {
+    "actions": {
+      "groupAriaLabel": "Share link actions for {subject}",
+      "preview": "Preview",
+      "previewAriaLabel": "Preview {subject}",
+      "delete": "Delete",
+      "deleteAriaLabel": "Delete share link for {subject}"
+    },
+    "previewLabels": {
+      "groupAriaLabel": "Share link actions for {subject}",
+      "preview": "Preview",
+      "previewAriaLabel": "Preview {subject}"
+    },
+    "done": {
+      "caption": "Done",
+      "ariaLabel": "Close share link preview for {subject}"
+    },
+    "editLabels": {
+      "caption": "Edit labels",
+      "ariaLabel": "Edit labels for {subject}"
+    },
+    "goToLink": {
+      "caption": "Follow the link",
+      "ariaLabel": "Open share link for {subject} in a new tab"
+    },
+    "labelsToggle": {
+      "visible": "Labels visible",
+      "hidden": "Labels hidden",
+      "ariaLabel": "Show labels on share link for {subject}"
+    },
+    "update": {
+      "caption": "Update",
+      "ariaLabel": "Update share link for {subject}",
+      "disabledInactive": "What is yet to begin - can't be changed",
+      "disabledUnchanged": "Everything's in its right place",
+      "unavailableAlt": "Update unavailable for {subject}: {message}"
+    }
+  },
+  "ShareLinkManagement": {
+    "list": {
+      "empty": "No share links found."
+    },
+    "filters": {
+      "groupAriaLabel": "Filter share links by status",
+      "showTitle": "Show\r\n {title}",
+      "hideTitle": "Hide\r\n {title}",
+      "options": {
+        "active": {
+          "title": "Active",
+          "showAriaLabel": "Show active share links",
+          "hideAriaLabel": "Hide active share links"
+        },
+        "inactive": {
+          "title": "Inactive",
+          "showAriaLabel": "Show inactive share links",
+          "hideAriaLabel": "Hide inactive share links"
+        },
+        "expired": {
+          "title": "Expired",
+          "showAriaLabel": "Show expired share links",
+          "hideAriaLabel": "Hide expired share links"
+        },
+        "viewLimitReached": {
+          "title": "0 hits left",
+          "showAriaLabel": "Show share links that reached their view limit",
+          "hideAriaLabel": "Hide share links that reached their view limit"
+        }
+      }
+    },
+    "row": {
+      "deleteQuestion": "Do you want to magically erase this link from existance?",
+      "deleteCancel": "Not yet",
+      "deleteConfirm": "Erase",
+      "erased": "Share link erased",
+      "eraseError": "Could not erase share link",
+      "statsAriaLabel": "Share link stats",
+      "lanternAriaLabel": "Haiku lantern: {subject}",
+      "copyTitle": "Copy link!",
+      "copyAriaLabel": "Copy share link for {subject}",
+      "settingsAriaLabel": "Share link settings for {subject}"
+    }
+  },
+  "ShareLinkPreviewModal": {
+    "panelAriaLabel": "Shared lantern: {subject}",
+    "labelsAriaLabel": "{subject} labels",
+    "lanternAriaLabel": "Haiku lantern: {subject}",
+    "unavailable": "This haiku is no longer available."
+  },
+  "ShareLinksSort": {
+    "title": "Sort by",
+    "ariaLabel": "Sort share links",
+    "coverAriaLabel": "Select {title}",
+    "categories": {
+      "creationDate": "Creation date",
+      "creationDateAriaLabel": "Sort by creation date",
+      "alpacabeth": "Alpacabeth",
+      "alpacabethAriaLabel": "Sort alphabetically",
+      "hitsLeft": "Hits left",
+      "hitsLeftAriaLabel": "Sort by hits left",
+      "timeLeft": "Time left",
+      "timeLeftAriaLabel": "Sort by time left"
+    }
+  },
+  "ShareLinkStatus": {
+    "labels": {
+      "expired": "Expired",
+      "viewLimitReached": "View limit reached",
+      "stopped": "Stopped",
+      "expiresIn": "Expires in",
+      "remainingViews": "Remaining views",
+      "active": "Active"
+    },
+    "duration": {
+      "lessThanMinute": "less than a minute",
+      "minutes": "{count, plural, one {# minute} other {# minutes}}",
+      "hours": "{count, plural, one {# hour} other {# hours}}",
+      "days": "{count, plural, one {# day} other {# days}}",
+      "months": "{count, plural, one {# month} other {# months}}"
     }
   }
 }

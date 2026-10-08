@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import styles from "./GoldenAgeTitle.module.css";
 
 export type GoldenAgeTitleProps = {
@@ -8,8 +9,6 @@ export type GoldenAgeTitleProps = {
 };
 
 const DEFAULT_TITLE = "GPDerp!";
-const DEFAULT_SUBTITLE = "THE HAIKU GENERATOR";
-const DEFAULT_TAGLINE = "AI, BUT IMPRACTICAL!";
 
 /**
  * Vintage 1940s–1960s comic-cover masthead: oversized yellow title,
@@ -18,10 +17,11 @@ const DEFAULT_TAGLINE = "AI, BUT IMPRACTICAL!";
  */
 export function GoldenAgeTitle({
   title = DEFAULT_TITLE,
-  subtitle = DEFAULT_SUBTITLE,
-  tagline = DEFAULT_TAGLINE,
+  subtitle,
+  tagline,
   className,
 }: GoldenAgeTitleProps) {
+  const t = useTranslations("GoldenAgeTitle");
   const rootClass = [styles.root, className].filter(Boolean).join(" ");
 
   return (
@@ -29,9 +29,9 @@ export function GoldenAgeTitle({
       <div className={styles.masthead}>
         <h1 className={styles.title}>{title}</h1>
         <div className={styles.subtitleRow}>
-          <p className={styles.subtitle}>{subtitle}</p>
+          <p className={styles.subtitle}>{subtitle ?? t("subtitle")}</p>
         </div>
-        <p className={styles.tagline}>{tagline}</p>
+        <p className={styles.tagline}>{tagline ?? t("tagline")}</p>
       </div>
     </header>
   );

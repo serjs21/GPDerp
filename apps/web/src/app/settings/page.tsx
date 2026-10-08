@@ -69,26 +69,26 @@ const TAB_META: Record<
   }
 > = {
   profile: {
-    title: "Profile",
+    title: "title",
     background: "sunburst",
     color: "soviet",
-    ariaLabel: "Profile information",
+    ariaLabel: "tabs.profile.ariaLabel",
     iconSrc: "/profile/profile.svg",
     bubbleStyle: "square",
   },
   "share-links": {
-    title: "Share Links",
+    title: "tabs.shareLinks.title",
     background: "solid",
     color: "#9d8ccd",
-    ariaLabel: "Manage share links",
+    ariaLabel: "tabs.shareLinks.ariaLabel",
     iconSrc: "/profile/share_link.svg",
     bubbleStyle: "thought",
   },
   labels: {
-    title: "Labels",
+    title: "tabs.labels.title",
     background: "halftone",
     color: "#4ce8d9",
-    ariaLabel: "Manage labels",
+    ariaLabel: "tabs.labels.ariaLabel",
     iconSrc: "/profile/labels.svg",
     bubbleStyle: "diamond",
   },
@@ -209,15 +209,17 @@ export default function ProfilePage() {
         }
       })
       .catch(() => {
-        comicToast.error("Could not load profile");
+        comicToast.error(t("toasts.loadError"));
       })
       .finally(() => setLoading(false));
+    // t only formats the error toast; re-running would refetch the profile on locale change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialized, isLoggedIn, setLocale, setTheme]);
 
   if (!initialized || !isLoggedIn) return null;
   if (loading || !profile) return null;
 
-  const displayName = profile.userName || profile.email || "User";
+  const displayName = profile.userName || profile.email || t("userFallback");
   const isGoogleUser = profile.providers.includes(AuthProvider.GOOGLE);
   const pendingNewEmail = profile.pendingEmailChange?.newEmail ?? null;
 
@@ -229,10 +231,10 @@ export default function ProfilePage() {
         lastName: values.lastName,
       });
       setProfile(updated);
-      comicToast.success("Profile updated");
+      comicToast.success(t("toasts.updateSuccess"));
       checkAuthentication();
     } catch {
-      comicToast.error("Could not update profile");
+      comicToast.error(t("toasts.updateError"));
     } finally {
       setSaving(false);
     }
@@ -255,9 +257,9 @@ export default function ProfilePage() {
           : prev,
       );
       setEmailConfirmOpen(false);
-      comicToast.success("Email change verification sent");
+      comicToast.success(t("toasts.emailChangeSent"));
     } catch {
-      comicToast.error("Could not create email change request");
+      comicToast.error(t("toasts.emailChangeError"));
     } finally {
       setRequestingEmailChange(false);
     }
@@ -280,9 +282,9 @@ export default function ProfilePage() {
           : prev,
       );
       setResendOpen(false);
-      comicToast.success("Verification email sent");
+      comicToast.success(t("toasts.verificationSent"));
     } catch {
-      comicToast.error("Could not resend verification email");
+      comicToast.error(t("toasts.verificationError"));
     } finally {
       setResendingEmailChange(false);
     }
@@ -313,10 +315,10 @@ export default function ProfilePage() {
           setSavingAvatar(true);
           const updated = await updateOwnAvatar(publicUrl);
           setProfile(updated);
-          comicToast.success("Profile picture saved");
+          comicToast.success(t("toasts.avatarSaved"));
           checkAuthentication();
         } catch {
-          comicToast.error("Could not save profile picture to your account");
+          comicToast.error(t("toasts.avatarError"));
         } finally {
           setSavingAvatar(false);
         }
@@ -353,10 +355,10 @@ export default function ProfilePage() {
                 return {
                   id,
                   panel: {
-                    title: meta.title,
+                    title: t(meta.title),
                     background: meta.background,
                     color: meta.color,
-                    ariaLabel: meta.ariaLabel,
+                    ariaLabel: t(meta.ariaLabel),
                   },
                   content: (
                     <LabelMethodIcon
@@ -395,7 +397,7 @@ export default function ProfilePage() {
                 <aside
                   ref={setSideNode}
                   className={styles.sidePanel}
-                  aria-label="Sort and filter"
+                  aria-label={t("sortAndFilter")}
                 />
               ) : null}
             </div>

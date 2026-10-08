@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import styles from "./RegisterLantern.module.css";
 
 export type RegisterLanternProps = {
@@ -18,6 +19,7 @@ export function RegisterLantern({
   className,
   disabled = false,
 }: RegisterLanternProps) {
+  const t = useTranslations("AuthLanterns");
   const rootClass = [
     styles.root,
     selected ? styles.selected : styles.idle,
@@ -29,7 +31,7 @@ export function RegisterLantern({
   const content = (
     <>
       <span className={styles.base} aria-hidden />
-      <span className={styles.label}>Register</span>
+      <span className={styles.label}>{t("register")}</span>
     </>
   );
 
@@ -39,7 +41,7 @@ export function RegisterLantern({
         type="button"
         className={rootClass}
         disabled={disabled}
-        aria-label="Register"
+        aria-label={t("register")}
         aria-pressed={selected}
         onClick={onClick}
       >

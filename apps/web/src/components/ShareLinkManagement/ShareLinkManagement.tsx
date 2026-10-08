@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRef, type RefObject } from "react";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { ShareLinksSort } from "@/components/ShareLinksSort";
@@ -35,6 +36,7 @@ function ShareLinkListBody({
   onChanged: () => void;
   sentinelRef: RefObject<HTMLDivElement | null>;
 }) {
+  const t = useTranslations("ShareLinkManagement.list");
   if (showCenterLoader) {
     return (
       <div className={styles.loaderRow}>
@@ -46,7 +48,7 @@ function ShareLinkListBody({
   return (
     <>
       {showEmpty ? (
-        <p className={styles.empty}>No share links found.</p>
+        <p className={styles.empty}>{t("empty")}</p>
       ) : (
         items.map((link) => {
           const haikuId = link.sharedHaikuId;

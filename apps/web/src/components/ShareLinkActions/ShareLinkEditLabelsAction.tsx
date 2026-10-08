@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   SHARE_LINK_ACTION_COLORS,
   SHARE_LINK_ACTION_ICONS,
@@ -16,13 +17,14 @@ export function ShareLinkEditLabelsAction({
   onEditLabels,
   captionClassName,
 }: ShareLinkEditLabelsActionProps) {
+  const t = useTranslations("ShareLinkActions.editLabels");
   return (
     <ShareLinkActionButton
       src={SHARE_LINK_ACTION_ICONS.editLabels}
-      caption="Edit labels"
+      caption={t("caption")}
       captionClassName={[styles.captionLabels, captionClassName].filter(Boolean).join(" ")}
       layout={SHARE_LINK_PREVIEW_ACTION_LAYOUTS.editLabels}
-      ariaLabel={`Edit labels for ${subject}`}
+      ariaLabel={t("ariaLabel", { subject })}
       color={SHARE_LINK_ACTION_COLORS.editLabels.panel}
       hoverFill={SHARE_LINK_ACTION_COLORS.editLabels.hover}
       disabled={disabled}

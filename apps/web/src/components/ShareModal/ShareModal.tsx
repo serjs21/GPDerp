@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { Typography } from "@/components/StyledComponents";
 import {
   ComicPageDialog,
@@ -46,7 +47,7 @@ export function ShareModal({
   open,
   onClose,
   haikuId,
-  haikuSubject = "Haiku",
+  haikuSubject: haikuSubjectProp,
   haiku = null,
   initialCreatedUrl = null,
   initialCreatedLink = null,
@@ -54,6 +55,8 @@ export function ShareModal({
   initialMethod = "link",
   initialEmailRecipients = EMPTY_EMAIL_RECIPIENTS,
 }: ShareModalProps) {
+  const t = useTranslations("ShareModal.modal");
+  const haikuSubject = haikuSubjectProp ?? t("defaultSubject");
   const {
     method,
     setMethod,
@@ -127,8 +130,8 @@ export function ShareModal({
               panel: {
                 background: "sunburst",
                 color: "teal",
-                title: "Link",
-                ariaLabel: "Share by link",
+                title: t("linkTabTitle"),
+                ariaLabel: t("linkTabAriaLabel"),
               },
               content: (
                 <ShareMethodIcon
@@ -144,8 +147,8 @@ export function ShareModal({
               panel: {
                 background: "halftone",
                 color: "orange",
-                title: "Email",
-                ariaLabel: "Share via email",
+                title: t("emailTabTitle"),
+                ariaLabel: t("emailTabAriaLabel"),
               },
               content: (
                 <ShareMethodIcon
@@ -164,7 +167,7 @@ export function ShareModal({
             loadingLink ? (
               <ComicPagePanel span="full" color="white" contentAlign="center" className={styles.contentPanel}>
                 <Typography.Paragraph type="secondary" style={{ margin: 0 }}>
-                  Loading…
+                  {t("loading")}
                 </Typography.Paragraph>
               </ComicPagePanel>
             ) : (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   ComicPageCtaAction,
   ComicPageDialog,
@@ -30,6 +31,7 @@ export function AuthGateModal({
   initialMode = "login",
   onForgotPassword,
 }: AuthGateModalProps) {
+  const t = useTranslations("AuthGateModal");
   const authVerification = useAuthenticationVerification();
   const openForgot =
     onForgotPassword ?? (() => authVerification.openResetPasswordModal({ mode: "request" }));
@@ -60,7 +62,7 @@ export function AuthGateModal({
       ctaFooter={
         mode === "login" ? (
           <ComicPageCtaAction
-            label="Sign in"
+            label={t("signIn")}
             type="submit"
             busy={submitting}
             disabled={submitting}
@@ -68,7 +70,7 @@ export function AuthGateModal({
           />
         ) : (
           <ComicPageCtaAction
-            label="Create account"
+            label={t("createAccount")}
             type="submit"
             busy={submitting}
             disabled={submitting}
@@ -89,8 +91,8 @@ export function AuthGateModal({
               panel: {
                 background: "sunburst",
                 color: "blue",
-                title: "Sign in",
-                ariaLabel: "Sign in",
+                title: t("signInTab"),
+                ariaLabel: t("signInTab"),
               },
               content: (
                 <LabelMethodIcon
@@ -106,8 +108,8 @@ export function AuthGateModal({
               panel: {
                 background: "halftone",
                 color: "purple",
-                title: "Register",
-                ariaLabel: "Register",
+                title: t("registerTab"),
+                ariaLabel: t("registerTab"),
               },
               content: (
                 <LabelMethodIcon
@@ -148,7 +150,7 @@ export function AuthGateModal({
                 className={styles.linkButton}
                 onClick={openForgot}
               >
-                Forgot password?
+                {t("forgotPassword")}
               </button>
             </p>
           </div>

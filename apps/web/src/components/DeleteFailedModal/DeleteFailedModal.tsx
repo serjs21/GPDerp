@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/StyledComponents";
 import { PaperModal } from "@/components/PaperModal";
 import styles from "./DeleteFailedModal.module.css";
@@ -17,28 +18,29 @@ export function DeleteFailedModal({
   onRetry,
   onLeaveItBe,
 }: DeleteFailedModalProps) {
+  const t = useTranslations("DeleteFailedModal");
   return (
     <PaperModal
       open={open}
       onOpenChange={(next) => {
         if (!next && !retrying) onLeaveItBe();
       }}
-      title="Deletion failed"
+      title={t("title")}
       roughSeed={19}
       size="sm"
       footer={
         <div className={styles.footer}>
           <Button onClick={onLeaveItBe} disabled={retrying}>
-            Leave it be
+            {t("leaveItBe")}
           </Button>
           <Button type="primary" danger loading={retrying} onClick={onRetry}>
-            Retry
+            {t("retry")}
           </Button>
         </div>
       }
     >
       <p className={styles.body}>
-        We couldn&apos;t delete this haiku. You can try again, or leave it in your list.
+        {t("body")}
       </p>
     </PaperModal>
   );

@@ -11,6 +11,7 @@ import {
   type ReactNode,
   type RefObject,
 } from "react";
+import { useTranslations } from "next-intl";
 import { ComicBubbleStage } from "@/components/ComicConfirmModal/ComicBubbleStage";
 import { ComicPressButton } from "@/components/ComicPressButton";
 import stageStyles from "@/components/ComicConfirmModal/comicBubbleStage.module.css";
@@ -292,12 +293,13 @@ function useOpenState({
  * Comic speech-bubble dropdown with scrollable options and a checkmarked selection.
  */
 export function TextBubbleDropdown(props: TextBubbleDropdownProps) {
+  const t = useTranslations("TextBubbleDropdown");
   return (
     <TextBubbleDropdownInner
       options={props.options}
       value={props.value ?? null}
       onChange={props.onChange}
-      placeholder={props.placeholder ?? "Select option"}
+      placeholder={props.placeholder ?? t("placeholder")}
       openProp={props.open}
       defaultOpen={props.defaultOpen ?? false}
       onOpenChange={props.onOpenChange}

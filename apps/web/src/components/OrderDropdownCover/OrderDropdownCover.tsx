@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   useMemo,
   useRef,
@@ -49,12 +50,14 @@ export function OrderDropdownCover({
   widthRem = ORDER_DROPDOWN_COVER_WIDTH_REM,
   disabled = false,
   className,
-  "aria-label": ariaLabel = "Change order",
+  "aria-label": ariaLabelProp,
   "aria-expanded": ariaExpanded,
   "aria-controls": ariaControls,
   "aria-haspopup": ariaHasPopup,
   onClick,
 }: OrderDropdownCoverProps) {
+  const t = useTranslations("OrderDropdownCover");
+  const ariaLabel = ariaLabelProp ?? t("ariaLabel");
   const [pressed, setPressed] = useState(false);
   const [sounds, setSounds] = useState<OpenSound[]>([]);
   const soundIdRef = useRef(0);

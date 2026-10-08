@@ -2,6 +2,7 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useTranslations } from "next-intl";
 import type { CSSProperties, ReactNode } from "react";
 import { PaperRoughFrame } from "./PaperRoughFrame";
 import { PaperSurface } from "./PaperSurface";
@@ -41,6 +42,7 @@ export function PaperModal({
   className,
   closeOnOverlayClick = true,
 }: PaperModalProps) {
+  const t = useTranslations("PaperModal");
   const reduceMotion = useReducedMotion();
   const motionBundle = resolvePaperMotion(motionPreset);
   const overlayVariants = reduceMotion ? motionBundle.reducedOverlay : motionBundle.overlay;
@@ -105,11 +107,11 @@ export function PaperModal({
                         {title ? (
                           <Dialog.Title className={styles.title}>{title}</Dialog.Title>
                         ) : (
-                          <Dialog.Title className={styles.visuallyHidden}>Dialog</Dialog.Title>
+                          <Dialog.Title className={styles.visuallyHidden}>{t("dialog")}</Dialog.Title>
                         )}
                         {showClose ? (
                           <Dialog.Close asChild>
-                            <button type="button" className={styles.closeButton} aria-label="Close">
+                            <button type="button" className={styles.closeButton} aria-label={t("close")}>
                               ×
                             </button>
                           </Dialog.Close>
@@ -118,7 +120,7 @@ export function PaperModal({
                     )}
 
                     {!title && !showClose ? (
-                      <Dialog.Title className={styles.visuallyHidden}>Dialog</Dialog.Title>
+                      <Dialog.Title className={styles.visuallyHidden}>{t("dialog")}</Dialog.Title>
                     ) : null}
 
                     {description ? (

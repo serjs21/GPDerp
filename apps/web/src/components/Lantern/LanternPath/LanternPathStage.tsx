@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef, type ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import {
   LANTERN_FLIGHT_PATH_EXIT_STOP_ID,
   LANTERN_FLIGHT_PATH_INITIAL_STOP_ID,
@@ -21,6 +22,7 @@ export type LanternPathStageProps = {
 
 export const LanternPathStage = forwardRef<HTMLDivElement, LanternPathStageProps>(
   function LanternPathStage({ children, hud, controls, className, showGuides = false }, ref) {
+    const t = useTranslations("Lantern.lanternPathStage");
     const exitStop = routeStopById(LANTERN_FLIGHT_PATH_EXIT_STOP_ID);
     const initialStop = routeStopById(LANTERN_FLIGHT_PATH_INITIAL_STOP_ID);
 
@@ -29,7 +31,7 @@ export const LanternPathStage = forwardRef<HTMLDivElement, LanternPathStageProps
     return (
       <div ref={ref} className={viewportClass}>
         {hud}
-        <div className={styles.flightPathStage} aria-label="Lantern flight path">
+        <div className={styles.flightPathStage} aria-label={t("ariaLabel")}>
           <div className={styles.flightPathGuideBox}>
             {showGuides ? (
               /* eslint-disable-next-line @next/next/no-img-element */

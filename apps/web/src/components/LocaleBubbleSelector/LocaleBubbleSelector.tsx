@@ -66,7 +66,7 @@ export function LocaleBubbleSelector({
   onChange,
   className,
   ariaLabel,
-  placeholder = "Language",
+  placeholder: placeholderProp,
   dropDirection = "down",
   tailDirection = "top-left",
   open: openProp,
@@ -75,6 +75,7 @@ export function LocaleBubbleSelector({
   disabled,
 }: LocaleBubbleSelectorProps) {
   const t = useTranslations("Profile");
+  const placeholder = placeholderProp ?? t("language");
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
@@ -83,7 +84,7 @@ export function LocaleBubbleSelector({
 
   const SelectedFlag = LOCALE_FLAGS[value];
   const selectedLabel = nativeLanguageLabel(value);
-  const mergedAriaLabel = ariaLabel ?? `Language: ${selectedLabel}`;
+  const mergedAriaLabel = ariaLabel ?? t("languageAriaLabel", { language: selectedLabel });
 
   const labeledOptions = useMemo(
     () =>

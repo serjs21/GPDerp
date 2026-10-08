@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import { HEADER_NAV_ICON_SIZE_PX } from "@/consts/header/siteHeaderConsts";
@@ -23,6 +24,7 @@ export type GoHomeProps = {
  * UserMenu. Hover expands a zero-width label and pushes the centered icon left.
  */
 export function GoHome({ className, forceShow = false }: GoHomeProps) {
+  const t = useTranslations("GoHome");
   const pathname = usePathname();
   const sharpShape = resolveComicLabelShapePreset("sharp");
 
@@ -59,7 +61,7 @@ export function GoHome({ className, forceShow = false }: GoHomeProps) {
           href="/"
           prefetch
           className={styles.panel}
-          aria-label="Go home"
+          aria-label={t("label")}
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- public SVG asset */}
           <img
@@ -71,7 +73,7 @@ export function GoHome({ className, forceShow = false }: GoHomeProps) {
             height={48}
           />
           <span className={styles.actionFooter} aria-hidden>
-            Go home
+            {t("label")}
           </span>
         </Link>
       </div>

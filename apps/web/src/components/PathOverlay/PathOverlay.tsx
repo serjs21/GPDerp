@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
+import { useTranslations } from "next-intl";
 import { animate } from "animejs";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useOptionalCelestialTheme } from "@/app/providers/CelestialThemeProvider";
@@ -218,6 +219,7 @@ function PathScrim({
   onGoToBeginning,
   onCloseComplete,
 }: PathScrimProps) {
+  const t = useTranslations("PathOverlay.pathOverlay");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const labelsRef = useRef<HTMLDivElement>(null);
   const celestial = useOptionalCelestialTheme();
@@ -491,7 +493,7 @@ function PathScrim({
             type="button"
             className={styles.lobe}
             style={darkLobeStyle}
-            aria-label="Continue the journey"
+            aria-label={t("continueJourney")}
             onClick={() => onKeepScrolling?.()}
             onHoverStart={() => setHoveredSide("dark")}
             onHoverEnd={() => setHoveredSide((side) => (side === "dark" ? null : side))}
@@ -517,7 +519,7 @@ function PathScrim({
             type="button"
             className={styles.lobe}
             style={lightLobeStyle}
-            aria-label="Go back to the start"
+            aria-label={t("goBackToStart")}
             onClick={() => onGoToBeginning?.()}
             onHoverStart={() => setHoveredSide("light")}
             onHoverEnd={() => setHoveredSide((side) => (side === "light" ? null : side))}
@@ -605,6 +607,7 @@ export function PathOverlay({
   className,
   contentClassName,
 }: PathOverlayProps) {
+  const t = useTranslations("PathOverlay.pathOverlay");
   const titleId = useId();
   const clipUid = useId().replace(/:/g, "");
   const darkClipId = `path-dark-${clipUid}`;
@@ -657,7 +660,7 @@ export function PathOverlay({
           exit={{ opacity: 1 }}
         >
           <span id={titleId} className={styles.visuallyHidden}>
-            Overlay
+            {t("title")}
           </span>
 
           <PathScrim

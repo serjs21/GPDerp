@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   SHARE_LINK_ACTION_COLORS,
   SHARE_LINK_ACTION_ICONS,
@@ -19,18 +20,19 @@ export function ShareLinkPreviewLabelsActions({
   disabled = false,
   className,
 }: ShareLinkPreviewLabelsActionsProps) {
+  const t = useTranslations("ShareLinkActions.previewLabels");
   return (
     <div
       className={[styles.strip, className].filter(Boolean).join(" ")}
       role="group"
-      aria-label={`Share link actions for ${subject}`}
+      aria-label={t("groupAriaLabel", { subject })}
     >
       <ShareLinkActionButton
         src={SHARE_LINK_ACTION_ICONS.preview}
-        caption="Preview"
+        caption={t("preview")}
         captionClassName={styles.caption}
         layout={SHARE_LINK_ACTION_ROW_LAYOUTS.preview}
-        ariaLabel={`Preview ${subject}`}
+        ariaLabel={t("previewAriaLabel", { subject })}
         color={SHARE_LINK_ACTION_COLORS.preview.panel}
         hoverFill={SHARE_LINK_ACTION_COLORS.preview.hover}
         disabled={disabled}

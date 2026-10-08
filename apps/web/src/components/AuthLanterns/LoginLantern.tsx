@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import styles from "./LoginLantern.module.css";
 
 export type LoginLanternProps = {
@@ -18,6 +19,7 @@ export function LoginLantern({
   className,
   disabled = false,
 }: LoginLanternProps) {
+  const t = useTranslations("AuthLanterns");
   const rootClass = [
     styles.root,
     selected ? styles.selected : styles.idle,
@@ -29,7 +31,7 @@ export function LoginLantern({
   const content = (
     <>
       <span className={styles.base} aria-hidden />
-      <span className={styles.label}>Login</span>
+      <span className={styles.label}>{t("login")}</span>
     </>
   );
 
@@ -39,7 +41,7 @@ export function LoginLantern({
         type="button"
         className={rootClass}
         disabled={disabled}
-        aria-label="Login"
+        aria-label={t("login")}
         aria-pressed={selected}
         onClick={onClick}
       >

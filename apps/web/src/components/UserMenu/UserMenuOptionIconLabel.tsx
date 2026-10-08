@@ -8,12 +8,13 @@ import styles from "./UserMenu.module.css";
 export function UserMenuOptionIconLabel({
   src,
   iconLabel,
+  seedId,
   text,
   size = USER_MENU_BURST_SIZE,
 }: UserMenuOptionIconLabelProps) {
   return (
     <span className={styles.optionLabel}>
-      <UserMenuBurstFrame label={iconLabel} size={size}>
+      <UserMenuBurstFrame label={iconLabel} seedId={seedId} size={size}>
         {/* eslint-disable-next-line @next/next/no-img-element -- public SVG asset */}
         <img
           className={frameStyles.icon}

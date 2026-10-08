@@ -7,6 +7,7 @@ import {
   useState,
   type FormEvent,
 } from "react";
+import { useTranslations } from "next-intl";
 import authStyles from "@/app/auth.shared.module.css";
 import { useGoogleOAuthAvailability } from "@/app/providers/GoogleOAuthAvailabilityProvider";
 import { AuthField, GoogleSquareButton } from "@/components/AuthFlows/AuthFlowChrome";
@@ -32,6 +33,7 @@ export const RegisterFlow = forwardRef<AuthFlowHandle, RegisterFlowProps>(functi
   { onSuccess, showGoogle = false, hideCta = false, onSubmittingChange },
   ref,
 ) {
+  const t = useTranslations("AuthFlows.register");
   const googleOAuthEnabled = useGoogleOAuthAvailability();
   const canShowGoogle = showGoogle && googleOAuthEnabled;
   const [email, setEmail] = useState("");
@@ -55,19 +57,19 @@ export const RegisterFlow = forwardRef<AuthFlowHandle, RegisterFlowProps>(functi
   const validateAndSubmit = () => {
     const trimmedEmail = email.trim();
     if (!trimmedEmail || !isValidEmail(trimmedEmail)) {
-      setError("Enter a valid email");
+      setError(t("invalidEmail"));
       return;
     }
     if (!password) {
-      setError("Password is required");
+      setError(t("passwordRequired"));
       return;
     }
     if (password.length < 8) {
-      setError("At least 8 characters");
+      setError(t("passwordTooShort"));
       return;
     }
     if (confirm !== password) {
-      setError("Passwords do not match");
+      setError(t("passwordsDoNotMatch"));
       return;
     }
     setError(null);
@@ -95,9 +97,9 @@ export const RegisterFlow = forwardRef<AuthFlowHandle, RegisterFlowProps>(functi
           <GoogleSquareButton
             text="signup_with"
             onSuccess={(credential) => void signUpWithGoogle(credential)}
-            onError={() => comicToast.error("Google sign-up failed")}
+            onError={() => comicToast.error(t("googleSignUpFailed"))}
           />
-          <div className={authStyles.divider}>or register with email</div>
+          <div className={authStyles.divider}>{t("divider")}</div>
         </div>
       ) : null}
 
@@ -112,8 +114,8 @@ export const RegisterFlow = forwardRef<AuthFlowHandle, RegisterFlowProps>(functi
               setEmail(e.target.value);
               setError(null);
             }}
-            placeholder="Email"
-            aria-label="Email"
+            placeholder={t("emailPlaceholder")}
+            aria-label={t("emailPlaceholder")}
           />
         </AuthField>
         <AuthField>
@@ -126,8 +128,8 @@ export const RegisterFlow = forwardRef<AuthFlowHandle, RegisterFlowProps>(functi
               setPassword(e.target.value);
               setError(null);
             }}
-            placeholder="Password"
-            aria-label="Password"
+            placeholder={t("passwordPlaceholder")}
+            aria-label={t("passwordPlaceholder")}
           />
         </AuthField>
         <AuthField>
@@ -140,15 +142,15 @@ export const RegisterFlow = forwardRef<AuthFlowHandle, RegisterFlowProps>(functi
               setConfirm(e.target.value);
               setError(null);
             }}
-            placeholder="Confirm password"
-            aria-label="Confirm password"
+            placeholder={t("confirmPasswordPlaceholder")}
+            aria-label={t("confirmPasswordPlaceholder")}
           />
         </AuthField>
         {error ? <p className={authStyles.fieldError}>{error}</p> : null}
         {!hideCta ? (
           <div className={authStyles.submitItem}>
             <ComicPageCtaAction
-              label={submitting ? "Creating account" : "Create account"}
+              label={submitting ? t("submitting") : t("submit")}
               type="submit"
               busy={submitting}
               disabled={submitting}

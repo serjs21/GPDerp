@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useTranslations } from "next-intl";
 import authStyles from "../auth.shared.module.css";
 import {
   completeRegistrationUsername,
@@ -18,6 +19,7 @@ import { consumePostLoginReturn } from "@/utils/auth/postLoginReturn";
 type FormValues = { userName: string };
 
 const CompleteRegistrationPage = () => {
+  const t = useTranslations("CompleteRegistrationPage");
   const router = useRouter();
   const { user, initialized, isLoggedIn, checkAuthentication } = useAuthenticationState();
   const [form] = Form.useForm<FormValues>();
@@ -43,7 +45,7 @@ const CompleteRegistrationPage = () => {
     if (!v || v.length < MIN_USERNAME_LENGTH) return;
     const result = await fetchUsernameAvailability(v);
     if (!result.available) {
-      throw new Error(result.reason ?? "Username is not available");
+      throw new Error(result.reason ?? t("usernameUnavailable"));
     }
   };
 
@@ -51,7 +53,7 @@ const CompleteRegistrationPage = () => {
     setSubmitting(true);
     try {
       await completeRegistrationUsername({ userName: values.userName.trim() });
-      comicToast.success("You’re all set");
+      comicToast.success(t("success"));
       checkAuthentication();
       router.replace(consumePostLoginReturn("/"));
       router.refresh();
@@ -59,13 +61,13 @@ const CompleteRegistrationPage = () => {
       if (axios.isAxiosError(e) && e.response?.data) {
         const data = e.response.data as { error?: string; code?: string };
         if (data.code === "USERNAME_TAKEN") {
-          comicToast.error(data.error ?? "Username taken");
+          comicToast.error(data.error ?? t("usernameTaken"));
           return;
         }
-        comicToast.error(data.error ?? "Could not save username");
+        comicToast.error(data.error ?? t("saveFailed"));
         return;
       }
-      comicToast.error("Could not save username");
+      comicToast.error(t("saveFailed"));
     } finally {
       setSubmitting(false);
     }
@@ -75,7 +77,7 @@ const CompleteRegistrationPage = () => {
     return (
       <div className={authStyles.authPage}>
         <Card className={authStyles.card}>
-          <Typography.Paragraph>Loading…</Typography.Paragraph>
+          <Typography.Paragraph>{t("loading")}</Typography.Paragraph>
         </Card>
       </div>
     );
@@ -83,22 +85,20 @@ const CompleteRegistrationPage = () => {
 
   return (
     <div className={authStyles.authPage}>
-      <Card className={authStyles.card} title="Complete registration">
-        <Typography.Paragraph type="secondary">
-          Choose a username to finish setting up your account.
-        </Typography.Paragraph>
+      <Card className={authStyles.card} title={t("title")}>
+        <Typography.Paragraph type="secondary">{t("lead")}</Typography.Paragraph>
         <Form form={form} onFinish={(v) => void onFinish(v)} layout="vertical" requiredMark={false}>
           <Form.Item
             name="userName"
-            label="Username"
+            label={t("usernameLabel")}
             hasFeedback
             validateTrigger="onBlur"
             rules={[
-              { required: true, message: "Choose a username" },
-              { min: MIN_USERNAME_LENGTH, message: `At least ${MIN_USERNAME_LENGTH} characters` },
+              { required: true, message: t("usernameRequired") },
+              { min: MIN_USERNAME_LENGTH, message: t("usernameTooShort", { min: MIN_USERNAME_LENGTH }) },
               {
                 pattern: /^[a-zA-Z0-9_]+$/,
-                message: "Letters, numbers, and underscores only",
+                message: t("usernamePattern"),
               },
               {
                 validator: async (_, value: string) => {
@@ -107,16 +107,16 @@ const CompleteRegistrationPage = () => {
               },
             ]}
           >
-            <Input autoComplete="username" placeholder="your_handle" />
+            <Input autoComplete="username" placeholder={t("usernamePlaceholder")} />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" block loading={submitting}>
-              Continue
+              {t("continue")}
             </Button>
           </Form.Item>
         </Form>
         <Typography.Paragraph type="secondary" className={authStyles.footerLinks}>
-          <Link href="/">Back to home</Link>
+          <Link href="/">{t("backHome")}</Link>
         </Typography.Paragraph>
       </Card>
     </div>

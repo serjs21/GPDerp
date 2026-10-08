@@ -1,9 +1,7 @@
 "use client";
 
-import {
-  HEADER_HAIKU_SEARCH_ICON_SRC,
-  HEADER_HAIKU_SEARCH_PLACEHOLDER,
-} from "./consts/headerToolConsts";
+import { useTranslations } from "next-intl";
+import { HEADER_HAIKU_SEARCH_ICON_SRC } from "./consts/headerToolConsts";
 import type { HeaderSearchButtonProps } from "./HeaderSearchButton.types";
 import { HeaderToolFace } from "./HeaderToolFace";
 import { HeaderToolFrame } from "./HeaderToolFrame";
@@ -15,6 +13,7 @@ import styles from "./HeaderToolButton.module.css";
 
 /** Header search button + input: haiku titles on `/`, the active tab on `/settings`. */
 export function HeaderSearchButton({ className, forcedHover }: HeaderSearchButtonProps) {
+  const t = useTranslations("HeaderHaikuTools.search");
   const haikuSearch = useHeaderHaikuSearch();
   const settingsSearch = useHeaderSettingsSearch();
   const { active, handlers } = useHeaderToolHover(forcedHover);
@@ -29,9 +28,9 @@ export function HeaderSearchButton({ className, forcedHover }: HeaderSearchButto
     ? settingsSearch.setSearchString
     : haikuSearch.setSearchString;
   const inputRef = isSettings ? settingsSearch.inputRef : haikuSearch.inputRef;
-  const placeholder = isSettings ? settingsSearch.placeholder : HEADER_HAIKU_SEARCH_PLACEHOLDER;
-  const inputAriaLabel = isSettings ? settingsSearch.ariaLabel : "Search haiku titles";
-  const buttonAriaLabel = isSettings ? settingsSearch.buttonAriaLabel : "Search haikus";
+  const placeholder = isSettings ? settingsSearch.placeholder : t("placeholder");
+  const inputAriaLabel = isSettings ? settingsSearch.ariaLabel : t("inputAriaLabel");
+  const buttonAriaLabel = isSettings ? settingsSearch.buttonAriaLabel : t("buttonAriaLabel");
   const onSearchClick = isSettings ? settingsSearch.toggleExpanded : haikuSearch.openSearch;
   const onInputBlur = isSettings ? undefined : haikuSearch.onBlur;
   const iconSrc = isSettings ? settingsSearch.iconSrc : HEADER_HAIKU_SEARCH_ICON_SRC;
@@ -58,7 +57,7 @@ export function HeaderSearchButton({ className, forcedHover }: HeaderSearchButto
             <img src={iconSrc} alt="" className={styles.iconImg} width={28} height={28} />
           </HeaderToolFace>
           <HeaderToolFace enterFrom="right" hidden={!active}>
-            <span className={styles.actionName}>Search</span>
+            <span className={styles.actionName}>{t("actionName")}</span>
           </HeaderToolFace>
         </button>
       </HeaderToolFrame>

@@ -18,7 +18,7 @@ import {
 import styles from "./PostcardRenderer.module.css";
 
 /** Fixed 1200×800 static postcard composition (capture target, no interactivity). */
-export function PostcardRenderer({ theme, haiku, fontScale, className, ref }: PostcardRendererProps) {
+export function PostcardRenderer({ theme, haiku, getAriaLabel, fontScale, className, ref }: PostcardRendererProps) {
   const { scene, backgroundBodies } = theme;
   const balance = useMemo(
     () =>
@@ -49,7 +49,7 @@ export function PostcardRenderer({ theme, haiku, fontScale, className, ref }: Po
       />
       <div className={styles.lanternSlot}>
         <LanternFrame
-          ariaLabel={title ? `Haiku postcard: ${title}` : "Haiku postcard"}
+          ariaLabel={getAriaLabel(title)}
           suppressReveal
           showLabelBelt={false}
           style={buildPostcardLanternStyle()}

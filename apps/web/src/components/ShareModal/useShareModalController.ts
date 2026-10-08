@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { comicToast } from "@/components/ComicToast";
 import type { HaikuDto } from "@/api/haikus";
 import {
@@ -10,8 +11,6 @@ import {
 import type { ShareMethod } from "./types";
 import { useSharePostcardFront } from "./useSharePostcardFront";
 
-const POSTCARDS_QUEUED_MESSAGE = "Postcards were placed in the mail box";
-
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 const EMPTY_EMAIL_RECIPIENTS: string[] = [];
 
@@ -20,9 +19,6 @@ const getAxiosErrorMessage = (error: unknown, fallbackMessage: string) => {
   const apiMessage = (error.response?.data as { error?: string } | undefined)?.error;
   return typeof apiMessage === "string" ? apiMessage : fallbackMessage;
 };
-
-const getEmailCtaHint = (normalizedEmailsCount: number) =>
-  normalizedEmailsCount === 0 ? "Add at least one recipient email" : "Fix invalid recipient emails";
 
 const stubCreatedLinkFromUrl = (
   shareUrl: string,
@@ -62,7 +58,7 @@ export function useShareModalController({
   open,
   haikuId,
   haiku = null,
-  haikuSubject = "Haiku",
+  haikuSubject: haikuSubjectParam,
   initialCreatedUrl = null,
   initialCreatedLink = null,
   initialEmptyLink = false,
@@ -70,6 +66,8 @@ export function useShareModalController({
   initialEmailRecipients = EMPTY_EMAIL_RECIPIENTS,
   onEmailQueued,
 }: UseShareModalControllerParams) {
+  const t = useTranslations("ShareModal.controller");
+  const haikuSubject = haikuSubjectParam ?? t("defaultSubject");
   const [method, setMethod] = useState<ShareMethod>("link");
   const [shareLink, setShareLink] = useState<ShareLinkListItem | null>(null);
   const [loadingLink, setLoadingLink] = useState(false);
@@ -110,7 +108,7 @@ export function useShareModalController({
       } catch (e) {
         if (!cancelled) {
           setShareLink(null);
-          comicToast.error(getAxiosErrorMessage(e, "Could not load share link"));
+          comicToast.error(getAxiosErrorMessage(e, t("loadLinkError")));
         }
       } finally {
         if (!cancelled) setLoadingLink(false);
@@ -129,6 +127,7 @@ export function useShareModalController({
     initialEmptyLink,
     initialMethod,
     initialEmailRecipients,
+    t,
   ]);
 
   const normalizedEmails = useMemo(
@@ -144,7 +143,7 @@ export function useShareModalController({
   const emailCtaHint =
     canSendEmail || sendingEmail
       ? ""
-      : getEmailCtaHint(normalizedEmails.length);
+      : t(normalizedEmails.length === 0 ? "addRecipientHint" : "fixInvalidHint");
 
   const onSendEmail = async () => {
     if (!canSendEmail) return;
@@ -154,10 +153,10 @@ export function useShareModalController({
       const front = await preparePostcardFront();
       if (front === null) return;
       await shareHaikuByEmail({ haikuId, emails: normalizedEmails, message, postcard: front && { front } });
-      comicToast.success(POSTCARDS_QUEUED_MESSAGE);
+      comicToast.success(t("postcardsQueued"));
       onEmailQueued?.();
     } catch (e) {
-      comicToast.error(getAxiosErrorMessage(e, "Could not send email"));
+      comicToast.error(getAxiosErrorMessage(e, t("sendEmailError")));
     } finally {
       setSendingEmail(false);
     }

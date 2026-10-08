@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef, useCallback, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import type { HaikuListSort } from "@/api/haikus";
 import { Button } from "@/components/StyledComponents";
 import { SVGPath, type SVGPathHandle } from "@/components/SVGPath";
@@ -40,6 +41,7 @@ export const SavedHaikusLanternPath = forwardRef<
   excludedLabelIds = [],
   sort,
 }, ref) {
+  const t = useTranslations("SavedHaikusLanternPath");
   const {
     haikus,
     hasNextPage,
@@ -107,7 +109,7 @@ export const SavedHaikusLanternPath = forwardRef<
 
   if (isInitialLoading) {
     return (
-      <div className={styles.flightPathLoader} aria-busy="true" aria-label="Loading haikus">
+      <div className={styles.flightPathLoader} aria-busy="true" aria-label={t("loading")}>
         <SakuraPetalLoader />
       </div>
     );
@@ -116,9 +118,9 @@ export const SavedHaikusLanternPath = forwardRef<
   if (isError) {
     return (
       <div className={styles.flightPathError}>
-        <p>Could not load saved haikus.</p>
+        <p>{t("loadError")}</p>
         <Button type="primary" onClick={refetch}>
-          Try again
+          {t("retry")}
         </Button>
       </div>
     );
@@ -126,7 +128,7 @@ export const SavedHaikusLanternPath = forwardRef<
 
   if (showSearchLoader) {
     return (
-      <div className={styles.flightPathLoader} aria-busy="true" aria-label="Searching haikus">
+      <div className={styles.flightPathLoader} aria-busy="true" aria-label={t("searching")}>
         <SakuraPetalLoader />
       </div>
     );

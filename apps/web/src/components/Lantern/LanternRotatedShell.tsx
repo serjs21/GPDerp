@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { LabelHalo } from "@/components/LabelHalo/LabelHalo";
 import type {
   LabelHaloLabelItem,
@@ -55,6 +56,7 @@ export function LanternRotatedShell({
   ariaLabel,
   faceHalo = null,
 }: LanternRotatedShellProps) {
+  const t = useTranslations("Lantern.lanternRotatedShell");
   const transform = getRotationBaseTransform(rotationBase);
   const rootStyle = buildRotationBaseRootStyle({
     widthRem,
@@ -81,7 +83,7 @@ export function LanternRotatedShell({
       labels={faceHalo.labels}
       interactive={faceHalo.interactive ?? false}
       onPlacementCommit={faceHalo.onPlacementCommit}
-      ariaLabel={faceHalo.ariaLabel ?? `${ariaLabel} labels`}
+      ariaLabel={faceHalo.ariaLabel ?? t("labels", { label: ariaLabel })}
     >
       <div className={styles.content}>{children}</div>
     </LabelHalo>

@@ -1,6 +1,7 @@
 import { comicToast } from "@/components/ComicToast";
 import axios from "axios";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   fetchUsernameAvailability,
   loginWithGoogleCredential,
@@ -21,6 +22,7 @@ type UseRegistrationOptions = {
 };
 
 export function useRegistration({ onSuccess, afterAccountCreated }: UseRegistrationOptions) {
+  const t = useTranslations("AuthHooks");
   const [submitting, setSubmitting] = useState(false);
 
   const registerWithPassword = async (values: RegisterFormValues) => {
@@ -30,16 +32,16 @@ export function useRegistration({ onSuccess, afterAccountCreated }: UseRegistrat
         email: values.email.trim().toLowerCase(),
         password: values.password,
       });
-      comicToast.success("If this email can be used for a new account, we sent a verification link. Check your inbox.");
+      comicToast.success(t("registrationSent"));
       afterAccountCreated?.();
       onSuccess();
     } catch (e: unknown) {
       if (axios.isAxiosError(e) && e.response?.data) {
         const data = e.response.data as { error?: string; code?: string };
-        comicToast.error(data.error ?? "Registration failed");
+        comicToast.error(data.error ?? t("registrationFailed"));
         return;
       }
-      comicToast.error("Registration failed");
+      comicToast.error(t("registrationFailed"));
     } finally {
       setSubmitting(false);
     }
@@ -50,7 +52,7 @@ export function useRegistration({ onSuccess, afterAccountCreated }: UseRegistrat
     if (!v || v.length < MIN_USERNAME_LENGTH) return;
     const result = await fetchUsernameAvailability(v);
     if (!result.available) {
-      throw new Error(result.reason ?? "Username is not available");
+      throw new Error(result.reason ?? t("usernameUnavailable"));
     }
   };
 
@@ -60,7 +62,7 @@ export function useRegistration({ onSuccess, afterAccountCreated }: UseRegistrat
       await loginWithGoogleCredential(credential);
       onSuccess();
     } catch {
-      comicToast.error("Google sign-in failed");
+      comicToast.error(t("googleSignInFailed"));
     }
   };
 

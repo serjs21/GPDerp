@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { HaikuActions } from "@/components/HaikuContainer/HaikuActions";
 import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
@@ -93,8 +94,9 @@ function LanternBodyLines({
   typing: boolean;
   lineStarts: number[];
 }) {
+  const t = useTranslations("Lantern.lantern");
   return (
-    <div className={styles.bodyLines} aria-label="Haiku">
+    <div className={styles.bodyLines} aria-label={t("bodyAriaLabel")}>
       {lines.map((line, index) => (
         <p key={index} className={styles.bodyLine}>
           {line ? (
@@ -255,18 +257,22 @@ function resolveHaikuStack(
   );
 }
 
-function resolveRotatedAriaLabel(props: LanternProps): string {
+function resolveRotatedAriaLabel(
+  props: LanternProps,
+  t: ReturnType<typeof useTranslations>,
+): string {
   if (props.ariaLabel) return props.ariaLabel;
   if ("haiku" in props && props.haiku) {
-    return `Haiku lantern: ${props.haiku.title ?? ""}`;
+    return t("haikuLantern", { title: props.haiku.title ?? "" });
   }
   if ("generatingDraft" in props && props.generatingDraft) {
-    return `Generating haiku: ${props.generatingDraft.subject}`;
+    return t("generating", { subject: props.generatingDraft.subject });
   }
-  return "Rotated haiku lantern";
+  return t("rotatedLantern");
 }
 
 export function Lantern(props: LanternProps) {
+  const t = useTranslations("Lantern.lantern");
   if (props.rotationBase) {
     const content = resolveHaikuStack(props, { forShell: true });
     if (!content) return null;
@@ -280,7 +286,7 @@ export function Lantern(props: LanternProps) {
         mirrored={props.mirrored}
         actionsBarOffsetX={props.actionsBarOffsetX}
         actionsBarOffsetY={props.actionsBarOffsetY}
-        ariaLabel={resolveRotatedAriaLabel(props)}
+        ariaLabel={resolveRotatedAriaLabel(props, t)}
         faceHalo={props.faceHalo}
       >
         {content}

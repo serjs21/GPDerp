@@ -1,9 +1,11 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useHeaderHaikuSearch } from "./useHeaderHaikuSearch";
 import styles from "./HeaderHaikuTools.module.css";
 
 export function HeaderHaikuSearch() {
+  const t = useTranslations("HeaderHaikuTools.search");
   const {
     enabled,
     expanded,
@@ -22,7 +24,7 @@ export function HeaderHaikuSearch() {
       <button
         type="button"
         className={styles.iconButton}
-        aria-label="Search haikus"
+        aria-label={t("buttonAriaLabel")}
         aria-expanded={expanded}
         onClick={openSearch}
       >
@@ -39,8 +41,8 @@ export function HeaderHaikuSearch() {
           value={searchString}
           onChange={(e) => setSearchString(e.target.value)}
           onBlur={onBlur}
-          placeholder="Search titles…"
-          aria-label="Search haiku titles"
+          placeholder={t("placeholder")}
+          aria-label={t("inputAriaLabel")}
           autoComplete="off"
           spellCheck={false}
         />

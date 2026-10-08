@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useCallback, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { UIButton } from "@/components/ui";
@@ -46,8 +47,10 @@ export function CelestialThemeSelector({
   coordinates = BANGKOK_COORDINATES,
   sceneVars,
   className,
-  ariaLabel = "Theme time of day",
+  ariaLabel: ariaLabelProp,
 }: CelestialThemeSelectorProps) {
+  const t = useTranslations("CelestialThemeSelector");
+  const ariaLabel = ariaLabelProp ?? t("ariaLabel");
   const [panelPhase, setPanelPhase] = useState<CelestialSelectorPanelPhase | null>(
     null,
   );

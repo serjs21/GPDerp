@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   SHARE_LINK_ACTION_COLORS,
   SHARE_LINK_ACTION_ICONS,
@@ -20,6 +21,7 @@ export function ShareLinkLabelsToggle({
   captionClassName,
   disabled = false,
 }: ShareLinkLabelsToggleProps) {
+  const t = useTranslations("ShareLinkActions.labelsToggle");
   const colors = showLabels
     ? SHARE_LINK_ACTION_COLORS.showLabels
     : SHARE_LINK_ACTION_COLORS.hideLabels;
@@ -27,11 +29,11 @@ export function ShareLinkLabelsToggle({
   return (
     <ShareLinkActionButton
       src={showLabels ? SHARE_LINK_ACTION_ICONS.showLabels : SHARE_LINK_ACTION_ICONS.hideLabels}
-      caption={showLabels ? "Labels visible" : "Labels hidden"}
+      caption={showLabels ? t("visible") : t("hidden")}
       captionClassName={[styles.captionLabels, captionClassName].filter(Boolean).join(" ")}
       layout={showLabels ? layouts.show : layouts.hide}
       rowLayout={showLabels ? rowLayouts?.show : rowLayouts?.hide}
-      ariaLabel={`Show labels on share link for ${subject}`}
+      ariaLabel={t("ariaLabel", { subject })}
       color={colors.panel}
       hoverFill={colors.hover}
       pressed={showLabels}

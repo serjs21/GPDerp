@@ -20,9 +20,9 @@ export const SHARE_LINK_UPDATE_LAYOUT = {
   caption: { bottom: "1rem", right: "0", rotateDeg: 0, fontSize: "1.2rem", width: "100%", textAlign: "center" },
 } as const satisfies ShareLinkActionLayout;
 
-export const SHARE_LINK_UPDATE_DISABLED_MESSAGES = {
-  inactive: "What is yet to begin - can't be changed",
-  unchanged: "Everything's in its right place",
+export const SHARE_LINK_UPDATE_DISABLED_MESSAGE_KEYS = {
+  inactive: "disabledInactive",
+  unchanged: "disabledUnchanged",
 } as const;
 
 /** Bubble floats to the right of the Update panel (mirror of Tune in's left callout). */

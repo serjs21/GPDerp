@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
+import { useTranslations } from "next-intl";
 import {
   ComicPagePanel,
   type ComicPanelBackground,
@@ -21,8 +22,6 @@ const TUNE_IN_DISABLED_CALLOUT_POSITION = {
   left: "-8.5rem",
   bottom: "0rem",
 } as const;
-
-const TUNE_IN_DISABLED_MESSAGE = "Searching for me is useless.";
 
 export type LabelActionsProps = {
   labelName: string;
@@ -175,10 +174,11 @@ export function LabelActions({
   onDelete,
   className,
 }: LabelActionsProps) {
+  const t = useTranslations("ManageLabel.labelActions");
   const tuneInButton = (
     <LabelActionButton
       src={hasConnections ? TUNE_IN_SRC : NOT_CONNECTED_ACTION_SRC}
-      caption={hasConnections ? "Tune in" : undefined}
+      caption={hasConnections ? t("tuneIn") : undefined}
       layout={hasConnections ? "iconEnd" : "iconFill"}
       color={hasConnections ? "#9fa1ff" : "sky"}
       background={hasConnections ? "solid" : "sunburst"}
@@ -189,8 +189,8 @@ export function LabelActions({
       selected
       ariaLabel={
         hasConnections
-          ? `Tune in to haikus labeled ${labelName}`
-          : `No haikus labeled ${labelName}`
+          ? t("tuneInAriaLabel", { name: labelName })
+          : t("noHaikusAriaLabel", { name: labelName })
       }
       onSelect={onTuneIn}
       disabled={!hasConnections}
@@ -202,7 +202,7 @@ export function LabelActions({
     <div
       className={[styles.stack, className].filter(Boolean).join(" ")}
       role="group"
-      aria-label={`Actions for ${labelName}`}
+      aria-label={t("groupAriaLabel", { name: labelName })}
     >
       {hasConnections ? (
         tuneInButton
@@ -214,7 +214,7 @@ export function LabelActions({
           
           position={TUNE_IN_DISABLED_CALLOUT_POSITION}
           callout={
-            <div className={styles.speechBubble}>{TUNE_IN_DISABLED_MESSAGE}</div>
+            <div className={styles.speechBubble}>{t("tuneInDisabled")}</div>
           }
           calloutClassName={styles.speechBubbleSlot}
         >
@@ -223,23 +223,23 @@ export function LabelActions({
       )}
       <LabelActionButton
         src={EDIT_SRC}
-        caption="Edit"
+        caption={t("edit")}
         layout="iconStart"
         color="#c0ffc3"
         captionClassName={styles.captionEdit}
         iconClassName={styles.iconEdit}
-        ariaLabel={`Edit ${labelName}`}
+        ariaLabel={t("editAriaLabel", { name: labelName })}
         onSelect={onEdit}
         hoverFill={"#6dfe73"}
       />
       <LabelActionButton
         src={DELETE_SRC}
-        caption="Delete"
+        caption={t("delete")}
         layout="iconEnd"
         captionClassName={styles.captionDelete}
         color="#ffaea8"
         iconClassName={styles.iconDelete}
-        ariaLabel={`Delete ${labelName}`}
+        ariaLabel={t("deleteAriaLabel", { name: labelName })}
         onSelect={onDelete}
         hoverFill={DELETE_HOVER}
         invertIconOnHover

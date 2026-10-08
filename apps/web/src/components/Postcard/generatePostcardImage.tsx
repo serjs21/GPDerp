@@ -2,12 +2,14 @@
 
 import type { HaikuDto } from "@/api/haikus";
 import { PostcardRenderer } from "./PostcardRenderer";
+import type { PostcardRendererProps } from "./PostcardRenderer.types";
 import type { PostcardTheme } from "./utils/postcardTheme";
 import { renderOffscreenImage } from "./utils/renderOffscreenImage";
 
 export type GeneratePostcardImageInput = {
   theme: PostcardTheme;
   haiku: HaikuDto;
+  getAriaLabel: PostcardRendererProps["getAriaLabel"];
   fontScale?: number;
 };
 
@@ -18,9 +20,10 @@ export type GeneratePostcardImageInput = {
 export function generatePostcardImage({
   theme,
   haiku,
+  getAriaLabel,
   fontScale,
 }: GeneratePostcardImageInput): Promise<Blob> {
   return renderOffscreenImage(
-    <PostcardRenderer theme={theme} haiku={haiku} fontScale={fontScale} />,
+    <PostcardRenderer theme={theme} haiku={haiku} getAriaLabel={getAriaLabel} fontScale={fontScale} />,
   );
 }

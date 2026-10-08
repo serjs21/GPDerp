@@ -2,6 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useState, type CSSProperties } from "react";
+import { useTranslations } from "next-intl";
 import type { ShareLinkListItem } from "@/api/shareLinks";
 import { haikuQueryKeys, type HaikuDto } from "@/api/haikus";
 import * as shareLinksApi from "@/api/shareLinks";
@@ -53,8 +54,9 @@ function PreviewLanternStats({
   hitsLabel: string;
   timeLabel: string;
 }) {
+  const t = useTranslations("ShareLink.card");
   return (
-    <div className={managementStyles.previewStats} aria-label="Share link stats">
+    <div className={managementStyles.previewStats} aria-label={t("statsAriaLabel")}>
       <span className={managementStyles.previewStat} aria-label={hitsLabel}>
         {/* eslint-disable-next-line @next/next/no-img-element -- pixel meter icons */}
         <img
@@ -123,6 +125,7 @@ export function ShareLink({
   createShareLinkFn = shareLinksApi.createShareLink,
   refreshShareLinkFn = shareLinksApi.refreshShareLink,
 }: ShareLinkProps) {
+  const t = useTranslations("ShareLink.card");
   const ctrl = useShareLinkControls({
     link,
     haikuId,
@@ -188,7 +191,7 @@ export function ShareLink({
         styles.panel,
         ctrl.grayscale ? styles.panelShellInactive : styles.panelShellActive,
       ].join(" ")}
-      ariaLabel={`Share link for ${ctrl.subject}`}
+      ariaLabel={t("panelAriaLabel", { subject: ctrl.subject })}
     >
       <div className={managementStyles.lanternWrap}>
         <Sway
@@ -198,7 +201,7 @@ export function ShareLink({
           amplitude={3.25}
         >
           <LanternFrame
-            ariaLabel={`Haiku lantern: ${ctrl.subject}`}
+            ariaLabel={t("lanternAriaLabel", { subject: ctrl.subject })}
             className={managementStyles.lanternFrame}
             widthRem={9}
           >
@@ -223,7 +226,7 @@ export function ShareLink({
       >
         {ctrl.copyEnabled ? (
           <OverlayTitle
-            title="Copy link!"
+            title={t("copyTitle")}
             direction="bottom"
             className={managementStyles.lanternSlot}
           >
@@ -231,7 +234,7 @@ export function ShareLink({
               type="button"
               className={managementStyles.lanternCopy}
               onClick={ctrl.onCopy}
-              aria-label={`Copy share link for ${ctrl.subject}`}
+              aria-label={t("copyAriaLabel", { subject: ctrl.subject })}
             >
               {lanternPanel}
             </button>
@@ -257,7 +260,7 @@ export function ShareLink({
             color="white"
             contentAlign="start"
             className={`${managementStyles.settingsPanel} ${styles.settingsPanel}`}
-            ariaLabel={`Share link settings for ${ctrl.subject}`}
+            ariaLabel={t("settingsAriaLabel", { subject: ctrl.subject })}
           >
             <div className={`${managementStyles.settingsBody} ${styles.settingsBody}`}>
               <ShareLinkSettingsControls

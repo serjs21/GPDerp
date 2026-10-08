@@ -10,6 +10,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useTranslations } from "next-intl";
 import { animate } from "motion/react";
 import type { HaikuDto } from "@/api/haikus";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
@@ -155,6 +156,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
   },
   ref,
 ) {
+  const t = useTranslations("SVGPath.svgPath");
   const splitPath = useSplitPathSvg();
   const parsed = splitPath?.parsed ?? null;
   const stageRef = useRef<HTMLDivElement>(null);
@@ -513,7 +515,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
   return (
     <PathNavigationProvider value={pathNavigation}>
       <div ref={stageRef} className={viewportClass}>
-        <div className={styles.stage} aria-label="Lantern SVG path">
+        <div className={styles.stage} aria-label={t("stageAriaLabel")}>
           <div ref={svgAreaRef} className={styles.guideBox}>
             {showGuides && splitPath ? (
               <svg

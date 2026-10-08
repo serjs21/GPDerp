@@ -5,15 +5,18 @@ import {
   type LabelSortCategory,
 } from "../consts/labelSortConsts";
 
-export function resolveLabelSortCategories(locale: AppLocale): LabelSortCategory[] {
-  if (locale !== "ja") return LABEL_SORT_CATEGORIES;
-  return LABEL_SORT_CATEGORIES.map((category) =>
-    category.id === "creationDate"
+export function resolveLabelSortCategories(
+  locale: AppLocale,
+  t: (key: string) => string,
+): LabelSortCategory[] {
+  return LABEL_SORT_CATEGORIES.map(({ titleKey, ariaLabelKey, ...category }) => {
+    const translated = { ...category, title: t(titleKey), ariaLabel: t(ariaLabelKey) };
+    return locale === "ja" && category.id === "creationDate"
       ? {
-          ...category,
+          ...translated,
           coverSrc: LABEL_CREATION_DATE_COVER_JA,
           coverMirrored: true,
         }
-      : category,
-  );
+      : translated;
+  });
 }

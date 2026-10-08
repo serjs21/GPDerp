@@ -25,7 +25,7 @@ import { CelestialThemeProvider } from "./providers/CelestialThemeProvider";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { getSsrThemeSettings } from "@/hooks/useTheme.server";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getMessages, getTranslations } from "next-intl/server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -80,23 +80,26 @@ const flacucho = localFont({
   weight: "400",
 });
 
-export const metadata: Metadata = {
-  title: "GPDerp!",
-  description: "AI, but useless",
-  manifest: "/site.webmanifest",
-  icons: {
-    icon: [
-      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
-    ],
-    apple: "/icons/apple-touch-icon.png",
-  },
-  themeColor: "#bc002d",
-  appleWebApp: {
-    capable: true,
-    title: "GPDerp",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("RootLayout");
+  return {
+    title: "GPDerp!",
+    description: t("description"),
+    manifest: "/site.webmanifest",
+    icons: {
+      icon: [
+        { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+        { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+      ],
+      apple: "/icons/apple-touch-icon.png",
+    },
+    themeColor: "#bc002d",
+    appleWebApp: {
+      capable: true,
+      title: "GPDerp",
+    },
+  };
+}
 
 export default async function RootLayout({
   children,

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { HEADER_FILTER_ICON_SRC } from "./consts/headerToolConsts";
 import type { HeaderFilterButtonProps } from "./HeaderFilterButton.types";
 import { HeaderToolFace } from "./HeaderToolFace";
@@ -11,6 +12,7 @@ import styles from "./HeaderToolButton.module.css";
 
 /** Header "filter haikus by labels" button; owns the active-filter chips and the filter modal. */
 export function HeaderFilterButton({ className, forcedHover }: HeaderFilterButtonProps) {
+  const t = useTranslations("HeaderHaikuTools.filter");
   const labels = useHeaderHaikuLabelManage();
   const { active, hide, handlers } = useHeaderToolHover(forcedHover);
 
@@ -23,7 +25,7 @@ export function HeaderFilterButton({ className, forcedHover }: HeaderFilterButto
           <button
             type="button"
             className={styles.button}
-            aria-label="Filter haikus by labels"
+            aria-label={t("buttonAriaLabel")}
             aria-expanded={labels.modalOpen}
             disabled={!labels.canOpen}
             {...handlers}
@@ -37,7 +39,7 @@ export function HeaderFilterButton({ className, forcedHover }: HeaderFilterButto
               <img src={HEADER_FILTER_ICON_SRC} alt="" className={styles.iconImg} width={22} height={28} />
             </HeaderToolFace>
             <HeaderToolFace enterFrom="left" hidden={!active}>
-              <span className={styles.actionName}>Filter</span>
+              <span className={styles.actionName}>{t("actionName")}</span>
             </HeaderToolFace>
           </button>
         </HeaderToolFrame>

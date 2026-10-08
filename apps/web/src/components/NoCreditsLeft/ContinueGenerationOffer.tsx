@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ComicConfirmModal } from "@/components/ComicConfirmModal/ComicConfirmModal";
 import {
   GENERATION_PURCHASE_ACKNOWLEDGED_EVENT,
@@ -14,6 +15,7 @@ import {
 } from "./pendingHaikuAfterPurchase";
 
 export function ContinueGenerationOffer() {
+  const t = useTranslations("NoCreditsLeft.continueGenerationOffer");
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -37,9 +39,9 @@ export function ContinueGenerationOffer() {
         setOpen(next);
         if (!next) clearPendingHaikuAfterPurchase();
       }}
-      question={subject ? `Continue generating “${subject}”?` : "Continue generating?"}
-      confirmLabel="Continue"
-      cancelLabel="Not now"
+      question={subject ? t("questionWithSubject", { subject }) : t("question")}
+      confirmLabel={t("confirm")}
+      cancelLabel={t("cancel")}
       onConfirm={() => {
         window.localStorage.setItem(PENDING_HAIKU_SUBJECT_STORAGE_KEY, subject);
         clearPendingHaikuAfterPurchase();

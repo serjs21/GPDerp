@@ -52,7 +52,7 @@ export function LibraryCard() {
                 className={styles.uploader}
                 size={PHOTO_SIZE_PX}
                 iconUrl={profile.avatarUrl}
-                alt={`${profile.displayName} profile icon`}
+                alt={t("profileIconAlt", { name: profile.displayName })}
                 fallbackChar={profile.displayName.slice(0, 1)}
                 disabled={profile.savingAvatar}
                 onUploaded={profile.onAvatarUploaded}

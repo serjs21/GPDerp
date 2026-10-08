@@ -4,6 +4,7 @@ import axios from "axios";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import { useReducedMotion } from "motion/react";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import type { ShareLinkListItem } from "@/api/shareLinks";
 import * as shareLinksApi from "@/api/shareLinks";
@@ -160,6 +161,7 @@ export function useShareLinkControls({
   createShareLinkFn = shareLinksApi.createShareLink,
   refreshShareLinkFn = shareLinksApi.refreshShareLink,
 }: UseShareLinkControlsArgs) {
+  const t = useTranslations("ShareLink.controls");
   const reduceMotion = useReducedMotion();
   const { locale } = useLocale();
   const { copy } = useCopy();
@@ -258,10 +260,10 @@ export function useShareLinkControls({
     try {
       const updated = await shareLinksApi.setShareLinkDisabled(link.id, true);
       onLinkUpdate?.(updated);
-      comicToast.success("Share link stopped");
+      comicToast.success(t("stopped"));
       onChanged();
     } catch (error: unknown) {
-      comicToast.error(getAxiosErrorMessage(error, "Could not stop share link"));
+      comicToast.error(getAxiosErrorMessage(error, t("stopError")));
     } finally {
       setIsUpdating(false);
       await holdMinBusy(startedAt, Math.round(PLANE_LIFT_MS * 1000));
@@ -308,10 +310,10 @@ export function useShareLinkControls({
         const updated = await shareLinksApi.setShareLinkDisabled(current.id, false);
         onLinkUpdate?.(updated);
       }
-      comicToast.success("Share link started");
+      comicToast.success(t("started"));
       onChanged();
     } catch (error: unknown) {
-      comicToast.error(getAxiosErrorMessage(error, "Could not start share link"));
+      comicToast.error(getAxiosErrorMessage(error, t("startError")));
     } finally {
       setIsUpdating(false);
       await holdMinBusy(startedAt);
@@ -327,10 +329,10 @@ export function useShareLinkControls({
     try {
       const updated = await refreshShareLinkFn(link.id, buildLimitPayload(form));
       onLinkUpdate?.(updated);
-      comicToast.success("Share link updated");
+      comicToast.success(t("updated"));
       onChanged();
     } catch (error: unknown) {
-      comicToast.error(getAxiosErrorMessage(error, "Could not update share link"));
+      comicToast.error(getAxiosErrorMessage(error, t("updateError")));
     } finally {
       setIsUpdating(false);
       await holdMinBusy(startedAt);
@@ -346,7 +348,7 @@ export function useShareLinkControls({
       onLinkUpdate?.(updated);
       onChanged();
     } catch (error: unknown) {
-      comicToast.error(getAxiosErrorMessage(error, "Could not update label visibility"));
+      comicToast.error(getAxiosErrorMessage(error, t("labelsError")));
     } finally {
       setTogglingLabels(false);
     }
@@ -359,16 +361,16 @@ export function useShareLinkControls({
 
   const hitsLabel =
     hits.kind === "unlimited"
-      ? "Unlimited visits"
+      ? t("hitsUnlimited")
       : hits.kind === "empty"
-        ? "No visits left"
-        : `${hits.count} visits left`;
+        ? t("hitsEmpty")
+        : t("hitsRemaining", { count: hits.count });
   const timeLabel =
     time.kind === "unlimited"
-      ? "No expiration"
+      ? t("timeUnlimited")
       : time.text
-        ? `Time left ${time.text}`
-        : "Time left";
+        ? t("timeLeftWithValue", { time: time.text })
+        : t("timeLeft");
 
   return {
     subject,

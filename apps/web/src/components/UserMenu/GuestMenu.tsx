@@ -2,11 +2,13 @@
 
 import { useMemo } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useAuthenticationVerification } from "@/app/providers/AuthenticationVerificationProvider";
 import { BrushMenu, type BrushMenuOption } from "@/components/BrushMenu";
 import {
-  GUEST_MENU_LABEL,
+  GUEST_MENU_LABEL_KEY,
   GUEST_MENU_TRIGGER_SRC,
+  USER_MENU_BURST_SEED_IDS,
   USER_MENU_GO_HOME,
   USER_MENU_LOGIN,
   USER_MENU_TRIGGER_FILL,
@@ -20,6 +22,8 @@ import styles from "./UserMenu.module.css";
 
 /** Brush menu for logged-out visitors (share link page): Go home + Login. */
 export function GuestMenu({ className }: GuestMenuProps) {
+  const t = useTranslations("UserMenu");
+  const guestLabel = t(GUEST_MENU_LABEL_KEY);
   const router = useRouter();
   const pathname = usePathname();
   const { openAuthenticationModal } = useAuthenticationVerification();
@@ -27,15 +31,15 @@ export function GuestMenu({ className }: GuestMenuProps) {
 
   const options = useMemo<BrushMenuOption[]>(
     () => [
-      ...(onMainPage ? [] : [goHomeOption()]),
+      ...(onMainPage ? [] : [goHomeOption(t)]),
       {
         value: USER_MENU_LOGIN.value,
-        label: <GoHomeOptionLabel text={USER_MENU_LOGIN.label} />,
+        label: <GoHomeOptionLabel text={t(USER_MENU_LOGIN.labelKey)} />,
         iconSrc: USER_MENU_LOGIN.backgroundSrc,
         className: styles.loginOption,
       },
     ],
-    [onMainPage],
+    [onMainPage, t],
   );
 
   const handleChange = (key: string) => {
@@ -56,12 +60,16 @@ export function GuestMenu({ className }: GuestMenuProps) {
       className={className}
       triggerClassName={styles.trigger}
       triggerBrush
-      expandLabel={GUEST_MENU_LABEL}
+      expandLabel={guestLabel}
       options={options}
-      placeholder={GUEST_MENU_LABEL}
+      placeholder={guestLabel}
       onChange={handleChange}
       renderTrigger={() => (
-        <UserMenuBurstFrame label={GUEST_MENU_LABEL} fill={USER_MENU_TRIGGER_FILL}>
+        <UserMenuBurstFrame
+          label={guestLabel}
+          seedId={USER_MENU_BURST_SEED_IDS.guest}
+          fill={USER_MENU_TRIGGER_FILL}
+        >
           {/* eslint-disable-next-line @next/next/no-img-element -- public SVG asset */}
           <img
             className={frameStyles.icon}

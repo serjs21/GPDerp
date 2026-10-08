@@ -1,11 +1,13 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ManageLabelsPanel } from "@/components/ManageLabel";
 import { SakuraPetalLoader } from "@/components/Loaders";
 import { useManageLabelsAccount } from "@/hooks/useAccountLabels";
 import styles from "./styles.module.css";
 
 export default function ManageLabelsPage() {
+  const t = useTranslations("ManageLabelsPage");
   const { data: accountId, isPending: isAccountPending } = useManageLabelsAccount();
 
   return (
@@ -22,7 +24,7 @@ export default function ManageLabelsPage() {
             className={styles.panel}
           />
         ) : (
-          <p className={styles.empty}>Unable to resolve account.</p>
+          <p className={styles.empty}>{t("unresolvedAccount")}</p>
         )}
       </section>
     </div>

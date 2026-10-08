@@ -2,6 +2,7 @@
 
 import { type ReactNode } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
+import { useTranslations } from "next-intl";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import authStyles from "@/app/auth.shared.module.css";
 
@@ -11,8 +12,8 @@ type GoogleSquareButtonProps = {
   onError: () => void;
 };
 
-function googleLabel(text: GoogleSquareButtonProps["text"]): string {
-  return text === "signup_with" ? "Sign up with Google" : "Sign in with Google";
+function googleLabelKey(text: GoogleSquareButtonProps["text"]) {
+  return text === "signup_with" ? "signUpWithGoogle" : "signInWithGoogle";
 }
 
 /** Official multicolor G — colors must stay unmodified per Google branding. */
@@ -49,7 +50,8 @@ function GoogleGMark() {
  * Full-width white comic button that opens Google’s OAuth popup (access token).
  */
 export function GoogleSquareButton({ text, onSuccess, onError }: GoogleSquareButtonProps) {
-  const label = googleLabel(text);
+  const t = useTranslations("AuthFlows.chrome");
+  const label = t(googleLabelKey(text));
 
   const startGoogleLogin = useGoogleLogin({
     flow: "implicit",
