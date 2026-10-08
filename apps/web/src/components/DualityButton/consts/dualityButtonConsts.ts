@@ -27,9 +27,9 @@ export const COVER_LABEL_ARC_SPAN_DEG = 96;
 /** Extra radius beyond half face size (rem). */
 export const COVER_LABEL_ARC_GAP_REM = 0.42;
 /** Max title font size (rem) when the arc has room. */
-export const COVER_LABEL_FONT_MAX_REM = 0.95;
+export const COVER_LABEL_FONT_MAX_REM = 1.5;
 /** Min title font size (rem) for long labels. */
-export const COVER_LABEL_FONT_MIN_REM = 0.52;
+export const COVER_LABEL_FONT_MIN_REM = 0.72;
 /** Approx Bangers uppercase glyph width in em. */
 export const COVER_LABEL_CHAR_EM = 0.62;
 

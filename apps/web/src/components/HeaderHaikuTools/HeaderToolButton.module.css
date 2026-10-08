@@ -94,6 +94,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  white-space: break-spaces;
   transition:
     transform var(--header-tool-motion),
     opacity var(--header-tool-motion);
@@ -102,6 +103,8 @@
 .faceFromLeft,
 .faceFromRight {
   z-index: 1;
+  white-space: break-spaces;
+  max-width: 4rem;
 }
 
 .faceHidden {
@@ -125,7 +128,7 @@
   width: 100%;
   height: 100%;
   max-width: 100%;
-  padding: 0;
+  padding: 0 0.2rem;
   overflow: hidden;
   background: #111;
   color: #fff;
@@ -135,8 +138,8 @@
   letter-spacing: 0.02em;
   line-height: 1;
   text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: break-word;
   user-select: none;
 }
 

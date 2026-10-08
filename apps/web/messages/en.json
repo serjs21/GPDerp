@@ -549,7 +549,7 @@
     }
   },
   "LabelsFilterModal": {
-    "filter": "Filter"
+    "filter": "Filter by label"
   },
   "ManageLabel": {
     "manageLabel": {
@@ -598,11 +598,11 @@
       "buttonAriaLabel": "Search haikus",
       "placeholder": "Search titles…",
       "inputAriaLabel": "Search haiku titles",
-      "actionName": "Search"
+      "actionName": "Search by name"
     },
     "filter": {
       "buttonAriaLabel": "Filter haikus by labels",
-      "actionName": "Filter",
+      "actionName": "Filter by label",
       "activeFiltersAriaLabel": "Active label filters",
       "removeFilterAriaLabel": "Remove filter {name}",
       "removeExcludeFilterAriaLabel": "Remove exclude filter {name}"
