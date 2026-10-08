@@ -13,8 +13,7 @@ import {
   haikuListOrderBy,
   type HaikuListSort,
 } from "./utils/haikuListSort";
-
-const TITLE_MAX_LEN = 200;
+import { HAIKU_TITLE_MAX_CHARS } from "../../consts/haiku";
 
 const generationHaikuSelect = {
   id: true,
@@ -101,7 +100,10 @@ export const haikuRepository = {
     body: string;
   }): Promise<CreateFromGenerationResult> {
     const rawTitle = params.subject.trim() || "Haiku";
-    const title = rawTitle.length > TITLE_MAX_LEN ? rawTitle.slice(0, TITLE_MAX_LEN) : rawTitle;
+    const title =
+      rawTitle.length > HAIKU_TITLE_MAX_CHARS
+        ? rawTitle.slice(0, HAIKU_TITLE_MAX_CHARS).trimEnd()
+        : rawTitle;
 
     return prismaClient.$transaction(async (tx) => {
       const spend = await trySpendGenerationCreditWithTx(

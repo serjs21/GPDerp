@@ -8,6 +8,8 @@ import {
   useBackgroundSceneThemeBalance,
 } from "@/components/BackgroundScene";
 import { LanternSubmit } from "@/components/LanternSubmit";
+import { HAIKU_TITLE_MAX_CHARS } from "@/consts/haiku/haikuTitleConsts";
+import { useIsHydrated } from "@/hooks/useIsHydrated";
 import {
   POST_SIGN_INPUT_ASSET_SRC,
   POST_SIGN_INPUT_IMAGE_HEIGHT,
@@ -80,12 +82,7 @@ export function PostSignInput({
   const colorMatrix = colorBalanceToMatrix(global);
   const canSubmit = Boolean(subject.trim()) && !isLoading;
   const footerClearancePx = useFooterClearance(sticky);
-  const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
-
-  useEffect(() => {
-    if (!sticky) return;
-    setPortalRoot(document.body);
-  }, [sticky]);
+  const isHydrated = useIsHydrated();
 
   const rootStyle = {
     "--post-sign-input-width": `${widthRem}rem`,
@@ -131,6 +128,7 @@ export function PostSignInput({
           className={styles.input}
           value={subject}
           onChange={(e) => onSubjectChange(e.target.value)}
+          maxLength={HAIKU_TITLE_MAX_CHARS}
           disabled={isLoading}
           autoComplete="off"
           autoFocus
@@ -148,7 +146,7 @@ export function PostSignInput({
   );
 
   if (sticky) {
-    return portalRoot ? createPortal(article, portalRoot) : null;
+    return isHydrated ? createPortal(article, document.body) : null;
   }
   return article;
 }
