@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef, useCallback, useMemo } from "react";
+import type { HaikuListSort } from "@/api/haikus";
 import { Button } from "@/components/StyledComponents";
 import { SVGPath, type SVGPathHandle } from "@/components/SVGPath";
 import { SakuraPetalLoader } from "@/components/Loaders";
@@ -24,6 +25,8 @@ export type SavedHaikusLanternPathProps = {
   searchString?: string;
   selectedLabelIds?: string[];
   excludedLabelIds?: string[];
+  /** Lantern order; omitted = newest first. */
+  sort?: HaikuListSort;
 };
 
 export const SavedHaikusLanternPath = forwardRef<
@@ -35,6 +38,7 @@ export const SavedHaikusLanternPath = forwardRef<
   searchString = "",
   selectedLabelIds = [],
   excludedLabelIds = [],
+  sort,
 }, ref) {
   const {
     haikus,
@@ -47,13 +51,14 @@ export const SavedHaikusLanternPath = forwardRef<
     isInitialLoading,
     isError,
     refetch,
-  } = useInfiniteHaikusQuery();
+  } = useInfiniteHaikusQuery({ sort });
 
   const trimmedSearch = searchString.trim();
   const isSearching = trimmedSearch !== "";
   const debouncedSearch = useDebouncedValue(trimmedSearch, HAIKU_SEARCH_DEBOUNCE_MS);
   const searchQuery = useInfiniteHaikusQuery({
     q: debouncedSearch,
+    sort,
     enabled: initialized && isLoggedIn && debouncedSearch !== "",
   });
 
@@ -64,11 +69,11 @@ export const SavedHaikusLanternPath = forwardRef<
     // API results may still belong to the previous debounced term; re-check them against the current one.
     const searchResults = debouncedSearch ? matches(searchQuery.haikus) : [];
     return filterHaikusByLabels(
-      mergeHaikuSearchResults(matches(haikus), searchResults),
+      mergeHaikuSearchResults(matches(haikus), searchResults, sort),
       selectedLabelIds,
       excludedLabelIds,
     );
-  }, [haikus, isSearching, trimmedSearch, debouncedSearch, searchQuery.haikus, selectedLabelIds, excludedLabelIds]);
+  }, [haikus, isSearching, trimmedSearch, debouncedSearch, searchQuery.haikus, selectedLabelIds, excludedLabelIds, sort]);
 
   const searchPending =
     isSearching && (debouncedSearch !== trimmedSearch || searchQuery.isInitialLoading);

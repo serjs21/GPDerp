@@ -8,6 +8,7 @@ import {
   haikuQueryKeys,
   HAIKU_LIST_PAGE_SIZE,
   type HaikuDto,
+  type HaikuListSort,
 } from "@/api/haikus";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
 
@@ -16,22 +17,30 @@ export type UseInfiniteHaikusQueryOptions = {
   enabled?: boolean;
   /** Title search sent to the API. Passing it (even empty) uses a separate search cache entry. */
   q?: string;
+  /** Non-default order; omitted keeps the newest-first list cache. */
+  sort?: HaikuListSort;
+};
+
+const listQueryKey = (pageSize: number, q?: string, sort?: HaikuListSort) => {
+  if (q !== undefined) return haikuQueryKeys.searchList(pageSize, q, sort);
+  if (sort) return haikuQueryKeys.sortedList(pageSize, sort);
+  return haikuQueryKeys.infiniteList(pageSize);
 };
 
 export function useInfiniteHaikusQuery({
   pageSize = HAIKU_LIST_PAGE_SIZE,
   enabled: enabledOverride,
   q,
+  sort,
 }: UseInfiniteHaikusQueryOptions = {}) {
   const { isLoggedIn, initialized } = useAuthenticationState();
   const queryClient = useQueryClient();
   const enabled = enabledOverride ?? (initialized && isLoggedIn);
 
   const query = useInfiniteQuery({
-    queryKey:
-      q !== undefined ? haikuQueryKeys.searchList(pageSize, q) : haikuQueryKeys.infiniteList(pageSize),
+    queryKey: listQueryKey(pageSize, q, sort),
     queryFn: ({ pageParam }) =>
-      fetchHaikusPage({ offset: pageParam as number, pageSize, q: q || undefined }),
+      fetchHaikusPage({ offset: pageParam as number, pageSize, q: q || undefined, sort }),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => {
       const { offset, haikus, total } = lastPage.data;

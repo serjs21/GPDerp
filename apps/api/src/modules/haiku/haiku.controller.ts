@@ -13,6 +13,7 @@ import { paymentsService } from "../payments/payments.service";
 import { insufficientCreditsBody } from "../payments/utils/purchaseResponses";
 import { haikuService, type HaikuStreamYield } from "./haiku.service";
 import { readShareHaikuEmailRequest } from "./utils/shareHaikuEmailRequest";
+import { parseHaikuListSort } from "./utils/haikuListSort";
 
 type ShareEmailFailureReason = Extract<
   Awaited<ReturnType<typeof haikuService.shareHaikuByEmailForUser>>,
@@ -285,12 +286,19 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
         offset = n;
       }
 
+      const sort = parseHaikuListSort({ sort: q.sort, order: q.order });
+      if (!sort.ok) {
+        res.code(400).send({ ok: false, error: sort.error });
+        return;
+      }
+
       const result = await haikuService.listHaikusForUser({
         userId,
         accountIdParam,
         pageSize,
         offset,
         q: q.q?.trim() || undefined,
+        sort: sort.value,
       });
 
       if (!result.ok) {

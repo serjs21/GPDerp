@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { ORDER_SORT_DEFAULT_VALUE, type OrderSortValue } from "@/components/OrderDropdown";
 
 export type HaikuFiltersState = {
   searchString: string;
@@ -22,6 +23,9 @@ export type HaikuFiltersState = {
     includeIds: string[];
     excludeIds: string[];
   }) => void;
+  /** Header order dropdown selection for the lantern path. */
+  orderSort: OrderSortValue;
+  setOrderSort: (value: OrderSortValue) => void;
 };
 
 const HaikuFiltersContext = createContext<HaikuFiltersState | undefined>(undefined);
@@ -30,6 +34,7 @@ export function HaikuFiltersProvider({ children }: { children: ReactNode }) {
   const [searchString, setSearchString] = useState("");
   const [selectedLabelIds, setSelectedLabelIds] = useState<string[]>([]);
   const [excludedLabelIds, setExcludedLabelIds] = useState<string[]>([]);
+  const [orderSort, setOrderSort] = useState<OrderSortValue>(ORDER_SORT_DEFAULT_VALUE);
 
   const removeLabelId = useCallback((id: string) => {
     setSelectedLabelIds((prev) => prev.filter((labelId) => labelId !== id));
@@ -59,6 +64,8 @@ export function HaikuFiltersProvider({ children }: { children: ReactNode }) {
       setExcludedLabelIds,
       removeExcludedLabelId,
       setLabelFilters,
+      orderSort,
+      setOrderSort,
     }),
     [
       searchString,
@@ -67,6 +74,7 @@ export function HaikuFiltersProvider({ children }: { children: ReactNode }) {
       excludedLabelIds,
       removeExcludedLabelId,
       setLabelFilters,
+      orderSort,
     ],
   );
 

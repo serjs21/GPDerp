@@ -8,6 +8,11 @@ import {
   pickLeastOccupiedLabelPlacement,
   type HaikuLinkedLabel,
 } from "./haikuLabelPlacement";
+import {
+  DEFAULT_HAIKU_LIST_SORT,
+  haikuListOrderBy,
+  type HaikuListSort,
+} from "./utils/haikuListSort";
 
 const TITLE_MAX_LEN = 200;
 
@@ -131,13 +136,19 @@ export const haikuRepository = {
     });
   },
 
-  async listForAccounts(accountIds: string[], take: number, skip: number, q?: string) {
+  async listForAccounts(
+    accountIds: string[],
+    take: number,
+    skip: number,
+    q?: string,
+    sort: HaikuListSort = DEFAULT_HAIKU_LIST_SORT,
+  ) {
     if (accountIds.length === 0) {
       return [];
     }
     const rows = await prismaClient.haiku.findMany({
       where: accountsHaikuWhere(accountIds, q),
-      orderBy: { createdAt: "desc" },
+      orderBy: haikuListOrderBy(sort),
       take,
       skip,
       select: fullHaikuSelect,

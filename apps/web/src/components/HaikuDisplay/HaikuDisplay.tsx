@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { CreationModal } from "@/components/CreationModal";
 import { SavedHaikusLanternPath } from "@/components/SavedHaikusLanternPath/SavedHaikusLanternPath";
 import { PostSignInput } from "@/components/PostSignInput";
@@ -10,6 +10,7 @@ import { useInfiniteHaikusQuery } from "@/hooks/useInfiniteHaikusQuery";
 import { useCreationPathGate } from "@/components/HaikuGenerationStickyNote/hooks/useCreationPathGate";
 import { useHaikuGenerationFlow } from "@/components/HaikuGenerationStickyNote/hooks/useHaikuGenerationFlow";
 import { useHaikuFilters } from "@/app/providers/HaikuFiltersProvider";
+import { orderSortToHaikuListSort } from "@/utils/haikuSort/haikuListSortUtils";
 import styles from "./HaikuDisplay.module.css";
 
 export function HaikuDisplay() {
@@ -17,7 +18,8 @@ export function HaikuDisplay() {
   const bindHaikuSavedRef = useRef<(haiku: import("@/api/haikus").HaikuDto) => void>(() => {});
   const { invalidate } = useInfiniteHaikusQuery();
   const { onHaikuDeleted, onHaikuDeleteFailed, deleteFailedModal } = useHaikuDeleteController();
-  const { searchString, selectedLabelIds, excludedLabelIds } = useHaikuFilters();
+  const { searchString, selectedLabelIds, excludedLabelIds, orderSort } = useHaikuFilters();
+  const sort = useMemo(() => orderSortToHaikuListSort(orderSort), [orderSort]);
 
   const {
     subject,
@@ -55,6 +57,7 @@ export function HaikuDisplay() {
           searchString={searchString}
           selectedLabelIds={selectedLabelIds}
           excludedLabelIds={excludedLabelIds}
+          sort={sort}
         />
       </div>
       <div className={styles.inputSection}>

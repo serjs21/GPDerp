@@ -55,6 +55,7 @@ jest.mock("@/app/providers/HaikuFiltersProvider", () => ({
     searchString: "",
     selectedLabelIds: [],
     excludedLabelIds: [],
+    orderSort: { categoryId: null, direction: "asc" },
   }),
 }));
 

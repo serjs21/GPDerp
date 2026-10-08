@@ -1,4 +1,5 @@
-import type { HaikuDto } from "@/api/haikus";
+import type { HaikuDto, HaikuListSort } from "@/api/haikus";
+import { compareHaikusBySort } from "@/utils/haikuSort/haikuListSortUtils";
 
 export const normalizeHaikuSearch = (search: string): string => search.trim().toLowerCase();
 
@@ -6,12 +7,16 @@ export const normalizeHaikuSearch = (search: string): string => search.trim().to
 export const haikuMatchesSearch = (haiku: HaikuDto, normalizedSearch: string): boolean =>
   !normalizedSearch || haiku.title.toLowerCase().includes(normalizedSearch);
 
-/** Already-fetched matches plus API results; newest first, one entry per id. */
-export function mergeHaikuSearchResults(localMatches: HaikuDto[], searchResults: HaikuDto[]): HaikuDto[] {
+/** Already-fetched matches plus API results in `sort` order (newest first by default), one entry per id. */
+export function mergeHaikuSearchResults(
+  localMatches: HaikuDto[],
+  searchResults: HaikuDto[],
+  sort?: HaikuListSort,
+): HaikuDto[] {
   const byId = new Map<string, HaikuDto>();
   for (const haiku of localMatches) byId.set(haiku.id, haiku);
   for (const haiku of searchResults) if (!byId.has(haiku.id)) byId.set(haiku.id, haiku);
-  return [...byId.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return [...byId.values()].sort((a, b) => compareHaikusBySort(a, b, sort));
 }
 
 export function filterHaikusByLabels(

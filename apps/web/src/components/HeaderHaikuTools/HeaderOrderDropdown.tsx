@@ -1,12 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { usePathname } from "next/navigation";
-import {
-  OrderDropdown,
-  ORDER_SORT_DEFAULT_VALUE,
-  type OrderSortValue,
-} from "@/components/OrderDropdown";
+import { useHaikuFilters } from "@/app/providers/HaikuFiltersProvider";
+import { OrderDropdown } from "@/components/OrderDropdown";
 import { coverWidthRemForLabelWidth } from "@/components/OrderDropdownCover";
 import { HEADER_TOOL_WIDTH_REM } from "./consts/headerToolConsts";
 import type { HeaderOrderDropdownProps } from "./HeaderOrderDropdown.types";
@@ -15,16 +11,20 @@ import styles from "./HeaderToolButton.module.css";
 /** Gavel label as wide as the other header tools. */
 const HEADER_ORDER_COVER_WIDTH_REM = coverWidthRemForLabelWidth(HEADER_TOOL_WIDTH_REM);
 
-/** Header gavel that opens the haiku sort column (UI only — not wired to the feed yet). */
+/** Header gavel that opens the haiku sort column; drives the lantern path order. */
 export function HeaderOrderDropdown({ className }: HeaderOrderDropdownProps) {
   const pathname = usePathname();
-  const [value, setValue] = useState<OrderSortValue>(ORDER_SORT_DEFAULT_VALUE);
+  const { orderSort, setOrderSort } = useHaikuFilters();
 
   if (pathname !== "/") return null;
 
   return (
     <div className={[styles.anchor, className].filter(Boolean).join(" ")}>
-      <OrderDropdown value={value} onChange={setValue} widthRem={HEADER_ORDER_COVER_WIDTH_REM} />
+      <OrderDropdown
+        value={orderSort}
+        onChange={setOrderSort}
+        widthRem={HEADER_ORDER_COVER_WIDTH_REM}
+      />
     </div>
   );
 }

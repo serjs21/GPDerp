@@ -41,25 +41,33 @@ export type HaikuListErrorBody = { ok: false; error: string };
 
 export type HaikuListResponse = HaikuListSuccess | HaikuListErrorBody;
 
+/** GET /haiku `sort` + `order`; omitted means newest first. */
+export type HaikuListSort = {
+  field: "createdAt" | "title";
+  order: "asc" | "desc";
+};
+
 export type FetchHaikusParams = {
   offset: number;
   pageSize?: number;
   accountId?: string;
   /** Case-insensitive title search on the API. */
   q?: string;
+  sort?: HaikuListSort;
 };
 
 /**
  * GET /haiku — authenticated; lists haikus across the user’s workspaces (or filtered by accountId).
  */
 export async function fetchHaikusPage(params: FetchHaikusParams): Promise<HaikuListSuccess> {
-  const { offset, pageSize = HAIKU_LIST_PAGE_SIZE, accountId, q } = params;
+  const { offset, pageSize = HAIKU_LIST_PAGE_SIZE, accountId, q, sort } = params;
   const { data } = await axios.get<HaikuListResponse>("/haiku", {
     params: {
       offset,
       pageSize,
       ...(accountId !== undefined && accountId !== "" ? { accountId } : {}),
       ...(q ? { q } : {}),
+      ...(sort ? { sort: sort.field, order: sort.order } : {}),
     },
   });
 
@@ -97,7 +105,14 @@ export const haikuQueryKeys = {
   infiniteList: (pageSize: number) => [...haikuQueryKeys.all, "infinite", pageSize] as const,
   /** Kept apart from `infiniteList` so prepending new haikus only touches the unfiltered list. */
   searchLists: () => [...haikuQueryKeys.all, "search"] as const,
-  searchList: (pageSize: number, q: string) => [...haikuQueryKeys.searchLists(), pageSize, q] as const,
+  searchList: (pageSize: number, q: string, sort?: HaikuListSort) =>
+    sort
+      ? ([...haikuQueryKeys.searchLists(), pageSize, q, sort.field, sort.order] as const)
+      : ([...haikuQueryKeys.searchLists(), pageSize, q] as const),
+  /** Non-default orders; new haikus can't be prepended, so these are refetched instead. */
+  sortedLists: () => [...haikuQueryKeys.all, "sorted"] as const,
+  sortedList: (pageSize: number, sort: HaikuListSort) =>
+    [...haikuQueryKeys.sortedLists(), pageSize, sort.field, sort.order] as const,
 };
 
 /**
@@ -111,12 +126,16 @@ export const flattenInfiniteHaikuPages = (pages: HaikuListSuccess[]): HaikuDto[]
     (h) => h.id,
   );
 
-/** Upsert newest item into the first infinite page (for WS `saved` without refetch). */
+/**
+ * Upsert newest item into the first infinite page (for WS `saved` without refetch);
+ * sorted lists are refetched since the item's position there is unknown.
+ */
 export function prependHaikuToInfiniteCache(
   queryClient: QueryClient,
   pageSize: number,
   haiku: HaikuDto,
 ): void {
+  void queryClient.invalidateQueries({ queryKey: haikuQueryKeys.sortedLists() });
   queryClient.setQueryData<InfiniteData<HaikuListSuccess, number>>(
     haikuQueryKeys.infiniteList(pageSize),
     (old) => {
@@ -157,7 +176,7 @@ export function prependHaikuToInfiniteCache(
   );
 }
 
-/** Remove a haiku from the infinite list and any search result caches (optimistic delete). */
+/** Remove a haiku from the infinite list and any search / sorted caches (optimistic delete). */
 export function removeHaikuFromInfiniteCache(
   queryClient: QueryClient,
   pageSize: number,
@@ -185,6 +204,10 @@ export function removeHaikuFromInfiniteCache(
   );
   queryClient.setQueriesData<InfiniteData<HaikuListSuccess, number>>(
     { queryKey: haikuQueryKeys.searchLists() },
+    removeFrom,
+  );
+  queryClient.setQueriesData<InfiniteData<HaikuListSuccess, number>>(
+    { queryKey: haikuQueryKeys.sortedLists() },
     removeFrom,
   );
 }

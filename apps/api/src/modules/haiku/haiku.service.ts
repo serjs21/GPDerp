@@ -13,6 +13,7 @@ import { postcardBatchRepository } from "../postcard/postcardBatch.repository";
 import { enqueuePostcardEmails } from "../postcard/postcardQueue";
 import { postcardMessageFits } from "../postcard/postcardTextWrap";
 import { normalizeShareRecipient } from "./utils/shareHaikuEmailRequest";
+import type { HaikuListSort } from "./utils/haikuListSort";
 
 const chunkToString = (chunk: string | Buffer): string =>
   typeof chunk === "string" ? chunk : Buffer.from(chunk).toString("utf-8");
@@ -278,6 +279,7 @@ export const haikuService = {
     offset: number;
     /** Case-insensitive title substring filter. */
     q?: string;
+    sort?: HaikuListSort;
   }): Promise<
     | { ok: false; reason: "forbidden" }
     | {
@@ -288,7 +290,7 @@ export const haikuService = {
         offset: number;
       }
   > {
-    const { userId, accountIdParam, pageSize, offset, q } = params;
+    const { userId, accountIdParam, pageSize, offset, q, sort } = params;
 
     let accountIds: string[];
 
@@ -308,7 +310,7 @@ export const haikuService = {
     }
 
     const [items, total] = await Promise.all([
-      haikuRepository.listForAccounts(accountIds, pageSize, offset, q),
+      haikuRepository.listForAccounts(accountIds, pageSize, offset, q, sort),
       haikuRepository.countForAccounts(accountIds, q),
     ]);
 
