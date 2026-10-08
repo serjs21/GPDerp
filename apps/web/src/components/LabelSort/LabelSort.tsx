@@ -34,6 +34,8 @@ export type LabelSortProps = {
   color?: ComicPanelColor;
   background?: ComicPanelBackground;
   className?: string;
+  /** Extra class on the coin column (spacing overrides). */
+  clusterClassName?: string;
   "aria-label"?: string;
 };
 
@@ -53,6 +55,7 @@ export function LabelSort({
   color = "white",
   background = "solid",
   className,
+  clusterClassName,
   "aria-label": ariaLabel = "Sort labels",
 }: LabelSortProps) {
   const { locale } = useLocale();
@@ -74,7 +77,7 @@ export function LabelSort({
     >
       <div
         ref={clusterRef}
-        className={[styles.cluster, rotated ? styles.clusterRotated : ""]
+        className={[styles.cluster, rotated ? styles.clusterRotated : "", clusterClassName]
           .filter(Boolean)
           .join(" ")}
         style={rotated ? buildRotatedSortClusterStyle(coinSizeRem) : undefined}

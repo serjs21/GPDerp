@@ -45,6 +45,7 @@ export function OrderDropdown({
             onChange={onChange}
             categories={ORDER_SORT_CATEGORIES}
             title={ORDER_SORT_TITLE}
+            clusterClassName={styles.cluster}
             rotated
             aria-label={ariaLabel}
           />
