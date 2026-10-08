@@ -1,5 +1,0 @@
-.root {
-  width: var(--haiku-card-width, 28rem);
-  max-width: 100%;
-  margin-inline: auto;
-}

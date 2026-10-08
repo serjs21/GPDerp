@@ -1,0 +1,15 @@
+{
+  "$schema": "https://unpkg.com/knip@latest/schema-jsonc.json",
+  "entry": [
+    "src/app/**/{page,layout,not-found,error,global-error,loading,template,route,default}.{ts,tsx}",
+    "src/app/**/{icon,apple-icon,opengraph-image,sitemap,robots,manifest}.{ts,tsx}",
+    "src/i18n/request.ts",
+    "next.config.ts"
+  ],
+  "project": ["src/**/*.{ts,tsx}"],
+  "next": false,
+  "storybook": false,
+  "jest": false,
+  "vitest": false,
+  "playwright": false
+}

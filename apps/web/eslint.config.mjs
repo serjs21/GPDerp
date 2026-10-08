@@ -36,8 +36,6 @@ const eslintConfig = defineConfig([
       "src/api/iconUpload.ts",
       "src/app/profile/page.tsx",
       "src/axios.setup.ts",
-      "src/components/AuthenticationNav/components/AuthDualityToggle/AuthDualityToggle.tsx",
-      "src/components/AuthenticationNav/components/TextToIcon/TextToIcon.tsx",
       "src/components/IconUploader/IconUploader.tsx",
       "src/components/LocaleSelector/LocaleSelector.tsx",
       "src/components/SavedHaikusList/SavedHaikusList.tsx",

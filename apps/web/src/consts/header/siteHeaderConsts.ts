@@ -1,6 +1,5 @@
 export const HEADER_NAV_ICON_SIZE_PX = 45;
 
-/** Marks the sticky app header (LayoutProviders + Storybook app layout). */
 export const SITE_HEADER_SELECTOR = "[data-site-header]";
 
 /**

@@ -6,7 +6,7 @@ import {
   colorBalanceToMatrix,
   useBackgroundSceneThemeBalance,
 } from "@/components/BackgroundScene";
-import { LanternSubmit } from "@/components/StoneInput/LanternSubmit";
+import { LanternSubmit } from "@/components/LanternSubmit";
 import {
   POST_SIGN_INPUT_ASSET_SRC,
   POST_SIGN_INPUT_IMAGE_HEIGHT,
