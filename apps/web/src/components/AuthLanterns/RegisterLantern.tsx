@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { withDefaults } from "@/utils/props/withDefaults";
 import styles from "./RegisterLantern.module.css";
 
 export type RegisterLanternProps = {
@@ -10,15 +11,14 @@ export type RegisterLanternProps = {
   disabled?: boolean;
 };
 
+const REGISTER_LANTERN_DEFAULTS = { selected: false, disabled: false };
+
 /**
  * Mirrored dark comic lantern control with “Register” lettering on the tilted face.
  */
-export function RegisterLantern({
-  selected = false,
-  onClick,
-  className,
-  disabled = false,
-}: RegisterLanternProps) {
+export function RegisterLantern(props: RegisterLanternProps) {
+  const { selected, disabled, className } = withDefaults(props, REGISTER_LANTERN_DEFAULTS);
+  const { onClick } = props;
   const t = useTranslations("AuthLanterns");
   const rootClass = [
     styles.root,

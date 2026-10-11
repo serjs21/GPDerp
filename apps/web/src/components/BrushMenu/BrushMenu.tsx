@@ -1,300 +1,81 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-  type ReactNode,
-  type RefObject,
-} from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
-import { BrushOption, type BrushOptionBrushPaths } from "./BrushOption";
-import { BrushPaintLayer } from "./BrushPaintLayer";
-import { BRUSH_OPTION_MIN_WIDTH_REM } from "./brushRevealPaths";
-import {
-  useBrushMenuDrawAnimation,
-  type BrushMenuDrawPhase,
-  type BrushRevealPathGroup,
-  type BrushTriggerSizePx,
-} from "./useBrushMenuDrawAnimation";
+import { useDismissOnOutside } from "@/hooks/useDismissOnOutside";
+import { withDefaults } from "@/utils/props/withDefaults";
+import type { BrushMenuOption, BrushMenuProps } from "./BrushMenu.types";
+import { BrushMenuTrigger } from "./BrushMenuTrigger";
+import { BrushMenuTriggerShell } from "./BrushMenuTriggerShell";
+import { BrushOptionList } from "./BrushOptionList";
+import { BRUSH_MENU_ROOT_STYLE } from "./consts/brushMenuConsts";
+import { useBrushMenuDrawAnimation, type BrushTriggerSizePx } from "./useBrushMenuDrawAnimation";
+import { useBrushMenuDrawRegistry } from "./useBrushMenuDrawRegistry";
+import { useBrushMenuOpenState } from "./useBrushMenuOpenState";
+import { useBrushTriggerSize } from "./useBrushTriggerSize";
+import { brushMenuPhaseView, brushPanelStyle, resolveTriggerLabel } from "./utils/brushMenuUtils";
 import styles from "./BrushMenu.module.css";
 
-export type BrushMenuOption = {
-  value: string;
-  label: ReactNode;
-  disabled?: boolean;
-  /** Show the row but do not select or close the menu. */
-  displayOnly?: boolean;
-  /** Override round-robin brush stroke asset. */
-  iconSrc?: string;
-  /** Label text color (defaults to cream). */
-  color?: string;
-  /** Comic-burst fill behind the option icon (`--brush-option-icon-fill`). */
-  backgroundColor?: string;
-  className?: string;
+export type { BrushMenuOption, BrushMenuProps } from "./BrushMenu.types";
+
+const BRUSH_MENU_DEFAULTS = {
+  value: null,
+  defaultOpen: false,
+  disabled: false,
+  triggerBrush: false,
 };
 
-export type BrushMenuProps = {
-  options: BrushMenuOption[];
-  value?: string | null;
-  onChange?: (value: string) => void;
-  open?: boolean;
-  defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  placeholder?: string;
-  disabled?: boolean;
-  className?: string;
-  triggerClassName?: string;
-  /**
-   * Paint brush + expanding label on the trigger itself (in-flow width).
-   * Avatar/icon from `renderTrigger` stays mounted at the closed origin;
-   * brush and expand label draw underneath / beside it.
-   */
-  triggerBrush?: boolean;
-  /** Label shown beside the trigger when open (contributes real layout width). */
-  expandLabel?: ReactNode;
-  renderTrigger?: (ctx: { open: boolean; label: string }) => ReactNode;
-};
-
-function useOpenState(
-  openProp: boolean | undefined,
-  defaultOpen: boolean,
-  onOpenChange?: (open: boolean) => void,
-) {
-  const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
-  const isControlled = openProp !== undefined;
-  const open = isControlled ? Boolean(openProp) : uncontrolledOpen;
-
-  const setOpen = useCallback(
-    (next: boolean) => {
-      if (!isControlled) {
-        setUncontrolledOpen(next);
-      }
-      onOpenChange?.(next);
-    },
-    [isControlled, onOpenChange],
+export function BrushMenu(props: BrushMenuProps) {
+  const { value, defaultOpen, disabled, triggerBrush, className, triggerClassName } = withDefaults(
+    props,
+    BRUSH_MENU_DEFAULTS,
   );
-
-  return { open, setOpen };
-}
-
-function useDismissOnOutside({
-  open,
-  disabled,
-  rootRef,
-  requestClose,
-}: {
-  open: boolean;
-  disabled: boolean;
-  rootRef: RefObject<HTMLDivElement | null>;
-  requestClose: () => void;
-}) {
-  useEffect(() => {
-    if (!open || disabled) return;
-
-    const onPointerDown = (event: MouseEvent | PointerEvent) => {
-      const root = rootRef.current;
-      if (!root) return;
-      if (event.target instanceof Node && !root.contains(event.target)) {
-        requestClose();
-      }
-    };
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        requestClose();
-      }
-    };
-
-    document.addEventListener("pointerdown", onPointerDown);
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.removeEventListener("pointerdown", onPointerDown);
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [disabled, open, rootRef, requestClose]);
-}
-
-function BrushOptionList({
-  listId,
-  options,
-  value,
-  disabled,
-  placeholder,
-  brushPathsRef,
-  labelElsRef,
-  onSelect,
-  panelStyle,
-}: {
-  listId: string;
-  options: BrushMenuOption[];
-  value: string | null;
-  disabled: boolean;
-  placeholder: string;
-  brushPathsRef: RefObject<(BrushOptionBrushPaths | null)[]>;
-  labelElsRef: RefObject<(HTMLSpanElement | null)[]>;
-  onSelect: (nextValue: string) => void;
-  panelStyle?: CSSProperties;
-}) {
-  return (
-    <ul
-      id={listId}
-      className={styles.panel}
-      role="listbox"
-      aria-label={placeholder}
-      style={panelStyle}
-    >
-      {options.map((option, index) => (
-        <li key={option.value} className={styles.item} role="none">
-          <BrushOption
-            onBrushPaths={(paths) => {
-              brushPathsRef.current[index] = paths;
-            }}
-            labelRef={(node) => {
-              labelElsRef.current[index] = node;
-            }}
-            index={index}
-            iconSrc={option.iconSrc}
-            label={option.label}
-            color={option.color}
-            backgroundColor={option.backgroundColor}
-            selected={option.value === value}
-            disabled={option.disabled || disabled}
-            displayOnly={option.displayOnly}
-            className={option.className}
-            role="option"
-            aria-selected={option.value === value}
-            data-brush-option=""
-            onSelect={() => {
-              if (option.displayOnly) return;
-              onSelect(option.value);
-            }}
-          />
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function resolveTriggerLabel(
-  options: BrushMenuOption[],
-  value: string | null,
-  placeholder: string,
-) {
-  const selected = options.find((option) => option.value === value);
-  if (!selected) return placeholder;
-  return typeof selected.label === "string" ? selected.label : placeholder;
-}
-
-function toPathGroups(
-  entries: (BrushOptionBrushPaths | null)[],
-): BrushRevealPathGroup[] {
-  const groups: BrushRevealPathGroup[] = [];
-  for (const paths of entries) {
-    if (!paths || paths.length === 0) continue;
-    groups.push(paths);
-  }
-  return groups;
-}
-
-export function BrushMenu({
-  options,
-  value = null,
-  onChange,
-  open: openProp,
-  defaultOpen = false,
-  onOpenChange,
-  placeholder: placeholderProp,
-  disabled = false,
-  className,
-  triggerClassName,
-  triggerBrush = false,
-  expandLabel,
-  renderTrigger,
-}: BrushMenuProps) {
+  const { options, onChange, expandLabel, renderTrigger } = props;
   const t = useTranslations("BrushMenu");
-  const placeholder = placeholderProp ?? t("placeholder");
+  const placeholder = props.placeholder ?? t("placeholder");
   const listId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
-  const shellRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const triggerBrushPathsRef = useRef<BrushOptionBrushPaths | null>(null);
-  const triggerExpandLabelRef = useRef<HTMLSpanElement | null>(null);
-  const closedTriggerSizeRef = useRef<BrushTriggerSizePx>({
-    width: 36,
-    height: 36,
-  });
-  const brushPathsRef = useRef<(BrushOptionBrushPaths | null)[]>([]);
-  const labelElsRef = useRef<(HTMLSpanElement | null)[]>([]);
-  const { open, setOpen } = useOpenState(openProp, defaultOpen, onOpenChange);
+  const { open, setOpen } = useBrushMenuOpenState(props.open, defaultOpen, props.onOpenChange);
   const [closing, setClosing] = useState(false);
-  /** Options as they were when closing started; navigation must not swap rows mid-animation. */
-  const [closingOptions, setClosingOptions] = useState<BrushMenuOption[] | null>(
-    null,
-  );
-  const [paintOpenHeightPx, setPaintOpenHeightPx] = useState<number | null>(
-    null,
-  );
+  const [closingOptions, setClosingOptions] = useState<BrushMenuOption[] | null>(null);
   const reducedMotion = useReducedMotion() ?? false;
+  const { panelMounted, dismissible, displayedOptions, drawPhase } = brushMenuPhaseView(
+    open,
+    closing,
+    closingOptions,
+    options,
+    disabled,
+  );
 
-  const panelMounted = open || closing;
-  const displayedOptions = closing && closingOptions ? closingOptions : options;
-  const drawPhase: BrushMenuDrawPhase | null = closing
-    ? "closing"
-    : open
-      ? "open"
-      : null;
-
-  const captureClosedTriggerSize = useCallback(() => {
-    const shell = shellRef.current;
-    if (!shell) return;
-    const prevW = shell.style.width;
-    const prevH = shell.style.height;
-    shell.style.width = "";
-    shell.style.height = "";
-    closedTriggerSizeRef.current = {
-      width: shell.offsetWidth || 36,
-      height: shell.offsetHeight || 36,
-    };
-    shell.style.width = prevW;
-    shell.style.height = prevH;
-  }, []);
-
-  useLayoutEffect(() => {
-    if (panelMounted || !triggerBrush) return;
-    captureClosedTriggerSize();
-  }, [
-    panelMounted,
+  const {
+    shellRef,
+    closedTriggerSizeRef,
+    paintOpenHeightPx,
+    setPaintOpenHeightPx,
+    captureClosedTriggerSize,
+    getClosedTriggerSizePx,
+    getOpenTriggerSizePx,
+  } = useBrushTriggerSize({
+    rootRef,
     triggerBrush,
+    open,
+    closing,
+    panelMounted,
     expandLabel,
     renderTrigger,
-    captureClosedTriggerSize,
-  ]);
-
-  useLayoutEffect(() => {
-    if (!triggerBrush || !open || closing) return;
-    const shell = shellRef.current;
-    if (!shell || shell.style.width) return;
-    const closed = closedTriggerSizeRef.current;
-    // In-flow footprint: width starts closed; height stays avatar-sized.
-    shell.style.width = `${closed.width}px`;
-    shell.style.height = `${closed.height}px`;
-  }, [open, closing, triggerBrush]);
-
-  // Position absolute panel under the full paint height as soon as options mount.
-  useLayoutEffect(() => {
-    if (!triggerBrush || !panelMounted) return;
-    const option = rootRef.current?.querySelector<HTMLElement>(
-      "[data-brush-option]",
-    );
-    if (option) setPaintOpenHeightPx(option.offsetHeight);
-  }, [triggerBrush, panelMounted, displayedOptions]);
+    displayedOptions,
+  });
+  const {
+    triggerBrushPathsRef,
+    triggerExpandLabelRef,
+    brushPathsRef,
+    labelElsRef,
+    getBrushPathGroups,
+    getLabelEls,
+    resetDrawRegistry,
+  } = useBrushMenuDrawRegistry(triggerBrush);
 
   const requestClose = useCallback(() => {
     if (disabled || closing || !open) return;
@@ -306,15 +87,13 @@ export function BrushMenu({
     setClosingOptions(options);
     setClosing(true);
     setOpen(false);
-  }, [closing, disabled, open, options, reducedMotion, setOpen]);
+  }, [closing, disabled, open, options, reducedMotion, setOpen, setPaintOpenHeightPx]);
 
   const handleCloseComplete = useCallback(() => {
     setClosing(false);
     setClosingOptions(null);
     setPaintOpenHeightPx(null);
-    triggerBrushPathsRef.current = null;
-    brushPathsRef.current = [];
-    labelElsRef.current = [];
+    resetDrawRegistry();
     if (shellRef.current) {
       shellRef.current.style.width = "";
       shellRef.current.style.height = "";
@@ -322,69 +101,18 @@ export function BrushMenu({
     if (triggerRef.current) {
       triggerRef.current.style.height = "";
     }
-  }, []);
+  }, [resetDrawRegistry, setPaintOpenHeightPx, shellRef]);
 
-  useDismissOnOutside({
-    open: panelMounted && !closing,
-    disabled,
-    rootRef,
-    requestClose,
-  });
+  useDismissOnOutside(dismissible, rootRef, requestClose);
 
-  const getBrushPathGroups = useCallback(() => {
-    const groups: BrushRevealPathGroup[] = [];
-    if (triggerBrush && triggerBrushPathsRef.current) {
-      groups.push(triggerBrushPathsRef.current);
-    }
-    groups.push(...toPathGroups(brushPathsRef.current));
-    return groups;
-  }, [triggerBrush]);
-
-  const getLabelEls = useCallback(() => {
-    const labels: HTMLSpanElement[] = [];
-    if (triggerBrush && triggerExpandLabelRef.current) {
-      labels.push(triggerExpandLabelRef.current);
-    }
-    for (const label of labelElsRef.current) {
-      if (label) labels.push(label);
-    }
-    return labels;
-  }, [triggerBrush]);
-
-  const getSizeEl = useCallback(
-    () => (triggerBrush ? shellRef.current : null),
-    [triggerBrush],
+  const getSizeEl = useCallback(() => (triggerBrush ? shellRef.current : null), [shellRef, triggerBrush]);
+  const getPaintEl = useCallback(() => (triggerBrush ? triggerRef.current : null), [triggerBrush]);
+  const handleOpenSize = useCallback(
+    (size: BrushTriggerSizePx) => {
+      setPaintOpenHeightPx(size.height);
+    },
+    [setPaintOpenHeightPx],
   );
-
-  const getPaintEl = useCallback(
-    () => (triggerBrush ? triggerRef.current : null),
-    [triggerBrush],
-  );
-
-  const getClosedTriggerSizePx = useCallback(
-    () => closedTriggerSizeRef.current,
-    [],
-  );
-
-  const getOpenTriggerSizePx = useCallback((): BrushTriggerSizePx => {
-    const root = rootRef.current;
-    const option = root?.querySelector<HTMLElement>("[data-brush-option]");
-    const panel = root?.querySelector<HTMLElement>(`.${styles.panel}`);
-    const width =
-      option?.offsetWidth ||
-      panel?.offsetWidth ||
-      Math.max(
-        closedTriggerSizeRef.current.width,
-        BRUSH_OPTION_MIN_WIDTH_REM * 16,
-      );
-    const height =
-      option?.offsetHeight || closedTriggerSizeRef.current.height;
-    return { width, height };
-  }, []);
-
-  const handleOpenSize = useCallback((size: BrushTriggerSizePx) => {
-    setPaintOpenHeightPx(size.height);
-  }, []);
 
   useBrushMenuDrawAnimation({
     phase: drawPhase,
@@ -416,67 +144,24 @@ export function BrushMenu({
     setOpen(true);
   };
 
-  const showTriggerBrush = triggerBrush && panelMounted;
-  const showExpandLabel =
-    triggerBrush && panelMounted && expandLabel != null;
-
-  const triggerButton = (
-    <button
-      ref={triggerRef}
-      type="button"
-      className={`${styles.trigger}${
-        triggerClassName ? ` ${triggerClassName}` : ""
-      }${triggerBrush ? ` ${styles.triggerAnchored}` : ""}${
-        showTriggerBrush ? ` ${styles.triggerBrushOpen}` : ""
-      }`}
-      data-brush-open={showTriggerBrush ? "true" : undefined}
-      disabled={disabled}
-      aria-haspopup="listbox"
-      aria-expanded={panelMounted}
-      aria-controls={panelMounted ? listId : undefined}
-      onClick={toggleOpen}
-    >
-      {showTriggerBrush ? (
-        <BrushPaintLayer
-          index={0}
-          onBrushPaths={(paths) => {
-            triggerBrushPathsRef.current = paths;
-          }}
-        />
-      ) : null}
-      <span className={styles.triggerFace}>
-        {renderTrigger
-          ? renderTrigger({ open: panelMounted, label: triggerLabel })
-          : triggerLabel}
-        {showExpandLabel ? (
-          <span className={styles.expandSlot}>
-            <span ref={triggerExpandLabelRef} className={styles.expandLabel}>
-              {expandLabel}
-            </span>
-          </span>
-        ) : null}
-      </span>
-    </button>
-  );
-
   return (
-    <div
-      ref={rootRef}
-      className={`${styles.wrap}${className ? ` ${className}` : ""}`}
-      style={
-        {
-          ["--brush-option-min-width"]: `${BRUSH_OPTION_MIN_WIDTH_REM}rem`,
-        } as CSSProperties
-      }
-    >
-      {triggerBrush ? (
-        <div ref={shellRef} className={styles.shell}>
-          <div className={styles.avatarSlot} aria-hidden />
-          {triggerButton}
-        </div>
-      ) : (
-        triggerButton
-      )}
+    <div ref={rootRef} className={[styles.wrap, className].filter(Boolean).join(" ")} style={BRUSH_MENU_ROOT_STYLE}>
+      <BrushMenuTriggerShell triggerBrush={triggerBrush} shellRef={shellRef}>
+        <BrushMenuTrigger
+          buttonRef={triggerRef}
+          brushPathsRef={triggerBrushPathsRef}
+          expandLabelRef={triggerExpandLabelRef}
+          triggerClassName={triggerClassName}
+          triggerBrush={triggerBrush}
+          panelMounted={panelMounted}
+          listId={listId}
+          label={triggerLabel}
+          disabled={disabled}
+          expandLabel={expandLabel}
+          renderTrigger={renderTrigger}
+          onClick={toggleOpen}
+        />
+      </BrushMenuTriggerShell>
 
       {panelMounted ? (
         <BrushOptionList
@@ -488,15 +173,7 @@ export function BrushMenu({
           brushPathsRef={brushPathsRef}
           labelElsRef={labelElsRef}
           onSelect={handleSelect}
-          panelStyle={
-            triggerBrush
-              ? {
-                  top: `calc(${
-                    paintOpenHeightPx ?? closedTriggerSizeRef.current.height
-                  }px + var(--brush-stack-gap))`,
-                }
-              : { top: "100%", marginTop: "var(--brush-stack-gap)" }
-          }
+          panelStyle={brushPanelStyle(triggerBrush, paintOpenHeightPx, closedTriggerSizeRef.current.height)}
         />
       ) : null}
     </div>

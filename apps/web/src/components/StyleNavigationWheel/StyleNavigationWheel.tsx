@@ -2,30 +2,21 @@
 
 import { motion, type Transition } from "motion/react";
 import {
-  useState,
   type CSSProperties,
   type PointerEventHandler,
   type ReactNode,
   type Ref,
 } from "react";
 import type { SelectorDialLayout } from "@/theme/celestialSelectorLayout";
-import {
-  complementaryCelestialOpacities,
-  selectorCosmicRotationDeg,
-} from "@/theme/celestialSelectorLayout";
+import { complementaryCelestialOpacities } from "@/theme/celestialSelectorLayout";
 import { celestialSelectorTransition } from "@/components/CelestialThemeSelector/celestialSelectorMotion";
+import { withDefaults } from "@/utils/props/withDefaults";
 import { STYLE_NAVIGATION_WHEEL } from "./styleNavigationWheel.config";
+import { useContinuousWheelRotationDeg } from "./useContinuousWheelRotationDeg";
+import { styleNavigationWheelClassNames } from "./utils/styleNavigationWheelUtils";
 import styles from "./StyleNavigationWheel.module.css";
 
 const MOTION_PERSPECTIVE_PX = 900;
-
-/** Keep successive rotations within ±180° of the previous value (shortest turn). */
-function unwrapRotationDeg(previousDeg: number, targetDeg: number) {
-  let next = targetDeg;
-  while (next - previousDeg > 180) next -= 360;
-  while (next - previousDeg < -180) next += 360;
-  return next;
-}
 
 export type StyleNavigationWheelPointerHandlers = {
   onPointerDown?: PointerEventHandler<HTMLDivElement>;
@@ -289,35 +280,23 @@ function FixedMoon({ opacity }: { opacity: number }) {
   );
 }
 
+const STYLE_NAVIGATION_WHEEL_DEFAULTS = {
+  variant: "panel",
+  motionInstant: false,
+  interactive: false,
+  hideNavStar: false,
+} as const;
+
 /**
  * Style navigation wheel: stars + compass + earth on one slot-rotated circle base.
  * Sun/moon stay fixed on the face; celestial opacities crossfade with slot.
  */
-export function StyleNavigationWheel({
-  layout,
-  slot,
-  variant = "panel",
-  motionLayoutIdPrefix,
-  motionInstant = false,
-  className,
-  faceRef,
-  pointerHandlers,
-  interactive = false,
-  hideNavStar = false,
-}: StyleNavigationWheelProps) {
-  const variantClass = variant === "trigger" ? styles.trigger : styles.panel;
-  const interactiveClass = interactive ? styles.interactive : "";
-  const rawRotationDeg =
-    selectorCosmicRotationDeg(slot) +
-    STYLE_NAVIGATION_WHEEL.circleBaseRotationOffsetDeg;
-  const [cosmicRotationDeg, setCosmicRotationDeg] = useState(rawRotationDeg);
-  const continuousRotationDeg = unwrapRotationDeg(
-    cosmicRotationDeg,
-    rawRotationDeg,
-  );
-  if (continuousRotationDeg !== cosmicRotationDeg) {
-    setCosmicRotationDeg(continuousRotationDeg);
-  }
+export function StyleNavigationWheel(props: StyleNavigationWheelProps) {
+  const { slot, variant, motionLayoutIdPrefix, motionInstant, className, interactive, hideNavStar } =
+    withDefaults(props, STYLE_NAVIGATION_WHEEL_DEFAULTS);
+  const { layout, faceRef, pointerHandlers } = props;
+  const { rootClass, faceClass } = styleNavigationWheelClassNames(styles, variant, interactive, className);
+  const continuousRotationDeg = useContinuousWheelRotationDeg(slot);
 
   const { sunOpacity, moonOpacity } = complementaryCelestialOpacities(slot, layout);
   const layoutEnabled = Boolean(motionLayoutIdPrefix);
@@ -349,14 +328,12 @@ export function StyleNavigationWheel({
   );
 
   return (
-    <div
-      className={`${styles.root} ${variantClass}${className ? ` ${className}` : ""}`}
-    >
+    <div className={rootClass}>
       <MotionLayer
         layoutId={layoutId("face")}
         layoutEnabled={layoutEnabled}
         transition={transition}
-        className={`${styles.face}${interactiveClass ? ` ${interactiveClass}` : ""}`}
+        className={faceClass}
         elementRef={faceRef}
         pointerHandlers={interactive ? pointerHandlers : undefined}
       >

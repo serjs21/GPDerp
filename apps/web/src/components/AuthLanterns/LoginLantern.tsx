@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { withDefaults } from "@/utils/props/withDefaults";
 import styles from "./LoginLantern.module.css";
 
 export type LoginLanternProps = {
@@ -10,15 +11,14 @@ export type LoginLanternProps = {
   disabled?: boolean;
 };
 
+const LOGIN_LANTERN_DEFAULTS = { selected: false, disabled: false };
+
 /**
  * Light comic lantern control with “Login” lettering on the tilted face.
  */
-export function LoginLantern({
-  selected = false,
-  onClick,
-  className,
-  disabled = false,
-}: LoginLanternProps) {
+export function LoginLantern(props: LoginLanternProps) {
+  const { selected, disabled, className } = withDefaults(props, LOGIN_LANTERN_DEFAULTS);
+  const { onClick } = props;
   const t = useTranslations("AuthLanterns");
   const rootClass = [
     styles.root,

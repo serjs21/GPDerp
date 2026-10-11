@@ -1,82 +1,29 @@
 "use client";
 
-import type { CSSProperties } from "react";
-import { useInvertedSvgUrl } from "./useInvertedSvgUrl";
-import { useStrokeInvertSvg } from "./utils/strokeInvertSvg";
+import { withDefaults } from "@/utils/props/withDefaults";
+import { DualityImageIcon } from "./DualityImageIcon";
+import { DualityMaskIcon } from "./DualityMaskIcon";
+import { DualityStrokeIcon } from "./DualityStrokeIcon";
+import type { DualityFaceIconProps } from "./DualityFaceIcon.types";
+import { dualityIconPositionClass, dualityIconSizeStyle } from "./utils/dualityFaceIconUtils";
 import styles from "./DualityButton.module.css";
 
-export type DualityIconTone = "mask" | "strokeInvert" | "image";
+export type {
+  DualityFaceIconPosition,
+  DualityFaceIconProps,
+  DualityIconTone,
+} from "./DualityFaceIcon.types";
 
-export type DualityFaceIconPosition = "top" | "bottom" | "center";
+const DUALITY_FACE_ICON_DEFAULTS = { tone: "mask", scale: 1 } as const;
 
-export type DualityFaceIconProps = {
-  src: string;
-  position: DualityFaceIconPosition;
-  /** `mask` tints the whole glyph; `strokeInvert` only flips black ink; `image` keeps authored colors. */
-  tone?: DualityIconTone;
-  /** Size multiplier vs the default end icons (center time glyph uses 2). */
-  scale?: number;
-};
+export function DualityFaceIcon(props: DualityFaceIconProps) {
+  const { src, position, tone, scale } = withDefaults(props, DUALITY_FACE_ICON_DEFAULTS);
+  const placeClass = dualityIconPositionClass(styles, position);
+  const sizeStyle = dualityIconSizeStyle(scale);
 
-function positionClass(position: DualityFaceIconPosition): string {
-  if (position === "top") return styles.iconTop;
-  if (position === "bottom") return styles.iconBottom;
-  return styles.iconCenter;
-}
-
-export function DualityFaceIcon({
-  src,
-  position,
-  tone = "mask",
-  scale = 1,
-}: DualityFaceIconProps) {
-  const strokeMarkup = useStrokeInvertSvg(tone === "strokeInvert" ? src : "");
-  const invertedSrc = useInvertedSvgUrl(tone === "image" ? src : "");
-  const placeClass = positionClass(position);
-  const sizeStyle =
-    scale !== 1
-      ? ({
-          "--duality-icon-scale": String(scale),
-        } as CSSProperties)
-      : undefined;
-
-  if (tone === "image") {
-    return (
-      <span className={[styles.icon, styles.iconImage, placeClass].join(" ")} style={sizeStyle} aria-hidden>
-        {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
-        <img className={styles.imageOnLight} src={src} alt="" draggable={false} decoding="async" />
-        {invertedSrc ? (
-          // eslint-disable-next-line @next/next/no-img-element -- generated SVG data URL
-          <img className={styles.imageOnDark} src={invertedSrc} alt="" draggable={false} decoding="async" />
-        ) : null}
-      </span>
-    );
-  }
-
+  if (tone === "image") return <DualityImageIcon src={src} placeClass={placeClass} sizeStyle={sizeStyle} />;
   if (tone === "strokeInvert") {
-    return (
-      <span
-        className={[styles.icon, styles.iconRich, placeClass].join(" ")}
-        style={sizeStyle}
-        dangerouslySetInnerHTML={
-          strokeMarkup ? { __html: strokeMarkup } : undefined
-        }
-        aria-hidden
-      />
-    );
+    return <DualityStrokeIcon src={src} placeClass={placeClass} sizeStyle={sizeStyle} />;
   }
-
-  return (
-    <span
-      className={[styles.icon, styles.iconMask, placeClass].join(" ")}
-      style={
-        {
-          ...sizeStyle,
-          WebkitMaskImage: `url("${src}")`,
-          maskImage: `url("${src}")`,
-        } as CSSProperties
-      }
-      aria-hidden
-    />
-  );
+  return <DualityMaskIcon src={src} placeClass={placeClass} sizeStyle={sizeStyle} />;
 }

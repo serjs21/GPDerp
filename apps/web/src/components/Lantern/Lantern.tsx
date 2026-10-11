@@ -6,10 +6,9 @@ import { HaikuActions } from "@/components/HaikuContainer/HaikuActions";
 import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { LocalDateTime } from "@/components/LocalDateTime";
-import { parseHaikuBody } from "@/utils/parseHaikuBody";
 import { formatHaikuTitle } from "@/utils/strings";
 import { TextTyping } from "@/components/TextTyping/TextTyping";
-import { typingStartIndices } from "@/components/TextTyping/utils/textTypingUtils";
+import { lanternContentTyping } from "./utils/lanternContentUtils";
 import {
   LANTERN_ROTATED_WIDTH_REM,
   type LanternRotatedVariantId,
@@ -125,12 +124,7 @@ function LanternContent({
   typing: boolean;
   actions?: ReactNode;
 }) {
-  const { lines, author } = parseHaikuBody(body);
-  const authorText = author ? `—${author}` : "";
-  // Title → body lines → author reveal as one continuous sequence.
-  const starts = typingStartIndices([title ?? "", ...lines, authorText]);
-  const lineStarts = starts.slice(1, 1 + lines.length);
-  const authorStart = starts[starts.length - 1];
+  const { lines, authorText, lineStarts, authorStart } = lanternContentTyping(title, body);
 
   const shared = (
     <>

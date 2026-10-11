@@ -1,107 +1,42 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
-import {
-  DUALITY_BUTTON_BASE_SRC,
-  DUALITY_BUTTON_DIRECTION_SRC,
-  DUALITY_BUTTON_FLIP_MS,
-} from "./consts/dualityButtonConsts";
-import {
-  DualityFaceIcon,
-  type DualityIconTone,
-} from "./DualityFaceIcon";
+import { withDefaults } from "@/utils/props/withDefaults";
+import { DUALITY_BUTTON_BASE_SRC, DUALITY_BUTTON_DIRECTION_SRC } from "./consts/dualityButtonConsts";
+import { DualityEndIcons } from "./DualityEndIcons";
+import { DualityFaceIcon } from "./DualityFaceIcon";
+import type { DualityButtonProps } from "./DualityButton.types";
+import { useDualityFlip } from "./useDualityFlip";
+import { dualityButtonClassName, dualityButtonRootStyle } from "./utils/dualityButtonUtils";
 import styles from "./DualityButton.module.css";
 
-export type DualityButtonProps = {
-  /** Icon shown at the top of the face (e.g. “new”). Ignored when `centerIconSrc` is set. */
-  topIconSrc?: string;
-  /** Icon shown at the bottom of the face (e.g. “old”). Ignored when `centerIconSrc` is set. */
-  bottomIconSrc?: string;
-  /** Single centered glyph (e.g. time remaining). Overrides top/bottom. */
-  centerIconSrc?: string;
-  /** Size multiplier for the centered glyph (default 2). */
-  centerIconScale?: number;
-  /**
-   * `mask` — mono tint (black/white swap on flip).
-   * `strokeInvert` — only black ink flips; light fills stay as authored.
-   * `image` — full-color artwork drawn as authored (no tint, no flip swap).
-   */
-  iconTone?: DualityIconTone;
-  /** Controlled flip state. When omitted, the button manages its own state. */
-  flipped?: boolean;
-  /** Initial flip when uncontrolled. */
-  defaultFlipped?: boolean;
-  onFlippedChange?: (flipped: boolean) => void;
-  /** When false, hides the curved direction cue (e.g. while a cover overlay is up). */
-  showDirection?: boolean;
-  disabled?: boolean;
-  className?: string;
-  style?: CSSProperties;
-  "aria-label": string;
-};
+export type { DualityButtonProps } from "./DualityButton.types";
 
-function flippedFromTurns(clockwiseDeg: number): boolean {
-  return Math.round(clockwiseDeg / 180) % 2 === 1;
-}
+const DUALITY_BUTTON_DEFAULTS = {
+  iconTone: "mask",
+  defaultFlipped: false,
+  showDirection: true,
+  disabled: false,
+} as const;
 
-export function DualityButton({
-  topIconSrc,
-  bottomIconSrc,
-  centerIconSrc,
-  centerIconScale = 1,
-  iconTone = "mask",
-  flipped: flippedProp,
-  defaultFlipped = false,
-  onFlippedChange,
-  showDirection = true,
-  disabled = false,
-  className,
-  style,
-  "aria-label": ariaLabel,
-}: DualityButtonProps) {
-  const isControlled = flippedProp != null;
-  const [clockwiseDeg, setClockwiseDeg] = useState(
-    (flippedProp ?? defaultFlipped) ? 180 : 0,
-  );
-  const flipped = flippedFromTurns(clockwiseDeg);
-  const lastControlledRef = useRef(flippedProp);
-
-  // External controlled updates: advance clockwise to the requested side (never CCW).
-  useEffect(() => {
-    if (!isControlled) return;
-    const target = flippedProp!;
-    if (lastControlledRef.current === target) return;
-    lastControlledRef.current = target;
-    setClockwiseDeg((prevDeg) => {
-      if (flippedFromTurns(prevDeg) === target) return prevDeg;
-      return prevDeg + 180;
-    });
-  }, [flippedProp, isControlled]);
-
-  const rootStyle = {
-    ...style,
-    "--duality-flip-ms": `${DUALITY_BUTTON_FLIP_MS}ms`,
-    "--duality-base-rotate": `${clockwiseDeg}deg`,
-  } as CSSProperties;
+export function DualityButton(props: DualityButtonProps) {
+  const { topIconSrc, bottomIconSrc, centerIconSrc, iconTone, defaultFlipped, showDirection, disabled, className } =
+    withDefaults(props, DUALITY_BUTTON_DEFAULTS);
+  const { clockwiseDeg, flipped, onClick } = useDualityFlip({
+    flippedProp: props.flipped,
+    defaultFlipped,
+    disabled,
+    onFlippedChange: props.onFlippedChange,
+  });
 
   return (
     <button
       type="button"
-      className={[styles.root, flipped ? styles.flipped : "", className]
-        .filter(Boolean)
-        .join(" ")}
-      style={rootStyle}
-      aria-label={ariaLabel}
+      className={dualityButtonClassName(styles, flipped, className)}
+      style={dualityButtonRootStyle(props.style, clockwiseDeg)}
+      aria-label={props["aria-label"]}
       aria-pressed={flipped}
       disabled={disabled}
-      onClick={() => {
-        if (disabled) return;
-        const nextDeg = clockwiseDeg + 180;
-        const nextFlipped = flippedFromTurns(nextDeg);
-        setClockwiseDeg(nextDeg);
-        if (isControlled) lastControlledRef.current = nextFlipped;
-        onFlippedChange?.(nextFlipped);
-      }}
+      onClick={onClick}
     >
       <span className={styles.baseWrap} aria-hidden>
         {showDirection ? (
@@ -123,28 +58,12 @@ export function DualityButton({
           decoding="async"
         />
         {centerIconSrc ? (
-          <DualityFaceIcon
-            src={centerIconSrc}
-            position="center"
-            tone={iconTone}
-            scale={1.2}
-          />
+          <DualityFaceIcon src={centerIconSrc} position="center" tone={iconTone} scale={1.2} />
         ) : null}
       </span>
-      {!centerIconSrc ? (
-        <>
-          {topIconSrc ? (
-            <DualityFaceIcon src={topIconSrc} position="top" tone={iconTone} />
-          ) : null}
-          {bottomIconSrc ? (
-            <DualityFaceIcon
-              src={bottomIconSrc}
-              position="bottom"
-              tone={iconTone}
-            />
-          ) : null}
-        </>
-      ) : null}
+      {centerIconSrc ? null : (
+        <DualityEndIcons topIconSrc={topIconSrc} bottomIconSrc={bottomIconSrc} iconTone={iconTone} />
+      )}
     </button>
   );
 }
