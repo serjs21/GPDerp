@@ -21,8 +21,20 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
+      testIgnore: "perf/**",
       use: { ...devices["Desktop Chrome"] },
     },
+    // Benchmarks only via `pnpm bench:app` (serial, no tracing). Records → test-results/perf/.
+    ...(process.env.PLAYWRIGHT_PERF
+      ? [
+          {
+            name: "perf",
+            testMatch: "perf/**/*.perf.ts",
+            fullyParallel: false,
+            use: { ...devices["Desktop Chrome"], trace: "off" as const },
+          },
+        ]
+      : []),
   ],
   webServer: {
     command: `pnpm exec next start -p ${port}`,

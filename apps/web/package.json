@@ -23,6 +23,7 @@
     "test:coverage": "jest --coverage",
     "test:playwright": "playwright test",
     "test:playwright:app": "pnpm build && playwright test -c playwright.app.config.ts",
+    "bench:app": "PLAYWRIGHT_PERF=1 playwright test -c playwright.app.config.ts --project=perf --workers=1",
     "test:playwright:storybook-health": "playwright test tests/playwright/storybook-runtime-health.spec.ts",
     "infra-tests:jest": "jest infra-tests --runInBand",
     "infra-tests:storybook:build": "pnpm build-storybook",
