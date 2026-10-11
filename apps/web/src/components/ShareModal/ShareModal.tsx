@@ -162,49 +162,60 @@ export function ShareModal({
           ]}
         />
 
-        <div className={styles.contentSlot}>
-          {method === "link" ? (
-            loadingLink ? (
-              <ComicPagePanel span="full" color="white" contentAlign="center" className={styles.contentPanel}>
-                <Typography.Paragraph type="secondary" style={{ margin: 0 }}>
-                  {t("loading")}
-                </Typography.Paragraph>
-              </ComicPagePanel>
-            ) : (
-              <ShareLink
-                link={shareLink}
-                haikuId={haikuId}
-                haikuSubject={haikuSubject}
-                haiku={haiku}
-                onChanged={() => undefined}
-                onLinkUpdate={setShareLink}
-              />
-            )
-          ) : (
-            <ComicPagePanel span="full" color="white" contentAlign="start" className={styles.contentPanel}>
-              <SendShareEmailContent
-                message={emailMessage}
-                emails={emailRecipients}
-                invalidEmails={invalidEmails}
-                onMessageChange={setEmailMessage}
-                onEmailsChange={setEmailRecipients}
-                disabled={sendingEmail}
-              />
-            </ComicPagePanel>
-          )}
-        </div>
-
-        {method === "email" ? (
-          <div className={styles.sendRow}>
-            <ShareEmailSendPanel
-              canSendEmail={canSendEmail}
-              sendingEmail={sendingEmail}
-              preparingPostcard={preparingPostcard}
-              emailCtaHint={emailCtaHint}
-              onSendEmail={() => void onSendEmail()}
-            />
+        {/* Both tabs share one grid cell; the link pane stays mounted (hidden) so the email tab takes its height. */}
+        <div className={styles.panes}>
+          <div
+            className={styles.pane}
+            data-active={method === "link"}
+            inert={method !== "link"}
+            aria-hidden={method !== "link"}
+          >
+            <div className={styles.contentSlot}>
+              {loadingLink ? (
+                <ComicPagePanel span="full" color="white" contentAlign="center" className={styles.contentPanel}>
+                  <Typography.Paragraph type="secondary" style={{ margin: 0 }}>
+                    {t("loading")}
+                  </Typography.Paragraph>
+                </ComicPagePanel>
+              ) : (
+                <ShareLink
+                  link={shareLink}
+                  haikuId={haikuId}
+                  haikuSubject={haikuSubject}
+                  haiku={haiku}
+                  onChanged={() => undefined}
+                  onLinkUpdate={setShareLink}
+                />
+              )}
+            </div>
           </div>
-        ) : null}
+
+          {method === "email" ? (
+            <div className={styles.pane} data-active>
+              <div className={styles.contentSlot}>
+                <ComicPagePanel span="full" color="white" contentAlign="start" className={styles.contentPanel}>
+                  <SendShareEmailContent
+                    message={emailMessage}
+                    emails={emailRecipients}
+                    invalidEmails={invalidEmails}
+                    onMessageChange={setEmailMessage}
+                    onEmailsChange={setEmailRecipients}
+                    disabled={sendingEmail}
+                  />
+                </ComicPagePanel>
+              </div>
+              <div className={styles.sendRow}>
+                <ShareEmailSendPanel
+                  canSendEmail={canSendEmail}
+                  sendingEmail={sendingEmail}
+                  preparingPostcard={preparingPostcard}
+                  emailCtaHint={emailCtaHint}
+                  onSendEmail={() => void onSendEmail()}
+                />
+              </div>
+            </div>
+          ) : null}
+        </div>
       </div>
     </ComicPageDialog>
   );
