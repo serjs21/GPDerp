@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { HaikuActions } from "@/components/HaikuContainer/HaikuActions";
 import type { HaikuContainerProps } from "@/components/HaikuContainer/HaikuContainer";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
-import { formatCreatedAt } from "@/utils/date";
+import { LocalDateTime } from "@/components/LocalDateTime";
 import { parseHaikuBody } from "@/utils/parseHaikuBody";
 import { formatHaikuTitle } from "@/utils/strings";
 import { TextTyping } from "@/components/TextTyping/TextTyping";
@@ -67,7 +67,7 @@ function resolveSavedContent(haiku: NonNullable<HaikuContainerProps["haiku"]>) {
   return {
     title,
     body: haiku.body,
-    meta: formatCreatedAt(haiku.createdAt),
+    meta: <LocalDateTime iso={haiku.createdAt} />,
     generating: false,
   };
 }
@@ -120,7 +120,7 @@ function LanternContent({
 }: {
   title?: string;
   body: string;
-  meta?: string;
+  meta?: ReactNode;
   bodyOnly: boolean;
   typing: boolean;
   actions?: ReactNode;

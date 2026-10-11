@@ -6,7 +6,7 @@ import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
-import { formatCreatedAt } from "@/utils/date";
+import { LocalDateTime } from "@/components/LocalDateTime";
 import { formatHaikuTitle } from "@/utils/strings";
 import { HaikuActions } from "./HaikuActions";
 import { GENERATING_HAIKU_CARD_MOTION } from "./haikuCardMotion";
@@ -59,7 +59,9 @@ export const HaikuContainer = (props: HaikuContainerProps) => {
         <HaikuActions variant="saved" haiku={haiku} onDeleted={onDeleted} onChanged={onChanged} />
       </div>
       <div className={styles.titleRow}>{formatHaikuTitle(haiku)}</div>
-      <div className={styles.meta}>{formatCreatedAt(haiku.createdAt)}</div>
+      <div className={styles.meta}>
+        <LocalDateTime iso={haiku.createdAt} />
+      </div>
       <div className={styles.body}>{haiku.body}</div>
       <div className={styles.labels}>
         {haiku.labels.map((label) => {
