@@ -22,6 +22,7 @@ const config: Config = {
   testPathIgnorePatterns: [
     "/node_modules/",
     "<rootDir>/tests/playwright/",
+    "<rootDir>/tests/playwright-app/",
   ],
 };
 

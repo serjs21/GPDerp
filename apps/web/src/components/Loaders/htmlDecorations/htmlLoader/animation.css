@@ -18,7 +18,8 @@ html[data-hydrated="true"] .scene-container {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  pointer-events: none; 
+  /* Blocks clicks on the hidden page while it waits for critical art. */
+  pointer-events: auto;
   display: flex;
   justify-content: center;
   align-items: center;

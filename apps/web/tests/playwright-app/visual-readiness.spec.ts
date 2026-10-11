@@ -186,6 +186,22 @@ test.describe("first-load visual readiness", () => {
     expect((await readProbe(page)).visualReady).toBe("ready");
   });
 
+  test("CSS-only mountain mask is part of the shell's readiness", async ({ page }) => {
+    await mockApi(page, { loggedIn: false });
+    const mountainMask = await holdRequests(page, MOUNTAIN_MASK);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll<HTMLImageElement>("img")]
+        .filter((img) => img.src.includes("/background/"))
+        .every((img) => img.complete && img.naturalWidth > 0),
+    );
+    expect(await isRevealed(page)).toBe(false);
+
+    mountainMask.release();
+    await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+    expect((await readProbe(page)).visualReady).toBe("ready");
+  });
+
   test("failed background reveals degraded within the cap, without a broken frame", async ({ page }) => {
     await mockApi(page, { loggedIn: false });
     await holdRequests(page, BACKGROUND, "abort");
