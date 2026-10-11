@@ -4,6 +4,7 @@ import storybook from "eslint-plugin-storybook";
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
+import localRules from "./eslint-rules/index.mjs";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -50,6 +51,17 @@ const eslintConfig = defineConfig([
     rules: {
       complexity: "off",
       "max-lines-per-function": "off",
+    },
+  },
+  {
+    // Component complexity <= 5 (classic). No directory carve-outs: animation components opt out
+    // individually with `@animationComponent <reason>`. Legacy debt lives in eslint-suppressions.json;
+    // `pnpm lint:components:changed` holds new/modified components to the limit without suppressions.
+    files: ["src/**/*.tsx"],
+    ignores: ["**/*.stories.tsx", "**/*.test.tsx"],
+    plugins: { local: localRules },
+    rules: {
+      "local/component-complexity": ["error", { max: 5 }],
     },
   },
   // Override default ignores of eslint-config-next.

@@ -1,0 +1,397 @@
+{
+  "src/app/settings/page.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/app/share/[shareHash]/SharedHaikuLantern.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/AuthFlows/LoginFlow.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/AuthFlows/RegisterFlow.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/AuthLanterns/LoginLantern.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/AuthLanterns/RegisterLantern.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/AuthenticationNav/UserAvatar.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/BrushMenu/BrushMenu.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/BrushMenu/BrushOption.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/CelestialScene/CelestialStoryControls.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/CelestialThemeClock/CelestialThemeClock.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/CelestialThemeSelector/CelestialThemeSelector.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ComicBurstLabel/ComicBurstLabel.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ComicButton/ComicButton.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ComicConfirmModal/ComicConfirmModal.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ComicDialogContent/ComicDialogContent.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ComicLabelCreationModal/ComicLabelCreationModal.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ComicLabelPickerPanel/ComicLabelPickerPanel.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ComicPageLayout/ComicPageCtaAction.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ComicPageLayout/ComicPageDialog.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ComicPageLayout/ComicPagePanel.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ComicToast/ComicToastItem.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/CreationModal/CreationModal.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/DualityButton/CoverLabel.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/DualityButton/CoverState.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/DualityButton/DualityButton.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/DualityButton/DualityFaceIcon.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/HaikuContainer/HaikuActions.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/HeaderHaikuTools/HeaderSearchButton.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/HoverHoldCallout/HoverHoldCallout.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/IconUploader/IconUploader.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/LabelHalo/LabelHalo.tsx": {
+    "local/component-complexity": {
+      "count": 2
+    }
+  },
+  "src/components/LabelHalo/LabelSlot.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/LabelMethodIcon/LabelMethodIcon.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/LabelSort/LabelSort.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/Lantern/LabelBelt.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/Lantern/Lantern.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/Lantern/LanternFrame.tsx": {
+    "local/component-complexity": {
+      "count": 2
+    }
+  },
+  "src/components/Lantern/LanternPath/LanternPath.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/Lantern/LanternPath/LanternPathLantern.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/Lantern/LanternPath/LanternPathStage.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/Lantern/LanternRotatedShell.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/LanternSubmit/LanternSubmit.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/LibraryCard/LibraryCard.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/Loaders/contentLoaders/SakuraPetalLoader.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/LocaleBubbleSelector/LocaleBubbleSelector.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ManageLabel/LabelActions.tsx": {
+    "local/component-complexity": {
+      "count": 2
+    }
+  },
+  "src/components/ManageLabel/ManageLabel.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ManageLabel/ManageLabelsPanel.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/OrderDropdown/OrderDropdown.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/PaperModal/PaperModal.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/PathOverlay/PathOverlay.tsx": {
+    "local/component-complexity": {
+      "count": 2
+    }
+  },
+  "src/components/PostSignInput/PostSignInput.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ResetPasswordModal/ResetPasswordModal.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/RestartLinkButton/RestartLinkButton.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/RotationTable/RotationTable.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/SVGPath/CreationPathLantern.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/SVGPath/SVGPath.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/SVGPath/SVGPathLantern.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/SavedHaikusLanternPath/SavedHaikusLanternPath.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ShareLink/ShareLink.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ShareLink/ShareLinkLifecycleAction.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ShareLink/ShareLinkSettingsControls.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ShareLinkActions/ShareLinkActionButton.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ShareLinkActions/ShareLinkLabelsToggle.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ShareLinkActions/ShareLinkUpdateAction.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ShareLinkLanternPanel/ShareLinkLanternPanel.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ShareLinkManagement/ShareLinkManagementRow.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ShareLinkPreviewModal/ShareLinkPreviewModal.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ShareLinksSort/ShareLinksSort.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ShareModal/SendShareEmailContent.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ShareModal/ShareEmailSendPanel.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ShareModal/ShareModal.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/StyleNavigationWheel/StyleNavigationWheel.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/Sway/Sway.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/TextBubbleDropdown/TextBubbleDropdown.tsx": {
+    "local/component-complexity": {
+      "count": 3
+    }
+  },
+  "src/components/VerifyEmail/VerifyEmailCard.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/animations/SteppedTransition/SteppedTransition.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ui/index.tsx": {
+    "local/component-complexity": {
+      "count": 1
+    }
+  }
+}
