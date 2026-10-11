@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type ComponentType,
-} from "react";
+import { useRef, type ComponentType } from "react";
 import { Languages } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { DE, ES, FR, IT, JP, PT, TH, US } from "country-flag-icons/react/3x2";
@@ -17,12 +11,10 @@ import {
 } from "@/components/TextBubbleDropdown";
 import type { AppLocale } from "@/config/userConfiguration";
 import type { LocaleOption } from "@/components/LocaleSelector";
-import {
-  languageMatchesQuery,
-  nativeLanguageLabel,
-} from "./localeLanguageLabels";
+import { nativeLanguageLabel } from "./localeLanguageLabels";
 import { LocaleSearchHeader } from "./LocaleSearchHeader";
 import { useFocusSearchOnPanelReady } from "./useFocusSearchOnPanelReady";
+import { useLocaleSearchMenu } from "./useLocaleSearchMenu";
 import styles from "./LocaleBubbleSelector.module.css";
 
 type FlagComponent = ComponentType<{
@@ -48,6 +40,7 @@ export type LocaleBubbleSelectorProps = {
   className?: string;
   ariaLabel?: string;
   placeholder?: string;
+  /** Defaults to the dropdown's own `down` / `top-left`. */
   dropDirection?: TextBubbleDropDirection;
   tailDirection?: TextBubbleTailDirection;
   open?: boolean;
@@ -67,49 +60,26 @@ export function LocaleBubbleSelector({
   className,
   ariaLabel,
   placeholder: placeholderProp,
-  dropDirection = "down",
-  tailDirection = "top-left",
+  dropDirection,
+  tailDirection,
   open: openProp,
-  defaultOpen = false,
+  defaultOpen,
   onOpenChange,
   disabled,
 }: LocaleBubbleSelectorProps) {
   const t = useTranslations("Profile");
   const placeholder = placeholderProp ?? t("language");
   const searchInputRef = useRef<HTMLInputElement | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
-  const isControlled = openProp !== undefined;
-  const open = isControlled ? Boolean(openProp) : uncontrolledOpen;
+  const { open, handleOpenChange, searchQuery, setSearchQuery, filteredOptions } = useLocaleSearchMenu({
+    options,
+    openProp,
+    defaultOpen,
+    onOpenChange,
+  });
 
   const SelectedFlag = LOCALE_FLAGS[value];
-  const selectedLabel = nativeLanguageLabel(value);
-  const mergedAriaLabel = ariaLabel ?? t("languageAriaLabel", { language: selectedLabel });
-
-  const labeledOptions = useMemo(
-    () =>
-      options.map((option) => ({
-        value: option.value,
-        label: nativeLanguageLabel(option.value),
-      })),
-    [options],
-  );
-
-  const filteredOptions = useMemo(() => {
-    if (!searchQuery.trim()) return labeledOptions;
-    return labeledOptions.filter((option) =>
-      languageMatchesQuery(option.value, searchQuery),
-    );
-  }, [labeledOptions, searchQuery]);
-
-  const handleOpenChange = useCallback(
-    (next: boolean) => {
-      if (!isControlled) setUncontrolledOpen(next);
-      onOpenChange?.(next);
-      if (!next) setSearchQuery("");
-    },
-    [isControlled, onOpenChange],
-  );
+  const mergedAriaLabel =
+    ariaLabel ?? t("languageAriaLabel", { language: nativeLanguageLabel(value) });
 
   useFocusSearchOnPanelReady(open, disabled, searchInputRef);
 

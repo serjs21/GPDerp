@@ -4,4 +4,4 @@
  * minus room for the " (n)" duplicate suffix. Keep in sync with the API's
  * `HAIKU_TITLE_MAX_CHARS`.
  */
-export const HAIKU_TITLE_MAX_CHARS = 72;
+export const HAIKU_TITLE_MAX_CHARS = 110;

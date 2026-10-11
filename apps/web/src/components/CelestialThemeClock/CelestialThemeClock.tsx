@@ -103,7 +103,7 @@ export const CelestialThemeClock = forwardRef<
   };
 
   return (
-    <div className={`${styles.root}${className ? ` ${className}` : ""}`}>
+    <div className={[styles.root, className].filter(Boolean).join(" ")}>
       <RotationTable
         className={styles.dialTable}
         fill

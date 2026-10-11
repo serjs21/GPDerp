@@ -3,33 +3,33 @@
   "scenario": "Click the Alpacabet sort coin on /settings?tab=labels until every label row renders sorted",
   "datasetSize": 1000,
   "samples": [
-    19744.8,
-    22965,
-    20747.6,
-    20719.4,
-    22539.2,
-    20521.3,
-    19234.2
+    37938.8,
+    24537.2,
+    25677.3,
+    23340,
+    29513.5,
+    22543.5,
+    29984.3
   ],
   "extra": {
     "labelPageRequests": 83,
-    "maxEventDuration": 96,
-    "longTasksPerRun": 117,
-    "longTaskMsPerRun": 10881
+    "maxEventDuration": 32,
+    "longTasksPerRun": 156,
+    "longTaskMsPerRun": 14616
   },
   "environment": {
-    "gitSha": "921265e",
-    "gitDirty": false,
-    "buildId": "bh4JPOG5QlZbqtCVQ4Hws",
+    "gitSha": "0186fb8",
+    "gitDirty": true,
+    "buildId": "D9S5_9iJ34bzy8bd4toy9",
     "nodeEnv": "production",
     "browser": "chromium 145.0.7632.6",
     "viewport": "1280x720",
     "cpuThrottle": 1,
     "platform": "darwin arm64 Apple M2 Pro",
-    "timestamp": "2026-10-11T21:33:26.571Z"
+    "timestamp": "2026-10-11T22:45:02.300Z"
   },
   "runs": 7,
   "unit": "ms",
-  "median": 20719.4,
-  "p95": 22965
+  "median": 25677.3,
+  "p95": 37938.8
 }

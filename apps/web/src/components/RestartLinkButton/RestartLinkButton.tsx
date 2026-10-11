@@ -1,163 +1,25 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState, type CSSProperties, type FocusEvent } from "react";
+import { useMemo, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { ComicPressButton } from "@/components/ComicPressButton";
+import { withDefaults } from "@/utils/props/withDefaults";
+import { HOVER_LABEL, RESTART_LINK_BUTTON_DEFAULTS } from "./consts/restartLinkButtonConsts";
+import { RestartButtonFace } from "./RestartButtonFace";
+import type { RestartLinkButtonProps } from "./RestartLinkButton.types";
+import { RestartReviveLockup } from "./RestartReviveLockup";
 import styles from "./RestartLinkButton.module.css";
-import {
-  useRestartLinkButtonAnimation,
-  type RestartLinkButtonAnimationRefs,
-} from "./useRestartLinkButtonAnimation";
+import { useRestartLinkButtonAnimation, type RestartLinkButtonAnimationRefs } from "./useRestartLinkButtonAnimation";
+import { useRestartLinkHover } from "./useRestartLinkHover";
+import { restartLinkRootStyle } from "./utils/restartLinkButtonUtils";
 
-export type RestartLinkReason = "expired" | "limit_reached";
+export type { RestartLinkButtonProps, RestartLinkReason } from "./RestartLinkButton.types";
 
-export type RestartLinkButtonProps = {
-  reason: RestartLinkReason;
-  onClick?: () => void;
-  disabled?: boolean;
-  className?: string;
-  /** Keep the hover lockup visible (Storybook / previews). */
-  forceHover?: boolean;
-  /** Banner left, as a percent of the expired emblem. Default 50. */
-  reviveTextX?: number;
-  /** Banner top, as a percent of the expired emblem. Default 50. */
-  reviveTextY?: number;
-  /** Banner rotation in degrees. Default -3. */
-  reviveTextRotate?: number;
-};
-
-const FILTER_ICON_SRC: Record<RestartLinkReason, string> = {
-  expired: "/share_links_filter/expired.svg",
-  limit_reached: "/share_links_filter/limit_reached.svg",
-};
-
-const IDLE_LABEL: Record<RestartLinkReason, string> = {
-  expired: "expired",
-  limit_reached: "limitReached",
-};
-
-const HOVER_LABEL: Record<RestartLinkReason, string> = {
-  expired: "revive",
-  limit_reached: "resurrect",
-};
-
-const HIPOINTS_SRC = "/profile/re-hipoints.svg";
-const RE_EXPIRED_SRC = "/profile/re-expired.svg";
-
-function reviveBannerStyle(x: number, y: number, rotate: number): CSSProperties {
-  return {
-    "--revive-banner-x": `${String(x)}%`,
-    "--revive-banner-y": `${String(y)}%`,
-    "--revive-banner-rotate": `${String(rotate)}deg`,
-  } as CSSProperties;
-}
-
-function CharLine({
-  text,
-  className,
-  lineRef,
-}: {
-  text: string;
-  className: string;
-  lineRef: RestartLinkButtonAnimationRefs["idleChars"];
-}) {
-  return (
-    <span ref={lineRef} className={className} aria-hidden>
-      {Array.from(text).map((ch, index) => (
-        <span key={`${ch}-${String(index)}`} className={styles.char} data-restart-char>
-          {ch === " " ? "\u00a0" : ch}
-        </span>
-      ))}
-    </span>
+export function RestartLinkButton(props: RestartLinkButtonProps) {
+  const { reason, disabled, className, forceHover, reviveTextX, reviveTextY, reviveTextRotate } = withDefaults(
+    props,
+    RESTART_LINK_BUTTON_DEFAULTS,
   );
-}
-
-function HipointsMark({ markRef }: { markRef: RestartLinkButtonAnimationRefs["hipoints"] }) {
-  return (
-    <span className={styles.hipointsWell} aria-hidden>
-      <span ref={markRef} className={styles.hipointsIcon}>
-        {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
-        <img src={HIPOINTS_SRC} alt="" className={styles.hipointsGlyph} />
-      </span>
-    </span>
-  );
-}
-
-function ReviveLockup({
-  lockupRef,
-  bannerRef,
-}: {
-  lockupRef: RestartLinkButtonAnimationRefs["reviveLockup"];
-  bannerRef: RestartLinkButtonAnimationRefs["reviveBanner"];
-}) {
-  const t = useTranslations("RestartLinkButton");
-  return (
-    <span ref={lockupRef} className={styles.reviveLockup} aria-hidden>
-      {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
-      <img src={RE_EXPIRED_SRC} alt="" className={styles.reviveEmblem} />
-      <span ref={bannerRef} className={styles.reviveBanner}>
-        <span className={styles.reviveText}>{t("revive")}</span>
-      </span>
-    </span>
-  );
-}
-
-function ButtonFace({
-  reason,
-  showHipoints,
-  idleFace,
-  idleChars,
-  hoverChars,
-  hipoints,
-  filterIcon,
-}: {
-  reason: RestartLinkReason;
-  showHipoints: boolean;
-  idleFace: RestartLinkButtonAnimationRefs["idleFace"];
-  idleChars: RestartLinkButtonAnimationRefs["idleChars"];
-  hoverChars: RestartLinkButtonAnimationRefs["hoverChars"];
-  hipoints: RestartLinkButtonAnimationRefs["hipoints"];
-  filterIcon: RestartLinkButtonAnimationRefs["filterIcon"];
-}) {
-  const t = useTranslations("RestartLinkButton");
-  return (
-    <span
-      ref={idleFace}
-      className={[styles.row, showHipoints ? styles.rowWithHipoints : ""].filter(Boolean).join(" ")}
-    >
-      <span className={styles.iconCluster}>
-        {showHipoints ? <HipointsMark markRef={hipoints} /> : null}
-        <span className={styles.iconStage} aria-hidden>
-          <span ref={filterIcon} className={styles.filterIcon}>
-            {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
-            <img src={FILTER_ICON_SRC[reason]} alt="" className={styles.filterGlyph} />
-          </span>
-        </span>
-      </span>
-      <span className={styles.labelSlot}>
-        <CharLine text={t(IDLE_LABEL[reason])} className={styles.labelLine} lineRef={idleChars} />
-        {showHipoints ? (
-          <CharLine
-            text={t(HOVER_LABEL.limit_reached)}
-            className={[styles.labelLine, styles.labelLineHover].join(" ")}
-            lineRef={hoverChars}
-          />
-        ) : null}
-      </span>
-    </span>
-  );
-}
-
-export function RestartLinkButton({
-  reason,
-  onClick,
-  disabled = false,
-  className,
-  forceHover = false,
-  reviveTextX = 50,
-  reviveTextY = 80,
-  reviveTextRotate = -3,
-}: RestartLinkButtonProps) {
   const t = useTranslations("RestartLinkButton");
   const idleFace = useRef<HTMLElement | null>(null);
   const idleChars = useRef<HTMLElement | null>(null);
@@ -166,8 +28,6 @@ export function RestartLinkButton({
   const filterIcon = useRef<HTMLElement | null>(null);
   const reviveLockup = useRef<HTMLElement | null>(null);
   const reviveBanner = useRef<HTMLElement | null>(null);
-  const [pointerInside, setPointerInside] = useState(false);
-  const [focusVisible, setFocusVisible] = useState(false);
 
   const refs = useMemo<RestartLinkButtonAnimationRefs>(
     () => ({
@@ -182,28 +42,19 @@ export function RestartLinkButton({
     [],
   );
 
-  const expanded = !disabled && (forceHover || pointerInside || focusVisible);
-  useRestartLinkButtonAnimation(expanded, !disabled, refs, reason, forceHover);
-
-  const syncFocusVisible = useCallback((event: FocusEvent<HTMLButtonElement>) => {
-    setFocusVisible(event.currentTarget.matches(":focus-visible"));
-  }, []);
-
-  const showRevive = reason === "expired";
+  const hover = useRestartLinkHover(disabled, forceHover);
+  useRestartLinkButtonAnimation(hover.expanded, !disabled, refs, reason, forceHover);
 
   return (
     <ComicPressButton
       className={[styles.root, className].filter(Boolean).join(" ")}
-      style={showRevive ? reviveBannerStyle(reviveTextX, reviveTextY, reviveTextRotate) : undefined}
+      style={restartLinkRootStyle(reason, { x: reviveTextX, y: reviveTextY, rotate: reviveTextRotate })}
       disabled={disabled}
       aria-label={t(HOVER_LABEL[reason])}
-      onClick={onClick}
-      onMouseEnter={() => setPointerInside(true)}
-      onMouseLeave={() => setPointerInside(false)}
-      onFocus={syncFocusVisible}
-      onBlur={() => setFocusVisible(false)}
+      onClick={props.onClick}
+      {...hover.handlers}
     >
-      <ButtonFace
+      <RestartButtonFace
         reason={reason}
         showHipoints={reason === "limit_reached"}
         idleFace={idleFace}
@@ -212,7 +63,7 @@ export function RestartLinkButton({
         hipoints={hipoints}
         filterIcon={filterIcon}
       />
-      {showRevive ? <ReviveLockup lockupRef={reviveLockup} bannerRef={reviveBanner} /> : null}
+      {reason === "expired" ? <RestartReviveLockup lockupRef={reviveLockup} bannerRef={reviveBanner} /> : null}
     </ComicPressButton>
   );
 }

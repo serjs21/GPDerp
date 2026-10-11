@@ -1,72 +1,39 @@
 "use client";
 
-import { forwardRef, useCallback, useRef, type CSSProperties, type ReactNode } from "react";
+import { forwardRef, useCallback, useRef } from "react";
+import { withDefaults } from "@/utils/props/withDefaults";
 import { ComicBubbleStage } from "../ComicConfirmModal/ComicBubbleStage";
-import stageStyles from "../ComicConfirmModal/comicBubbleStage.module.css";
-import type { ComicBubbleStyle } from "../ComicConfirmModal/comicBubblePresets";
+import type { ComicButtonProps } from "./ComicButton.types";
 import {
-  stagePaddingClassForDirection,
-  type ComicSourceDirection,
-} from "../ComicConfirmModal/comicSourceDirection";
-import {
-  COMIC_PANEL_COLORS,
-  type ComicPanelColor,
-  type ComicPanelNamedColor,
-} from "../ComicPageLayout/comicPagePresets";
+  comicButtonAppearance,
+  comicButtonStageClassName,
+  comicButtonTargetsKey,
+} from "./utils/comicButtonUtils";
 import styles from "./ComicButton.module.css";
 
-export type ComicButtonMode = "standalone" | "embedded";
+export type { ComicButtonMode, ComicButtonProps } from "./ComicButton.types";
 
-function resolveFontColor(fontColor: ComicPanelColor | (string & {}) | undefined): string | undefined {
-  if (!fontColor) return undefined;
-  if (Object.prototype.hasOwnProperty.call(COMIC_PANEL_COLORS, fontColor)) {
-    return COMIC_PANEL_COLORS[fontColor as ComicPanelNamedColor].base;
-  }
-  return fontColor;
-}
-
-export type ComicButtonProps = {
-  children: ReactNode;
-  bubbleStyle?: ComicBubbleStyle;
-  /** Where the speech originates; `none` renders a tail-less bubble. */
-  sourceDirection?: ComicSourceDirection;
-  mode?: ComicButtonMode;
-  /** Embedded modal CTA placement. */
-  slot?: "start" | "end" | "center";
-  disabled?: boolean;
-  className?: string;
-  style?: CSSProperties;
-  type?: "button" | "submit" | "reset";
-  onClick?: () => void;
-  /** Comical bubble fill(s). */
-  backgroundColors?: string[];
-  /** Label color: panel token (e.g. `darkGreen`) or any CSS color. */
-  fontColor?: ComicPanelColor | (string & {});
-};
+const COMIC_BUTTON_DEFAULTS = {
+  bubbleStyle: "speech",
+  sourceDirection: "none",
+  mode: "standalone",
+  slot: "center",
+  disabled: false,
+  type: "button",
+} as const;
 
 export const ComicButton = forwardRef<HTMLButtonElement, ComicButtonProps>(function ComicButton(
-  {
-    children,
-    bubbleStyle = "speech",
-    sourceDirection = "none",
-    mode = "standalone",
-    slot = "center",
-    disabled = false,
-    className,
-    style,
-    type = "button",
-    onClick,
-    backgroundColors,
-    fontColor,
-  },
+  props,
   ref,
 ) {
+  const { bubbleStyle, sourceDirection, mode, slot, disabled, type } = withDefaults(
+    props,
+    COMIC_BUTTON_DEFAULTS,
+  );
+  const { children, className, onClick, backgroundColors } = props;
   const stageRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
-  const resolvedFontColor = resolveFontColor(fontColor);
-  const buttonStyle = resolvedFontColor
-    ? ({ ...style, color: resolvedFontColor } as CSSProperties)
-    : style;
+  const appearance = comicButtonAppearance(props.style, props.fontColor);
 
   const setButtonRef = (node: HTMLButtonElement | null) => {
     buttonRef.current = node;
@@ -89,16 +56,13 @@ export const ComicButton = forwardRef<HTMLButtonElement, ComicButtonProps>(funct
     [backgroundColors, bubbleStyle, sourceDirection],
   );
 
-  const labelKey = typeof children === "string" ? children : "node";
-  const colorsKey = backgroundColors?.join(",") ?? "";
-
   if (mode === "embedded") {
     return (
       <button
         ref={setButtonRef}
         type={type}
         className={[styles.bubbleEmbedded, className].filter(Boolean).join(" ")}
-        style={buttonStyle}
+        style={appearance.style}
         disabled={disabled}
         data-comic-role="cta"
         data-comic-slot={slot}
@@ -111,29 +75,25 @@ export const ComicButton = forwardRef<HTMLButtonElement, ComicButtonProps>(funct
     );
   }
 
-  const stagePaddingClass = stagePaddingClassForDirection(sourceDirection, {
-    stageTailBottom: styles.stageTailBottom,
-    stageTailTop: styles.stageTailTop,
-    stageTailLeft: styles.stageTailLeft,
-    stageTailRight: styles.stageTailRight,
-    stageCompact: styles.stageCompact,
-  });
-
   return (
     <ComicBubbleStage
       ref={stageRef}
       active
-      targetsKey={`btn:${bubbleStyle}:${sourceDirection}:${labelKey}:${colorsKey}:${resolvedFontColor ?? ""}`}
+      targetsKey={comicButtonTargetsKey({
+        bubbleStyle,
+        sourceDirection,
+        children,
+        backgroundColors,
+        color: appearance.color,
+      })}
       getTargets={getTargets}
-      className={[stageStyles.stage, styles.stageStandalone, stagePaddingClass, className]
-        .filter(Boolean)
-        .join(" ")}
+      className={comicButtonStageClassName(sourceDirection, className)}
     >
       <button
         ref={setButtonRef}
         type={type}
         className={styles.bubble}
-        style={buttonStyle}
+        style={appearance.style}
         disabled={disabled}
         data-bubble-style={bubbleStyle}
         data-source-direction={sourceDirection}

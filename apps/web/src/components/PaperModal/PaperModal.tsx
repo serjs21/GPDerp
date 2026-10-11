@@ -1,13 +1,15 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useTranslations } from "next-intl";
+import { AnimatePresence, motion } from "motion/react";
 import type { CSSProperties, ReactNode } from "react";
+import { withDefaults } from "@/utils/props/withDefaults";
+import { PaperModalBody } from "./PaperModalBody";
 import { PaperRoughFrame } from "./PaperRoughFrame";
 import { PaperSurface } from "./PaperSurface";
-import { resolvePaperMotion, type PaperMotionPreset } from "./paperMotion";
+import type { PaperMotionPreset } from "./paperMotion";
 import { PAPER_SIZE_MAX_WIDTH, type PaperModalSize } from "./paperTokens";
+import { usePaperMotionVariants } from "./usePaperMotionVariants";
 import styles from "./PaperModal.module.css";
 
 export type PaperModalProps = {
@@ -28,29 +30,31 @@ export type PaperModalProps = {
   closeOnOverlayClick?: boolean;
 };
 
-export function PaperModal({
-  open,
-  onOpenChange,
-  title,
-  description,
-  children,
-  footer,
-  motionPreset = "dropSettle",
-  size = "md",
-  showClose = true,
-  roughSeed = 42,
-  className,
-  closeOnOverlayClick = true,
-}: PaperModalProps) {
-  const t = useTranslations("PaperModal");
-  const reduceMotion = useReducedMotion();
-  const motionBundle = resolvePaperMotion(motionPreset);
-  const overlayVariants = reduceMotion ? motionBundle.reducedOverlay : motionBundle.overlay;
-  const paperVariants = reduceMotion ? motionBundle.reducedPaper : motionBundle.paper;
+const PAPER_MODAL_DEFAULTS = {
+  motionPreset: "dropSettle",
+  size: "md",
+  showClose: true,
+  roughSeed: 42,
+  closeOnOverlayClick: true,
+} as const;
 
-  const paperStyle = {
-    "--paper-modal-max-width": PAPER_SIZE_MAX_WIDTH[size],
-  } as CSSProperties;
+/** Waits for the paper's exit before the content root unmounts. */
+const CONTENT_ROOT_VARIANTS = {
+  initial: {},
+  animate: {},
+  exit: { transition: { when: "afterChildren" } },
+} as const;
+
+export function PaperModal(props: PaperModalProps) {
+  const { motionPreset, size, showClose, roughSeed, closeOnOverlayClick } = withDefaults(
+    props,
+    PAPER_MODAL_DEFAULTS,
+  );
+  const { open, onOpenChange, title, description, children, footer, className } = props;
+  const variants = usePaperMotionVariants(motionPreset);
+  const keepOpenOnOutside = (event: Event) => {
+    if (!closeOnOverlayClick) event.preventDefault();
+  };
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -60,7 +64,7 @@ export function PaperModal({
             <Dialog.Overlay asChild forceMount key="paper-modal-overlay">
               <motion.div
                 className={styles.overlay}
-                variants={overlayVariants}
+                variants={variants.overlay}
                 initial="initial"
                 animate="animate"
                 exit="exit"
@@ -75,63 +79,31 @@ export function PaperModal({
               asChild
               forceMount
               key="paper-modal-content"
-              onPointerDownOutside={(event) => {
-                if (!closeOnOverlayClick) event.preventDefault();
-              }}
-              onInteractOutside={(event) => {
-                if (!closeOnOverlayClick) event.preventDefault();
-              }}
+              onPointerDownOutside={keepOpenOnOutside}
+              onInteractOutside={keepOpenOnOutside}
             >
               <motion.div
                 className={styles.contentRoot}
                 initial="initial"
                 animate="animate"
                 exit="exit"
-                variants={{
-                  initial: {},
-                  animate: {},
-                  exit: { transition: { when: "afterChildren" } },
-                }}
+                variants={CONTENT_ROOT_VARIANTS}
               >
                 <motion.div
                   className={[styles.paper, className].filter(Boolean).join(" ")}
-                  style={paperStyle}
-                  variants={paperVariants}
+                  style={{ "--paper-modal-max-width": PAPER_SIZE_MAX_WIDTH[size] } as CSSProperties}
+                  variants={variants.paper}
                 >
                   <PaperSurface />
                   <PaperRoughFrame seed={roughSeed} />
-
-                  <div className={styles.body}>
-                    {(title || showClose) && (
-                      <div className={styles.header}>
-                        {title ? (
-                          <Dialog.Title className={styles.title}>{title}</Dialog.Title>
-                        ) : (
-                          <Dialog.Title className={styles.visuallyHidden}>{t("dialog")}</Dialog.Title>
-                        )}
-                        {showClose ? (
-                          <Dialog.Close asChild>
-                            <button type="button" className={styles.closeButton} aria-label={t("close")}>
-                              ×
-                            </button>
-                          </Dialog.Close>
-                        ) : null}
-                      </div>
-                    )}
-
-                    {!title && !showClose ? (
-                      <Dialog.Title className={styles.visuallyHidden}>{t("dialog")}</Dialog.Title>
-                    ) : null}
-
-                    {description ? (
-                      <Dialog.Description className={styles.description}>{description}</Dialog.Description>
-                    ) : (
-                      <Dialog.Description className={styles.visuallyHidden}> </Dialog.Description>
-                    )}
-
-                    {children ? <div className={styles.children}>{children}</div> : null}
-                    {footer ? <div className={styles.footer}>{footer}</div> : null}
-                  </div>
+                  <PaperModalBody
+                    title={title}
+                    description={description}
+                    showClose={showClose}
+                    footer={footer}
+                  >
+                    {children}
+                  </PaperModalBody>
                 </motion.div>
               </motion.div>
             </Dialog.Content>

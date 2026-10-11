@@ -10,32 +10,47 @@ import { ShareLinkActionButton } from "./ShareLinkActionButton";
 import type { ShareLinkLabelsToggleProps } from "./ShareLinkLabelsToggle.types";
 import styles from "./ShareLinkActions.module.css";
 
+const DEFAULT_LAYOUTS = { show: SHARE_LINK_ACTION_LAYOUTS.showLabels, hide: SHARE_LINK_ACTION_LAYOUTS.hideLabels };
+
+const LABELS_TOGGLE_VARIANTS = {
+  show: {
+    placement: "show",
+    captionKey: "visible",
+    src: SHARE_LINK_ACTION_ICONS.showLabels,
+    colors: SHARE_LINK_ACTION_COLORS.showLabels,
+  },
+  hide: {
+    placement: "hide",
+    captionKey: "hidden",
+    src: SHARE_LINK_ACTION_ICONS.hideLabels,
+    colors: SHARE_LINK_ACTION_COLORS.hideLabels,
+  },
+} as const;
+
 /** Show/hide labels panel toggle; fills its parent box. */
 export function ShareLinkLabelsToggle({
   subject,
   showLabels,
   togglingLabels,
   onToggleLabels,
-  layouts = { show: SHARE_LINK_ACTION_LAYOUTS.showLabels, hide: SHARE_LINK_ACTION_LAYOUTS.hideLabels },
+  layouts,
   rowLayouts,
   captionClassName,
-  disabled = false,
+  disabled,
 }: ShareLinkLabelsToggleProps) {
   const t = useTranslations("ShareLinkActions.labelsToggle");
-  const colors = showLabels
-    ? SHARE_LINK_ACTION_COLORS.showLabels
-    : SHARE_LINK_ACTION_COLORS.hideLabels;
+  const variant = showLabels ? LABELS_TOGGLE_VARIANTS.show : LABELS_TOGGLE_VARIANTS.hide;
 
   return (
     <ShareLinkActionButton
-      src={showLabels ? SHARE_LINK_ACTION_ICONS.showLabels : SHARE_LINK_ACTION_ICONS.hideLabels}
-      caption={showLabels ? t("visible") : t("hidden")}
+      src={variant.src}
+      caption={t(variant.captionKey)}
       captionClassName={[styles.captionLabels, captionClassName].filter(Boolean).join(" ")}
-      layout={showLabels ? layouts.show : layouts.hide}
-      rowLayout={showLabels ? rowLayouts?.show : rowLayouts?.hide}
+      layout={(layouts ?? DEFAULT_LAYOUTS)[variant.placement]}
+      rowLayout={rowLayouts?.[variant.placement]}
       ariaLabel={t("ariaLabel", { subject })}
-      color={colors.panel}
-      hoverFill={colors.hover}
+      color={variant.colors.panel}
+      hoverFill={variant.colors.hover}
       pressed={showLabels}
       busy={togglingLabels}
       inverted={!showLabels}

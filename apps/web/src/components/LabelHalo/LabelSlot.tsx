@@ -1,24 +1,17 @@
 "use client";
 
-import {
-  useEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-  type FocusEvent,
-  type KeyboardEvent,
-} from "react";
+import { useRef, type CSSProperties } from "react";
 import { useTranslations } from "next-intl";
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { resolveComicLabelShapePreset } from "@/components/ComicLabelCreationModal/comicLabelShapes";
 import { RotationTable } from "@/components/RotationTable";
-import {
-  LABEL_HALO_ROTATE_ICON_SRC,
-  LABEL_SLOT_ROTATE_STEP_DEG,
-  type LabelPlacement,
-} from "./consts/labelHaloConsts";
+import { withDefaults } from "@/utils/props/withDefaults";
+import type { LabelPlacement } from "./consts/labelHaloConsts";
 import { type LabelHaloAnchor } from "./consts/labelHaloConnectionPoints";
+import { LabelSlotRotateControl } from "./LabelSlotRotateControl";
+import { useLabelSlotRotation } from "./useLabelSlotRotation";
+import { labelSlotClassName, mergeRefs, slotControlsVisible } from "./utils/labelSlotUtils";
 import styles from "./LabelSlot.module.css";
 
 export type LabelSlotProps = {
@@ -47,209 +40,69 @@ export type LabelSlotProps = {
   rootRef?: (node: HTMLDivElement | null) => void;
 };
 
-function mergeRefs(
-  ...refs: Array<((node: HTMLDivElement | null) => void) | { current: HTMLDivElement | null } | undefined>
-) {
-  return (node: HTMLDivElement | null) => {
-    for (const ref of refs) {
-      if (!ref) continue;
-      if (typeof ref === "function") ref(node);
-      else ref.current = node;
-    }
-  };
-}
+const LABEL_SLOT_DEFAULTS = { isDragging: false, showRotateControl: true, disabled: false };
 
-function samePlacement(a: LabelPlacement, b: LabelPlacement) {
-  return (
-    a.xPercent === b.xPercent &&
-    a.yPercent === b.yPercent &&
-    a.rotateDeg === b.rotateDeg
-  );
-}
-
-export function LabelSlot({
-  id,
-  name,
-  color,
-  shape,
-  xPercent,
-  yPercent,
-  connection: _connection = "start",
-  rotateDeg,
-  onPlacementCommit,
-  onRotateDraft,
-  isDragging = false,
-  active: activeProp,
-  showRotateControl = true,
-  disabled = false,
-  className,
-  style,
-  rootRef: rootRefProp,
-}: LabelSlotProps) {
+export function LabelSlot(props: LabelSlotProps) {
+  const { id, name, isDragging, showRotateControl, disabled } = withDefaults(props, LABEL_SLOT_DEFAULTS);
   const t = useTranslations("LabelHalo.slot");
   const rootRef = useRef<HTMLDivElement | null>(null);
-  const draftRotateRef = useRef(rotateDeg);
-  const xPercentRef = useRef(xPercent);
-  const yPercentRef = useRef(yPercent);
-  xPercentRef.current = xPercent;
-  yPercentRef.current = yPercent;
-  const onPlacementCommitRef = useRef(onPlacementCommit);
-  onPlacementCommitRef.current = onPlacementCommit;
-  const onRotateDraftRef = useRef(onRotateDraft);
-  onRotateDraftRef.current = onRotateDraft;
-  const [draftRotateDeg, setDraftRotateDeg] = useState(rotateDeg);
-  const [selected, setSelected] = useState(false);
-  const [isRotateDragging, setIsRotateDragging] = useState(false);
-  const committedRef = useRef<LabelPlacement>({ xPercent, yPercent, rotateDeg });
-
-  useEffect(() => {
-    draftRotateRef.current = rotateDeg;
-    setDraftRotateDeg(rotateDeg);
-  }, [rotateDeg]);
-
-  const preset = resolveComicLabelShapePreset(shape);
-  const controlsVisible =
-    showRotateControl &&
-    !isDragging &&
-    (Boolean(activeProp) || selected || isRotateDragging);
-
-  const commitIfChanged = () => {
-    const next: LabelPlacement = {
-      xPercent: xPercentRef.current,
-      yPercent: yPercentRef.current,
-      rotateDeg: draftRotateRef.current,
-    };
-    if (samePlacement(committedRef.current, next)) return;
-    committedRef.current = next;
-    onPlacementCommitRef.current?.(next);
-  };
-
-  const setDraft = (next: number) => {
-    draftRotateRef.current = next;
-    setDraftRotateDeg(next);
-    onRotateDraftRef.current?.(next);
-  };
-
-  const nudge = (delta: number) => {
-    setDraft(draftRotateRef.current + delta);
-    setSelected(true);
-  };
-
-  const blurSelection = () => {
-    setSelected(false);
-    setIsRotateDragging(false);
-    commitIfChanged();
-  };
-
-  const onFocusOut = (event: FocusEvent<HTMLDivElement>) => {
-    const next = event.relatedTarget;
-    if (next instanceof Node && rootRef.current?.contains(next)) return;
-    blurSelection();
-  };
-
-  useEffect(() => {
-    if (!selected && !isRotateDragging) return;
-
-    const onPointerDown = (event: PointerEvent) => {
-      const target = event.target;
-      if (!(target instanceof Node)) return;
-      if (rootRef.current?.contains(target)) return;
-      setSelected(false);
-      setIsRotateDragging(false);
-      commitIfChanged();
-    };
-
-    document.addEventListener("pointerdown", onPointerDown, true);
-    return () => document.removeEventListener("pointerdown", onPointerDown, true);
-  }, [selected, isRotateDragging]);
-
-  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (disabled) return;
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      nudge(-LABEL_SLOT_ROTATE_STEP_DEG);
-    } else if (event.key === "ArrowRight") {
-      event.preventDefault();
-      nudge(LABEL_SLOT_ROTATE_STEP_DEG);
-    } else if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      setSelected(true);
-    } else if (event.key === "Escape") {
-      event.preventDefault();
-      blurSelection();
-      rootRef.current?.blur();
-    }
-  };
-
-  const rotateControl = showRotateControl ? (
-    <button
-      type="button"
-      className={styles.rotateControl}
-      tabIndex={controlsVisible && !disabled ? 0 : -1}
-      aria-label={t("rotateAriaLabel")}
-      aria-hidden={!controlsVisible}
-      disabled={disabled}
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG asset */}
-      <img
-        className={styles.rotateIcon}
-        src={LABEL_HALO_ROTATE_ICON_SRC}
-        alt=""
-        draggable={false}
-      />
-    </button>
-  ) : null;
+  const rotation = useLabelSlotRotation({
+    xPercent: props.xPercent,
+    yPercent: props.yPercent,
+    rotateDeg: props.rotateDeg,
+    onPlacementCommit: props.onPlacementCommit,
+    onRotateDraft: props.onRotateDraft,
+    disabled,
+    rootRef,
+  });
+  const preset = resolveComicLabelShapePreset(props.shape);
+  const controlsVisible = slotControlsVisible({
+    showRotateControl,
+    isDragging,
+    active: props.active,
+    selected: rotation.selected,
+    isRotateDragging: rotation.isRotateDragging,
+  });
 
   return (
     <div
       id={`label-slot-${id}`}
-      ref={mergeRefs(rootRef, rootRefProp)}
-      className={[
-        styles.slot,
-        controlsVisible ? styles.slotActive : "",
-        isDragging ? styles.slotDragging : "",
-        isRotateDragging ? styles.slotRotateDragging : "",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
-      style={style}
+      ref={mergeRefs(rootRef, props.rootRef)}
+      className={labelSlotClassName({
+        controlsVisible,
+        isDragging,
+        isRotateDragging: rotation.isRotateDragging,
+        className: props.className,
+      })}
+      style={props.style}
       role="group"
       tabIndex={disabled ? -1 : 0}
-      aria-label={t("ariaLabel", { name, degrees: Math.round(draftRotateDeg) })}
+      aria-label={t("ariaLabel", { name, degrees: Math.round(rotation.draftRotateDeg) })}
       aria-disabled={disabled || undefined}
-      onClick={() => {
-        if (!disabled) setSelected(true);
-      }}
-      onFocus={() => {
-        if (!disabled) setSelected(true);
-      }}
-      onBlur={onFocusOut}
-      onKeyDown={onKeyDown}
+      onClick={rotation.select}
+      onFocus={rotation.select}
+      onBlur={rotation.onFocusOut}
+      onKeyDown={rotation.onKeyDown}
     >
       <RotationTable
         className={styles.rotationTable}
-        degrees={draftRotateDeg}
-        onDegreesChange={(next) => {
-          setSelected(true);
-          setIsRotateDragging(true);
-          setDraft(next);
-        }}
-        onDegreesCommit={() => {
-          setIsRotateDragging(false);
-        }}
+        degrees={rotation.draftRotateDeg}
+        onDegreesChange={rotation.rotateTo}
+        onDegreesCommit={rotation.endRotateDrag}
         transformOrigin="center center"
         applyTransform
         valueMode="relative"
         disabled={disabled || !showRotateControl}
         contentClassName={styles.rotateContent}
-        control={rotateControl}
+        control={
+          showRotateControl ? <LabelSlotRotateControl visible={controlsVisible} disabled={disabled} /> : null
+        }
         stopPropagationOnControl
       >
         <div className={styles.burstWrap}>
           <ComicBurstLabel
             text={formatComicLabelText(name)}
-            fill={color}
+            fill={props.color}
             shapeKind={preset.kind}
             spikeCount={preset.spikeCount}
             randomness={preset.randomness}

@@ -10,6 +10,11 @@ export function resolveUserAvatarSrc(avatar?: string | null): string {
   return trimmed ? trimmed : DEFAULT_USER_AVATAR_SRC;
 }
 
+/** First letter of the user name, then email, as the image fallback. */
+function userAvatarInitial(user: UserObject): string {
+  return (user.userName?.slice(0, 1) ?? user.email?.slice(0, 1) ?? "?").toUpperCase();
+}
+
 export const UserAvatar = ({
   user,
   size = 36,
@@ -22,17 +27,14 @@ export const UserAvatar = ({
   fill?: boolean;
   className?: string;
 }) => {
-  const src = resolveUserAvatarSrc(user.avatar);
-  const initial = (user.userName?.slice(0, 1) ?? user.email?.slice(0, 1) ?? "?").toUpperCase();
-
   return (
     <Avatar
       shape="square"
       size={size}
-      src={src}
-      className={`${fill ? styles.fill : ""}${className ? ` ${className}` : ""}`}
+      src={resolveUserAvatarSrc(user.avatar)}
+      className={[fill && styles.fill, className].filter(Boolean).join(" ")}
     >
-      {initial}
+      {userAvatarInitial(user)}
     </Avatar>
   );
 };

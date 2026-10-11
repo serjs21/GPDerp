@@ -9,16 +9,15 @@ import type {
 import { CoverState, coverLabelSharedFontSizeRem } from "@/components/DualityButton";
 import { useElementWidth } from "@/hooks/useElementWidth";
 import { useLocale } from "@/hooks/useLocale";
-import {
-  buildRotatedSortClusterStyle,
-  rotatedSortCoinSizeRem,
-} from "@/utils/sort/rotatedSortUtils";
+import { rotatedSortCoinSizeRem } from "@/utils/sort/rotatedSortUtils";
+import { withDefaults } from "@/utils/props/withDefaults";
 import {
   LABEL_SORT_SIZE_REM,
   type LabelSortCategory,
   type LabelSortValue,
 } from "./consts/labelSortConsts";
 import { resolveLabelSortCategories } from "./utils/labelSortLocaleUtils";
+import { labelSortLayout } from "./utils/labelSortLayoutUtils";
 import styles from "./LabelSort.module.css";
 
 export type LabelSortProps = {
@@ -40,54 +39,54 @@ export type LabelSortProps = {
   "aria-label"?: string;
 };
 
+const LABEL_SORT_DEFAULTS = {
+  sizeRem: LABEL_SORT_SIZE_REM,
+  disabled: false,
+  rotated: false,
+  color: "white",
+  background: "solid",
+} as const;
+
 /**
  * Row of CoverState sort coins for labels. One category uncovered at a time;
  * switching re-covers the previous coin and opens the new one. Clicking the
  * active DualityButton toggles asc/desc.
  */
-export function LabelSort({
-  value,
-  onChange,
-  categories: categoriesProp,
-  sizeRem = LABEL_SORT_SIZE_REM,
-  disabled = false,
-  title,
-  rotated = false,
-  color = "white",
-  background = "solid",
-  className,
-  clusterClassName,
-  "aria-label": ariaLabelProp,
-}: LabelSortProps) {
+export function LabelSort(props: LabelSortProps) {
+  const { sizeRem, disabled, rotated, color, background } = withDefaults(props, LABEL_SORT_DEFAULTS);
+  const { value, onChange } = props;
   const t = useTranslations("LabelSort");
-  const ariaLabel = ariaLabelProp ?? t("ariaLabel");
+  const ariaLabel = props["aria-label"] ?? t("ariaLabel");
   const { locale } = useLocale();
-  const categories = categoriesProp ?? resolveLabelSortCategories(locale, t);
+  const categories = props.categories ?? resolveLabelSortCategories(locale, t);
   const [clusterRef, clusterWidth] = useElementWidth<HTMLDivElement>(rotated);
   const coinSizeRem = rotatedSortCoinSizeRem(clusterWidth, sizeRem);
   const titleFontSizeRem = coverLabelSharedFontSizeRem(
     categories.map((category) => category.title),
     coinSizeRem,
   );
+  const layout = labelSortLayout({
+    rotated,
+    coinSizeRem,
+    className: props.className,
+    clusterClassName: props.clusterClassName,
+  });
+
   return (
     <ComicPagePanel
-      title={title ?? t("title")}
-      titleDirection={rotated ? "horizontal" : "vertical"}
+      title={props.title ?? t("title")}
+      titleDirection={layout.titleDirection}
       background={background}
       color={color}
       contentAlign="center"
       overflowVisible
-      className={[styles.panel, rotated ? styles.panelRotated : "", className]
-        .filter(Boolean)
-        .join(" ")}
+      className={layout.panelClassName}
       ariaLabel={ariaLabel}
     >
       <div
         ref={clusterRef}
-        className={[styles.cluster, rotated ? styles.clusterRotated : "", clusterClassName]
-          .filter(Boolean)
-          .join(" ")}
-        style={rotated ? buildRotatedSortClusterStyle(coinSizeRem) : undefined}
+        className={layout.clusterClassName}
+        style={layout.clusterStyle}
         role="radiogroup"
         aria-label={ariaLabel}
       >

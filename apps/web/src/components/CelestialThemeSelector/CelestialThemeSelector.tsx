@@ -2,33 +2,21 @@
 
 import { useTranslations } from "next-intl";
 import { useCallback, useRef, useState, type CSSProperties } from "react";
-import { createPortal } from "react-dom";
 import { UIButton } from "@/components/ui";
-import {
-  CelestialThemeClock,
-  type CelestialThemeClockHandle,
-} from "@/components/CelestialThemeClock";
-import { STYLE_NAVIGATION_WHEEL } from "@/components/StyleNavigationWheel/styleNavigationWheel.config";
+import type { CelestialThemeClockHandle } from "@/components/CelestialThemeClock";
 import { formatClockLabel } from "@/theme/celestialTime";
 import type { GeoCoordinates } from "@/theme/celestialTheme";
-import {
-  selectorButtonModeFromSunY,
-  selectorViewerSunYPercent,
-} from "@/theme/celestialSelectorLayout";
 import { BANGKOK_COORDINATES } from "@/theme/useCelestialScene";
-import { CELESTIAL_TRIGGER_BODY_BADGE } from "./celestialTriggerBodyBadge.config";
-import { CELESTIAL_SELECTOR_PANEL_MOTION } from "./celestialSelectorPanelMotion.config";
-import { styleNavigationStarRimAngleDeg } from "./styleNavigationStarRimAngle";
+import { CelestialSelectorPanel } from "./CelestialSelectorPanel";
 import { useCelestialSelectorOpenTransition } from "./useCelestialSelectorOpenTransition";
 import {
   useCelestialSelectorPanelMotion,
   type CelestialSelectorPanelPhase,
 } from "./useCelestialSelectorPanelMotion";
+import { triggerBodyBadge } from "./utils/selectorTriggerUtils";
 import styles from "./CelestialThemeSelector.module.css";
 
 const ALIEN_TRIGGER_SRC = "/theme-selector/alien-obduction.svg";
-const NAV_STAR_SRC = STYLE_NAVIGATION_WHEEL.stars.src;
-const NAV_STAR_SIZE_PERCENT = STYLE_NAVIGATION_WHEEL.stars.sizePercent;
 
 export type CelestialThemeSelectorProps = {
   slot: number;
@@ -62,32 +50,9 @@ export function CelestialThemeSelector({
   const panelContentRef = useRef<HTMLDivElement>(null);
   const timeLabel = formatClockLabel(slot);
   const sceneStyle = sceneVars as CSSProperties | undefined;
-  const dialHalf = selectorButtonModeFromSunY(selectorViewerSunYPercent(slot));
-  const bodyBadge =
-    dialHalf === "day"
-      ? {
-          src: CELESTIAL_TRIGGER_BODY_BADGE.sunSrc,
-          label: "sun",
-        }
-      : {
-          src: CELESTIAL_TRIGGER_BODY_BADGE.moonSrc,
-          label: "moon",
-        };
-  const bodyBadgeStyle = {
-    left: `${CELESTIAL_TRIGGER_BODY_BADGE.leftPercent}%`,
-    top: `${CELESTIAL_TRIGGER_BODY_BADGE.topPercent}%`,
-    width: `${CELESTIAL_TRIGGER_BODY_BADGE.sizePercent}%`,
-  } as CSSProperties;
-
+  const bodyBadge = triggerBodyBadge(slot);
   const isPanelMounted = panelPhase !== null;
   const isExpanded = panelPhase === "open";
-  const ringStartAngleDeg = styleNavigationStarRimAngleDeg(slot);
-  const navStarAngleRad = (ringStartAngleDeg * Math.PI) / 180;
-  const navStarStyle = {
-    left: `${50 + 50 * Math.cos(navStarAngleRad)}%`,
-    top: `${50 + 50 * Math.sin(navStarAngleRad)}%`,
-    width: `${NAV_STAR_SIZE_PERCENT}%`,
-  } as CSSProperties;
 
   const requestClose = useCallback(() => {
     if (panelPhaseRef.current !== "open") return;
@@ -133,75 +98,9 @@ export function CelestialThemeSelector({
     });
   };
 
-  const panel =
-    typeof document !== "undefined" && isPanelMounted
-      ? createPortal(
-          <div
-            ref={panelRef}
-            className={styles.panel}
-            style={
-              {
-                "--panel-top": `${panelAnchor.top}px`,
-                "--panel-left": `${panelAnchor.left}px`,
-              } as CSSProperties
-            }
-            role="dialog"
-            aria-label={ariaLabel}
-          >
-            <div
-              ref={panelPopRef}
-              className={styles.panelPop}
-              style={sceneStyle}
-            >
-              <div ref={panelChromeRef} className={styles.panelChrome} aria-hidden>
-                <svg
-                  className={styles.panelRing}
-                  viewBox="0 0 100 100"
-                >
-                  <circle
-                    ref={ringRef}
-                    className={styles.panelRingPath}
-                    cx="50"
-                    cy="50"
-                    r="48.5"
-                    fill="none"
-                    stroke={CELESTIAL_SELECTOR_PANEL_MOTION.ringStroke}
-                    strokeWidth={CELESTIAL_SELECTOR_PANEL_MOTION.ringStrokeWidthPx}
-                    strokeLinecap="round"
-                    vectorEffect="non-scaling-stroke"
-                    transform={`rotate(${ringStartAngleDeg} 50 50)`}
-                  />
-                </svg>
-                {/* eslint-disable-next-line @next/next/no-img-element -- public SVG nav star */}
-                <img
-                  src={NAV_STAR_SRC}
-                  alt=""
-                  className={styles.panelNavStar}
-                  style={navStarStyle}
-                  draggable={false}
-                />
-              </div>
-              <div ref={panelContentRef} className={styles.panelContent}>
-                <CelestialThemeClock
-                  ref={clockRef}
-                  value={slot}
-                  onChange={handlePreview}
-                  onCommit={handleCommit}
-                  coordinates={coordinates}
-                  showBodyGlow
-                  hideNavStar
-                  ariaLabel={ariaLabel}
-                />
-              </div>
-            </div>
-          </div>,
-          document.body,
-        )
-      : null;
-
   return (
     <div
-      className={`${styles.wrap}${className ? ` ${className}` : ""}`}
+      className={[styles.wrap, className].filter(Boolean).join(" ")}
       style={sceneStyle}
     >
       <div className={styles.perspectiveRoot}>
@@ -229,7 +128,7 @@ export function CelestialThemeSelector({
                   src={bodyBadge.src}
                   alt=""
                   className={styles.triggerBodyBadge}
-                  style={bodyBadgeStyle}
+                  style={bodyBadge.style}
                   data-body={bodyBadge.label}
                   draggable={false}
                 />
@@ -237,7 +136,23 @@ export function CelestialThemeSelector({
             </span>
           </UIButton>
         </div>
-        {panel}
+        {isPanelMounted ? (
+          <CelestialSelectorPanel
+            panelRef={panelRef}
+            panelPopRef={panelPopRef}
+            panelChromeRef={panelChromeRef}
+            panelContentRef={panelContentRef}
+            ringRef={ringRef}
+            clockRef={clockRef}
+            anchor={panelAnchor}
+            sceneStyle={sceneStyle}
+            ariaLabel={ariaLabel}
+            slot={slot}
+            coordinates={coordinates}
+            onPreview={handlePreview}
+            onCommit={handleCommit}
+          />
+        ) : null}
       </div>
     </div>
   );

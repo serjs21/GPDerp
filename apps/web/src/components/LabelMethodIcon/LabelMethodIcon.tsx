@@ -1,6 +1,6 @@
 "use client";
 
-import { buildComicBurstPath } from "@/components/ComicBurstLabel/comicBurstPath";
+import { resolveLabelMethodFrame } from "./utils/labelMethodFrameUtils";
 import styles from "./LabelMethodIcon.module.css";
 
 export type LabelMethodIconBubbleStyle =
@@ -25,43 +25,6 @@ export type LabelMethodIconProps = {
   className?: string;
 };
 
-const THOUGHT_LAYOUT = buildComicBurstPath({
-  width: 100,
-  height: 112,
-  kind: "thought",
-  spikeCount: 12,
-  randomness: 0.18,
-  seedKey: "label-method-thought",
-});
-
-const POINTED_ARCS_LAYOUT = buildComicBurstPath({
-  width: 100,
-  height: 88,
-  kind: "burst",
-  spikeCount: 12,
-  randomness: 0.18,
-  seedKey: "label-method-pointed-arcs",
-});
-
-type FrameKey = "diamond" | "round" | "rect" | "thought" | "pointedArcs";
-
-function frameClassKeyForStyle(bubbleStyle: string): FrameKey {
-  if (bubbleStyle === "diamond") return "diamond";
-  if (bubbleStyle === "thought") return "thought";
-  if (bubbleStyle === "pointedArcs") return "pointedArcs";
-  if (bubbleStyle === "circle") return "round";
-  return "rect";
-}
-
-function frameClassForStyle(bubbleStyle: string): string {
-  const key = frameClassKeyForStyle(bubbleStyle);
-  if (key === "diamond") return styles.frameDiamond;
-  if (key === "thought") return styles.frameThought;
-  if (key === "pointedArcs") return styles.framePointedArcs;
-  if (key === "round") return styles.frameRound;
-  return styles.frameRect;
-}
-
 /**
  * Comic method icon with a static CSS bubble frame.
  * Avoids Comical.js single-edit-root races used by ShareMethodIcon.
@@ -72,16 +35,7 @@ export function LabelMethodIcon({
   active = true,
   className,
 }: LabelMethodIconProps) {
-  const styleKey = String(bubbleStyle ?? "rectangle");
-  const frameKey = frameClassKeyForStyle(styleKey);
-  const frameClass = frameClassForStyle(styleKey);
-
-  const burstOutline =
-    frameKey === "thought"
-      ? THOUGHT_LAYOUT
-      : frameKey === "pointedArcs"
-        ? POINTED_ARCS_LAYOUT
-        : null;
+  const { frameClass, burstOutline } = resolveLabelMethodFrame(String(bubbleStyle));
 
   return (
     <div

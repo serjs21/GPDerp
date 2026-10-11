@@ -1,25 +1,19 @@
 "use client";
 
 import { useMemo, useState, type AnimationEvent } from "react";
-import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
-import { ComicDialogContent } from "@/components/ComicDialogContent/ComicDialogContent";
-import dialogStyles from "@/components/ComicDialogContent/ComicDialogContent.module.css";
-import { COMIC_TOAST_TONE_PRESETS } from "@/components/ComicToast";
 import { LabelHalo, toLabelHaloItems } from "@/components/LabelHalo";
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { SVG_PATH_LANTERN_WIDTH_REM } from "@/components/SVGPath/consts/pathLanternLayoutConsts";
 import { useViewportBottomOverlap } from "@/hooks/useViewportBottomOverlap";
-import { SHARED_HAIKU_CREATED_BY_KEY } from "./consts/sharedHaikuCopyConsts";
 import { SHARED_HAIKU_FOOTER_SELECTOR } from "./consts/sharedHaikuCreatedByConsts";
+import { SharedHaikuCreatedBy } from "./SharedHaikuCreatedBy";
 import type { SharedHaikuLanternProps } from "./SharedHaikuLantern.types";
-import { sharedHaikuCreatedByStyle } from "./utils/sharedHaikuCreatedByUtils";
 import { sharedHaikuFlyInStyle } from "./utils/sharedHaikuFlyInUtils";
+import { prefersReducedMotionOnceReady, sharedHaikuRootClassName } from "./utils/sharedHaikuMotionUtils";
 import styles from "./SharedHaikuLantern.module.css";
-
-const SUCCESS_TONE = COMIC_TOAST_TONE_PRESETS.success;
 
 export function SharedHaikuLantern({ haiku, showLabels, subject, authorName }: SharedHaikuLanternProps) {
   const t = useTranslations("SharedHaikuPage");
@@ -28,10 +22,7 @@ export function SharedHaikuLantern({ haiku, showLabels, subject, authorName }: S
   const [typed, setTyped] = useState(false);
 
   // No typing animation under reduced motion, so no `animationend` to wait for.
-  // `initialized` is false on the server and at hydration, so `window` is only read client-side.
-  const reducedMotion =
-    initialized && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const showCreatedBy = typed || reducedMotion;
+  const showCreatedBy = typed || prefersReducedMotionOnceReady(initialized);
   const footerOverlap = useViewportBottomOverlap(SHARED_HAIKU_FOOTER_SELECTOR, showCreatedBy);
 
   // LabelHalo syncs `labels` into state on identity change — keep it stable.
@@ -59,7 +50,7 @@ export function SharedHaikuLantern({ haiku, showLabels, subject, authorName }: S
 
   return (
     <div
-      className={[styles.root, initialized && styles.animate].filter(Boolean).join(" ")}
+      className={sharedHaikuRootClassName(styles, initialized)}
       style={sharedHaikuFlyInStyle()}
       onAnimationEnd={handleAnimationEnd}
     >
@@ -72,25 +63,7 @@ export function SharedHaikuLantern({ haiku, showLabels, subject, authorName }: S
           lantern
         )}
       </div>
-      {showCreatedBy
-        ? createPortal(
-            <div
-              className={`${styles.createdBy} magictime puffIn`}
-              style={sharedHaikuCreatedByStyle(footerOverlap)}
-              role="status"
-            >
-              <ComicDialogContent
-                bubbleStyle={SUCCESS_TONE.bubbleStyle}
-                backgroundColors={SUCCESS_TONE.backgroundColors}
-                className={[dialogStyles.previewStage, styles.bubbleStage].join(" ")}
-                contentClassName={styles.createdByText}
-              >
-                {t(SHARED_HAIKU_CREATED_BY_KEY, { authorName })}
-              </ComicDialogContent>
-            </div>,
-            document.body,
-          )
-        : null}
+      {showCreatedBy ? <SharedHaikuCreatedBy authorName={authorName} footerOverlap={footerOverlap} /> : null}
     </div>
   );
 }

@@ -1,14 +1,18 @@
 "use client";
 
 import { forwardRef, useCallback, useRef, type CSSProperties, type ReactNode } from "react";
+import { withDefaults } from "@/utils/props/withDefaults";
 import { ComicBubbleStage } from "../ComicConfirmModal/ComicBubbleStage";
-import stageStyles from "../ComicConfirmModal/comicBubbleStage.module.css";
 import type { ComicBubbleStyle } from "../ComicConfirmModal/comicBubblePresets";
-import {
-  stagePaddingClassForDirection,
-  type ComicSourceDirection,
-} from "../ComicConfirmModal/comicSourceDirection";
+import type { ComicSourceDirection } from "../ComicConfirmModal/comicSourceDirection";
+import { comicDialogStageClassName, comicDialogTargetsKey } from "./utils/comicDialogContentUtils";
 import styles from "./ComicDialogContent.module.css";
+
+const COMIC_DIALOG_CONTENT_DEFAULTS = {
+  bubbleStyle: "pointedArcs",
+  sourceDirection: "none",
+  mode: "standalone",
+} as const;
 
 export type ComicDialogContentMode = "standalone" | "embedded";
 
@@ -47,18 +51,11 @@ const ComicDialogContentInner = forwardRef<HTMLDivElement, ComicDialogContentPro
  */
 export const ComicDialogContent = forwardRef<HTMLDivElement, ComicDialogContentProps>(
   function ComicDialogContent(
-    {
-      children,
-      bubbleStyle = "pointedArcs",
-      sourceDirection = "none",
-      mode = "standalone",
-      className,
-      contentClassName,
-      style,
-      backgroundColors,
-    },
+    props,
     ref,
   ) {
+    const { bubbleStyle, sourceDirection, mode } = withDefaults(props, COMIC_DIALOG_CONTENT_DEFAULTS);
+    const { children, className, contentClassName, style, backgroundColors } = props;
     const innerRef = useRef<HTMLDivElement | null>(null);
     const stageRef = useRef<HTMLDivElement | null>(null);
 
@@ -84,8 +81,6 @@ export const ComicDialogContent = forwardRef<HTMLDivElement, ComicDialogContentP
       [backgroundColors, bubbleStyle, sourceDirection],
     );
 
-    const labelKey = typeof children === "string" ? children : "node";
-
     if (mode === "embedded") {
       return (
         <ComicDialogContentInner ref={setRef} contentClassName={contentClassName} className={className} style={style}>
@@ -94,23 +89,13 @@ export const ComicDialogContent = forwardRef<HTMLDivElement, ComicDialogContentP
       );
     }
 
-    const stagePaddingClass = stagePaddingClassForDirection(sourceDirection, {
-      stageTailBottom: styles.stageTailBottom,
-      stageTailTop: styles.stageTailTop,
-      stageTailLeft: styles.stageTailLeft,
-      stageTailRight: styles.stageTailRight,
-      stageCompact: styles.stageCompact,
-    });
-
     return (
       <ComicBubbleStage
         ref={stageRef}
         active
-        targetsKey={`dialog:${bubbleStyle}:${sourceDirection}:${labelKey}`}
+        targetsKey={comicDialogTargetsKey(bubbleStyle, sourceDirection, children)}
         getTargets={getTargets}
-        className={[stageStyles.stage, styles.stageStandalone, stagePaddingClass, className]
-          .filter(Boolean)
-          .join(" ")}
+        className={comicDialogStageClassName(sourceDirection, className)}
         style={style}
       >
         <ComicDialogContentInner ref={setRef} contentClassName={contentClassName}>

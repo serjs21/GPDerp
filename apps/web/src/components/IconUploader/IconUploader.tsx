@@ -1,10 +1,12 @@
 "use client";
 
-import { EditOutlined, LoadingOutlined } from "@ant-design/icons";
-import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useId, useState } from "react";
 import { useFileUpload } from "@/hooks/useFileUpload";
+import { withDefaults } from "@/utils/props/withDefaults";
+import { IconUploaderFace } from "./IconUploaderFace";
+import { IconUploadStatus } from "./IconUploadStatus";
+import { iconHitClassName } from "./utils/iconUploaderUtils";
 import styles from "./IconUploader.module.css";
 
 export type IconUploaderResult = {
@@ -27,111 +29,65 @@ type IconUploaderProps = {
   onUploaded: (result: IconUploaderResult) => void;
 };
 
-export function IconUploader({
-  label,
-  iconUrl,
-  alt,
-  fallbackChar,
-  disabled = false,
-  className,
-  size = DEFAULT_SIZE_PX,
-  onUploaded,
-}: IconUploaderProps) {
+const ICON_UPLOADER_DEFAULTS = { disabled: false, size: DEFAULT_SIZE_PX };
+
+export function IconUploader(props: IconUploaderProps) {
+  const { disabled, size } = withDefaults(props, ICON_UPLOADER_DEFAULTS);
   const t = useTranslations("IconUploader");
   const inputId = useId();
   const [failedRemoteImageUrl, setFailedRemoteImageUrl] = useState<string | null>(null);
-  const { previewUrl, error, success, isUploading, isDragActive, progress, onInputChange, onDragOver, onDragLeave, onDrop } =
-    useFileUpload({
-      disabled,
-      onUploaded,
-    });
-  const displayUrl = previewUrl || iconUrl;
-  const showRemoteImage = Boolean(displayUrl && !previewUrl && failedRemoteImageUrl !== displayUrl);
-  const showPreviewImage = Boolean(previewUrl);
-  const placeholderChar = (fallbackChar?.trim().slice(0, 1) || "?").toUpperCase();
-
-  const interactive = !disabled && !isUploading;
-  const inputDisabled = disabled || isUploading;
-
-  const inner = (
-    <>
-      {showPreviewImage && displayUrl ? (
-        <Image
-          src={displayUrl}
-          alt={alt ?? t("alt")}
-          className={styles.iconImage}
-          width={size}
-          height={size}
-          unoptimized
-        />
-      ) : showRemoteImage && displayUrl ? (
-        <Image
-          src={displayUrl}
-          alt={alt ?? t("alt")}
-          className={styles.iconImage}
-          width={size}
-          height={size}
-          unoptimized
-          referrerPolicy="no-referrer"
-          onError={() => setFailedRemoteImageUrl(displayUrl)}
-        />
-      ) : (
-        <span className={styles.placeholder} aria-hidden>
-          {placeholderChar}
-        </span>
-      )}
-      <span className={styles.overlay} aria-hidden>
-        {isUploading ? <LoadingOutlined /> : <EditOutlined />}
-      </span>
-    </>
+  const upload = useFileUpload({ disabled, onUploaded: props.onUploaded });
+  const interactive = !disabled && !upload.isUploading;
+  const hitClassName = iconHitClassName({
+    disabled,
+    isUploading: upload.isUploading,
+    isDragActive: upload.isDragActive,
+  });
+  const face = (
+    <IconUploaderFace
+      previewUrl={upload.previewUrl}
+      iconUrl={props.iconUrl}
+      alt={props.alt}
+      fallbackChar={props.fallbackChar}
+      size={size}
+      isUploading={upload.isUploading}
+      failedRemoteImageUrl={failedRemoteImageUrl}
+      onRemoteImageError={setFailedRemoteImageUrl}
+    />
   );
 
-  const hitClassName = [
-    styles.iconHitArea,
-    disabled ? styles.iconHitAreaDisabled : "",
-    isUploading ? styles.iconHitAreaUploading : "",
-    isDragActive ? styles.dropZoneActive : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-
   return (
-    <div className={[styles.container, className].filter(Boolean).join(" ")}>
+    <div className={[styles.container, props.className].filter(Boolean).join(" ")}>
       <input
         id={inputId}
         className={styles.fileInput}
         type="file"
         accept="image/png,image/jpeg,image/jpg,image/webp"
-        onChange={(event) => void onInputChange(event)}
-        disabled={inputDisabled}
-        aria-label={label ?? t("label")}
+        onChange={(event) => void upload.onInputChange(event)}
+        disabled={!interactive}
+        aria-label={props.label ?? t("label")}
       />
 
       {interactive ? (
         <label
           htmlFor={inputId}
           className={hitClassName}
-          onDragOver={onDragOver}
-          onDragLeave={onDragLeave}
-          onDrop={(event) => void onDrop(event)}
+          onDragOver={upload.onDragOver}
+          onDragLeave={upload.onDragLeave}
+          onDrop={(event) => void upload.onDrop(event)}
         >
-          {inner}
+          {face}
         </label>
       ) : (
-        <span className={hitClassName}>{inner}</span>
+        <span className={hitClassName}>{face}</span>
       )}
 
-      {isUploading ? (
-        <div>
-          <div className={styles.progressTrack}>
-            <div className={styles.progressBar} style={{ width: `${progress}%` }} />
-          </div>
-          <div className={styles.meta}>{t("uploading", { progress })}</div>
-        </div>
-      ) : null}
-
-      {error ? <div className={styles.error}>{error}</div> : null}
-      {success ? <div className={styles.success}>{success}</div> : null}
+      <IconUploadStatus
+        isUploading={upload.isUploading}
+        progress={upload.progress}
+        error={upload.error}
+        success={upload.success}
+      />
     </div>
   );
 }

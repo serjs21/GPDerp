@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { withDefaults } from "@/utils/props/withDefaults";
 import styles from "./ui.module.css";
 
 const cx = (...tokens: Array<string | false | null | undefined>) => tokens.filter(Boolean).join(" ");
@@ -11,33 +12,36 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   loading?: boolean;
 };
 
-export const UIButton = ({
-  variant = "default",
-  active,
-  loading = false,
-  className,
-  disabled,
-  children,
-  ...props
-}: ButtonProps) => (
-  <button
-    {...props}
-    disabled={disabled || loading}
-    aria-busy={loading || undefined}
-    className={cx(
-      "gp-ui-btn",
-      styles.button,
-      variant === "primary" && styles.buttonPrimary,
-      variant === "danger" && styles.buttonDanger,
-      variant === "tab" && styles.tab,
-      active && styles.tabActive,
-      loading && styles.buttonLoading,
-      className,
-    )}
-  >
-    {children}
-  </button>
-);
+const UI_BUTTON_VARIANT_CLASS: Record<NonNullable<ButtonProps["variant"]>, string | undefined> = {
+  default: undefined,
+  primary: styles.buttonPrimary,
+  danger: styles.buttonDanger,
+  tab: styles.tab,
+};
+
+export const UIButton = (props: ButtonProps) => {
+  const { variant, active, loading, className, disabled, children, ...rest } = withDefaults(props, {
+    variant: "default",
+    loading: false,
+  });
+  return (
+    <button
+      {...rest}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
+      className={cx(
+        "gp-ui-btn",
+        styles.button,
+        UI_BUTTON_VARIANT_CLASS[variant],
+        active && styles.tabActive,
+        loading && styles.buttonLoading,
+        className,
+      )}
+    >
+      {children}
+    </button>
+  );
+};
 
 export const UICard = ({ title, children, className }: { title?: ReactNode; children: ReactNode; className?: string }) => (
   <section className={cx(styles.card, className)}>

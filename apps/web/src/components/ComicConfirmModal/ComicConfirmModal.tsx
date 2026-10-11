@@ -2,26 +2,16 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
 import { ComicButton } from "@/components/ComicButton/ComicButton";
 import { ComicDialogContent } from "@/components/ComicDialogContent/ComicDialogContent";
 import { COMIC_PANEL_COLORS } from "@/components/ComicPageLayout/comicPagePresets";
-import {
-  ACTIVATING_DOT_CYCLE,
-  ACTIVATING_DOT_MS,
-} from "@/components/ShareLink/useShareLinkControls";
+import { useActivatingDots } from "@/hooks/useActivatingDots";
+import { withDefaults } from "@/utils/props/withDefaults";
 import { ComicBubbleStage } from "./ComicBubbleStage";
 import type { ComicBubbleStyle } from "./comicBubblePresets";
 import stageStyles from "./comicBubbleStage.module.css";
 import { useComicConfirmStage } from "./useComicConfirmStage";
 import styles from "./ComicConfirmModal.module.css";
-
-const DEFAULT_QUESTION_FILL = COMIC_PANEL_COLORS.cream.base;
-const DEFAULT_CONFIRM_FILL = COMIC_PANEL_COLORS.red.base;
-const DEFAULT_CANCEL_FILL = "#ffffff";
-const DEFAULT_QUESTION_STYLE: ComicBubbleStyle = "thought";
-const DEFAULT_CANCEL_STYLE: ComicBubbleStyle = "speech";
-const DEFAULT_CONFIRM_STYLE: ComicBubbleStyle = "pointedArcs";
 
 export type ComicConfirmModalProps = {
   open: boolean;
@@ -49,30 +39,38 @@ export type ComicConfirmModalProps = {
   className?: string;
 };
 
-export function ComicConfirmModal({
-  open,
-  onOpenChange,
-  question,
-  onConfirm,
-  onCancel,
-  confirmLabel: confirmLabelProp,
-  cancelLabel: cancelLabelProp,
-  questionFill = DEFAULT_QUESTION_FILL,
-  confirmFill = DEFAULT_CONFIRM_FILL,
-  cancelFill = DEFAULT_CANCEL_FILL,
-  questionBubbleStyle = DEFAULT_QUESTION_STYLE,
-  cancelBubbleStyle = DEFAULT_CANCEL_STYLE,
-  confirmBubbleStyle = DEFAULT_CONFIRM_STYLE,
-  closeOnOverlayClick = true,
-  closeOnSelect = true,
-  confirming = false,
-  className,
-}: ComicConfirmModalProps) {
+const COMIC_CONFIRM_MODAL_DEFAULTS = {
+  questionFill: COMIC_PANEL_COLORS.cream.base,
+  confirmFill: COMIC_PANEL_COLORS.red.base,
+  cancelFill: "#ffffff",
+  questionBubbleStyle: "thought" as ComicBubbleStyle,
+  cancelBubbleStyle: "speech" as ComicBubbleStyle,
+  confirmBubbleStyle: "pointedArcs" as ComicBubbleStyle,
+  closeOnOverlayClick: true,
+  closeOnSelect: true,
+  confirming: false,
+};
+
+export function ComicConfirmModal(props: ComicConfirmModalProps) {
+  const {
+    open,
+    question,
+    questionFill,
+    confirmFill,
+    cancelFill,
+    questionBubbleStyle,
+    cancelBubbleStyle,
+    confirmBubbleStyle,
+    closeOnOverlayClick,
+    closeOnSelect,
+    confirming,
+  } = withDefaults(props, COMIC_CONFIRM_MODAL_DEFAULTS);
+  const { onOpenChange, onConfirm, onCancel } = props;
   const t = useTranslations("ComicConfirmModal");
-  const confirmLabel = confirmLabelProp ?? t("confirm");
-  const cancelLabel = cancelLabelProp ?? t("cancel");
+  const confirmLabel = props.confirmLabel ?? t("confirm");
+  const cancelLabel = props.cancelLabel ?? t("cancel");
   const allowOutsideDismiss = closeOnOverlayClick && !confirming;
-  const [busyDots, setBusyDots] = useState<(typeof ACTIVATING_DOT_CYCLE)[number]>("");
+  const busyDots = useActivatingDots(confirming);
   const { questionRef, cancelRef, confirmRef, getTargets, targetsKey } = useComicConfirmStage({
     question,
     cancelLabel,
@@ -85,20 +83,6 @@ export function ComicConfirmModal({
     confirmFill,
   });
 
-  useEffect(() => {
-    if (!confirming) {
-      setBusyDots("");
-      return;
-    }
-    setBusyDots("");
-    let step = 0;
-    const id = window.setInterval(() => {
-      step = (step + 1) % ACTIVATING_DOT_CYCLE.length;
-      setBusyDots(ACTIVATING_DOT_CYCLE[step]!);
-    }, ACTIVATING_DOT_MS);
-    return () => window.clearInterval(id);
-  }, [confirming]);
-
   const handleCancel = () => {
     if (confirming) return;
     onCancel?.();
@@ -109,6 +93,10 @@ export function ComicConfirmModal({
     if (confirming) return;
     onConfirm();
     if (closeOnSelect) onOpenChange(false);
+  };
+
+  const blockOutsideDismiss = (event: Event) => {
+    if (!allowOutsideDismiss) event.preventDefault();
   };
 
   return (
@@ -123,17 +111,13 @@ export function ComicConfirmModal({
         <Dialog.Overlay className={styles.overlay} />
         <Dialog.Content
           className={styles.contentRoot}
-          onPointerDownOutside={(event) => {
-            if (!allowOutsideDismiss) event.preventDefault();
-          }}
-          onInteractOutside={(event) => {
-            if (!allowOutsideDismiss) event.preventDefault();
-          }}
+          onPointerDownOutside={blockOutsideDismiss}
+          onInteractOutside={blockOutsideDismiss}
           onEscapeKeyDown={(event) => {
             if (confirming) event.preventDefault();
           }}
         >
-          <div className={[styles.panel, className].filter(Boolean).join(" ")}>
+          <div className={[styles.panel, props.className].filter(Boolean).join(" ")}>
             <Dialog.Title className={styles.visuallyHidden}>{question}</Dialog.Title>
             <Dialog.Description className={styles.visuallyHidden}>
               {t("description")}

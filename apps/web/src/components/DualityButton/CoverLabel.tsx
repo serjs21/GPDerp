@@ -40,6 +40,8 @@ export type CoverLabelProps = {
  * Title + arrow on one concentric track around the face. On open, the arrow
  * fades in from behind the title, pushes it clockwise, and the title fades.
  * After open, `baseRotateDeg` turns the cue with the duality base.
+ *
+ * @animationComponent aria-hidden arc-text morph tied to the duality base rotation
  */
 export function CoverLabel({
   title,

@@ -1,27 +1,17 @@
 "use client";
 
-import type { CSSProperties } from "react";
 import { useTranslations } from "next-intl";
-import {
-  ComicPagePanel,
-  type ComicPanelBackground,
-  type ComicPanelColor,
-} from "@/components/ComicPageLayout";
-import { ComicPressButton } from "@/components/ComicPressButton";
 import { HoverHoldCallout } from "@/components/HoverHoldCallout";
+import { LabelActionButton } from "./LabelActionButton";
+import {
+  DELETE_HOVER,
+  DELETE_SRC,
+  EDIT_SRC,
+  TUNE_IN_DISABLED_CALLOUT_POSITION,
+  TUNE_IN_HOVER,
+  TUNE_IN_VARIANTS,
+} from "./consts/labelActionConsts";
 import styles from "./LabelActions.module.css";
-
-const TUNE_IN_SRC = "/profile/label_actions/tune_in.svg";
-const NOT_CONNECTED_ACTION_SRC = "/profile/label_actions/not_connected_action.svg";
-const EDIT_SRC = "/profile/label_actions/edit.svg";
-const DELETE_SRC = "/profile/label_actions/delete.svg";
-
-const DELETE_HOVER = "var(--accent-red, #aa1f3f)";
-
-const TUNE_IN_DISABLED_CALLOUT_POSITION = {
-  left: "-8.5rem",
-  bottom: "0rem",
-} as const;
 
 export type LabelActionsProps = {
   labelName: string;
@@ -32,135 +22,6 @@ export type LabelActionsProps = {
   onDelete: () => void;
   className?: string;
 };
-
-type ActionLayout = "iconEnd" | "iconStart" | "iconOnly" | "iconFill";
-
-type ActionButtonProps = {
-  src: string;
-  caption?: string;
-  ariaLabel: string;
-  layout: ActionLayout;
-  captionClassName?: string;
-  iconClassName: string;
-  onSelect: () => void;
-  disabled?: boolean;
-  /** When omitted, mirrors `!disabled` (ComicPagePanel grayscale when false). */
-  selected?: boolean;
-  hoverFill?: string;
-  invertIconOnHover?: boolean;
-  background?: ComicPanelBackground;
-  color?: ComicPanelColor;
-  /** Mask the icon with `--ink-on-sky` instead of showing the raw SVG fill. */
-  inkOnSkyIcon?: boolean;
-};
-
-function rowLayoutClass(layout: ActionLayout): string {
-  if (layout === "iconStart") return styles.iconStart;
-  if (layout === "iconOnly") return styles.iconOnly;
-  if (layout === "iconFill") return styles.iconFill;
-  return styles.iconEnd;
-}
-
-function LabelActionButton({
-  src,
-  caption,
-  ariaLabel,
-  layout,
-  captionClassName,
-  iconClassName,
-  onSelect,
-  disabled = false,
-  selected,
-  hoverFill,
-  invertIconOnHover = false,
-  background = "solid",
-  color = "white",
-  inkOnSkyIcon = false,
-}: ActionButtonProps) {
-  const isSelected = selected ?? !disabled;
-  const style = (
-    hoverFill
-      ? { "--label-action-hover-fill": hoverFill }
-      : undefined
-  ) as CSSProperties | undefined;
-
-  const icon = inkOnSkyIcon ? (
-    <span
-      className={[styles.icon, styles.iconInkOnSky, iconClassName].join(" ")}
-      style={{ "--label-action-icon-mask": `url("${src}")` } as CSSProperties}
-      aria-hidden
-    />
-  ) : (
-    // eslint-disable-next-line @next/next/no-img-element -- static public SVG
-    <img
-      className={[styles.icon, iconClassName].join(" ")}
-      src={src}
-      alt=""
-      draggable={false}
-      decoding="async"
-    />
-  );
-
-  const content =
-    layout === "iconOnly" || layout === "iconFill" || !caption ? (
-      icon
-    ) : layout === "iconStart" ? (
-      <>
-        {icon}
-        <span
-          className={[styles.caption, captionClassName].filter(Boolean).join(" ")}
-          aria-hidden
-        >
-          {caption}
-        </span>
-      </>
-    ) : (
-      <>
-        <span
-          className={[styles.caption, captionClassName].filter(Boolean).join(" ")}
-          aria-hidden
-        >
-          {caption}
-        </span>
-        {icon}
-      </>
-    );
-
-  return (
-    <ComicPressButton
-      className={styles.pressShell}
-      aria-label={ariaLabel}
-      aria-pressed={isSelected}
-      disabled={disabled}
-      onClick={() => {
-        if (disabled) return;
-        onSelect();
-      }}
-    >
-      <ComicPagePanel
-        background={background}
-        color={color}
-        flexWeight={1}
-        contentAlign="start"
-        isMotionBackground={false}
-        className={[
-          styles.action,
-          isSelected ? "" : styles.unpressed,
-          invertIconOnHover ? styles.invertOnHover : "",
-          disabled ? styles.disabled : "",
-          disabled && (inkOnSkyIcon || layout === "iconFill")
-            ? styles.disabledPreserveBg
-            : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-        style={style}
-      >
-        <div className={[styles.row, rowLayoutClass(layout)].join(" ")}>{content}</div>
-      </ComicPagePanel>
-    </ComicPressButton>
-  );
-}
 
 /**
  * Stacked comic panel actions for a manage-label row:
@@ -175,26 +36,21 @@ export function LabelActions({
   className,
 }: LabelActionsProps) {
   const t = useTranslations("ManageLabel.labelActions");
+  const tuneIn = hasConnections ? TUNE_IN_VARIANTS.connected : TUNE_IN_VARIANTS.notConnected;
   const tuneInButton = (
     <LabelActionButton
-      src={hasConnections ? TUNE_IN_SRC : NOT_CONNECTED_ACTION_SRC}
-      caption={hasConnections ? t("tuneIn") : undefined}
-      layout={hasConnections ? "iconEnd" : "iconFill"}
-      color={hasConnections ? "#9fa1ff" : "sky"}
-      background={hasConnections ? "solid" : "sunburst"}
-      captionClassName={hasConnections ? styles.captionTuneIn : undefined}
-      iconClassName={
-        hasConnections ? styles.iconTuneIn : styles.iconNotConnected
-      }
+      src={tuneIn.src}
+      caption={tuneIn.captionKey ? t(tuneIn.captionKey) : undefined}
+      layout={tuneIn.layout}
+      color={tuneIn.color}
+      background={tuneIn.background}
+      captionClassName={tuneIn.captionClassName}
+      iconClassName={tuneIn.iconClassName}
       selected
-      ariaLabel={
-        hasConnections
-          ? t("tuneInAriaLabel", { name: labelName })
-          : t("noHaikusAriaLabel", { name: labelName })
-      }
+      ariaLabel={t(tuneIn.ariaKey, { name: labelName })}
       onSelect={onTuneIn}
       disabled={!hasConnections}
-      hoverFill={"#738aff"}
+      hoverFill={TUNE_IN_HOVER}
     />
   );
 
@@ -211,11 +67,8 @@ export function LabelActions({
           className={styles.tuneInCallout}
           holdMs={3000}
           fadeMs={200}
-          
           position={TUNE_IN_DISABLED_CALLOUT_POSITION}
-          callout={
-            <div className={styles.speechBubble}>{t("tuneInDisabled")}</div>
-          }
+          callout={<div className={styles.speechBubble}>{t("tuneInDisabled")}</div>}
           calloutClassName={styles.speechBubbleSlot}
         >
           {tuneInButton}

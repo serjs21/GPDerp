@@ -29,6 +29,8 @@ export type SteppedTransitionProps = {
  * Pose-to-pose transition: hold discrete poses and crossfade opacity only.
  * Does not spatially tween between poses. Renders a fragment so consumers can
  * keep absolute path positioning on each pose node.
+ *
+ * @animationComponent pose hold-and-crossfade primitive that renders only animation layers
  */
 export function SteppedTransition({
   poses,

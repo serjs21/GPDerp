@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { useTranslations } from "next-intl";
 
+import { sakuraLoaderFadeStyle } from "./utils/sakuraPetalLoaderUtils";
 import styles from "./SakuraPetalLoader.module.css";
 
 export interface SakuraPetalLoaderProps {
@@ -15,11 +16,6 @@ export interface SakuraPetalLoaderProps {
 
 const PETAL_COUNT = 7;
 
-/** Diameter ≈ 2 × (orbit at 1rem + default petal height 0.82rem); fits root.compact 1.5rem box */
-const COMPACT_INTRINSIC_DIAMETER_REM = 2 * (1 + 0.82);
-const COMPACT_ACTION_ROW_HEIGHT_REM = 1.5;
-const COMPACT_FIT_SCALE = COMPACT_ACTION_ROW_HEIGHT_REM / COMPACT_INTRINSIC_DIAMETER_REM;
-
 /**
  * Sakura petals arranged like Ant Design Spin indicators: steady linear rotation
  * of the ring plus a phased pulse on each petal. Orbit radius is updated on an
@@ -31,14 +27,7 @@ export const SakuraPetalLoader = ({
   scale = 1,
 }: SakuraPetalLoaderProps) => {
   const t = useTranslations("Loaders.sakuraPetalLoader");
-  const fadeStyle: CSSProperties | undefined = compact
-    ? {
-        transform: `scale(${COMPACT_FIT_SCALE * scale})`,
-        transformOrigin: "center center",
-      }
-    : scale !== 1
-      ? { transform: `scale(${scale})`, transformOrigin: "center center" }
-      : undefined;
+  const fadeStyle = sakuraLoaderFadeStyle(compact, scale);
 
   return (
     <div

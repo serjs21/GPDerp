@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { HaikuDto } from "@/api/haikus";
 import type { ShareLinkControls } from "@/components/ShareLink/useShareLinkControls";
 
@@ -30,10 +31,14 @@ export type ShareLinkLanternPanelProps = {
 
 export type ShareLinkLanternContentProps = {
   subject: string;
-  haiku: HaikuDto | null;
-  loading: boolean;
+  haiku?: HaikuDto | null;
+  loading?: boolean;
   fallbackId: string;
-  createdAt: string | null;
+  createdAt?: string | null;
+};
+
+export type ShareLinkCopyWrapProps = Pick<ShareLinkLanternPanelControls, "subject" | "onCopy"> & {
+  children: ReactNode;
 };
 
 export type ShareLinkLanternStatsProps = Pick<

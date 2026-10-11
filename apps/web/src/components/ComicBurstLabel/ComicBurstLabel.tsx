@@ -1,16 +1,11 @@
 "use client";
 
 import { memo, useMemo, type CSSProperties, type ReactNode } from "react";
-import {
-  layoutComicBurstLabel,
-  type ComicBurstShapeKind,
-} from "./comicBurstPath";
+import type { ComicBurstShapeKind } from "./comicBurstPath";
 import { useIsHydrated } from "@/hooks/useIsHydrated";
-import {
-  burstDisplayFontSize,
-  estimateComicBurstTextWidth,
-  measureComicBurstTextWidth,
-} from "./measureComicBurstText";
+import { withDefaults } from "@/utils/props/withDefaults";
+import { BurstOverlay } from "./BurstOverlay";
+import { resolveBurstLayout, strokeCapsForShape } from "./utils/burstLayoutUtils";
 import { stretchPathProps, stretchSvgProps } from "./utils/stretchUtils";
 import styles from "./ComicBurstLabel.module.css";
 
@@ -42,122 +37,37 @@ export type ComicBurstLabelProps = {
   stretch?: boolean;
 };
 
-const DEFAULT_FILL = "#f4511e";
-const DEFAULT_STROKE = "#000000";
-const DEFAULT_TEXT_COLOR = "#ffffff";
-
-function resolveBurstLayout(params: {
-  text: string;
-  fontSizeProp?: number;
-  paddingX: number;
-  paddingY: number;
-  spikeCount: number;
-  randomness: number;
-  seedKey: string | number;
-  shapeKind: ComicBurstShapeKind;
-  hasChildren: boolean;
-  hasLeading: boolean;
-  canMeasure: boolean;
-}) {
-  const {
-    text,
-    fontSizeProp,
-    paddingX,
-    paddingY,
-    spikeCount,
-    randomness,
-    seedKey,
-    shapeKind,
-    hasChildren,
-    hasLeading,
-    canMeasure,
-  } = params;
-  const fontSize = fontSizeProp ?? burstDisplayFontSize(text);
-  // Icon/custom content: size from fontSize box, not lettering width.
-  const leadingExtra = hasLeading ? fontSize * 1.2 : 0;
-  // Canvas measuring only after hydration so SSR and first client render match.
-  const letteringWidth = canMeasure
-    ? measureComicBurstTextWidth(text, fontSize)
-    : estimateComicBurstTextWidth(text, fontSize);
-  const textWidth = hasChildren ? fontSize : letteringWidth + leadingExtra;
-  const layout = layoutComicBurstLabel({
-    textWidth,
-    fontSize,
-    paddingX,
-    paddingY,
-    spikeCount,
-    randomness,
-    seedKey,
-    kind: shapeKind,
-    text,
-    tight: hasChildren,
-  });
-  const strokePx = Math.min(2.5, Math.max(1.5, fontSize * 0.08));
-  return { layout, fontSize, strokePx };
-}
-
-function BurstOverlay({
-  text,
-  textColor,
-  leading,
-  children,
-}: {
-  text: string;
-  textColor: string;
-  leading?: ReactNode;
-  children?: ReactNode;
-}) {
-  if (children) {
-    return (
-      <span className={styles.labelContent} aria-hidden>
-        {children}
-      </span>
-    );
-  }
-  if (leading) {
-    return (
-      <span className={styles.labelWithLeading} style={{ color: textColor }} aria-hidden>
-        <span className={styles.labelLeading}>{leading}</span>
-        <span className={styles.labelLettering}>{text}</span>
-      </span>
-    );
-  }
-  return (
-    <span className={styles.labelText} style={{ color: textColor }} aria-hidden>
-      {text}
-    </span>
-  );
-}
+const COMIC_BURST_LABEL_DEFAULTS = {
+  fill: "#f4511e",
+  stroke: "#000000",
+  textColor: "#ffffff",
+  spikeCount: 12,
+  randomness: 0.18,
+  shapeKind: "burst",
+  paddingX: 18,
+  paddingY: 14,
+  strokeWidth: 4,
+} as const;
 
 /**
  * Comic-book impact burst label: procedural SVG spikes + Bangers KA-BLAM lettering.
  * Shape is seeded from `seed ?? text` so the silhouette stays stable across renders.
  * Longer text uses a slightly smaller display size so lettering stays inside the silhouette.
  */
-function strokeCapsForShape(shapeKind: ComicBurstShapeKind): {
-  strokeLinejoin: "miter" | "round";
-  strokeLinecap: "square" | "round";
-} {
-  if (shapeKind === "rect" || shapeKind === "diamond") {
-    return { strokeLinejoin: "miter", strokeLinecap: "square" };
-  }
-  return { strokeLinejoin: "round", strokeLinecap: "round" };
-}
-
 export const ComicBurstLabel = memo(function ComicBurstLabel(props: ComicBurstLabelProps) {
-  const text = props.text;
-  const fill = props.fill ?? DEFAULT_FILL;
-  const stroke = props.stroke ?? DEFAULT_STROKE;
-  const textColor = props.textColor ?? DEFAULT_TEXT_COLOR;
-  const spikeCount = props.spikeCount ?? 12;
-  const randomness = props.randomness ?? 0.18;
-  const shapeKind = props.shapeKind ?? "burst";
-  const paddingX = props.paddingX ?? 18;
-  const paddingY = props.paddingY ?? 14;
-  const strokeWidth = props.strokeWidth ?? 4;
-  const className = props.className;
-  const leading = props.leading;
-  const children = props.children;
+  const {
+    text,
+    fill,
+    stroke,
+    textColor,
+    spikeCount,
+    randomness,
+    shapeKind,
+    paddingX,
+    paddingY,
+    strokeWidth,
+  } = withDefaults(props, COMIC_BURST_LABEL_DEFAULTS);
+  const { className, leading, children } = props;
   const seedKey = props.seed ?? text;
   const { strokeLinejoin, strokeLinecap } = strokeCapsForShape(shapeKind);
   const canMeasure = useIsHydrated();

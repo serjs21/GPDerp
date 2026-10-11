@@ -19,6 +19,11 @@ export type LanternTransform = {
   stackOrder?: number;
 };
 
+/** Faded out or collapsed at this pose: nothing to render. */
+export function isLanternTransformHidden(transform: LanternTransform): boolean {
+  return (transform.opacity ?? 1) <= 0.01 || transform.scale <= 0;
+}
+
 export function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }

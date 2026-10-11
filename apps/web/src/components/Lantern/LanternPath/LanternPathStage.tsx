@@ -2,14 +2,8 @@
 
 import { forwardRef, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
-import {
-  LANTERN_FLIGHT_PATH_EXIT_STOP_ID,
-  LANTERN_FLIGHT_PATH_INITIAL_STOP_ID,
-  routeStopById,
-} from "../path";
+import { LanternPathGuides } from "./LanternPathGuides";
 import styles from "./LanternPath.module.css";
-
-const ROUTE_GUIDE_SRC = "/route-split-segments-exact.svg";
 
 export type LanternPathStageProps = {
   children: ReactNode;
@@ -21,11 +15,8 @@ export type LanternPathStageProps = {
 };
 
 export const LanternPathStage = forwardRef<HTMLDivElement, LanternPathStageProps>(
-  function LanternPathStage({ children, hud, controls, className, showGuides = false }, ref) {
+  function LanternPathStage({ children, hud, controls, className, showGuides }, ref) {
     const t = useTranslations("Lantern.lanternPathStage");
-    const exitStop = routeStopById(LANTERN_FLIGHT_PATH_EXIT_STOP_ID);
-    const initialStop = routeStopById(LANTERN_FLIGHT_PATH_INITIAL_STOP_ID);
-
     const viewportClass = [styles.flightPathViewport, className].filter(Boolean).join(" ");
 
     return (
@@ -33,28 +24,7 @@ export const LanternPathStage = forwardRef<HTMLDivElement, LanternPathStageProps
         {hud}
         <div className={styles.flightPathStage} aria-label={t("ariaLabel")}>
           <div className={styles.flightPathGuideBox}>
-            {showGuides ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img src={ROUTE_GUIDE_SRC} alt="" draggable={false} decoding="async" />
-            ) : null}
-            {showGuides && exitStop ? (
-              <span
-                className={`${styles.flightPathStopLabel} ${styles.flightPathStopLabelExit}`}
-                style={{ left: `${exitStop.x * 100}%`, top: `${exitStop.y * 100}%` }}
-                aria-hidden
-              >
-                0
-              </span>
-            ) : null}
-            {showGuides && initialStop ? (
-              <span
-                className={`${styles.flightPathStopLabel} ${styles.flightPathStopLabelInitial}`}
-                style={{ left: `${initialStop.x * 100}%`, top: `${initialStop.y * 100}%` }}
-                aria-hidden
-              >
-                1
-              </span>
-            ) : null}
+            {showGuides ? <LanternPathGuides /> : null}
             {children}
           </div>
         </div>

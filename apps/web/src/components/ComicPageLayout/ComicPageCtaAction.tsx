@@ -3,10 +3,9 @@
 import { ComicBurstLabel } from "@/components/ComicBurstLabel/ComicBurstLabel";
 import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLabelText";
 import { ComicPressButton } from "@/components/ComicPressButton";
+import { ctaBurstFill } from "./utils/comicPageCtaUtils";
 import styles from "./ComicPageCtaAction.module.css";
 
-const CTA_FILL = "#17131A";
-const CTA_DISABLED_FILL = "#9e9e9e";
 const CTA_FONT_SIZE = 22;
 const CTA_PADDING_X = 48;
 const CTA_PADDING_Y = 10;
@@ -18,7 +17,7 @@ export type ComicPageCtaActionProps = {
   busy?: boolean;
   fill?: string;
   textColor?: string;
-  /** Use `submit` so Enter in ComicPageDialog fields activates this CTA. */
+  /** Use `submit` so Enter in ComicPageDialog fields activates this CTA. Default `button`. */
   type?: "button" | "submit";
   "aria-label"?: string;
 };
@@ -27,15 +26,14 @@ export type ComicPageCtaActionProps = {
 export function ComicPageCtaAction({
   label,
   onClick,
-  disabled = false,
-  busy = false,
+  disabled,
+  busy,
   fill,
   textColor,
-  type = "button",
+  type,
   "aria-label": ariaLabel,
 }: ComicPageCtaActionProps) {
   const canPress = !disabled && !busy;
-  const burstFill = canPress ? (fill ?? CTA_FILL) : CTA_DISABLED_FILL;
 
   return (
     <ComicPressButton
@@ -55,7 +53,7 @@ export function ComicPageCtaAction({
       <ComicBurstLabel
         className={styles.burst}
         text={formatComicLabelText(label)}
-        fill={burstFill}
+        fill={ctaBurstFill(canPress, fill)}
         textColor={textColor}
         shapeKind="rect"
         seed={`cta-${label}`}

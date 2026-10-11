@@ -1,23 +1,14 @@
 "use client";
 
-import { forwardRef, useCallback, useMemo } from "react";
-import { useTranslations } from "next-intl";
+import { forwardRef, useCallback } from "react";
 import type { HaikuListSort } from "@/api/haikus";
-import { Button } from "@/components/StyledComponents";
 import { SVGPath, type SVGPathHandle } from "@/components/SVGPath";
-import { SakuraPetalLoader } from "@/components/Loaders";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { useHaikuDeleteController } from "@/hooks/useHaikuDeleteController";
-import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useInfiniteHaikusQuery } from "@/hooks/useInfiniteHaikusQuery";
-import { HAIKU_SEARCH_DEBOUNCE_MS } from "./consts/haikuSearchConsts";
-import {
-  filterHaikusByLabels,
-  haikuMatchesSearch,
-  mergeHaikuSearchResults,
-  normalizeHaikuSearch,
-} from "./utils/haikuSearchUtils";
-import styles from "@/components/Lantern/LanternPath/LanternPath.module.css";
+import { SavedHaikusPathStatus } from "./SavedHaikusPathStatus";
+import { useSavedHaikusSearch } from "./useSavedHaikusSearch";
+import { savedHaikusPathPhase } from "./utils/savedHaikusPathUtils";
 
 export type SavedHaikusLanternPathProps = {
   generatingDraft?: GeneratingDraft | null;
@@ -34,14 +25,13 @@ export const SavedHaikusLanternPath = forwardRef<
   SVGPathHandle,
   SavedHaikusLanternPathProps
 >(function SavedHaikusLanternPath({
-  generatingDraft = null,
-  creationChromeOpen = false,
-  searchString = "",
-  selectedLabelIds = [],
-  excludedLabelIds = [],
+  generatingDraft,
+  creationChromeOpen,
+  searchString,
+  selectedLabelIds,
+  excludedLabelIds,
   sort,
 }, ref) {
-  const t = useTranslations("SavedHaikusLanternPath");
   const {
     haikus,
     hasNextPage,
@@ -54,47 +44,22 @@ export const SavedHaikusLanternPath = forwardRef<
     isError,
     refetch,
   } = useInfiniteHaikusQuery({ sort });
+  const signedIn = initialized && isLoggedIn;
 
-  const trimmedSearch = searchString.trim();
-  const isSearching = trimmedSearch !== "";
-  const debouncedSearch = useDebouncedValue(trimmedSearch, HAIKU_SEARCH_DEBOUNCE_MS);
-  const searchQuery = useInfiniteHaikusQuery({
-    q: debouncedSearch,
+  const search = useSavedHaikusSearch({
+    haikus,
+    listPaging: { hasNextPage, isFetchingNextPage, fetchNextPage },
+    searchString,
+    selectedLabelIds,
+    excludedLabelIds,
     sort,
-    enabled: initialized && isLoggedIn && debouncedSearch !== "",
+    queryEnabled: signedIn,
   });
-
-  const filteredHaikus = useMemo(() => {
-    if (!isSearching) return filterHaikusByLabels(haikus, selectedLabelIds, excludedLabelIds);
-    const normalizedSearch = normalizeHaikuSearch(trimmedSearch);
-    const matches = (list: typeof haikus) => list.filter((haiku) => haikuMatchesSearch(haiku, normalizedSearch));
-    // API results may still belong to the previous debounced term; re-check them against the current one.
-    const searchResults = debouncedSearch ? matches(searchQuery.haikus) : [];
-    return filterHaikusByLabels(
-      mergeHaikuSearchResults(matches(haikus), searchResults, sort),
-      selectedLabelIds,
-      excludedLabelIds,
-    );
-  }, [haikus, isSearching, trimmedSearch, debouncedSearch, searchQuery.haikus, selectedLabelIds, excludedLabelIds, sort]);
-
-  const searchPending =
-    isSearching && (debouncedSearch !== trimmedSearch || searchQuery.isInitialLoading);
-  const showSearchLoader = searchPending && filteredHaikus.length === 0;
-
-  // No paging until the debounced term catches up, so typing never triggers list requests.
-  const pagedQuery = !isSearching
-    ? { hasNextPage, isFetchingNextPage, fetchNextPage }
-    : searchPending
-      ? { hasNextPage: false, isFetchingNextPage: false, fetchNextPage: () => {} }
-      : {
-          hasNextPage: searchQuery.hasNextPage,
-          isFetchingNextPage: searchQuery.isFetchingNextPage,
-          fetchNextPage: searchQuery.fetchNextPage,
-        };
 
   const { onHaikuDeleted, onHaikuDeleteFailed, deleteFailedModal } = useHaikuDeleteController();
 
-  const fetchVisibleNextPage = pagedQuery.fetchNextPage;
+  const { filteredHaikus, showSearchLoader, paging } = search;
+  const fetchVisibleNextPage = paging.fetchNextPage;
   const handleVacantQueueSlot = useCallback(() => {
     fetchVisibleNextPage();
   }, [fetchVisibleNextPage]);
@@ -103,36 +68,9 @@ export const SavedHaikusLanternPath = forwardRef<
     invalidate();
   }, [invalidate]);
 
-  if (!initialized || !isLoggedIn) {
-    return null;
-  }
-
-  if (isInitialLoading) {
-    return (
-      <div className={styles.flightPathLoader} aria-busy="true" aria-label={t("loading")}>
-        <SakuraPetalLoader />
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className={styles.flightPathError}>
-        <p>{t("loadError")}</p>
-        <Button type="primary" onClick={refetch}>
-          {t("retry")}
-        </Button>
-      </div>
-    );
-  }
-
-  if (showSearchLoader) {
-    return (
-      <div className={styles.flightPathLoader} aria-busy="true" aria-label={t("searching")}>
-        <SakuraPetalLoader />
-      </div>
-    );
-  }
+  const phase = savedHaikusPathPhase({ signedIn, isInitialLoading, isError, showSearchLoader });
+  if (phase === "hidden") return null;
+  if (phase !== "ready") return <SavedHaikusPathStatus phase={phase} onRetry={refetch} />;
 
   return (
     <>
@@ -141,13 +79,13 @@ export const SavedHaikusLanternPath = forwardRef<
         haikus={filteredHaikus}
         generatingDraft={generatingDraft}
         creationChromeOpen={creationChromeOpen}
-        hasNextPage={pagedQuery.hasNextPage}
-        isFetchingNextPage={pagedQuery.isFetchingNextPage}
+        hasNextPage={paging.hasNextPage}
+        isFetchingNextPage={paging.isFetchingNextPage}
         onVacantQueueSlot={handleVacantQueueSlot}
         onHaikuDeleted={onHaikuDeleted}
         onHaikuDeleteFailed={onHaikuDeleteFailed}
         onHaikuChanged={handleHaikuChanged}
-        excludeLabelIds={selectedLabelIds}
+        excludeLabelIds={search.selectedLabelIds}
       />
       {deleteFailedModal}
     </>

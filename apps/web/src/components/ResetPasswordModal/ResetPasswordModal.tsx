@@ -25,6 +25,11 @@ function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+const RESET_COPY_KEYS = {
+  request: { title: "requestTitle", lead: "requestLead", cta: "requestCta" },
+  confirm: { title: "confirmTitle", lead: "confirmLead", cta: "confirmCta" },
+} as const;
+
 export function ResetPasswordModal({
   open,
   onClose,
@@ -102,17 +107,16 @@ export function ResetPasswordModal({
     }
   };
 
-  const onFormSubmit = (event: FormEvent) => {
-    event.preventDefault();
-    if (mode === "request") {
-      void submitRequest();
-      return;
-    }
-    void submitConfirm();
+  const submit = () => {
+    void (mode === "request" ? submitRequest() : submitConfirm());
   };
 
-  const title = mode === "request" ? t("requestTitle") : t("confirmTitle");
-  const ctaLabel = mode === "request" ? t("requestCta") : t("confirmCta");
+  const onFormSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    submit();
+  };
+
+  const copyKeys = RESET_COPY_KEYS[mode];
 
   return (
     <ComicPageDialog
@@ -124,27 +128,17 @@ export function ResetPasswordModal({
       }}
       ctaFooter={
         <ComicPageCtaAction
-          label={ctaLabel}
+          label={t(copyKeys.cta)}
           type="submit"
           busy={submitting}
           disabled={submitting}
-          onClick={() => {
-            if (mode === "request") {
-              void submitRequest();
-              return;
-            }
-            void submitConfirm();
-          }}
+          onClick={submit}
         />
       }
     >
       <div className={styles.body}>
-        <h2 className={styles.title}>{title}</h2>
-        {mode === "request" ? (
-          <p className={styles.lead}>{t("requestLead")}</p>
-        ) : (
-          <p className={styles.lead}>{t("confirmLead")}</p>
-        )}
+        <h2 className={styles.title}>{t(copyKeys.title)}</h2>
+        <p className={styles.lead}>{t(copyKeys.lead)}</p>
 
         <form className={styles.form} onSubmit={onFormSubmit} noValidate>
           {mode === "request" ? (

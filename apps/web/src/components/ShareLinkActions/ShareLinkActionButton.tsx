@@ -2,6 +2,7 @@
 
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { ComicPressButton } from "@/components/ComicPressButton";
+import { withDefaults } from "@/utils/props/withDefaults";
 import type { ShareLinkActionButtonProps } from "./ShareLinkActionButton.types";
 import { shareLinkActionPanelClassName } from "./utils/shareLinkActionClassUtils";
 import {
@@ -12,27 +13,37 @@ import {
 } from "./utils/shareLinkActionStyleUtils";
 import styles from "./ShareLinkActions.module.css";
 
-export function ShareLinkActionButton({
-  src,
-  caption,
-  captionClassName,
-  className,
-  layout,
-  rowLayout,
-  ariaLabel,
-  onSelect,
-  color,
-  background = "solid",
-  isMotionBackground = false,
-  shine = false,
-  accentColor,
-  hoverFill,
-  disabled = false,
-  pressed = true,
-  busy = false,
-  inverted = false,
-  invertCaptionOnHover = false,
-}: ShareLinkActionButtonProps) {
+const SHARE_LINK_ACTION_BUTTON_DEFAULTS = {
+  background: "solid",
+  isMotionBackground: false,
+  shine: false,
+  disabled: false,
+  pressed: true,
+  busy: false,
+  inverted: false,
+  invertCaptionOnHover: false,
+} as const;
+
+export function ShareLinkActionButton(props: ShareLinkActionButtonProps) {
+  const {
+    src,
+    caption,
+    captionClassName,
+    className,
+    ariaLabel,
+    color,
+    accentColor,
+    hoverFill,
+    background,
+    isMotionBackground,
+    shine,
+    disabled,
+    pressed,
+    busy,
+    inverted,
+    invertCaptionOnHover,
+  } = withDefaults(props, SHARE_LINK_ACTION_BUTTON_DEFAULTS);
+  const { layout, rowLayout, onSelect } = props;
   return (
     <ComicPressButton
       className={styles.pressShell}

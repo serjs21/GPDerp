@@ -29,7 +29,8 @@ export function LibraryCard() {
 
   const remainingLabel =
     loadingCredits || credits === null ? t("remainingUnknown") : t("remaining", { count: credits });
-  const buyDisabled = !checkoutReady || startingCheckout || initializing;
+  const checkoutBusy = startingCheckout || initializing;
+  const buyDisabled = !checkoutReady || checkoutBusy;
 
   const saveNamesIfChanged = (form: HTMLFormElement) => {
     if (profile.saving) return;
@@ -96,7 +97,7 @@ export function LibraryCard() {
                 </p>
                 <ComicPageCtaAction
                   label={t("buyMore")}
-                  busy={startingCheckout || initializing}
+                  busy={checkoutBusy}
                   disabled={buyDisabled}
                   onClick={() => void buy()}
                 />

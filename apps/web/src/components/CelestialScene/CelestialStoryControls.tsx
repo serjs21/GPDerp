@@ -144,12 +144,11 @@ export function CelestialStoryControls({
         <div className={state.useCelestialMode ? styles.dimmed : undefined}>{themeSelectorSlot}</div>
       ) : null}
 
-      {state.useCelestialMode && celestialModeNote ? (
-        <p className={styles.note}>{celestialModeNote}</p>
-      ) : null}
-
       {state.useCelestialMode ? (
-        <CelestialFields state={state} onChange={onChange} onPreset={onPreset} />
+        <>
+          {celestialModeNote ? <p className={styles.note}>{celestialModeNote}</p> : null}
+          <CelestialFields state={state} onChange={onChange} onPreset={onPreset} />
+        </>
       ) : null}
     </div>
   );

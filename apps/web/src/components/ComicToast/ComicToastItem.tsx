@@ -6,6 +6,7 @@ import { ComicDialogContent } from "@/components/ComicDialogContent/ComicDialogC
 import dialogStyles from "@/components/ComicDialogContent/ComicDialogContent.module.css";
 import { getComicToastPreset } from "./comicToastPresets";
 import type { ComicToastRecord } from "./comicToastState";
+import { toastContentClassName, toastItemClassName } from "./utils/comicToastItemUtils";
 import styles from "./ComicToast.module.css";
 
 export type ComicToastItemProps = {
@@ -41,13 +42,9 @@ export function ComicToastItem({ toast, onDismiss, onRemove }: ComicToastItemPro
     return () => window.clearTimeout(timeoutId);
   }, [onRemove, toast.exiting, toast.id]);
 
-  const motionClass = toast.exiting ? styles.itemExit : entered ? styles.itemEnter : "";
-  const contentText = typeof toast.content === "string" ? toast.content : "";
-  const wrapContent = contentText.length > 52;
-
   return (
     <div
-      className={[styles.item, motionClass].filter(Boolean).join(" ")}
+      className={toastItemClassName(toast.exiting, entered)}
       role="status"
       aria-live="polite"
     >
@@ -55,9 +52,7 @@ export function ComicToastItem({ toast, onDismiss, onRemove }: ComicToastItemPro
         bubbleStyle={preset.bubbleStyle}
         backgroundColors={preset.backgroundColors}
         className={[dialogStyles.previewStage, styles.stage].join(" ")}
-        contentClassName={[styles.toastContent, wrapContent && styles.toastContentWrap]
-          .filter(Boolean)
-          .join(" ")}
+        contentClassName={toastContentClassName(toast.content)}
       >
         {toast.content}
         {toast.description ? <div className={styles.description}>{toast.description}</div> : null}

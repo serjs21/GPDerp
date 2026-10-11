@@ -36,8 +36,9 @@ export function OrderDropdown({
   const rootRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
   const close = useCallback(() => setOpen(false), []);
+  const menuOpen = open && !disabled;
 
-  useDismissOnOutside(open && !disabled, rootRef, close);
+  useDismissOnOutside(menuOpen, rootRef, close);
 
   return (
     <div ref={rootRef} className={[styles.root, className].filter(Boolean).join(" ")}>
@@ -53,7 +54,7 @@ export function OrderDropdown({
       {/* Stays mounted while closed so the coins keep their pose instead of replaying it on reopen. */}
       <div
         id={menuId}
-        className={[styles.menu, open && !disabled ? "" : styles.menuClosed]
+        className={[styles.menu, menuOpen ? "" : styles.menuClosed]
           .filter(Boolean)
           .join(" ")}
       >

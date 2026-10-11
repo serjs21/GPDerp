@@ -6,10 +6,12 @@ import type { HaikuDto } from "@/api/haikus";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { computeVisibleLanterns } from "./computeVisibleLanterns";
 import { LANTERN_PATH_FOCUS_STOP } from "./lanternPath.config";
+import { LanternPathControls } from "./LanternPathControls";
 import { LanternPathLantern } from "./LanternPathLantern";
 import { LanternPathStage } from "./LanternPathStage";
 import { useLanternPathInput } from "./useLanternPathInput";
 import { useLanternPathScroll } from "./useLanternPathScroll";
+import { lanternPathHudLabel } from "./utils/lanternPathHudUtils";
 import styles from "./LanternPath.module.css";
 
 export type LanternPathProps = {
@@ -26,13 +28,13 @@ export type LanternPathProps = {
 
 export function LanternPath({
   haikus,
-  generatingDraft = null,
+  generatingDraft,
   initialFocusIndex,
   onFocusChange,
   onHaikuDeleted,
   onHaikuChanged,
   className,
-  showGuides = false,
+  showGuides,
 }: LanternPathProps) {
   const t = useTranslations("Lantern.lanternPath");
   const stageRef = useRef<HTMLDivElement>(null);
@@ -54,17 +56,7 @@ export function LanternPath({
     tweenProgress,
     fromFocusIndex,
   );
-
-  const focusHaiku = haikus[focusIndex];
-  const hudLabel = generatingDraft
-    ? t("generating", { subject: generatingDraft.subject })
-    : focusHaiku
-      ? t("focusPosition", {
-          title: focusHaiku.title || t("untitled"),
-          position: focusIndex + 1,
-          total: haikus.length,
-        })
-      : t("empty");
+  const hudLabel = lanternPathHudLabel(t, { generatingDraft, haikus, focusIndex });
 
   return (
     <LanternPathStage
@@ -73,29 +65,14 @@ export function LanternPath({
       showGuides={showGuides}
       hud={<p className={styles.flightPathHud}>{hudLabel}</p>}
       controls={
-        <div className={styles.flightPathControls}>
-          <button
-            type="button"
-            className={styles.flightPathControlButton}
-            aria-label={t("previous")}
-            disabled={!canStepBack}
-            onClick={stepBack}
-          >
-            ←
-          </button>
-          <span className={styles.flightPathControlLabel}>
-            stop-{LANTERN_PATH_FOCUS_STOP} ({focusIndex + 1} / {Math.max(haikus.length, 1)})
-          </span>
-          <button
-            type="button"
-            className={styles.flightPathControlButton}
-            aria-label={t("next")}
-            disabled={!canStepForward}
-            onClick={stepForward}
-          >
-            →
-          </button>
-        </div>
+        <LanternPathControls
+          focusIndex={focusIndex}
+          haikuCount={haikus.length}
+          canStepBack={canStepBack}
+          canStepForward={canStepForward}
+          onStepBack={stepBack}
+          onStepForward={stepForward}
+        />
       }
     >
       {visibleLanterns.map(({ haikuIndex, haiku, pathStop }) => (

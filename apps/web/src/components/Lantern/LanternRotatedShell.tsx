@@ -1,18 +1,19 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
-import { useTranslations } from "next-intl";
-import { LabelHalo } from "@/components/LabelHalo/LabelHalo";
 import type {
   LabelHaloLabelItem,
   LabelPlacement,
 } from "@/components/LabelHalo/consts/labelHaloConsts";
+import { withDefaults } from "@/utils/props/withDefaults";
 import {
   getRotationBaseTransform,
   LANTERN_ROTATED_WIDTH_REM,
   type LanternRotatedVariantId,
 } from "./consts/rotationBaseConsts";
 import { LanternActionsDockProvider } from "./LanternActionsDockContext";
+import { LanternRotatedBaseArt } from "./LanternRotatedBaseArt";
+import { LanternRotatedFace } from "./LanternRotatedFace";
 import styles from "./LanternRotated.module.css";
 import { buildRotationBaseRootStyle } from "./utils/rotationBaseUtils";
 
@@ -41,22 +42,17 @@ export type LanternRotatedShellProps = {
   faceHalo?: LanternRotatedFaceHalo | null;
 };
 
+const LANTERN_ROTATED_SHELL_DEFAULTS = {
+  widthRem: LANTERN_ROTATED_WIDTH_REM,
+  mirrored: false,
+};
+
 /**
  * Rotated base PNG shell with content transformed onto the painted paper face.
  */
-export function LanternRotatedShell({
-  rotationBase,
-  children,
-  className,
-  style,
-  widthRem = LANTERN_ROTATED_WIDTH_REM,
-  mirrored = false,
-  actionsBarOffsetX,
-  actionsBarOffsetY,
-  ariaLabel,
-  faceHalo = null,
-}: LanternRotatedShellProps) {
-  const t = useTranslations("Lantern.lanternRotatedShell");
+export function LanternRotatedShell(props: LanternRotatedShellProps) {
+  const { rotationBase, className, widthRem, mirrored, actionsBarOffsetX, actionsBarOffsetY, ariaLabel } =
+    withDefaults(props, LANTERN_ROTATED_SHELL_DEFAULTS);
   const transform = getRotationBaseTransform(rotationBase);
   const rootStyle = buildRotationBaseRootStyle({
     widthRem,
@@ -64,51 +60,20 @@ export function LanternRotatedShell({
     mirrored,
     actionsBarOffsetX,
     actionsBarOffsetY,
-    style,
+    style: props.style,
   });
-
   const rootClass = [styles.root, className].filter(Boolean).join(" ");
-  const shellClass = [styles.shell, mirrored ? styles.shellMirrored : null]
-    .filter(Boolean)
-    .join(" ");
-  const showFlame = transform.flameBottom != null || transform.flameHeight != null;
-
-  const showHalo =
-    faceHalo != null &&
-    (Boolean(faceHalo.interactive) || faceHalo.labels.length > 0);
-
-  const faceBody = showHalo ? (
-    <LabelHalo
-      layout="fill"
-      labels={faceHalo.labels}
-      interactive={faceHalo.interactive ?? false}
-      onPlacementCommit={faceHalo.onPlacementCommit}
-      ariaLabel={faceHalo.ariaLabel ?? t("labels", { label: ariaLabel })}
-    >
-      <div className={styles.content}>{children}</div>
-    </LabelHalo>
-  ) : (
-    <div className={styles.content}>{children}</div>
-  );
 
   return (
     <LanternActionsDockProvider>
       {(dockRef) => (
         <article className={rootClass} style={rootStyle} aria-label={ariaLabel}>
-          <div className={shellClass} aria-hidden>
-            {/* eslint-disable-next-line @next/next/no-img-element -- decorative lantern art from /public */}
-            <img
-              className={styles.image}
-              src={transform.assetSrc}
-              alt=""
-              width={transform.imageWidth}
-              height={transform.imageHeight}
-              draggable={false}
-              decoding="async"
-            />
-            {showFlame ? <span className={styles.flame} /> : null}
+          <LanternRotatedBaseArt transform={transform} mirrored={mirrored} />
+          <div className={styles.face}>
+            <LanternRotatedFace faceHalo={props.faceHalo} ariaLabel={ariaLabel}>
+              {props.children}
+            </LanternRotatedFace>
           </div>
-          <div className={styles.face}>{faceBody}</div>
           <div
             ref={dockRef}
             className={styles.actionsBarHost}

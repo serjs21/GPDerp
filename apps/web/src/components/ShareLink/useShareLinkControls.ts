@@ -10,6 +10,8 @@ import type { ShareLinkListItem } from "@/api/shareLinks";
 import * as shareLinksApi from "@/api/shareLinks";
 import { comicToast } from "@/components/ComicToast";
 import { isShareLinkWakeSettled, type ShareLinkWakeSegment } from "@/components/ShareLinkActions";
+import { ACTIVATING_MIN_MS } from "@/consts/activating/activatingDotsConsts";
+import { useActivatingDots } from "@/hooks/useActivatingDots";
 import { useCopy } from "@/hooks/useCopy";
 import { useLocale } from "@/hooks/useLocale";
 import {
@@ -28,9 +30,6 @@ export const HEART_SRC = "/share_modal/link/heart.svg";
 export const CLOCK_SRC = "/share_modal/link/clock.svg";
 export const INFINITY_SRC = "/share_modal/link/infinity.svg";
 
-export const ACTIVATING_DOT_MS = 300;
-export const ACTIVATING_DOT_CYCLE = ["", ".", "..", "..."] as const;
-export const ACTIVATING_MIN_MS = ACTIVATING_DOT_MS * ACTIVATING_DOT_CYCLE.length;
 export const PLANE_ALTITUDE_Y = -50;
 export const PLANE_LIFT_MS = 0.4;
 
@@ -173,7 +172,6 @@ export function useShareLinkControls({
   const [deactivating, setDeactivating] = useState(false);
   const [updatingLimits, setUpdatingLimits] = useState(false);
   const [togglingLabels, setTogglingLabels] = useState(false);
-  const [busyDots, setBusyDots] = useState<(typeof ACTIVATING_DOT_CYCLE)[number]>("");
   const [now, setNow] = useState<Date | null>(null);
   const [form, setForm] = useState<LimitForm>(() => formFromLink(link));
   const [wake, setWake] = useState<{
@@ -194,6 +192,7 @@ export function useShareLinkControls({
   }
   const restartReason = getRestartReason(link, now ?? undefined);
   const busy = activating || deactivating || updatingLimits;
+  const busyDots = useActivatingDots(busy);
   const limitsLocked = busy;
   const copyEnabled = active && !busy;
   const grayscale = !active && !deactivating;
@@ -244,20 +243,6 @@ export function useShareLinkControls({
     const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
   }, [active, link, payload.expirationDate]);
-
-  useEffect(() => {
-    if (!busy) {
-      setBusyDots("");
-      return;
-    }
-    setBusyDots("");
-    let step = 0;
-    const id = window.setInterval(() => {
-      step = (step + 1) % ACTIVATING_DOT_CYCLE.length;
-      setBusyDots(ACTIVATING_DOT_CYCLE[step]!);
-    }, ACTIVATING_DOT_MS);
-    return () => window.clearInterval(id);
-  }, [busy]);
 
   const holdMinBusy = async (startedAt: number, minMs = ACTIVATING_MIN_MS) => {
     const elapsed = Date.now() - startedAt;

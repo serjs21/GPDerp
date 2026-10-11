@@ -88,6 +88,24 @@ export const SHARE_LINK_UPDATE_NOT_STARTED_CALLOUT_POSITION = {
   bottom: "10%",
 } as const satisfies CalloutPosition;
 
+/** Disabled Update panel: link started but unchanged, or link not started yet. */
+export const SHARE_LINK_UPDATE_UNAVAILABLE_VARIANTS = {
+  unchanged: {
+    messageKey: SHARE_LINK_UPDATE_DISABLED_MESSAGE_KEYS.unchanged,
+    position: SHARE_LINK_UPDATE_CALLOUT_POSITION,
+    icon: SHARE_LINK_UPDATE_ICONS.disabled,
+    bubbleClass: "speechBubble",
+    slotClass: "speechBubbleSlot",
+  },
+  inactive: {
+    messageKey: SHARE_LINK_UPDATE_DISABLED_MESSAGE_KEYS.inactive,
+    position: SHARE_LINK_UPDATE_NOT_STARTED_CALLOUT_POSITION,
+    icon: SHARE_LINK_UPDATE_ICONS.notStarted,
+    bubbleClass: "notStartedBubble",
+    slotClass: "notStartedBubbleSlot",
+  },
+} as const;
+
 export const SHARE_LINK_UPDATE_CALLOUT_TIMING = {
   holdMs: 3000,
   fadeMs: 200,

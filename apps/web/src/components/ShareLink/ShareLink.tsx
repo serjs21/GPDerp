@@ -11,6 +11,7 @@ import { ShareLinkLanternPanel } from "@/components/ShareLinkLanternPanel";
 import { ShareLinkPreviewModal } from "@/components/ShareLinkPreviewModal";
 import styles from "./ShareLink.module.css";
 import { useShareLinkControls } from "./useShareLinkControls";
+import { shareLinkApiFns, shareLinkCardClassName, shareLinkCardView } from "./utils/shareLinkCardUtils";
 
 export { buildLimitPayload } from "./useShareLinkControls";
 
@@ -39,11 +40,11 @@ export function ShareLink({
   link,
   haikuId,
   haikuSubject,
-  haiku = null,
+  haiku,
   onChanged,
   onLinkUpdate,
-  createShareLinkFn = shareLinksApi.createShareLink,
-  refreshShareLinkFn = shareLinksApi.refreshShareLink,
+  createShareLinkFn,
+  refreshShareLinkFn,
 }: ShareLinkProps) {
   const ctrl = useShareLinkControls({
     link,
@@ -51,37 +52,33 @@ export function ShareLink({
     haikuSubject,
     onChanged,
     onLinkUpdate,
-    createShareLinkFn,
-    refreshShareLinkFn,
+    ...shareLinkApiFns({ createShareLinkFn, refreshShareLinkFn }),
   });
 
   const queryClient = useQueryClient();
   const [previewOpen, setPreviewOpen] = useState(false);
-  const showLabels = link?.showLabels ?? false;
+  const view = shareLinkCardView(link, haikuId);
+  const toggleLabels = () => void ctrl.onToggleLabels(!view.showLabels);
 
   return (
-    <article
-      className={[styles.root, styles.card, ctrl.grayscale ? styles.cardInactive : ""]
-        .filter(Boolean)
-        .join(" ")}
-    >
+    <article className={shareLinkCardClassName(styles, ctrl.grayscale)}>
       <div className={styles.panelShell}>
         <ShareLinkLanternPanel
           ctrl={ctrl}
-          haiku={haiku}
-          fallbackId={haikuId || link?.sharedHaikuId || link?.id || "share-link-preview"}
-          createdAt={link?.createdAt ?? null}
+          haiku={haiku ?? null}
+          fallbackId={view.lanternFallbackId}
+          createdAt={view.createdAt}
           className={styles.panel}
         />
       </div>
 
       <ShareLinkPreviewLabelsActions
         subject={ctrl.subject}
-        showLabels={showLabels}
+        showLabels={view.showLabels}
         togglingLabels={ctrl.togglingLabels}
         disabled={!link}
         onPreview={() => setPreviewOpen(true)}
-        onToggleLabels={() => void ctrl.onToggleLabels(!showLabels)}
+        onToggleLabels={toggleLabels}
       />
 
       <ShareLinkControlsColumn ctrl={ctrl} classNames={CARD_CONTROLS_CLASS_NAMES} />
@@ -90,11 +87,11 @@ export function ShareLink({
         open={previewOpen}
         onOpenChange={setPreviewOpen}
         subject={ctrl.subject}
-        shareUrl={link?.shareUrl}
+        shareUrl={view.shareUrl}
         haiku={haiku ?? undefined}
-        showLabels={showLabels}
+        showLabels={view.showLabels}
         togglingLabels={ctrl.togglingLabels}
-        onToggleLabels={() => void ctrl.onToggleLabels(!showLabels)}
+        onToggleLabels={toggleLabels}
         onHaikuChanged={() => void queryClient.invalidateQueries({ queryKey: haikuQueryKeys.all })}
       />
     </article>

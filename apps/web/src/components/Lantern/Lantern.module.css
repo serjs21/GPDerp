@@ -188,7 +188,7 @@
 }
 
 .title {
-  margin: 0.4rem 0 0.6rem;
+  margin: 0.4rem 0.6rem 0.6rem;
   align-self: stretch;
   font-family: inherit;
   font-size: var(--lantern-title-font-size, 1rem);

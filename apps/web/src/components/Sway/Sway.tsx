@@ -28,6 +28,7 @@ export type SwayProps = {
 const DEFAULT_SPEED_S = 4.2;
 const DEFAULT_AMPLITUDE_DEG = 3.5;
 
+/** @animationComponent CSS-keyframe pendulum wrapper with a reduced-motion bypass */
 export function Sway({
   children,
   speed = DEFAULT_SPEED_S,

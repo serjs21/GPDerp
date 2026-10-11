@@ -2,6 +2,7 @@
 
 import { Dialog } from "@base-ui/react/dialog";
 import type { CSSProperties, KeyboardEvent, ReactNode } from "react";
+import { withDefaults } from "@/utils/props/withDefaults";
 import { ComicPageLayout } from "./ComicPageLayout";
 import styles from "./ComicPageLayout.module.css";
 
@@ -41,19 +42,19 @@ function submitOnEnter(event: KeyboardEvent<HTMLElement>) {
   submit.click();
 }
 
-export function ComicPageDialog({
-  open,
-  onOpenChange,
-  title,
-  children,
-  ctaFooter,
-  closeOnOverlayClick = true,
-  closeOnEscape = true,
-  showClose = false,
-  className,
-  contentClassName,
-  contentStyle,
-}: ComicPageDialogProps) {
+const COMIC_PAGE_DIALOG_DEFAULTS = {
+  closeOnOverlayClick: true,
+  closeOnEscape: true,
+  showClose: false,
+} as const;
+
+export function ComicPageDialog(props: ComicPageDialogProps) {
+  const { closeOnOverlayClick, closeOnEscape, showClose } = withDefaults(
+    props,
+    COMIC_PAGE_DIALOG_DEFAULTS,
+  );
+  const { open, onOpenChange, title, children, ctaFooter, className, contentClassName, contentStyle } =
+    props;
   return (
     <Dialog.Root
       open={open}
@@ -74,11 +75,7 @@ export function ComicPageDialog({
             style={contentStyle}
           >
             <div className={styles.comicPageShell} onKeyDown={submitOnEnter}>
-              {title ? (
-                <Dialog.Title className={styles.srOnly}>{title}</Dialog.Title>
-              ) : (
-                <Dialog.Title className={styles.srOnly}>Dialog</Dialog.Title>
-              )}
+              <Dialog.Title className={styles.srOnly}>{title ? title : "Dialog"}</Dialog.Title>
               <ComicPageLayout title={title} showClose={showClose} className={className}>
                 {children}
                 {ctaFooter ? (

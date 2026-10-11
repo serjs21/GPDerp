@@ -1,20 +1,17 @@
 "use client";
 
-import {
-  useLayoutEffect,
-  useState,
-  type CSSProperties,
-  type RefObject,
-} from "react";
+import type { RefObject } from "react";
 import { createPortal } from "react-dom";
 import type { HaikuDto } from "@/api/haikus";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import type { LanternTransform } from "@/components/Lantern/lanternTransform";
-import {
-  CREATION_PATH_LANTERN_ABOVE_CHROME_Z_INDEX,
-  CREATION_PATH_LANTERN_Z_INDEX,
-} from "./consts/creationPathLanternConsts";
 import { SVGPathLantern } from "./SVGPathLantern";
+import { useGuideBoxRect } from "./useGuideBoxRect";
+import {
+  creationLanternHaiku,
+  creationLanternOverlayStyle,
+  isCreationLanternHidden,
+} from "./utils/creationPathLanternUtils";
 import styles from "./CreationPathLantern.module.css";
 
 export type CreationPathLanternProps = {
@@ -41,72 +38,26 @@ export type CreationPathLanternProps = {
 export function CreationPathLantern({
   transform,
   overlayOpacity,
-  generatingDraft = null,
-  handoffHaiku = null,
+  generatingDraft,
+  handoffHaiku,
   excludeLabelIds,
-  elevateAboveChrome = false,
+  elevateAboveChrome,
   guideBoxRef,
 }: CreationPathLanternProps) {
-  const [guideBoxRect, setGuideBoxRect] = useState<DOMRect | null>(null);
+  const guideBoxRect = useGuideBoxRect(Boolean(elevateAboveChrome), guideBoxRef);
 
-  useLayoutEffect(() => {
-    if (!elevateAboveChrome) {
-      setGuideBoxRect(null);
-      return;
-    }
-    const el = guideBoxRef?.current;
-    if (!el) return;
+  if (isCreationLanternHidden(overlayOpacity, generatingDraft, handoffHaiku)) return null;
 
-    const sync = () => setGuideBoxRect(el.getBoundingClientRect());
-    sync();
-
-    const ro = new ResizeObserver(sync);
-    ro.observe(el);
-    window.addEventListener("resize", sync);
-    window.addEventListener("scroll", sync, true);
-
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", sync);
-      window.removeEventListener("scroll", sync, true);
-    };
-  }, [elevateAboveChrome, guideBoxRef]);
-
-  if (overlayOpacity <= 0.01) return null;
-  if (!generatingDraft && !handoffHaiku) return null;
-
-  const elevated = elevateAboveChrome && guideBoxRect != null;
-  const zIndex = elevated
-    ? CREATION_PATH_LANTERN_ABOVE_CHROME_Z_INDEX
-    : CREATION_PATH_LANTERN_Z_INDEX;
-
-  const style = (
-    elevated
-      ? {
-          position: "fixed",
-          left: guideBoxRect.left,
-          top: guideBoxRect.top,
-          width: guideBoxRect.width,
-          height: guideBoxRect.height,
-          opacity: overlayOpacity,
-          zIndex,
-          pointerEvents: "none",
-        }
-      : {
-          opacity: overlayOpacity,
-          zIndex,
-        }
-  ) as CSSProperties;
-
+  const elevated = guideBoxRect != null;
   const node = (
     <div
       className={elevated ? styles.overlayElevated : styles.overlay}
-      style={style}
+      style={creationLanternOverlayStyle(guideBoxRect, overlayOpacity)}
       data-creation-path-lantern=""
     >
       <SVGPathLantern
         generatingDraft={generatingDraft}
-        haiku={generatingDraft ? undefined : (handoffHaiku ?? undefined)}
+        haiku={creationLanternHaiku(generatingDraft, handoffHaiku)}
         transform={transform}
         suppressReveal
         isAnimating={overlayOpacity < 1}

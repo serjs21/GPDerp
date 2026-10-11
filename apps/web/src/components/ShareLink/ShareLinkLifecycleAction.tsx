@@ -2,10 +2,12 @@
 
 import { useTranslations } from "next-intl";
 import { ComicPressButton } from "@/components/ComicPressButton";
-import { RestartLinkButton } from "@/components/RestartLinkButton";
+import { ShareLinkBusyButton } from "./ShareLinkBusyButton";
 import type { ShareLinkLifecycleActionProps } from "./ShareLinkLifecycleAction.types";
+import { ShareLinkStartButton } from "./ShareLinkStartButton";
 import styles from "./ShareLink.module.css";
-import { PAUSE_ICON_SRC, START_ICON_SRC } from "./useShareLinkControls";
+import { PAUSE_ICON_SRC } from "./useShareLinkControls";
+import { shareLinkLifecyclePhase } from "./utils/shareLinkCardUtils";
 
 /** Launch / Stop / Restart button for a share link, with in-flight states. */
 export function ShareLinkLifecycleAction({
@@ -19,32 +21,19 @@ export function ShareLinkLifecycleAction({
   onStart,
   onStop,
   stopButtonClassName,
-  restartReason = null,
+  restartReason,
   className,
 }: ShareLinkLifecycleActionProps) {
   const t = useTranslations("ShareLink.lifecycle");
+  const phase = shareLinkLifecyclePhase({ activating, deactivating, active });
+  const blocked = isUpdating || busy;
+
   return (
     <div className={[styles.actionRow, className].filter(Boolean).join(" ")}>
-      {activating ? (
-        <ComicPressButton className={styles.actionButton} disabled aria-live="polite">
-          <span className={styles.actionLabel}>
-            {t("activating")}
-            <span className={styles.activatingDots}>{busyDots}</span>
-          </span>
-        </ComicPressButton>
-      ) : deactivating ? (
-        <ComicPressButton className={styles.actionButton} disabled aria-live="polite">
-          <span className={styles.actionLabel}>
-            {t("stopping")}
-            <span className={styles.activatingDots}>{busyDots}</span>
-          </span>
-        </ComicPressButton>
-      ) : active ? (
+      {phase === "stop" ? (
         <ComicPressButton
-          className={[styles.actionButton, styles.stopButton, stopButtonClassName]
-            .filter(Boolean)
-            .join(" ")}
-          disabled={isUpdating || busy}
+          className={[styles.actionButton, styles.stopButton, stopButtonClassName].filter(Boolean).join(" ")}
+          disabled={blocked}
           onClick={() => void onStop()}
           aria-label={t("stopAriaLabel")}
         >
@@ -52,24 +41,10 @@ export function ShareLinkLifecycleAction({
           <img src={PAUSE_ICON_SRC} alt="" className={styles.actionIcon} aria-hidden />
           <span className={styles.actionLabel}>{t("stop")}</span>
         </ComicPressButton>
-      ) : restartReason ? (
-        <RestartLinkButton
-          reason={restartReason}
-          disabled={!formValid || isUpdating || busy}
-          className={styles.restartButton}
-          onClick={() => void onStart()}
-        />
+      ) : phase === "start" ? (
+        <ShareLinkStartButton onStart={onStart} restartReason={restartReason} disabled={!formValid || blocked} />
       ) : (
-        <ComicPressButton
-          className={styles.actionButton}
-          disabled={!formValid || isUpdating || busy}
-          onClick={() => void onStart()}
-          aria-label={t("launchAriaLabel")}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element -- action icon asset */}
-          <img src={START_ICON_SRC} alt="" className={styles.actionIcon} aria-hidden />
-          <span className={styles.actionLabel}>{t("launch")}</span>
-        </ComicPressButton>
+        <ShareLinkBusyButton label={t(phase)} busyDots={busyDots} />
       )}
     </div>
   );

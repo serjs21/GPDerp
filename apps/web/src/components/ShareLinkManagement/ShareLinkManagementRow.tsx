@@ -1,21 +1,20 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
-import { useRef, useState } from "react";
-import { deleteShareLink, type ShareLinkListItem } from "@/api/shareLinks";
+import { useState } from "react";
+import type { ShareLinkListItem } from "@/api/shareLinks";
 import type { HaikuDto } from "@/api/haikus";
 import { ComicConfirmModal } from "@/components/ComicConfirmModal";
-import { comicToast } from "@/components/ComicToast";
 import { ShareLinkActions } from "@/components/ShareLinkActions";
 import { ShareLinkControlsColumn } from "@/components/ShareLinkControlsColumn";
 import { ShareLinkLanternPanel } from "@/components/ShareLinkLanternPanel";
 import { useShareLinkControls } from "@/components/ShareLink/useShareLinkControls";
-import { MAGIC_EXIT_COLLAPSE_MS } from "@/components/ManageLabel/consts/magicAnimationConsts";
-import { useCollapseExit } from "@/hooks/useCollapseExit";
 import { ShareLinkPreviewModal } from "@/components/ShareLinkPreviewModal";
+import { useOptimisticShowLabels } from "./useOptimisticShowLabels";
 import { SHARE_LINK_HAIKUS_QUERY_KEY } from "./useShareLinkHaikuEnrichment";
+import { useShareLinkRowDelete } from "./useShareLinkRowDelete";
+import { shareLinkRowClassNames } from "./utils/shareLinkRowUtils";
 import styles from "./ShareLinkManagement.module.css";
 
 export type ShareLinkManagementRowProps = {
@@ -25,82 +24,27 @@ export type ShareLinkManagementRowProps = {
   onChanged: () => void;
 };
 
-export function ShareLinkManagementRow({
-  link,
-  haiku,
-  haikuLoading = false,
-  onChanged,
-}: ShareLinkManagementRowProps) {
+export function ShareLinkManagementRow({ link, haiku, haikuLoading, onChanged }: ShareLinkManagementRowProps) {
   const t = useTranslations("ShareLinkManagement.row");
-  const reduceMotion = useReducedMotion();
   const queryClient = useQueryClient();
-  // Optimistic until the list refetch catches up (`base` stops matching the link).
-  const [labelsOverride, setLabelsOverride] = useState<{ base: boolean; value: boolean } | null>(
-    null,
-  );
-  const showLabels =
-    labelsOverride && labelsOverride.base === link.showLabels
-      ? labelsOverride.value
-      : link.showLabels;
+  const { showLabels, onLinkUpdate } = useOptimisticShowLabels(link);
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [exiting, setExiting] = useState(false);
-  const rowRef = useRef<HTMLDivElement>(null);
+  const { rowRef, exiting, deleteOpen, setDeleteOpen, confirmDelete } = useShareLinkRowDelete(link.id, onChanged);
 
   const ctrl = useShareLinkControls({
     link,
     haikuId: link.sharedHaikuId ?? "",
     haikuSubject: link.haikuSubject,
     onChanged,
-    onLinkUpdate: (updated) =>
-      setLabelsOverride({ base: link.showLabels, value: updated.showLabels }),
+    onLinkUpdate,
   });
 
-  // Animate first: the delete socket event drops the row from cache immediately.
-  const eraseLink = async () => {
-    try {
-      await deleteShareLink(link.id);
-      comicToast.success(t("erased"));
-      onChanged();
-    } catch {
-      setExiting(false);
-      comicToast.error(t("eraseError"));
-    }
-  };
-
-  useCollapseExit({
-    ref: rowRef,
-    exiting,
-    durationMs: MAGIC_EXIT_COLLAPSE_MS,
-    listGap: "var(--share-link-list-gap, 1.75rem)",
-    onComplete: () => void eraseLink(),
-  });
-
-  const handleDeleteConfirm = () => {
-    setDeleteOpen(false);
-    if (reduceMotion) {
-      void eraseLink();
-      return;
-    }
-    setExiting(true);
-  };
+  const classNames = shareLinkRowClassNames(exiting, ctrl.grayscale);
+  const toggleLabels = () => void ctrl.onToggleLabels(!showLabels);
 
   return (
-    <div
-      ref={rowRef}
-      className={[styles.linkRowShell, exiting ? styles.linkRowShellExiting : ""]
-        .filter(Boolean)
-        .join(" ")}
-    >
-      <div
-        className={[
-          styles.linkRow,
-          ctrl.grayscale ? styles.linkRowInactive : "",
-          exiting ? styles.boingOutDown : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-      >
+    <div ref={rowRef} className={classNames.shell}>
+      <div className={classNames.row}>
         <ShareLinkLanternPanel
           ctrl={ctrl}
           haiku={haiku}
@@ -115,7 +59,7 @@ export function ShareLinkManagementRow({
           showLabels={showLabels}
           togglingLabels={ctrl.togglingLabels}
           onPreview={() => setPreviewOpen(true)}
-          onToggleLabels={() => void ctrl.onToggleLabels(!showLabels)}
+          onToggleLabels={toggleLabels}
           onDelete={() => setDeleteOpen(true)}
           className={styles.actionsCell}
         />
@@ -131,10 +75,8 @@ export function ShareLinkManagementRow({
           loading={haikuLoading}
           showLabels={showLabels}
           togglingLabels={ctrl.togglingLabels}
-          onToggleLabels={() => void ctrl.onToggleLabels(!showLabels)}
-          onHaikuChanged={() =>
-            void queryClient.invalidateQueries({ queryKey: [SHARE_LINK_HAIKUS_QUERY_KEY] })
-          }
+          onToggleLabels={toggleLabels}
+          onHaikuChanged={() => void queryClient.invalidateQueries({ queryKey: [SHARE_LINK_HAIKUS_QUERY_KEY] })}
         />
 
         <ComicConfirmModal
@@ -143,7 +85,7 @@ export function ShareLinkManagementRow({
           question={t("deleteQuestion")}
           cancelLabel={t("deleteCancel")}
           confirmLabel={t("deleteConfirm")}
-          onConfirm={handleDeleteConfirm}
+          onConfirm={confirmDelete}
         />
       </div>
     </div>

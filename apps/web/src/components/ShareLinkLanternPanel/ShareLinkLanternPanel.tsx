@@ -2,27 +2,27 @@
 
 import { useTranslations } from "next-intl";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
-import { ComicPressButton } from "@/components/ComicPressButton";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { MfgDate } from "@/components/MfgDate";
-import { OverlayTitle } from "@/components/OverlayTitle";
 import { Sway } from "@/components/Sway";
+import { ShareLinkCopyWrap } from "./ShareLinkCopyWrap";
 import { ShareLinkLanternContent } from "./ShareLinkLanternContent";
 import type { ShareLinkLanternPanelProps } from "./ShareLinkLanternPanel.types";
 import { ShareLinkLanternStats } from "./ShareLinkLanternStats";
+import { lanternPanelClassName, lanternPanelFooterDate } from "./utils/lanternPanelUtils";
 import styles from "./ShareLinkLanternPanel.module.css";
 
 /** Swaying share-link lantern with stats + Mfg date; click-to-copy while the link is active. */
 export function ShareLinkLanternPanel({
   ctrl,
-  haiku = null,
-  loading = false,
+  haiku,
+  loading,
   fallbackId,
-  createdAt = null,
+  createdAt,
   className,
 }: ShareLinkLanternPanelProps) {
   const t = useTranslations("ShareLinkLanternPanel");
-  const footerDate = haiku?.createdAt ?? createdAt;
+  const footerDate = lanternPanelFooterDate(haiku, createdAt);
 
   const panel = (
     <ComicPagePanel
@@ -40,9 +40,7 @@ export function ShareLinkLanternPanel({
       }
       footer={footerDate ? <MfgDate date={footerDate} /> : undefined}
       contentAlign="center"
-      className={[styles.panel, ctrl.grayscale ? styles.inactive : styles.active, className]
-        .filter(Boolean)
-        .join(" ")}
+      className={lanternPanelClassName(styles, ctrl.grayscale, className)}
       ariaLabel={t("panelAriaLabel", { subject: ctrl.subject })}
     >
       <div className={styles.wrap}>
@@ -68,14 +66,8 @@ export function ShareLinkLanternPanel({
   if (!ctrl.copyEnabled) return panel;
 
   return (
-    <OverlayTitle title={t("copyTitle")} direction="bottom" className={styles.slot}>
-      <ComicPressButton
-        className={styles.copy}
-        onClick={ctrl.onCopy}
-        aria-label={t("copyAriaLabel", { subject: ctrl.subject })}
-      >
-        {panel}
-      </ComicPressButton>
-    </OverlayTitle>
+    <ShareLinkCopyWrap subject={ctrl.subject} onCopy={ctrl.onCopy}>
+      {panel}
+    </ShareLinkCopyWrap>
   );
 }

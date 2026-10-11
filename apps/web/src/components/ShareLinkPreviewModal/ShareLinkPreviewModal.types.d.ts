@@ -16,3 +16,24 @@ export type ShareLinkPreviewModalProps = {
   /** Refetch the haiku after label placement / label edits. */
   onHaikuChanged: () => void;
 };
+
+export type ShareLinkPreviewLanternProps = Pick<
+  ShareLinkPreviewModalProps,
+  "subject" | "showLabels" | "onHaikuChanged"
+> & {
+  haiku: HaikuDto;
+};
+
+export type ShareLinkPreviewBodyProps = Pick<
+  ShareLinkPreviewModalProps,
+  "subject" | "haiku" | "loading" | "showLabels" | "onHaikuChanged"
+>;
+
+export type ShareLinkPreviewFooterProps = Pick<
+  ShareLinkPreviewModalProps,
+  "subject" | "shareUrl" | "showLabels" | "togglingLabels" | "onToggleLabels"
+> & {
+  canEditLabels: boolean;
+  onEditLabels: () => void;
+  onDone: () => void;
+};

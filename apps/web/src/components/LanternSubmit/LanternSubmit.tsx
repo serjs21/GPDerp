@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { withDefaults } from "@/utils/props/withDefaults";
 import styles from "./LanternSubmit.module.css";
 
 export type LanternSubmitProps = {
@@ -12,13 +13,14 @@ export type LanternSubmitProps = {
   type?: "submit" | "button";
 };
 
-export function LanternSubmit({
-  disabled = false,
-  active = false,
-  "aria-label": ariaLabel,
-  className,
-  type = "submit",
-}: LanternSubmitProps) {
+const LANTERN_SUBMIT_DEFAULTS = {
+  disabled: false,
+  active: false,
+  type: "submit",
+} as const;
+
+export function LanternSubmit(props: LanternSubmitProps) {
+  const { disabled, active, type, className } = withDefaults(props, LANTERN_SUBMIT_DEFAULTS);
   const t = useTranslations("LanternSubmit");
   const showFlame = active && !disabled;
   const rootClass = [styles.root, className].filter(Boolean).join(" ");
@@ -28,7 +30,7 @@ export function LanternSubmit({
       type={type}
       className={rootClass}
       disabled={disabled}
-      aria-label={ariaLabel ?? t("ariaLabel")}
+      aria-label={props["aria-label"] ?? t("ariaLabel")}
       aria-disabled={disabled}
     >
       <span className={styles.icon} aria-hidden />

@@ -14,16 +14,8 @@ import { NotebookPageRough } from "./NotebookPageRough";
 import {
   notebookStyleVars,
 } from "./notebookTokens";
+import type { SendShareEmailContentProps } from "./SendShareEmailContent.types";
 import styles from "./SendShareEmailContent.module.css";
-
-type SendShareEmailContentProps = {
-  message: string;
-  emails: string[];
-  invalidEmails: string[];
-  onMessageChange: (value: string) => void;
-  onEmailsChange: (value: string[]) => void;
-  disabled?: boolean;
-};
 
 export const SendShareEmailContent = ({
   message,
@@ -31,7 +23,7 @@ export const SendShareEmailContent = ({
   invalidEmails,
   onMessageChange,
   onEmailsChange,
-  disabled = false,
+  disabled,
 }: SendShareEmailContentProps) => {
   const t = useTranslations("ShareModal.email");
   const notebookRef = useRef<HTMLDivElement>(null);

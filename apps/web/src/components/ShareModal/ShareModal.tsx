@@ -1,23 +1,20 @@
 "use client";
 
-import { useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { Typography } from "@/components/StyledComponents";
 import {
   ComicPageDialog,
   ComicPagePanel,
 } from "@/components/ComicPageLayout";
-import { ComicPanelTabs } from "@/components/ComicPanelTabs";
 import type { HaikuDto } from "@/api/haikus";
 import type { ShareLinkListItem } from "@/api/shareLinks";
 import { ShareLink } from "@/components/ShareLink/ShareLink";
-import { useShareLinkSocket } from "@/hooks/useShareLinkSocket";
-import { SendShareEmailContent } from "./SendShareEmailContent";
-import { ShareEmailSendPanel } from "./ShareEmailSendPanel";
-import { ShareMethodIcon } from "./ShareMethodIcon";
+import { ShareModalEmailPane } from "./ShareModalEmailPane";
+import { ShareModalMethodTabs } from "./ShareModalMethodTabs";
 import styles from "./ShareModal.module.css";
 import type { ShareMethod } from "./types";
 import { useShareModalController } from "./useShareModalController";
+import { useShareModalLinkSocket } from "./useShareModalLinkSocket";
 
 export type { LinkPolicy, ShareMethod } from "./types";
 
@@ -41,39 +38,21 @@ export type ShareModalProps = {
   initialEmailRecipients?: string[];
 };
 
-const EMPTY_EMAIL_RECIPIENTS: string[] = [];
-
 export function ShareModal({
   open,
   onClose,
   haikuId,
   haikuSubject: haikuSubjectProp,
-  haiku = null,
-  initialCreatedUrl = null,
-  initialCreatedLink = null,
-  initialEmptyLink = false,
-  initialMethod = "link",
-  initialEmailRecipients = EMPTY_EMAIL_RECIPIENTS,
+  haiku,
+  initialCreatedUrl,
+  initialCreatedLink,
+  initialEmptyLink,
+  initialMethod,
+  initialEmailRecipients,
 }: ShareModalProps) {
   const t = useTranslations("ShareModal.modal");
   const haikuSubject = haikuSubjectProp ?? t("defaultSubject");
-  const {
-    method,
-    setMethod,
-    shareLink,
-    setShareLink,
-    loadingLink,
-    emailMessage,
-    setEmailMessage,
-    emailRecipients,
-    setEmailRecipients,
-    sendingEmail,
-    preparingPostcard,
-    invalidEmails,
-    canSendEmail,
-    emailCtaHint,
-    onSendEmail,
-  } = useShareModalController({
+  const controller = useShareModalController({
     open,
     haikuId,
     haiku,
@@ -85,29 +64,8 @@ export function ShareModal({
     initialEmailRecipients,
     onEmailQueued: onClose,
   });
-
-  const onShareLinkSocketUpdate = useCallback(
-    (updated: ShareLinkListItem) => {
-      setShareLink((prev) => {
-        if (updated.sharedHaikuId === haikuId) return { ...prev, ...updated };
-        if (prev?.id === updated.id) return { ...prev, ...updated };
-        return prev;
-      });
-    },
-    [haikuId, setShareLink],
-  );
-
-  const onShareLinkSocketDeleted = useCallback(
-    (id: string) => {
-      setShareLink((prev) => (prev?.id === id ? null : prev));
-    },
-    [setShareLink],
-  );
-
-  useShareLinkSocket(open, {
-    onShareLink: onShareLinkSocketUpdate,
-    onShareLinkDeleted: onShareLinkSocketDeleted,
-  });
+  const { method, setMethod, shareLink, setShareLink, loadingLink } = controller;
+  useShareModalLinkSocket(open, haikuId, setShareLink);
 
   return (
     <ComicPageDialog
@@ -119,48 +77,7 @@ export function ShareModal({
       }}
     >
       <div className={styles.body}>
-        <ComicPanelTabs
-          className={styles.methodRow}
-          panelClassName={styles.methodPanel}
-          value={method}
-          onChange={setMethod}
-          tabs={[
-            {
-              id: "link",
-              panel: {
-                background: "sunburst",
-                color: "teal",
-                title: t("linkTabTitle"),
-                ariaLabel: t("linkTabAriaLabel"),
-              },
-              content: (
-                <ShareMethodIcon
-                  src="/share_modal/link.svg"
-                  bubbleStyle="pointedArcs"
-                  sourceDirection="none"
-                  active={method === "link"}
-                />
-              ),
-            },
-            {
-              id: "email",
-              panel: {
-                background: "halftone",
-                color: "orange",
-                title: t("emailTabTitle"),
-                ariaLabel: t("emailTabAriaLabel"),
-              },
-              content: (
-                <ShareMethodIcon
-                  src="/share_modal/email.svg"
-                  bubbleStyle="rectangle"
-                  sourceDirection="none"
-                  active={method === "email"}
-                />
-              ),
-            },
-          ]}
-        />
+        <ShareModalMethodTabs method={method} onChange={setMethod} />
 
         {/* Both tabs share one grid cell; the link pane stays mounted (hidden) so the email tab takes its height. */}
         <div className={styles.panes}>
@@ -191,29 +108,23 @@ export function ShareModal({
           </div>
 
           {method === "email" ? (
-            <div className={styles.pane} data-active>
-              <div className={styles.contentSlot}>
-                <ComicPagePanel span="full" color="white" contentAlign="start" className={styles.contentPanel}>
-                  <SendShareEmailContent
-                    message={emailMessage}
-                    emails={emailRecipients}
-                    invalidEmails={invalidEmails}
-                    onMessageChange={setEmailMessage}
-                    onEmailsChange={setEmailRecipients}
-                    disabled={sendingEmail}
-                  />
-                </ComicPagePanel>
-              </div>
-              <div className={styles.sendRow}>
-                <ShareEmailSendPanel
-                  canSendEmail={canSendEmail}
-                  sendingEmail={sendingEmail}
-                  preparingPostcard={preparingPostcard}
-                  emailCtaHint={emailCtaHint}
-                  onSendEmail={() => void onSendEmail()}
-                />
-              </div>
-            </div>
+            <ShareModalEmailPane
+              content={{
+                message: controller.emailMessage,
+                emails: controller.emailRecipients,
+                invalidEmails: controller.invalidEmails,
+                onMessageChange: controller.setEmailMessage,
+                onEmailsChange: controller.setEmailRecipients,
+                disabled: controller.sendingEmail,
+              }}
+              send={{
+                canSendEmail: controller.canSendEmail,
+                sendingEmail: controller.sendingEmail,
+                preparingPostcard: controller.preparingPostcard,
+                emailCtaHint: controller.emailCtaHint,
+                onSendEmail: () => void controller.onSendEmail(),
+              }}
+            />
           ) : null}
         </div>
       </div>
