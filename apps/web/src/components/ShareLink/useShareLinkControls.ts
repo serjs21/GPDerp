@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import type { ShareLinkListItem } from "@/api/shareLinks";
 import * as shareLinksApi from "@/api/shareLinks";
 import { comicToast } from "@/components/ComicToast";
+import { isShareLinkWakeSettled, type ShareLinkWakeSegment } from "@/components/ShareLinkActions";
 import { useCopy } from "@/hooks/useCopy";
 import { useLocale } from "@/hooks/useLocale";
 import {
@@ -173,9 +174,16 @@ export function useShareLinkControls({
   const [busyDots, setBusyDots] = useState<(typeof ACTIVATING_DOT_CYCLE)[number]>("");
   const [now, setNow] = useState<Date | null>(null);
   const [form, setForm] = useState<LimitForm>(() => formFromLink(link));
+  const [wake, setWake] = useState<{ segment: ShareLinkWakeSegment; ended: boolean } | null>(
+    null,
+  );
 
   const subject = link?.haikuSubject || haikuSubject;
   const active = link != null && isActiveShareLink(link, now ?? undefined);
+  // Hand back to the static Update image once the link prop reflects the result.
+  if (wake?.ended && isShareLinkWakeSettled(wake.segment, active)) {
+    setWake(null);
+  }
   const restartReason = getRestartReason(link, now ?? undefined);
   const busy = activating || deactivating || updatingLimits;
   const limitsLocked = busy;
@@ -257,12 +265,15 @@ export function useShareLinkControls({
     const startedAt = Date.now();
     setDeactivating(true);
     setIsUpdating(true);
+    setWake({ segment: "sleeping", ended: false });
     try {
       const updated = await shareLinksApi.setShareLinkDisabled(link.id, true);
       onLinkUpdate?.(updated);
+      setWake({ segment: "sleepConfirmed", ended: false });
       comicToast.success(t("stopped"));
       onChanged();
     } catch (error: unknown) {
+      setWake({ segment: "sleepFailed", ended: false });
       comicToast.error(getAxiosErrorMessage(error, t("stopError")));
     } finally {
       setIsUpdating(false);
@@ -277,6 +288,7 @@ export function useShareLinkControls({
     const startedAt = Date.now();
     setActivating(true);
     setIsUpdating(true);
+    setWake({ segment: "waking", ended: false });
     const limitPayload = buildLimitPayload(form);
     try {
       if (link == null) {
@@ -310,9 +322,11 @@ export function useShareLinkControls({
         const updated = await shareLinksApi.setShareLinkDisabled(current.id, false);
         onLinkUpdate?.(updated);
       }
+      setWake({ segment: "wakeConfirmed", ended: false });
       comicToast.success(t("started"));
       onChanged();
     } catch (error: unknown) {
+      setWake({ segment: "wakeFailed", ended: false });
       comicToast.error(getAxiosErrorMessage(error, t("startError")));
     } finally {
       setIsUpdating(false);
@@ -352,6 +366,10 @@ export function useShareLinkControls({
     } finally {
       setTogglingLabels(false);
     }
+  };
+
+  const onWakeAnimationEnd = () => {
+    setWake((current) => (current ? { ...current, ended: true } : current));
   };
 
   const onCopy = () => {
@@ -397,6 +415,8 @@ export function useShareLinkControls({
     deactivating,
     updatingLimits,
     togglingLabels,
+    wakeSegment: wake?.segment ?? null,
+    onWakeAnimationEnd,
     onStop,
     onStart,
     onUpdateLimits,

@@ -2,6 +2,7 @@ import type { TransitionPose } from "@/components/animations/SteppedTransition";
 import type { ComicPanelColor } from "@/components/ComicPageLayout";
 import type { CalloutPosition } from "@/components/HoverHoldCallout";
 import type { ShareLinkActionLayout } from "../ShareLinkActionButton.types";
+import type { ShareLinkWakeSegment } from "../ShareLinkWakeTransition.types";
 
 export const SHARE_LINK_UPDATE_ICONS = {
   enabled: "/share_link_actions/update.svg",
@@ -17,13 +18,41 @@ export const SHARE_LINK_WAKE_FRAMES = [
   SHARE_LINK_UPDATE_ICONS.disabled,
 ] as const;
 
-/** One stepped pose per frame; `progress` encodes the frame index. */
-export const SHARE_LINK_WAKE_POSES: TransitionPose[] = SHARE_LINK_WAKE_FRAMES.map((_, index) => ({
-  progress: index / (SHARE_LINK_WAKE_FRAMES.length - 1),
-  x: 0,
-  y: 0,
-  rotation: 0,
-}));
+/**
+ * Frame indices per segment. Each segment starts on the frame the previous one
+ * ended on, so restarting the stepped transition never jumps.
+ */
+const SHARE_LINK_WAKE_SEGMENT_FRAMES: Record<ShareLinkWakeSegment, readonly number[]> = {
+  waking: [0, 1],
+  wakeConfirmed: [1, 2, 3],
+  wakeFailed: [1, 0],
+  sleeping: [3, 2],
+  sleepConfirmed: [2, 1, 0],
+  sleepFailed: [2, 3],
+};
+
+/** Stepped poses per segment; `progress` encodes the frame index. */
+export const SHARE_LINK_WAKE_SEGMENT_POSES = Object.fromEntries(
+  Object.entries(SHARE_LINK_WAKE_SEGMENT_FRAMES).map(([segment, frames]) => [
+    segment,
+    frames.map(
+      (frame): TransitionPose => ({
+        progress: frame / (SHARE_LINK_WAKE_FRAMES.length - 1),
+        x: 0,
+        y: 0,
+        rotation: 0,
+      }),
+    ),
+  ]),
+) as Record<ShareLinkWakeSegment, TransitionPose[]>;
+
+/** Whether the link is active once each terminal segment finishes. */
+export const SHARE_LINK_WAKE_TERMINAL_ACTIVE: Partial<Record<ShareLinkWakeSegment, boolean>> = {
+  wakeConfirmed: true,
+  wakeFailed: false,
+  sleepConfirmed: false,
+  sleepFailed: true,
+};
 
 export const SHARE_LINK_WAKE_TIMING = {
   holdMs: 320,

@@ -3,8 +3,10 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { SHARE_LINK_WAKE_FRAMES } from "./consts/shareLinkUpdateActionConsts";
+import { ShareLinkUpdateAction } from "./ShareLinkUpdateAction";
 import { ShareLinkWakeTransition } from "./ShareLinkWakeTransition";
-import type { ShareLinkWakeTransitionProps } from "./ShareLinkWakeTransition.types";
+import type { ShareLinkWakeSegment } from "./ShareLinkWakeTransition.types";
+import { isShareLinkWakeSettled } from "./utils/shareLinkWakeUtils";
 
 /** Matches the Update column in ShareLinkManagementRow (6.25rem × settings panel min-height). */
 const FRAME_STYLE = {
@@ -21,6 +23,8 @@ const STACK_STYLE = {
   gap: "0.75rem",
 } as const;
 
+const BUTTONS_STYLE = { display: "flex", gap: "0.5rem" } as const;
+
 const GRID_STYLE = {
   display: "flex",
   gap: "1.5rem",
@@ -33,16 +37,60 @@ const CAPTION_STYLE = {
   fontFamily: "sans-serif",
 } as const;
 
-function ReplayableWake(args: ShareLinkWakeTransitionProps) {
-  const [run, setRun] = useState(0);
+const PENDING: Partial<Record<ShareLinkWakeSegment, true>> = { waking: true, sleeping: true };
+
+/** Mirrors useShareLinkControls: hold mid-frame until the request is confirmed or fails. */
+function SimulatedLifecycle() {
+  const [active, setActive] = useState(false);
+  const [wake, setWake] = useState<{ segment: ShareLinkWakeSegment; ended: boolean } | null>(
+    null,
+  );
+  if (wake?.ended && isShareLinkWakeSettled(wake.segment, active)) setWake(null);
+  const pending = wake != null && PENDING[wake.segment] === true;
+
+  const settle = (ok: boolean) => {
+    if (!wake) return;
+    const starting = wake.segment === "waking";
+    if (ok) setActive(starting);
+    setWake({
+      segment: starting ? (ok ? "wakeConfirmed" : "wakeFailed") : ok ? "sleepConfirmed" : "sleepFailed",
+      ended: false,
+    });
+  };
+
   return (
     <div style={STACK_STYLE}>
       <div style={FRAME_STYLE}>
-        <ShareLinkWakeTransition key={run} {...args} playing={args.playing && run > 0} />
+        <ShareLinkUpdateAction
+          subject="Morning mist"
+          active={active}
+          canUpdate={false}
+          updating={false}
+          onUpdate={() => {}}
+          wakeSegment={wake?.segment ?? null}
+          onWakeAnimationEnd={() => setWake((w) => (w ? { ...w, ended: true } : w))}
+        />
       </div>
-      <button type="button" onClick={() => setRun((n) => n + 1)}>
-        {run === 0 ? "Start link" : "Replay"}
-      </button>
+      <div style={BUTTONS_STYLE}>
+        {pending ? (
+          <>
+            <button type="button" onClick={() => settle(true)}>
+              Confirm
+            </button>
+            <button type="button" onClick={() => settle(false)}>
+              Fail
+            </button>
+          </>
+        ) : (
+          <button
+            type="button"
+            disabled={wake != null}
+            onClick={() => setWake({ segment: active ? "sleeping" : "waking", ended: false })}
+          >
+            {active ? "Stop link" : "Start link"}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -54,6 +102,10 @@ const meta = {
     layout: "centered",
   },
   argTypes: {
+    segment: {
+      control: "select",
+      options: ["waking", "wakeConfirmed", "wakeFailed", "sleeping", "sleepConfirmed", "sleepFailed"],
+    },
     holdMs: { control: { type: "range", min: 0, max: 1000, step: 10 } },
     crossfadeMs: { control: { type: "range", min: 0, max: 600, step: 10 } },
     fadeMode: { control: "inline-radio", options: ["crossfade", "outThenCut"] },
@@ -61,22 +113,26 @@ const meta = {
   },
   args: {
     subject: "Morning mist",
-    playing: true,
+    segment: "wakeConfirmed",
     reducedMotion: false,
   },
-  render: (args) => <ReplayableWake {...args} />,
+  render: (args) => (
+    <div style={FRAME_STYLE}>
+      <ShareLinkWakeTransition {...args} />
+    </div>
+  ),
 } satisfies Meta<typeof ShareLinkWakeTransition>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Press "Start link" to play not_started → wake_1 → wake_2 → update_disabled. */
-export const Wake: Story = {};
-
-/** Hard cuts between frames (no crossfade). */
-export const HardCut: Story = {
-  args: { crossfadeMs: 0 },
+/** Start / stop with a simulated request: Confirm continues, Fail plays back. */
+export const Lifecycle: Story = {
+  render: () => <SimulatedLifecycle />,
 };
+
+/** One segment in isolation — pick it from the controls. */
+export const Segment: Story = {};
 
 /** Each wake frame, static, at Update-panel size. */
 export const Frames: Story = {

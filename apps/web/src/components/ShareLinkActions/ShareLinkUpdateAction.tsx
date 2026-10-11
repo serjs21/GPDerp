@@ -1,5 +1,6 @@
 "use client";
 
+import { useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { HoverHoldCallout } from "@/components/HoverHoldCallout";
@@ -14,6 +15,7 @@ import {
 } from "./consts/shareLinkUpdateActionConsts";
 import { ShareLinkActionButton } from "./ShareLinkActionButton";
 import type { ShareLinkUpdateActionProps } from "./ShareLinkUpdateAction.types";
+import { ShareLinkWakeTransition } from "./ShareLinkWakeTransition";
 import actionStyles from "./ShareLinkActions.module.css";
 import styles from "./ShareLinkUpdateAction.module.css";
 
@@ -23,8 +25,22 @@ export function ShareLinkUpdateAction({
   canUpdate,
   updating,
   onUpdate,
+  wakeSegment = null,
+  onWakeAnimationEnd,
 }: ShareLinkUpdateActionProps) {
   const t = useTranslations("ShareLinkActions.update");
+  const reduceMotion = useReducedMotion();
+  if (wakeSegment) {
+    return (
+      <ShareLinkWakeTransition
+        subject={subject}
+        segment={wakeSegment}
+        reducedMotion={reduceMotion ?? false}
+        onComplete={onWakeAnimationEnd}
+      />
+    );
+  }
+
   if (active && canUpdate) {
     return (
       <ShareLinkActionButton

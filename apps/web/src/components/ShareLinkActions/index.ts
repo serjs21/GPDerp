@@ -2,6 +2,8 @@ export { ShareLinkActions } from "./ShareLinkActions";
 export type { ShareLinkActionsProps } from "./ShareLinkActions.types";
 export { ShareLinkUpdateAction } from "./ShareLinkUpdateAction";
 export type { ShareLinkUpdateActionProps } from "./ShareLinkUpdateAction.types";
+export type { ShareLinkWakeSegment } from "./ShareLinkWakeTransition.types";
+export { isShareLinkWakeSettled } from "./utils/shareLinkWakeUtils";
 export { ShareLinkLabelsToggle } from "./ShareLinkLabelsToggle";
 export type { ShareLinkLabelsToggleProps } from "./ShareLinkLabelsToggle.types";
 export { ShareLinkPreviewLabelsActions } from "./ShareLinkPreviewLabelsActions";

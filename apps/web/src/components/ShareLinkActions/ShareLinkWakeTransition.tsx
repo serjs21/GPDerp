@@ -5,7 +5,7 @@ import { useSteppedTransition } from "@/components/animations/SteppedTransition"
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import {
   SHARE_LINK_WAKE_FRAMES,
-  SHARE_LINK_WAKE_POSES,
+  SHARE_LINK_WAKE_SEGMENT_POSES,
   SHARE_LINK_WAKE_TIMING,
 } from "./consts/shareLinkUpdateActionConsts";
 import type { ShareLinkWakeTransitionProps } from "./ShareLinkWakeTransition.types";
@@ -15,12 +15,12 @@ import updateStyles from "./ShareLinkUpdateAction.module.css";
 import styles from "./ShareLinkWakeTransition.module.css";
 
 /**
- * Stepped not-started → started wake-up in the Update panel slot:
- * not_started → wake_1 → wake_2 → update_disabled.
+ * Stepped wake-up / shut-down in the Update panel slot over
+ * not_started ↔ wake_1 ↔ wake_2 ↔ update_disabled, one segment at a time.
  */
 export function ShareLinkWakeTransition({
   subject,
-  playing,
+  segment,
   holdMs = SHARE_LINK_WAKE_TIMING.holdMs,
   crossfadeMs = SHARE_LINK_WAKE_TIMING.crossfadeMs,
   fadeMode = "crossfade",
@@ -29,15 +29,15 @@ export function ShareLinkWakeTransition({
 }: ShareLinkWakeTransitionProps) {
   const t = useTranslations("ShareLinkActions.update");
   const { layers } = useSteppedTransition({
-    poses: SHARE_LINK_WAKE_POSES,
-    active: playing,
+    poses: SHARE_LINK_WAKE_SEGMENT_POSES[segment],
+    active: true,
     holdMs,
     crossfadeMs,
     fadeMode,
     reducedMotion,
     onComplete,
   });
-  const opacities = shareLinkWakeFrameOpacities(SHARE_LINK_WAKE_FRAMES.length, layers, playing);
+  const opacities = shareLinkWakeFrameOpacities(SHARE_LINK_WAKE_FRAMES.length, layers);
 
   return (
     <ComicPagePanel

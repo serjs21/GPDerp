@@ -292,6 +292,8 @@ export function ShareLink({
               canUpdate={ctrl.showUpdate && ctrl.formValid}
               updating={ctrl.updatingLimits}
               onUpdate={() => void ctrl.onUpdateLimits()}
+              wakeSegment={ctrl.wakeSegment}
+              onWakeAnimationEnd={ctrl.onWakeAnimationEnd}
             />
           </div>
         </div>
