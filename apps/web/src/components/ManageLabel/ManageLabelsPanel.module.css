@@ -35,13 +35,6 @@
   gap: var(--comic-page-gutter, 10px);
   min-width: 0;
 }
-
-@media (max-width: 640px) {
-  .sortRow {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
 .sortRow .sortBesideCreate {
   width: 100%;
   min-width: 0;

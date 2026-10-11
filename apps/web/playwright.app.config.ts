@@ -4,7 +4,8 @@ const port = Number(process.env.APP_PORT ?? 3100);
 
 /**
  * App-level specs against a production build (not Storybook). API calls are mocked per test.
- * Run: `pnpm test:playwright:app` (builds, then serves on APP_PORT, default 3100).
+ * Run: `pnpm test:playwright:app` (builds first). The web server never rebuilds: rebuilding
+ * `.next` under a running `next start` makes it serve chunk URLs that no longer exist.
  */
 export default defineConfig({
   testDir: "./tests/playwright-app",
@@ -24,9 +25,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `pnpm build && pnpm exec next start -p ${port}`,
+    command: `pnpm exec next start -p ${port}`,
     port,
     reuseExistingServer: true,
-    timeout: 300_000,
+    timeout: 60_000,
   },
 });
