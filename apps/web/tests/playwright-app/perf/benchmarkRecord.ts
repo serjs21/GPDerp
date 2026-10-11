@@ -33,7 +33,8 @@ export type BenchmarkRecord = {
 export const PERF_RUNS = Number(process.env.PERF_RUNS ?? 7);
 export const PERF_CPU_THROTTLE = Number(process.env.PERF_CPU_THROTTLE ?? 1);
 
-const RECORD_DIR = path.join(process.cwd(), "test-results", "perf");
+/** Outside Playwright's `test-results/` outputDir, which is emptied at the start of every run. */
+const RECORD_DIR = path.join(process.cwd(), "perf-records");
 const round = (value: number) => Math.round(value * 10) / 10;
 
 export function median(samples: number[]): number {
@@ -87,7 +88,7 @@ export function buildRecord(
   };
 }
 
-/** Writes `test-results/perf/<name>-<size>.json` and returns the path. */
+/** Writes `perf-records/<name>-<size>.json` and returns the path. */
 export function writeRecord(record: BenchmarkRecord): string {
   mkdirSync(RECORD_DIR, { recursive: true });
   const file = path.join(RECORD_DIR, `${record.name.replace(/[^\w-]+/g, "_")}-${record.datasetSize}.json`);

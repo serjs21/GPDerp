@@ -74,7 +74,7 @@ function findTag(sourceCode, fn, owner) {
   return null;
 }
 
-export default {
+const componentComplexity = {
   meta: {
     type: "suggestion",
     docs: {
@@ -142,3 +142,5 @@ export default {
     };
   },
 };
+
+export default componentComplexity;

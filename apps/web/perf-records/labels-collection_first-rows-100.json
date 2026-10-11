@@ -1,19 +1,19 @@
 {
   "name": "labels-collection/first-rows",
   "scenario": "Navigate to /settings?tab=labels until the first label rows render",
-  "datasetSize": 1000,
+  "datasetSize": 100,
   "samples": [
-    446.3,
-    327,
-    365.8,
-    344.8,
-    622.7,
-    384.7,
-    334
+    324.5,
+    325.7,
+    326.7,
+    331.4,
+    327.3,
+    326.1,
+    345.7
   ],
   "extra": {},
   "environment": {
-    "gitSha": "313941e",
+    "gitSha": "921265e",
     "gitDirty": false,
     "buildId": "bh4JPOG5QlZbqtCVQ4Hws",
     "nodeEnv": "production",
@@ -21,10 +21,10 @@
     "viewport": "1280x720",
     "cpuThrottle": 1,
     "platform": "darwin arm64 Apple M2 Pro",
-    "timestamp": "2026-10-11T21:20:40.208Z"
+    "timestamp": "2026-10-11T21:30:25.252Z"
   },
   "runs": 7,
   "unit": "ms",
-  "median": 365.8,
-  "p95": 622.7
+  "median": 326.7,
+  "p95": 345.7
 }

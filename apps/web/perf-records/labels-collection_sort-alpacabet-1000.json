@@ -1,0 +1,35 @@
+{
+  "name": "labels-collection/sort-alpacabet",
+  "scenario": "Click the Alpacabet sort coin on /settings?tab=labels until every label row renders sorted",
+  "datasetSize": 1000,
+  "samples": [
+    19744.8,
+    22965,
+    20747.6,
+    20719.4,
+    22539.2,
+    20521.3,
+    19234.2
+  ],
+  "extra": {
+    "labelPageRequests": 83,
+    "maxEventDuration": 96,
+    "longTasksPerRun": 117,
+    "longTaskMsPerRun": 10881
+  },
+  "environment": {
+    "gitSha": "921265e",
+    "gitDirty": false,
+    "buildId": "bh4JPOG5QlZbqtCVQ4Hws",
+    "nodeEnv": "production",
+    "browser": "chromium 145.0.7632.6",
+    "viewport": "1280x720",
+    "cpuThrottle": 1,
+    "platform": "darwin arm64 Apple M2 Pro",
+    "timestamp": "2026-10-11T21:33:26.571Z"
+  },
+  "runs": 7,
+  "unit": "ms",
+  "median": 20719.4,
+  "p95": 22965
+}

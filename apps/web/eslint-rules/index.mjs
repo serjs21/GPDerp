@@ -1,8 +1,10 @@
 import componentComplexity from "./componentComplexity.mjs";
 
-export default {
+const localRules = {
   meta: { name: "local" },
   rules: {
     "component-complexity": componentComplexity,
   },
 };
+
+export default localRules;

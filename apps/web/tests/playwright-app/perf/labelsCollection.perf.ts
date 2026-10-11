@@ -8,7 +8,7 @@ import { applyCpuThrottle, installPerfObservers, readPerfProbe, resetPerfProbe, 
  * - first-rows: navigation start → first label rows rendered (page clock).
  * - sort-alpacabet: click the "Alpacabet" sort coin → every label rendered in sorted order
  *   (the panel loads all remaining pages before sorting in memory).
- * Run: `pnpm bench:app` (optionally `-- --grep "1000 labels"`, PERF_RUNS, PERF_CPU_THROTTLE).
+ * Run: `pnpm bench:app` (optionally `--grep "1000 labels"`, PERF_RUNS, PERF_CPU_THROTTLE).
  */
 
 const ACCOUNT_ID = "account-1";

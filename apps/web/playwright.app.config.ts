@@ -24,7 +24,7 @@ export default defineConfig({
       testIgnore: "perf/**",
       use: { ...devices["Desktop Chrome"] },
     },
-    // Benchmarks only via `pnpm bench:app` (serial, no tracing). Records → test-results/perf/.
+    // Benchmarks only via `pnpm bench:app` (serial, no tracing). Records → perf-records/.
     ...(process.env.PLAYWRIGHT_PERF
       ? [
           {
