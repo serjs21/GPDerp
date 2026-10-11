@@ -39,23 +39,37 @@ const CAPTION_STYLE = {
 
 const PENDING: Partial<Record<ShareLinkWakeSegment, true>> = { waking: true, sleeping: true };
 
-/** Mirrors useShareLinkControls: hold mid-frame until the request is confirmed or fails. */
+/** Simulated delay between the start request confirming and the link prop turning active. */
+const ACTIVE_LAG_MS = 1000;
+
+/**
+ * Mirrors useShareLinkControls: hold mid-frame until the request is confirmed or
+ * fails; a confirmed start also holds wake_1 until the link turns active.
+ */
 function SimulatedLifecycle() {
   const [active, setActive] = useState(false);
-  const [wake, setWake] = useState<{ segment: ShareLinkWakeSegment; ended: boolean } | null>(
-    null,
-  );
+  const [wake, setWake] = useState<{
+    segment: ShareLinkWakeSegment;
+    ended: boolean;
+    awaitingActive?: boolean;
+  } | null>(null);
+  if (wake?.awaitingActive && active) setWake({ segment: "wakeConfirmed", ended: false });
   if (wake?.ended && isShareLinkWakeSettled(wake.segment, active)) setWake(null);
-  const pending = wake != null && PENDING[wake.segment] === true;
+  const pending = wake != null && PENDING[wake.segment] === true && !wake.awaitingActive;
 
   const settle = (ok: boolean) => {
     if (!wake) return;
-    const starting = wake.segment === "waking";
-    if (ok) setActive(starting);
-    setWake({
-      segment: starting ? (ok ? "wakeConfirmed" : "wakeFailed") : ok ? "sleepConfirmed" : "sleepFailed",
-      ended: false,
-    });
+    if (wake.segment === "waking") {
+      if (!ok) {
+        setWake({ segment: "wakeFailed", ended: false });
+        return;
+      }
+      setWake({ ...wake, awaitingActive: true });
+      window.setTimeout(() => setActive(true), ACTIVE_LAG_MS);
+      return;
+    }
+    if (ok) setActive(false);
+    setWake({ segment: ok ? "sleepConfirmed" : "sleepFailed", ended: false });
   };
 
   return (

@@ -174,12 +174,18 @@ export function useShareLinkControls({
   const [busyDots, setBusyDots] = useState<(typeof ACTIVATING_DOT_CYCLE)[number]>("");
   const [now, setNow] = useState<Date | null>(null);
   const [form, setForm] = useState<LimitForm>(() => formFromLink(link));
-  const [wake, setWake] = useState<{ segment: ShareLinkWakeSegment; ended: boolean } | null>(
-    null,
-  );
+  const [wake, setWake] = useState<{
+    segment: ShareLinkWakeSegment;
+    ended: boolean;
+    /** Start confirmed; keep holding on wake_1 until the link prop turns active. */
+    awaitingActive?: boolean;
+  } | null>(null);
 
   const subject = link?.haikuSubject || haikuSubject;
   const active = link != null && isActiveShareLink(link, now ?? undefined);
+  if (wake?.awaitingActive && active) {
+    setWake({ segment: "wakeConfirmed", ended: false });
+  }
   // Hand back to the static Update image once the link prop reflects the result.
   if (wake?.ended && isShareLinkWakeSettled(wake.segment, active)) {
     setWake(null);
@@ -322,7 +328,7 @@ export function useShareLinkControls({
         const updated = await shareLinksApi.setShareLinkDisabled(current.id, false);
         onLinkUpdate?.(updated);
       }
-      setWake({ segment: "wakeConfirmed", ended: false });
+      setWake({ segment: "waking", ended: false, awaitingActive: true });
       comicToast.success(t("started"));
       onChanged();
     } catch (error: unknown) {
