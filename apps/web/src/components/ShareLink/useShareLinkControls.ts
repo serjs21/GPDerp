@@ -28,7 +28,7 @@ export const HEART_SRC = "/share_modal/link/heart.svg";
 export const CLOCK_SRC = "/share_modal/link/clock.svg";
 export const INFINITY_SRC = "/share_modal/link/infinity.svg";
 
-export const ACTIVATING_DOT_MS = 500;
+export const ACTIVATING_DOT_MS = 300;
 export const ACTIVATING_DOT_CYCLE = ["", ".", "..", "..."] as const;
 export const ACTIVATING_MIN_MS = ACTIVATING_DOT_MS * ACTIVATING_DOT_CYCLE.length;
 export const PLANE_ALTITUDE_Y = -50;
