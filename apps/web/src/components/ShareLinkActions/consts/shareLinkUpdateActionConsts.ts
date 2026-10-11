@@ -1,3 +1,4 @@
+import type { TransitionPose } from "@/components/animations/SteppedTransition";
 import type { ComicPanelColor } from "@/components/ComicPageLayout";
 import type { CalloutPosition } from "@/components/HoverHoldCallout";
 import type { ShareLinkActionLayout } from "../ShareLinkActionButton.types";
@@ -6,6 +7,27 @@ export const SHARE_LINK_UPDATE_ICONS = {
   enabled: "/share_link_actions/update.svg",
   disabled: "/share_link_actions/update_disabled.svg",
   notStarted: "/share_link_actions/not_started.svg",
+} as const;
+
+/** Not-started → started wake-up frames, in play order. */
+export const SHARE_LINK_WAKE_FRAMES = [
+  SHARE_LINK_UPDATE_ICONS.notStarted,
+  "/share_link_actions/wake_1.svg",
+  "/share_link_actions/wake_2.svg",
+  SHARE_LINK_UPDATE_ICONS.disabled,
+] as const;
+
+/** One stepped pose per frame; `progress` encodes the frame index. */
+export const SHARE_LINK_WAKE_POSES: TransitionPose[] = SHARE_LINK_WAKE_FRAMES.map((_, index) => ({
+  progress: index / (SHARE_LINK_WAKE_FRAMES.length - 1),
+  x: 0,
+  y: 0,
+  rotation: 0,
+}));
+
+export const SHARE_LINK_WAKE_TIMING = {
+  holdMs: 320,
+  crossfadeMs: 90,
 } as const;
 
 export const SHARE_LINK_UPDATE_COLORS = {

@@ -760,7 +760,8 @@
       "ariaLabel": "Update share link for {subject}",
       "disabledInactive": "What is yet to begin - can't be changed",
       "disabledUnchanged": "Everything's in its right place",
-      "unavailableAlt": "Update unavailable for {subject}: {message}"
+      "unavailableAlt": "Update unavailable for {subject}: {message}",
+      "wakingAlt": "Share link for {subject} is starting"
     }
   },
   "ShareLinkManagement": {
