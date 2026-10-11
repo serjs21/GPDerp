@@ -41,7 +41,9 @@ export function ShareLinkLifecycleAction({
         </ComicPressButton>
       ) : active ? (
         <ComicPressButton
-          className={[styles.actionButton, stopButtonClassName].filter(Boolean).join(" ")}
+          className={[styles.actionButton, styles.stopButton, stopButtonClassName]
+            .filter(Boolean)
+            .join(" ")}
           disabled={isUpdating || busy}
           onClick={() => void onStop()}
           aria-label={t("stopAriaLabel")}

@@ -1,0 +1,139 @@
+.slot {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 14rem;
+  height: 100%;
+}
+
+.copy {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 14rem;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+}
+
+.panel {
+  min-height: 8rem;
+  min-width: 0;
+  container-type: size;
+  transition: filter 0.3s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+}
+
+.copy .panel {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+}
+
+.inactive {
+  filter: grayscale(1);
+}
+
+.active {
+  filter: grayscale(0);
+}
+
+.wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: calc(100cqh - 1rem);
+  max-height: calc(100cqh - 1rem);
+  min-height: 0;
+  padding: 0.35rem;
+}
+
+.sway {
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.frame {
+  box-sizing: border-box;
+  width: auto !important;
+  height: 100% !important;
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: 368 / 391;
+}
+
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0.35rem;
+  box-sizing: border-box;
+}
+
+.lantern {
+  container-type: inline-size;
+  justify-content: center;
+  padding-top: 0.08rem;
+}
+
+.lantern p {
+  letter-spacing: 0.01em;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.12rem;
+  text-align: start;
+  text-transform: none;
+  pointer-events: none;
+}
+
+.stat {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.statIcon {
+  display: block;
+  width: 0.85rem;
+  height: 0.85rem;
+  object-fit: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+.statValue {
+  font-family: var(--font-pixel-display);
+  font-size: 0.58rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--comic-ink, #2d2d2d);
+  white-space: nowrap;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    transition: none;
+  }
+}

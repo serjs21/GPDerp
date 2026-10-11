@@ -3,92 +3,20 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
-import { useRef, useState, type CSSProperties } from "react";
+import { useRef, useState } from "react";
 import { deleteShareLink, type ShareLinkListItem } from "@/api/shareLinks";
 import type { HaikuDto } from "@/api/haikus";
 import { ComicConfirmModal } from "@/components/ComicConfirmModal";
-import { ComicPagePanel } from "@/components/ComicPageLayout";
-import { ComicPressButton } from "@/components/ComicPressButton";
 import { comicToast } from "@/components/ComicToast";
-import { ShareLinkActions, ShareLinkUpdateAction } from "@/components/ShareLinkActions";
-import { MfgDate } from "@/components/MfgDate";
-import { Lantern } from "@/components/Lantern/Lantern";
-import { LanternFrame } from "@/components/Lantern/LanternFrame";
-import { buildPreviewLanternTypographyStyle } from "@/components/Lantern/utils/previewLanternTypography";
-import { SakuraPetalLoader } from "@/components/Loaders";
-import { OverlayTitle } from "@/components/OverlayTitle";
-import { Sway } from "@/components/Sway";
-import shareStyles from "@/components/ShareLink/ShareLink.module.css";
-import { ShareLinkLifecycleAction } from "@/components/ShareLink/ShareLinkLifecycleAction";
-import { ShareLinkSettingsControls } from "@/components/ShareLink/ShareLinkSettingsControls";
-import {
-  CLOCK_SRC,
-  HEART_FILLED_SRC,
-  HEART_SRC,
-  INFINITY_SRC,
-  useShareLinkControls,
-} from "@/components/ShareLink/useShareLinkControls";
+import { ShareLinkActions } from "@/components/ShareLinkActions";
+import { ShareLinkControlsColumn } from "@/components/ShareLinkControlsColumn";
+import { ShareLinkLanternPanel } from "@/components/ShareLinkLanternPanel";
+import { useShareLinkControls } from "@/components/ShareLink/useShareLinkControls";
 import { MAGIC_EXIT_COLLAPSE_MS } from "@/components/ManageLabel/consts/magicAnimationConsts";
 import { useCollapseExit } from "@/hooks/useCollapseExit";
-import type { HitsMeterDisplay, TimeMeterDisplay } from "@/utils/shareLinkDisplay";
 import { ShareLinkPreviewModal } from "@/components/ShareLinkPreviewModal";
 import { SHARE_LINK_HAIKUS_QUERY_KEY } from "./useShareLinkHaikuEnrichment";
 import styles from "./ShareLinkManagement.module.css";
-
-function previewLanternBodyStyle(body: string, title?: string): CSSProperties {
-  return buildPreviewLanternTypographyStyle(body, {
-    title,
-    minBodyRem: 0.3,
-    maxBodyRem: 0.72,
-    maxTitleRem: 0.68,
-    maxAuthorRem: 0.48,
-  });
-}
-
-function PreviewLanternStats({
-  hits,
-  time,
-  hitsLabel,
-  timeLabel,
-}: {
-  hits: HitsMeterDisplay;
-  time: TimeMeterDisplay;
-  hitsLabel: string;
-  timeLabel: string;
-}) {
-  const t = useTranslations("ShareLinkManagement.row");
-  return (
-    <div className={styles.previewStats} aria-label={t("statsAriaLabel")}>
-      <span className={styles.previewStat} aria-label={hitsLabel}>
-        {/* eslint-disable-next-line @next/next/no-img-element -- pixel meter icons */}
-        <img
-          src={hits.kind === "empty" ? HEART_SRC : HEART_FILLED_SRC}
-          alt=""
-          className={styles.previewStatIcon}
-          aria-hidden
-        />
-        {hits.kind === "unlimited" ? (
-          // eslint-disable-next-line @next/next/no-img-element -- pixel meter icons
-          <img src={INFINITY_SRC} alt="" className={styles.previewStatIcon} aria-hidden />
-        ) : (
-          <span className={styles.previewStatValue}>
-            {hits.count}/{hits.total}
-          </span>
-        )}
-      </span>
-      <span className={styles.previewStat} aria-label={timeLabel}>
-        {/* eslint-disable-next-line @next/next/no-img-element -- pixel meter icons */}
-        <img src={CLOCK_SRC} alt="" className={styles.previewStatIcon} aria-hidden />
-        {time.kind === "unlimited" ? (
-          // eslint-disable-next-line @next/next/no-img-element -- pixel meter icons
-          <img src={INFINITY_SRC} alt="" className={styles.previewStatIcon} aria-hidden />
-        ) : (
-          <span className={styles.previewStatValue}>{time.text}</span>
-        )}
-      </span>
-    </div>
-  );
-}
 
 export type ShareLinkManagementRowProps = {
   link: ShareLinkListItem;
@@ -157,81 +85,6 @@ export function ShareLinkManagementRow({
     setExiting(true);
   };
 
-  const showLoader = haikuLoading;
-  const previewBody = haiku?.body ?? "";
-  const lanternContent = haiku ? (
-    <Lantern
-      haiku={haiku}
-      showActions={false}
-      bodyOnly
-      className={styles.previewLantern}
-      style={previewLanternBodyStyle(previewBody, haiku.title)}
-    />
-  ) : showLoader ? (
-    <div className={styles.lanternLoader}>
-      <SakuraPetalLoader />
-    </div>
-  ) : (
-    <Lantern
-      haiku={{
-        id: link.sharedHaikuId ?? link.id,
-        title: ctrl.subject,
-        titleSuffix: 0,
-        body: "",
-        createdAt: link.createdAt,
-        accountId: "",
-        createdById: "",
-        labels: [],
-      }}
-      showActions={false}
-      bodyOnly
-      className={styles.previewLantern}
-    />
-  );
-
-  const lanternStats = ctrl.active ? (
-    <PreviewLanternStats
-      hits={ctrl.hits}
-      time={ctrl.time}
-      hitsLabel={ctrl.hitsLabel}
-      timeLabel={ctrl.timeLabel}
-    />
-  ) : undefined;
-
-  const createdAt = haiku?.createdAt ?? link.createdAt;
-  const previewFooter = <MfgDate date={createdAt} />;
-
-  const lanternPanel = (
-    <ComicPagePanel
-      background="halftone"
-      color="sky"
-      title={lanternStats}
-      footer={previewFooter}
-      contentAlign="center"
-      className={[
-        styles.lanternPanel,
-        ctrl.grayscale ? shareStyles.panelShellInactive : shareStyles.panelShellActive,
-      ].join(" ")}
-    >
-      <div className={styles.lanternWrap}>
-        <Sway
-          className={styles.lanternSway}
-          disabled={!ctrl.active}
-          speed={4.6}
-          amplitude={3.25}
-        >
-          <LanternFrame
-            ariaLabel={t("lanternAriaLabel", { subject: ctrl.subject })}
-            className={styles.lanternFrame}
-            widthRem={9}
-          >
-            {lanternContent}
-          </LanternFrame>
-        </Sway>
-      </div>
-    </ComicPagePanel>
-  );
-
   return (
     <div
       ref={rowRef}
@@ -248,19 +101,13 @@ export function ShareLinkManagementRow({
           .filter(Boolean)
           .join(" ")}
       >
-        {ctrl.copyEnabled ? (
-          <OverlayTitle title={t("copyTitle")} direction="bottom" className={styles.lanternSlot}>
-            <ComicPressButton
-              className={styles.lanternCopy}
-              onClick={ctrl.onCopy}
-              aria-label={t("copyAriaLabel", { subject: ctrl.subject })}
-            >
-              {lanternPanel}
-            </ComicPressButton>
-          </OverlayTitle>
-        ) : (
-          lanternPanel
-        )}
+        <ShareLinkLanternPanel
+          ctrl={ctrl}
+          haiku={haiku}
+          loading={haikuLoading}
+          fallbackId={link.sharedHaikuId ?? link.id}
+          createdAt={link.createdAt}
+        />
 
         <ShareLinkActions
           subject={ctrl.subject}
@@ -273,64 +120,7 @@ export function ShareLinkManagementRow({
           className={styles.actionsCell}
         />
 
-        <div className={styles.settingsColumn}>
-          <div className={styles.settingsRow}>
-            <ComicPagePanel
-              background="solid"
-              color="white"
-              contentAlign="start"
-              className={styles.settingsPanel}
-              ariaLabel={t("settingsAriaLabel", { subject: ctrl.subject })}
-            >
-              <div className={styles.settingsBody}>
-                <ShareLinkSettingsControls
-                  form={ctrl.form}
-                  setForm={ctrl.setForm}
-                  limitsLocked={ctrl.limitsLocked}
-                  formValid={ctrl.formValid}
-                  showUpdate={ctrl.showUpdate}
-                  updatingLimits={ctrl.updatingLimits}
-                  activating={ctrl.activating}
-                  deactivating={ctrl.deactivating}
-                  active={ctrl.active}
-                  busy={ctrl.busy}
-                  isUpdating={ctrl.isUpdating}
-                  busyDots={ctrl.busyDots}
-                  onUpdateLimits={ctrl.onUpdateLimits}
-                  onStart={ctrl.onStart}
-                  onStop={ctrl.onStop}
-                  restartReason={ctrl.restartReason}
-                  hideUpdate
-                  hideLifecycleAction
-                />
-              </div>
-            </ComicPagePanel>
-            <div className={styles.settingsUpdate}>
-              <ShareLinkUpdateAction
-                subject={ctrl.subject}
-                active={ctrl.active}
-                canUpdate={ctrl.showUpdate && ctrl.formValid}
-                updating={ctrl.updatingLimits}
-                onUpdate={() => void ctrl.onUpdateLimits()}
-                wakeSegment={ctrl.wakeSegment}
-                onWakeAnimationEnd={ctrl.onWakeAnimationEnd}
-              />
-            </div>
-          </div>
-          <ShareLinkLifecycleAction
-            formValid={ctrl.formValid}
-            activating={ctrl.activating}
-            deactivating={ctrl.deactivating}
-            active={ctrl.active}
-            busy={ctrl.busy}
-            isUpdating={ctrl.isUpdating}
-            busyDots={ctrl.busyDots}
-            onStart={ctrl.onStart}
-            onStop={ctrl.onStop}
-            stopButtonClassName={shareStyles.stopButton}
-            restartReason={ctrl.restartReason}
-          />
-        </div>
+        <ShareLinkControlsColumn ctrl={ctrl} />
 
         <ShareLinkPreviewModal
           open={previewOpen}

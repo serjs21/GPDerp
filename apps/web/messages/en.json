@@ -685,14 +685,6 @@
     }
   },
   "ShareLink": {
-    "card": {
-      "statsAriaLabel": "Share link stats",
-      "panelAriaLabel": "Share link for {subject}",
-      "lanternAriaLabel": "Haiku lantern: {subject}",
-      "copyTitle": "Copy link!",
-      "copyAriaLabel": "Copy share link for {subject}",
-      "settingsAriaLabel": "Share link settings for {subject}"
-    },
     "lifecycle": {
       "activating": "Activating",
       "stopping": "Stopping",
@@ -800,13 +792,18 @@
       "deleteCancel": "No",
       "deleteConfirm": "Yes",
       "erased": "Share link erased",
-      "eraseError": "It failed. The universe remains unchanged.",
-      "statsAriaLabel": "Share link stats",
-      "lanternAriaLabel": "Haiku lantern: {subject}",
-      "copyTitle": "Copy share link!",
-      "copyAriaLabel": "Copy share link for {subject}",
-      "settingsAriaLabel": "Share link settings for {subject}"
+      "eraseError": "It failed. The universe remains unchanged."
     }
+  },
+  "ShareLinkLanternPanel": {
+    "statsAriaLabel": "Share link stats",
+    "panelAriaLabel": "Share link for {subject}",
+    "lanternAriaLabel": "Haiku lantern: {subject}",
+    "copyTitle": "Copy share link!",
+    "copyAriaLabel": "Copy share link for {subject}"
+  },
+  "ShareLinkControlsColumn": {
+    "settingsAriaLabel": "Share link settings for {subject}"
   },
   "ShareLinkPreviewModal": {
     "panelAriaLabel": "Shared lantern: {subject}",

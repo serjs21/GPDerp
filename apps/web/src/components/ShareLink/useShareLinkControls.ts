@@ -151,6 +151,8 @@ export type UseShareLinkControlsArgs = {
   refreshShareLinkFn?: typeof shareLinksApi.refreshShareLink;
 };
 
+export type ShareLinkControls = ReturnType<typeof useShareLinkControls>;
+
 /** Shared start/stop/limits state for ShareLink + ShareLinkManagement. */
 // eslint-disable-next-line max-lines-per-function, complexity -- intentional single control surface
 export function useShareLinkControls({
