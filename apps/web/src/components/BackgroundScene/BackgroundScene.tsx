@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, useRef, type CSSProperties } from "react";
+import { useId, type CSSProperties } from "react";
+import { preload } from "react-dom";
 import type { SelectorBackgroundBodies } from "@/theme/celestialSelectorLayout";
 import {
   formatCssRem,
@@ -18,7 +19,7 @@ import {
   DEFAULT_COLOR_BALANCE,
   type ColorBalanceValues,
 } from "./backgroundSceneColorBalance";
-import { useBackgroundSceneMaskLayout } from "./useBackgroundSceneMaskLayout";
+import { BACKGROUND_SCENE_SOURCE_SIZE } from "./backgroundSceneMaskLayout";
 import { BackgroundSceneStars } from "./BackgroundSceneStars";
 import styles from "./BackgroundScene.module.css";
 
@@ -37,8 +38,9 @@ export function BackgroundScene({
   mountainColorBalance = DEFAULT_COLOR_BALANCE,
   className,
 }: BackgroundSceneProps) {
-  const baseArtStackRef = useRef<HTMLDivElement>(null);
-  const maskLayout = useBackgroundSceneMaskLayout(baseArtStackRef);
+  // Mask URL lives only in CSS; without a preload it is requested after style resolution, not with
+  // the HTML. CSS masks are CORS fetches, so the preload must be too or the mask downloads twice.
+  preload(BACKGROUND_SCENE_ASSETS.masks.mountain, { as: "image", crossOrigin: "anonymous" });
   const globalFilterId = useId().replace(/:/g, "");
   const mountainFilterId = useId().replace(/:/g, "");
   const globalMatrix = colorBalanceToMatrix(colorBalance);
@@ -92,15 +94,7 @@ export function BackgroundScene({
           </defs>
         </svg>
 
-        <div
-          ref={baseArtStackRef}
-          className={styles.baseArtStack}
-          style={
-            {
-              "--mountain-mask-image": `url("${BACKGROUND_SCENE_ASSETS.masks.mountain}")`,
-            } as CSSProperties
-          }
-        >
+        <div className={styles.baseArtStack}>
           {/* Native img required for SVG feColorMatrix filter url() on the base art layer. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -109,6 +103,9 @@ export function BackgroundScene({
             alt=""
             aria-hidden
             draggable={false}
+            width={BACKGROUND_SCENE_SOURCE_SIZE.baseWidth}
+            height={BACKGROUND_SCENE_SOURCE_SIZE.baseHeight}
+            fetchPriority="high"
             style={{ filter: `url(#${globalFilterId})` }}
           />
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -118,15 +115,10 @@ export function BackgroundScene({
             alt=""
             aria-hidden
             draggable={false}
-            style={
-              {
-                filter: `url(#${mountainFilterId})`,
-                WebkitMaskSize: `${maskLayout.maskWidthPx}px ${maskLayout.maskHeightPx}px`,
-                maskSize: `${maskLayout.maskWidthPx}px ${maskLayout.maskHeightPx}px`,
-                WebkitMaskPosition: maskLayout.maskPosition,
-                maskPosition: maskLayout.maskPosition,
-              } as CSSProperties
-            }
+            width={BACKGROUND_SCENE_SOURCE_SIZE.baseWidth}
+            height={BACKGROUND_SCENE_SOURCE_SIZE.baseHeight}
+            fetchPriority="high"
+            style={{ filter: `url(#${mountainFilterId})` }}
           />
         </div>
       </div>

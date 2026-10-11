@@ -49,12 +49,17 @@
   width: 100%;
   height: auto;
   pointer-events: none;
-  -webkit-mask-image: var(--mountain-mask-image);
-  mask-image: var(--mountain-mask-image);
+  -webkit-mask-image: url("/background/masks/mountain-mask.png");
+  mask-image: url("/background/masks/mountain-mask.png");
   -webkit-mask-source-type: luminance;
   mask-mode: luminance;
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
+  /* Width-locked to the art; height follows the mask's 1672:941 intrinsic ratio. */
+  -webkit-mask-size: 100% auto;
+  mask-size: 100% auto;
+  -webkit-mask-position: center bottom;
+  mask-position: center bottom;
 }
 
 .filterDefs {

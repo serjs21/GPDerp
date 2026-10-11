@@ -52,6 +52,13 @@
   pointer-events: none;
 }
 
+/* Content-sized so the cluster wraps (preferences drop below) instead of overlapping. */
+@media (max-width: 640px) {
+  .headerNavSlot {
+    flex: 1 1 auto;
+  }
+}
+
 .headerAuthNav {
   display: flex;
   align-items: flex-start;

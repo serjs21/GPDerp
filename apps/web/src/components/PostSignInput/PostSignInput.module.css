@@ -16,7 +16,8 @@
 .rootSticky {
   position: fixed;
   bottom: calc(var(--post-sign-sticky-bottom) + env(safe-area-inset-bottom, 0px));
-  left: 41%;
+  /* Never let the centred sign start left of the viewport edge. */
+  left: max(41%, min(100%, var(--post-sign-input-width)) / 2);
   transform: translateX(-50%);
   z-index: 900;
   width: min(100%, var(--post-sign-input-width));

@@ -152,8 +152,6 @@
 
   .stack .captionLabels {
     width: auto;
-    white-space: break-spaces;
-    max-width: 50%;
     text-align: center;
   }
 }

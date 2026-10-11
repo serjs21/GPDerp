@@ -21,13 +21,7 @@
 @media (max-width: 480px) {
   .wrap {
     justify-content: flex-end;
-  }
-
-  .themeSelector {
-    min-width: 0;
-  }
-
-  .localeSelector {
-    min-width: 0;
+    /* Stays right-aligned when it wraps under the header tools. */
+    margin-left: auto;
   }
 }

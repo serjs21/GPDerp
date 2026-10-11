@@ -192,3 +192,53 @@
     top: calc(4.5rem + env(safe-area-inset-top, 0px));
   }
 }
+
+/*
+ * The header may wrap to two lines here, so the search bar and chips hang
+ * below the sticky <header> (their containing block once the slot and the
+ * search anchor are static) instead of beside the buttons / at a fixed top.
+ */
+@media (max-width: 640px) {
+  .toolsSlot,
+  .toolsSlot :has(> .searchInput) {
+    position: static;
+  }
+
+  .toolsSlot .searchInput {
+    top: calc(100% + 0.4rem);
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+    transform: none;
+  }
+
+  .filterChips {
+    position: absolute;
+    top: calc(100% + 0.35rem);
+  }
+
+  .toolsSlot:has(.searchInput) > .filterChips {
+    top: calc(100% + 3.8rem);
+  }
+
+  /*
+   * Settings: the always-open input stays in the header row (no overlay on the
+   * tabs); the header grows and the preferences wrap below instead.
+   */
+  .toolsSlot:has(.searchInputSettings),
+  .toolsSlot :has(> .searchInputSettings) {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .toolsSlot :has(> .searchInputSettings) {
+    gap: 0.4rem;
+  }
+
+  .searchInputSettings {
+    position: static;
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 16rem;
+  }
+}

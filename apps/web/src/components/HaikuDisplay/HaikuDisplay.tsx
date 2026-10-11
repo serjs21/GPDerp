@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import { preload } from "react-dom";
 import { CreationModal } from "@/components/CreationModal";
 import { SavedHaikusLanternPath } from "@/components/SavedHaikusLanternPath/SavedHaikusLanternPath";
 import { PostSignInput } from "@/components/PostSignInput";
@@ -11,9 +12,13 @@ import { useCreationPathGate } from "@/components/HaikuGenerationStickyNote/hook
 import { useHaikuGenerationFlow } from "@/components/HaikuGenerationStickyNote/hooks/useHaikuGenerationFlow";
 import { useHaikuFilters } from "@/app/providers/HaikuFiltersProvider";
 import { orderSortToHaikuListSort } from "@/utils/haikuSort/haikuListSortUtils";
+import { MAIN_MEMBER_LANTERN_ASSETS } from "@/consts/visualReadiness/criticalAssets";
 import styles from "./HaikuDisplay.module.css";
 
 export function HaikuDisplay() {
+  // Lantern art is otherwise first requested when lanterns mount after the haiku query,
+  // so lanternReveal would fade in frames whose base image is still downloading.
+  for (const { src } of MAIN_MEMBER_LANTERN_ASSETS) preload(src, { as: "image" });
   const pathRef = useRef<SVGPathHandle>(null);
   const bindHaikuSavedRef = useRef<(haiku: import("@/api/haikus").HaikuDto) => void>(() => {});
   const { invalidate } = useInfiniteHaikusQuery();

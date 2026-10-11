@@ -36,3 +36,14 @@
 .coin {
   flex: 0 0 auto;
 }
+
+@media (max-width: 640px) {
+  .panel {
+    height: auto;
+  }
+
+  .cluster {
+    flex-wrap: wrap;
+    gap: 0.75rem 0.6rem;
+  }
+}

@@ -67,14 +67,19 @@
   transform-origin: top left;
 }
 
+.panelDropDownLeft {
+  z-index: 1;
+  top: 2rem;
+  right: -4rem;
+  left: auto;
+  transform-origin: top right;
+}
+
+/* The trigger sits at the viewport edge here; don't hang the bubble past it. */
+@media (max-width: 640px) {
   .panelDropDownLeft {
-    z-index: 1;
-    transform-origin: 125% 40%;
-    top: 2rem;
-    left: auto;
-    right: -4rem;
-    left: auto;
-    transform-origin: top right;
+    right: 0;
+  }
 }
 
 .panelDropDownRight {

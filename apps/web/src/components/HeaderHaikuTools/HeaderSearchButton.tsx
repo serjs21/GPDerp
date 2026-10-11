@@ -65,7 +65,11 @@ export function HeaderSearchButton({ className, forcedHover }: HeaderSearchButto
       {expanded ? (
         <input
           ref={inputRef}
-          className={[toolStyles.searchInput, fadingOut ? toolStyles.searchInputFadeOut : ""]
+          className={[
+            toolStyles.searchInput,
+            isSettings ? toolStyles.searchInputSettings : "",
+            fadingOut ? toolStyles.searchInputFadeOut : "",
+          ]
             .filter(Boolean)
             .join(" ")}
           type="search"

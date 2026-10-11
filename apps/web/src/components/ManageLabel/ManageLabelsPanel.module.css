@@ -29,11 +29,17 @@
   position: relative;
   flex: 0 0 auto;
   display: grid;
-  /* Sort never shrinks below 20rem; the create panel absorbs the squeeze. */
-  grid-template-columns: minmax(17.5rem, 2fr) minmax(0, 3fr);
+  /* Sort never shrinks below 17.5rem (or the row); the create panel absorbs the squeeze. */
+  grid-template-columns: minmax(min(17.5rem, 100%), 2fr) minmax(0, 3fr);
   align-items: stretch;
   gap: var(--comic-page-gutter, 10px);
   min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .sortRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .sortRow .sortBesideCreate {

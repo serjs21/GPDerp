@@ -20,7 +20,9 @@
   margin: 0 auto;
   /* Definite height so tab lists get a real scrollport (not the comic frame). */
   height: calc(95vh - 2rem);
+  height: calc(95dvh - 2rem);
   max-height: calc(95vh - 2rem);
+  max-height: calc(95dvh - 2rem);
   overflow: hidden;
 }
 
@@ -80,6 +82,17 @@
 
 .sidePanel {
   display: none;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding-inline: 0.5rem;
+  }
+
+  /* ComicPageLayout sets the frame gutter inline, so override the padding itself. */
+  .page > .layout {
+    padding: 1rem;
+  }
 }
 
 /* Keep the breakpoint in sync with SETTINGS_SIDE_PANEL_QUERY. */

@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import { useAuthenticationState } from "@/app/providers/AuthenticationProvider";
-import { GoHome } from "@/components/GoHome";
 import {
   HeaderFilterButton,
   HeaderOrderDropdown,
@@ -26,7 +25,6 @@ export const AuthNavigation = () => {
         {isLoggedIn ? (
           <div className={toolStyles.toolsSlot}>
             <LoggedInUserNav user={user} onLogout={logout} />
-            <GoHome />
             <HeaderFilterButton />
             <HeaderOrderDropdown />
             <HeaderSearchButton />
