@@ -20,6 +20,8 @@ export type UserProfileResponse = {
   configuration: {
     theme: ThemeName;
     language: AppLocale;
+    /** Saved celestial theme slot; `null` follows the user's local clock. */
+    celestialSlot: number | null;
   };
 };
 
@@ -58,13 +60,14 @@ export async function resendEmailChange(newEmail?: string): Promise<{ pendingEma
 }
 
 type UserConfigurationResponse =
-  | { ok: true; data: { theme: ThemeName; language: AppLocale } }
+  | { ok: true; data: UserProfileResponse["configuration"] }
   | { ok: false; error: string };
 
 export async function updateOwnConfiguration(body: {
   theme?: ThemeName;
   language?: AppLocale;
-}): Promise<{ theme: ThemeName; language: AppLocale }> {
+  celestialSlot?: number | null;
+}): Promise<UserProfileResponse["configuration"]> {
   const { data } = await axios.patch<UserConfigurationResponse>("/user/configuration", body);
   if (!data.ok) throw new Error(data.error ?? "Failed to update settings");
   return data.data;

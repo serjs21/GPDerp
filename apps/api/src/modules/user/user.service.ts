@@ -69,14 +69,36 @@ export type UserProfileView = {
     expiresAt: string;
     requestedAt: string;
   } | null;
-  configuration: {
-    theme: string;
-    language: string;
-  };
+  configuration: UserConfigurationDto;
+};
+
+type UserConfigurationDto = {
+  theme: string;
+  language: string;
+  /** Null = follow the user's local clock. */
+  celestialSlot: number | null;
 };
 
 const SUPPORTED_THEMES = new Set(["tokyo-dusk", "sumie", "night-sky"]);
 const SUPPORTED_LANGUAGES = new Set(["en", "ja", "es", "fr", "th", "de", "it", "pt"]);
+const CELESTIAL_SLOT_MAX = 95;
+
+/** `undefined` = not provided, `null` = reset to clock, number = explicit slot; `false` = invalid. */
+function parseCelestialSlot(value: unknown): number | null | undefined | false {
+  if (value === undefined || value === null) return value;
+  if (typeof value !== "number" || !Number.isInteger(value)) return false;
+  return value >= 0 && value <= CELESTIAL_SLOT_MAX ? value : false;
+}
+
+function toConfigurationDto(
+  configuration: { theme: string; language: string; celestialSlot: number | null } | null | undefined,
+): UserConfigurationDto {
+  return {
+    theme: configuration?.theme ?? "tokyo-dusk",
+    language: configuration?.language ?? "en",
+    celestialSlot: configuration?.celestialSlot ?? null,
+  };
+}
 
 export const userService = {
   async checkEmailForPasswordRegistration(emailRaw: string) {
@@ -352,10 +374,7 @@ export const userService = {
             requestedAt: pending.createdAt.toISOString(),
           }
         : null,
-      configuration: {
-        theme: user.configuration?.theme ?? "tokyo-dusk",
-        language: user.configuration?.language ?? "en",
-      },
+      configuration: toConfigurationDto(user.configuration),
     };
   },
 
@@ -546,14 +565,15 @@ export const userService = {
     userId: string;
     payload: Record<string, unknown>;
   }): Promise<
-    | { ok: true; configuration: { theme: string; language: string } }
-    | { ok: false; reason: "not_found" | "invalid_theme" | "invalid_language" }
+    | { ok: true; configuration: UserConfigurationDto }
+    | { ok: false; reason: "not_found" | "invalid_theme" | "invalid_language" | "invalid_celestial_slot" }
   > {
     const existing = await prismaClient.user.findUnique({ where: { id: params.userId }, select: { id: true } });
     if (!existing) return { ok: false, reason: "not_found" };
 
     const rawTheme = cleanText(params.payload.theme, 32);
     const rawLanguage = cleanText(params.payload.language, 16);
+    const celestialSlot = parseCelestialSlot(params.payload.celestialSlot);
 
     if (rawTheme !== undefined && !SUPPORTED_THEMES.has(rawTheme)) {
       return { ok: false, reason: "invalid_theme" };
@@ -561,16 +581,13 @@ export const userService = {
     if (rawLanguage !== undefined && !SUPPORTED_LANGUAGES.has(rawLanguage)) {
       return { ok: false, reason: "invalid_language" };
     }
+    if (celestialSlot === false) {
+      return { ok: false, reason: "invalid_celestial_slot" };
+    }
 
-    if (rawTheme === undefined && rawLanguage === undefined) {
+    if (rawTheme === undefined && rawLanguage === undefined && celestialSlot === undefined) {
       const current = await prismaClient.userConfiguration.findUnique({ where: { userId: params.userId } });
-      return {
-        ok: true,
-        configuration: {
-          theme: current?.theme ?? "tokyo-dusk",
-          language: current?.language ?? "en",
-        },
-      };
+      return { ok: true, configuration: toConfigurationDto(current) };
     }
 
     const updated = await prismaClient.userConfiguration.upsert({
@@ -578,20 +595,16 @@ export const userService = {
       update: {
         ...(rawTheme !== undefined ? { theme: rawTheme } : {}),
         ...(rawLanguage !== undefined ? { language: rawLanguage } : {}),
+        ...(celestialSlot !== undefined ? { celestialSlot } : {}),
       },
       create: {
         userId: params.userId,
         theme: rawTheme ?? "tokyo-dusk",
         language: rawLanguage ?? "en",
+        celestialSlot: celestialSlot ?? null,
       },
     });
 
-    return {
-      ok: true,
-      configuration: {
-        theme: updated.theme,
-        language: updated.language,
-      },
-    };
+    return { ok: true, configuration: toConfigurationDto(updated) };
   },
 };

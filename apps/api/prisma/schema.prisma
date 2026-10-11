@@ -71,6 +71,8 @@ model UserConfiguration {
   userId    String   @unique @db.Uuid
   theme     String   @default("tokyo-dusk")
   language  String   @default("en")
+  /// Celestial theme time slot (0-95, 15-minute steps). Null = follow the user's local clock.
+  celestialSlot Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

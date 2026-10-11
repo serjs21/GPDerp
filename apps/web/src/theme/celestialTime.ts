@@ -40,6 +40,11 @@ export function slotToDate(slot: number) {
   return new Date(`${CELESTIAL_FIXED_DATE}T${label}:00${CELESTIAL_TIMEZONE_OFFSET}`);
 }
 
+/** Slot containing `date`'s wall-clock time in the browser's own time zone. */
+export function localClockSlot(date: Date) {
+  return Math.floor((date.getHours() * 60 + date.getMinutes()) / CELESTIAL_MINUTES_STEP);
+}
+
 export function dateToSlot(date: Date) {
   const bangkokTime = new Intl.DateTimeFormat("en-GB", {
     timeZone: "Asia/Bangkok",

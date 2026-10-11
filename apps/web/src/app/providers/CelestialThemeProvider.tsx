@@ -9,11 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import {
-  COOKIE_MAX_AGE,
-  CELESTIAL_SLOT_COOKIE,
-  PREFERENCE_CELESTIAL_SLOT_STORAGE_KEY,
-} from "@/config/userConfiguration";
+import { useCelestialSlotState } from "@/hooks/useCelestialSlotState";
 import {
   getSelectorDialLayoutFromSlot,
   selectorLayoutToBackgroundBodies,
@@ -27,11 +23,6 @@ import {
 
 const DEFAULT_CELESTIAL_SLOT = 16;
 
-const writeCelestialSlotCookie = (slot: number) => {
-  if (typeof document === "undefined") return;
-  document.cookie = `${CELESTIAL_SLOT_COOKIE}=${slot}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
-};
-
 type CelestialThemeContextValue = {
   slot: number;
   effectiveSlot: number;
@@ -41,6 +32,8 @@ type CelestialThemeContextValue = {
   scene: ReturnType<typeof useCelestialScene>;
   setPreviewSlot: (slot: number | null) => void;
   commitSlot: (slot: number) => void;
+  /** Apply a slot saved in user settings; `null` follows the local clock. */
+  applySavedSlot: (slot: number | null) => void;
 };
 
 const CelestialThemeContext = createContext<CelestialThemeContextValue | null>(null);
@@ -48,19 +41,18 @@ const CelestialThemeContext = createContext<CelestialThemeContextValue | null>(n
 type CelestialThemeProviderProps = {
   children: ReactNode;
   initialSlot?: number;
+  /** Follow the user's stored selection, falling back to the local clock. Stories leave this off. */
+  followUserPreference?: boolean;
 };
 
 export function CelestialThemeProvider({
   children,
   initialSlot = DEFAULT_CELESTIAL_SLOT,
+  followUserPreference = false,
 }: CelestialThemeProviderProps) {
-  const [slot, setSlot] = useState(() => clampSlot(initialSlot));
+  const { slot, storeSlot } = useCelestialSlotState(initialSlot, followUserPreference);
   const [previewSlot, setPreviewSlotState] = useState<number | null>(null);
   const coordinates = BANGKOK_COORDINATES;
-
-  useEffect(() => {
-    writeCelestialSlotCookie(slot);
-  }, [slot]);
 
   const effectiveSlot = previewSlot ?? slot;
   const scene = useCelestialScene({
@@ -100,15 +92,13 @@ export function CelestialThemeProvider({
     setPreviewSlotState(next === null ? null : clampSlot(next));
   }, []);
 
-  const commitSlot = useCallback((next: number) => {
-    const clamped = clampSlot(next);
-    setPreviewSlotState(null);
-    setSlot(clamped);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(PREFERENCE_CELESTIAL_SLOT_STORAGE_KEY, String(clamped));
-    }
-    writeCelestialSlotCookie(clamped);
-  }, []);
+  const commitSlot = useCallback(
+    (next: number) => {
+      setPreviewSlotState(null);
+      storeSlot(clampSlot(next));
+    },
+    [storeSlot],
+  );
 
   const value = useMemo(
     () => ({
@@ -120,6 +110,7 @@ export function CelestialThemeProvider({
       scene,
       setPreviewSlot,
       commitSlot,
+      applySavedSlot: storeSlot,
     }),
     [
       slot,
@@ -130,6 +121,7 @@ export function CelestialThemeProvider({
       scene,
       setPreviewSlot,
       commitSlot,
+      storeSlot,
     ],
   );
 

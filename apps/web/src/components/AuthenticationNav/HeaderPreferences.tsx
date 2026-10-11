@@ -14,6 +14,7 @@ import {
 } from "@/config/userConfiguration";
 import { useProfileI18n } from "@/hooks/useProfileI18n";
 import { useLocale } from "@/hooks/useLocale";
+import { clampSlot } from "@/theme/celestialTime";
 import { useTranslations } from "next-intl";
 import styles from "./headerPreferences.module.css";
 
@@ -26,37 +27,33 @@ export const HeaderPreferences = () => {
   const { effectiveSlot, setPreviewSlot, commitSlot, scene } = useCelestialTheme();
 
   const persistIfLoggedIn = useCallback(
-    async (body: { language?: AppLocale }) => {
+    async (body: { language?: AppLocale; celestialSlot?: number }) => {
       if (!isLoggedIn) return;
       try {
-        await updateOwnConfiguration({
-          language: body.language ?? locale,
-        });
-        router.refresh();
+        await updateOwnConfiguration(body);
       } catch {
         comicToast.error(t("preferencesSaveError"));
       }
     },
-    [isLoggedIn, locale, router, t],
+    [isLoggedIn, t],
   );
 
   const onLocaleChange = (next: AppLocale) => {
     setLocale(next);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(PREFERENCE_LOCALE_STORAGE_KEY, next);
-    }
-    if (!isLoggedIn) {
-      router.refresh();
-      return;
-    }
-    void persistIfLoggedIn({ language: next });
+    window.localStorage.setItem(PREFERENCE_LOCALE_STORAGE_KEY, next);
+    void persistIfLoggedIn({ language: next }).then(() => router.refresh());
+  };
+
+  const onThemeChange = (next: number) => {
+    commitSlot(next);
+    void persistIfLoggedIn({ celestialSlot: clampSlot(next) });
   };
 
   return (
     <div className={styles.wrap} role="group" aria-label={t("preferencesGroupLabel")}>
         <CelestialThemeSelector
         slot={effectiveSlot}
-        onChange={commitSlot}
+        onChange={onThemeChange}
         onPreviewChange={setPreviewSlot}
         sceneVars={scene.sceneVars}
         className={styles.themeSelector}

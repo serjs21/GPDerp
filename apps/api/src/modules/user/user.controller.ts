@@ -116,6 +116,9 @@ const userPluginImpl = async (app: FastifyInstance) => {
         if (result.reason === "invalid_language") {
           return res.code(400).send({ ok: false, error: "Invalid language" });
         }
+        if (result.reason === "invalid_celestial_slot") {
+          return res.code(400).send({ ok: false, error: "Invalid celestial slot" });
+        }
         return res.code(404).send({ ok: false, error: "User not found" });
       }
       return res.send({ ok: true, data: result.configuration });

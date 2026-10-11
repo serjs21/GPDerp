@@ -22,6 +22,7 @@ import { QueryProvider } from "./providers/QueryProvider";
 import { HtmlLoader } from "@/components/Loaders";
 import { ThemeProvider } from "@/theme/ThemeProvider";
 import { CelestialThemeProvider } from "./providers/CelestialThemeProvider";
+import { UserPreferencesSync } from "./providers/UserPreferencesSync";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { getSsrThemeSettings } from "@/hooks/useTheme.server";
 import { NextIntlClientProvider } from "next-intl";
@@ -118,7 +119,8 @@ export default async function RootLayout({
           <NextIntlClientProvider locale={initialLocale} messages={messages}>
             <ThemeProvider initialTheme={initialTheme}>
               <AuthenticationProvider>
-                <CelestialThemeProvider initialSlot={initialCelestialSlot}>
+                <CelestialThemeProvider initialSlot={initialCelestialSlot} followUserPreference>
+                  <UserPreferencesSync />
                   <QueryProvider>
                     <LayoutProvider googleClientId={googleClientId}>
                       {children}
