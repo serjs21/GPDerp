@@ -40,7 +40,7 @@ export function useStableLabelOrder({
   useEffect(() => {
     if (!active) {
       orderQueryKey.current = null;
-      setListOrderIds([]);
+      setListOrderIds((prev) => (prev.length === 0 ? prev : []));
       return;
     }
     const rebuild = orderQueryKey.current !== query;

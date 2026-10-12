@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { useEffect, useRef } from "react";
+import { useDebouncedSearchInput } from "@/hooks/useDebouncedSearchInput";
 
 const SEARCH_DEBOUNCE_MS = 200;
 
@@ -10,15 +10,8 @@ const SEARCH_DEBOUNCE_MS = 200;
  * controlled `searchQuery` when `headerDriven`.
  */
 export function useManageLabelsSearch(active: boolean, headerDriven: boolean, searchQuery: string) {
-  const [searchInput, setSearchInput] = useState("");
-  const [wasActive, setWasActive] = useState(active);
   const searchRef = useRef<HTMLInputElement>(null);
-  const debouncedQ = useDebouncedValue(searchInput.trim(), SEARCH_DEBOUNCE_MS);
-
-  if (wasActive !== active) {
-    setWasActive(active);
-    if (!active) setSearchInput("");
-  }
+  const { searchInput, setSearchInput, query } = useDebouncedSearchInput(active, SEARCH_DEBOUNCE_MS);
 
   useEffect(() => {
     if (!active || headerDriven) return;
@@ -31,6 +24,6 @@ export function useManageLabelsSearch(active: boolean, headerDriven: boolean, se
     searchRef,
     searchInput,
     setSearchInput,
-    resolvedQ: headerDriven ? searchQuery.trim() : debouncedQ,
+    resolvedQ: headerDriven ? searchQuery.trim() : query,
   };
 }

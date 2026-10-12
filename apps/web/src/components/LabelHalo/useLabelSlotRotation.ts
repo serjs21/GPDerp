@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type FocusEvent, type KeyboardEvent, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type FocusEvent, type KeyboardEvent, type RefObject } from "react";
 import { LABEL_SLOT_ROTATE_STEP_DEG, type LabelPlacement } from "./consts/labelHaloConsts";
 import type { LabelSlotProps } from "./LabelSlot";
 import { samePlacement } from "./utils/labelSlotUtils";
@@ -52,7 +52,7 @@ export function useLabelSlotRotation({
   const [selected, setSelected] = useState(false);
   const [isRotateDragging, setIsRotateDragging] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     latestRef.current = { xPercent, yPercent, onPlacementCommit, onRotateDraft };
   }, [xPercent, yPercent, onPlacementCommit, onRotateDraft]);
 

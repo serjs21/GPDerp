@@ -1,21 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { useEffect, useRef } from "react";
+import { useDebouncedSearchInput } from "@/hooks/useDebouncedSearchInput";
 
 const SEARCH_DEBOUNCE_MS = 200;
 
 /** Filter input state: focused when the panel activates, cleared when it deactivates, debounced for queries. */
 export function useLabelPickerSearch(active: boolean) {
-  const [searchInput, setSearchInput] = useState("");
-  const [wasActive, setWasActive] = useState(active);
   const searchRef = useRef<HTMLInputElement>(null);
-  const query = useDebouncedValue(searchInput.trim(), SEARCH_DEBOUNCE_MS);
-
-  if (wasActive !== active) {
-    setWasActive(active);
-    if (!active) setSearchInput("");
-  }
+  const { searchInput, setSearchInput, query } = useDebouncedSearchInput(active, SEARCH_DEBOUNCE_MS);
 
   useEffect(() => {
     if (!active) return;

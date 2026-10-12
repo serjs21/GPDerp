@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import type { LabelHaloLabelItem, LabelPlacement } from "./consts/labelHaloConsts";
 import { clearDropAreaRoughOutline } from "./utils/dropAreaRoughOutline";
 import { nextDraggingId } from "./utils/haloPlacementUtils";
@@ -23,10 +23,9 @@ export function useHaloLabelDraft(
     return map;
   });
 
-  const [syncedLabels, setSyncedLabels] = useState(labels);
-
-  if (syncedLabels !== labels) {
-    setSyncedLabels(labels);
+  // Passive effect (not render-time sync) so new labels commit in the same flush as
+  // `useLabelPuffIn`'s delays; otherwise they paint once at full opacity before puffing in.
+  useEffect(() => {
     setDraft(labels);
     setRotateById((prev) => {
       const next = { ...prev };
@@ -35,7 +34,7 @@ export function useHaloLabelDraft(
       }
       return next;
     });
-  }
+  }, [labels]);
 
   const onPositionDraft = useCallback((labelId: string, xPercent: number, yPercent: number) => {
     setDraft((current) => current.map((label) => (label.id === labelId ? { ...label, xPercent, yPercent } : label)));

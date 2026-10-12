@@ -1,7 +1,7 @@
 "use client";
 
 import { createDraggable } from "animejs";
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
 import type { LabelPlacement } from "./consts/labelHaloConsts";
 import { paintDropAreaRoughOutline } from "./utils/dropAreaRoughOutline";
 import { percentFromRect } from "./utils/haloPlacementUtils";
@@ -57,7 +57,7 @@ export function useHaloDraggable({
 }: HaloDraggableOptions) {
   const rotateDegRef = useRef(rotateDeg);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     rotateDegRef.current = rotateDeg;
   }, [rotateDeg]);
 
