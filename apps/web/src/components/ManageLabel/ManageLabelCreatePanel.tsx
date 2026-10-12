@@ -7,6 +7,7 @@ import { formatComicLabelText } from "@/components/ComicBurstLabel/formatComicLa
 import { ComicLabelCreationModal } from "@/components/ComicLabelCreationModal";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { useElementSize } from "@/hooks/useElementSize";
+import { TICKET_BASE_SRC } from "./consts/ticketRotationConsts";
 import styles from "./ManageLabelCreatePanel.module.css";
 import { buildTicketFaceStyle, ticketFaceGeometry } from "./utils/ticketRotationUtils";
 
@@ -51,7 +52,7 @@ export function ManageLabelCreatePanel({
             {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
             <img
               className={styles.ticketArt}
-              src="/create_label_button_base/label_ticket_base.svg"
+              src={TICKET_BASE_SRC}
               alt=""
               draggable={false}
             />

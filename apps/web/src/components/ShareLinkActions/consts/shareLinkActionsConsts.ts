@@ -75,11 +75,11 @@ export const SHARE_LINK_PREVIEW_ACTION_LAYOUTS = {
 
 export const SHARE_LINK_PREVIEW_LABELS_TOGGLE_LAYOUTS = {
   show: {
-    icon: { size: "4.5rem", bottom: "0rem", left: "0.2rem", rotateDeg: 0 },
+    icon: { size: "auto", height: "4rem", bottom: "0.2rem", left: "0.2rem", rotateDeg: 0 },
     caption: PREVIEW_CAPTION_TOP_RIGHT,
   },
   hide: {
-    icon: { size: "4.5rem", bottom: "0rem", left: "0.2rem", rotateDeg: 0 },
+    icon: { size: "auto", height: "4rem", bottom: "0.2rem", left: "0.2rem", rotateDeg: 0 },
     caption: PREVIEW_CAPTION_TOP_RIGHT,
   },
 } as const;

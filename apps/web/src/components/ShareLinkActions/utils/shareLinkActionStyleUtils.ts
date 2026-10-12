@@ -21,6 +21,7 @@ export function shareLinkActionLayoutStyle(
     [`${prefix}-icon-right`]: icon.right ?? "auto",
     [`${prefix}-icon-left`]: icon.left ?? "auto",
     [`${prefix}-icon-rotate`]: `${icon.rotateDeg}deg`,
+    ...(icon.height ? { [`${prefix}-icon-height`]: icon.height } : {}),
     [`${prefix}-caption-top`]: caption.top ?? "auto",
     [`${prefix}-caption-bottom`]: caption.bottom ?? "auto",
     [`${prefix}-caption-right`]: caption.right ?? "auto",

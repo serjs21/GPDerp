@@ -33,6 +33,11 @@
   padding: 3.35rem 0.75rem 0.75rem;
 }
 
+/* Keeps layout (and the cover <img> requests) while hiding coins until their art decodes. */
+.cluster.clusterPending {
+  visibility: hidden;
+}
+
 .coin {
   flex: 0 0 auto;
 }

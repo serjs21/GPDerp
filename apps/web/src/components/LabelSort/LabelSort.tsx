@@ -9,6 +9,8 @@ import type {
 import { CoverState, coverLabelSharedFontSizeRem } from "@/components/DualityButton";
 import { useElementWidth } from "@/hooks/useElementWidth";
 import { useLocale } from "@/hooks/useLocale";
+import { useVisualReadiness } from "@/hooks/useVisualReadiness";
+import { CONTROL_ART_MAX_WAIT_MS } from "@/consts/visualReadiness/criticalAssets";
 import { rotatedSortCoinSizeRem } from "@/utils/sort/rotatedSortUtils";
 import { withDefaults } from "@/utils/props/withDefaults";
 import {
@@ -65,11 +67,16 @@ export function LabelSort(props: LabelSortProps) {
     categories.map((category) => category.title),
     coinSizeRem,
   );
+  const coverArt = useVisualReadiness({
+    criticalAssets: categories.map((category) => ({ src: category.coverSrc })),
+    maxWaitMs: CONTROL_ART_MAX_WAIT_MS,
+  });
   const layout = labelSortLayout({
     rotated,
     coinSizeRem,
     className: props.className,
     clusterClassName: props.clusterClassName,
+    coversPending: coverArt.status === "loading",
   });
 
   return (

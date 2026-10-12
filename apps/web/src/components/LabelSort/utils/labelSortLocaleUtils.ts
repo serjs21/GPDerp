@@ -20,3 +20,10 @@ export function resolveLabelSortCategories(
       : translated;
   });
 }
+
+/** Cover art shown on the coins while covered — what the cluster looks like on first render. */
+export function labelSortCoverSrcs(locale: AppLocale): string[] {
+  return LABEL_SORT_CATEGORIES.map((category) =>
+    locale === "ja" && category.id === "creationDate" ? LABEL_CREATION_DATE_COVER_JA : category.coverSrc,
+  );
+}

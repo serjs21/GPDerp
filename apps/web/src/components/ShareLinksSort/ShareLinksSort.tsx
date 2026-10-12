@@ -5,6 +5,8 @@ import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { coverLabelSharedFontSizeRem } from "@/components/DualityButton";
 import { useElementWidth } from "@/hooks/useElementWidth";
 import { useLocale } from "@/hooks/useLocale";
+import { useVisualReadiness } from "@/hooks/useVisualReadiness";
+import { CONTROL_ART_MAX_WAIT_MS } from "@/consts/visualReadiness/criticalAssets";
 import { withDefaults } from "@/utils/props/withDefaults";
 import { rotatedSortCoinSizeRem } from "@/utils/sort/rotatedSortUtils";
 import {
@@ -50,7 +52,16 @@ export function ShareLinksSort(props: ShareLinksSortProps) {
     categories.map((category) => t(`categories.${category.titleKey}`)),
     coinSizeRem,
   );
-  const layout = shareLinksSortLayout({ rotated, coinSizeRem, className });
+  const coverArt = useVisualReadiness({
+    criticalAssets: categories.map((category) => ({ src: category.coverSrc })),
+    maxWaitMs: CONTROL_ART_MAX_WAIT_MS,
+  });
+  const layout = shareLinksSortLayout({
+    rotated,
+    coinSizeRem,
+    className,
+    coversPending: coverArt.status === "loading",
+  });
 
   return (
     <ComicPagePanel

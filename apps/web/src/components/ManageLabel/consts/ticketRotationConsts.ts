@@ -1,3 +1,5 @@
+export const TICKET_BASE_SRC = "/create_label_button_base/label_ticket_base.svg";
+
 /** Root font size used to convert rem to measured px. */
 export const TICKET_ROOT_FONT_PX = 16;
 

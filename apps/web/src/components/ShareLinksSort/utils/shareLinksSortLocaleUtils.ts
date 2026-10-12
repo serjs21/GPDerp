@@ -19,3 +19,8 @@ export function resolveShareLinksSortCategories(
       : category,
   );
 }
+
+/** Cover art shown on the coins while covered — what the cluster looks like on first render. */
+export function shareLinksSortCoverSrcs(locale: AppLocale): string[] {
+  return resolveShareLinksSortCategories(locale).map((category) => category.coverSrc);
+}

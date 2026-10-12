@@ -70,7 +70,7 @@
   display: block;
   width: var(--share-link-action-icon-size, 1.9rem);
   max-width: 50%;
-  height: auto;
+  height: var(--share-link-action-icon-height, auto);
   object-fit: contain;
   transform: rotate(var(--share-link-action-icon-rotate, 0deg));
   pointer-events: none;

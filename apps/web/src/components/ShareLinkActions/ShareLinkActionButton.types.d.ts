@@ -12,8 +12,10 @@ export type ShareLinkActionPlacement = {
   ({ right: string; left?: never } | { left: string; right?: never });
 
 export type ShareLinkActionIconPlacement = ShareLinkActionPlacement & {
-  /** Icon box width and height (CSS length). */
+  /** Icon box width (CSS length); height follows the aspect ratio unless `height` is set. */
   size: string;
+  /** Icon height (CSS length); omitted keeps the stylesheet default (`auto`). */
+  height?: string;
 };
 
 export type ShareLinkActionCaptionPlacement = ShareLinkActionPlacement & {

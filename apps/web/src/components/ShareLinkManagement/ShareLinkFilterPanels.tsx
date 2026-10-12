@@ -2,52 +2,11 @@
 
 import { useTranslations } from "next-intl";
 import { ALL_SHARE_LINK_FILTERS, type ShareLinkFilter } from "@/api/shareLinks";
-import { ComicPagePanel, type ComicPanelColor } from "@/components/ComicPageLayout";
+import { ComicPagePanel } from "@/components/ComicPageLayout";
 import { LabelMethodIcon } from "@/components/LabelMethodIcon";
 import { OverlayTitle } from "@/components/OverlayTitle";
+import { SHARE_LINK_FILTER_OPTIONS } from "./consts/shareLinkFilterConsts";
 import styles from "./ShareLinkFilterPanels.module.css";
-
-const FILTER_OPTIONS: Array<{
-  id: ShareLinkFilter;
-  messageKey: "active" | "inactive" | "expired" | "viewLimitReached";
-  iconSrc: string;
-  background: "sunburst" | "halftone" | "solid";
-  color: ComicPanelColor;
-  bubbleStyle: "circle" | "diamond" | "thought" | "rectangle";
-}> = [
-  {
-    id: "active",
-    messageKey: "active",
-    iconSrc: "/share_links_filter/active.svg",
-    background: "sunburst",
-    color: "green",
-    bubbleStyle: "circle",
-  },
-  {
-    id: "inactive",
-    messageKey: "inactive",
-    iconSrc: "/share_links_filter/inactive.svg",
-    background: "halftone",
-    color: "blue",
-    bubbleStyle: "rectangle",
-  },
-  {
-    id: "expired",
-    messageKey: "expired",
-    iconSrc: "/share_links_filter/expired.svg",
-    background: "solid",
-    color: "#ceaf82",
-    bubbleStyle: "diamond",
-  },
-  {
-    id: "view_limit_reached",
-    messageKey: "viewLimitReached",
-    iconSrc: "/share_links_filter/limit_reached.svg",
-    background: "solid",
-    color: "#7f87de",
-    bubbleStyle: "thought",
-  },
-];
 
 export type ShareLinkFilterPanelsProps = {
   selected: ShareLinkFilter[];
@@ -79,7 +38,7 @@ export function ShareLinkFilterPanels({
       role="group"
       aria-label={t("groupAriaLabel")}
     >
-      {FILTER_OPTIONS.map((option) => {
+      {SHARE_LINK_FILTER_OPTIONS.map((option) => {
         const checked = selectedSet.has(option.id);
         const title = t(`options.${option.messageKey}.title`);
         return (

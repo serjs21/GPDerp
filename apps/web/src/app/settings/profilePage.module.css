@@ -12,6 +12,11 @@
   overflow: hidden;
 }
 
+/* First view only: stay hidden (images keep loading) until the tab's control art decodes or the cap passes. */
+.page[data-visual-ready="loading"] {
+  visibility: hidden;
+}
+
 .layout {
   box-sizing: border-box;
   display: flex;

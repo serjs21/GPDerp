@@ -43,3 +43,6 @@ export const MAIN_MEMBER_CRITICAL_ASSETS: readonly CriticalImage[] = [
  * as `degraded` so slow or failing images never block the app.
  */
 export const FIRST_REVEAL_MAX_WAIT_MS = 5000;
+
+/** Upper bound on hiding an in-page control cluster (e.g. sort coins) while its art decodes. */
+export const CONTROL_ART_MAX_WAIT_MS = 2000;

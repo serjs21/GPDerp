@@ -88,9 +88,8 @@
 }
 
 .submit {
-  /* Insets match constants.POST_SIGN_INPUT_SUBMIT_INSET (full asset box) */
   position: absolute;
-  inset: 24.4% 9.8% 42.1% 77.9%;
+  inset: 31.4% 9.8% 42.1% 77.9%;
   width: auto;
   height: auto;
   --lantern-submit-size: auto;

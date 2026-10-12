@@ -11,6 +11,8 @@ const MOUNTAIN_MASK = "**/background/masks/mountain-mask.png";
 const ROTATED_LANTERN = "**/lantern/lantern_base_rotated.png";
 const UPRIGHT_LANTERN = "**/lantern/lantern_base.png";
 const FIRST_REVEAL_MAX_WAIT_MS = 5000;
+const SHARE_LINKS_SORT_COVER = "**/sort_button/time_cover.svg";
+const CONTROL_ART_MAX_WAIT_MS = 2000;
 
 type RevealProbe = {
   revealAt: number | null;
@@ -95,6 +97,9 @@ async function mockApi(page: Page, { loggedIn }: { loggedIn: boolean }) {
       }
       if (pathname === "/haiku") {
         return route.fulfill({ json: { ok: true, data: { haikus: [], total: 0, pageSize: 20, offset: 0 } } });
+      }
+      if (pathname === "/share_links") {
+        return route.fulfill({ json: { ok: true, data: { items: [], total: 0, pageSize: 50, offset: 0 } } });
       }
       if (pathname === "/user/profile") {
         return route.fulfill({
@@ -291,6 +296,87 @@ test.describe("first-load visual readiness", () => {
     await expect(page.locator('main[class*="profilePage"]')).toBeAttached();
     expect(lantern.seen()).toBe(0);
     lantern.release();
+  });
+
+  test("settings share-links: sort coins stay hidden until their cover art decodes", async ({ page }) => {
+    await mockApi(page, { loggedIn: true });
+    const cover = await holdRequests(page, SHARE_LINKS_SORT_COVER);
+    await page.goto("/settings?tab=share-links", { waitUntil: "domcontentloaded" });
+    const cluster = page.locator('[role="radiogroup"]');
+    await expect(cluster).toBeAttached();
+    await expect.poll(() => cover.seen()).toBeGreaterThan(0);
+    expect(await cluster.evaluate((node) => getComputedStyle(node).visibility)).toBe("hidden");
+
+    cover.release();
+    await expect.poll(() => cluster.evaluate((node) => getComputedStyle(node).visibility)).toBe("visible");
+    const covers = await cluster.evaluate((node) =>
+      [...node.querySelectorAll<HTMLImageElement>('img[src*="_cover"]')].map((img) => ({
+        complete: img.complete,
+        naturalWidth: img.naturalWidth,
+      })),
+    );
+    expect(covers).toHaveLength(4);
+    for (const art of covers) {
+      expect(art.complete).toBe(true);
+      expect(art.naturalWidth).toBeGreaterThan(0);
+    }
+  });
+
+  test("settings share-links: failed cover art reveals the coins within the cap", async ({ page }) => {
+    await mockApi(page, { loggedIn: true });
+    await holdRequests(page, SHARE_LINKS_SORT_COVER, "abort");
+    await page.goto("/settings?tab=share-links", { waitUntil: "domcontentloaded" });
+    const cluster = page.locator('[role="radiogroup"]');
+    await expect(cluster).toBeAttached();
+    await expect
+      .poll(() => cluster.evaluate((node) => getComputedStyle(node).visibility), {
+        timeout: CONTROL_ART_MAX_WAIT_MS + 3000,
+      })
+      .toBe("visible");
+  });
+
+  test("settings: page stays hidden until the tab strip art decodes, then reveals complete", async ({ page }) => {
+    await mockApi(page, { loggedIn: true });
+    const tabIcon = await holdRequests(page, "**/profile/share_link.svg");
+    await page.goto("/settings?tab=share-links", { waitUntil: "domcontentloaded" });
+    const main = page.locator('main[class*="profilePage"]');
+    await expect(main).toBeAttached();
+    expect(await main.evaluate((node) => getComputedStyle(node).visibility)).toBe("hidden");
+
+    tabIcon.release();
+    await expect.poll(() => main.evaluate((node) => getComputedStyle(node).visibility)).toBe("visible");
+    const icons = await main.evaluate((node) =>
+      [...node.querySelectorAll<HTMLImageElement>('img[src*="/profile/"], img[src*="/share_links_filter/"]')].map(
+        (img) => img.complete && img.naturalWidth > 0,
+      ),
+    );
+    expect(icons.length).toBeGreaterThanOrEqual(7);
+    expect(icons.every(Boolean)).toBe(true);
+
+    // Switching tabs after the first view must not hide the page again.
+    await page.evaluate(() => {
+      (window as unknown as { next: { router: { replace: (href: string) => void } } }).next.router.replace(
+        "/settings?tab=labels",
+      );
+    });
+    await page.waitForURL((url) => url.searchParams.get("tab") === "labels");
+    expect(await main.evaluate((node) => getComputedStyle(node).visibility)).toBe("visible");
+  });
+
+  test("settings: tab art is requested before the profile fetch resolves", async ({ page }) => {
+    await mockApi(page, { loggedIn: true });
+    let releaseProfile!: () => void;
+    const profileGate = new Promise<void>((resolve) => (releaseProfile = resolve));
+    await page.route(/\/user\/profile$/, async (route) => {
+      await profileGate;
+      await route.fallback();
+    });
+    const coverRequested = page.waitForRequest((request) => request.url().includes("/sort_button/time_cover.svg"));
+    await page.goto("/settings?tab=share-links", { waitUntil: "domcontentloaded" });
+    await coverRequested;
+    await expect(page.locator('[role="radiogroup"]')).toHaveCount(0);
+    releaseProfile();
+    await expect(page.locator('[role="radiogroup"]')).toBeAttached();
   });
 
   test("client navigation and back/forward keep the persistent background mounted", async ({ page }) => {

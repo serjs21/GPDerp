@@ -9,17 +9,23 @@ export function shareLinksSortLayout(params: {
   rotated: boolean;
   coinSizeRem: number;
   className: string | undefined;
+  /** Cover art still decoding: keep the coins hidden so they never show as empty disks. */
+  coversPending: boolean;
 }): {
   titleDirection: "horizontal" | "vertical";
   panelClassName: string;
   clusterClassName: string;
   clusterStyle: CSSProperties | undefined;
 } {
-  const { rotated, coinSizeRem, className } = params;
+  const { rotated, coinSizeRem, className, coversPending } = params;
   return {
     titleDirection: rotated ? "horizontal" : "vertical",
     panelClassName: joinClasses(styles.panel, rotated && styles.panelRotated, className),
-    clusterClassName: joinClasses(styles.cluster, rotated && styles.clusterRotated),
+    clusterClassName: joinClasses(
+      styles.cluster,
+      rotated && styles.clusterRotated,
+      coversPending && styles.clusterPending,
+    ),
     clusterStyle: rotated ? buildRotatedSortClusterStyle(coinSizeRem) : undefined,
   };
 }

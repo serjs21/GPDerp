@@ -13,6 +13,7 @@ import { ProfileTabs } from "./components/ProfileTabs";
 import { useOwnProfile } from "./hooks/useOwnProfile";
 import { useProfileContextValue } from "./hooks/useProfileContextValue";
 import { useProfileTab } from "./hooks/useProfileTab";
+import { useSettingsTabArt } from "./hooks/useSettingsTabArt";
 import { isProfilePageReady } from "./utils/profileUtils";
 import styles from "./profilePage.module.css";
 
@@ -25,13 +26,14 @@ export default function ProfilePage() {
   const sidePanelWide = useMediaQuery(SETTINGS_SIDE_PANEL_QUERY);
   const { data: labelsAccountId } = useManageLabelsAccount();
   const { tab, setTab, searchQuery } = useProfileTab();
+  const tabArtStatus = useSettingsTabArt(tab);
   const { profile, setProfile, loading } = useOwnProfile(initialized, isLoggedIn);
   const profileContextValue = useProfileContextValue(profile, setProfile, checkAuthentication);
 
   if (!isProfilePageReady(initialized, isLoggedIn, loading) || !profileContextValue) return null;
 
   return (
-    <main ref={setPageNode} className={styles.page}>
+    <main ref={setPageNode} className={styles.page} data-visual-ready={tabArtStatus}>
       <ProfileProvider value={profileContextValue}>
         <ComicPageLayout className={styles.layout}>
           <div className={styles.body}>
