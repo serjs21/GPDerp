@@ -98,6 +98,12 @@ async function mockApi(page: Page, { loggedIn }: { loggedIn: boolean }) {
       if (pathname === "/haiku") {
         return route.fulfill({ json: { ok: true, data: { haikus: [], total: 0, pageSize: 20, offset: 0 } } });
       }
+      if (pathname === "/haiku/manage_labels/account") {
+        return route.fulfill({ json: { ok: true, data: { accountId: "account-1" } } });
+      }
+      if (pathname.startsWith("/haiku/labels/")) {
+        return route.fulfill({ json: { ok: true, data: { labels: [], total: 0, pageSize: 50, offset: 0 } } });
+      }
       if (pathname === "/share_links") {
         return route.fulfill({ json: { ok: true, data: { items: [], total: 0, pageSize: 50, offset: 0 } } });
       }
@@ -361,6 +367,29 @@ test.describe("first-load visual readiness", () => {
     });
     await page.waitForURL((url) => url.searchParams.get("tab") === "labels");
     expect(await main.evaluate((node) => getComputedStyle(node).visibility)).toBe("visible");
+  });
+
+  test("settings labels: page stays hidden until the create ticket art decodes", async ({ page }) => {
+    await mockApi(page, { loggedIn: true });
+    const ticket = await holdRequests(page, "**/create_label_button_base/label_ticket_base.svg");
+    await page.goto("/settings?tab=labels", { waitUntil: "domcontentloaded" });
+    const main = page.locator('main[class*="profilePage"]');
+    await expect(main).toBeAttached();
+    await expect.poll(() => ticket.seen()).toBeGreaterThan(0);
+    expect(await main.evaluate((node) => getComputedStyle(node).visibility)).toBe("hidden");
+
+    ticket.release();
+    await expect.poll(() => main.evaluate((node) => getComputedStyle(node).visibility)).toBe("visible");
+    const sortCluster = page.locator('[role="radiogroup"]').first();
+    await expect(sortCluster).toBeAttached();
+    await expect.poll(() => sortCluster.evaluate((node) => getComputedStyle(node).visibility)).toBe("visible");
+    const art = await main.evaluate((node) =>
+      [...node.querySelectorAll<HTMLImageElement>('img[src*="_cover"], img[src*="label_ticket_base"]')].map(
+        (img) => img.complete && img.naturalWidth > 0,
+      ),
+    );
+    expect(art.length).toBeGreaterThanOrEqual(4);
+    expect(art.every(Boolean)).toBe(true);
   });
 
   test("settings: tab art is requested before the profile fetch resolves", async ({ page }) => {

@@ -31,7 +31,7 @@ export const SHARE_LINK_ACTION_LAYOUTS = {
     caption: { top: COMMON_CAPTION_TOP, right: "6px", rotateDeg: 0 },
   },
   followLink: {
-    icon: { size: "3rem", top: "0.4rem", left: "0rem", rotateDeg: 0 },
+    icon: { size: "3rem", bottom: ".1rem", left: "0rem", rotateDeg: 0 },
     caption: { top: COMMON_CAPTION_TOP, right: "6px", rotateDeg: 0 },
   },
   showLabels: {
@@ -64,7 +64,7 @@ export const SHARE_LINK_PREVIEW_ACTION_LAYOUTS = {
     caption: PREVIEW_CAPTION_TOP_RIGHT,
   },
   followLink: {
-    icon: { size: "5rem", bottom: "0rem", left: "0.4rem", rotateDeg: 0 },
+    icon: { size: "5rem", bottom: "0.1rem", left: "0.4rem", rotateDeg: 0 },
     caption: PREVIEW_CAPTION_TOP_RIGHT,
   },
   done: {
@@ -75,11 +75,11 @@ export const SHARE_LINK_PREVIEW_ACTION_LAYOUTS = {
 
 export const SHARE_LINK_PREVIEW_LABELS_TOGGLE_LAYOUTS = {
   show: {
-    icon: { size: "auto", height: "4rem", bottom: "0.2rem", left: "0.2rem", rotateDeg: 0 },
+    icon: { size: "auto", height: "4rem", bottom: "0.2rem", left: "0.1rem", rotateDeg: 0 },
     caption: PREVIEW_CAPTION_TOP_RIGHT,
   },
   hide: {
-    icon: { size: "auto", height: "4rem", bottom: "0.2rem", left: "0.2rem", rotateDeg: 0 },
+    icon: { size: "auto", height: "4rem", bottom: "0.2rem", left: "0.1rem", rotateDeg: 0 },
     caption: PREVIEW_CAPTION_TOP_RIGHT,
   },
 } as const;
