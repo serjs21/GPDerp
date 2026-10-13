@@ -2,6 +2,7 @@ import {
   canStepBack,
   canStepForward,
   catchUpStopForHaiku,
+  clampScrollFocusIndex,
   queueLoaderStop,
   shouldFetchNextQueuePage,
   stopForHaikuIndex,
@@ -44,6 +45,13 @@ describe("stops", () => {
     expect(shouldFetchNextQueuePage(3, 0)).toBe(true);
     expect(shouldFetchNextQueuePage(21, 0)).toBe(false);
     expect(shouldFetchNextQueuePage(21, 1)).toBe(true);
+  });
+
+  it("lets the creation scroll reach focus -1, including for the first haiku on an empty path", () => {
+    expect(clampScrollFocusIndex(-1, 0)).toBe(-1);
+    expect(clampScrollFocusIndex(-1, 3)).toBe(-1);
+    expect(clampScrollFocusIndex(5, 3)).toBe(2);
+    expect(clampScrollFocusIndex(5, 0)).toBe(0);
   });
 
   it("packs catch-up haikus at the join stop then fans out", () => {

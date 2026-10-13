@@ -136,8 +136,7 @@ export function useSvgPathScroll(
 
   const snapFocusIndex = useCallback(
     (toIndex: number, clamp: typeof clampFocusIndex = clampFocusIndex) => {
-      if (haikuCount === 0) return false;
-
+      // Not gated on an empty list: the first save snaps creation focus (-1) back to 0 before the prepend.
       const next = clamp(toIndex, haikuCount);
       if (focusRef.current === next) return false;
 
@@ -197,8 +196,6 @@ export function useSvgPathScroll(
   }, [durationMs, haikuCount, onFocusChange, runJump]);
 
   const scrollToCreationSlot = useCallback(() => {
-    if (haikuCount === 0) return false;
-
     const current = focusRef.current;
     if (current === CREATION_FOCUS_INDEX) return false;
 
@@ -219,7 +216,7 @@ export function useSvgPathScroll(
       },
       clampScrollFocusIndex,
     );
-  }, [creationSlotDurationMs, haikuCount, onFocusChange, runJump]);
+  }, [creationSlotDurationMs, onFocusChange, runJump]);
 
   const getFocusIndex = useCallback(() => focusRef.current, []);
 

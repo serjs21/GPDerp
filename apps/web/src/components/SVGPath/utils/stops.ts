@@ -55,10 +55,9 @@ export function canStepForward(focusIndex: number, haikuCount: number): boolean 
   return focusIndex < haikuCount - 1;
 }
 
-/** Scroll target clamp; allows creation slot (-1) when list is non-empty. */
+/** Scroll target clamp; allows the creation slot (-1), also on an empty list (first haiku's fly-in). */
 export function clampScrollFocusIndex(focusIndex: number, haikuCount: number): number {
-  if (haikuCount <= 0) return 0;
-  return Math.max(CREATION_FOCUS_INDEX, Math.min(haikuCount - 1, focusIndex));
+  return Math.max(CREATION_FOCUS_INDEX, Math.min(Math.max(haikuCount - 1, 0), focusIndex));
 }
 
 export function clampFocusIndex(focusIndex: number, haikuCount: number): number {
