@@ -42,11 +42,11 @@ export const LANTERN_ROTATED_CONTENT_HEIGHT_PCT =
 export const LANTERN_ROTATED_WIDTH_REM = 14;
 
 /**
- * `lantern_base_rotated.png` — shared with AuthLanterns.
+ * `lantern_base_rotated.webp` — shared with AuthLanterns.
  * Auth label sits ~68%/39% with tilt 17° / skewX 25°; haiku panel anchors on the same face.
  */
 const ROTATED: LanternRotatedContentTransform = {
-  assetSrc: "/lantern/lantern_base_rotated.png",
+  assetSrc: "/lantern/lantern_base_rotated.webp",
   imageWidth: 350,
   imageHeight: 383,
   contentLeftPct: 68,
@@ -60,10 +60,10 @@ const ROTATED: LanternRotatedContentTransform = {
 };
 
 /**
- * `lanter-base-rotated-2.png` — worm’s-eye base; tuned to face panel in Storybook.
+ * `lanter-base-rotated-2.webp` — worm’s-eye base; tuned to face panel in Storybook.
  */
 const ROTATED_2: LanternRotatedContentTransform = {
-  assetSrc: "/lantern/lanter-base-rotated-2.png",
+  assetSrc: "/lantern/lanter-base-rotated-2.webp",
   imageWidth: 300,
   imageHeight: 380,
   contentLeftPct: 68,

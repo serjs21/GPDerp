@@ -7,6 +7,9 @@ export type CriticalImage = {
    * `<img>` / CSS `background-image` → omit; CSS `mask-image` → `"anonymous"` (CORS fetch).
    */
   crossOrigin?: "anonymous";
+  /** Responsive `<img>` candidates; must equal the element's `srcSet`/`sizes` so both pick the same file. */
+  srcSet?: string;
+  sizes?: string;
 };
 
 /** Only critical view art goes through here; the bound guards against unbounded growth. */
@@ -15,13 +18,15 @@ const MAX_TRACKED_IMAGES = 32;
 const pending = new Map<string, Promise<ImageReadiness>>();
 const settledReady = new Set<string>();
 
-const cacheKey = ({ src, crossOrigin }: CriticalImage): string =>
-  `${crossOrigin ?? "no-cors"} ${new URL(src, document.baseURI).href}`;
+const cacheKey = ({ src, crossOrigin, srcSet }: CriticalImage): string =>
+  `${crossOrigin ?? "no-cors"} ${new URL(src, document.baseURI).href} ${srcSet ?? ""}`;
 
-function loadAndDecode({ src, crossOrigin }: CriticalImage): Promise<ImageReadiness> {
+function loadAndDecode({ src, crossOrigin, srcSet, sizes }: CriticalImage): Promise<ImageReadiness> {
   const image = new Image();
   image.decoding = "async";
   if (crossOrigin) image.crossOrigin = crossOrigin;
+  if (sizes) image.sizes = sizes;
+  if (srcSet) image.srcset = srcSet;
 
   if (typeof image.decode !== "function") {
     return new Promise((resolve) => {

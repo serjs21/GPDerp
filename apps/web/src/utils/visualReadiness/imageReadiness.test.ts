@@ -12,6 +12,8 @@ const created: FakeImage[] = [];
 class FakeImage {
   decoding = "auto";
   crossOrigin: string | null = null;
+  srcset = "";
+  sizes = "";
   complete = false;
   naturalWidth = 0;
   private url = "";
@@ -80,6 +82,14 @@ describe("preloadAndDecodeImage", () => {
     expect(created).toHaveLength(2);
     expect(created[1]!.crossOrigin).toBe("anonymous");
     expect(isImageDecoded({ src: "/mask.png", crossOrigin: "anonymous" })).toBe(true);
+  });
+
+  it("applies srcSet/sizes so the loader picks the same candidate as the <img>", async () => {
+    const asset = { src: "/bg.webp", srcSet: "/bg-1x.webp 800w, /bg.webp 1600w", sizes: "100vw" };
+    await preloadAndDecodeImage(asset);
+    expect(created[0]).toMatchObject({ srcset: asset.srcSet, sizes: asset.sizes });
+    expect(isImageDecoded(asset)).toBe(true);
+    expect(isImageDecoded({ src: "/bg.webp" })).toBe(false);
   });
 
   it("resolves failed on load error, never marks decoded, and retries later", async () => {

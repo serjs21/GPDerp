@@ -1,7 +1,7 @@
 .root {
   /*
    * Face anchors are % of the lantern box (mask contain + centered).
-   * Large front panel sits roughly center-right on lantern_base_rotated.png.
+   * Large front panel sits roughly center-right on lantern_base_rotated.webp.
    */
    --auth-lantern-tilt: 17deg;
    --auth-lantern-skew: 25deg;
@@ -54,8 +54,8 @@ div.root {
   position: absolute;
   inset: 0;
   background: #f7f4ef;
-  -webkit-mask-image: url("/lantern/lantern_base_rotated.png");
-  mask-image: url("/lantern/lantern_base_rotated.png");
+  -webkit-mask-image: url("/lantern/lantern_base_rotated.webp");
+  mask-image: url("/lantern/lantern_base_rotated.webp");
   -webkit-mask-size: contain;
   mask-size: contain;
   -webkit-mask-repeat: no-repeat;

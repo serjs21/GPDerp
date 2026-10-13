@@ -17,7 +17,11 @@ export const AUTH_LANTERN_MASK: CriticalImage = {
 
 /** Persistent shell art visible on every route (base + mountain layers). */
 export const SHELL_CRITICAL_ASSETS: readonly CriticalImage[] = [
-  { src: BACKGROUND_SCENE_ASSETS.base },
+  {
+    src: BACKGROUND_SCENE_ASSETS.base,
+    srcSet: BACKGROUND_SCENE_ASSETS.baseSrcSet,
+    sizes: BACKGROUND_SCENE_ASSETS.baseSizes,
+  },
   BACKGROUND_MOUNTAIN_MASK,
 ];
 

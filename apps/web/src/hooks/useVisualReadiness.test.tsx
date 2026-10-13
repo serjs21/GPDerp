@@ -4,15 +4,19 @@ import type { CriticalImage, ImageReadiness } from "@/utils/visualReadiness/imag
 
 const deferreds = new Map<string, (value: ImageReadiness) => void>();
 const decoded = new Set<string>();
+const received: CriticalImage[] = [];
 
 jest.mock("@/utils/visualReadiness/imageReadiness", () => ({
-  preloadAndDecodeImage: ({ src }: CriticalImage) =>
-    new Promise<ImageReadiness>((resolve) => {
+  preloadAndDecodeImage: (asset: CriticalImage) => {
+    received.push(asset);
+    const { src } = asset;
+    return new Promise<ImageReadiness>((resolve) => {
       deferreds.set(src, (value) => {
         if (value === "ready") decoded.add(src);
         resolve(value);
       });
-    }),
+    });
+  },
   isImageDecoded: ({ src }: CriticalImage) => decoded.has(src),
 }));
 
@@ -28,6 +32,7 @@ describe("useVisualReadiness", () => {
   beforeEach(() => {
     deferreds.clear();
     decoded.clear();
+    received.length = 0;
     jest.useRealTimers();
   });
 
@@ -59,6 +64,13 @@ describe("useVisualReadiness", () => {
     );
     await settle("/mask.png", "ready");
     expect(result.current.status).toBe("ready");
+  });
+
+  it("passes responsive srcSet/sizes through to the loader", async () => {
+    const asset = { src: "/bg.webp", srcSet: "/bg-1x.webp 800w, /bg.webp 1600w", sizes: "100vw" };
+    renderHook(() => useVisualReadiness({ criticalAssets: [asset], maxWaitMs: 1000 }));
+    await settle("/bg.webp", "ready");
+    expect(received).toEqual([expect.objectContaining(asset)]);
   });
 
   it("reports degraded with the failed assets when an image fails", async () => {

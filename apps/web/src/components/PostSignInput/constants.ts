@@ -23,7 +23,7 @@ export const POST_SIGN_INPUT_CONTENT_HEIGHT =
 export const POST_SIGN_INPUT_IMAGE_ASPECT =
   POST_SIGN_INPUT_CONTENT_WIDTH / POST_SIGN_INPUT_CONTENT_HEIGHT;
 
-export const POST_SIGN_INPUT_ASSET_SRC = "/input/input_base_post_sign.png";
+export const POST_SIGN_INPUT_ASSET_SRC = "/input/input_base_post_sign.webp";
 
 /** Default display width in rem (keeps aspect via CSS). */
 export const POST_SIGN_INPUT_WIDTH_REM = 20;

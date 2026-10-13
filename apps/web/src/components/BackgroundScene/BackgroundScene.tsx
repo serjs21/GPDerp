@@ -100,6 +100,8 @@ export function BackgroundScene({
           <img
             className={styles.baseArt}
             src={BACKGROUND_SCENE_ASSETS.base}
+            srcSet={BACKGROUND_SCENE_ASSETS.baseSrcSet}
+            sizes={BACKGROUND_SCENE_ASSETS.baseSizes}
             alt=""
             aria-hidden
             draggable={false}
@@ -112,6 +114,8 @@ export function BackgroundScene({
           <img
             className={styles.mountainArt}
             src={BACKGROUND_SCENE_ASSETS.base}
+            srcSet={BACKGROUND_SCENE_ASSETS.baseSrcSet}
+            sizes={BACKGROUND_SCENE_ASSETS.baseSizes}
             alt=""
             aria-hidden
             draggable={false}

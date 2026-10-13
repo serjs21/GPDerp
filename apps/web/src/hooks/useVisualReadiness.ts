@@ -31,14 +31,12 @@ type SettledRun = {
 
 const NONE: readonly string[] = [];
 
-const toKey = (assets: readonly CriticalImage[]): string =>
-  assets.map(({ src, crossOrigin }) => `${crossOrigin ?? ""}|${src}`).join("\n");
+const EMPTY_KEY = "[]";
 
-const fromKey = (key: string): CriticalImage[] =>
-  key.split("\n").map((entry) => {
-    const [crossOrigin, src] = entry.split("|") as ["" | "anonymous", string];
-    return crossOrigin ? { src, crossOrigin } : { src };
-  });
+const toKey = (assets: readonly CriticalImage[]): string =>
+  JSON.stringify(assets.map(({ src, crossOrigin, srcSet, sizes }) => ({ src, crossOrigin, srcSet, sizes })));
+
+const fromKey = (key: string): CriticalImage[] => JSON.parse(key) as CriticalImage[];
 
 /**
  * Tracks whether a view's critical images are requested and decoded. Gates visibility /
@@ -54,7 +52,7 @@ export function useVisualReadiness({
   const alreadyDecoded = criticalAssets.every(isImageDecoded);
 
   useEffect(() => {
-    if (!enabled || alreadyDecoded || key === "") return;
+    if (!enabled || alreadyDecoded || key === EMPTY_KEY) return;
     const assets = fromKey(key);
     let cancelled = false;
     const outstanding = new Set(assets.map((asset) => asset.src));

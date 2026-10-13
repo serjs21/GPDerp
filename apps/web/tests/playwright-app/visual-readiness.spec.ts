@@ -6,10 +6,10 @@ import { expect, test, type Page, type Route } from "playwright/test";
  * observable state captured at the reveal moment, not final-state screenshots.
  */
 
-const BACKGROUND = "**/background/background_base.webp";
+const BACKGROUND = "**/background/background_base*.webp";
 const MOUNTAIN_MASK = "**/background/masks/mountain-mask.png";
-const ROTATED_LANTERN = "**/lantern/lantern_base_rotated.png";
-const UPRIGHT_LANTERN = "**/lantern/lantern_base.png";
+const ROTATED_LANTERN = "**/lantern/lantern_base_rotated.webp";
+const UPRIGHT_LANTERN = "**/lantern/lantern_base.webp";
 const FIRST_REVEAL_MAX_WAIT_MS = 5000;
 const SHARE_LINKS_SORT_COVER = "**/sort_button/time_cover.svg";
 const CONTROL_ART_MAX_WAIT_MS = 2000;

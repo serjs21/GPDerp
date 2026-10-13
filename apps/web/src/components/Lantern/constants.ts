@@ -1,9 +1,9 @@
-/** Native lantern asset size (matches `public/lantern/lantern_base.png`). */
+/** Native lantern asset size (matches `public/lantern/lantern_base.webp`). */
 export const LANTERN_IMAGE_WIDTH = 368;
 export const LANTERN_IMAGE_HEIGHT = 391;
 export const LANTERN_IMAGE_ASPECT = LANTERN_IMAGE_WIDTH / LANTERN_IMAGE_HEIGHT;
 
-export const LANTERN_ASSET_SRC = "/lantern/lantern_base.png";
+export const LANTERN_ASSET_SRC = "/lantern/lantern_base.webp";
 
 /** Default display width in rem (keeps aspect via CSS). */
 export const LANTERN_WIDTH_REM = 17.5;
