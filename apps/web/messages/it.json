@@ -32,20 +32,7 @@
   },
   "ProfileInfo": {
     "firstName": "Nome",
-    "lastName": "Cognome",
-    "emailTitle": "Email",
-    "currentEmail": "Email corrente",
-    "confirmationRequired": "Conferma richiesta",
-    "pendingNewEmail": "Nuova email in sospeso",
-    "resendEmail": "Invia di nuovo email",
-    "changeEmail": "Cambia email",
-    "newEmailPlaceholder": "nuovo@email.com",
-    "confirmEmailChangeTitle": "Conferma cambio email",
-    "confirmEmailChangeBody": "Sara richiesta una verifica per {email}.",
-    "resendVerificationEmailTitle": "Reinvia email di verifica",
-    "resendDescription": "Puoi cambiare la destinazione prima di reinviare.",
-    "confirm": "Conferma",
-    "cancel": "Annulla"
+    "lastName": "Cognome"
   },
   "Themes": {
     "tokyoDusk": "Tokyo Dusk",

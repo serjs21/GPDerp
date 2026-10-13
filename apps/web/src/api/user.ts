@@ -12,11 +12,6 @@ export type UserProfileResponse = {
   avatarManuallySet: boolean;
   emailVerifiedAt: string | null;
   providers: AuthProvider[];
-  pendingEmailChange: {
-    newEmail: string;
-    expiresAt: string;
-    requestedAt: string;
-  } | null;
   configuration: {
     theme: ThemeName;
     language: AppLocale;
@@ -42,20 +37,6 @@ export async function updateOwnProfile(body: { firstName?: string; lastName?: st
 export async function updateOwnAvatar(avatar: string): Promise<UserProfileResponse> {
   const { data } = await axios.patch<ProfileApiResponse>("/user/profile/avatar", { avatar });
   if (!data.ok) throw new Error(data.error ?? "Failed to update avatar");
-  return data.data;
-}
-
-type EmailChangeResponse = { ok: true; data: { pendingEmail: string } } | { ok: false; error: string };
-
-export async function requestEmailChange(newEmail: string): Promise<{ pendingEmail: string }> {
-  const { data } = await axios.post<EmailChangeResponse>("/user/change-email/request", { newEmail });
-  if (!data.ok) throw new Error(data.error ?? "Failed to create email change request");
-  return data.data;
-}
-
-export async function resendEmailChange(newEmail?: string): Promise<{ pendingEmail: string }> {
-  const { data } = await axios.post<EmailChangeResponse>("/user/change-email/resend", { newEmail });
-  if (!data.ok) throw new Error(data.error ?? "Failed to resend email change verification");
   return data.data;
 }
 

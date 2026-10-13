@@ -4,11 +4,10 @@ import type { Dispatch, SetStateAction } from "react";
 import { useTranslations } from "next-intl";
 import type { UserProfileResponse } from "@/api/user";
 import type { ProfileContextValue } from "../ProfileContext";
-import { pendingNewEmailOf, profileIdentity } from "../utils/profileUtils";
-import { useProfileEmailChange } from "./useProfileEmailChange";
+import { profileIdentity } from "../utils/profileUtils";
 import { useProfileSave } from "./useProfileSave";
 
-/** Profile tab context (identity + save/email flows); null until the profile has loaded. */
+/** Profile tab context (identity + save flows); null until the profile has loaded. */
 export function useProfileContextValue(
   profile: UserProfileResponse | null,
   setProfile: Dispatch<SetStateAction<UserProfileResponse | null>>,
@@ -16,13 +15,11 @@ export function useProfileContextValue(
 ): ProfileContextValue | null {
   const t = useTranslations("Profile");
   const save = useProfileSave(setProfile, checkAuthentication);
-  const emailChange = useProfileEmailChange(setProfile, pendingNewEmailOf(profile));
   if (!profile) return null;
 
   return {
     ...profileIdentity(profile, t("userFallback")),
     ...save,
-    ...emailChange,
     saveProfileLabel: t("saveProfile"),
   };
 }

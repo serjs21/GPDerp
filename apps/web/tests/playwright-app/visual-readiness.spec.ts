@@ -114,7 +114,6 @@ async function mockApi(page: Page, { loggedIn }: { loggedIn: boolean }) {
             data: {
               ...MEMBER,
               providers: [],
-              pendingEmailChange: null,
               configuration: { theme: "night-sky", language: "en" },
             },
           },

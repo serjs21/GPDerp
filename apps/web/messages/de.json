@@ -32,20 +32,7 @@
   },
   "ProfileInfo": {
     "firstName": "Vorname",
-    "lastName": "Nachname",
-    "emailTitle": "E-Mail",
-    "currentEmail": "Aktuelle E-Mail",
-    "confirmationRequired": "Bestaetigung erforderlich",
-    "pendingNewEmail": "Neue E-Mail ausstehend",
-    "resendEmail": "E-Mail erneut senden",
-    "changeEmail": "E-Mail aendern",
-    "newEmailPlaceholder": "neu@email.com",
-    "confirmEmailChangeTitle": "E-Mail-Aenderung bestaetigen",
-    "confirmEmailChangeBody": "Eine Verifizierung wird fuer {email} benoetigt.",
-    "resendVerificationEmailTitle": "Verifizierungs-E-Mail erneut senden",
-    "resendDescription": "Sie koennen das Ziel vor dem erneuten Senden aendern.",
-    "confirm": "Bestaetigen",
-    "cancel": "Abbrechen"
+    "lastName": "Nachname"
   },
   "Themes": {
     "tokyoDusk": "Tokyo Dusk",

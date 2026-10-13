@@ -32,20 +32,7 @@
   },
   "ProfileInfo": {
     "firstName": "名",
-    "lastName": "姓",
-    "emailTitle": "メール",
-    "currentEmail": "現在のメール",
-    "confirmationRequired": "確認が必要です",
-    "pendingNewEmail": "保留中の新しいメール",
-    "resendEmail": "メールを再送",
-    "changeEmail": "メールを変更",
-    "newEmailPlaceholder": "new@email.com",
-    "confirmEmailChangeTitle": "メール変更を確認",
-    "confirmEmailChangeBody": "{email} へのメール確認が必要です。",
-    "resendVerificationEmailTitle": "確認メールを再送",
-    "resendDescription": "再送前に宛先メールを変更できます。",
-    "confirm": "確認",
-    "cancel": "キャンセル"
+    "lastName": "姓"
   },
   "Themes": {
     "tokyoDusk": "東京ダスク",

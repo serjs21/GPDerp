@@ -45,7 +45,7 @@ async function mockSignedInApi(page: Page, labels: ReturnType<typeof makeLabels>
         return route.fulfill({
           json: {
             ok: true,
-            data: { ...MEMBER, providers: [], pendingEmailChange: null, configuration: { theme: "night-sky", language: "en" } },
+            data: { ...MEMBER, providers: [], configuration: { theme: "night-sky", language: "en" } },
           },
         });
       }

@@ -32,20 +32,7 @@
   },
   "ProfileInfo": {
     "firstName": "ชื่อ",
-    "lastName": "นามสกุล",
-    "emailTitle": "อีเมล",
-    "currentEmail": "อีเมลปัจจุบัน",
-    "confirmationRequired": "ต้องยืนยัน",
-    "pendingNewEmail": "อีเมลใหม่ที่รอดำเนินการ",
-    "resendEmail": "ส่งอีเมลอีกครั้ง",
-    "changeEmail": "เปลี่ยนอีเมล",
-    "newEmailPlaceholder": "new@email.com",
-    "confirmEmailChangeTitle": "ยืนยันการเปลี่ยนอีเมล",
-    "confirmEmailChangeBody": "ต้องยืนยันอีเมลสำหรับ {email}",
-    "resendVerificationEmailTitle": "ส่งอีเมลยืนยันอีกครั้ง",
-    "resendDescription": "คุณสามารถเปลี่ยนอีเมลปลายทางก่อนส่งอีกครั้ง",
-    "confirm": "ยืนยัน",
-    "cancel": "ยกเลิก"
+    "lastName": "นามสกุล"
   },
   "Themes": {
     "tokyoDusk": "Tokyo Dusk",

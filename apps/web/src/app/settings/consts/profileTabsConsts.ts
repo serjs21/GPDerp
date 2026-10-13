@@ -41,6 +41,3 @@ export const TAB_META: Record<
     bubbleStyle: "diamond",
   },
 };
-
-/** Pending email-change links expire after a day. */
-export const EMAIL_CHANGE_TTL_MS = 24 * 60 * 60 * 1000;

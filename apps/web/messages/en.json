@@ -29,10 +29,6 @@
       "loadError": "Could not load profile",
       "updateSuccess": "Profile updated",
       "updateError": "Could not update profile",
-      "emailChangeSent": "Email change verification sent",
-      "emailChangeError": "Could not create email change request",
-      "verificationSent": "Verification email sent",
-      "verificationError": "Could not resend verification email",
       "avatarSaved": "Profile picture saved",
       "avatarError": "Could not save profile picture to your account"
     }
@@ -60,20 +56,7 @@
   },
   "ProfileInfo": {
     "firstName": "First name",
-    "lastName": "Last name",
-    "emailTitle": "Email",
-    "currentEmail": "Current email",
-    "confirmationRequired": "Confirmation required",
-    "pendingNewEmail": "Pending new email",
-    "resendEmail": "Resend email",
-    "changeEmail": "Change email",
-    "newEmailPlaceholder": "new@email.com",
-    "confirmEmailChangeTitle": "Confirm email change",
-    "confirmEmailChangeBody": "Email verification will be required for {email}.",
-    "resendVerificationEmailTitle": "Resend verification email",
-    "resendDescription": "You can change the target email before resending.",
-    "confirm": "Confirm",
-    "cancel": "Cancel"
+    "lastName": "Last name"
   },
   "Themes": {
     "tokyoDusk": "Tokyo Dusk",
