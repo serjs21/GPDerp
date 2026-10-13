@@ -3,9 +3,10 @@ export const ICON_UPLOAD_DEFAULTS = {
   maxInputFileSizeBytes: 15 * 1024 * 1024,
   maxOutputFileSizeBytes: 2 * 1024 * 1024,
   preferredTargetSizeBytes: 1 * 1024 * 1024,
-  maxWidth: 1024,
-  maxHeight: 1024,
-  minDimension: 128,
+  /** Saved size, not an input limit: avatars display at most ~86 CSS px, so 256 covers 3x screens. */
+  maxWidth: 256,
+  maxHeight: 256,
+  minDimension: 64,
 };
 
 export type ProcessedImageForUpload = {
