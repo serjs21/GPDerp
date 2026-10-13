@@ -35,9 +35,11 @@ export function HeaderSearchButton({ className, forcedHover }: HeaderSearchButto
             {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
             <img src={view.iconSrc} alt="" className={styles.iconImg} width={28} height={28} />
           </HeaderToolFace>
-          <HeaderToolFace enterFrom="right" hidden={!active}>
-            <span className={styles.actionName}>{t("actionName")}</span>
-          </HeaderToolFace>
+          {view.isSettings ? null : (
+            <HeaderToolFace enterFrom="right" hidden={!active}>
+              <span className={styles.actionName}>{t("actionName")}</span>
+            </HeaderToolFace>
+          )}
         </button>
       </HeaderToolFrame>
 
