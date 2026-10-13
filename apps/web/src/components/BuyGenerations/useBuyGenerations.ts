@@ -77,7 +77,7 @@ export function useBuyGenerations() {
       const checkout = await createCheckout();
       const transactionId = checkout.transactionId;
       const email = user.email.trim();
-      const successUrl = `${window.location.origin}/settings?txn=${encodeURIComponent(transactionId)}`;
+      const successUrl = `${window.location.origin}/?txn=${encodeURIComponent(transactionId)}`;
 
       await openPaddleCheckoutWithFallback(
         (opts) => paddle.Checkout.open(opts),

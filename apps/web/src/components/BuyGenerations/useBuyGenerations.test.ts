@@ -116,7 +116,7 @@ describe("useBuyGenerations", () => {
         customer: { email: "buyer@example.com" },
         settings: expect.objectContaining({
           displayMode: "overlay",
-          successUrl: expect.stringContaining(`txn=${transactionId}`),
+          successUrl: `${window.location.origin}/?txn=${transactionId}`,
         }),
       }),
     );
