@@ -2,20 +2,23 @@
 
 import { createContext, useContext, type ReactNode } from "react";
 
-const GoogleOAuthAvailabilityContext = createContext(false);
+const GoogleOAuthClientIdContext = createContext<string | null>(null);
 
+/** Carries the Google client id; the GSI script itself loads only inside `GoogleOAuthScope`. */
 export const GoogleOAuthAvailabilityProvider = ({
   children,
-  enabled,
+  clientId,
 }: {
   children: ReactNode;
-  enabled: boolean;
+  clientId?: string | null;
 }) => {
   return (
-    <GoogleOAuthAvailabilityContext.Provider value={enabled}>
+    <GoogleOAuthClientIdContext.Provider value={clientId || null}>
       {children}
-    </GoogleOAuthAvailabilityContext.Provider>
+    </GoogleOAuthClientIdContext.Provider>
   );
 };
 
-export const useGoogleOAuthAvailability = () => useContext(GoogleOAuthAvailabilityContext);
+export const useGoogleOAuthClientId = () => useContext(GoogleOAuthClientIdContext);
+
+export const useGoogleOAuthAvailability = () => useGoogleOAuthClientId() !== null;

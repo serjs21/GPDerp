@@ -23,5 +23,4 @@ export {
   notification,
 } from "antd";
 
-export { GoogleLogin as GoogleLoginButton } from "@react-oauth/google";
 export type { MenuProps } from "antd";

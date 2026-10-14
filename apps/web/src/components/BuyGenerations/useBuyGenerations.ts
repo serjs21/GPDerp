@@ -23,7 +23,7 @@ function readTxnFromLocation(): string | null {
 export function useBuyGenerations() {
   const t = useTranslations("BuyGenerations");
   const { paddle, ready, initializing, configured } = usePaddle();
-  const { user } = useAuthenticationState();
+  const { user, isLoggedIn } = useAuthenticationState();
   const { requestAuthentication } = useAuthenticationVerification();
   const paddleEnv = readPaddleClientEnv();
   const [startingCheckout, setStartingCheckout] = useState(false);
@@ -101,7 +101,9 @@ export function useBuyGenerations() {
   return {
     startingCheckout,
     initializing,
-    checkoutReady: configured && ready && Boolean(paddle) && Boolean(paddleEnv.priceId),
+    // Guests get an enabled button that opens sign-in; the SDK only loads once they are signed in.
+    checkoutReady:
+      configured && Boolean(paddleEnv.priceId) && (!isLoggedIn || (ready && Boolean(paddle))),
     buy,
   };
 }

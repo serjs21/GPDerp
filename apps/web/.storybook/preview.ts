@@ -6,7 +6,7 @@ import { Bangers, Geist, Geist_Mono, Noto_Serif_JP, Patrick_Hand, Press_Start_2P
 import { createElement } from 'react';
 import enMessages from '../messages/en.json';
 import '@/theme/globals.css';
-import 'magic.css/dist/magic.min.css';
+import '@/theme/magicPuffIn.css';
 import '@/theme/themes/tokyo-dusk.css';
 import '@/theme/themes/sumie.css';
 import '@/theme/themes/night-sky.css';
@@ -25,7 +25,6 @@ const geistMono = Geist_Mono({
 const notoSerifJP = Noto_Serif_JP({
   variable: '--font-noto-serif',
   subsets: ['latin'],
-  weight: ['300', '500', '700'],
 });
 
 const zenKurenaido = Zen_Kurenaido({

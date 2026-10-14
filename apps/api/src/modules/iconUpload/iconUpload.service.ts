@@ -30,6 +30,8 @@ const describePresignedUrl = (uploadUrl: string) => {
 const ALLOWED_MIME_TYPES = new Set(["image/png", "image/jpeg", "image/jpg", "image/webp"]);
 const MAX_ICON_UPLOAD_SIZE_BYTES = 2 * 1024 * 1024;
 const PRESIGNED_UPLOAD_TTL_SECONDS = 60;
+/** Keys are unique per upload (UUID), so the stored bytes never change under a URL. */
+const ICON_CACHE_CONTROL = "public, max-age=31536000, immutable";
 
 const MIME_TO_EXTENSION: Record<string, string> = {
   "image/png": "png",
@@ -135,6 +137,7 @@ export const iconUploadService = {
           Key: key,
           Body: input.buffer,
           ContentType: normalizedMimeType,
+          CacheControl: ICON_CACHE_CONTROL,
         }),
       );
       debugLog("uploadIconBuffer PutObject ok", { key });

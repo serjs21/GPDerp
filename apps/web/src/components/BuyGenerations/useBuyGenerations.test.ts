@@ -86,6 +86,7 @@ describe("useBuyGenerations", () => {
     mockRequestAuthentication.mockReturnValue(true);
     mockUseAuthenticationState.mockReturnValue({
       user: { email: "buyer@example.com" },
+      isLoggedIn: true,
     });
     mockUsePaddle.mockReturnValue({
       paddle: { Checkout: { open: openCheckout } },
@@ -132,6 +133,27 @@ describe("useBuyGenerations", () => {
 
     expect(mockedCreateCheckout).not.toHaveBeenCalled();
     expect(mockedOpenFallback).not.toHaveBeenCalled();
+  });
+
+  it("keeps Buy enabled for guests (no SDK loaded) so the click can prompt sign-in", async () => {
+    mockUseAuthenticationState.mockReturnValue({ user: { email: "" }, isLoggedIn: false });
+    mockUsePaddle.mockReturnValue({ paddle: null, ready: false, initializing: false, configured: true });
+    mockRequestAuthentication.mockReturnValue(false);
+    const { result } = renderHook(() => useBuyGenerations());
+    expect(result.current.checkoutReady).toBe(true);
+
+    await act(async () => {
+      await result.current.buy();
+    });
+
+    expect(mockRequestAuthentication).toHaveBeenCalledTimes(1);
+    expect(mockedCreateCheckout).not.toHaveBeenCalled();
+  });
+
+  it("is not checkout-ready for a signed-in user until the SDK has loaded", () => {
+    mockUsePaddle.mockReturnValue({ paddle: null, ready: false, initializing: true, configured: true });
+    const { result } = renderHook(() => useBuyGenerations());
+    expect(result.current.checkoutReady).toBe(false);
   });
 
   it("does not open checkout when the price id is missing", async () => {

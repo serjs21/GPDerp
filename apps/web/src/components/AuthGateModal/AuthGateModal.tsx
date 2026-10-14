@@ -10,6 +10,7 @@ import { ComicPanelTabs } from "@/components/ComicPanelTabs";
 import { LabelMethodIcon } from "@/components/LabelMethodIcon";
 import { LoginFlow, type AuthFlowHandle } from "@/components/AuthFlows/LoginFlow";
 import { RegisterFlow } from "@/components/AuthFlows/RegisterFlow";
+import { GoogleOAuthScope } from "@/components/GoogleOAuthScope";
 import { useAuthenticationVerification } from "@/app/providers/AuthenticationVerificationProvider";
 import styles from "./styles.module.css";
 
@@ -126,24 +127,26 @@ export function AuthGateModal({
 
         <div className={styles.contentSlot}>
           <div className={styles.tabPane}>
-            {mode === "login" ? (
-              <LoginFlow
-                ref={loginRef}
-                showGoogle
-                hideCta
-                onSubmittingChange={setSubmitting}
-                onSuccess={handleAuthenticated}
-                onGoogleSignupRequired={() => setMode("register")}
-              />
-            ) : (
-              <RegisterFlow
-                ref={registerRef}
-                showGoogle
-                hideCta
-                onSubmittingChange={setSubmitting}
-                onSuccess={handleAuthenticated}
-              />
-            )}
+            <GoogleOAuthScope>
+              {mode === "login" ? (
+                <LoginFlow
+                  ref={loginRef}
+                  showGoogle
+                  hideCta
+                  onSubmittingChange={setSubmitting}
+                  onSuccess={handleAuthenticated}
+                  onGoogleSignupRequired={() => setMode("register")}
+                />
+              ) : (
+                <RegisterFlow
+                  ref={registerRef}
+                  showGoogle
+                  hideCta
+                  onSubmittingChange={setSubmitting}
+                  onSuccess={handleAuthenticated}
+                />
+              )}
+            </GoogleOAuthScope>
             <p className={styles.linkRow}>
               <button
                 type="button"

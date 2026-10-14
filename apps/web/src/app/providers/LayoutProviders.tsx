@@ -5,7 +5,6 @@ import { useMarkHydrated } from "@/hooks/useMarkHydrated";
 import { useScrollTopOnRouteChange } from "@/hooks/useScrollTopOnRouteChange";
 import styles from "./headerStyles.module.css";
 import layoutStyles from "./layoutProviders.module.css";
-import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthNavigation } from "@/components/AuthenticationNav/AuthNavigation";
 import { SiteFooter } from "@/components/SiteFooter/SiteFooter";
 import { CompleteRegistrationRedirect } from "@/components/AuthFlows/CompleteRegistrationRedirect";
@@ -66,12 +65,9 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
     </PaddleProvider>
   );
 
-  const withGoogleAvailability = (
-    <GoogleOAuthAvailabilityProvider enabled={Boolean(clientId)}>
+  return (
+    <GoogleOAuthAvailabilityProvider clientId={clientId}>
       {withAuthVerification}
     </GoogleOAuthAvailabilityProvider>
   );
-
-  if (!clientId) return withGoogleAvailability;
-  return <GoogleOAuthProvider clientId={clientId}>{withGoogleAvailability}</GoogleOAuthProvider>;
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import { type ReactNode } from "react";
-import { useGoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin, useGoogleOAuth } from "@react-oauth/google";
 import { useTranslations } from "next-intl";
 import { ComicPagePanel } from "@/components/ComicPageLayout";
 import authStyles from "@/app/auth.shared.module.css";
@@ -52,6 +52,8 @@ function GoogleGMark() {
 export function GoogleSquareButton({ text, onSuccess, onError }: GoogleSquareButtonProps) {
   const t = useTranslations("AuthFlows.chrome");
   const label = t(googleLabelKey(text));
+  // GSI loads when the auth surface mounts; clicking before that would silently no-op.
+  const { scriptLoadedSuccessfully } = useGoogleOAuth();
 
   const startGoogleLogin = useGoogleLogin({
     flow: "implicit",
@@ -70,6 +72,7 @@ export function GoogleSquareButton({ text, onSuccess, onError }: GoogleSquareBut
         type="button"
         className={authStyles.googleAction}
         aria-label={label}
+        disabled={!scriptLoadedSuccessfully}
         onClick={() => {
           startGoogleLogin();
         }}

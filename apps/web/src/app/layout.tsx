@@ -10,7 +10,7 @@ import {
   Zen_Kurenaido,
 } from "next/font/google";
 import "@/theme/globals.css";
-import "magic.css/dist/magic.min.css";
+import "@/theme/magicPuffIn.css";
 import "@/theme/themes/tokyo-dusk.css";
 import "@/theme/themes/sumie.css";
 import "@/theme/themes/night-sky.css";
@@ -37,11 +37,11 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",  subsets: ["latin"],
 });
 
-// Traditional Japanese Serif Font
+// Traditional Japanese Serif Font. Variable weight axis: one set of @font-face rules covers every
+// weight, instead of one ~124-slice set per static weight in render-blocking CSS.
 const notoSerifJP = Noto_Serif_JP({
   variable: "--font-noto-serif",
   subsets: ["latin"],
-  weight: ["300", "500", "700"],
 });
 
 // Handwritten brush script for lantern haiku text

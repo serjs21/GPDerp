@@ -7,6 +7,7 @@ import {
   type Paddle,
   type PaddleEventData,
 } from "@paddle/paddle-js";
+import { useAuthenticationState } from "./AuthenticationProvider";
 import { readPaddleClientEnv } from "./paddleClientEnv";
 import { loadPaddleSdk } from "./loadPaddleSdk";
 import { PADDLE_CHECKOUT_LOADED_EVENT } from "./openPaddleCheckoutWithFallback";
@@ -34,11 +35,13 @@ const readTransactionId = (event: PaddleEventData): string | null => {
 
 export const PaddleProvider = ({ children }: { children: ReactNode }) => {
   const { token, environment, configured } = readPaddleClientEnv();
+  // Guests cannot check out (`buy()` asks for sign-in first), so they never download the SDK.
+  const { isLoggedIn } = useAuthenticationState();
   const [paddle, setPaddle] = useState<Paddle | null>(null);
-  const [initializing, setInitializing] = useState(configured);
+  const [settled, setSettled] = useState(false);
 
   useEffect(() => {
-    if (!configured || !token) return;
+    if (!configured || !token || !isLoggedIn) return;
 
     let cancelled = false;
     void loadPaddleSdk()
@@ -65,21 +68,21 @@ export const PaddleProvider = ({ children }: { children: ReactNode }) => {
       .then((instance) => {
         if (cancelled) return;
         if (instance) setPaddle(instance);
-        setInitializing(false);
+        setSettled(true);
       })
       .catch(() => {
-        if (!cancelled) setInitializing(false);
+        if (!cancelled) setSettled(true);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [configured, environment, token]);
+  }, [configured, environment, token, isLoggedIn]);
 
   const value: PaddleContextValue = {
     paddle,
     ready: Boolean(paddle),
-    initializing,
+    initializing: configured && isLoggedIn && !paddle && !settled,
     configured,
   };
 

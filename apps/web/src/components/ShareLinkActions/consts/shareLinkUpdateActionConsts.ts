@@ -18,10 +18,7 @@ export const SHARE_LINK_WAKE_FRAMES = [
   SHARE_LINK_UPDATE_ICONS.disabled,
 ] as const;
 
-/**
- * Frame indices per segment. Each segment starts on the frame the previous one
- * ended on, so restarting the stepped transition never jumps.
- */
+
 const SHARE_LINK_WAKE_SEGMENT_FRAMES: Record<ShareLinkWakeSegment, readonly number[]> = {
   waking: [0, 1],
   wakeConfirmed: [1, 2, 3],
@@ -31,7 +28,6 @@ const SHARE_LINK_WAKE_SEGMENT_FRAMES: Record<ShareLinkWakeSegment, readonly numb
   sleepFailed: [2, 3],
 };
 
-/** Stepped poses per segment; `progress` encodes the frame index. */
 export const SHARE_LINK_WAKE_SEGMENT_POSES = Object.fromEntries(
   Object.entries(SHARE_LINK_WAKE_SEGMENT_FRAMES).map(([segment, frames]) => [
     segment,
@@ -46,7 +42,6 @@ export const SHARE_LINK_WAKE_SEGMENT_POSES = Object.fromEntries(
   ]),
 ) as Record<ShareLinkWakeSegment, TransitionPose[]>;
 
-/** Whether the link is active once each terminal segment finishes. */
 export const SHARE_LINK_WAKE_TERMINAL_ACTIVE: Partial<Record<ShareLinkWakeSegment, boolean>> = {
   wakeConfirmed: true,
   wakeFailed: false,
@@ -76,19 +71,16 @@ export const SHARE_LINK_UPDATE_DISABLED_MESSAGE_KEYS = {
   unchanged: "disabledUnchanged",
 } as const;
 
-/** Bubble floats to the right of the Update panel (mirror of Tune in's left callout). */
 export const SHARE_LINK_UPDATE_CALLOUT_POSITION = {
-  right: "calc(70% + 0.6rem)",
+  right: "calc(90% + 0.6rem)",
   bottom: "30%",
 } as const satisfies CalloutPosition;
 
-/** Bubble placement for the not-started (inactive link) variation. */
 export const SHARE_LINK_UPDATE_NOT_STARTED_CALLOUT_POSITION = {
-  right: "calc(100% + 0.6rem)",
+  right: "calc(90% + 0.6rem)",
   bottom: "10%",
 } as const satisfies CalloutPosition;
 
-/** Disabled Update panel: link started but unchanged, or link not started yet. */
 export const SHARE_LINK_UPDATE_UNAVAILABLE_VARIANTS = {
   unchanged: {
     messageKey: SHARE_LINK_UPDATE_DISABLED_MESSAGE_KEYS.unchanged,

@@ -12,6 +12,7 @@ import authStyles from "../auth.shared.module.css";
 import { useAuthenticationState } from "../providers/AuthenticationProvider";
 import { useAuthenticationVerification } from "../providers/AuthenticationVerificationProvider";
 import { LoginFlow } from "@/components/AuthFlows/LoginFlow";
+import { GoogleOAuthScope } from "@/components/GoogleOAuthScope";
 import {
   consumePostLoginReturn,
   ensurePostLoginReturnFromReferrer,
@@ -37,14 +38,16 @@ const LoginPage = () => {
   return (
     <div className={authStyles.authPage}>
       <Card className={authStyles.card} title={t("title")}>
-        <LoginFlow
-          onSuccess={onLoginSuccess}
-          showGoogle
-          onGoogleSignupRequired={() => {
-            comicToast.info(t("completeSetupOnRegistration"));
-            router.push("/register");
-          }}
-        />
+        <GoogleOAuthScope>
+          <LoginFlow
+            onSuccess={onLoginSuccess}
+            showGoogle
+            onGoogleSignupRequired={() => {
+              comicToast.info(t("completeSetupOnRegistration"));
+              router.push("/register");
+            }}
+          />
+        </GoogleOAuthScope>
         <Typography.Paragraph type="secondary" className={authStyles.footerLinks}>
           <Link href="/register">{t("createAccountLink")}</Link>
           {" · "}

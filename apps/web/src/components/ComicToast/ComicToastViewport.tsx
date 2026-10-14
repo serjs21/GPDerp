@@ -26,7 +26,7 @@ export function ComicToastViewport({ toasts, onDismiss, onRemove }: ComicToastVi
   const visible = toasts.slice(-COMIC_TOAST_MAX_VISIBLE);
 
   return createPortal(
-    <div className={styles.viewport} aria-label={t("notifications")}>
+    <div className={styles.viewport} role="region" aria-label={t("notifications")}>
       {visible.map((toast) => (
         <ComicToastItem key={toast.id} toast={toast} onDismiss={onDismiss} onRemove={onRemove} />
       ))}
