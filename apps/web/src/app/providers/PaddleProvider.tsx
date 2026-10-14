@@ -1,92 +1,51 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import {
-  CheckoutEventNames,
-  initializePaddle,
-  type Paddle,
-  type PaddleEventData,
-} from "@paddle/paddle-js";
-import { useAuthenticationState } from "./AuthenticationProvider";
+import { createContext, useContext, useRef, type ReactNode } from "react";
+import type { Paddle } from "@paddle/paddle-js";
 import { readPaddleClientEnv } from "./paddleClientEnv";
-import { loadPaddleSdk } from "./loadPaddleSdk";
 import { PADDLE_CHECKOUT_LOADED_EVENT } from "./openPaddleCheckoutWithFallback";
+import {
+  initPaddleClient,
+  PADDLE_CHECKOUT_COMPLETED_EVENT,
+  type PaddleCheckoutCompletedDetail,
+} from "./initPaddleClient";
 
-export const PADDLE_CHECKOUT_COMPLETED_EVENT = "paddle:checkout-completed";
-export { PADDLE_CHECKOUT_LOADED_EVENT };
-
-export type PaddleCheckoutCompletedDetail = {
-  transactionId: string;
-};
+export { PADDLE_CHECKOUT_COMPLETED_EVENT, PADDLE_CHECKOUT_LOADED_EVENT };
+export type { PaddleCheckoutCompletedDetail };
 
 type PaddleContextValue = {
-  paddle: Paddle | null;
-  ready: boolean;
-  initializing: boolean;
   configured: boolean;
+  /**
+   * Downloads and initializes Paddle on first call (purchase intent), then reuses it.
+   * Resolves `null` when Paddle is not configured or failed to load; a later call retries.
+   */
+  ensurePaddle: () => Promise<Paddle | null>;
 };
 
 const PaddleContext = createContext<PaddleContextValue | undefined>(undefined);
 
-const readTransactionId = (event: PaddleEventData): string | null => {
-  const id = event.data?.transaction_id ?? event.data?.id;
-  return typeof id === "string" && id.startsWith("txn_") ? id : null;
-};
-
 export const PaddleProvider = ({ children }: { children: ReactNode }) => {
   const { token, environment, configured } = readPaddleClientEnv();
-  // Guests cannot check out (`buy()` asks for sign-in first), so they never download the SDK.
-  const { isLoggedIn } = useAuthenticationState();
-  const [paddle, setPaddle] = useState<Paddle | null>(null);
-  const [settled, setSettled] = useState(false);
+  const paddleRef = useRef<Promise<Paddle | null> | null>(null);
 
-  useEffect(() => {
-    if (!configured || !token || !isLoggedIn) return;
-
-    let cancelled = false;
-    void loadPaddleSdk()
-      .then(() =>
-        initializePaddle({
-          token,
-          environment,
-          eventCallback: (event) => {
-            if (event.name === CheckoutEventNames.CHECKOUT_LOADED) {
-              window.dispatchEvent(new CustomEvent(PADDLE_CHECKOUT_LOADED_EVENT));
-            }
-
-            if (event.name !== CheckoutEventNames.CHECKOUT_COMPLETED) return;
-            const transactionId = readTransactionId(event);
-            if (!transactionId || typeof window === "undefined") return;
-            window.dispatchEvent(
-              new CustomEvent<PaddleCheckoutCompletedDetail>(PADDLE_CHECKOUT_COMPLETED_EVENT, {
-                detail: { transactionId },
-              }),
-            );
-          },
-        }),
-      )
-      .then((instance) => {
-        if (cancelled) return;
-        if (instance) setPaddle(instance);
-        setSettled(true);
-      })
-      .catch(() => {
-        if (!cancelled) setSettled(true);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [configured, environment, token, isLoggedIn]);
-
-  const value: PaddleContextValue = {
-    paddle,
-    ready: Boolean(paddle),
-    initializing: configured && isLoggedIn && !paddle && !settled,
-    configured,
+  const ensurePaddle = () => {
+    if (!configured || !token) return Promise.resolve(null);
+    paddleRef.current ??= initPaddleClient(token, environment).then(
+      (instance) => {
+        if (!instance) paddleRef.current = null;
+        return instance;
+      },
+      () => {
+        paddleRef.current = null;
+        return null;
+      },
+    );
+    return paddleRef.current;
   };
 
-  return <PaddleContext.Provider value={value}>{children}</PaddleContext.Provider>;
+  return (
+    <PaddleContext.Provider value={{ configured, ensurePaddle }}>{children}</PaddleContext.Provider>
+  );
 };
 
 export const usePaddle = (): PaddleContextValue => {

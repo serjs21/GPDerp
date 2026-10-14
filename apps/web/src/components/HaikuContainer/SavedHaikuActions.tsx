@@ -1,17 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { CreateAddLabelsModal } from "@/components/CreateAddLabelsModal";
-import { DeleteConfirmModal } from "@/components/DeleteConfirmModal";
-import { ShareModal } from "@/components/ShareModal/ShareModal";
 import { useCopy } from "@/hooks/useCopy";
 import { useHaikuActionsOpenPreference } from "@/hooks/useHaikuActionsOpenPreference";
-import { formatHaikuPlainToText, formatHaikuTitle } from "@/utils/strings";
+import { useLazyDialog } from "@/hooks/useLazyDialog";
+import { formatHaikuPlainToText } from "@/utils/strings";
 import { HaikuActionButtons } from "./HaikuActionButtons";
 import type { HaikuActionId, SavedHaikuActionsProps } from "./HaikuActions.types";
 import { HaikuActionsPanel } from "./HaikuActionsPanel";
 import { HaikuActionsToggle } from "./HaikuActionsToggle";
 import { HaikuClapBurst } from "./HaikuClapBurst";
+import { loadCreateAddLabelsModal, loadShareModal, preloadHaikuActionModals } from "./haikuActionModalsLazy";
+import { SavedHaikuActionModals } from "./SavedHaikuActionModals";
 import { useClapBurst } from "./useClapBurst";
 import { useHaikuActionsHover } from "./useHaikuActionsHover";
 import { useHaikuDelete } from "./useHaikuDelete";
@@ -25,8 +24,8 @@ export function SavedHaikuActions({
   forcedHover,
   forcedOpen,
 }: SavedHaikuActionsProps) {
-  const [shareOpen, setShareOpen] = useState(false);
-  const [labelsOpen, setLabelsOpen] = useState(false);
+  const share = useLazyDialog(loadShareModal);
+  const labels = useLazyDialog(loadCreateAddLabelsModal);
   const { deleteOpen, setDeleteOpen, deleting, handleDeleteConfirm } = useHaikuDelete({
     haiku,
     onDelete,
@@ -35,7 +34,7 @@ export function SavedHaikuActions({
   const { toggleWrapRef, clapPosition, clapFading, playClap } = useClapBurst();
   const { copy } = useCopy();
   const { isOpen, setOpenPreference } = useHaikuActionsOpenPreference(forcedOpen);
-  const modalBlocking = shareOpen || labelsOpen || deleteOpen;
+  const modalBlocking = share.open || labels.open || deleteOpen;
   const { activeHover, setHoverIfLive, clearHover, setHoverFromFocus, clearHoverFromBlur } =
     useHaikuActionsHover(forcedHover, modalBlocking);
 
@@ -52,10 +51,10 @@ export function SavedHaikuActions({
         setDeleteOpen(true);
         break;
       case "share":
-        setShareOpen(true);
+        share.requestOpen();
         break;
       case "label":
-        setLabelsOpen(true);
+        labels.requestOpen();
         break;
       case "copy":
         void copy(formatHaikuPlainToText(haiku));
@@ -70,31 +69,29 @@ export function SavedHaikuActions({
       <HaikuActionsPanel open={isOpen && !modalBlocking} onMouseLeave={clearHover}>
         <HaikuActionButtons
           activeHover={activeHover}
-          onHover={setHoverIfLive}
-          onFocusHover={setHoverFromFocus}
+          onHover={(id) => {
+            preloadHaikuActionModals();
+            setHoverIfLive(id);
+          }}
+          onFocusHover={(id, target) => {
+            preloadHaikuActionModals();
+            setHoverFromFocus(id, target);
+          }}
           onBlur={clearHoverFromBlur}
           onAction={onActionClick}
         />
       </HaikuActionsPanel>
-      <ShareModal
-        haikuId={haiku.id}
-        haikuSubject={formatHaikuTitle(haiku)}
+      <SavedHaikuActionModals
         haiku={haiku}
-        open={shareOpen}
-        onClose={() => setShareOpen(false)}
-      />
-      <CreateAddLabelsModal
-        open={labelsOpen}
-        haiku={haiku}
-        initialTab="add"
-        onClose={() => setLabelsOpen(false)}
-        onSaved={onChanged}
-      />
-      <DeleteConfirmModal
-        open={deleteOpen}
-        onOpenChange={setDeleteOpen}
-        onConfirm={handleDeleteConfirm}
-        confirming={deleting}
+        share={share}
+        labels={labels}
+        onChanged={onChanged}
+        deleteDialog={{
+          open: deleteOpen,
+          onOpenChange: setDeleteOpen,
+          onConfirm: handleDeleteConfirm,
+          confirming: deleting,
+        }}
       />
     </>
   );

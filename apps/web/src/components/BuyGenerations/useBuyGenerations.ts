@@ -22,7 +22,7 @@ function readTxnFromLocation(): string | null {
 
 export function useBuyGenerations() {
   const t = useTranslations("BuyGenerations");
-  const { paddle, ready, initializing, configured } = usePaddle();
+  const { configured, ensurePaddle } = usePaddle();
   const { user, isLoggedIn } = useAuthenticationState();
   const { requestAuthentication } = useAuthenticationVerification();
   const paddleEnv = readPaddleClientEnv();
@@ -67,13 +67,21 @@ export function useBuyGenerations() {
     return () => window.removeEventListener(PADDLE_CHECKOUT_COMPLETED_EVENT, onCompleted);
   }, [t]);
 
+  /** Warm the SDK on purchase intent (hover/focus/modal open) so the click opens checkout fast. */
+  const prepareCheckout = () => {
+    if (isLoggedIn) void ensurePaddle();
+  };
+
   const buy = async () => {
     if (!requestAuthentication()) return;
-    if (!paddle || startingCheckoutRef.current || !paddleEnv.priceId) return;
+    if (startingCheckoutRef.current || !paddleEnv.priceId) return;
 
     startingCheckoutRef.current = true;
     setStartingCheckout(true);
     try {
+      // Before createCheckout, so a failed SDK load never leaves an orphan server transaction.
+      const paddle = await ensurePaddle();
+      if (!paddle) throw new Error("Paddle unavailable");
       const checkout = await createCheckout();
       const transactionId = checkout.transactionId;
       const email = user.email.trim();
@@ -100,10 +108,9 @@ export function useBuyGenerations() {
 
   return {
     startingCheckout,
-    initializing,
-    // Guests get an enabled button that opens sign-in; the SDK only loads once they are signed in.
-    checkoutReady:
-      configured && Boolean(paddleEnv.priceId) && (!isLoggedIn || (ready && Boolean(paddle))),
+    // The SDK loads on demand inside `buy()` (covered by `startingCheckout`), so Buy is enabled up front.
+    checkoutReady: configured && Boolean(paddleEnv.priceId),
+    prepareCheckout,
     buy,
   };
 }

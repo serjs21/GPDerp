@@ -31,6 +31,7 @@ jest.mock("@/app/providers/openPaddleCheckoutWithFallback", () => ({
 }));
 
 const mockUsePaddle = jest.fn();
+const mockEnsurePaddle = jest.fn();
 jest.mock("@/app/providers/PaddleProvider", () => ({
   PADDLE_CHECKOUT_COMPLETED_EVENT: "paddle:checkout-completed",
   usePaddle: () => mockUsePaddle(),
@@ -88,12 +89,8 @@ describe("useBuyGenerations", () => {
       user: { email: "buyer@example.com" },
       isLoggedIn: true,
     });
-    mockUsePaddle.mockReturnValue({
-      paddle: { Checkout: { open: openCheckout } },
-      ready: true,
-      initializing: false,
-      configured: true,
-    });
+    mockEnsurePaddle.mockResolvedValue({ Checkout: { open: openCheckout } });
+    mockUsePaddle.mockReturnValue({ configured: true, ensurePaddle: mockEnsurePaddle });
   });
 
   it("does not fetch credits on mount", () => {
@@ -135,25 +132,42 @@ describe("useBuyGenerations", () => {
     expect(mockedOpenFallback).not.toHaveBeenCalled();
   });
 
-  it("keeps Buy enabled for guests (no SDK loaded) so the click can prompt sign-in", async () => {
+  it("keeps Buy enabled for guests without loading the SDK, so the click can prompt sign-in", async () => {
     mockUseAuthenticationState.mockReturnValue({ user: { email: "" }, isLoggedIn: false });
-    mockUsePaddle.mockReturnValue({ paddle: null, ready: false, initializing: false, configured: true });
     mockRequestAuthentication.mockReturnValue(false);
     const { result } = renderHook(() => useBuyGenerations());
     expect(result.current.checkoutReady).toBe(true);
 
+    act(() => result.current.prepareCheckout());
     await act(async () => {
       await result.current.buy();
     });
 
     expect(mockRequestAuthentication).toHaveBeenCalledTimes(1);
+    expect(mockEnsurePaddle).not.toHaveBeenCalled();
     expect(mockedCreateCheckout).not.toHaveBeenCalled();
   });
 
-  it("is not checkout-ready for a signed-in user until the SDK has loaded", () => {
-    mockUsePaddle.mockReturnValue({ paddle: null, ready: false, initializing: true, configured: true });
+  it("does not load the SDK on mount; prepareCheckout warms it for signed-in users", () => {
     const { result } = renderHook(() => useBuyGenerations());
-    expect(result.current.checkoutReady).toBe(false);
+    expect(mockEnsurePaddle).not.toHaveBeenCalled();
+    expect(result.current.checkoutReady).toBe(true);
+
+    act(() => result.current.prepareCheckout());
+    expect(mockEnsurePaddle).toHaveBeenCalledTimes(1);
+  });
+
+  it("toasts and creates no server transaction when the SDK fails to load", async () => {
+    mockEnsurePaddle.mockResolvedValue(null);
+    const { result } = renderHook(() => useBuyGenerations());
+
+    await act(async () => {
+      await result.current.buy();
+    });
+
+    expect(mockedCreateCheckout).not.toHaveBeenCalled();
+    expect(mockedOpenFallback).not.toHaveBeenCalled();
+    expect(mockedComicToast.error).toHaveBeenCalledWith("error");
   });
 
   it("does not open checkout when the price id is missing", async () => {

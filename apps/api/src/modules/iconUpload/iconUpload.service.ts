@@ -31,7 +31,7 @@ const ALLOWED_MIME_TYPES = new Set(["image/png", "image/jpeg", "image/jpg", "ima
 const MAX_ICON_UPLOAD_SIZE_BYTES = 2 * 1024 * 1024;
 const PRESIGNED_UPLOAD_TTL_SECONDS = 60;
 /** Keys are unique per upload (UUID), so the stored bytes never change under a URL. */
-const ICON_CACHE_CONTROL = "public, max-age=31536000, immutable";
+export const ICON_CACHE_CONTROL = "public, max-age=31536000, immutable";
 
 const MIME_TO_EXTENSION: Record<string, string> = {
   "image/png": "png",
@@ -40,7 +40,7 @@ const MIME_TO_EXTENSION: Record<string, string> = {
   "image/webp": "webp",
 };
 
-const r2Client = new S3Client({
+export const r2Client = new S3Client({
   region: env.R2_REGION,
   endpoint: env.R2_S3_ENDPOINT,
   // Without path style, the SDK signs virtual-hosted AWS URLs (bucket.s3.region.amazonaws.com),

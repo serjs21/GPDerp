@@ -4,7 +4,7 @@ import { PaddleProvider, usePaddle } from "./PaddleProvider";
 const mockLoadPaddleSdk = jest.fn(() => Promise.resolve());
 jest.mock("./loadPaddleSdk", () => ({ loadPaddleSdk: () => mockLoadPaddleSdk() }));
 
-const mockInitializePaddle = jest.fn(() => Promise.resolve({ Checkout: { open: jest.fn() } }));
+const mockInitializePaddle = jest.fn();
 jest.mock("@paddle/paddle-js", () => ({
   CheckoutEventNames: { CHECKOUT_LOADED: "checkout.loaded", CHECKOUT_COMPLETED: "checkout.completed" },
   initializePaddle: () => mockInitializePaddle(),
@@ -13,9 +13,6 @@ jest.mock("@paddle/paddle-js", () => ({
 jest.mock("./paddleClientEnv", () => ({
   readPaddleClientEnv: () => ({ token: "test_token", environment: "sandbox", configured: true, priceId: "pri" }),
 }));
-
-const mockAuthState = { isLoggedIn: false };
-jest.mock("./AuthenticationProvider", () => ({ useAuthenticationState: () => mockAuthState }));
 
 type PaddleValue = ReturnType<typeof usePaddle>;
 let latest: PaddleValue | null = null;
@@ -27,35 +24,47 @@ function Probe({ onValue }: { onValue: (value: PaddleValue) => void }) {
   return null;
 }
 
+async function renderProvider() {
+  await act(async () => {
+    render(
+      <PaddleProvider>
+        <Probe onValue={capture} />
+      </PaddleProvider>,
+    );
+  });
+  return latest!;
+}
+
 describe("PaddleProvider", () => {
+  const instance = { Checkout: { open: jest.fn() } };
+
   beforeEach(() => {
     jest.clearAllMocks();
     latest = null;
+    mockInitializePaddle.mockResolvedValue(instance);
   });
 
-  it("does not download the SDK for guests and reports not initializing", async () => {
-    mockAuthState.isLoggedIn = false;
-    await act(async () => {
-      render(
-        <PaddleProvider>
-          <Probe onValue={capture} />
-        </PaddleProvider>,
-      );
-    });
+  it("does not download the SDK on mount", async () => {
+    const value = await renderProvider();
     expect(mockLoadPaddleSdk).not.toHaveBeenCalled();
-    expect(latest).toMatchObject({ paddle: null, ready: false, initializing: false, configured: true });
+    expect(value.configured).toBe(true);
   });
 
-  it("loads the SDK once the user is signed in", async () => {
-    mockAuthState.isLoggedIn = true;
-    await act(async () => {
-      render(
-        <PaddleProvider>
-          <Probe onValue={capture} />
-        </PaddleProvider>,
-      );
-    });
+  it("loads the SDK once on demand and reuses the instance", async () => {
+    const value = await renderProvider();
+    const [first, second] = await Promise.all([value.ensurePaddle(), value.ensurePaddle()]);
+    expect(first).toBe(instance);
+    expect(second).toBe(instance);
+    expect(await value.ensurePaddle()).toBe(instance);
     expect(mockLoadPaddleSdk).toHaveBeenCalledTimes(1);
-    expect(latest).toMatchObject({ ready: true, initializing: false });
+    expect(mockInitializePaddle).toHaveBeenCalledTimes(1);
+  });
+
+  it("resolves null on a failed load and retries on the next call", async () => {
+    mockLoadPaddleSdk.mockRejectedValueOnce(new Error("blocked"));
+    const value = await renderProvider();
+    expect(await value.ensurePaddle()).toBeNull();
+    expect(await value.ensurePaddle()).toBe(instance);
+    expect(mockLoadPaddleSdk).toHaveBeenCalledTimes(2);
   });
 });

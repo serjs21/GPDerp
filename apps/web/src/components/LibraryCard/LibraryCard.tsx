@@ -25,12 +25,11 @@ export function LibraryCard() {
   const { profileInfo } = useProfileI18n();
   const t = useTranslations("LibraryCard");
   const { credits, loadingCredits } = useGenerationCredits();
-  const { startingCheckout, initializing, checkoutReady, buy } = useBuyGenerations();
+  const { startingCheckout, checkoutReady, prepareCheckout, buy } = useBuyGenerations();
 
   const remainingLabel =
     loadingCredits || credits === null ? t("remainingUnknown") : t("remaining", { count: credits });
-  const checkoutBusy = startingCheckout || initializing;
-  const buyDisabled = !checkoutReady || checkoutBusy;
+  const buyDisabled = !checkoutReady || startingCheckout;
 
   const saveNamesIfChanged = (form: HTMLFormElement) => {
     if (profile.saving) return;
@@ -91,13 +90,17 @@ export function LibraryCard() {
                   />
                 </label>
               </form>
-              <div className={styles.generations}>
+              <div
+                className={styles.generations}
+                onPointerEnter={prepareCheckout}
+                onFocus={prepareCheckout}
+              >
                 <p className={styles.remaining} aria-live="polite">
                   {remainingLabel}
                 </p>
                 <ComicPageCtaAction
                   label={t("buyMore")}
-                  busy={checkoutBusy}
+                  busy={startingCheckout}
                   disabled={buyDisabled}
                   onClick={() => void buy()}
                 />

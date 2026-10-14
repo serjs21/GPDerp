@@ -13,6 +13,7 @@ import { useHaikuGenerationFlow } from "@/components/HaikuGenerationStickyNote/h
 import { useHaikuFilters } from "@/app/providers/HaikuFiltersProvider";
 import { orderSortToHaikuListSort } from "@/utils/haikuSort/haikuListSortUtils";
 import { MAIN_MEMBER_LANTERN_ASSETS } from "@/consts/visualReadiness/criticalAssets";
+import { setHaikuDisplayMounted } from "./haikuDisplayMountStore";
 import styles from "./HaikuDisplay.module.css";
 
 export function HaikuDisplay() {
@@ -51,6 +52,11 @@ export function HaikuDisplay() {
   useEffect(() => {
     bindHaikuSavedRef.current = bindHaikuSaved;
   }, [bindHaikuSaved]);
+
+  useEffect(() => {
+    setHaikuDisplayMounted(true);
+    return () => setHaikuDisplayMounted(false);
+  }, []);
 
   return (
     <div className={styles.wrapper}>

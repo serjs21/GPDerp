@@ -19,15 +19,23 @@ type RevealProbe = {
   visualReady: string | null;
   authReadyAt: number | null;
   artAtReveal: { complete: boolean; naturalWidth: number }[];
+  memberViewAtReveal: boolean;
 };
 
 async function installRevealProbe(page: Page) {
   await page.addInitScript(() => {
-    const probe = { revealAt: null, visualReady: null, authReadyAt: null, artAtReveal: [] } as {
+    const probe = {
+      revealAt: null,
+      visualReady: null,
+      authReadyAt: null,
+      artAtReveal: [],
+      memberViewAtReveal: false,
+    } as {
       revealAt: number | null;
       visualReady: string | null;
       authReadyAt: number | null;
       artAtReveal: { complete: boolean; naturalWidth: number }[];
+      memberViewAtReveal: boolean;
     };
     (window as unknown as { __reveal: typeof probe }).__reveal = probe;
     const observer = new MutationObserver(() => {
@@ -42,6 +50,7 @@ async function installRevealProbe(page: Page) {
         probe.artAtReveal = [...document.querySelectorAll<HTMLImageElement>("img")]
           .filter((img) => img.src.includes("/background/"))
           .map((img) => ({ complete: img.complete, naturalWidth: img.naturalWidth }));
+        probe.memberViewAtReveal = Boolean(document.querySelector('[class*="HaikuDisplay"]'));
       }
     });
     const start = () =>
@@ -289,7 +298,35 @@ test.describe("first-load visual readiness", () => {
     lantern.release();
     await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
     expect((await readProbe(page)).visualReady).toBe("ready");
-    await expect(page.locator('[class*="HaikuDisplay"]').first()).toBeAttached();
+    expect((await readProbe(page)).memberViewAtReveal).toBe(true);
+  });
+
+  test("member on Main: reveal waits for the code-split member view to mount", async ({ page }) => {
+    await mockApi(page, { loggedIn: true });
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    let held = 0;
+    await page.route("**/_next/static/chunks/*.js", async (route) => {
+      const response = await route.fetch();
+      const body = await response.text();
+      if (body.includes("HaikuDisplay-module")) {
+        held += 1;
+        await gate;
+      }
+      await route.fulfill({ response, body }).catch(() => {});
+    });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await expect.poll(() => held).toBeGreaterThan(0);
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll<HTMLImageElement>("img")]
+        .filter((img) => img.src.includes("/background/"))
+        .every((img) => img.complete && img.naturalWidth > 0),
+    );
+    await page.waitForTimeout(500);
+    expect(await isRevealed(page)).toBe(false);
+    release();
+    await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+    expect((await readProbe(page)).memberViewAtReveal).toBe(true);
   });
 
   test("member on Settings waits only for shell art, not Main's lantern art", async ({ page }) => {
