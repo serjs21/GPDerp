@@ -80,9 +80,12 @@
   pointer-events: none;
 }
 
-/* TextBubbleDropdown's trigger button. */
+/* TextBubbleDropdown's trigger button; ink matches the other header buttons (border + press shadow). */
 .root > button {
+  --comic-ink: #111111;
+
   height: 3rem;
+  border-width: 1px;
 }
 
 .triggerInner {

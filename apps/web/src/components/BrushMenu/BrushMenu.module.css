@@ -47,6 +47,24 @@
   line-height: normal;
 }
 
+/*
+ * Narrow headers: the growing shell would push the header tools onto a second
+ * line, so it leaves flow and `.wrap` keeps the closed avatar footprint.
+ */
+@media (max-width: 640px) {
+  .wrap:has(> .shell) {
+    width: var(--brush-avatar-slot);
+    height: var(--brush-avatar-slot);
+  }
+
+  .shell {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 40;
+  }
+}
+
 /* Closed footprint — keeps layout when the trigger is position:absolute. */
 .avatarSlot {
   display: block;
