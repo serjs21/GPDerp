@@ -29,6 +29,7 @@ export function HeaderSearchButton({ className, forcedHover }: HeaderSearchButto
           aria-label={view.buttonAriaLabel}
           aria-expanded={view.expanded}
           {...handlers}
+          onPointerDown={view.onSearchPointerDown}
           onClick={view.onSearchClick}
         >
           <HeaderToolFace>

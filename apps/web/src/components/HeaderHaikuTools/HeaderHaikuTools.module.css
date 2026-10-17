@@ -220,11 +220,14 @@
   .toolsSlot:has(.searchInput) > .filterChips {
     top: calc(100% + 3.8rem);
   }
+}
 
-  /*
-   * Settings: the always-open input stays in the header row (no overlay on the
-   * tabs); the header grows and the preferences wrap below instead.
-   */
+/*
+ * Settings: while the open input still fits the header row, keep it inline (no
+ * overlay on the tabs). Narrower, it hangs below the header like the haiku
+ * search. Lower bound in sync with HEADER_SETTINGS_SEARCH_COMPACT_QUERY.
+ */
+@media (min-width: 506px) and (max-width: 640px) {
   .toolsSlot:has(.searchInputSettings),
   .toolsSlot :has(> .searchInputSettings) {
     flex: 1 1 auto;

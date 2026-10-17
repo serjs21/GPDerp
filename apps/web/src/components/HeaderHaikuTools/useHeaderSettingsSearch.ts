@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useSettingsSearchOpenState } from "./useSettingsSearchOpenState";
 
 const SEARCH_DEBOUNCE_MS = 200;
 
@@ -33,7 +34,8 @@ const COPY: Record<
 
 /**
  * Header search for `/settings` share-links and labels tabs.
- * Open by default; collapses only when the search icon is toggled (not on blur).
+ * Open by default and toggled by the icon; on narrow headers closed by default
+ * and also collapses on blur when empty (see `useSettingsSearchOpenState`).
  */
 export function useHeaderSettingsSearch() {
   const t = useTranslations("HeaderHaikuTools.settingsSearch");
@@ -45,17 +47,17 @@ export function useHeaderSettingsSearch() {
 
   const urlSearch = searchParams.get("search") ?? "";
   const [draft, setDraft] = useState(urlSearch);
-  const [expanded, setExpanded] = useState(true);
+  const { expanded, toggleExpanded, onSearchPointerDown, onInputBlur } = useSettingsSearchOpenState(
+    enabled,
+    tab,
+    draft,
+  );
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setDraft(urlSearch);
   }, [urlSearch, tab]);
-
-  useEffect(() => {
-    if (enabled) setExpanded(true);
-  }, [enabled, tab]);
 
   useEffect(() => {
     if (!enabled || !expanded) return;
@@ -93,7 +95,9 @@ export function useHeaderSettingsSearch() {
     enabled,
     tab,
     expanded,
-    toggleExpanded: () => setExpanded((open) => !open),
+    toggleExpanded,
+    onSearchPointerDown,
+    onInputBlur,
     searchString: draft,
     setSearchString: setDraft,
     inputRef,

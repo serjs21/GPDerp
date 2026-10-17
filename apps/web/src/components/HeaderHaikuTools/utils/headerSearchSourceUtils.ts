@@ -18,6 +18,7 @@ export type HeaderSearchView = {
   inputAriaLabel: string;
   buttonAriaLabel: string;
   onSearchClick: () => void;
+  onSearchPointerDown: (() => void) | undefined;
   onInputBlur: (() => void) | undefined;
   iconSrc: string;
   labelsTab: boolean;
@@ -34,7 +35,8 @@ function settingsSearchView(settings: SettingsSearch): HeaderSearchView {
     inputAriaLabel: settings.ariaLabel,
     buttonAriaLabel: settings.buttonAriaLabel,
     onSearchClick: settings.toggleExpanded,
-    onInputBlur: undefined,
+    onSearchPointerDown: settings.onSearchPointerDown,
+    onInputBlur: settings.onInputBlur,
     iconSrc: settings.iconSrc,
     labelsTab: settings.tab === "labels",
   };
@@ -51,6 +53,7 @@ function haikuSearchView(haiku: HaikuSearch, t: Translate): HeaderSearchView {
     inputAriaLabel: t("inputAriaLabel"),
     buttonAriaLabel: t("buttonAriaLabel"),
     onSearchClick: haiku.openSearch,
+    onSearchPointerDown: undefined,
     onInputBlur: haiku.onBlur,
     iconSrc: HEADER_HAIKU_SEARCH_ICON_SRC,
     labelsTab: false,
