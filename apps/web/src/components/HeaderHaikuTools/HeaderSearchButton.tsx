@@ -7,6 +7,7 @@ import { HeaderToolFace } from "./HeaderToolFace";
 import { HeaderToolFrame } from "./HeaderToolFrame";
 import { useHeaderSearchSource } from "./useHeaderSearchSource";
 import { useHeaderToolHover } from "./useHeaderToolHover";
+import { headerSearchButtonClassNames } from "./utils/headerSearchButtonUtils";
 import styles from "./HeaderToolButton.module.css";
 
 /** Header search button + input: haiku titles on `/`, the active tab on `/settings`. */
@@ -16,13 +17,11 @@ export function HeaderSearchButton({ className, forcedHover }: HeaderSearchButto
   const { active, handlers } = useHeaderToolHover(forcedHover);
   if (!view) return null;
 
-  const panelClassName = [styles.panelSearch, view.labelsTab ? styles.panelSearchLabels : ""]
-    .filter(Boolean)
-    .join(" ");
+  const classNames = headerSearchButtonClassNames(view, className);
 
   return (
-    <div className={[styles.anchor, className].filter(Boolean).join(" ")}>
-      <HeaderToolFrame panelClassName={panelClassName}>
+    <div className={classNames.anchor}>
+      <HeaderToolFrame panelClassName={classNames.panel}>
         <button
           type="button"
           className={styles.button}

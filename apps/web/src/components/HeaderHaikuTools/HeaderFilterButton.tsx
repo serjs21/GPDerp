@@ -8,6 +8,7 @@ import { HeaderToolFrame } from "./HeaderToolFrame";
 import { LabelFilterExtras } from "./LabelFilterExtras";
 import { useHeaderHaikuLabelManage } from "./useHeaderHaikuLabelManage";
 import { useHeaderToolHover } from "./useHeaderToolHover";
+import toolStyles from "./HeaderHaikuTools.module.css";
 import styles from "./HeaderToolButton.module.css";
 
 /** Header "filter haikus by labels" button; owns the active-filter chips and the filter modal. */
@@ -20,7 +21,7 @@ export function HeaderFilterButton({ className, forcedHover }: HeaderFilterButto
 
   return (
     <>
-      <div className={[styles.anchor, className].filter(Boolean).join(" ")}>
+      <div className={[styles.anchor, toolStyles.shrinkTool, className].filter(Boolean).join(" ")}>
         <HeaderToolFrame panelClassName={styles.panelFilter}>
           <button
             type="button"

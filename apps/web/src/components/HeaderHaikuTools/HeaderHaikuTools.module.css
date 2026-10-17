@@ -220,6 +220,25 @@
   .toolsSlot:has(.searchInput) > .filterChips {
     top: calc(100% + 3.8rem);
   }
+
+  /*
+   * Main page: tools shrink toward 2.8rem before the header wraps. Size
+   * containment makes the row's intrinsic width the shrunk one, so the cluster
+   * only breaks the line once the minimum no longer fits.
+   */
+  .toolsSlot:has(> .shrinkTool) {
+    flex: 1 1 auto;
+  }
+
+  .toolsSlot:has(> .shrinkTool) > :not(.shrinkTool) {
+    flex-shrink: 0;
+  }
+
+  .toolsSlot > .shrinkTool {
+    flex: 0 1 4rem;
+    min-width: 2.8rem;
+    contain: inline-size;
+  }
 }
 
 /*

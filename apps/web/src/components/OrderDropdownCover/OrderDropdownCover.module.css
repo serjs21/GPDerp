@@ -1,7 +1,12 @@
 .root {
+  --odc-label-width: calc(var(--odc-pad-left) + var(--odc-stage-width) + var(--odc-pad-right));
+
   position: relative;
   display: inline-block;
-  box-sizing: content-box;
+  box-sizing: border-box;
+  /* Label width; a narrower container squeezes it (art stays centred, clipped). */
+  width: var(--odc-label-width);
+  max-width: 100%;
   padding: var(--odc-pad-top) var(--odc-pad-right) var(--odc-pad-bottom) var(--odc-pad-left);
   border: none;
   background: none;
@@ -38,6 +43,7 @@
   position: relative;
   display: block;
   width: var(--odc-stage-width);
+  max-width: 100%;
   height: var(--odc-stage-height);
 }
 
@@ -50,10 +56,13 @@
   pointer-events: none;
 }
 
-/* Same box as .stage, scaled about the label centre, then shifted so the base stays in view. */
+/*
+ * Same box as .stage, scaled about the label centre, then shifted so the base stays in view.
+ * Placed from the clip's centre so it stays centred when the label is squeezed.
+ */
 .art {
   position: absolute;
-  left: calc(var(--odc-pad-left) - var(--odc-label-stroke) / 2);
+  left: calc(50% + var(--odc-pad-left) - var(--odc-label-width) / 2);
   top: calc(var(--odc-pad-top) - var(--odc-label-stroke) / 2);
   display: block;
   width: var(--odc-stage-width);

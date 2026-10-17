@@ -6,6 +6,7 @@ import { OrderDropdown } from "@/components/OrderDropdown";
 import { coverWidthRemForLabelWidth } from "@/components/OrderDropdownCover";
 import { HEADER_TOOL_WIDTH_REM } from "./consts/headerToolConsts";
 import type { HeaderOrderDropdownProps } from "./HeaderOrderDropdown.types";
+import toolStyles from "./HeaderHaikuTools.module.css";
 import styles from "./HeaderToolButton.module.css";
 
 /** Gavel label as wide as the other header tools. */
@@ -19,7 +20,7 @@ export function HeaderOrderDropdown({ className }: HeaderOrderDropdownProps) {
   if (pathname !== "/") return null;
 
   return (
-    <div className={[styles.anchor, className].filter(Boolean).join(" ")}>
+    <div className={[styles.anchor, toolStyles.shrinkTool, className].filter(Boolean).join(" ")}>
       <OrderDropdown
         value={orderSort}
         onChange={setOrderSort}
