@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import type { HaikuDto } from "@/api/haikus";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import type { LanternTransform } from "@/components/Lantern/lanternTransform";
+import { PathNavigationProvider } from "@/components/PathNavigation";
 import { SVGPathLantern } from "./SVGPathLantern";
 import { useGuideBoxRect } from "./useGuideBoxRect";
 import {
@@ -55,15 +56,17 @@ export function CreationPathLantern({
       style={creationLanternOverlayStyle(guideBoxRect, overlayOpacity)}
       data-creation-path-lantern=""
     >
-      <SVGPathLantern
-        generatingDraft={generatingDraft}
-        haiku={creationLanternHaiku(generatingDraft, handoffHaiku)}
-        transform={transform}
-        suppressReveal
-        isAnimating={overlayOpacity < 1}
-        actionsAlwaysVisible
-        excludeLabelIds={excludeLabelIds}
-      />
+      <PathNavigationProvider value={null}>
+        <SVGPathLantern
+          generatingDraft={generatingDraft}
+          haiku={creationLanternHaiku(generatingDraft, handoffHaiku)}
+          transform={transform}
+          suppressReveal
+          isAnimating={overlayOpacity < 1}
+          actionsAlwaysVisible
+          excludeLabelIds={excludeLabelIds}
+        />
+      </PathNavigationProvider>
     </div>
   );
 

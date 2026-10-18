@@ -32,7 +32,7 @@ export const LABEL_FILTER_SOFT =
   "brightness(1.05) drop-shadow(0 0 0.35em color-mix(in srgb, #ffffff 28%, transparent))";
 export const LABEL_FILTER_STRONG =
   "brightness(1.1) drop-shadow(0 0 0.5em color-mix(in srgb, #ffffff 42%, transparent))";
-/** Right label sits on the light half (dark ink) — warm parchment halo. */
+/** Right label sits on the light half — warm parchment halo. */
 export const LABEL_RIGHT_GLOW_SOFT =
   "0 0 0.45em color-mix(in srgb, #ffe9a8 55%, transparent), 0 0 1em color-mix(in srgb, #fff4d0 35%, transparent)";
 export const LABEL_RIGHT_GLOW_STRONG =

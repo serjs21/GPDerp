@@ -29,14 +29,12 @@
   }
 }
 
-/* Black SVG used as a mask so it takes the side's text colour. */
 .icon {
   display: block;
   z-index: 1;
   width: 8rem;
   height: 8rem;
-  background-color: currentColor;
-  -webkit-mask: url("/overlay/go_to_start.svg") center / contain no-repeat;
-  mask: url("/overlay/go_to_start.svg") center / contain no-repeat;
+  object-fit: contain;
+  user-select: none;
   pointer-events: none;
 }
