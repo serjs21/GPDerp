@@ -161,14 +161,14 @@
 }
 
 /* Lantern, controls, then the actions as a 2×2 grid (same reading order as the strip). */
-@media (max-width: 640px) {
+@media (max-width: 440px) {
   .linkRow {
     grid-template-columns: minmax(0, 1fr);
   }
 
   .linkRow > .actionsCell {
     grid-row: 3;
-    flex-wrap: wrap-reverse;
+    flex-wrap: wrap;
     height: calc(2 * 3.2rem + 0.5rem);
   }
 

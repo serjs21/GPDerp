@@ -83,7 +83,11 @@ export function ManageLabel(props: ManageLabelProps) {
           onAnimationEnd={handleAnimationEnd}
         >
           <ComicPageRow className={styles.strip}>
-            <ManageLabelPreview label={label} onEdit={() => setEditOpen(true)} />
+            <ManageLabelPreview
+              label={label}
+              connectedTotal={connected.total}
+              onEdit={() => setEditOpen(true)}
+            />
             <ManageLabelConnections
               accountId={accountId}
               labelName={label.name}

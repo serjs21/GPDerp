@@ -100,7 +100,7 @@
 
 .captionLabels {
   white-space: break-spaces;
-  max-width: 50%;
+  max-width: 45%;
   text-align: var(--share-link-action-caption-text-align, center);
   width: var(--share-link-action-caption-width, 3rem);
 }

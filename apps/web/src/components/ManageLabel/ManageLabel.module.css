@@ -116,15 +116,20 @@
   max-width: 6.25rem;
 }
 
-/* Label on its own line; connections + actions share the line below. */
+/*
+ * Narrow strip: label | actions on one line. The connections panel is hidden;
+ * its count shows in the label's title (MANAGE_LABEL_COMPACT_QUERY).
+ */
 @media (max-width: 640px) {
-  .strip {
-    flex-wrap: wrap;
+  .strip > .connectedSlot {
+    display: none;
   }
+}
 
-  .strip > .labelSlot {
-    flex: 1 1 100% !important;
-  }
+.notConnectedTitleIcon {
+  display: block;
+  width: 1.1rem;
+  height: 1.1rem;
 }
 
 .labelPanel,
