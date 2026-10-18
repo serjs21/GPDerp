@@ -34,6 +34,8 @@
   width: 8rem;
   height: 8rem;
   object-fit: contain;
+  /* Black source SVG rendered white on the dark half. */
+  filter: brightness(0) invert(1);
   user-select: none;
   pointer-events: none;
 }
