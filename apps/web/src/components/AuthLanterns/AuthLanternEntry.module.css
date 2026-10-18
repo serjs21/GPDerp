@@ -7,6 +7,11 @@
 
 .register {
   margin-top: 5rem;
+  outline: none;
+}
+
+.login {
+  outline: none;
 }
 
 .compact {

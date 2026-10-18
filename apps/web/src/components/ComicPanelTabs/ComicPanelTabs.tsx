@@ -31,8 +31,8 @@ export type ComicPanelTabsProps<T extends string = string> = {
   "aria-label"?: string;
 };
 
-const DEFAULT_SELECTED_FLEX_WEIGHT = 1.25;
-const DEFAULT_UNSELECTED_FLEX_WEIGHT = 0.75;
+const DEFAULT_SELECTED_FLEX_WEIGHT = 1.15;
+const DEFAULT_UNSELECTED_FLEX_WEIGHT = 0.95;
 
 export function ComicPanelTabs<T extends string>({
   tabs,

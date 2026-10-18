@@ -29,7 +29,7 @@ export function AuthLanternEntry({
 
   return (
     <div className={rootClass} aria-label={t("entryGroupLabel")}>
-      <LoginLantern onClick={onLoginClick} />
+      <LoginLantern onClick={onLoginClick} className={styles.login}  />
       <RegisterLantern className={styles.register} onClick={onRegisterClick} />
     </div>
   );

@@ -147,7 +147,7 @@
     transform: rotate(var(--share-link-action-row-caption-rotate, var(--share-link-action-caption-rotate, 0deg)));
     font-size: var(--share-link-action-row-caption-font-size, var(--share-link-action-caption-font-size, 0.8rem));
     width: var(--share-link-action-row-caption-width, var(--share-link-action-caption-width, auto));
-    text-align: var(--share-link-action-row-caption-text-align, var(--share-link-action-caption-text-align, start));
+    text-align: var(--share-link-action-row-caption-text-align, var(--share-link-action-caption-text-align, end));
   }
 
   .stack .captionLabels {
