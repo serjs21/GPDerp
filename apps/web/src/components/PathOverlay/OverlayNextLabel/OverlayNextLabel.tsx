@@ -15,16 +15,7 @@ export function OverlayNextLabel({ className }: OverlayNextLabelProps) {
   return (
     <div className={rootClass}>
       <span className={styles.label}>{t("label")}</span>
-      {/* eslint-disable-next-line @next/next/no-img-element -- static public asset */}
-      <img
-        className={styles.arrow}
-        src="/overlay/arrow-continue.png"
-        alt=""
-        width={207}
-        height={227}
-        draggable={false}
-        aria-hidden
-      />
+      <span className={styles.icon} aria-hidden />
     </div>
   );
 }

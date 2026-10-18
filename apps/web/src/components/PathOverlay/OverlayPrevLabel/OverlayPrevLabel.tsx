@@ -15,16 +15,7 @@ export function OverlayPrevLabel({ className }: OverlayPrevLabelProps) {
   return (
     <div className={rootClass}>
       <span className={styles.label}>{t("label")}</span>
-      {/* eslint-disable-next-line @next/next/no-img-element -- static public asset */}
-      <img
-        className={styles.arrow}
-        src="/overlay/arrow-return.png"
-        alt=""
-        width={239}
-        height={183}
-        draggable={false}
-        aria-hidden
-      />
+      <span className={styles.icon} aria-hidden />
     </div>
   );
 }
