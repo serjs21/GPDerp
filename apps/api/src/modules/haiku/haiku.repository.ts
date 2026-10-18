@@ -1,7 +1,7 @@
 import type { Prisma } from "../../generated/prisma";
 import { prismaClient } from "../../lib/prisma";
 import { HAIKU_GENERATION_CREDIT_COST } from "../payments/constants";
-import { trySpendGenerationCreditWithTx } from "../payments/payments.repository";
+import { trySpendGenerationCreditsWithTx } from "../wallet/wallet.repository";
 import {
   haikuLabelLinkSelect,
   mapHaikuLabelLinks,
@@ -106,7 +106,7 @@ export const haikuRepository = {
         : rawTitle;
 
     return prismaClient.$transaction(async (tx) => {
-      const spend = await trySpendGenerationCreditWithTx(
+      const spend = await trySpendGenerationCreditsWithTx(
         tx,
         params.createdById,
         HAIKU_GENERATION_CREDIT_COST,

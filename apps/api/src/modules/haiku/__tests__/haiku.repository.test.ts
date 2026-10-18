@@ -4,18 +4,18 @@ jest.mock("../../../lib/prisma", () => ({
   },
 }));
 
-jest.mock("../../payments/payments.repository", () => ({
-  trySpendGenerationCreditWithTx: jest.fn(),
+jest.mock("../../wallet/wallet.repository", () => ({
+  trySpendGenerationCreditsWithTx: jest.fn(),
 }));
 
-import { trySpendGenerationCreditWithTx } from "../../payments/payments.repository";
+import { trySpendGenerationCreditsWithTx } from "../../wallet/wallet.repository";
 import { haikuRepository } from "../haiku.repository";
 
 const { prismaClient } = jest.requireMock("../../../lib/prisma") as {
   prismaClient: { $transaction: jest.Mock };
 };
 
-const mockedSpend = trySpendGenerationCreditWithTx as jest.MockedFunction<typeof trySpendGenerationCreditWithTx>;
+const mockedSpend = trySpendGenerationCreditsWithTx as jest.MockedFunction<typeof trySpendGenerationCreditsWithTx>;
 
 const haikuRow = {
   id: "haiku-1",

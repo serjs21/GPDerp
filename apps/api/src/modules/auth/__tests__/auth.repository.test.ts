@@ -30,6 +30,9 @@ describe("authRepository", () => {
       membership: {
         create: jest.fn().mockResolvedValue({}),
       },
+      wallet: {
+        create: jest.fn().mockResolvedValue({}),
+      },
     };
     prismaClient.$transaction.mockImplementation(async (cb: any) => cb(tx));
 
@@ -46,9 +49,10 @@ describe("authRepository", () => {
       data: expect.objectContaining({
         email: "user@example.com",
         userName: "user_example",
-        generationCredits: 5,
       }),
     });
+    expect(tx.user.create.mock.calls[0][0].data).not.toHaveProperty("generationCredits");
+    expect(tx.wallet.create).toHaveBeenCalledWith({ data: { userId: "user-1", generationCredits: 5 } });
     expect(tx.account.create).toHaveBeenCalledWith({
       data: {
         name: "User's Account",

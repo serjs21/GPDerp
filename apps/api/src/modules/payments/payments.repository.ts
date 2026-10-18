@@ -1,11 +1,15 @@
-import { GenerationPurchaseStatus, type Prisma } from "../../generated/prisma";
+import { GenerationPurchaseStatus } from "../../generated/prisma";
 import { prismaClient } from "../../lib/prisma";
 import { isUniqueConstraintError } from "../../utils/prismaErrors";
+import {
+  getGenerationCredits,
+  grantGenerationCreditsWithTx,
+  trySpendGenerationCreditsWithTx,
+  type SpendGenerationCreditResult,
+} from "../wallet/wallet.repository";
 import { GENERATION_PACK_CREDITS, GENERATION_PACK_PRODUCT_KEY } from "./constants";
 
-export type SpendGenerationCreditResult =
-  | { ok: true; creditsRemaining: number }
-  | { ok: false; reason: "insufficient" | "not_found" };
+export type { SpendGenerationCreditResult } from "../wallet/wallet.repository";
 
 export type FulfillCompletedPurchaseResult =
   | { status: "granted"; userId: string; credits: number }
@@ -21,35 +25,6 @@ export type ConfirmationContext = {
   previousMessage: string | null;
 };
 
-export async function trySpendGenerationCreditWithTx(
-  tx: Prisma.TransactionClient,
-  userId: string,
-  amount: number,
-): Promise<SpendGenerationCreditResult> {
-  if (!Number.isInteger(amount) || amount < 1) {
-    throw new Error("Credit spend amount must be a positive integer");
-  }
-
-  const claimed = await tx.user.updateMany({
-    where: { id: userId, generationCredits: { gte: amount } },
-    data: { generationCredits: { decrement: amount } },
-  });
-  if (claimed.count === 1) {
-    const after = await tx.user.findUnique({
-      where: { id: userId },
-      select: { generationCredits: true },
-    });
-    return { ok: true, creditsRemaining: after!.generationCredits };
-  }
-
-  const exists = await tx.user.findUnique({
-    where: { id: userId },
-    select: { id: true },
-  });
-  if (!exists) return { ok: false, reason: "not_found" };
-  return { ok: false, reason: "insufficient" };
-}
-
 const pendingPurchaseSelect = {
   id: true,
   userId: true,
@@ -63,12 +38,8 @@ const pendingPurchaseSelect = {
 } as const;
 
 export const paymentsRepository = {
-  async getCredits(userId: string): Promise<number | null> {
-    const user = await prismaClient.user.findUnique({
-      where: { id: userId },
-      select: { generationCredits: true },
-    });
-    return user?.generationCredits ?? null;
+  getCredits(userId: string): Promise<number | null> {
+    return getGenerationCredits(userId);
   },
 
   countCompletedPurchases(userId: string): Promise<number> {
@@ -136,7 +107,7 @@ export const paymentsRepository = {
    * Safe under concurrent `/beer_me_haiku` requests.
    */
   trySpendGenerationCredit(userId: string, amount: number): Promise<SpendGenerationCreditResult> {
-    return prismaClient.$transaction((tx) => trySpendGenerationCreditWithTx(tx, userId, amount));
+    return prismaClient.$transaction((tx) => trySpendGenerationCreditsWithTx(tx, userId, amount));
   },
 
   createPendingPurchase(userId: string) {
@@ -195,19 +166,8 @@ export const paymentsRepository = {
         });
         if (claimed.count !== 1) return { status: "duplicate" as const };
 
-        await tx.user.update({
-          where: { id: purchase.userId },
-          data: { generationCredits: { increment: purchase.credits } },
-        });
-        const after = await tx.user.findUnique({
-          where: { id: purchase.userId },
-          select: { generationCredits: true },
-        });
-        return {
-          status: "granted" as const,
-          userId: purchase.userId,
-          credits: after!.generationCredits,
-        };
+        const credits = await grantGenerationCreditsWithTx(tx, purchase.userId, purchase.credits);
+        return { status: "granted" as const, userId: purchase.userId, credits };
       });
     } catch (error) {
       if (isUniqueConstraintError(error)) return { status: "duplicate" };

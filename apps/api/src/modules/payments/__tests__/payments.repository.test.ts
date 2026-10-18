@@ -1,7 +1,7 @@
 jest.mock("../../../lib/prisma", () => ({
   prismaClient: {
     $transaction: jest.fn(),
-    user: { findUnique: jest.fn(), updateMany: jest.fn() },
+    wallet: { findUnique: jest.fn() },
     generationPurchase: { create: jest.fn(), findUnique: jest.fn() },
   },
 }));
@@ -13,9 +13,8 @@ import { paymentsRepository } from "../payments.repository";
 const { prismaClient } = jest.requireMock("../../../lib/prisma") as {
   prismaClient: {
     $transaction: jest.Mock;
-    user: {
+    wallet: {
       findUnique: jest.Mock;
-      updateMany: jest.Mock;
     };
     generationPurchase: {
       create: jest.Mock;
@@ -104,9 +103,8 @@ describe("paymentsRepository.fulfillCompletedPurchase", () => {
           }),
         updateMany: jest.fn().mockResolvedValue({ count: 1 }),
       },
-      user: {
-        update: jest.fn().mockResolvedValue({}),
-        findUnique: jest.fn().mockResolvedValue({ generationCredits: 199 }),
+      wallet: {
+        upsert: jest.fn().mockResolvedValue({ generationCredits: 199 }),
       },
     };
     prismaClient.$transaction.mockImplementation(async (cb: (inner: typeof tx) => Promise<unknown>) => cb(tx));
@@ -127,9 +125,11 @@ describe("paymentsRepository.fulfillCompletedPurchase", () => {
         completedAt: expect.any(Date),
       },
     });
-    expect(tx.user.update).toHaveBeenCalledWith({
-      where: { id: "user-1" },
-      data: { generationCredits: { increment: 100 } },
+    expect(tx.wallet.upsert).toHaveBeenCalledWith({
+      where: { userId: "user-1" },
+      create: { userId: "user-1", generationCredits: 100 },
+      update: { generationCredits: { increment: 100 } },
+      select: { generationCredits: true },
     });
   });
 
@@ -148,8 +148,8 @@ describe("paymentsRepository.fulfillCompletedPurchase", () => {
           }),
         updateMany: jest.fn(),
       },
-      user: {
-        update: jest.fn(),
+      wallet: {
+        upsert: jest.fn(),
       },
     };
     prismaClient.$transaction.mockImplementation(async (cb: (inner: typeof tx) => Promise<unknown>) => cb(tx));
@@ -162,7 +162,7 @@ describe("paymentsRepository.fulfillCompletedPurchase", () => {
 
     expect(result).toEqual({ status: "duplicate" });
     expect(tx.generationPurchase.updateMany).not.toHaveBeenCalled();
-    expect(tx.user.update).not.toHaveBeenCalled();
+    expect(tx.wallet.upsert).not.toHaveBeenCalled();
   });
 
   it("is idempotent when the Paddle event was already stored", async () => {
@@ -171,8 +171,8 @@ describe("paymentsRepository.fulfillCompletedPurchase", () => {
         findUnique: jest.fn().mockResolvedValueOnce({ id: purchaseReference }),
         updateMany: jest.fn(),
       },
-      user: {
-        update: jest.fn(),
+      wallet: {
+        upsert: jest.fn(),
       },
     };
     prismaClient.$transaction.mockImplementation(async (cb: (inner: typeof tx) => Promise<unknown>) => cb(tx));
@@ -184,18 +184,27 @@ describe("paymentsRepository.fulfillCompletedPurchase", () => {
     });
 
     expect(result).toEqual({ status: "duplicate" });
-    expect(tx.user.update).not.toHaveBeenCalled();
+    expect(tx.wallet.upsert).not.toHaveBeenCalled();
   });
 });
 
-describe("paymentsRepository.trySpendGenerationCredit", () => {
+describe("paymentsRepository wallet delegation", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("decrements credits when the balance is sufficient", async () => {
+  it("reads the balance from the wallet", async () => {
+    prismaClient.wallet.findUnique.mockResolvedValue({ generationCredits: 42 });
+    await expect(paymentsRepository.getCredits("user-1")).resolves.toBe(42);
+    expect(prismaClient.wallet.findUnique).toHaveBeenCalledWith({
+      where: { userId: "user-1" },
+      select: { generationCredits: true },
+    });
+  });
+
+  it("debits the wallet inside a transaction", async () => {
     const tx = {
-      user: {
+      wallet: {
         updateMany: jest.fn().mockResolvedValue({ count: 1 }),
         findUnique: jest.fn().mockResolvedValue({ generationCredits: 99 }),
       },
@@ -206,39 +215,9 @@ describe("paymentsRepository.trySpendGenerationCredit", () => {
       ok: true,
       creditsRemaining: 99,
     });
-    expect(tx.user.updateMany).toHaveBeenCalledWith({
-      where: { id: "user-1", generationCredits: { gte: 1 } },
+    expect(tx.wallet.updateMany).toHaveBeenCalledWith({
+      where: { userId: "user-1", generationCredits: { gte: 1 } },
       data: { generationCredits: { decrement: 1 } },
-    });
-  });
-
-  it("returns insufficient when the balance is too low", async () => {
-    const tx = {
-      user: {
-        updateMany: jest.fn().mockResolvedValue({ count: 0 }),
-        findUnique: jest.fn().mockResolvedValue({ id: "user-1" }),
-      },
-    };
-    prismaClient.$transaction.mockImplementation(async (cb: (inner: typeof tx) => Promise<unknown>) => cb(tx));
-
-    await expect(paymentsRepository.trySpendGenerationCredit("user-1", 1)).resolves.toEqual({
-      ok: false,
-      reason: "insufficient",
-    });
-  });
-
-  it("returns not_found when the user does not exist", async () => {
-    const tx = {
-      user: {
-        updateMany: jest.fn().mockResolvedValue({ count: 0 }),
-        findUnique: jest.fn().mockResolvedValue(null),
-      },
-    };
-    prismaClient.$transaction.mockImplementation(async (cb: (inner: typeof tx) => Promise<unknown>) => cb(tx));
-
-    await expect(paymentsRepository.trySpendGenerationCredit("missing", 1)).resolves.toEqual({
-      ok: false,
-      reason: "not_found",
     });
   });
 });

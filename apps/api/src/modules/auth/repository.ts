@@ -6,6 +6,7 @@ import type {
 } from "../../generated/prisma";
 import { prismaClient } from "../../lib/prisma";
 import { NEW_USER_FREE_GENERATION_CREDITS } from "../payments/constants";
+import { createWalletWithTx } from "../wallet/wallet.repository";
 
 export const authRepository = {
   findUserByEmail(email: string) {
@@ -69,9 +70,10 @@ export const authRepository = {
           lastName: params.lastName,
           avatar: params.avatar ?? "",
           emailVerifiedAt: params.emailVerifiedAt ?? null,
-          generationCredits: NEW_USER_FREE_GENERATION_CREDITS,
         },
       });
+
+      await createWalletWithTx(tx, user.id, NEW_USER_FREE_GENERATION_CREDITS);
 
       await tx.authIdentity.create({
         data: {
