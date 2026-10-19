@@ -1,0 +1,212 @@
+/* Gmail web message view (2024+ "Material 3" chrome); values approximate Gmail's own styles. */
+.root {
+  --gmail-ink: #1f1f1f;
+  --gmail-ink-soft: #5e5e5e;
+  --gmail-icon: #444746;
+  --gmail-surface: #f6f8fc;
+
+  box-sizing: border-box;
+  max-width: 100%;
+  padding: 0.75rem;
+  background: var(--gmail-surface);
+  color: var(--gmail-ink);
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
+}
+
+.desktop {
+  width: 100%;
+  min-width: 40rem;
+}
+
+.mobile {
+  padding: 0;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0 0 0.75rem;
+}
+
+.mobile .tabs {
+  padding: 0.5rem 0.75rem 0;
+}
+
+.tab {
+  appearance: none;
+  padding: 0.3rem 0.85rem;
+  border: 1px solid #c4c7c5;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--gmail-ink);
+  font: 500 0.8rem/1.2 "Google Sans", Roboto, Arial, sans-serif;
+  cursor: pointer;
+}
+
+.tab[aria-selected="true"] {
+  border-color: #c2e7ff;
+  background: #c2e7ff;
+  color: #001d35;
+}
+
+.card {
+  border-radius: 16px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.mobile .card {
+  border-radius: 0;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  height: 48px;
+  padding: 0 0.5rem;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.toolbar > :nth-child(1) {
+  margin-right: 0.75rem;
+}
+
+.toolbar > :last-child {
+  margin-left: auto;
+}
+
+.iconButton {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--gmail-icon);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.subject {
+  margin: 0;
+  padding: 20px 16px 8px 72px;
+  color: var(--gmail-ink);
+  font: 400 22px/28px "Google Sans", Roboto, Arial, sans-serif;
+  overflow-wrap: anywhere;
+}
+
+.mobile .subject {
+  padding: 16px 16px 8px;
+  font-size: 20px;
+}
+
+.labelChip {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: #e1e3e1;
+  color: #444746;
+  font: 400 12px/18px Roboto, Arial, sans-serif;
+  vertical-align: middle;
+}
+
+.sender {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 12px 8px 4px 16px;
+}
+
+.avatar {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #7b1fa2;
+  color: #fff;
+  font: 500 18px/1 Roboto, Arial, sans-serif;
+}
+
+.senderText {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.senderLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.senderName {
+  color: var(--gmail-ink);
+  font: 700 14px/20px "Google Sans", Roboto, Arial, sans-serif;
+}
+
+.senderAddress,
+.recipientLine,
+.date {
+  color: var(--gmail-ink-soft);
+  font: 400 12px/20px Roboto, Arial, sans-serif;
+}
+
+.senderAddress {
+  overflow-wrap: anywhere;
+}
+
+.replyTo {
+  overflow-wrap: anywhere;
+}
+
+.senderMeta {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+}
+
+.date {
+  margin-right: 4px;
+  white-space: nowrap;
+}
+
+.mobile .senderAddress,
+.mobile .senderMeta > :not(.date) {
+  display: none;
+}
+
+.body {
+  padding: 12px 16px 32px 72px;
+}
+
+.mobile .body {
+  padding: 12px 16px 24px;
+}
+
+.frame {
+  display: block;
+  width: 100%;
+  border: 0;
+}
+
+.plainText {
+  color: #222;
+  font: small/1.5 Arial, Helvetica, sans-serif;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.plainText a {
+  color: #15c;
+}

@@ -17,6 +17,7 @@ import {
 } from "./modules/payments/purchaseMessagesDev.controller";
 import { startPostcardQueue, stopPostcardQueue } from "./modules/postcard/postcardQueue";
 import { isPostcardDevRouteEnabled, postcardDevPlugin } from "./modules/postcard/postcardDev.controller";
+import { emailPreviewDevPlugin, isEmailPreviewDevRouteEnabled } from "./modules/email/emailPreviewDev.controller";
 
 const app = Fastify({
   logger: true,
@@ -61,6 +62,9 @@ async function run() {
   }
   if (isPostcardDevRouteEnabled()) {
     await app.register(postcardDevPlugin);
+  }
+  if (isEmailPreviewDevRouteEnabled()) {
+    await app.register(emailPreviewDevPlugin);
   }
 
   /* ------------------------------ Routes ------------------------------ */
