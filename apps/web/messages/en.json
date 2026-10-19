@@ -663,7 +663,7 @@
   },
   "CommonHooks": {
     "useCopy": {
-      "copied": "Copied to clipboard",
+      "copied": "The text was copied",
       "copyError": "Could not copy"
     }
   },

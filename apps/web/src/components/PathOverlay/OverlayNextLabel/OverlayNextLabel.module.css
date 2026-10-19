@@ -31,8 +31,8 @@
 .icon {
   display: block;
   z-index: 1;
-  width: 8rem;
-  height: 8rem;
+  width: 6rem;
+  height: 6rem;
   object-fit: contain;
   /* Black source SVG rendered white on the dark half. */
   filter: brightness(0) invert(1);

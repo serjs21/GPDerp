@@ -32,8 +32,8 @@
 .icon {
   display: block;
   z-index: 1;
-  width: 8rem;
-  height: 8rem;
+  width: 6rem;
+  height: 6rem;
   object-fit: contain;
   user-select: none;
   pointer-events: none;

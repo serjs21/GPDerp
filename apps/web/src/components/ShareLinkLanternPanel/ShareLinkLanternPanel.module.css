@@ -84,8 +84,6 @@
 
 .lantern {
   container-type: inline-size;
-  justify-content: center;
-  padding-top: 0.08rem;
 }
 
 .lantern p {

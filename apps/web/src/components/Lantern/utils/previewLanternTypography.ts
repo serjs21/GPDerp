@@ -18,7 +18,8 @@ export type PreviewLanternTypographyOptions = {
 };
 
 /**
- * Container-query CSS vars so bodyOnly title/body/author fit small preview lanterns.
+ * Container-query font-size vars so bodyOnly title/body/author fit small preview lanterns.
+ * Layout (spacing, line height) comes from the shared `.bodyOnly` styles.
  */
 export function buildPreviewLanternTypographyStyle(
   body: string,
@@ -42,8 +43,5 @@ export function buildPreviewLanternTypographyStyle(
     "--lantern-body-font-size": `clamp(${minBodyRem}rem, calc(${cqi}), ${maxBodyRem}rem)`,
     "--lantern-title-font-size": `clamp(${minBodyRem}rem, calc(${cqi}), ${maxTitleRem}rem)`,
     "--lantern-author-font-size": `clamp(${Math.max(0.2, minBodyRem - 0.06)}rem, calc(${cqi} * 0.85), ${maxAuthorRem}rem)`,
-    "--lantern-body-line-height": "1.22",
-    "--lantern-stack-gap": "0.06rem",
-    "--lantern-stack-padding-top": "0.08rem",
   } as CSSProperties;
 }

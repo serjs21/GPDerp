@@ -121,31 +121,24 @@
   text-align: center;
 }
 
-/* Compact handwritten layout for preview / path mini lanterns. */
+/*
+ * Preview / path mini lanterns: smaller type, same title and text layout as the main
+ * lantern. Spacing is the main lantern's, scaled by body size (0.85rem main body).
+ */
 .bodyOnly {
   --lantern-body-font-size: 0.72rem;
-  --lantern-body-line-height: 1.28;
   --lantern-title-font-size: 0.78rem;
   --lantern-author-font-size: 0.55rem;
-  --lantern-stack-gap: 0.08rem;
-  --lantern-stack-padding-top: 0.12rem;
-  justify-content: center;
+  --lantern-stack-gap: calc(var(--lantern-body-font-size) * 0.25 / 0.85);
+  --lantern-stack-padding-top: calc(var(--lantern-body-font-size) * 0.35 / 0.85);
 }
 
 .bodyOnly .title {
-  margin: 0 0 0.12rem;
-  font-size: var(--lantern-title-font-size);
-  letter-spacing: 0.04em;
-}
-
-.bodyOnly .author {
-  margin: 0.15rem 0.25rem 0;
-  font-size: var(--lantern-author-font-size);
+  margin: 0.4em 0.6em 0.6em;
 }
 
 .bodyOnly .bodyLines {
-  gap: 0.04rem;
-  min-height: calc(var(--lantern-body-line-height) * var(--lantern-body-font-size) * 3);
+  gap: calc(var(--lantern-body-font-size) * 0.1 / 0.85);
 }
 
 .actions {
