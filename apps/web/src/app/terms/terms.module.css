@@ -30,7 +30,8 @@
 .prose {
   line-height: 1.65;
   font-size: 1rem;
-  color: var(--sumi-ink);
+  /* Fixed ink: the panel stays light in every theme, but `--sumi-ink` is light in night-sky. */
+  color: #000;
 }
 
 .prose :global(h1) {
