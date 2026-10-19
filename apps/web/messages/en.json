@@ -391,11 +391,11 @@
   "PathOverlay": {
     "pathOverlay": {
       "title": "Overlay",
-      "continueJourney": "Continue the journey",
+      "continueJourney": "Stay here",
       "goBackToStart": "Go back to the start"
     },
     "overlayNextLabel": {
-      "label": "Continue the journey"
+      "label": "Stay here"
     },
     "overlayPrevLabel": {
       "label": "Go back to the start"

@@ -88,7 +88,7 @@
   width: 50%;
   display: flex;
   justify-content: center;
-  color: #fff;
+  color: color-mix(in srgb, #f5f0e8 92%, transparent);
   will-change: filter, text-shadow;
 }
 
