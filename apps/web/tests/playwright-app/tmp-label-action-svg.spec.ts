@@ -63,32 +63,43 @@ async function mockApi(page: Page) {
   ]);
 }
 
-test("not-connected action svg timing", async ({ page }) => {
-  await page.setViewportSize({ width: 1280, height: 1000 });
-  await mockApi(page);
-  const t0 = Date.now();
-  page.on("requestfinished", (req) => {
-    if (req.url().includes("not_connected_action")) console.log("svg finished", Date.now() - t0, "ms");
-  });
-  page.on("requestfailed", (req) => {
-    if (req.url().includes("label_actions")) console.log("FAILED", req.url(), req.failure()?.errorText);
-  });
-  await page.goto("/settings?tab=labels");
-  for (let i = 0; i < 12; i++) {
-    const state = await page.evaluate(() => {
-      const imgs = [...document.querySelectorAll<HTMLImageElement>("img[src*='not_connected_action']")];
-      return {
-        revealed: document.documentElement.dataset.hydrated === "true",
-        imgs: imgs.map((img) => {
-          const r = img.getBoundingClientRect();
-          return `${img.complete ? "complete" : "loading"}/${img.naturalWidth}w/${Math.round(r.width)}x${Math.round(r.height)}`;
-        }),
-      };
+const measure = (page: Page) =>
+  page.evaluate(() => {
+    const stacks = [...document.querySelectorAll("[role='group'][aria-label^='Label actions'], [role='group']")].filter((g) =>
+      g.querySelector("img[src*='not_connected_action']"),
+    );
+    return stacks.slice(0, 1).map((g) => {
+      const wrapper = g.firstElementChild as HTMLElement;
+      const panels = [...g.querySelectorAll("button")].map((b) => Math.round(b.getBoundingClientRect().height));
+      return { wrapperDisplay: getComputedStyle(wrapper).display, buttonHeights: panels.join("/") };
     });
-    console.log(Date.now() - t0, "ms", JSON.stringify(state));
-    if (i === 1 || i === 11) {
-      await page.screenshot({ path: `/tmp/gpderp-shots/label-actions-${i}.png`, clip: { x: 900, y: 150, width: 380, height: 700 } });
+  });
+
+for (const mode of ["normal", "dev-order"]) {
+  test(`tune-in panel height (${mode}, svg delayed 3s)`, async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 1000 });
+    await mockApi(page);
+    await page.route("**/not_connected_action.svg", async (route) => {
+      await new Promise((r) => setTimeout(r, 3000));
+      await route.continue();
+    });
+    await page.goto("/settings?tab=labels");
+    await page.locator("img[src*='not_connected_action']").first().waitFor({ state: "attached" });
+    if (mode === "dev-order") {
+      await page.evaluate(() => {
+        const root = [...document.styleSheets]
+          .flatMap((sheet) => { try { return [...sheet.cssRules]; } catch { return []; } })
+          .map((rule) => (rule as CSSStyleRule).selectorText ?? "")
+          .find((sel) => /^\.HoverHoldCallout-module__\w+__root$/.test(sel));
+        const style = document.createElement("style");
+        style.textContent = `${root} { display: inline-block; }`;
+        document.head.appendChild(style);
+      });
     }
-    await page.waitForTimeout(150);
-  }
-});
+    await page.waitForTimeout(800);
+    console.log(mode, "before svg", JSON.stringify(await measure(page)));
+    await page.screenshot({ path: `/tmp/gpderp-shots/tunein-${mode}-loading.png`, clip: { x: 900, y: 150, width: 380, height: 420 } });
+    await page.waitForTimeout(3200);
+    console.log(mode, "after svg", JSON.stringify(await measure(page)));
+  });
+}

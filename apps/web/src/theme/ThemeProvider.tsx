@@ -3,6 +3,7 @@
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import type { ReactNode } from "react";
 import { THEMES, type ThemeName } from "@/config/userConfiguration";
+import { ThemeCookieSync } from "./ThemeCookieSync";
 
 /**
  * React 19 warns when a `<script>` renders on the client. The theme script only needs to run from
@@ -27,6 +28,7 @@ export function ThemeProvider({
       storageKey="gpderp-theme"
       scriptProps={THEME_SCRIPT_PROPS}
     >
+      <ThemeCookieSync />
       {children}
     </NextThemesProvider>
   );

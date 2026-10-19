@@ -178,8 +178,12 @@
   opacity: 1;
 }
 
-/* Stretch wrapper so disabled Tune in still fills the stack cell; events hit this (child has pointer-events: none). */
-.tuneInCallout {
+/*
+ * Stretch wrapper so disabled Tune in still fills the stack cell; events hit this (child has pointer-events: none).
+ * Scoped under .stack so it beats HoverHoldCallout's `.root { display: inline-block }` whatever the
+ * stylesheet order; inline-block collapses the panel to its borders.
+ */
+.stack > .tuneInCallout {
   display: flex;
   flex: 1 1 0;
   flex-direction: column;
@@ -190,7 +194,7 @@
   cursor: default;
 }
 
-.tuneInCallout > * {
+.stack > .tuneInCallout > * {
   flex: 1 1 0;
   min-height: 0;
 }

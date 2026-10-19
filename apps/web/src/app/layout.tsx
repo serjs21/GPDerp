@@ -112,7 +112,8 @@ export default async function RootLayout({
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? process.env.GOOGLE_CLIENT_ID;
   
   return (
-    <html lang={initialLocale} data-theme={initialTheme} className={`${notoSerifJP.variable} ${zenKurenaido.variable} ${geistSans.variable} ${geistMono.variable} ${pressStart2P.variable} ${bangers.variable} ${flacucho.variable} ${patrickHand.variable}`}>
+    // next-themes' pre-hydration script rewrites `data-theme` from localStorage.
+    <html lang={initialLocale} data-theme={initialTheme} suppressHydrationWarning className={`${notoSerifJP.variable} ${zenKurenaido.variable} ${geistSans.variable} ${geistMono.variable} ${pressStart2P.variable} ${bangers.variable} ${flacucho.variable} ${patrickHand.variable}`}>
       <body>
         <AntdRegistry>
           <HtmlLoader />
