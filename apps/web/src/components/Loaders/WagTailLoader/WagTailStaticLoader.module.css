@@ -1,0 +1,71 @@
+/*
+ * WAG_TAIL_LOADER_DEFAULTS written out as CSS for the static loaders (no runtime style builders).
+ * Generated from buildWagTailStyle / tailCopyStyle / linesStyle; utils/wagTailStaticLoaderCss.test.ts
+ * fails if these drift from the defaults. Animation and layout come from WagTailLoader.module.css.
+ */
+
+.defaults {
+  --wag-width: 12rem;
+  --wag-aspect: 359.45 / 343.23;
+  --wag-attach-x: 86.5%;
+  --wag-attach-y: 47.5%;
+  --wag-tail-width: 2.04rem;
+  --wag-base-deg: -51deg;
+  --wag-step-deg: 30deg;
+  --wag-base-jitter: 5deg;
+  --wag-step-jitter: 5deg;
+  --wag-step-ms: 60ms;
+  --wag-lines-x: -0.54rem;
+  --wag-lines-y: 0.18rem;
+  --wag-lines-width: 3.24rem;
+  --wag-lines-base-deg: -31deg;
+  --wag-lines-shift: 0.5px;
+  --wag-lines-rotate: 10deg;
+  --wag-bg-base-deg: 0deg;
+  --wag-bg-size: 100%;
+  --wag-bg-offset-x: -25%;
+  --wag-bg-offset-y: -25%;
+  --wag-bg-origin: 1% 14%;
+  --wag-bg-steps: 2;
+  --wag-bg-turn: -4deg;
+  --wag-bg-duration: 800ms;
+}
+
+.copy0 {
+  --wag-index: 0;
+  --wag-c0: 0.2;
+  --wag-c1: 0.7;
+  --wag-c2: 0.2;
+  --wag-c3: 0.7;
+}
+
+.copy1 {
+  --wag-index: 1;
+  --wag-c0: 0.8;
+  --wag-c1: 0.2;
+  --wag-c2: 0.8;
+  --wag-c3: 0.2;
+}
+
+.copy2 {
+  --wag-index: 2;
+  --wag-c0: 0.7;
+  --wag-c1: 0.2;
+  --wag-c2: 0.7;
+  --wag-c3: 0.2;
+}
+
+.copy3 {
+  --wag-index: 3;
+  --wag-c0: 0.2;
+  --wag-c1: 0.8;
+  --wag-c2: 0.2;
+  --wag-c3: 0.8;
+}
+
+.linesDefaults {
+  --wag-c0: 0.2;
+  --wag-c1: 0.8;
+  --wag-c2: 0.7;
+  --wag-c3: 0.2;
+}
