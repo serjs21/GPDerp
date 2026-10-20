@@ -18,6 +18,8 @@ export function buildWagTailStyle(props: ResolvedWagTailProps): CSSProperties {
     "--wag-tail-width": percentOfWidth(widthRem, props.tailWidthPercent),
     "--wag-base-deg": `${props.baseRotationDeg}deg`,
     "--wag-step-deg": `${props.stepDeg}deg`,
+    "--wag-base-jitter": `${props.baseJitterDeg}deg`,
+    "--wag-step-jitter": `${props.stepJitterDeg}deg`,
     "--wag-step-ms": `${props.stepMs}ms`,
     "--wag-o0": String(opacities[0]),
     "--wag-o1": String(opacities[1]),

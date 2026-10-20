@@ -12,6 +12,12 @@ export type WagTailLoaderProps = {
   /** Rotation of the first copy; copy i is rotated by baseRotationDeg + i * stepDeg around its bottom-left corner. */
   baseRotationDeg?: number;
   stepDeg?: number;
+  /**
+   * Per-frame wobble ranges for baseRotationDeg / stepDeg (+-value). The fixed 12-frame sequence moves at most
+   * 0.6 x range per frame, i.e. 3deg per frame at the default 5deg.
+   */
+  baseJitterDeg?: number;
+  stepJitterDeg?: number;
   /** Opacity pattern moved one copy along every `stepMs` (default 0.6, 1, 0.8, 0.5). */
   opacities?: WagTailOpacities;
   stepMs?: number;

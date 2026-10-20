@@ -34,9 +34,14 @@
   transform: rotate(calc(var(--wag-base-deg) + var(--wag-step-deg) * var(--wag-index)));
   user-select: none;
   pointer-events: none;
-  /* Copy i starts i steps into the cycle, so each tick moves the opacity pattern by one copy. */
-  animation: wagOpacity calc(var(--wag-step-ms) * 4) step-end infinite;
-  animation-delay: calc(var(--wag-step-ms) * var(--wag-index) * -1);
+  /*
+   * Copy i starts i steps into the opacity cycle, so each tick moves the pattern by one copy.
+   * The jitter cycle (12 frames, same tick) is shared by all copies and adds to the transform via `rotate`.
+   */
+  animation:
+    wagOpacity calc(var(--wag-step-ms) * 4) step-end infinite,
+    wagJitter calc(var(--wag-step-ms) * 12) step-end infinite;
+  animation-delay: calc(var(--wag-step-ms) * var(--wag-index) * -1), 0s;
 }
 
 .lines {
@@ -80,6 +85,53 @@
   }
   100% {
     opacity: var(--wag-o0);
+  }
+}
+
+/*
+ * Base-rotation and step jitter, one frame per tick: base offset = --wag-base-jitter x kb, step offset =
+ * --wag-step-jitter x ks (x copy index). kb / ks stay within [-1, 1] and change by at most 0.6 per frame
+ * (wrap included), so with 5deg ranges each wobbles within +-5deg by at most 3deg per frame.
+ */
+@keyframes wagJitter {
+  0% {
+    rotate: calc(var(--wag-base-jitter) * 0 + var(--wag-step-jitter) * 0 * var(--wag-index));
+  }
+  8.333% {
+    rotate: calc(var(--wag-base-jitter) * 0.6 + var(--wag-step-jitter) * -0.6 * var(--wag-index));
+  }
+  16.667% {
+    rotate: calc(var(--wag-base-jitter) * 1 + var(--wag-step-jitter) * -1 * var(--wag-index));
+  }
+  25% {
+    rotate: calc(var(--wag-base-jitter) * 0.6 + var(--wag-step-jitter) * -0.4 * var(--wag-index));
+  }
+  33.333% {
+    rotate: calc(var(--wag-base-jitter) * 0 + var(--wag-step-jitter) * 0.2 * var(--wag-index));
+  }
+  41.667% {
+    rotate: calc(var(--wag-base-jitter) * -0.4 + var(--wag-step-jitter) * 0.8 * var(--wag-index));
+  }
+  50% {
+    rotate: calc(var(--wag-base-jitter) * -1 + var(--wag-step-jitter) * 1 * var(--wag-index));
+  }
+  58.333% {
+    rotate: calc(var(--wag-base-jitter) * -0.6 + var(--wag-step-jitter) * 0.4 * var(--wag-index));
+  }
+  66.667% {
+    rotate: calc(var(--wag-base-jitter) * -0.2 + var(--wag-step-jitter) * -0.2 * var(--wag-index));
+  }
+  75% {
+    rotate: calc(var(--wag-base-jitter) * 0.4 + var(--wag-step-jitter) * 0.2 * var(--wag-index));
+  }
+  83.333% {
+    rotate: calc(var(--wag-base-jitter) * 0.8 + var(--wag-step-jitter) * 0.6 * var(--wag-index));
+  }
+  91.667% {
+    rotate: calc(var(--wag-base-jitter) * 0.4 + var(--wag-step-jitter) * 0.2 * var(--wag-index));
+  }
+  100% {
+    rotate: calc(var(--wag-base-jitter) * 0 + var(--wag-step-jitter) * 0 * var(--wag-index));
   }
 }
 

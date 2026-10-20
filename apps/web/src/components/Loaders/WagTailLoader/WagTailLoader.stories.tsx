@@ -24,6 +24,8 @@ const meta = {
     tailWidthPercent: range(5, 60, 0.5),
     baseRotationDeg: range(-180, 180),
     stepDeg: range(0, 60),
+    baseJitterDeg: range(0, 15, 0.5),
+    stepJitterDeg: range(0, 15, 0.5),
     stepMs: range(50, 1000, 10),
     linesOffsetXPercent: range(-60, 60, 0.5),
     linesOffsetYPercent: range(-60, 60, 0.5),
