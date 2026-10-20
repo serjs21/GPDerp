@@ -35,13 +35,13 @@
   user-select: none;
   pointer-events: none;
   /*
-   * Copy i starts i steps into the opacity cycle, so each tick moves the pattern by one copy.
-   * The jitter cycle (12 frames, same tick) is shared by all copies and adds to the transform via `rotate`.
+   * Each copy steps through its own four opacities (--wag-c0..3, set per copy so the pattern jumps
+   * opacityJumpSteps copies per tick). The jitter cycle (12 frames, same tick) is shared by all copies
+   * and adds to the transform via `rotate`.
    */
   animation:
     wagOpacity calc(var(--wag-step-ms) * 4) step-end infinite,
     wagJitter calc(var(--wag-step-ms) * 12) step-end infinite;
-  animation-delay: calc(var(--wag-step-ms) * var(--wag-index) * -1), 0s;
 }
 
 .lines {
@@ -51,6 +51,8 @@
   width: var(--wag-lines-width);
   height: auto;
   transform-origin: center;
+  /* Static base angle; the wagLines poses animate `transform` and add to it. */
+  rotate: var(--wag-lines-base-deg);
   user-select: none;
   pointer-events: none;
   animation: wagLines calc(var(--wag-step-ms) * 4) step-end infinite;
@@ -72,19 +74,19 @@
 
 @keyframes wagOpacity {
   0% {
-    opacity: var(--wag-o0);
+    opacity: var(--wag-c0);
   }
   25% {
-    opacity: var(--wag-o1);
+    opacity: var(--wag-c1);
   }
   50% {
-    opacity: var(--wag-o2);
+    opacity: var(--wag-c2);
   }
   75% {
-    opacity: var(--wag-o3);
+    opacity: var(--wag-c3);
   }
   100% {
-    opacity: var(--wag-o0);
+    opacity: var(--wag-c0);
   }
 }
 

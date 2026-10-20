@@ -20,11 +20,15 @@ export type WagTailLoaderProps = {
   stepJitterDeg?: number;
   /** Opacity pattern moved one copy along every `stepMs` (default 0.6, 1, 0.8, 0.5). */
   opacities?: WagTailOpacities;
+  /** How many copies the opacity pattern moves per tick (default 3; with 4 copies, 3 = one copy backwards). */
+  opacityJumpSteps?: number;
   stepMs?: number;
   /** Motion lines' bottom-left corner relative to the attach point, in % of the base width (+Y is up). */
   linesOffsetXPercent?: number;
   linesOffsetYPercent?: number;
   linesWidthPercent?: number;
+  /** Static rotation of the motion lines around their center; the per-tick poses add to it. */
+  linesBaseRotationDeg?: number;
   /** Per-step drift / tilt of the motion lines. */
   linesShiftPx?: number;
   linesRotateDeg?: number;

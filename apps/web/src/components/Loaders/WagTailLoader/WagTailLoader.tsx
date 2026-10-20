@@ -44,7 +44,7 @@ export function WagTailLoader(props: WagTailLoaderProps) {
           <img
             key={index}
             className={styles.tail}
-            style={tailCopyStyle(index)}
+            style={tailCopyStyle(index, resolved)}
             data-rest={index === WAG_TAIL_REST_COPY_INDEX || undefined}
             src={WAG_TAIL_ASSETS.tail}
             alt=""

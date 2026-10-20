@@ -8,7 +8,7 @@ const percentOfWidth = (widthRem: number, percent: number) => `${(widthRem * per
 
 /** Root CSS custom properties: geometry in rem (children of a zero-size anchor can't use %), timing and poses. */
 export function buildWagTailStyle(props: ResolvedWagTailProps): CSSProperties {
-  const { widthRem, opacities } = props;
+  const { widthRem } = props;
   const { base } = WAG_TAIL_ASSET_SIZES;
   return {
     "--wag-width": `${widthRem}rem`,
@@ -21,21 +21,37 @@ export function buildWagTailStyle(props: ResolvedWagTailProps): CSSProperties {
     "--wag-base-jitter": `${props.baseJitterDeg}deg`,
     "--wag-step-jitter": `${props.stepJitterDeg}deg`,
     "--wag-step-ms": `${props.stepMs}ms`,
-    "--wag-o0": String(opacities[0]),
-    "--wag-o1": String(opacities[1]),
-    "--wag-o2": String(opacities[2]),
-    "--wag-o3": String(opacities[3]),
     "--wag-lines-x": percentOfWidth(widthRem, props.linesOffsetXPercent),
     "--wag-lines-y": percentOfWidth(widthRem, props.linesOffsetYPercent),
     "--wag-lines-width": percentOfWidth(widthRem, props.linesWidthPercent),
+    "--wag-lines-base-deg": `${props.linesBaseRotationDeg}deg`,
     "--wag-lines-shift": `${props.linesShiftPx}px`,
     "--wag-lines-rotate": `${props.linesRotateDeg}deg`,
   } as CSSProperties;
 }
 
-/** Copy index drives both its rotation and its negative delay into the shared opacity cycle. */
-export function tailCopyStyle(index: number): CSSProperties {
-  return { "--wag-index": String(index) } as CSSProperties;
+/**
+ * Opacity copy `index` shows on tick `tick`: the pattern moves `jumpSteps` copies per tick
+ * (with 4 copies, a jump of 3 runs the pattern backwards one copy).
+ */
+export function tailOpacityAt(
+  opacities: ResolvedWagTailProps["opacities"],
+  jumpSteps: number,
+  index: number,
+  tick: number,
+): number {
+  const count = opacities.length;
+  const position = (((index + jumpSteps * tick) % count) + count) % count;
+  return opacities[position];
+}
+
+/** Copy index drives its rotation; `--wag-c0..3` are its own four opacity keyframe values. */
+export function tailCopyStyle(index: number, props: Pick<ResolvedWagTailProps, "opacities" | "opacityJumpSteps">): CSSProperties {
+  const style: Record<string, string> = { "--wag-index": String(index) };
+  props.opacities.forEach((_, tick) => {
+    style[`--wag-c${tick}`] = String(tailOpacityAt(props.opacities, props.opacityJumpSteps, index, tick));
+  });
+  return style as CSSProperties;
 }
 
 export function resolveWagTailProps(props: WagTailLoaderProps): ResolvedWagTailProps {
