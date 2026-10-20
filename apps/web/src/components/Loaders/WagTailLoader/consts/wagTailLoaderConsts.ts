@@ -1,4 +1,5 @@
 export const WAG_TAIL_ASSETS = {
+  background: "/loader/background.svg",
   base: "/loader/loader_dog_base.svg",
   tail: "/loader/tail.svg",
   motionLines: "/loader/motion_lines.svg",
@@ -6,6 +7,8 @@ export const WAG_TAIL_ASSETS = {
 
 /** Intrinsic sizes (SVG viewBoxes) for width/height attributes and the stage aspect ratio. */
 export const WAG_TAIL_ASSET_SIZES = {
+  /** Same canvas as the base, so it fills the stage behind it. */
+  background: { width: 359.45, height: 343.23 },
   base: { width: 359.45, height: 343.23 },
   tail: { width: 110, height: 177 },
   motionLines: { width: 157, height: 176 },
@@ -37,5 +40,11 @@ export const WAG_TAIL_LOADER_DEFAULTS = {
   linesOpacityJumpSteps: 1,
   linesShiftPx: 0.5,
   linesRotateDeg: 10,
+  backgroundBaseRotationDeg: 0,
+  backgroundStepDeg: 10,
+  backgroundSteps: 3,
+  backgroundStepMs: 100,
+  backgroundOriginXPercent: 50,
+  backgroundOriginYPercent: 50,
   showAttachPoint: false,
 } as const;

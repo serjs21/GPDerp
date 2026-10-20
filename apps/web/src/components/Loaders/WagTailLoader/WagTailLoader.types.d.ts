@@ -36,6 +36,18 @@ export type WagTailLoaderProps = {
   /** Per-step drift / tilt of the motion lines. */
   linesShiftPx?: number;
   linesRotateDeg?: number;
+  /** Static rotation of the background behind the dog. */
+  backgroundBaseRotationDeg?: number;
+  /**
+   * Background turns by this much every `backgroundStepMs` (its own clock, separate from `stepMs`) for
+   * `backgroundSteps` poses, then jumps back to its base angle; 0 keeps it still.
+   */
+  backgroundStepDeg?: number;
+  backgroundSteps?: number;
+  backgroundStepMs?: number;
+  /** Background rotation center, in % of the stage (default 50 / 50). */
+  backgroundOriginXPercent?: number;
+  backgroundOriginYPercent?: number;
   /** Debug dot on the attach point, for manual tuning. */
   showAttachPoint?: boolean;
 };

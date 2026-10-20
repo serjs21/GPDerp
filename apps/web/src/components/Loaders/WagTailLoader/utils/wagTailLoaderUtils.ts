@@ -27,7 +27,28 @@ export function buildWagTailStyle(props: ResolvedWagTailProps): CSSProperties {
     "--wag-lines-base-deg": `${props.linesBaseRotationDeg}deg`,
     "--wag-lines-shift": `${props.linesShiftPx}px`,
     "--wag-lines-rotate": `${props.linesRotateDeg}deg`,
+    ...backgroundSpinVars(props),
   } as CSSProperties;
+}
+
+/**
+ * Stepped background cycle: `steps` poses (0, stepDeg, 2 x stepDeg, ...), one per tick, then it jumps back
+ * to 0 instead of turning a full circle. `turnDeg` is where the keyframes end, one step past the last pose.
+ */
+export function backgroundSpin(stepDeg: number, stepCount: number): { steps: number; turnDeg: number } {
+  const steps = Math.max(1, Math.round(stepCount));
+  return { steps, turnDeg: steps * stepDeg };
+}
+
+function backgroundSpinVars(props: ResolvedWagTailProps): Record<string, string> {
+  const { steps, turnDeg } = backgroundSpin(props.backgroundStepDeg, props.backgroundSteps);
+  return {
+    "--wag-bg-base-deg": `${props.backgroundBaseRotationDeg}deg`,
+    "--wag-bg-origin": `${props.backgroundOriginXPercent}% ${props.backgroundOriginYPercent}%`,
+    "--wag-bg-steps": String(steps),
+    "--wag-bg-turn": `${turnDeg}deg`,
+    "--wag-bg-duration": `${steps * props.backgroundStepMs}ms`,
+  };
 }
 
 /**

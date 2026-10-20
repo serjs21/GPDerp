@@ -1,4 +1,4 @@
-import { linesStyle, tailOpacityAt } from "./wagTailLoaderUtils";
+import { backgroundSpin, linesStyle, tailOpacityAt } from "./wagTailLoaderUtils";
 
 const OPACITIES = [0.6, 1, 0.8, 0.5] as const;
 const frame = (jump: number, tick: number) => [0, 1, 2, 3].map((index) => tailOpacityAt(OPACITIES, jump, index, tick));
@@ -17,6 +17,22 @@ describe("tailOpacityAt", () => {
 
   it("supports a single-copy jump", () => {
     expect(frame(1, 1)).toEqual([1, 0.8, 0.5, 0.6]);
+  });
+});
+
+describe("backgroundSpin", () => {
+  it("cycles through the given number of poses instead of a full turn", () => {
+    expect(backgroundSpin(10, 3)).toEqual({ steps: 3, turnDeg: 30 });
+    expect(backgroundSpin(-15, 3)).toEqual({ steps: 3, turnDeg: -45 });
+  });
+
+  it("keeps at least one whole step", () => {
+    expect(backgroundSpin(10, 0)).toEqual({ steps: 1, turnDeg: 10 });
+    expect(backgroundSpin(10, 2.6)).toEqual({ steps: 3, turnDeg: 30 });
+  });
+
+  it("stays still for a zero step", () => {
+    expect(backgroundSpin(0, 3)).toEqual({ steps: 3, turnDeg: 0 });
   });
 });
 

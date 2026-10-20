@@ -31,6 +31,15 @@ export function WagTailLoader(props: WagTailLoaderProps) {
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
       <img
+        className={styles.background}
+        src={WAG_TAIL_ASSETS.background}
+        alt=""
+        width={WAG_TAIL_ASSET_SIZES.background.width}
+        height={WAG_TAIL_ASSET_SIZES.background.height}
+        draggable={false}
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
+      <img
         className={styles.base}
         src={WAG_TAIL_ASSETS.base}
         alt=""

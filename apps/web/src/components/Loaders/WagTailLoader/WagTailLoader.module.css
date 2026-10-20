@@ -6,12 +6,39 @@
   line-height: 0;
 }
 
+/*
+ * Behind the dog, same canvas. Steps through `--wag-bg-steps` poses (0, step, 2 x step, ...; one per
+ * backgroundStepMs, its own clock) and jumps back; `rotate` holds the static base angle.
+ */
+.background {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: var(--wag-bg-origin);
+  rotate: var(--wag-bg-base-deg);
+  user-select: none;
+  pointer-events: none;
+  animation: wagBackgroundSpin var(--wag-bg-duration) steps(var(--wag-bg-steps), end) infinite;
+}
+
 .base {
+  position: relative;
   display: block;
   width: 100%;
   height: 100%;
   user-select: none;
   pointer-events: none;
+}
+
+@keyframes wagBackgroundSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(var(--wag-bg-turn));
+  }
 }
 
 /* Zero-size point on the base; tails and lines position from it (geometry vars are in rem). */
@@ -161,6 +188,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .background,
   .tail,
   .lines {
     animation: none;
