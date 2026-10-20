@@ -2,8 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { ComicPageCtaAction, ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
-import { UNO_REVERSE_SRC } from "./consts/emailChangeRevertConsts";
 import type { EmailChangeRevertConfirmProps } from "./EmailChangeRevertConfirm.types";
+import { EmailChangeRevertUnoPanel } from "./EmailChangeRevertUnoPanel";
 import styles from "./EmailChangeRevertView.module.css";
 
 /** Both addresses side by side, then "undo it" / "keep it". Nothing changes until the user confirms. */
@@ -22,10 +22,7 @@ export function EmailChangeRevertConfirm({
         <ComicPagePanel title={t("restoreLabel")} background="solid" color="green">
           <p className={styles.address}>{restoreEmail}</p>
         </ComicPagePanel>
-        <ComicPagePanel background="sunburst" color="blue" className={styles.unoPanel}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
-          <img className={styles.unoCard} src={UNO_REVERSE_SRC} alt="" width={344} height={524} draggable={false} />
-        </ComicPagePanel>
+        <EmailChangeRevertUnoPanel color="blue" />
         <ComicPagePanel title={t("changedToLabel")} background="solid" color="red">
           <p className={styles.address}>{changedToEmail}</p>
         </ComicPagePanel>

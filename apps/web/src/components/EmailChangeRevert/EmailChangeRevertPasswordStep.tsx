@@ -5,6 +5,7 @@ import { AuthField } from "@/components/AuthFlows/AuthFlowChrome";
 import { ComicModalInput } from "@/components/ComicModalInput";
 import { ComicPageCtaAction, ComicPagePanel } from "@/components/ComicPageLayout";
 import type { EmailChangeRevertPasswordStepProps } from "./EmailChangeRevertPasswordStep.types";
+import { EmailChangeRevertSuccessRow } from "./EmailChangeRevertSuccessRow";
 import { useRevertPasswordForm } from "./useRevertPasswordForm";
 import styles from "./EmailChangeRevertView.module.css";
 
@@ -22,19 +23,16 @@ export function EmailChangeRevertPasswordStep({
 
   return (
     <>
-      <ComicPagePanel
-        title={t("revertedCaption")}
-        background="solid"
-        color="green"
-        className={styles.stackPanel}
-      >
-        <div className={styles.copy}>
-          <p className={styles.lead}>
-            {emailTaken ? t("emailTakenLead", { email: restoredEmail }) : t("setPasswordLead", { email: restoredEmail })}
-          </p>
-          <p className={styles.note}>{t("setPasswordNote")}</p>
-        </div>
-      </ComicPagePanel>
+      <EmailChangeRevertSuccessRow>
+        <ComicPagePanel title={t("revertedCaption")} background="solid" color="green">
+          <div className={styles.copy}>
+            <p className={styles.lead}>
+              {emailTaken ? t("emailTakenLead", { email: restoredEmail }) : t("setPasswordLead", { email: restoredEmail })}
+            </p>
+            <p className={styles.note}>{t("setPasswordNote")}</p>
+          </div>
+        </ComicPagePanel>
+      </EmailChangeRevertSuccessRow>
       <ComicPagePanel background="solid" color="white" className={styles.stackPanel}>
         <form className={styles.form} onSubmit={form.onFormSubmit} noValidate>
           <AuthField>

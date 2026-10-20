@@ -19,6 +19,11 @@
   min-height: 7.5rem;
 }
 
+/* Card beside a success message: the row sizes to the message, the card fills its height. */
+.successRow {
+  flex: 0 0 auto;
+}
+
 /* Narrow card column between the two address panels. */
 .page .unoPanel {
   flex: 0 0 5.5rem;
@@ -105,8 +110,12 @@
     flex: 0 0 auto;
   }
 
-  .unoCard {
+  .addressRow .unoCard {
     height: 5.5rem;
     margin: 0 auto;
+  }
+
+  .page .successRow .unoPanel {
+    flex-basis: 4rem;
   }
 }
