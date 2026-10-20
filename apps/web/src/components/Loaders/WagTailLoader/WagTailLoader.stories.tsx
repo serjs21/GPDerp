@@ -16,7 +16,11 @@ const meta = {
       </div>
     ),
   ],
-  args: { ...WAG_TAIL_LOADER_DEFAULTS, opacities: [...WAG_TAIL_LOADER_DEFAULTS.opacities] },
+  args: {
+    ...WAG_TAIL_LOADER_DEFAULTS,
+    opacities: [...WAG_TAIL_LOADER_DEFAULTS.opacities],
+    linesOpacities: [...WAG_TAIL_LOADER_DEFAULTS.linesOpacities],
+  },
   argTypes: {
     widthRem: range(4, 24, 0.5),
     attachXPercent: range(0, 120, 0.5),
@@ -28,6 +32,7 @@ const meta = {
     stepJitterDeg: range(0, 15, 0.5),
     stepMs: range(50, 1000, 10),
     opacityJumpSteps: range(1, 3),
+    linesOpacityJumpSteps: range(1, 3),
     linesOffsetXPercent: range(-60, 60, 0.5),
     linesOffsetYPercent: range(-60, 60, 0.5),
     linesWidthPercent: range(5, 80, 0.5),

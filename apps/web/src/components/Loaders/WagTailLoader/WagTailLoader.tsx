@@ -8,7 +8,7 @@ import {
   WAG_TAIL_REST_COPY_INDEX,
 } from "./consts/wagTailLoaderConsts";
 import type { WagTailLoaderProps } from "./WagTailLoader.types";
-import { buildWagTailStyle, resolveWagTailProps, tailCopyStyle } from "./utils/wagTailLoaderUtils";
+import { buildWagTailStyle, linesStyle, resolveWagTailProps, tailCopyStyle } from "./utils/wagTailLoaderUtils";
 import styles from "./WagTailLoader.module.css";
 
 const TAIL_COPY_INDEXES = Array.from({ length: WAG_TAIL_COPY_COUNT }, (_, index) => index);
@@ -56,6 +56,7 @@ export function WagTailLoader(props: WagTailLoaderProps) {
         {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
         <img
           className={styles.lines}
+          style={linesStyle(resolved)}
           src={WAG_TAIL_ASSETS.motionLines}
           alt=""
           width={WAG_TAIL_ASSET_SIZES.motionLines.width}

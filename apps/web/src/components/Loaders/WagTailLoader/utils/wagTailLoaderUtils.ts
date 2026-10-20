@@ -45,13 +45,28 @@ export function tailOpacityAt(
   return opacities[position];
 }
 
-/** Copy index drives its rotation; `--wag-c0..3` are its own four opacity keyframe values. */
+/** `--wag-c0..3`: the four `wagOpacity` keyframe values of one animated element. */
+function opacityCycleVars(
+  opacities: ResolvedWagTailProps["opacities"],
+  jumpSteps: number,
+  index: number,
+): Record<string, string> {
+  return Object.fromEntries(
+    opacities.map((_, tick) => [`--wag-c${tick}`, String(tailOpacityAt(opacities, jumpSteps, index, tick))]),
+  );
+}
+
+/** Copy index drives its rotation and its slot in the shared opacity pattern. */
 export function tailCopyStyle(index: number, props: Pick<ResolvedWagTailProps, "opacities" | "opacityJumpSteps">): CSSProperties {
-  const style: Record<string, string> = { "--wag-index": String(index) };
-  props.opacities.forEach((_, tick) => {
-    style[`--wag-c${tick}`] = String(tailOpacityAt(props.opacities, props.opacityJumpSteps, index, tick));
-  });
-  return style as CSSProperties;
+  return {
+    "--wag-index": String(index),
+    ...opacityCycleVars(props.opacities, props.opacityJumpSteps, index),
+  } as CSSProperties;
+}
+
+/** The motion lines run the same opacity cycle as one element: tick t shows linesOpacities[jump x t]. */
+export function linesStyle(props: Pick<ResolvedWagTailProps, "linesOpacities" | "linesOpacityJumpSteps">): CSSProperties {
+  return opacityCycleVars(props.linesOpacities, props.linesOpacityJumpSteps, 0) as CSSProperties;
 }
 
 export function resolveWagTailProps(props: WagTailLoaderProps): ResolvedWagTailProps {

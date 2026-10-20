@@ -29,6 +29,10 @@ export type WagTailLoaderProps = {
   linesWidthPercent?: number;
   /** Static rotation of the motion lines around their center; the per-tick poses add to it. */
   linesBaseRotationDeg?: number;
+  /** Motion lines opacity per tick, same cycle as the tails (default all 1 = no change). */
+  linesOpacities?: WagTailOpacities;
+  /** Pattern slots the lines skip per tick: tick t shows linesOpacities[(jump x t) mod 4]. */
+  linesOpacityJumpSteps?: number;
   /** Per-step drift / tilt of the motion lines. */
   linesShiftPx?: number;
   linesRotateDeg?: number;

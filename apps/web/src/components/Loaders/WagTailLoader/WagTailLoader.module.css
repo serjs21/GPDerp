@@ -55,7 +55,10 @@
   rotate: var(--wag-lines-base-deg);
   user-select: none;
   pointer-events: none;
-  animation: wagLines calc(var(--wag-step-ms) * 4) step-end infinite;
+  /* Poses plus the shared opacity keyframes (this element's --wag-c0..3 come from linesOpacities). */
+  animation:
+    wagLines calc(var(--wag-step-ms) * 4) step-end infinite,
+    wagOpacity calc(var(--wag-step-ms) * 4) step-end infinite;
 }
 
 .attachDot {
