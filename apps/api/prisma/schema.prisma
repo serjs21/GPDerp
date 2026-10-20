@@ -59,6 +59,7 @@ model User {
   authSessions                   AuthSession[]
   emailActionTokens              EmailActionToken[]
   emailChangeRequests            UserEmailChangeRequest[]
+  emailChangeRevertTokens        EmailChangeRevertToken[]
   suspiciousRegistrationAttempts SuspiciousRegistrationAttempt[]
   configuration                  UserConfiguration?
   wallet                         Wallet?
@@ -110,6 +111,23 @@ model UserEmailChangeRequest {
 
   @@unique([userId])
   @@index([expiresAt])
+}
+
+/// Undo link in the old-address alert. Separate from UserEmailChangeRequest (one row per user, overwritten
+/// on every request) so a later request cannot invalidate the owner's link.
+model EmailChangeRevertToken {
+  id             String    @id @default(uuid()) @db.Uuid
+  userId         String    @db.Uuid
+  tokenHash      String    @unique
+  restoreEmail   String
+  changedToEmail String
+  createdAt      DateTime  @default(now())
+  expiresAt      DateTime
+  usedAt         DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 /// Tracks failed password login attempts for rate limiting (per normalized email, rolling window).

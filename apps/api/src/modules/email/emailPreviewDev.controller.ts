@@ -99,7 +99,7 @@ export function buildEmailPreviews(): EmailPreview[] {
     preview(
       "emailChangeOldAddressAlert",
       "Email change alert (old address)",
-      buildEmailChangePreviousAddressAlert(SAMPLE_NEW_EMAIL),
+      buildEmailChangePreviousAddressAlert(SAMPLE_NEW_EMAIL, SAMPLE_TOKEN),
     ),
     sharePostcardPreview(),
     preview(

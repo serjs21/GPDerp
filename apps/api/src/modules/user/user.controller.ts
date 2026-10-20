@@ -101,6 +101,21 @@ const userPluginImpl = async (app: FastifyInstance) => {
     return res.send({ ok: true, data: { status: "verified" } });
   });
 
+  // Revert link from the old-address alert; the token is the credential (no session required).
+  app.get("/user/change-email/revert", async (req: FastifyRequest, res: FastifyReply) => {
+    const q = (req.query as { token?: string } | undefined) ?? {};
+    const token = q.token?.trim() ?? "";
+    if (!token) return res.code(400).send({ ok: false, error: "Missing token" });
+    return res.send({ ok: true, data: await userService.previewEmailChangeRevert(token) });
+  });
+
+  app.post("/user/change-email/revert", async (req: FastifyRequest, res: FastifyReply) => {
+    const body = (req.body as { token?: string } | undefined) ?? {};
+    const token = typeof body.token === "string" ? body.token.trim() : "";
+    if (!token) return res.code(400).send({ ok: false, error: "Missing token" });
+    return res.send({ ok: true, data: await userService.revertEmailChange(token, req.log) });
+  });
+
   app.patch(
     "/user/configuration",
     { preHandler: [app.requireAuthenticated] },

@@ -137,18 +137,15 @@ That's all, just wanted to let you know.`,
 
 export const buildEmailChangeVerificationEmail = (
   token: string,
-  nextEmail: string,
+  previousEmail: string,
 ) => {
   const verifyUrl = `${env.API_BASE_URL}/user/change-email/verify?token=${encodeURIComponent(token)}`;
 
   return {
     subject: "GPDerp Side Quest: Confirm Your New Email",
 
-    text: `Side quest: Confirm Your New Email
-
-You asked to change your account email to ${nextEmail}.
-
-There's one more step.
+    text: `Quest added: Confirm Your New Email
+    We just got a request to change your email from ${previousEmail} to this one. That's cool, but we need to confirm that it was intentional.
 
 Confirm it here:
 ${verifyUrl}
@@ -160,12 +157,12 @@ If you didn't request the change, just leave it alone. Nothing will happen.`,
     html: `
       <p><strong>Side quest: Confirm Your New Email</strong></p>
 
-      <p>You asked to change your account email to <strong>${nextEmail}</strong></p>
+      <p>We just just got a request to change your email from <strong>${previousEmail}</strong> to this one.</p>
 
       <p>There's one more step.</p>
 
       <p>
-        <a href="${verifyUrl}"><strong>Confirm the new email</strong></a>
+        <a href="${verifyUrl}"><strong>Confirm it here</strong></a>
       </p>
 
       <p>The link works for 24 hours.</p>
@@ -180,10 +177,15 @@ If you didn't request the change, just leave it alone. Nothing will happen.`,
 
 export const buildEmailChangePreviousAddressAlert = (
   nextEmail: string,
-) => ({
-  subject: "GPDerp: Your Email Might Be Changing",
+  revertToken: string,
+) => {
+  // Not `?token=`: the web app opens the reset-password modal for any `token` query param.
+  const revertUrl = `${env.WEB_APP_URL}/revert-email-change?revertToken=${encodeURIComponent(revertToken)}`;
 
-  text: `Hi.
+  return {
+    subject: "GPDerp: Your Email Might Be Changing",
+
+    text: `Hi.
 
 Someone requested to change the email on your account to:
 
@@ -191,13 +193,15 @@ ${nextEmail}
 
 If that was you, okay.
 
-If it wasn't, the change still needs to be confirmed, so it hasn't happened yet.
+If it wasn't, undo it here:
+${revertUrl}
 
-You might want to check your account if something seems off.
+That keeps this address on the account, signs everyone out, and asks you to pick a new password.
+The link works for 7 days, even if the change was already confirmed.
 
 That's it.`,
 
-  html: `
+    html: `
     <p>Hi.</p>
 
     <p>Someone requested to change the email on your account to:</p>
@@ -207,12 +211,16 @@ That's it.`,
     <p>If that was you, okay.</p>
 
     <p>
-      If it wasn't, the change still needs to be confirmed,
-      so it hasn't happened yet.
+      If it wasn't,
+      <a href="${revertUrl}"><strong>undo the change</strong></a>.
     </p>
 
-    <p>You might want to check your account if something seems off.</p>
+    <p>
+      That keeps this address on the account, signs everyone out, and asks you to pick a new password.
+      The link works for 7 days, even if the change was already confirmed.
+    </p>
 
     <p>That's it.</p>
   `,
-});
+  };
+};

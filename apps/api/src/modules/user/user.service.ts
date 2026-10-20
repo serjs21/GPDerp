@@ -1,11 +1,13 @@
+import { randomBytes } from "node:crypto";
 import type { FastifyBaseLogger } from "fastify/types/logger";
-import { AuthProvider } from "../../generated/prisma";
+import { AuthProvider, EmailActionType } from "../../generated/prisma";
 import { prismaClient } from "../../lib/prisma";
 import { authRepository } from "../auth/repository";
+import { recordDebugAuthLog } from "../auth/debugAuthLog";
 import { sendVerificationEmail } from "../auth/verificationEmail";
-import { AUTH_CODES, AUTH_MESSAGES } from "../auth/constants";
+import { AUTH_CODES, AUTH_MESSAGES, AUTH_TTL } from "../auth/constants";
 import { AuthError } from "../auth/errors";
-import { hashToken } from "../auth/utils";
+import { hashPassword, hashToken } from "../auth/utils";
 import { tokenService } from "../auth/tokenService";
 import {
   buildEmailChangePreviousAddressAlert,
@@ -21,6 +23,74 @@ import { stripDangerousControlChars } from "../../utils/sqlSafeInput";
 import { isUniqueConstraintError } from "../../utils/prismaErrors";
 
 const EMAIL_CHANGE_TTL_MS = 24 * 60 * 60 * 1000;
+/** Outlives the 24h confirmation link so an already-confirmed takeover can still be undone. */
+export const EMAIL_CHANGE_REVERT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+type EmailChangeRevertTokenState = "valid" | "invalid" | "expired" | "used";
+
+export type EmailChangeRevertPreview =
+  | { status: "valid"; restoreEmail: string; changedToEmail: string }
+  | { status: Exclude<EmailChangeRevertTokenState, "valid"> };
+
+export type EmailChangeRevertResult =
+  | { status: "reverted" | "email_taken"; restoredEmail: string; passwordResetToken?: string }
+  | { status: Exclude<EmailChangeRevertTokenState, "valid"> };
+
+function revertTokenState(
+  token: { usedAt: Date | null; expiresAt: Date } | null,
+  now: Date,
+): EmailChangeRevertTokenState {
+  if (!token) return "invalid";
+  if (token.usedAt) return "used";
+  if (token.expiresAt <= now) return "expired";
+  return "valid";
+}
+
+/** Swaps the email back, burns every other credential-ish token, and disables the password. */
+async function applyEmailChangeRevert(params: { userId: string; restoreEmail: string; disabledPasswordHash: string }) {
+  const { userId, restoreEmail } = params;
+  return prismaClient.$transaction(async (tx) => {
+    const now = new Date();
+    await tx.userEmailChangeRequest.updateMany({
+      where: { userId, consumedAt: null, invalidatedAt: null },
+      data: { invalidatedAt: now },
+    });
+    // A later alert (e.g. to an attacker's address) must not be able to undo this revert.
+    await tx.emailChangeRevertToken.updateMany({ where: { userId, usedAt: null }, data: { usedAt: now } });
+    await tx.emailActionToken.updateMany({
+      where: { userId, usedAt: null, invalidatedAt: null },
+      data: { invalidatedAt: now },
+    });
+
+    const user = await tx.user.findUnique({
+      where: { id: userId },
+      select: { email: true, passwordCredential: { select: { id: true } } },
+    });
+    if (!user) return null;
+
+    let emailTaken = false;
+    if (user.email !== restoreEmail) {
+      const occupant = await tx.user.findUnique({ where: { email: restoreEmail }, select: { id: true } });
+      emailTaken = Boolean(occupant && occupant.id !== userId);
+      if (!emailTaken) {
+        await tx.user.update({ where: { id: userId }, data: { email: restoreEmail, emailVerifiedAt: now } });
+      }
+    }
+
+    if (!user.passwordCredential) return { emailTaken, passwordResetToken: undefined };
+    await tx.passwordCredential.update({ where: { userId }, data: { passwordHash: params.disabledPasswordHash } });
+    const passwordResetToken = tokenService.createRefreshToken();
+    await tx.emailActionToken.create({
+      data: {
+        userId,
+        type: EmailActionType.PASSWORD_RESET,
+        tokenHash: hashToken(passwordResetToken),
+        expiresAt: new Date(now.getTime() + AUTH_TTL.resetTokenSeconds * 1000),
+      },
+    });
+    return { emailTaken, passwordResetToken };
+  });
+}
 
 type AuthFailureLog = { warn: (detail: Record<string, unknown>, message: string) => void };
 
@@ -482,13 +552,23 @@ export const userService = {
     });
 
     if (canSendEmails) {
+      const revertToken = tokenService.createRefreshToken();
+      await prismaClient.emailChangeRevertToken.create({
+        data: {
+          userId: params.userId,
+          tokenHash: hashToken(revertToken),
+          restoreEmail: profile.email,
+          changedToEmail: nextEmail,
+          expiresAt: new Date(Date.now() + EMAIL_CHANGE_REVERT_TTL_MS),
+        },
+      });
       await mailService.sendEmail({
         to: nextEmail,
         ...buildEmailChangeVerificationEmail(token, nextEmail),
       });
       await mailService.sendEmail({
         to: profile.email,
-        ...buildEmailChangePreviousAddressAlert(nextEmail),
+        ...buildEmailChangePreviousAddressAlert(nextEmail, revertToken),
       });
     }
 
@@ -559,6 +639,62 @@ export const userService = {
     });
 
     return { status: "verified" };
+  },
+
+  /** Read-only: what the revert link would undo. Opening the page must not change anything. */
+  async previewEmailChangeRevert(rawToken: string): Promise<EmailChangeRevertPreview> {
+    const token = await prismaClient.emailChangeRevertToken.findUnique({
+      where: { tokenHash: hashToken(rawToken) },
+    });
+    const state = revertTokenState(token, new Date());
+    if (state !== "valid" || !token) return { status: state === "valid" ? "invalid" : state };
+    return { status: "valid", restoreEmail: token.restoreEmail, changedToEmail: token.changedToEmail };
+  },
+
+  /**
+   * Undo an email change from the old-address alert: cancel or reverse it, sign out every session,
+   * and replace the password with a fresh reset token (password accounts).
+   */
+  async revertEmailChange(rawToken: string, log?: FastifyBaseLogger): Promise<EmailChangeRevertResult> {
+    const token = await prismaClient.emailChangeRevertToken.findUnique({
+      where: { tokenHash: hashToken(rawToken) },
+    });
+    const now = new Date();
+    const state = revertTokenState(token, now);
+    if (state !== "valid" || !token) return { status: state === "valid" ? "invalid" : state };
+
+    const claimed = await prismaClient.emailChangeRevertToken.updateMany({
+      where: { id: token.id, usedAt: null, expiresAt: { gt: now } },
+      data: { usedAt: now },
+    });
+    if (claimed.count === 0) return { status: "used" };
+
+    const disabledPasswordHash = await hashPassword(randomBytes(32).toString("base64url"));
+    const outcome = await applyEmailChangeRevert({
+      userId: token.userId,
+      restoreEmail: token.restoreEmail,
+      disabledPasswordHash,
+    });
+    if (!outcome) return { status: "invalid" };
+
+    await authRepository.revokeAllSessionsForUser(token.userId, "email_change_reverted");
+    void recordDebugAuthLog(
+      {
+        source: "api",
+        event: "sessions_revoked",
+        reason: "email_change_reverted",
+        message: "auth: all sessions revoked after email change revert",
+        userId: token.userId,
+        detail: { revokeReason: "email_change_reverted", emailTaken: outcome.emailTaken },
+      },
+      log,
+    );
+
+    return {
+      status: outcome.emailTaken ? "email_taken" : "reverted",
+      restoredEmail: token.restoreEmail,
+      ...(outcome.passwordResetToken ? { passwordResetToken: outcome.passwordResetToken } : {}),
+    };
   },
 
   async updateOwnConfiguration(params: {
