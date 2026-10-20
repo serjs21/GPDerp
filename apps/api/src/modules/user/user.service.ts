@@ -564,7 +564,7 @@ export const userService = {
       });
       await mailService.sendEmail({
         to: nextEmail,
-        ...buildEmailChangeVerificationEmail(token, nextEmail),
+        ...buildEmailChangeVerificationEmail(token, profile.email),
       });
       await mailService.sendEmail({
         to: profile.email,

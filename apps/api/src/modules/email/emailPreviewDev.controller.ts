@@ -93,7 +93,7 @@ export function buildEmailPreviews(): EmailPreview[] {
     preview(
       "emailChangeConfirm",
       "Confirm new email",
-      buildEmailChangeVerificationEmail(SAMPLE_TOKEN, SAMPLE_NEW_EMAIL),
+      buildEmailChangeVerificationEmail(SAMPLE_TOKEN, SAMPLE_RECIPIENT),
       { to: SAMPLE_NEW_EMAIL },
     ),
     preview(

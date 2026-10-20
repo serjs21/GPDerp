@@ -212,6 +212,10 @@ describe("createEmailChangeRequest", () => {
     expect(ttl).toBeGreaterThan(EMAIL_CHANGE_REVERT_TTL_MS - 60_000);
     expect(ttl).toBeLessThanOrEqual(EMAIL_CHANGE_REVERT_TTL_MS);
 
+    const confirmation = sendEmail.mock.calls.find(([message]) => message.to === "new@example.com")![0];
+    expect(confirmation.text).toContain("from owner@example.com to this one");
+    expect(confirmation.html).toContain("<strong>owner@example.com</strong>");
+
     const alert = sendEmail.mock.calls.find(([message]) => message.to === "owner@example.com")![0];
     const linkToken = new URL(/https?:\/\/\S+revert-email-change\?revertToken=[^\s"]+/.exec(alert.text)![0]).searchParams.get("revertToken")!;
     expect(hashToken(linkToken)).toBe(created.tokenHash);

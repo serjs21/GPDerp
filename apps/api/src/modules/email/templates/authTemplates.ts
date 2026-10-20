@@ -150,27 +150,30 @@ export const buildEmailChangeVerificationEmail = (
 Confirm it here:
 ${verifyUrl}
 
-The link works for 24 hours.
-
-If you didn't request the change, just leave it alone. Nothing will happen.`,
+If you don't know what this email is about, then just ignore it. Nothing will happen.
+Or you can send an email to the ${previousEmail} and ask them what is it all about. Or take over and hope they don't notice.
+You do you, the world is your oyster. We're not here to judge.
+You do you, we're not here to judge.
+This link will expire in 24 hours though.`,
 
     html: `
-      <p><strong>Side quest: Confirm Your New Email</strong></p>
+      <p><strong>Quest added: Confirm Your New Email</strong></p>
 
-      <p>We just just got a request to change your email from <strong>${previousEmail}</strong> to this one.</p>
+      <p>We just got a request to change your email from <strong>${previousEmail}</strong> to this one.</p>
 
-      <p>There's one more step.</p>
+      <p>That's cool, but we need to confirm that it was intentional.</p>
 
       <p>
         <a href="${verifyUrl}"><strong>Confirm it here</strong></a>
       </p>
 
-      <p>The link works for 24 hours.</p>
-
       <p>
-        If you didn't request the change, just leave it alone.
-        Nothing will happen.
+        If you don't know what this email is about, then just ignore it. Nothing will happen.
+        Or you can send an email to the <strong>${previousEmail}</strong> and ask them what is it all about. Or take over and hope they don't notice.
+        You do you, the world is your oyster. We're not here to judge.
       </p>
+
+      <p>This link will expire in 24 hours though.</p>
     `,
   };
 };
@@ -179,7 +182,6 @@ export const buildEmailChangePreviousAddressAlert = (
   nextEmail: string,
   revertToken: string,
 ) => {
-  // Not `?token=`: the web app opens the reset-password modal for any `token` query param.
   const revertUrl = `${env.WEB_APP_URL}/revert-email-change?revertToken=${encodeURIComponent(revertToken)}`;
 
   return {
