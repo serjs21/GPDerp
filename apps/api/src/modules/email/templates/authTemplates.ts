@@ -154,7 +154,7 @@ If you don't know what this email is about, then just ignore it. Nothing will ha
 Or you can send an email to the ${previousEmail} and ask them what is it all about. Or take over and hope they don't notice.
 You do you, the world is your oyster. We're not here to judge.
 You do you, we're not here to judge.
-This link will expire in 24 hours though.`,
+This link will expire in 24 hours.`,
 
     html: `
       <p><strong>Quest added: Confirm Your New Email</strong></p>
@@ -173,7 +173,7 @@ This link will expire in 24 hours though.`,
         You do you, the world is your oyster. We're not here to judge.
       </p>
 
-      <p>This link will expire in 24 hours though.</p>
+      <p>This link will expire in 24 hours.</p>
     `,
   };
 };
@@ -187,42 +187,26 @@ export const buildEmailChangePreviousAddressAlert = (
   return {
     subject: "GPDerp: Your Email Might Be Changing",
 
-    text: `Hi.
-
-Someone requested to change the email on your account to:
-
-${nextEmail}
-
-If that was you, okay.
-
-If it wasn't, undo it here:
-${revertUrl}
-
-That keeps this address on the account, signs everyone out, and asks you to pick a new password.
-The link works for 7 days, even if the change was already confirmed.
-
-That's it.`,
+    text: `Hi. Someone requested to change the email on your account to ${nextEmail}. I hope it was you.
+    If it was - then that's cool. But in case it wasn't, we've got you covered.
+    Just click here and it will be like nothing ever happened: ${revertUrl}.
+    I genuinely don't know who would want to do something like that, it's not like we store any valuable data or anything. But if someone else got access to your account you should probably use more secure passwords. But I'm not your mom, so you do you.
+    Anyway, there's a 7 day window to do the "if anyone has any objections" thing and after that it stays like that.`,
 
     html: `
     <p>Hi.</p>
 
-    <p>Someone requested to change the email on your account to:</p>
+    <p>Someone requested to change the email on your account to <strong>${nextEmail}</strong>. I hope it was you.</p>
 
-    <p><strong>${nextEmail}</strong></p>
-
-    <p>If that was you, okay.</p>
+    <p>If it was - then that's cool. But in case it wasn't, we've got you covered.</p>
 
     <p>
-      If it wasn't,
-      <a href="${revertUrl}"><strong>undo the change</strong></a>.
+      Just <a href="${revertUrl}"><strong>click here</strong></a> and it will be like nothing ever happened.
     </p>
 
-    <p>
-      That keeps this address on the account, signs everyone out, and asks you to pick a new password.
-      The link works for 7 days, even if the change was already confirmed.
-    </p>
+    <p>I genuinely don't know who would want to do something like that, it's not like we store any valuable data or anything. But if someone else got access to your account you should probably use more secure passwords. But I'm not your mom, so you do you.</p>
 
-    <p>That's it.</p>
+    <p>Anyway, there's a 7 day window to do the "if anyone has any objections" thing and after that it stays like that.</p>
   `,
   };
 };

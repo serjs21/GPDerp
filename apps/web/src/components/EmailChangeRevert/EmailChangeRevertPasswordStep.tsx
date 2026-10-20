@@ -24,8 +24,7 @@ export function EmailChangeRevertPasswordStep({
     <>
       <ComicPagePanel
         title={t("revertedCaption")}
-        titleColor="green"
-        background="halftone"
+        background="solid"
         color="green"
         className={styles.stackPanel}
       >

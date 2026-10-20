@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { ComicPageCtaAction, ComicPagePanel, ComicPageRow } from "@/components/ComicPageLayout";
+import { UNO_REVERSE_SRC } from "./consts/emailChangeRevertConsts";
 import type { EmailChangeRevertConfirmProps } from "./EmailChangeRevertConfirm.types";
 import styles from "./EmailChangeRevertView.module.css";
 
@@ -18,14 +19,18 @@ export function EmailChangeRevertConfirm({
   return (
     <>
       <ComicPageRow className={styles.addressRow}>
-        <ComicPagePanel title={t("restoreLabel")} titleColor="green" background="halftone" color="green">
+        <ComicPagePanel title={t("restoreLabel")} background="solid" color="green">
           <p className={styles.address}>{restoreEmail}</p>
         </ComicPagePanel>
-        <ComicPagePanel title={t("changedToLabel")} titleColor="yellow" background="sunburst" color="red">
+        <ComicPagePanel background="sunburst" color="yellow" className={styles.unoPanel}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
+          <img className={styles.unoCard} src={UNO_REVERSE_SRC} alt="" width={344} height={524} draggable={false} />
+        </ComicPagePanel>
+        <ComicPagePanel title={t("changedToLabel")} background="solid" color="red">
           <p className={styles.address}>{changedToEmail}</p>
         </ComicPagePanel>
       </ComicPageRow>
-      <ComicPagePanel background="solid" color="cream" className={styles.stackPanel}>
+      <ComicPagePanel background="solid" color="white" className={styles.stackPanel}>
         <div className={styles.copy}>
           <p className={styles.lead}>{t("confirmLead")}</p>
           <p className={styles.note}>{t("confirmConsequences")}</p>

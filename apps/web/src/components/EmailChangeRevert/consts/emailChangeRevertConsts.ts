@@ -1,5 +1,8 @@
 import type { EmailChangeRevertResultState } from "../EmailChangeRevertView.types";
 
+/** Decorative card between the "keep" and "instead of" addresses on the confirm step. */
+export const UNO_REVERSE_SRC = "/uno-reverse.svg";
+
 /** Matches the API's password policy minimum (ResetPasswordModal uses the same check). */
 export const EMAIL_CHANGE_REVERT_PASSWORD_MIN_LENGTH = 8;
 
