@@ -12,10 +12,13 @@
  */
 .background {
   position: absolute;
-  inset: 0;
+  /* Centered on the stage, then offset (negative allowed); size scales around the center. */
+  left: calc(50% + var(--wag-bg-offset-x));
+  top: calc(50% + var(--wag-bg-offset-y));
   display: block;
-  width: 100%;
-  height: 100%;
+  width: var(--wag-bg-size);
+  height: auto;
+  translate: -50% -50%;
   transform-origin: var(--wag-bg-origin);
   rotate: var(--wag-bg-base-deg);
   user-select: none;

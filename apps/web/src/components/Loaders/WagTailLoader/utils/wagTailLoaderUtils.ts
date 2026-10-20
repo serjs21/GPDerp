@@ -44,6 +44,9 @@ function backgroundSpinVars(props: ResolvedWagTailProps): Record<string, string>
   const { steps, turnDeg } = backgroundSpin(props.backgroundStepDeg, props.backgroundSteps);
   return {
     "--wag-bg-base-deg": `${props.backgroundBaseRotationDeg}deg`,
+    "--wag-bg-size": `${props.backgroundSizePercent}%`,
+    "--wag-bg-offset-x": `${props.backgroundOffsetXPercent}%`,
+    "--wag-bg-offset-y": `${props.backgroundOffsetYPercent}%`,
     "--wag-bg-origin": `${props.backgroundOriginXPercent}% ${props.backgroundOriginYPercent}%`,
     "--wag-bg-steps": String(steps),
     "--wag-bg-turn": `${turnDeg}deg`,

@@ -38,6 +38,11 @@ export type WagTailLoaderProps = {
   linesRotateDeg?: number;
   /** Static rotation of the background behind the dog. */
   backgroundBaseRotationDeg?: number;
+  /** Background width in % of the stage width (height keeps the SVG's aspect ratio); scales around its center. */
+  backgroundSizePercent?: number;
+  /** Shift of the background's center from the stage center, in % of the stage width / height (negative allowed). */
+  backgroundOffsetXPercent?: number;
+  backgroundOffsetYPercent?: number;
   /**
    * Background turns by this much every `backgroundStepMs` (its own clock, separate from `stepMs`) for
    * `backgroundSteps` poses, then jumps back to its base angle; 0 keeps it still.
@@ -45,7 +50,7 @@ export type WagTailLoaderProps = {
   backgroundStepDeg?: number;
   backgroundSteps?: number;
   backgroundStepMs?: number;
-  /** Background rotation center, in % of the stage (default 50 / 50). */
+  /** Background rotation center, in % of the background box (default 50 / 50; may be negative or above 100). */
   backgroundOriginXPercent?: number;
   backgroundOriginYPercent?: number;
   /** Debug dot on the attach point, for manual tuning. */
