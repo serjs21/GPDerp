@@ -481,6 +481,9 @@
   "Loaders": {
     "sakuraPetalLoader": {
       "ariaLabel": "Loading"
+    },
+    "wagTailLoader": {
+      "ariaLabel": "Loading"
     }
   },
   "MfgDate": {
