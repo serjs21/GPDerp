@@ -6,7 +6,6 @@ import type { EmailChangeRevertConfirmProps } from "./EmailChangeRevertConfirm.t
 import { EmailChangeRevertUnoPanel } from "./EmailChangeRevertUnoPanel";
 import styles from "./EmailChangeRevertView.module.css";
 
-/** Both addresses side by side, then "undo it" / "keep it". Nothing changes until the user confirms. */
 export function EmailChangeRevertConfirm({
   restoreEmail,
   changedToEmail,
