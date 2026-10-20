@@ -20,7 +20,7 @@ export function ShareLinkPreviewLantern({ subject, haiku, showLabels, onHaikuCha
       labels={haloLabels}
       onPlacementCommit={(labelId, placement) => void onPlacementCommit(labelId, placement)}
       ariaLabel={t("labelsAriaLabel", { subject })}
-      className={showLabels ? undefined : styles.labelsHidden}
+      className={[styles.lanternHalo, showLabels ? undefined : styles.labelsHidden].filter(Boolean).join(" ")}
     >
       <LanternFrame ariaLabel={t("lanternAriaLabel", { subject })} showLabelBelt={false}>
         <Lantern haiku={haiku} showActions={false} bodyOnly />

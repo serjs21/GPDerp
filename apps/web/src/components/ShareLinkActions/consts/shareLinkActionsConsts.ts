@@ -49,7 +49,7 @@ export const SHARE_LINK_ACTION_LAYOUTS = {
 
 const PREVIEW_CAPTION_TOP_RIGHT = { top: "0.4rem", right: "0.5rem", rotateDeg: 0 } as const;
 
-/** Preview modal footer panels (8rem × 6rem): caption top-right, icon bottom-left. */
+/** Preview modal footer panels (4rem tall): caption top-right, icon bottom-left. */
 export const SHARE_LINK_PREVIEW_ACTION_LAYOUTS = {
   showLabels: {
     icon: { size: "8rem", bottom: "0rem", left: "0.2rem", rotateDeg: 0 },

@@ -24,5 +24,6 @@ export function labelHaloHeightRem(lanternWidthRem: number = LANTERN_WIDTH_REM):
 export function shareLinkPreviewPanelStyle(): CSSProperties {
   return {
     "--share-link-preview-panel-height": `${labelHaloHeightRem() + SHARE_LINK_PREVIEW_EXTRA_HEIGHT_REM}rem`,
+    "--share-link-preview-lantern-width": `${LANTERN_WIDTH_REM}rem`,
   } as CSSProperties;
 }

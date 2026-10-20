@@ -3,6 +3,11 @@
   max-height: 92vh;
 }
 
+/* Outranks `.dialogPopup .page`; the top gutter keeps its height for the close button. */
+.dialog .page {
+  padding-bottom: 1rem;
+}
+
 /* Height comes from shareLinkPreviewPanelStyle(). */
 .panel {
   flex: 0 0 auto;
@@ -16,6 +21,21 @@
     height: auto;
     min-height: var(--share-link-preview-panel-height);
   }
+}
+
+/*
+ * When the panel is narrower than lantern + drop pad, the halo is clamped to the panel and the
+ * lantern would overflow to the right; shrink the side pad so it stays centered. Placements are
+ * percentages of the halo box, whose width is unchanged. Below the lantern width the halo is
+ * allowed past the panel so the flex-centered parent spills it evenly on both sides.
+ */
+.panel .lanternHalo {
+  max-width: none;
+  padding-inline: clamp(
+    0px,
+    calc((100% - var(--share-link-preview-lantern-width)) / 2),
+    var(--label-halo-pad-x)
+  );
 }
 
 /* Preview-only: labels stay placeable but read as hidden on the public page. */
@@ -36,7 +56,12 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  height: 6rem;
+  height: 4rem;
+}
+
+/* Layout icon sizes are widths; keep tall art (Done figure) inside the shorter panel. */
+.footerAction img {
+  max-height: calc(100% - 0.25rem);
 }
 
 .footerActionWide {
