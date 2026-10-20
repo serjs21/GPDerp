@@ -20,7 +20,7 @@ export const buildVerificationEmail = (token: string) => {
       <p>Welcome traveller.
 
       <p>One small administrative ritual remains before we can continue, and that is to click the link below to confirm that this is actually your email address.</p>
-      <p>Click here to complete the quest: <a href="${verifyUrl}">${verifyUrl}</a></p>
+      <p><a href="${verifyUrl}"><strong>Click here to complete the quest</strong></a></p>
       <p>This link will be available for 24 hours. After that - it will self destruct and you will need to start over.</p>
       <p>If that wasn't you, just ignore this message and let it fade into obscurity.</p>
     `,
@@ -29,40 +29,190 @@ export const buildVerificationEmail = (token: string) => {
 
 export const buildPasswordResetEmail = (token: string) => {
   const resetUrl = `${env.WEB_APP_URL}/?resetToken=${encodeURIComponent(token)}`;
+
   return {
-    subject: "GPDerp Side Quest Added: Change the lock",
-    text: `Reset your password by opening this link:\n${resetUrl}\n\nThis link expires in 24 hours.`,
-    html: `<p>Reset your password by clicking <a href="${resetUrl}">this link</a>.</p><p>This link expires in 24 hours.</p>`,
+    subject: "GPDerp Side Quest added: Password change",
+
+    text: `Side quest: Change Your Password
+
+Hi.
+
+Looks like you asked to reset your password, so here's the link:
+${resetUrl}
+
+It works for 24 hours. After that it won't work anymore. That's just how these links are. Keeping them alive forever wouldn't be good for anyone.
+
+If you didn't ask for this, you don't need to do anything. The time will take care of the rest.`,
+
+    html: `
+      <p><strong>GPDerp Side quest unlocked: Change Your Password</strong></p>
+
+      <p>Hi.</p>
+
+      <p>Looks like you asked to reset your password, so here's the link:</p>
+
+      <p>
+        <a href="${resetUrl}"><strong>Change your password</strong></a>
+      </p>
+
+      <p>It works for 24 hours. After that it won't work anymore. That's just how these links are. Keeping them alive forever wouldn't be good for anyone.</p>
+
+      <p>If you didn't ask for this, you don't need to do anything. The time will take care of the rest.</p>
+    `,
   };
 };
 
 export const buildWelcomeEmail = () => {
   const homeUrl = env.CLIENT_URL;
   const completeUrl = `${env.WEB_APP_URL}/complete-registration`;
+
   return {
-    subject: "GPderp Verification Quest Completed: Welcome to party!",
-    text: `Thanks for verifying your email. Your account is now active.\n\nIf you have not chosen a username yet, complete your profile here:\n${completeUrl}\n\nOr go to the app: ${homeUrl}`,
-    html: `<p>Thanks for verifying your email. Your account is now active.</p><p>If you have not chosen a username yet, <a href="${completeUrl}">complete your registration</a>.</p><p>Or get started at <a href="${homeUrl}">${homeUrl}</a>.</p>`,
+    subject: "GPDerp Quest Completed: Identity verified",
+
+    text: `Quest completed.
+
+Your email is verified now.
+
+So that's done.
+
+If you still need to choose a username, you can do that here:
+${completeUrl}
+
+Otherwise, you can go to the app:
+${homeUrl}
+
+I don't think there's anything else you need to do right now.`,
+
+    html: `
+      <p><strong>Quest completed: we now know that you are who you say you are</strong></p>
+
+      <p>Your email is verified now.</p>
+
+      <p>So that's done. The app is <a href="${homeUrl}"><strong>here</strong></a>.
+      </p>
+
+      <p>
+        That concludes the administrative portion of the adventure.
+        Ideally, things become less bureaucratic from here.
+      </p>
+    `,
   };
 };
 
-export const buildSuspiciousRegistrationAttemptEmail = (params: { countryLabel: string }) => ({
-  subject: "GPDerp snitching system activated: someone is trying to sign up with your email",
-  text: `Someone attempted to create a new account using this email address. The request appeared to originate from: ${params.countryLabel}.\n\nIf this was not you, you can ignore this message — your existing account is unchanged. If you are concerned, change your password from your account settings.`,
-  html: `<p>Someone attempted to create a new account using <strong>this email address</strong>.</p><p>The request appeared to originate from: <strong>${params.countryLabel}</strong>.</p><p>If this was not you, you can ignore this message — your existing account is unchanged. If you are concerned, change your password from your account settings.</p>`,
+export const buildSuspiciousRegistrationAttemptEmail = (params: {
+  countryLabel: string;
+}) => ({
+  subject: "GPDerp snitching system: Someone tried to sign up with your email",
+
+  text: `Hi there.
+
+Someone tried to create an account using your email address, and we won't stand for it. Identity theft is a serious crime.
+
+The request came from:
+${params.countryLabel}
+
+If it was you, that's fine. If it wasn't, that's also mostly fine. The signup attempt didn't affect your existing account.
+
+If you notice anything else strange, changing your password might be a good idea.
+
+That's all, just wanted to let you know.`,
+
+  html: `
+    <p>Hi there.</p>
+
+    <p>Someone tried to create an account using your email address, and we won't stand for it. Identity theft is a serious crime.</p>
+
+    <p>
+      The request came from:
+      <strong>${params.countryLabel}</strong>.
+    </p>
+
+    <p>If it was you, that's fine. If it wasn't, that's also mostly fine. The signup attempt didn't affect your existing account.</p>
+
+    <p>If you notice anything else strange, changing your password might be a good idea.</p>
+
+    <p>That's all, just wanted to let you know.</p>
+  `,
 });
 
-export const buildEmailChangeVerificationEmail = (token: string, nextEmail: string) => {
+export const buildEmailChangeVerificationEmail = (
+  token: string,
+  nextEmail: string,
+) => {
   const verifyUrl = `${env.API_BASE_URL}/user/change-email/verify?token=${encodeURIComponent(token)}`;
+
   return {
-    subject: "GPDerp Quest Added: Relocate your resources to a new email address",
-    text: `We received a request to change your account email to ${nextEmail}.\nConfirm it here:\n${verifyUrl}\n\nThis link expires in 24 hours.`,
-    html: `<p>We received a request to change your account email to <strong>${nextEmail}</strong>.</p><p>Confirm it by clicking <a href="${verifyUrl}">this link</a>.</p><p>This link expires in 24 hours.</p>`,
+    subject: "GPDerp Side Quest: Confirm Your New Email",
+
+    text: `Side quest: Confirm Your New Email
+
+You asked to change your account email to ${nextEmail}.
+
+There's one more step.
+
+Confirm it here:
+${verifyUrl}
+
+The link works for 24 hours.
+
+If you didn't request the change, just leave it alone. Nothing will happen.`,
+
+    html: `
+      <p><strong>Side quest: Confirm Your New Email</strong></p>
+
+      <p>You asked to change your account email to <strong>${nextEmail}</strong></p>
+
+      <p>There's one more step.</p>
+
+      <p>
+        <a href="${verifyUrl}"><strong>Confirm the new email</strong></a>
+      </p>
+
+      <p>The link works for 24 hours.</p>
+
+      <p>
+        If you didn't request the change, just leave it alone.
+        Nothing will happen.
+      </p>
+    `,
   };
 };
 
-export const buildEmailChangePreviousAddressAlert = (nextEmail: string) => ({
-  subject: "Your account email change was requested",
-  text: `A request was made to change your account email to ${nextEmail}.\nIf this wasn't you, please ignore this message.`,
-  html: `<p>A request was made to change your account email to <strong>${nextEmail}</strong>.</p><p>If this wasn't you, please ignore this message.</p>`,
+export const buildEmailChangePreviousAddressAlert = (
+  nextEmail: string,
+) => ({
+  subject: "GPDerp: Your Email Might Be Changing",
+
+  text: `Hi.
+
+Someone requested to change the email on your account to:
+
+${nextEmail}
+
+If that was you, okay.
+
+If it wasn't, the change still needs to be confirmed, so it hasn't happened yet.
+
+You might want to check your account if something seems off.
+
+That's it.`,
+
+  html: `
+    <p>Hi.</p>
+
+    <p>Someone requested to change the email on your account to:</p>
+
+    <p><strong>${nextEmail}</strong></p>
+
+    <p>If that was you, okay.</p>
+
+    <p>
+      If it wasn't, the change still needs to be confirmed,
+      so it hasn't happened yet.
+    </p>
+
+    <p>You might want to check your account if something seems off.</p>
+
+    <p>That's it.</p>
+  `,
 });
