@@ -1,6 +1,7 @@
 import axios from "axios";
 
-type RevertTokenProblem = "invalid" | "expired" | "used";
+/** `unavailable`: another account verified the old address since, so the link no longer works. */
+type RevertTokenProblem = "invalid" | "expired" | "used" | "unavailable";
 
 export type EmailChangeRevertPreview =
   | { status: "valid"; restoreEmail: string; changedToEmail: string }

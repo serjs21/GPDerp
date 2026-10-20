@@ -71,6 +71,7 @@ function makeTx(options: { email: string; hasPassword: boolean; occupantId?: str
 beforeEach(() => {
   jest.clearAllMocks();
   prismaClient.emailChangeRevertToken.updateMany.mockResolvedValue({ count: 1 });
+  prismaClient.user.findUnique.mockResolvedValue(null);
 });
 
 describe("previewEmailChangeRevert", () => {
@@ -86,6 +87,24 @@ describe("previewEmailChangeRevert", () => {
       where: { tokenHash: hashToken("raw") },
     });
     expect(prismaClient.emailChangeRevertToken.updateMany).not.toHaveBeenCalled();
+  });
+
+  it("disables the link once another account has verified the old address", async () => {
+    prismaClient.emailChangeRevertToken.findUnique.mockResolvedValue(tokenRow());
+    prismaClient.user.findUnique.mockResolvedValue({ id: "someone-else", emailVerifiedAt: new Date() });
+
+    await expect(userService.previewEmailChangeRevert("raw")).resolves.toEqual({ status: "unavailable" });
+    expect(prismaClient.user.findUnique).toHaveBeenCalledWith({
+      where: { email: "owner@example.com" },
+      select: { id: true, emailVerifiedAt: true },
+    });
+  });
+
+  it("keeps the link usable while the other account has not verified the address", async () => {
+    prismaClient.emailChangeRevertToken.findUnique.mockResolvedValue(tokenRow());
+    prismaClient.user.findUnique.mockResolvedValue({ id: "someone-else", emailVerifiedAt: null });
+
+    await expect(userService.previewEmailChangeRevert("raw")).resolves.toMatchObject({ status: "valid" });
   });
 
   it.each([
@@ -182,6 +201,16 @@ describe("revertEmailChange", () => {
     prismaClient.emailChangeRevertToken.findUnique.mockResolvedValue(row);
 
     await expect(userService.revertEmailChange("raw")).resolves.toEqual({ status });
+    expect(prismaClient.$transaction).not.toHaveBeenCalled();
+    expect(revokeAll).not.toHaveBeenCalled();
+  });
+
+  it("refuses to revert, with no side effects, when another account verified the old address", async () => {
+    prismaClient.emailChangeRevertToken.findUnique.mockResolvedValue(tokenRow());
+    prismaClient.user.findUnique.mockResolvedValue({ id: "someone-else", emailVerifiedAt: new Date() });
+
+    await expect(userService.revertEmailChange("raw")).resolves.toEqual({ status: "unavailable" });
+    expect(prismaClient.emailChangeRevertToken.updateMany).not.toHaveBeenCalled();
     expect(prismaClient.$transaction).not.toHaveBeenCalled();
     expect(revokeAll).not.toHaveBeenCalled();
   });

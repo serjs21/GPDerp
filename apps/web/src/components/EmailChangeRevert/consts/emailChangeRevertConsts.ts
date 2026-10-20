@@ -21,5 +21,6 @@ export const EMAIL_CHANGE_REVERT_RESULT_COPY: Record<EmailChangeRevertResultStat
   invalid: { title: "invalidTitle", body: "invalidBody", action: "home", panelColor: "red" },
   expired: { title: "expiredTitle", body: "expiredBody", action: "home", panelColor: "yellow" },
   used: { title: "usedTitle", body: "usedBody", action: "home", panelColor: "yellow" },
+  unavailable: { title: "unavailableTitle", body: "unavailableBody", action: "home", panelColor: "yellow" },
   failed: { title: "failedTitle", body: "failedBody", action: "home", panelColor: "red" },
 };

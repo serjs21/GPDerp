@@ -27,14 +27,25 @@ const EMAIL_CHANGE_TTL_MS = 24 * 60 * 60 * 1000;
 export const EMAIL_CHANGE_REVERT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 type EmailChangeRevertTokenState = "valid" | "invalid" | "expired" | "used";
+/** `unavailable`: the old address now belongs to another account that verified it, so the link is dead. */
+type EmailChangeRevertBlocked = Exclude<EmailChangeRevertTokenState, "valid"> | "unavailable";
 
 export type EmailChangeRevertPreview =
   | { status: "valid"; restoreEmail: string; changedToEmail: string }
-  | { status: Exclude<EmailChangeRevertTokenState, "valid"> };
+  | { status: EmailChangeRevertBlocked };
 
 export type EmailChangeRevertResult =
   | { status: "reverted" | "email_taken"; restoredEmail: string; passwordResetToken?: string }
-  | { status: Exclude<EmailChangeRevertTokenState, "valid"> };
+  | { status: EmailChangeRevertBlocked };
+
+/** Another account owns the old address and proved it (verified), so it can never be restored. */
+async function isRestoreEmailClaimed(token: { userId: string; restoreEmail: string }): Promise<boolean> {
+  const occupant = await prismaClient.user.findUnique({
+    where: { email: token.restoreEmail },
+    select: { id: true, emailVerifiedAt: true },
+  });
+  return Boolean(occupant && occupant.id !== token.userId && occupant.emailVerifiedAt);
+}
 
 function revertTokenState(
   token: { usedAt: Date | null; expiresAt: Date } | null,
@@ -648,6 +659,7 @@ export const userService = {
     });
     const state = revertTokenState(token, new Date());
     if (state !== "valid" || !token) return { status: state === "valid" ? "invalid" : state };
+    if (await isRestoreEmailClaimed(token)) return { status: "unavailable" };
     return { status: "valid", restoreEmail: token.restoreEmail, changedToEmail: token.changedToEmail };
   },
 
@@ -662,6 +674,7 @@ export const userService = {
     const now = new Date();
     const state = revertTokenState(token, now);
     if (state !== "valid" || !token) return { status: state === "valid" ? "invalid" : state };
+    if (await isRestoreEmailClaimed(token)) return { status: "unavailable" };
 
     const claimed = await prismaClient.emailChangeRevertToken.updateMany({
       where: { id: token.id, usedAt: null, expiresAt: { gt: now } },

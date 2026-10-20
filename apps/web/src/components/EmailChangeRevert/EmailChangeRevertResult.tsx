@@ -18,7 +18,7 @@ export function EmailChangeRevertResult({ state, onKeep, onSignIn }: EmailChange
       <ComicPagePanel
         title={t(copy.title)}
         titleColor="white"
-        background={state.kind === "loading" ? "motion" : "halftone"}
+        background={state.kind === "loading" ? "motion" : "solid"}
         color={copy.panelColor}
         loading={state.kind === "loading"}
         className={styles.stackPanel}

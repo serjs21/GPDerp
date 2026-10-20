@@ -43,7 +43,8 @@ export const PasswordRejected = story({
   restoredEmail: OWNER,
   emailTaken: false,
   busy: false,
-  error: "Password must include at least one number.",
+  // The form already enforces the only password rule (8+ characters); the server can still refuse an expired reset token.
+  error: "Invalid or expired token",
 });
 export const EmailTaken = story({ kind: "setPassword", restoredEmail: OWNER, emailTaken: true, busy: false, error: null });
 export const PasswordSaved = story({ kind: "passwordSaved", restoredEmail: OWNER });
@@ -52,6 +53,7 @@ export const EmailTakenNoPassword = story({ kind: "revertedNoPassword", restored
 export const InvalidLink = story({ kind: "invalid" });
 export const ExpiredLink = story({ kind: "expired" });
 export const UsedLink = story({ kind: "used" });
+export const UnavailableLink = story({ kind: "unavailable" });
 export const ServerUnreachable = story({ kind: "failed" });
 
 const FAKE_LATENCY_MS = 700;

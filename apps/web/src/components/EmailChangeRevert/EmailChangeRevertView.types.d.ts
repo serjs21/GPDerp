@@ -1,4 +1,4 @@
-export type EmailChangeRevertProblem = "invalid" | "expired" | "used" | "failed";
+export type EmailChangeRevertProblem = "invalid" | "expired" | "used" | "unavailable" | "failed";
 
 /**
  * Page states: `confirm.busy` is "reverting", `setPassword.busy` is "saving password";

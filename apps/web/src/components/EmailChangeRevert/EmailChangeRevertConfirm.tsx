@@ -22,7 +22,7 @@ export function EmailChangeRevertConfirm({
         <ComicPagePanel title={t("restoreLabel")} background="solid" color="green">
           <p className={styles.address}>{restoreEmail}</p>
         </ComicPagePanel>
-        <ComicPagePanel background="sunburst" color="yellow" className={styles.unoPanel}>
+        <ComicPagePanel background="sunburst" color="blue" className={styles.unoPanel}>
           {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
           <img className={styles.unoCard} src={UNO_REVERSE_SRC} alt="" width={344} height={524} draggable={false} />
         </ComicPagePanel>

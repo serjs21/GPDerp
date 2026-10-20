@@ -7,7 +7,7 @@ describe("previewToViewState", () => {
     ).toEqual({ kind: "confirm", restoreEmail: "owner@example.com", changedToEmail: "new@example.com", busy: false });
   });
 
-  it.each(["invalid", "expired", "used"] as const)("shows the %s state", (status) => {
+  it.each(["invalid", "expired", "used", "unavailable"] as const)("shows the %s state", (status) => {
     expect(previewToViewState({ status })).toEqual({ kind: status });
   });
 });

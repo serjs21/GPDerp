@@ -270,6 +270,8 @@
     "expiredBody": "This undo link was only good for 7 days. If something still looks wrong, reset your password from the sign-in screen.",
     "usedTitle": "Already used",
     "usedBody": "This link was already used, or the change was undone with another link.",
+    "unavailableTitle": "Link disabled",
+    "unavailableBody": "Your old address now belongs to another account that has confirmed it, so this change can no longer be undone. If something looks off, reset your password from the sign-in screen.",
     "failedTitle": "Something broke",
     "failedBody": "The server couldn't be reached. Try opening the link again in a moment.",
     "signInCta": "Sign in",

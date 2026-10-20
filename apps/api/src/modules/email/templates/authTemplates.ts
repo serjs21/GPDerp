@@ -189,7 +189,7 @@ export const buildEmailChangePreviousAddressAlert = (
 
     text: `Hi. Someone requested to change the email on your account to ${nextEmail}. I hope it was you.
     If it was - then that's cool. But in case it wasn't, we've got you covered.
-    Just click here and it will be like nothing ever happened: ${revertUrl}.
+    Just click here and it will be like nothing ever happened: ${revertUrl}
     I genuinely don't know who would want to do something like that, it's not like we store any valuable data or anything. But if someone else got access to your account you should probably use more secure passwords. But I'm not your mom, so you do you.
     Anyway, there's a 7 day window to do the "if anyone has any objections" thing and after that it stays like that.`,
 
