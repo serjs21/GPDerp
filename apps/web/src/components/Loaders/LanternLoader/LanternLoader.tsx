@@ -5,8 +5,8 @@ import { buildLanternKeyframes, buildLanternStyle, lanternKeyframesName, resolve
 import styles from "./LanternLoader.module.css";
 
 /**
- * Lantern that eases through a configurable list of poses (rotation, x/y, scale, opacity), one
- * `stepTransitionMs` per step, looping. CSS-only: the keyframes are generated from the steps, no timers.
+ * Lantern that steps through a configurable list of still frames (rotation, x/y, scale, opacity), holding
+ * each for `stepTransitionMs`, looping. CSS-only: the keyframes are generated from the steps, no timers.
  */
 export function LanternLoader(props: LanternLoaderProps) {
   const t = useTranslations("Loaders.lanternLoader");

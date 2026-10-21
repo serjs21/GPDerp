@@ -6,14 +6,14 @@
   line-height: 0;
 }
 
-/* Keyframes come from the step config (rendered next to the lantern); each segment eases on its own. */
+/* Keyframes come from the step config (rendered next to the lantern); step-end holds each pose as a still frame. */
 .lantern {
   display: block;
   width: 100%;
   height: 100%;
   user-select: none;
   pointer-events: none;
-  animation: var(--lantern-animation-name) var(--lantern-duration) ease-in-out infinite;
+  animation: var(--lantern-animation-name) var(--lantern-duration) step-end infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

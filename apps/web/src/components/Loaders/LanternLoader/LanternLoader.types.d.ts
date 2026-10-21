@@ -1,4 +1,4 @@
-/** One pose of the lantern; the loader eases from each step to the next, then back to the first. */
+/** One still frame of the lantern; the loader cuts from each step to the next, then back to the first. */
 export type LanternLoaderStep = {
   rotationDeg: number;
   /** Offset in % of the lantern's own width / height (+Y is down). */
@@ -13,6 +13,6 @@ export type LanternLoaderProps = {
   /** Rendered lantern width; height follows the SVG's aspect ratio. */
   widthRem?: number;
   steps?: readonly LanternLoaderStep[];
-  /** Duration of each step-to-step transition; one loop takes steps.length x stepTransitionMs. */
+  /** How long each step holds before cutting to the next; one loop takes steps.length x stepTransitionMs. */
   stepTransitionMs?: number;
 };

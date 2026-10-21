@@ -35,7 +35,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-/** 1.2s per transition: easier to read each pose while tuning. */
+/** 1.2s per frame: easier to read each pose while tuning. */
 export const SlowMotion: Story = {
   args: { stepTransitionMs: 1200 },
 };

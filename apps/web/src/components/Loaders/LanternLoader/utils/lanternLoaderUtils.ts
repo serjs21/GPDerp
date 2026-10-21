@@ -29,8 +29,8 @@ export function lanternKeyframesName(steps: readonly LanternLoaderStep[]): strin
 }
 
 /**
- * One keyframe per step at i / n of the loop, plus 100% = the first step so the loop closes smoothly.
- * The CSS timing function applies per segment, so each step-to-step transition eases on its own.
+ * One keyframe per step at i / n of the loop, plus 100% = the first step to close the loop.
+ * With the step-end timing in CSS, each pose holds for its whole slot, then cuts to the next.
  */
 export function buildLanternKeyframes(name: string, steps: readonly LanternLoaderStep[]): string {
   const frames = steps.map((step, index) => `${round((index / steps.length) * 100)}% { ${stepDeclarations(step)} }`);
