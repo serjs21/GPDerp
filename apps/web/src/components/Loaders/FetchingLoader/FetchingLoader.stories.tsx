@@ -25,7 +25,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Frames 1 2 3 4 3 2 on repeat. */
+/** Frames 1 2 1 3 on repeat. */
 export const Default: Story = {};
 
 /** 500ms per frame: easy to check the order and that the feet stay on one baseline. */

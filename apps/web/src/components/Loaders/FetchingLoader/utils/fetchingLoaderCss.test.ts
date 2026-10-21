@@ -1,7 +1,13 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { FETCHING_LOADER_FRAMES, FETCHING_LOADER_SEQUENCE } from "../consts/fetchingLoaderConsts";
-import { buildFetchingLoaderStyle, FETCHING_LOADER_STAGE, fetchingFrameSlots, fetchingFrameStyle } from "./fetchingLoaderUtils";
+import {
+  buildFetchingLoaderStyle,
+  FETCHING_LOADER_STAGE,
+  fetchingFrameSlots,
+  fetchingFrameStyle,
+  fetchingShownFrames,
+} from "./fetchingLoaderUtils";
 
 const CSS = readFileSync(join(__dirname, "..", "FetchingLoader.module.css"), "utf8");
 
@@ -19,22 +25,28 @@ const opacityAt = (stops: Array<[number, number]>, percent: number) =>
   stops.filter(([stop]) => stop <= percent).at(-1)?.[1];
 
 describe("FetchingLoader.module.css", () => {
-  it("shows exactly the frame FETCHING_LOADER_SEQUENCE names in every slot (1 2 3 4 3 2)", () => {
+  it("shows exactly the frame FETCHING_LOADER_SEQUENCE names in every slot (1 2 1 3)", () => {
     const slotCount = FETCHING_LOADER_SEQUENCE.length;
-    FETCHING_LOADER_FRAMES.forEach((_, frameIndex) => {
-      const stops = keyframeStops(`fetchingFrame${frameIndex + 1}`);
+    for (const { index } of fetchingShownFrames()) {
+      const stops = keyframeStops(`fetchingFrame${index + 1}`);
       const shownIn = Array.from({ length: slotCount }, (_, slot) => slot).filter(
         (slot) => opacityAt(stops, ((slot + 0.5) / slotCount) * 100) === 1,
       );
-      expect(shownIn).toEqual(fetchingFrameSlots(frameIndex));
-    });
+      expect(shownIn).toEqual(fetchingFrameSlots(index));
+    }
+  });
+
+  it("has keyframes only for the frames the sequence shows", () => {
+    const names = [...CSS.matchAll(/@keyframes\s+(fetchingFrame\d+)/g)].map(([, name]) => name);
+    expect(names).toEqual(fetchingShownFrames().map(({ index }) => `fetchingFrame${index + 1}`));
   });
 });
 
 describe("fetchingLoaderUtils", () => {
-  it("plays the frames as a ping-pong loop", () => {
-    expect(FETCHING_LOADER_SEQUENCE.map((index) => index + 1)).toEqual([1, 2, 3, 4, 3, 2]);
-    expect(fetchingFrameSlots(1)).toEqual([1, 5]);
+  it("loops 1 2 1 3 and renders only frames 1-3", () => {
+    expect(FETCHING_LOADER_SEQUENCE.map((index) => index + 1)).toEqual([1, 2, 1, 3]);
+    expect(fetchingFrameSlots(0)).toEqual([0, 2]);
+    expect(fetchingShownFrames().map(({ index }) => index + 1)).toEqual([1, 2, 3]);
   });
 
   it("sizes the stage to the largest canvas and keeps every frame at the same scale", () => {
@@ -46,6 +58,6 @@ describe("fetchingLoaderUtils", () => {
   });
 
   it("runs one frameMs per slot", () => {
-    expect(buildFetchingLoaderStyle({ frameMs: 100 })).toMatchObject({ "--fetching-duration": "600ms" });
+    expect(buildFetchingLoaderStyle({ frameMs: 100 })).toMatchObject({ "--fetching-duration": "400ms" });
   });
 });

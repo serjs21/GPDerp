@@ -7,10 +7,11 @@ export const FETCHING_LOADER_FRAMES = [
 ] as const;
 
 /**
- * Frame shown in each slot of one loop (indexes into FETCHING_LOADER_FRAMES): 1 2 3 4 3 2, then 1 again.
- * The keyframes in FetchingLoader.module.css follow this; fetchingLoaderCss.test.ts fails if they drift.
+ * Frame shown in each slot of one loop (indexes into FETCHING_LOADER_FRAMES): 1 2 1 3, then 1 again.
+ * Only frames listed here are rendered. The keyframes in FetchingLoader.module.css follow this;
+ * fetchingLoaderCss.test.ts fails if they drift.
  */
-export const FETCHING_LOADER_SEQUENCE = [0, 1, 2, 3, 2, 1] as const;
+export const FETCHING_LOADER_SEQUENCE = [0, 1, 0, 2] as const;
 
 /** Frame shown alone under prefers-reduced-motion. */
 export const FETCHING_LOADER_REST_FRAME = 0;

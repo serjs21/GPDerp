@@ -30,6 +30,13 @@ export function fetchingFrameStyle(frame: Frame): CSSProperties {
   } as CSSProperties;
 }
 
+/** Frames the sequence actually shows, in FETCHING_LOADER_FRAMES order (unused frames aren't rendered). */
+export function fetchingShownFrames(): Array<{ frame: Frame; index: number }> {
+  return FETCHING_LOADER_FRAMES.flatMap((frame, index) =>
+    (FETCHING_LOADER_SEQUENCE as readonly number[]).includes(index) ? [{ frame, index }] : [],
+  );
+}
+
 /** Slots (0-based) of the loop in which `frameIndex` is shown. */
 export function fetchingFrameSlots(frameIndex: number): number[] {
   return FETCHING_LOADER_SEQUENCE.flatMap((shown, slot) => (shown === frameIndex ? [slot] : []));
