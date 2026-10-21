@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { ComicPageRow } from "@/components/ComicPageLayout";
-import { SakuraPetalLoader } from "@/components/Loaders";
+import { FetchingStaticLoader } from "@/components/Loaders/FetchingLoader";
 import { LabelPickerOption } from "./LabelPickerOption";
 import type { LabelPickerResultsProps } from "./LabelPickerResults.types";
 import { chunkRows } from "./utils/labelPickerUtils";
@@ -26,7 +26,7 @@ export function LabelPickerResults({
     <div className={styles.listScroll} onScroll={onScroll}>
       {loading ? (
         <div className={styles.loaderRow}>
-          <SakuraPetalLoader />
+          <FetchingStaticLoader />
         </div>
       ) : labels.length === 0 ? (
         <p className={styles.empty}>{t("empty")}</p>
@@ -49,7 +49,7 @@ export function LabelPickerResults({
       )}
       {fetchingNextPage ? (
         <div className={styles.nextPageRow}>
-          <SakuraPetalLoader />
+          <FetchingStaticLoader />
         </div>
       ) : null}
     </div>
