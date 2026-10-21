@@ -1,12 +1,15 @@
 import { useTranslations } from "next-intl";
-import { LANTERN_LOADER_ASSET } from "./consts/lanternLoaderConsts";
+import { LANTERN_LOADER_ASSET, LANTERN_LOADER_DOT_COUNT } from "./consts/lanternLoaderConsts";
 import type { LanternLoaderProps } from "./LanternLoader.types";
 import { buildLanternKeyframes, buildLanternStyle, lanternKeyframesName, resolveLanternProps } from "./utils/lanternLoaderUtils";
 import styles from "./LanternLoader.module.css";
 
+const DOT_INDEXES = Array.from({ length: LANTERN_LOADER_DOT_COUNT }, (_, index) => index);
+
 /**
  * Lantern that steps through a configurable list of still frames (rotation, x/y, scale, opacity), holding
- * each for `stepTransitionMs`, looping. CSS-only: the keyframes are generated from the steps, no timers.
+ * each for `stepTransitionMs`, looping, under a "Loading" caption that gains a dot per step.
+ * CSS-only: the keyframes are generated from the steps, no timers.
  */
 export function LanternLoader(props: LanternLoaderProps) {
   const t = useTranslations("Loaders.lanternLoader");
@@ -35,6 +38,14 @@ export function LanternLoader(props: LanternLoaderProps) {
         height={LANTERN_LOADER_ASSET.height}
         draggable={false}
       />
+      <span className={styles.text} aria-hidden>
+        {t("text")}
+        {DOT_INDEXES.map((index) => (
+          <span key={index} className={styles.dot}>
+            .
+          </span>
+        ))}
+      </span>
     </div>
   );
 }

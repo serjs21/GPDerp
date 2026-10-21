@@ -503,7 +503,8 @@
       "ariaLabel": "Loading"
     },
     "lanternLoader": {
-      "ariaLabel": "Loading"
+      "ariaLabel": "Loading",
+      "text": "Loading"
     }
   },
   "MfgDate": {

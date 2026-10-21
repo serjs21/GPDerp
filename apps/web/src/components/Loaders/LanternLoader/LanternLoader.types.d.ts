@@ -15,4 +15,10 @@ export type LanternLoaderProps = {
   steps?: readonly LanternLoaderStep[];
   /** How long each step holds before cutting to the next; one loop takes steps.length x stepTransitionMs. */
   stepTransitionMs?: number;
+  /** Center of the "Loading" text, in % of the lantern's width / height. */
+  textXPercent?: number;
+  textYPercent?: number;
+  /** Skew of the "Loading" text (CSS skew(x, y)). */
+  textSkewXDeg?: number;
+  textSkewYDeg?: number;
 };

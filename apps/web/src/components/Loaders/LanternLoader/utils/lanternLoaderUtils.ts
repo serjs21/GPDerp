@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { LANTERN_LOADER_ASSET, LANTERN_LOADER_DEFAULTS } from "../consts/lanternLoaderConsts";
+import { LANTERN_LOADER_ASSET, LANTERN_LOADER_DEFAULTS, LANTERN_LOADER_DOT_COUNT } from "../consts/lanternLoaderConsts";
 import type { LanternLoaderProps, LanternLoaderStep } from "../LanternLoader.types";
 
 type ResolvedLanternProps = Required<Omit<LanternLoaderProps, "className">>;
@@ -9,6 +9,10 @@ export function resolveLanternProps(props: LanternLoaderProps): ResolvedLanternP
     widthRem: props.widthRem ?? LANTERN_LOADER_DEFAULTS.widthRem,
     steps: props.steps ?? LANTERN_LOADER_DEFAULTS.steps,
     stepTransitionMs: props.stepTransitionMs ?? LANTERN_LOADER_DEFAULTS.stepTransitionMs,
+    textXPercent: props.textXPercent ?? LANTERN_LOADER_DEFAULTS.textXPercent,
+    textYPercent: props.textYPercent ?? LANTERN_LOADER_DEFAULTS.textYPercent,
+    textSkewXDeg: props.textSkewXDeg ?? LANTERN_LOADER_DEFAULTS.textSkewXDeg,
+    textSkewYDeg: props.textSkewYDeg ?? LANTERN_LOADER_DEFAULTS.textSkewYDeg,
   };
 }
 
@@ -43,5 +47,10 @@ export function buildLanternStyle(props: ResolvedLanternProps, keyframesName: st
     "--lantern-aspect": `${LANTERN_LOADER_ASSET.width} / ${LANTERN_LOADER_ASSET.height}`,
     "--lantern-animation-name": keyframesName ?? "none",
     "--lantern-duration": `${props.steps.length * props.stepTransitionMs}ms`,
+    "--lantern-dots-duration": `${(LANTERN_LOADER_DOT_COUNT + 1) * props.stepTransitionMs}ms`,
+    "--lantern-text-x": `${props.textXPercent}%`,
+    "--lantern-text-y": `${props.textYPercent}%`,
+    "--lantern-text-skew-x": `${props.textSkewXDeg}deg`,
+    "--lantern-text-skew-y": `${props.textSkewYDeg}deg`,
   } as CSSProperties;
 }

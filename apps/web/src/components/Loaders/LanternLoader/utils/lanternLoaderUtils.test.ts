@@ -41,6 +41,17 @@ describe("buildLanternStyle", () => {
     });
   });
 
+  it("adds one dot per step (3 dots + the bare word) and places / skews the text", () => {
+    const resolved = resolveLanternProps({ stepTransitionMs: 250, textXPercent: 40, textYPercent: 60, textSkewXDeg: -12, textSkewYDeg: 3 });
+    expect(buildLanternStyle(resolved, "lantern")).toMatchObject({
+      "--lantern-dots-duration": "1000ms",
+      "--lantern-text-x": "40%",
+      "--lantern-text-y": "60%",
+      "--lantern-text-skew-x": "-12deg",
+      "--lantern-text-skew-y": "3deg",
+    });
+  });
+
   it("falls back to the defaults and to no animation without a keyframes name", () => {
     const resolved = resolveLanternProps({});
     expect(resolved).toEqual(LANTERN_LOADER_DEFAULTS);

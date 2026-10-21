@@ -18,6 +18,10 @@ const meta = {
     widthRem: LANTERN_LOADER_DEFAULTS.widthRem,
     steps: LANTERN_LOADER_DEFAULTS.steps.map((step) => ({ ...step })),
     stepTransitionMs: LANTERN_LOADER_DEFAULTS.stepTransitionMs,
+    textXPercent: LANTERN_LOADER_DEFAULTS.textXPercent,
+    textYPercent: LANTERN_LOADER_DEFAULTS.textYPercent,
+    textSkewXDeg: LANTERN_LOADER_DEFAULTS.textSkewXDeg,
+    textSkewYDeg: LANTERN_LOADER_DEFAULTS.textSkewYDeg,
   },
   argTypes: {
     widthRem: { control: { type: "range", min: 2, max: 24, step: 0.5 } },
@@ -26,6 +30,10 @@ const meta = {
       description: "Poses in order: rotationDeg, xPercent / yPercent (of the lantern's size), scale, opacity.",
     },
     stepTransitionMs: { control: { type: "range", min: 20, max: 3000, step: 10 } },
+    textXPercent: { control: { type: "range", min: -50, max: 150, step: 0.5 } },
+    textYPercent: { control: { type: "range", min: -50, max: 150, step: 0.5 } },
+    textSkewXDeg: { control: { type: "range", min: -45, max: 45, step: 0.5 } },
+    textSkewYDeg: { control: { type: "range", min: -45, max: 45, step: 0.5 } },
     className: { control: false },
   },
 } satisfies Meta<typeof LanternLoader>;

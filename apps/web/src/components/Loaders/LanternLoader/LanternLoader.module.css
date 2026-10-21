@@ -16,8 +16,76 @@
   animation: var(--lantern-animation-name) var(--lantern-duration) step-end infinite;
 }
 
+/* Stays put while the lantern steps; a white outline keeps it readable over the line art. */
+.text {
+  position: absolute;
+  left: var(--lantern-text-x);
+  top: var(--lantern-text-y);
+  z-index: 1;
+  translate: -50% -50%;
+  transform: skew(var(--lantern-text-skew-x), var(--lantern-text-skew-y));
+  color: #181713;
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: calc(var(--lantern-width) * 0.22);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  white-space: nowrap;
+  -webkit-text-stroke: 0.12em #fff;
+  paint-order: stroke fill;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Dot n shows from step n of a (dots + 1)-step cycle; hidden dots keep their width so the text doesn't shift. */
+.dot {
+  animation: var(--lantern-dots-duration) step-end infinite;
+}
+
+.dot:nth-child(1) {
+  animation-name: lanternDot1;
+}
+
+.dot:nth-child(2) {
+  animation-name: lanternDot2;
+}
+
+.dot:nth-child(3) {
+  animation-name: lanternDot3;
+}
+
+@keyframes lanternDot1 {
+  0% {
+    opacity: 0;
+  }
+  25%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes lanternDot2 {
+  0% {
+    opacity: 0;
+  }
+  50%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes lanternDot3 {
+  0% {
+    opacity: 0;
+  }
+  75%,
+  100% {
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .lantern {
+  .lantern,
+  .dot {
     animation: none;
   }
 }
