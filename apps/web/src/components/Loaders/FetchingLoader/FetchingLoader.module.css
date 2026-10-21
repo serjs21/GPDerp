@@ -1,0 +1,82 @@
+.root {
+  position: relative;
+  display: inline-block;
+  width: var(--fetching-width);
+  aspect-ratio: var(--fetching-aspect);
+  line-height: 0;
+}
+
+/* Every frame keeps its natural size, anchored bottom-center so the feet stay on one baseline. */
+.frame {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  display: block;
+  width: var(--fetching-frame-width);
+  height: var(--fetching-frame-height);
+  translate: -50% 0;
+  opacity: 0;
+  user-select: none;
+  pointer-events: none;
+  animation: var(--fetching-duration) step-end infinite;
+}
+
+/*
+ * One loop = 6 equal slots showing frames 1 2 3 4 3 2 (FETCHING_LOADER_SEQUENCE); each frame is opaque
+ * only in its slots. step-end holds every frame for its whole slot (hard cuts, no cross-fade).
+ */
+.frame:nth-child(1) {
+  animation-name: fetchingFrame1;
+}
+
+.frame:nth-child(2) {
+  animation-name: fetchingFrame2;
+}
+
+.frame:nth-child(3) {
+  animation-name: fetchingFrame3;
+}
+
+.frame:nth-child(4) {
+  animation-name: fetchingFrame4;
+}
+
+@keyframes fetchingFrame1 {
+  0% { opacity: 1; }
+  16.667% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes fetchingFrame2 {
+  0% { opacity: 0; }
+  16.667% { opacity: 1; }
+  33.333% { opacity: 0; }
+  83.333% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+@keyframes fetchingFrame3 {
+  0% { opacity: 0; }
+  33.333% { opacity: 1; }
+  50% { opacity: 0; }
+  66.667% { opacity: 1; }
+  83.333% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes fetchingFrame4 {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  66.667% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frame {
+    animation: none;
+  }
+
+  .frame[data-rest] {
+    opacity: 1;
+  }
+}

@@ -507,6 +507,9 @@
     },
     "loadingText": {
       "text": "Loading"
+    },
+    "fetchingLoader": {
+      "ariaLabel": "Loading"
     }
   },
   "MfgDate": {
