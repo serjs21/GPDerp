@@ -149,7 +149,7 @@ async function mockApi(page: Page, { loggedIn }: { loggedIn: boolean }) {
   }
 }
 
-const loader = (page: Page) => page.locator(".scene-container");
+const loader = (page: Page) => page.locator("[data-html-loader]");
 const isRevealed = (page: Page) =>
   page.evaluate(() => document.documentElement.dataset.hydrated === "true");
 

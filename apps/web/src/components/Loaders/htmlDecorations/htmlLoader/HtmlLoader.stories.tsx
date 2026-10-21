@@ -14,5 +14,5 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Full-viewport Fuji scene used as the initial HTML shell loader. */
+/** Full-viewport comic page used as the initial HTML shell loader. */
 export const Default: Story = {};
