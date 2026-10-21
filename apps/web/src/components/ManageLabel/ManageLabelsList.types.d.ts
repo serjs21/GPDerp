@@ -1,4 +1,4 @@
-import type { UIEvent } from "react";
+import type { ReactNode, UIEvent } from "react";
 import type { LabelDto } from "@/api/labels";
 
 export type ManageLabelsListProps = {
@@ -14,4 +14,6 @@ export type ManageLabelsListProps = {
   onExitComplete: (labelId: string) => void;
   onEnterAnimationEnd: (labelId: string) => void;
   onScroll: (event: UIEvent<HTMLDivElement>) => void;
+  /** First-page and next-page loader; defaults to the sakura petal loader. */
+  loader?: ReactNode;
 };

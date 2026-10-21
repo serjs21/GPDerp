@@ -5,6 +5,7 @@ import { LABEL_SORT_DEFAULT_VALUE, type LabelSortValue } from "@/components/Labe
 import { withDefaults } from "@/utils/props/withDefaults";
 import { ManageLabelCreatePanel } from "./ManageLabelCreatePanel";
 import { ManageLabelsList } from "./ManageLabelsList";
+import type { ManageLabelsListProps } from "./ManageLabelsList.types";
 import { ManageLabelsSearch } from "./ManageLabelsSearch";
 import { ManageLabelsSortLayout } from "./ManageLabelsSortLayout";
 import { useLabelRowLifecycle } from "./useLabelRowLifecycle";
@@ -27,6 +28,8 @@ export type ManageLabelsPanelProps = {
   showSort?: boolean;
   /** When set, sort (rotated) + create render here instead of above the list. */
   sidePanelTarget?: HTMLElement | null;
+  /** List loader (first page and next page); defaults to the sakura petal loader. */
+  loader?: ManageLabelsListProps["loader"];
 };
 
 const MANAGE_LABELS_PANEL_DEFAULTS = {
@@ -59,18 +62,17 @@ export function ManageLabelsPanel(props: ManageLabelsPanelProps) {
   });
   const placement = labelSortPlacement(showSort, props.sidePanelTarget);
 
-  const createPanel =
-    showCreate && !pages.isPagedLoading ? (
-      <ManageLabelCreatePanel
-        accountId={accountId}
-        onCreated={(label) => {
-          rows.trackCreated(label.id);
-          pages.refresh();
-        }}
-        stretch={showSort}
-        className={CREATE_CLASS_BY_PLACEMENT[placement]}
-      />
-    ) : null;
+  const createPanel = showCreate ? (
+    <ManageLabelCreatePanel
+      accountId={accountId}
+      onCreated={(label) => {
+        rows.trackCreated(label.id);
+        pages.refresh();
+      }}
+      stretch={showSort}
+      className={CREATE_CLASS_BY_PLACEMENT[placement]}
+    />
+  ) : null;
 
   return (
     <div className={[styles.root, props.className].filter(Boolean).join(" ")}>
@@ -100,6 +102,7 @@ export function ManageLabelsPanel(props: ManageLabelsPanelProps) {
         onExitComplete={rows.handleExitComplete}
         onEnterAnimationEnd={rows.clearEnterAnimation}
         onScroll={pages.loadMoreNearEnd}
+        loader={props.loader}
       />
       {placement === "none" ? createPanel : null}
     </div>

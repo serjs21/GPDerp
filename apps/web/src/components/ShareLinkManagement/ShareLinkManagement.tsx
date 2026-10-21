@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useRef, type RefObject } from "react";
-import { SakuraPetalLoader } from "@/components/Loaders";
+import { FetchingStaticLoader } from "@/components/Loaders/FetchingLoader";
 import { ShareLinksSort } from "@/components/ShareLinksSort";
 import type { ShareLinkListItem } from "@/api/shareLinks";
 import { useEndOfContentScroll } from "@/hooks/useEndOfContentScroll";
@@ -40,7 +40,7 @@ function ShareLinkListBody({
   if (showCenterLoader) {
     return (
       <div className={styles.loaderRow}>
-        <SakuraPetalLoader />
+        <FetchingStaticLoader />
       </div>
     );
   }
@@ -67,7 +67,7 @@ function ShareLinkListBody({
       <div ref={sentinelRef} className={styles.sentinel} aria-hidden />
       {showBottomLoader ? (
         <div className={styles.loaderRow}>
-          <SakuraPetalLoader />
+          <FetchingStaticLoader />
         </div>
       ) : null}
     </>

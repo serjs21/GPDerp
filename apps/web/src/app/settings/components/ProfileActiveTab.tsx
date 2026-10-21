@@ -1,5 +1,6 @@
 "use client";
 
+import { FetchingStaticLoader } from "@/components/Loaders/FetchingLoader";
 import { ManageLabelsPanel } from "@/components/ManageLabel";
 import { ShareLinkManagement } from "@/components/ShareLinkManagement";
 import { ProfileInfoTab } from "./ProfileInfoTab";
@@ -21,6 +22,7 @@ export function ProfileActiveTab({ tab, labelsAccountId, searchQuery, sidePanelT
           showCreate
           showSort
           sidePanelTarget={sidePanelTarget}
+          loader={<FetchingStaticLoader />}
         />
       ) : null;
   }

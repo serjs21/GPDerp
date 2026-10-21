@@ -19,15 +19,14 @@ export function ManageLabelsList({
   onExitComplete,
   onEnterAnimationEnd,
   onScroll,
+  loader = <SakuraPetalLoader />,
 }: ManageLabelsListProps) {
   const t = useTranslations("ManageLabel.panel");
 
   if (loading) {
     return (
       <div className={styles.listScroll} onScroll={onScroll}>
-        <div className={styles.loaderRow}>
-          <SakuraPetalLoader />
-        </div>
+        <div className={styles.loaderRow}>{loader}</div>
       </div>
     );
   }
@@ -58,11 +57,7 @@ export function ManageLabelsList({
               />
             );
           })}
-          {fetchingNextPage ? (
-            <div className={styles.loaderRow}>
-              <SakuraPetalLoader />
-            </div>
-          ) : null}
+          {fetchingNextPage ? <div className={styles.loaderRow}>{loader}</div> : null}
         </>
       )}
     </div>

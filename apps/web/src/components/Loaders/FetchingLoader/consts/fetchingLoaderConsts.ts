@@ -3,7 +3,6 @@ export const FETCHING_LOADER_FRAMES = [
   { src: "/loader/fetching1.svg", width: 241, height: 124.53 },
   { src: "/loader/fetching2.svg", width: 240, height: 132.88 },
   { src: "/loader/fetching3.svg", width: 252, height: 127.2 },
-  { src: "/loader/fetching4.svg", width: 240, height: 130.22 },
 ] as const;
 
 /**
@@ -18,5 +17,5 @@ export const FETCHING_LOADER_REST_FRAME = 0;
 
 export const FETCHING_LOADER_DEFAULTS = {
   widthRem: 10,
-  frameMs: 110,
+  frameMs: 150,
 } as const;

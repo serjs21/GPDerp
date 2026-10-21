@@ -1,0 +1,43 @@
+/*
+ * FetchingLoader with FETCHING_LOADER_DEFAULTS fixed in CSS (no inline styles), generated from
+ * buildFetchingLoaderStyle / fetchingFrameStyle. fetchingStaticLoaderCss.test.ts fails if a default
+ * or frame size changes without this file.
+ */
+.defaults {
+  --fetching-width: 10rem;
+  --fetching-aspect: 252 / 132.88;
+  --fetching-duration: 600ms;
+}
+
+.frame1 {
+  --fetching-frame-width: 95.635%;
+  --fetching-frame-height: 93.716%;
+}
+
+.frame2 {
+  --fetching-frame-width: 95.238%;
+  --fetching-frame-height: 100%;
+}
+
+.frame3 {
+  --fetching-frame-width: 100%;
+  --fetching-frame-height: 95.725%;
+}
+
+/* Hand-written: loader above its caption. */
+.wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.caption {
+  margin: 0;
+  color: var(--comic-ink, #2d2d2d);
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: 1.35rem;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  white-space: nowrap;
+}
