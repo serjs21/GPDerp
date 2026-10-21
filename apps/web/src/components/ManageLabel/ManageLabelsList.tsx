@@ -1,17 +1,16 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { FetchEmptyState } from "@/components/FetchEmptyState";
 import { ManageLabel } from "./ManageLabel";
 import { ManageLabelsLoaderRow } from "./ManageLabelsLoaderRow";
 import type { ManageLabelsListProps } from "./ManageLabelsList.types";
 import styles from "./ManageLabelsPanel.module.css";
 
-/** Scrollable manage-label rows: first-page loader, empty copy, or rows plus a next-page loader. */
+/** Scrollable manage-label rows: first-page loader, empty state, or rows plus a next-page loader. */
 export function ManageLabelsList({
   loading,
   fetchingNextPage,
   labels,
-  hasQuery,
   enterDelays,
   exitingById,
   onChanged,
@@ -21,8 +20,6 @@ export function ManageLabelsList({
   onScroll,
   loaders,
 }: ManageLabelsListProps) {
-  const t = useTranslations("ManageLabel.panel");
-
   if (loading) {
     return (
       <div className={styles.listScroll} onScroll={onScroll}>
@@ -35,7 +32,7 @@ export function ManageLabelsList({
     <div className={styles.listScroll} onScroll={onScroll}>
       {labels.length === 0 ? (
         <div className={styles.emptyLayout}>
-          <p className={styles.empty}>{hasQuery ? t("noResults") : t("empty")}</p>
+          <FetchEmptyState />
         </div>
       ) : (
         <>

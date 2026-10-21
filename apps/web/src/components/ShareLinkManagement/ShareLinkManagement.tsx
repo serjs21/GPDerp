@@ -1,7 +1,7 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { useRef, type RefObject } from "react";
+import { FetchEmptyState } from "@/components/FetchEmptyState";
 import { FetchingStaticLoader } from "@/components/Loaders/FetchingLoader";
 import { ShareLinksSort } from "@/components/ShareLinksSort";
 import type { ShareLinkListItem } from "@/api/shareLinks";
@@ -36,7 +36,6 @@ function ShareLinkListBody({
   onChanged: () => void;
   sentinelRef: RefObject<HTMLDivElement | null>;
 }) {
-  const t = useTranslations("ShareLinkManagement.list");
   if (showCenterLoader) {
     return (
       <div className={styles.loaderRow}>
@@ -48,7 +47,7 @@ function ShareLinkListBody({
   return (
     <>
       {showEmpty ? (
-        <p className={styles.empty}>{t("empty")}</p>
+        <FetchEmptyState />
       ) : (
         items.map((link) => {
           const haikuId = link.sharedHaikuId;

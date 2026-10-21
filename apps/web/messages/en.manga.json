@@ -558,7 +558,6 @@
   "ComicLabelPickerPanel": {
     "filterPlaceholder": "Filter labels…",
     "filterAriaLabel": "Filter labels",
-    "empty": "No labels found. Calling out got no response.",
     "disabledAriaLabel": "{name} (already used in the other filter)"
   },
   "CreateAddLabelsModal": {
@@ -639,9 +638,7 @@
     },
     "panel": {
       "searchPlaceholder": "Search labels…",
-      "searchAriaLabel": "Search labels by name",
-      "noResults": "No labels found. Calling out got no response.",
-      "empty": "No labels yet. The world has not been named."
+      "searchAriaLabel": "Search labels by name"
     }
   },
   "HeaderHaikuTools": {
@@ -815,9 +812,7 @@
     }
   },
   "ShareLinkManagement": {
-    "list": {
-      "empty": "No share links found. No paths yet."
-    },
+    "list": {},
     "filters": {
       "groupAriaLabel": "Filter share links by status",
       "showTitle": "Show\n{title}",
@@ -895,5 +890,8 @@
       "days": "{count, plural, one {# day} other {# days}}",
       "months": "{count, plural, one {# month} other {# months}}"
     }
+  },
+  "FetchEmptyState": {
+    "caption": "There was nothing to fetch"
   }
 }

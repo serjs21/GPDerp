@@ -94,7 +94,6 @@ export function ManageLabelsPanel(props: ManageLabelsPanelProps) {
         loading={pages.isPagedLoading}
         fetchingNextPage={pages.isFetchingNextPage}
         labels={rows.displayLabels}
-        hasQuery={Boolean(search.resolvedQ)}
         enterDelays={rows.enterDelays}
         exitingById={rows.exitingById}
         onChanged={pages.refresh}

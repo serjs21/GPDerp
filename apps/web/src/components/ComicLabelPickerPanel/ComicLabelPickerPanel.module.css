@@ -60,17 +60,6 @@
   margin-top: 2rem;
 }
 
-.empty {
-  margin: 0;
-  padding: 1.5rem 0.75rem;
-  color: var(--comic-ink, #2d2d2d);
-  font-family: var(--font-lantern-script, cursive);
-  font-size: 1rem;
-  letter-spacing: 0.03em;
-  text-align: center;
-  opacity: 0.7;
-}
-
 .footerRow {
   flex: 0 0 auto;
   width: 100%;

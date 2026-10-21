@@ -5,8 +5,6 @@ export type ManageLabelsListProps = {
   loading: boolean;
   fetchingNextPage: boolean;
   labels: LabelDto[];
-  /** A search query is applied (empty copy says "no results" instead of "no labels"). */
-  hasQuery: boolean;
   enterDelays: Record<string, number>;
   exitingById: Record<string, LabelDto>;
   onChanged: () => void;

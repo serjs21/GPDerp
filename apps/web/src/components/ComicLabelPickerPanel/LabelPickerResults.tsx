@@ -1,7 +1,7 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { ComicPageRow } from "@/components/ComicPageLayout";
+import { FetchEmptyState } from "@/components/FetchEmptyState";
 import { FetchingStaticLoader } from "@/components/Loaders/FetchingLoader";
 import { LabelPickerOption } from "./LabelPickerOption";
 import type { LabelPickerResultsProps } from "./LabelPickerResults.types";
@@ -10,7 +10,7 @@ import styles from "./ComicLabelPickerPanel.module.css";
 
 const LABELS_PER_ROW = 3;
 
-/** Scrollable label grid: loader on first page, empty copy, then rows of options plus a next-page loader. */
+/** Scrollable label grid: loader on first page, empty state, then rows of options plus a next-page loader. */
 export function LabelPickerResults({
   loading,
   fetchingNextPage,
@@ -20,8 +20,6 @@ export function LabelPickerResults({
   onToggle,
   onScroll,
 }: LabelPickerResultsProps) {
-  const t = useTranslations("ComicLabelPickerPanel");
-
   return (
     <div className={styles.listScroll} onScroll={onScroll}>
       {loading ? (
@@ -29,7 +27,7 @@ export function LabelPickerResults({
           <FetchingStaticLoader className={styles.initialFetch} />
         </div>
       ) : labels.length === 0 ? (
-        <p className={styles.empty}>{t("empty")}</p>
+        <FetchEmptyState />
       ) : (
         <div className={styles.labelRows}>
           {chunkRows(labels, LABELS_PER_ROW).map((row, rowIndex) => (
