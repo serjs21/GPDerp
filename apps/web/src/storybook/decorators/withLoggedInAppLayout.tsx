@@ -85,9 +85,10 @@ function resolveInitialSlot(parameters: {
 /**
  * Logged-in app chrome for Storybook: auth + seeded haikus + header/footer
  * around CelestialAppShell (same layout as the live home page).
+ * `parameters.seedHaikus: false` skips the seed so the haiku list comes from the API (e.g. withMockApi).
  */
 export const withLoggedInAppLayout: Decorator = (Story, { parameters }) => {
-  const qc = seedLoggedInHaikus();
+  const qc = parameters.seedHaikus === false ? createStoryQueryClient() : seedLoggedInHaikus();
   const initialSlot = resolveInitialSlot(parameters);
 
   return (
