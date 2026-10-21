@@ -501,6 +501,9 @@
     },
     "wagTailLoader": {
       "ariaLabel": "Loading"
+    },
+    "lanternLoader": {
+      "ariaLabel": "Loading"
     }
   },
   "MfgDate": {

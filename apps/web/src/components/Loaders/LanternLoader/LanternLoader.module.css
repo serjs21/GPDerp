@@ -1,0 +1,23 @@
+.root {
+  position: relative;
+  display: inline-block;
+  width: var(--lantern-width);
+  aspect-ratio: var(--lantern-aspect);
+  line-height: 0;
+}
+
+/* Keyframes come from the step config (rendered next to the lantern); each segment eases on its own. */
+.lantern {
+  display: block;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  pointer-events: none;
+  animation: var(--lantern-animation-name) var(--lantern-duration) ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lantern {
+    animation: none;
+  }
+}
