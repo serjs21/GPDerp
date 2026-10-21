@@ -26,7 +26,7 @@ export function LabelPickerResults({
     <div className={styles.listScroll} onScroll={onScroll}>
       {loading ? (
         <div className={styles.loaderRow}>
-          <FetchingStaticLoader />
+          <FetchingStaticLoader className={styles.initialFetch} />
         </div>
       ) : labels.length === 0 ? (
         <p className={styles.empty}>{t("empty")}</p>
