@@ -1,6 +1,6 @@
-// Server-safe (no "use client"): rendered by the pre-hydration HtmlLoader and, on reveal, by HtmlLoaderPageFlip.
+// Server-safe (no "use client", no inline styles): rendered by the pre-hydration HtmlLoader.
 import { GoldenAgeTitle } from "@/components/GoldenAgeTitle";
-import { LANTERN_LOADER_DEFAULTS, LanternLoader } from "@/components/Loaders/LanternLoader";
+import { LANTERN_STATIC_TEXT_TIMING_CLASS, LanternStaticLoader } from "@/components/Loaders/LanternLoader";
 import { LoadingText } from "@/components/Loaders/LoadingText";
 import { WagTailStaticLoaderWithBackground } from "@/components/Loaders/WagTailLoader";
 import type { HtmlLoaderPageProps } from "./HtmlLoaderPage.types";
@@ -18,11 +18,11 @@ export function HtmlLoaderPage({ className }: HtmlLoaderPageProps) {
         </div>
         <div className={styles.loaderRow}>
           <div className={`${styles.panel} ${styles.lanternPanel}`}>
-            <LanternLoader className={styles.lantern} />
+            <LanternStaticLoader className={styles.lantern} />
           </div>
           <div className={`${styles.panel} ${styles.loaderPanel}`}>
             {/* Stands in for the lantern's caption when the lantern panel is hidden (small screens). */}
-            <LoadingText className={styles.panelLoadingText} stepMs={LANTERN_LOADER_DEFAULTS.stepTransitionMs} />
+            <LoadingText className={`${styles.panelLoadingText} ${LANTERN_STATIC_TEXT_TIMING_CLASS}`} />
             <WagTailStaticLoaderWithBackground />
           </div>
         </div>

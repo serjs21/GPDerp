@@ -18,7 +18,6 @@ import { NoCreditsLeftHost } from "@/components/NoCreditsLeft/NoCreditsLeftHost"
 import { PurchaseConfirmHost } from "@/components/NoCreditsLeft/PurchaseConfirmHost";
 import { ContinueGenerationOffer } from "@/components/NoCreditsLeft/ContinueGenerationOffer";
 import { GenerationCreditsSocket } from "@/hooks/useGenerationCreditsSocket";
-import { HtmlLoaderExit } from "@/components/Loaders/htmlDecorations/htmlLoader/HtmlLoaderExit";
 
 export interface LayoutProviderProps {
   children: React.ReactNode;
@@ -27,7 +26,7 @@ export interface LayoutProviderProps {
 
 export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps): React.JSX.Element => {
   const clientId = googleClientId || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-  const revealed = useMarkHydrated();
+  useMarkHydrated();
   useScrollTopOnRouteChange();
 
   const withAuthVerification = (
@@ -68,7 +67,6 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
 
   return (
     <GoogleOAuthAvailabilityProvider clientId={clientId}>
-      <HtmlLoaderExit revealed={revealed} />
       {withAuthVerification}
     </GoogleOAuthAvailabilityProvider>
   );

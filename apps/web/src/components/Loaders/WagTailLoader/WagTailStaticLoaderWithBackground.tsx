@@ -18,6 +18,7 @@ export function WagTailStaticLoaderWithBackground({ className }: WagTailStaticLo
           width={WAG_TAIL_ASSET_SIZES.background.width}
           height={WAG_TAIL_ASSET_SIZES.background.height}
           draggable={false}
+          fetchPriority="high"
         />
       }
     />

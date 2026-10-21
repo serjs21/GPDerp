@@ -13,7 +13,7 @@ export function LoadingText({ className, stepMs }: LoadingTextProps) {
   return (
     <span
       className={[styles.root, className].filter(Boolean).join(" ")}
-      style={buildLoadingTextStyle(stepMs)}
+      style={stepMs === undefined ? undefined : buildLoadingTextStyle(stepMs)}
       aria-hidden
     >
       {t("text")}

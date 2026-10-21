@@ -30,6 +30,7 @@ export function WagTailStaticLoader({ className, background }: WagTailStaticLoad
         width={WAG_TAIL_ASSET_SIZES.base.width}
         height={WAG_TAIL_ASSET_SIZES.base.height}
         draggable={false}
+        fetchPriority="high"
       />
       <span className={styles.anchor}>
         {COPY_CLASSES.map((copyClass, index) => (
@@ -43,6 +44,7 @@ export function WagTailStaticLoader({ className, background }: WagTailStaticLoad
             width={WAG_TAIL_ASSET_SIZES.tail.width}
             height={WAG_TAIL_ASSET_SIZES.tail.height}
             draggable={false}
+            fetchPriority="high"
           />
         ))}
         {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG in the pre-hydration loader */}
@@ -53,6 +55,7 @@ export function WagTailStaticLoader({ className, background }: WagTailStaticLoad
           width={WAG_TAIL_ASSET_SIZES.motionLines.width}
           height={WAG_TAIL_ASSET_SIZES.motionLines.height}
           draggable={false}
+          fetchPriority="high"
         />
       </span>
     </div>
