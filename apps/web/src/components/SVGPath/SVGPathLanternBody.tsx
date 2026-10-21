@@ -2,9 +2,8 @@
 
 import { memo } from "react";
 import { Lantern } from "@/components/Lantern/Lantern";
-import { SakuraPetalLoader } from "@/components/Loaders";
+import { WagTailLanternFace } from "@/components/Loaders";
 import type { SVGPathLanternBodyProps } from "./SVGPathLantern.types";
-import styles from "./SVGPath.module.css";
 
 /** Loader slot, generating draft, or saved haiku inside an upright path lantern. */
 export const SVGPathLanternBody = memo(function SVGPathLanternBody({
@@ -16,11 +15,7 @@ export const SVGPathLanternBody = memo(function SVGPathLanternBody({
   onChanged,
 }: SVGPathLanternBodyProps) {
   if (loading) {
-    return (
-      <div className={styles.lanternLoader}>
-        <SakuraPetalLoader compact />
-      </div>
-    );
+    return <WagTailLanternFace />;
   }
   if (generatingDraft) {
     return (

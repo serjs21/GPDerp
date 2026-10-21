@@ -82,6 +82,11 @@
   min-height: 18rem;
 }
 
+/* Same size as the lantern it stands in for, narrowed with the panel. */
+.lanternLoader {
+  --wag-lantern-width: min(var(--share-link-preview-lantern-width), 100%);
+}
+
 .empty {
   margin: 0;
   padding: 2rem 1rem;

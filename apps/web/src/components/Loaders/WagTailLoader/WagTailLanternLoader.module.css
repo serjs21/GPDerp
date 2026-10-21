@@ -1,0 +1,30 @@
+/* Sized by --wag-lantern-width; the face scales with it. */
+.root {
+  position: relative;
+  display: inline-block;
+  width: var(--wag-lantern-width, 11.5rem);
+  /* LANTERN_IMAGE_WIDTH / LANTERN_IMAGE_HEIGHT */
+  aspect-ratio: 368 / 391;
+  line-height: 0;
+}
+
+/* Same glow as Lantern's `.image`. */
+.lantern {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 0.55rem color-mix(in srgb, #f5ebe0 38%, transparent))
+    drop-shadow(0 0.35rem 0.9rem color-mix(in srgb, var(--sumi-ink, #1a1814) 28%, transparent));
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Lantern's text inset (`.content` in Lantern.module.css): the front panel of the lantern base. */
+.root .face {
+  position: absolute;
+  inset: 8% 10% 21%;
+  width: auto;
+  height: auto;
+}

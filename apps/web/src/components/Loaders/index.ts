@@ -1,4 +1,9 @@
 export { WritingLoader } from "./WritingLoader/WritingLoader";
 export { SakuraPetalLoader } from "./contentLoaders/SakuraPetalLoader";
 export { HtmlLoader } from "./htmlDecorations/htmlLoader";
-export { WagTailStaticLoader, WagTailStaticLoaderWithBackground } from "./WagTailLoader";
+export {
+  WagTailLanternFace,
+  WagTailLanternLoader,
+  WagTailStaticLoader,
+  WagTailStaticLoaderWithBackground,
+} from "./WagTailLoader";
