@@ -1,11 +1,13 @@
 // Server Component (no "use client") — pairs with MarkHydrated by reading html[data-hydrated="true"]
 import { GoldenAgeTitle } from "@/components/GoldenAgeTitle";
+import { LanternLoader } from "@/components/Loaders/LanternLoader";
 import { WagTailStaticLoaderWithBackground } from "@/components/Loaders/WagTailLoader";
 import styles from "./HtmlLoader.module.css";
 
 /**
- * Full-viewport comic page shown until first reveal: black-and-white masthead, wagging dog bottom right.
- * Plain markup and CSS only (no client components), so it paints from the initial HTML.
+ * Full-viewport comic page shown until first reveal: black-and-white masthead, swaying lantern on the
+ * left, wagging dog bottom right. Plain markup and CSS only (no client components), so it paints from
+ * the initial HTML.
  */
 export const HtmlLoader = () => {
   return (
@@ -18,7 +20,9 @@ export const HtmlLoader = () => {
             </div>
           </div>
           <div className={styles.loaderRow}>
-            <div className={`${styles.panel} ${styles.fillerPanel}`} />
+            <div className={`${styles.panel} ${styles.lanternPanel}`}>
+              <LanternLoader />
+            </div>
             <div className={`${styles.panel} ${styles.loaderPanel}`}>
               <WagTailStaticLoaderWithBackground />
             </div>

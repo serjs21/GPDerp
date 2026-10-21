@@ -9,10 +9,19 @@ export const LANTERN_LOADER_ASSET = {
 export const LANTERN_LOADER_DEFAULTS = {
   widthRem: 8,
   steps: [
-    { rotationDeg: -6, xPercent: 0, yPercent: 0, scale: 1, opacity: 1 },
-    { rotationDeg: 0, xPercent: 0, yPercent: -4, scale: 1.03, opacity: 0.85 },
-    { rotationDeg: 6, xPercent: 0, yPercent: 0, scale: 1, opacity: 1 },
-    { rotationDeg: 0, xPercent: 0, yPercent: -4, scale: 1.03, opacity: 0.85 },
+    { rotationDeg: 0, xPercent: 0, yPercent: 0, scale: 1, opacity: 1 },
+   
+    { rotationDeg: 4, xPercent: 0, yPercent: -2, scale: 1.03, opacity: 0.95 },
+    { rotationDeg: 6, xPercent: 0, yPercent: 0, scale: 1.06, opacity: 1 },
+    { rotationDeg: 3, xPercent: 0, yPercent: -2, scale: 1.04, opacity: 0.95 },
+    { rotationDeg: 2, xPercent: 0, yPercent: -2, scale: 1.02, opacity: 0.95 },
+
+    { rotationDeg: 0, xPercent: 0, yPercent: 0, scale: 1, opacity: 1 },
+
+    { rotationDeg: -2, xPercent: 0, yPercent: 0, scale: 0.97, opacity: 0.83 },
+    { rotationDeg: -5, xPercent: 0, yPercent: -2, scale: 0.94, opacity: 0.85 },
+    { rotationDeg: -3, xPercent: 0, yPercent: 0, scale: 0.95, opacity: 1 },
+    { rotationDeg: -1, xPercent: 0, yPercent: -2, scale: 0.96, opacity: 0.85 },
   ],
-  stepTransitionMs: 400,
+  stepTransitionMs: 500,
 } as const;
