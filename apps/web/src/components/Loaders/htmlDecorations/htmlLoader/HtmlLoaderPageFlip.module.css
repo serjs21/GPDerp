@@ -6,20 +6,21 @@
   overflow: hidden;
 }
 
+/* Two-page spread shifted one page left: the left page is off screen, the right page fills the viewport. */
 .book {
-  width: 100%;
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
   height: 100%;
 }
 
-/*
- * react-pageflip rewrites each page's inline style (display: block + pixel size), so the content fills it
- * by height. No background of its own: the original is hidden during the turn and must not cover the app.
- */
+/* react-pageflip rewrites each page's inline style (display: block + pixel size), so content fills it by height. */
 .pageContent {
   height: 100%;
 }
 
-/* Under the turning page: transparent, so the app shows through as the page lifts. */
+/* The off-screen left page and the page under the turn: transparent, so the app shows through. */
 .blankPage {
   background: transparent;
 }
