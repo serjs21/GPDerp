@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { LANTERN_LOADER_ASSET, LANTERN_LOADER_DEFAULTS, LANTERN_LOADER_DOT_COUNT } from "../consts/lanternLoaderConsts";
+import { LANTERN_LOADER_ASSET, LANTERN_LOADER_DEFAULTS } from "../consts/lanternLoaderConsts";
 import type { LanternLoaderProps, LanternLoaderStep } from "../LanternLoader.types";
 
 type ResolvedLanternProps = Required<Omit<LanternLoaderProps, "className">>;
@@ -47,7 +47,6 @@ export function buildLanternStyle(props: ResolvedLanternProps, keyframesName: st
     "--lantern-aspect": `${LANTERN_LOADER_ASSET.width} / ${LANTERN_LOADER_ASSET.height}`,
     "--lantern-animation-name": keyframesName ?? "none",
     "--lantern-duration": `${props.steps.length * props.stepTransitionMs}ms`,
-    "--lantern-dots-duration": `${(LANTERN_LOADER_DOT_COUNT + 1) * props.stepTransitionMs}ms`,
     "--lantern-text-x": `${props.textXPercent}%`,
     "--lantern-text-y": `${props.textYPercent}%`,
     "--lantern-text-skew-x": `${props.textSkewXDeg}deg`,

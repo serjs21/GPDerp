@@ -25,10 +25,7 @@ export const LANTERN_LOADER_DEFAULTS = {
   ],
   stepTransitionMs: 500,
   textXPercent: 50,
-  textYPercent: 115,
+  textYPercent: 135,
   textSkewXDeg: 0,
   textSkewYDeg: 0,
 } as const;
-
-/** "Loading" gains one dot per step up to this many, then starts over (fixed keyframes in the CSS module). */
-export const LANTERN_LOADER_DOT_COUNT = 3;

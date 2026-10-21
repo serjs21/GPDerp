@@ -1,0 +1,65 @@
+/* A white outline keeps it readable over line art. */
+.root {
+  color: #181713;
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  white-space: nowrap;
+  -webkit-text-stroke: 0.12em #fff;
+  paint-order: stroke fill;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Dot n shows from step n of a (dots + 1)-step cycle; hidden dots keep their width so the text doesn't shift. */
+.dot {
+  animation: var(--loading-text-dots-duration) step-end infinite;
+}
+
+.dot:nth-child(1) {
+  animation-name: loadingTextDot1;
+}
+
+.dot:nth-child(2) {
+  animation-name: loadingTextDot2;
+}
+
+.dot:nth-child(3) {
+  animation-name: loadingTextDot3;
+}
+
+@keyframes loadingTextDot1 {
+  0% {
+    opacity: 0;
+  }
+  25%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes loadingTextDot2 {
+  0% {
+    opacity: 0;
+  }
+  50%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes loadingTextDot3 {
+  0% {
+    opacity: 0;
+  }
+  75%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot {
+    animation: none;
+  }
+}

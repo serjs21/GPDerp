@@ -486,7 +486,9 @@
       "ariaLabel": "Loading"
     },
     "lanternLoader": {
-      "ariaLabel": "Loading",
+      "ariaLabel": "Loading"
+    },
+    "loadingText": {
       "text": "Loading"
     }
   },

@@ -1,10 +1,9 @@
 import { useTranslations } from "next-intl";
-import { LANTERN_LOADER_ASSET, LANTERN_LOADER_DOT_COUNT } from "./consts/lanternLoaderConsts";
+import { LoadingText } from "@/components/Loaders/LoadingText";
+import { LANTERN_LOADER_ASSET } from "./consts/lanternLoaderConsts";
 import type { LanternLoaderProps } from "./LanternLoader.types";
 import { buildLanternKeyframes, buildLanternStyle, lanternKeyframesName, resolveLanternProps } from "./utils/lanternLoaderUtils";
 import styles from "./LanternLoader.module.css";
-
-const DOT_INDEXES = Array.from({ length: LANTERN_LOADER_DOT_COUNT }, (_, index) => index);
 
 /**
  * Lantern that steps through a configurable list of still frames (rotation, x/y, scale, opacity), holding
@@ -38,14 +37,7 @@ export function LanternLoader(props: LanternLoaderProps) {
         height={LANTERN_LOADER_ASSET.height}
         draggable={false}
       />
-      <span className={styles.text} aria-hidden>
-        {t("text")}
-        {DOT_INDEXES.map((index) => (
-          <span key={index} className={styles.dot}>
-            .
-          </span>
-        ))}
-      </span>
+      <LoadingText className={styles.text} stepMs={resolved.stepTransitionMs} />
     </div>
   );
 }

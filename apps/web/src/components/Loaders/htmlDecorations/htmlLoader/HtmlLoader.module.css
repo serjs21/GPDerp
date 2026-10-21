@@ -89,11 +89,16 @@
 
 /* Sized to the dog, which sits in the bottom-right corner. */
 .loaderPanel {
+  position: relative;
   flex: 0 0 auto;
   align-items: flex-end;
   justify-content: flex-end;
   /* Room for the background art, which reaches past the dog's top-left corner and rotates. */
   padding: 3.75rem 1.25rem 1.25rem 3.75rem;
+}
+
+.panelLoadingText {
+  display: none;
 }
 
 @media (max-width: 480px) {
@@ -103,6 +108,15 @@
 
   .loaderPanel {
     flex: 1 1 auto;
+  }
+
+  .panelLoadingText {
+    position: absolute;
+    top: 3rem;
+    left: 50%;
+    display: block;
+    translate: -50% 0;
+    font-size: 2.5rem;
   }
 }
 

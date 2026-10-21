@@ -1,6 +1,7 @@
 // Server Component (no "use client") — pairs with MarkHydrated by reading html[data-hydrated="true"]
 import { GoldenAgeTitle } from "@/components/GoldenAgeTitle";
-import { LanternLoader } from "@/components/Loaders/LanternLoader";
+import { LANTERN_LOADER_DEFAULTS, LanternLoader } from "@/components/Loaders/LanternLoader";
+import { LoadingText } from "@/components/Loaders/LoadingText";
 import { WagTailStaticLoaderWithBackground } from "@/components/Loaders/WagTailLoader";
 import styles from "./HtmlLoader.module.css";
 
@@ -24,6 +25,8 @@ export const HtmlLoader = () => {
               <LanternLoader className={styles.lantern} />
             </div>
             <div className={`${styles.panel} ${styles.loaderPanel}`}>
+              {/* Stands in for the lantern's caption when the lantern panel is hidden (small screens). */}
+              <LoadingText className={styles.panelLoadingText} stepMs={LANTERN_LOADER_DEFAULTS.stepTransitionMs} />
               <WagTailStaticLoaderWithBackground />
             </div>
           </div>

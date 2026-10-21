@@ -41,10 +41,9 @@ describe("buildLanternStyle", () => {
     });
   });
 
-  it("adds one dot per step (3 dots + the bare word) and places / skews the text", () => {
-    const resolved = resolveLanternProps({ stepTransitionMs: 250, textXPercent: 40, textYPercent: 60, textSkewXDeg: -12, textSkewYDeg: 3 });
+  it("places and skews the text", () => {
+    const resolved = resolveLanternProps({ textXPercent: 40, textYPercent: 60, textSkewXDeg: -12, textSkewYDeg: 3 });
     expect(buildLanternStyle(resolved, "lantern")).toMatchObject({
-      "--lantern-dots-duration": "1000ms",
       "--lantern-text-x": "40%",
       "--lantern-text-y": "60%",
       "--lantern-text-skew-x": "-12deg",
