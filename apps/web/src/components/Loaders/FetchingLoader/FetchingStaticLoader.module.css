@@ -33,6 +33,9 @@
 }
 
 .caption {
+  /* FETCHING_LOADER_DOT_COUNT x FETCHING_LOADER_DOT_STEP_MS (checked by fetchingStaticLoaderCss.test.ts). */
+  --fetching-dots-duration: 1200ms;
+
   margin: 0;
   color: var(--comic-ink, #2d2d2d);
   font-family: var(--font-comic-label), "Bangers", sans-serif;
@@ -40,4 +43,31 @@
   letter-spacing: 0.06em;
   line-height: 1;
   white-space: nowrap;
+}
+
+/* . -> .. -> ... : dot n shows from step n of the cycle; hidden dots keep their width so the word stays put. */
+.dot:nth-of-type(2) {
+  animation: fetchingDot2 var(--fetching-dots-duration) step-end infinite;
+}
+
+.dot:nth-of-type(3) {
+  animation: fetchingDot3 var(--fetching-dots-duration) step-end infinite;
+}
+
+@keyframes fetchingDot2 {
+  0% { opacity: 0; }
+  33.333% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+@keyframes fetchingDot3 {
+  0% { opacity: 0; }
+  66.667% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot {
+    animation: none;
+  }
 }

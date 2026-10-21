@@ -22,3 +22,7 @@ export const FETCHING_LOADER_DEFAULTS = {
   widthRem: 10,
   frameMs: 150,
 } as const;
+
+/** "Fetching" caption dots: . -> .. -> ... then back to ., one step each (FetchingStaticLoader.module.css). */
+export const FETCHING_LOADER_DOT_COUNT = 3;
+export const FETCHING_LOADER_DOT_STEP_MS = 400;

@@ -510,7 +510,7 @@
     },
     "fetchingLoader": {
       "ariaLabel": "Loading",
-      "text": "Fetching..."
+      "text": "Fetching"
     }
   },
   "MfgDate": {
