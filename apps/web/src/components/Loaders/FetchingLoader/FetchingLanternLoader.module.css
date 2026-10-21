@@ -1,8 +1,8 @@
-/* Sized by --wag-lantern-width; the face scales with it. */
+/* Sized by --fetching-lantern-width; the face scales with it. */
 .root {
   position: relative;
   display: inline-block;
-  width: var(--wag-lantern-width, 11.5rem);
+  width: var(--fetching-lantern-width, 11.5rem);
   /* LANTERN_IMAGE_WIDTH / LANTERN_IMAGE_HEIGHT */
   aspect-ratio: 368 / 391;
   line-height: 0;

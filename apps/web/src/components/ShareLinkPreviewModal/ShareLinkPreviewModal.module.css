@@ -84,7 +84,7 @@
 
 /* Same size as the lantern it stands in for, narrowed with the panel. */
 .lanternLoader {
-  --wag-lantern-width: min(var(--share-link-preview-lantern-width), 100%);
+  --fetching-lantern-width: min(var(--share-link-preview-lantern-width), 100%);
 }
 
 .empty {

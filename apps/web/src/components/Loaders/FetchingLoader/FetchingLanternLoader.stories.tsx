@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import type { CSSProperties } from "react";
-import { WagTailLanternLoader } from "./WagTailLanternLoader";
+import { FetchingLanternLoader } from "./FetchingLanternLoader";
 
 const STAGE_STYLE = { padding: "3rem", background: "#2b3150" } as const;
 const ROW_STYLE = { display: "flex", gap: "3rem", alignItems: "flex-end", flexWrap: "wrap" } as const;
 
-const sized = (width: string) => ({ "--wag-lantern-width": width }) as CSSProperties;
+const sized = (width: string) => ({ "--fetching-lantern-width": width }) as CSSProperties;
 
 const meta = {
-  title: "Loaders/WagTailLanternLoader",
-  component: WagTailLanternLoader,
+  title: "Loaders/FetchingLanternLoader",
+  component: FetchingLanternLoader,
   parameters: { layout: "centered" },
   decorators: [
     (Story) => (
@@ -18,7 +18,7 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof WagTailLanternLoader>;
+} satisfies Meta<typeof FetchingLanternLoader>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -26,13 +26,13 @@ type Story = StoryObj<typeof meta>;
 /** Default size (Lantern's default width). */
 export const Default: Story = {};
 
-/** Everything scales with --wag-lantern-width: path slot, default, share link preview. */
+/** Everything scales with --fetching-lantern-width: small, default, share link preview, path focus lantern. */
 export const Sizes: Story = {
   render: () => (
     <div style={ROW_STYLE}>
-      {["7rem", "11.5rem", "17.5rem"].map((width) => (
+      {["7rem", "11.5rem", "17.5rem", "19rem"].map((width) => (
         <div key={width} style={sized(width)}>
-          <WagTailLanternLoader />
+          <FetchingLanternLoader />
         </div>
       ))}
     </div>

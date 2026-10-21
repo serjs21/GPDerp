@@ -1,7 +1,7 @@
 "use client";
 
 import { LanternRotatedShell } from "@/components/Lantern/LanternRotatedShell";
-import { WagTailLanternFace } from "@/components/Loaders";
+import { FetchingLanternFace } from "@/components/Loaders/FetchingLoader";
 import { ROTATED_PATH_LANTERN_STYLE, SVG_PATH_LANTERN_WIDTH_REM } from "./consts/pathLanternLayoutConsts";
 import { RotatedPathAnchor } from "./RotatedPathAnchor";
 import type { RotatedLoadingPathLanternProps } from "./SVGPathLantern.types";
@@ -28,7 +28,7 @@ export function RotatedLoadingPathLantern({
         style={ROTATED_PATH_LANTERN_STYLE}
         ariaLabel={ariaLabel}
       >
-        <WagTailLanternFace />
+        <FetchingLanternFace />
       </LanternRotatedShell>
     </RotatedPathAnchor>
   );

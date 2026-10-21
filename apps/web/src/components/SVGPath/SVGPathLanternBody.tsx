@@ -2,7 +2,7 @@
 
 import { memo } from "react";
 import { Lantern } from "@/components/Lantern/Lantern";
-import { WagTailLanternFace } from "@/components/Loaders";
+import { FetchingLanternFace } from "@/components/Loaders/FetchingLoader";
 import type { SVGPathLanternBodyProps } from "./SVGPathLantern.types";
 
 /** Loader slot, generating draft, or saved haiku inside an upright path lantern. */
@@ -15,7 +15,7 @@ export const SVGPathLanternBody = memo(function SVGPathLanternBody({
   onChanged,
 }: SVGPathLanternBodyProps) {
   if (loading) {
-    return <WagTailLanternFace />;
+    return <FetchingLanternFace />;
   }
   if (generatingDraft) {
     return (
