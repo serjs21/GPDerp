@@ -76,7 +76,7 @@
 
 .lanternPanel {
   flex: 1 1 0;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   container-type: size;
 }
@@ -84,7 +84,7 @@
 /* Half the panel: 50% of its width or of its height, whichever is tighter for the lantern's aspect ratio. */
 .lanternPanel .lantern {
   width: min(50cqw, calc(50cqh * var(--lantern-aspect)));
-  margin-top: -3rem;
+  margin-top: 3rem;
 }
 
 /* Sized to the dog, which sits in the bottom-right corner. */
