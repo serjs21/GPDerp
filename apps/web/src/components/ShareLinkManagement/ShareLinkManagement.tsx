@@ -40,7 +40,7 @@ function ShareLinkListBody({
   if (showCenterLoader) {
     return (
       <div className={styles.loaderRow}>
-        <FetchingStaticLoader />
+        <FetchingStaticLoader className={styles.initialFetch} />
       </div>
     );
   }
@@ -67,7 +67,7 @@ function ShareLinkListBody({
       <div ref={sentinelRef} className={styles.sentinel} aria-hidden />
       {showBottomLoader ? (
         <div className={styles.loaderRow}>
-          <FetchingStaticLoader />
+          <FetchingStaticLoader className={styles.nextPageFetch} />
         </div>
       ) : null}
     </>

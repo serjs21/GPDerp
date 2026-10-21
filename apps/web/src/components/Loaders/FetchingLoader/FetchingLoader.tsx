@@ -1,7 +1,12 @@
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { FETCHING_LOADER_REST_FRAME } from "./consts/fetchingLoaderConsts";
 import type { FetchingLoaderProps } from "./FetchingLoader.types";
-import { buildFetchingLoaderStyle, fetchingFrameStyle, fetchingShownFrames } from "./utils/fetchingLoaderUtils";
+import {
+  buildFetchingLoaderStyle,
+  fetchingFrameStyle,
+  fetchingMirroredAttr,
+  fetchingShownFrames,
+} from "./utils/fetchingLoaderUtils";
 import styles from "./FetchingLoader.module.css";
 
 const SHOWN_FRAMES = fetchingShownFrames();
@@ -12,11 +17,13 @@ const SHOWN_FRAMES = fetchingShownFrames();
  */
 export function FetchingLoader(props: FetchingLoaderProps) {
   const t = useTranslations("Loaders.fetchingLoader");
+  const locale = useLocale();
 
   return (
     <div
       className={[styles.root, props.className].filter(Boolean).join(" ")}
       style={buildFetchingLoaderStyle(props)}
+      data-mirrored={fetchingMirroredAttr(locale)}
       role="status"
       aria-label={t("ariaLabel")}
     >

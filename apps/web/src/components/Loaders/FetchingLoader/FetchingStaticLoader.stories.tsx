@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { NextIntlClientProvider } from "next-intl";
+import enMessages from "../../../../messages/en.json";
 import { FetchingLoader } from "./FetchingLoader";
 import { FetchingStaticLoader } from "./FetchingStaticLoader";
 
@@ -24,6 +26,17 @@ type Story = StoryObj<typeof meta>;
 
 /** Defaults fixed in CSS (no inline styles) with the localized "Fetching..." caption; used by the settings lists. */
 export const Default: Story = {};
+
+/** `ja` locale: the dog runs right-to-left (frames mirrored; the caption is not). */
+export const Japanese: Story = {
+  decorators: [
+    (Story) => (
+      <NextIntlClientProvider locale="ja" messages={enMessages}>
+        <Story />
+      </NextIntlClientProvider>
+    ),
+  ],
+};
 
 /** Static version next to the configurable loader on its defaults: the dog should run identically. */
 export const ParityWithConfigurable: Story = {

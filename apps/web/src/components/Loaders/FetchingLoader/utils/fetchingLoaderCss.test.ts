@@ -6,6 +6,7 @@ import {
   FETCHING_LOADER_STAGE,
   fetchingFrameSlots,
   fetchingFrameStyle,
+  fetchingMirroredAttr,
   fetchingShownFrames,
 } from "./fetchingLoaderUtils";
 
@@ -55,6 +56,11 @@ describe("fetchingLoaderUtils", () => {
       "--fetching-frame-width": "100%",
       "--fetching-frame-height": "95.725%",
     });
+  });
+
+  it("mirrors the frames only for the Japanese locale", () => {
+    expect(fetchingMirroredAttr("ja")).toBe(true);
+    expect(fetchingMirroredAttr("en")).toBeUndefined();
   });
 
   it("runs one frameMs per slot", () => {

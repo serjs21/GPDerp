@@ -1,8 +1,8 @@
 // Server-safe (no "use client", no inline styles): defaults fixed in FetchingStaticLoader.module.css.
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { FETCHING_LOADER_REST_FRAME } from "./consts/fetchingLoaderConsts";
 import type { FetchingStaticLoaderProps } from "./FetchingStaticLoader.types";
-import { fetchingShownFrames } from "./utils/fetchingLoaderUtils";
+import { fetchingMirroredAttr, fetchingShownFrames } from "./utils/fetchingLoaderUtils";
 import styles from "./FetchingLoader.module.css";
 import staticStyles from "./FetchingStaticLoader.module.css";
 
@@ -11,10 +11,11 @@ const SHOWN_FRAMES = fetchingShownFrames();
 /** FetchingLoader on its defaults (same frames and keyframes) above a "Fetching..." caption. */
 export function FetchingStaticLoader({ className }: FetchingStaticLoaderProps) {
   const t = useTranslations("Loaders.fetchingLoader");
+  const locale = useLocale();
 
   return (
     <div className={[staticStyles.wrap, className].filter(Boolean).join(" ")} role="status">
-      <div className={`${styles.root} ${staticStyles.defaults}`} aria-hidden>
+      <div className={`${styles.root} ${staticStyles.defaults}`} data-mirrored={fetchingMirroredAttr(locale)} aria-hidden>
         {SHOWN_FRAMES.map(({ frame, index }) => (
           // eslint-disable-next-line @next/next/no-img-element -- static public SVG frames
           <img

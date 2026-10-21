@@ -28,8 +28,8 @@ export type ManageLabelsPanelProps = {
   showSort?: boolean;
   /** When set, sort (rotated) + create render here instead of above the list. */
   sidePanelTarget?: HTMLElement | null;
-  /** List loader (first page and next page); defaults to the sakura petal loader. */
-  loader?: ManageLabelsListProps["loader"];
+  /** List loaders (first page, next page); each defaults to the sakura petal loader. */
+  loaders?: ManageLabelsListProps["loaders"];
 };
 
 const MANAGE_LABELS_PANEL_DEFAULTS = {
@@ -102,7 +102,7 @@ export function ManageLabelsPanel(props: ManageLabelsPanelProps) {
         onExitComplete={rows.handleExitComplete}
         onEnterAnimationEnd={rows.clearEnterAnimation}
         onScroll={pages.loadMoreNearEnd}
-        loader={props.loader}
+        loaders={props.loaders}
       />
       {placement === "none" ? createPanel : null}
     </div>

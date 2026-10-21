@@ -19,14 +19,14 @@ export function ManageLabelsList({
   onExitComplete,
   onEnterAnimationEnd,
   onScroll,
-  loader,
+  loaders,
 }: ManageLabelsListProps) {
   const t = useTranslations("ManageLabel.panel");
 
   if (loading) {
     return (
       <div className={styles.listScroll} onScroll={onScroll}>
-        <ManageLabelsLoaderRow loader={loader} />
+        <ManageLabelsLoaderRow loaders={loaders} kind="initial" />
       </div>
     );
   }
@@ -57,7 +57,7 @@ export function ManageLabelsList({
               />
             );
           })}
-          {fetchingNextPage ? <ManageLabelsLoaderRow loader={loader} /> : null}
+          {fetchingNextPage ? <ManageLabelsLoaderRow loaders={loaders} kind="nextPage" /> : null}
         </>
       )}
     </div>

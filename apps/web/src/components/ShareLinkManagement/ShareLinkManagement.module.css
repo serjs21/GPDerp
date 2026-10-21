@@ -63,6 +63,16 @@
   padding: 1rem;
 }
 
+/* Fetching loader on the empty list (first load / filter change). */
+.initialFetch {
+  margin-top: 5rem;
+}
+
+/* Fetching loader under the rows while the next page loads. */
+.nextPageFetch {
+  margin-top: 2rem;
+}
+
 .empty {
   margin: 0;
   padding: 1rem 0.5rem;

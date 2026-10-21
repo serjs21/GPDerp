@@ -14,6 +14,11 @@ export type ManageLabelsListProps = {
   onExitComplete: (labelId: string) => void;
   onEnterAnimationEnd: (labelId: string) => void;
   onScroll: (event: UIEvent<HTMLDivElement>) => void;
-  /** First-page and next-page loader; defaults to the sakura petal loader. */
-  loader?: ReactNode;
+  /** First-page / next-page loaders; each defaults to the sakura petal loader. */
+  loaders?: ManageLabelsListLoaders;
+};
+
+export type ManageLabelsListLoaders = {
+  initial?: ReactNode;
+  nextPage?: ReactNode;
 };

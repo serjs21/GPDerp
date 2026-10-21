@@ -141,3 +141,12 @@
     height: 100%;
   }
 }
+
+/* Labels tab: fetching loader on the empty list, and under the rows while the next page loads. */
+.initialFetch {
+  margin-top: 5rem;
+}
+
+.nextPageFetch {
+  margin-top: 2rem;
+}

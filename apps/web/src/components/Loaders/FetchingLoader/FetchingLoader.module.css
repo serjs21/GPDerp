@@ -21,6 +21,11 @@
   animation: var(--fetching-duration) step-end infinite;
 }
 
+/* Japanese locale: the dog runs right-to-left (individual `scale` composes with the centering translate). */
+.root[data-mirrored] .frame {
+  scale: -1 1;
+}
+
 /*
  * One loop = 4 equal slots showing frames 1 2 1 3 (FETCHING_LOADER_SEQUENCE); each frame is opaque
  * only in its slots. step-end holds every frame for its whole slot (hard cuts, no cross-fade).

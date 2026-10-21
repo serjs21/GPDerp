@@ -1,5 +1,10 @@
 import type { CSSProperties } from "react";
-import { FETCHING_LOADER_DEFAULTS, FETCHING_LOADER_FRAMES, FETCHING_LOADER_SEQUENCE } from "../consts/fetchingLoaderConsts";
+import {
+  FETCHING_LOADER_DEFAULTS,
+  FETCHING_LOADER_FRAMES,
+  FETCHING_LOADER_MIRRORED_LOCALES,
+  FETCHING_LOADER_SEQUENCE,
+} from "../consts/fetchingLoaderConsts";
 import type { FetchingLoaderProps } from "../FetchingLoader.types";
 
 type Frame = (typeof FETCHING_LOADER_FRAMES)[number];
@@ -35,6 +40,11 @@ export function fetchingShownFrames(): Array<{ frame: Frame; index: number }> {
   return FETCHING_LOADER_FRAMES.flatMap((frame, index) =>
     (FETCHING_LOADER_SEQUENCE as readonly number[]).includes(index) ? [{ frame, index }] : [],
   );
+}
+
+/** `data-mirrored` value for the stage: set (frames flipped) in FETCHING_LOADER_MIRRORED_LOCALES. */
+export function fetchingMirroredAttr(locale: string): true | undefined {
+  return FETCHING_LOADER_MIRRORED_LOCALES.includes(locale) || undefined;
 }
 
 /** Slots (0-based) of the loop in which `frameIndex` is shown. */

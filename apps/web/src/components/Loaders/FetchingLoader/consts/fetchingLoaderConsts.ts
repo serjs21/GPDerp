@@ -12,6 +12,9 @@ export const FETCHING_LOADER_FRAMES = [
  */
 export const FETCHING_LOADER_SEQUENCE = [0, 1, 0, 2] as const;
 
+/** Locales where the dog runs the other way (frames mirrored horizontally). */
+export const FETCHING_LOADER_MIRRORED_LOCALES: readonly string[] = ["ja"];
+
 /** Frame shown alone under prefers-reduced-motion. */
 export const FETCHING_LOADER_REST_FRAME = 0;
 

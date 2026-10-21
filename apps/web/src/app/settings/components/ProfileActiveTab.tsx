@@ -5,6 +5,7 @@ import { ManageLabelsPanel } from "@/components/ManageLabel";
 import { ShareLinkManagement } from "@/components/ShareLinkManagement";
 import { ProfileInfoTab } from "./ProfileInfoTab";
 import type { ProfileActiveTabProps } from "./ProfileTabContent.types";
+import styles from "../profilePage.module.css";
 
 export function ProfileActiveTab({ tab, labelsAccountId, searchQuery, sidePanelTarget }: ProfileActiveTabProps) {
   switch (tab) {
@@ -22,7 +23,10 @@ export function ProfileActiveTab({ tab, labelsAccountId, searchQuery, sidePanelT
           showCreate
           showSort
           sidePanelTarget={sidePanelTarget}
-          loader={<FetchingStaticLoader />}
+          loaders={{
+            initial: <FetchingStaticLoader className={styles.initialFetch} />,
+            nextPage: <FetchingStaticLoader className={styles.nextPageFetch} />,
+          }}
         />
       ) : null;
   }
