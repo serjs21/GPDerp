@@ -2,12 +2,13 @@
 
 import { Lantern } from "@/components/Lantern/Lantern";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
-import { SVG_PATH_LANTERN_WIDTH_REM } from "./consts/pathLanternLayoutConsts";
+import { ROTATED_PATH_LANTERN_STYLE, SVG_PATH_LANTERN_WIDTH_REM } from "./consts/pathLanternLayoutConsts";
+import { RotatedLoadingPathLantern } from "./RotatedLoadingPathLantern";
 import { RotatedPathAnchor } from "./RotatedPathAnchor";
 import type { GeneratingPathLanternProps } from "./SVGPathLantern.types";
 import { SVGPathLanternBody } from "./SVGPathLanternBody";
 
-/** Unsaved path lantern: a streaming draft (rotated or upright) or a loading slot. */
+/** Unsaved path lantern: a streaming draft or a loading slot, each rotated or upright. */
 export function GeneratingPathLantern({
   generatingDraft,
   loading,
@@ -33,9 +34,20 @@ export function GeneratingPathLantern({
           mirrored={face.mirrored}
           showActions={showActions}
           widthRem={SVG_PATH_LANTERN_WIDTH_REM}
-          style={{ width: "100%", height: "100%", animation: "none" }}
+          style={ROTATED_PATH_LANTERN_STYLE}
         />
       </RotatedPathAnchor>
+    );
+  }
+  if (face.kind === "rotated" && loading) {
+    return (
+      <RotatedLoadingPathLantern
+        transform={transform}
+        face={face}
+        suppressReveal={suppressReveal}
+        isAnimating={isAnimating}
+        ariaLabel={ariaLabel}
+      />
     );
   }
 

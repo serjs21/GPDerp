@@ -1,3 +1,11 @@
+import type { CSSProperties } from "react";
+import { SVG_PATH_LANTERN_WIDTH_REM } from "@/components/SVGPath";
+
+/** Loader lantern at the size of the path's first (focused, unscaled) lantern. */
+export function savedHaikusPathLoaderStyle(): CSSProperties {
+  return { "--wag-lantern-width": `${SVG_PATH_LANTERN_WIDTH_REM}rem` } as CSSProperties;
+}
+
 export type HaikuPaging = {
   hasNextPage: boolean;
   isFetchingNextPage: boolean;

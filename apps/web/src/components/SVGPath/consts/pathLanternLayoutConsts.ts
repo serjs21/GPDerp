@@ -3,6 +3,9 @@ import type { LanternTransform } from "@/components/Lantern/lanternTransform";
 /** Path lantern display width — shared by SVGPath list, creation overlay, and CreationModal. */
 export const SVG_PATH_LANTERN_WIDTH_REM = 19;
 
+/** Rotated lantern filling its RotatedPathAnchor; the anchor owns entrance motion. */
+export const ROTATED_PATH_LANTERN_STYLE = { width: "100%", height: "100%", animation: "none" } as const;
+
 /** Authored stop-20 in `split_path_colored_stops.svg` (viewBox 1920×1080). */
 export const SVG_PATH_DEFAULT_STOP = {
   cx: 960.03,

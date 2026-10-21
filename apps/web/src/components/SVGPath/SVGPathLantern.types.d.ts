@@ -94,6 +94,13 @@ export type SavedPathLanternProps = PathLanternResolved &
     loading: boolean;
   };
 
+export type RotatedLoadingPathLanternProps = Pick<
+  PathLanternResolved,
+  "transform" | "suppressReveal" | "isAnimating" | "ariaLabel"
+> & {
+  face: RotatedStopFace;
+};
+
 export type GeneratingPathLanternProps = PathLanternResolved & {
   generatingDraft: GeneratingDraft | null | undefined;
   loading: boolean;

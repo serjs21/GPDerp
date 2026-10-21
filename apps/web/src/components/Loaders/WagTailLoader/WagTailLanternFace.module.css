@@ -17,7 +17,7 @@
  * fails if they drift. `--wag-width` resolves against the panel (.root), the rest against the dog.
  */
 .root .dog {
-  --wag-width: 65cqw;
+  --wag-width: 44cqw;
   --wag-tail-width: 17cqw;
   --wag-lines-x: -4.5cqw;
   --wag-lines-y: 1.5cqw;
