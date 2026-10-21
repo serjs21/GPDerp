@@ -1,8 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { SakuraPetalLoader } from "@/components/Loaders";
 import { ManageLabel } from "./ManageLabel";
+import { ManageLabelsLoaderRow } from "./ManageLabelsLoaderRow";
 import type { ManageLabelsListProps } from "./ManageLabelsList.types";
 import styles from "./ManageLabelsPanel.module.css";
 
@@ -19,14 +19,14 @@ export function ManageLabelsList({
   onExitComplete,
   onEnterAnimationEnd,
   onScroll,
-  loader = <SakuraPetalLoader />,
+  loader,
 }: ManageLabelsListProps) {
   const t = useTranslations("ManageLabel.panel");
 
   if (loading) {
     return (
       <div className={styles.listScroll} onScroll={onScroll}>
-        <div className={styles.loaderRow}>{loader}</div>
+        <ManageLabelsLoaderRow loader={loader} />
       </div>
     );
   }
@@ -57,7 +57,7 @@ export function ManageLabelsList({
               />
             );
           })}
-          {fetchingNextPage ? <div className={styles.loaderRow}>{loader}</div> : null}
+          {fetchingNextPage ? <ManageLabelsLoaderRow loader={loader} /> : null}
         </>
       )}
     </div>
