@@ -25,8 +25,8 @@ export const LANTERN_LOADER_DEFAULTS = {
   ],
   stepTransitionMs: 500,
   textXPercent: 50,
-  textYPercent: 55,
-  textSkewXDeg: -10,
+  textYPercent: 115,
+  textSkewXDeg: 0,
   textSkewYDeg: 0,
 } as const;
 
