@@ -1,0 +1,25 @@
+/* Above the server-rendered loader (z-index 9999) so the copy can cover it before it's hidden. */
+.scene {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  overflow: hidden;
+}
+
+.book {
+  width: 100%;
+  height: 100%;
+}
+
+/*
+ * react-pageflip rewrites each page's inline style (display: block + pixel size), so the content fills it
+ * by height. No background of its own: the original is hidden during the turn and must not cover the app.
+ */
+.pageContent {
+  height: 100%;
+}
+
+/* Under the turning page: transparent, so the app shows through as the page lifts. */
+.blankPage {
+  background: transparent;
+}

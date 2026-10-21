@@ -1,4 +1,5 @@
-:global(html[data-hydrated="true"]) .scene {
+/* Set by HtmlLoaderExit once its page-flip copy covers this one (or straight away without the flip). */
+:global(html[data-loader-exited="true"]) .scene {
   display: none;
   pointer-events: none;
 }
