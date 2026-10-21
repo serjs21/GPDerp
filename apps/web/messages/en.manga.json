@@ -673,9 +673,6 @@
     "alt": "Current profile picture",
     "uploading": "Uploading image: {progress}%"
   },
-  "ManageLabelsPage": {
-    "unresolvedAccount": "Could not identify the account."
-  },
   "LabelHooks": {
     "placementError": "Could not save label placement.",
     "uploadComplete": "Image uploaded. The new face has arrived.",

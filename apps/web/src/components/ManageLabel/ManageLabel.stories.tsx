@@ -58,7 +58,7 @@ const meta = {
     nextjs: {
       appDirectory: true,
       navigation: {
-        pathname: "/manage_labels",
+        pathname: "/settings",
       },
     },
   },

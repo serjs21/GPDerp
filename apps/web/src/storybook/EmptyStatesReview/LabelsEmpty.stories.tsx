@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import ManageLabelsPage from "@/app/manage_labels/page";
 import { LabelsFilterModal } from "@/components/LabelsFilterModal/LabelsFilterModal";
 import {
   labelsPagedRoute,
@@ -37,13 +36,6 @@ export const SettingsNoSearchResults: Story = {
     nextjs: { appDirectory: true, navigation: { pathname: "/settings", query: { tab: "labels", search: "tempest" } } },
   },
   render: () => <SettingsStoryPage tab="labels" searchQuery="tempest" />,
-};
-
-/** /manage_labels page (ManageLabelsList): no labels yet. */
-export const ManageLabelsPageNoLabels: Story = {
-  decorators: [NO_LABELS],
-  parameters: { nextjs: { appDirectory: true, navigation: { pathname: "/manage_labels" } } },
-  render: () => <ManageLabelsPage />,
 };
 
 /** Header labels filter (ComicLabelPickerPanel › LabelPickerResults): nothing to pick. */

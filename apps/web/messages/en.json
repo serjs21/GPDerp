@@ -656,9 +656,6 @@
     "alt": "Current icon",
     "uploading": "Uploading: {progress}%"
   },
-  "ManageLabelsPage": {
-    "unresolvedAccount": "Unable to resolve account."
-  },
   "LabelHooks": {
     "placementError": "Could not save label placement",
     "uploadComplete": "Upload complete",
