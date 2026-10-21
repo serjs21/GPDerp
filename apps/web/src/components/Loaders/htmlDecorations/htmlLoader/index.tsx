@@ -21,7 +21,7 @@ export const HtmlLoader = () => {
           </div>
           <div className={styles.loaderRow}>
             <div className={`${styles.panel} ${styles.lanternPanel}`}>
-              <LanternLoader />
+              <LanternLoader className={styles.lantern} />
             </div>
             <div className={`${styles.panel} ${styles.loaderPanel}`}>
               <WagTailStaticLoaderWithBackground />

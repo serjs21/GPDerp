@@ -4,6 +4,8 @@
   width: var(--lantern-width);
   aspect-ratio: var(--lantern-aspect);
   line-height: 0;
+  /* The text sizes off the rendered width, so a consumer's className can resize the whole loader. */
+  container-type: inline-size;
 }
 
 /* Keyframes come from the step config (rendered next to the lantern); step-end holds each pose as a still frame. */
@@ -26,7 +28,7 @@
   transform: skew(var(--lantern-text-skew-x), var(--lantern-text-skew-y));
   color: #181713;
   font-family: var(--font-comic-label), "Bangers", sans-serif;
-  font-size: calc(var(--lantern-width) * 0.22);
+  font-size: 22cqw;
   letter-spacing: 0.04em;
   line-height: 1;
   white-space: nowrap;
