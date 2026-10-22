@@ -115,6 +115,7 @@ function LanternContent({
   meta,
   bodyOnly,
   typing,
+  titleTyping,
   actions,
 }: {
   title?: string;
@@ -122,6 +123,8 @@ function LanternContent({
   meta?: ReactNode;
   bodyOnly: boolean;
   typing: boolean;
+  /** Typing reveal for the title alone (generating drafts: the body streams in instead). */
+  titleTyping: boolean;
   actions?: ReactNode;
 }) {
   const { lines, authorText, lineStarts, authorStart } = lanternContentTyping(title, body);
@@ -130,7 +133,7 @@ function LanternContent({
     <>
       {title ? (
         <p className={styles.title}>
-          <LanternText text={title} typing={typing} startIndex={0} />
+          <LanternText text={title} typing={titleTyping} startIndex={0} />
         </p>
       ) : null}
       <LanternBodyLines lines={lines} typing={typing} lineStarts={lineStarts} />
@@ -218,6 +221,7 @@ function resolveHaikuStack(
           meta={meta}
           bodyOnly={bodyOnly}
           typing={typing}
+          titleTyping
           actions={buildLanternActions(
             { bodyOnly, showActions, generatingDraft: noteProps.generatingDraft },
             "generating",
@@ -242,6 +246,7 @@ function resolveHaikuStack(
         meta={meta}
         bodyOnly={bodyOnly}
         typing={typing}
+        titleTyping={typing}
         actions={buildLanternActions(
           { bodyOnly, showActions, haiku, onDelete, onDeleted, onChanged },
           "saved",
