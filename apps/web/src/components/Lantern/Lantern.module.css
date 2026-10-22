@@ -103,12 +103,12 @@
 }
 
 .haikuStack {
-  --lantern-body-font-size: 0.85rem;
+  --lantern-body-font-size: 0.95rem;
   --lantern-body-line-height: 1.45;
-  --lantern-title-font-size: 1rem;
-  --lantern-author-font-size: 0.7rem;
+  --lantern-title-font-size: 1.1rem;
+  --lantern-author-font-size: 0.85rem;
   --lantern-stack-gap: 0.25rem;
-  --lantern-stack-padding-top: 0.35rem;
+  --lantern-stack-padding-top: 0.45rem;
 
   display: flex;
   flex-direction: column;
@@ -212,7 +212,7 @@
   font-family: inherit;
   font-size: var(--lantern-body-font-size);
   font-weight: 500;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.01em;
   line-height: var(--lantern-body-line-height);
   white-space: nowrap;
   overflow: hidden;

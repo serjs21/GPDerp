@@ -7,6 +7,7 @@ import { HAIKU_TYPING_PIECE_SIZES } from "@/consts/haiku/haikuTypingConsts";
 import { haikuTitleTypingDurationMs, haikuTypingCharDelayMs } from "@/utils/haikuTyping/haikuTypingUtils";
 import { createTypingPacer, type TypingPacer } from "@/utils/haikuTyping/typingPacer";
 import { formatChatTime } from "../utils/date";
+import { formatHaikuTitleText } from "../utils/strings";
 import { useWebSocket } from "./useWebSocket";
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:4000/ws";
@@ -45,6 +46,10 @@ type StartPayload = {
 
 type WsHaikuMessage = StartPayload | DeltaPayload | SavedPayload | CompletePayload;
 
+/** Subject with the saved-title transform (capitalization), so the generating title matches the saved one. */
+const readSubject = (data: Record<string, unknown>): string =>
+  typeof data.subject === "string" ? formatHaikuTitleText(data.subject) : "";
+
 function parseMessage(raw: string): WsHaikuMessage | null {
   try {
     const parsed = JSON.parse(raw || "{}") as Record<string, unknown>;
@@ -58,16 +63,16 @@ function parseMessage(raw: string): WsHaikuMessage | null {
     if (kind === "saved") {
       const haiku = data.haiku as HaikuDto | undefined;
       if (!haiku || typeof haiku.id !== "string") return null;
-      const subject = typeof data.subject === "string" ? data.subject : "";
+      const subject = readSubject(data);
       return { id, kind: "saved", data: { haiku, subject } };
     }
 
     if (kind === "complete" || kind === "start") {
-      const subject = typeof data.subject === "string" ? data.subject : "";
+      const subject = readSubject(data);
       return { id, kind, data: { subject } };
     }
 
-    const subject = typeof data.subject === "string" ? data.subject : "";
+    const subject = readSubject(data);
     const delta = typeof data.delta === "string" ? data.delta : "";
     return {
       id,
