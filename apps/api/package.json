@@ -11,6 +11,8 @@
     "build": "tsc -p tsconfig.json && cp src/modules/payments/confirm_purchase_message.md dist/modules/payments/ && cp -R assets dist/ && cp -R src/generated dist/",
     "start": "node dist/index.js",
     "check-db": "tsx scripts/check-connection.ts",
+    "migrate:prod": "sh -c 'set -a && . ./.env.neon && set +a && prisma migrate deploy'",
+    "neon:deploy": "neon deploy --no-env-pull && neon env pull --file .env.neon",
     "verify-email": "tsx scripts/verify-email.ts",
     "send-share-template-email": "tsx scripts/send-share-template-email.ts",
     "backfill-icon-cache": "tsx scripts/backfill-icon-cache.ts",
