@@ -44,6 +44,36 @@ Winter waits ahead.`);
     expect(result.author).toBeUndefined();
   });
 
+  it("keeps all three lines when the model puts the credit first without a dash", () => {
+    const result = parseHaikuBody(
+      "Professor I.M. Soggy\n\nRain clouds fill my mind,  \nHope drips down the windowsill—  \nEven sunshine hides.",
+    );
+
+    expect(result.lines).toEqual(["Rain clouds fill my mind,", "Hope drips down the windowsill—", "Even sunshine hides."]);
+    expect(result.author).toBe("Professor I.M. Soggy");
+  });
+
+  it("extracts an en-dash credit", () => {
+    const result = parseHaikuBody("Maple leaves whisper,  \nRaindrops tap on windowpanes—  \nFall sighs wet goodbye.  \n\n– Misty Drizzlewood");
+
+    expect(result.lines).toEqual(["Maple leaves whisper,", "Raindrops tap on windowpanes—", "Fall sighs wet goodbye."]);
+    expect(result.author).toBe("Misty Drizzlewood");
+  });
+
+  it("extracts a dashless credit set apart after the poem", () => {
+    const result = parseHaikuBody("One line here\nTwo line here\nThree line here\n\nHaik U. Wonder");
+
+    expect(result.lines).toEqual(["One line here", "Two line here", "Three line here"]);
+    expect(result.author).toBe("Haik U. Wonder");
+  });
+
+  it("does not guess a credit from a half-streamed body", () => {
+    const result = parseHaikuBody("Professor I.M. Soggy\n\nRain clouds");
+
+    expect(result.lines).toEqual(["Professor I.M. Soggy", "Rain clouds", ""]);
+    expect(result.author).toBeUndefined();
+  });
+
   it("slices to three lines when more than three content lines are provided", () => {
     const result = parseHaikuBody(`One
 Two

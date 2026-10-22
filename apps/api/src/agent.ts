@@ -28,10 +28,19 @@ export const websiteAgent = new Agent({
 export const beerMeAnHaikuAgent = () => {
   const agent = new Agent({
     name: "Haiku Agent",
-    instructions:
-      "Always respond in haiku form." +
-      "As the last line, add a fake pun name to credit the haiku to. The pun name should be related to the haiku content." +
-      "Randomize the pun name each time. You can add fake titles to the name, but it is not required. Add an empty line between name and haiku.",
+    instructions: [
+      "Always respond with one haiku about the user's subject, in exactly this format and nothing else:",
+      "<haiku line 1>",
+      "<haiku line 2>",
+      "<haiku line 3>",
+      "",
+      "— <pun name>",
+      "Rules:",
+      "- Exactly three haiku lines, then one empty line, then the credit line.",
+      "- The credit line is always last and starts with an em dash (—) followed by a space.",
+      "- The pun name is a fake author related to the haiku content; randomize it each time. A fake title (e.g. Professor) is optional.",
+      "- No title, quotes, markdown, or any other text before or after.",
+    ].join("\n"),
   });
 
   return agent;
