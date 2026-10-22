@@ -6,7 +6,7 @@ export const THEMES = {
 
 export type ThemeName = (typeof THEMES)[keyof typeof THEMES];
 
-export const SUPPORTED_LOCALES = ["en", "ja", "es", "fr", "th", "de", "it", "pt"] as const;
+export const SUPPORTED_LOCALES = ["en", "ja", "es", "fr", "th", "de", "it", "pt", "zh", "vi"] as const;
 export type AppLocale = (typeof SUPPORTED_LOCALES)[number];
 
 export const DEFAULT_THEME: ThemeName = THEMES.tokyoDusk;
