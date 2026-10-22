@@ -1,5 +1,6 @@
 import { Readable } from "node:stream";
 import _ from "lodash-es";
+import { HAIKU_STREAM_CHAR_DELAY_MAX_MS, HAIKU_STREAM_CHAR_DELAY_MIN_MS } from "../consts/haiku";
 
 type ResponseCreatedEvent = {
   type: "response.created";
@@ -107,7 +108,8 @@ export const runHaikuAgentStreamMock = () => {
         () => {
           this.push(chunk);
         },
-        10 + Math.random() * 30,
+        HAIKU_STREAM_CHAR_DELAY_MIN_MS +
+          Math.random() * (HAIKU_STREAM_CHAR_DELAY_MAX_MS - HAIKU_STREAM_CHAR_DELAY_MIN_MS),
       );
     },
   });
