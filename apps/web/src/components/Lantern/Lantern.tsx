@@ -8,6 +8,7 @@ import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
 import { LocalDateTime } from "@/components/LocalDateTime";
 import { formatHaikuTitle } from "@/utils/strings";
 import { TextTyping } from "@/components/TextTyping/TextTyping";
+import { haikuTitleTypingStyle } from "@/utils/haikuTyping/haikuTypingUtils";
 import { lanternContentTyping } from "./utils/lanternContentUtils";
 import {
   LANTERN_ROTATED_WIDTH_REM,
@@ -214,7 +215,7 @@ function resolveHaikuStack(
   if ("generatingDraft" in noteProps && noteProps.generatingDraft) {
     const { title, body, meta } = resolveGeneratingContent(noteProps.generatingDraft);
     return (
-      <div className={stackClass} style={stackStyle}>
+      <div className={stackClass} style={{ ...stackStyle, ...haikuTitleTypingStyle() }}>
         <LanternContent
           title={title}
           body={body}
