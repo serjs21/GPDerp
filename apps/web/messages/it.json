@@ -8,7 +8,30 @@
     "languageNoMatches": "Nessuna lingua corrispondente",
     "languageCurrent": "Attuale",
     "preferencesGroupLabel": "Schermo e lingua",
-    "preferencesSaveError": "Impossibile salvare le preferenze"
+    "preferencesSaveError": "Impossibile salvare le preferenze",
+    "languageAriaLabel": "Lingua: {language}",
+    "userFallback": "Utente",
+    "sortAndFilter": "Ordina e filtra",
+    "tabs": {
+      "profile": {
+        "ariaLabel": "Informazioni del profilo"
+      },
+      "shareLinks": {
+        "title": "Link condivisi",
+        "ariaLabel": "Gestisci i link condivisi"
+      },
+      "labels": {
+        "title": "Etichette",
+        "ariaLabel": "Gestisci le etichette"
+      }
+    },
+    "toasts": {
+      "loadError": "Impossibile caricare il profilo",
+      "updateSuccess": "Profilo aggiornato",
+      "updateError": "Impossibile aggiornare il profilo",
+      "avatarSaved": "Immagine del profilo salvata",
+      "avatarError": "Impossibile salvare l'immagine del profilo nel tuo account"
+    }
   },
   "BuyGenerations": {
     "title": "Generazioni haiku",
@@ -28,7 +51,8 @@
     "belongsTo": "Questa tessera appartiene a",
     "remaining": "{count} generazioni rimaste",
     "remainingUnknown": "Le generazioni rimanenti appariranno qui.",
-    "buyMore": "Compra ancora"
+    "buyMore": "Compra ancora",
+    "profileIconAlt": "Icona del profilo di {name}"
   },
   "ProfileInfo": {
     "firstName": "Nome",
@@ -48,7 +72,807 @@
       "th": "Thai",
       "de": "Tedesco",
       "it": "Italiano",
-      "pt": "Portoghese"
+      "pt": "Portoghese",
+      "zh": "Cinese",
+      "vi": "Vietnamita"
     }
+  },
+  "RootLayout": {
+    "description": "IA, ma inutile"
+  },
+  "LegalPages": {
+    "back": "← Indietro",
+    "terms": {
+      "title": "Termini di servizio",
+      "description": "Termini che regolano l'uso del servizio di generazione di haiku, la fatturazione tramite Paddle e le relative policy."
+    },
+    "privacy": {
+      "title": "Informativa sulla privacy",
+      "description": "Come raccogliamo, usiamo e proteggiamo i dati per il servizio di generazione di haiku, inclusi i pagamenti tramite Paddle."
+    },
+    "refund": {
+      "title": "Politica di rimborso",
+      "description": "Rimborsi, cancellazione degli abbonamenti e fatturazione del servizio di generazione di haiku tramite Paddle."
+    },
+    "cookies": {
+      "title": "Cookie Policy",
+      "description": "Come il servizio di generazione di haiku usa i cookie e tecnologie simili."
+    },
+    "acceptableUse": {
+      "title": "Politica di utilizzo accettabile",
+      "description": "Regole per un uso corretto del servizio di generazione di haiku."
+    }
+  },
+  "SiteFooter": {
+    "legalPolicies": "Note legali",
+    "terms": "Termini di servizio",
+    "privacy": "Informativa sulla privacy",
+    "refund": "Politica di rimborso",
+    "acceptableUse": "Utilizzo accettabile",
+    "cookies": "Cookie Policy",
+    "paddleNotice": "I pagamenti sono elaborati da <buyerTerms>Paddle</buyerTerms> in qualità di merchant of record. Al momento dell'acquisto si applicano la <refund>politica di rimborso per gli acquirenti</refund>, i <checkout>termini del checkout</checkout> e l'<privacy>informativa sulla privacy</privacy> di Paddle."
+  },
+  "NoCreditsLeft": {
+    "continueGenerationOffer": {
+      "questionWithSubject": "Continuare a generare “{subject}”?",
+      "question": "Continuare a generare?",
+      "confirm": "Continua",
+      "cancel": "Non ora"
+    }
+  },
+  "NoGenerationsLeftModal": {
+    "title": "Generazioni esaurite",
+    "dismiss": "Non ora",
+    "buy": "Compra 100 generazioni",
+    "fallbackMessage": "Compra altre generazioni per continuare a scrivere. I crediti vengono aggiunti dopo la conferma del pagamento."
+  },
+  "PurchaseConfirmModal": {
+    "title": "Acquisto confermato",
+    "done": "Fatto"
+  },
+  "CelestialThemeClock": {
+    "ariaLabel": "Momento della giornata"
+  },
+  "CelestialThemeSelector": {
+    "ariaLabel": "Momento della giornata del tema"
+  },
+  "ComicPageLayout": {
+    "close": "Chiudi"
+  },
+  "ComicToast": {
+    "notifications": "Notifiche"
+  },
+  "PaperModal": {
+    "dialog": "Finestra di dialogo",
+    "close": "Chiudi"
+  },
+  "ComicConfirmModal": {
+    "confirm": "Conferma",
+    "cancel": "Annulla",
+    "description": "Scegli conferma o annulla."
+  },
+  "OrderDropdown": {
+    "ariaLabel": "Ordina gli haiku",
+    "title": "Ordina per",
+    "categories": {
+      "creationDate": {
+        "title": "Data di creazione",
+        "ariaLabel": "Ordina per data di creazione"
+      },
+      "alpacabet": {
+        "title": "Alpacabeto",
+        "ariaLabel": "Ordina alfabeticamente"
+      }
+    }
+  },
+  "OrderDropdownCover": {
+    "ariaLabel": "Cambia ordine"
+  },
+  "TextBubbleDropdown": {
+    "placeholder": "Seleziona un'opzione"
+  },
+  "DualityButton": {
+    "coverState": {
+      "reveal": "Rivela {title}"
+    }
+  },
+  "BrushMenu": {
+    "placeholder": "Seleziona"
+  },
+  "AuthFlows": {
+    "login": {
+      "emailPlaceholder": "Email",
+      "passwordPlaceholder": "Password",
+      "invalidEmail": "Serve un'email valida perché funzioni. La sola determinazione non recapiterà il messaggio.",
+      "passwordRequired": "Inserisci la password. Il silenzio non aprirà questa porta.",
+      "divider": "oppure accedi con l'email",
+      "submit": "Accedi",
+      "submitting": "Accesso in corso",
+      "useGoogleSignIn": "Questo account usa l'accesso con Google.",
+      "tooManyAttempts": "Troppi tentativi. Aspetta e riprova più tardi. La tecnica del tocco rapido è in pausa.",
+      "invalidCredentials": "Email o password non validi",
+      "completeSetupOnRegistration": "Completa la configurazione dell'account nella pagina di registrazione.",
+      "googleSignInFailed": "Accesso con Google non riuscito"
+    },
+    "register": {
+      "emailPlaceholder": "Email",
+      "passwordPlaceholder": "Password",
+      "confirmPasswordPlaceholder": "Conferma password",
+      "invalidEmail": "Serve un'email valida perché funzioni. La sola determinazione non recapiterà il messaggio.",
+      "passwordRequired": "Inserisci la password. Il silenzio non aprirà questa porta.",
+      "passwordTooShort": "Almeno 8 caratteri",
+      "passwordsDoNotMatch": "Le password devono coincidere. I nostri robot non gestiscono bene l'ambiguità.",
+      "divider": "oppure registrati con l'email",
+      "submit": "Crea account",
+      "submitting": "Creazione account in corso",
+      "googleSignUpFailed": "Registrazione con Google non riuscita"
+    },
+    "chrome": {
+      "signInWithGoogle": "Accedi con Google",
+      "signUpWithGoogle": "Registrati con Google"
+    }
+  },
+  "AuthGateModal": {
+    "signIn": "Accedi",
+    "createAccount": "Crea account",
+    "signInTab": "Accedi",
+    "registerTab": "Registrati",
+    "forgotPassword": "Password dimenticata?"
+  },
+  "AuthLanterns": {
+    "login": "Accedi",
+    "register": "Registrati",
+    "entryGroupLabel": "Account"
+  },
+  "EmailChangeRevert": {
+    "pageTitle": "Annulla il cambio email",
+    "restoreLabel": "Questa va bene",
+    "changedToLabel": "Questa non va bene",
+    "confirmLead": "Vogliamo solo essere sicuri che tu voglia ancora farlo.",
+    "confirmConsequences": "L'email tornerà quella di prima e tutti verranno disconnessi ovunque.",
+    "confirmCta": "Sì, annulla",
+    "keepCta": "Non mi interessa più",
+    "revertedCaption": "Annullato",
+    "setPasswordLead": "Fatto. {email} resta sull'account e tutti sono stati disconnessi.",
+    "emailTakenLead": "Tutti sono stati disconnessi, ma {email} ora appartiene a un altro account, quindi non è stato possibile ripristinarla.",
+    "setPasswordNote": "Per sicurezza dovrai scegliere una nuova password. Sai, visto che qualcuno ha appena usato quella vecchia senza permesso.",
+    "newPasswordPlaceholder": "Nuova password",
+    "confirmPasswordPlaceholder": "Ripeti la nuova password",
+    "setPasswordCta": "Salva password",
+    "passwordTooShort": "Usa almeno {min} caratteri.",
+    "passwordsDoNotMatch": "Le password non coincidono.",
+    "passwordFailed": "Impossibile salvare la password. Riprova.",
+    "loadingTitle": "Verifica in corso",
+    "loadingBody": "I nostri robot stanno cercando i tuoi dati...",
+    "passwordSavedTitle": "Tutto a posto",
+    "passwordSavedBody": "Nuova password salvata. Accedi con {email} e la tua nuova password.",
+    "revertedTitle": "Annullato",
+    "revertedBody": "{email} resta sull'account e tutti sono stati disconnessi.",
+    "emailTakenNoPasswordBody": "Tutti sono stati disconnessi, ma {email} ora appartiene a un altro account, quindi non è stato possibile ripristinarla.",
+    "invalidTitle": "Link sconosciuto",
+    "invalidBody": "Questo link non corrisponde a nulla. Assicurati di aver aperto il link completo dall'email.",
+    "expiredTitle": "Link scaduto",
+    "expiredBody": "Questo link per annullare era valido solo 7 giorni. Se qualcosa ti sembra ancora strano, reimposta la password dalla schermata di accesso.",
+    "usedTitle": "Già usato",
+    "usedBody": "Questo link è già stato usato, oppure la modifica è stata annullata con un altro link.",
+    "unavailableTitle": "Link disattivato",
+    "unavailableBody": "Il tuo vecchio indirizzo ora appartiene a un altro account che lo ha confermato, quindi questa modifica non può più essere annullata. Se qualcosa non ti torna, reimposta la password dalla schermata di accesso.",
+    "failedTitle": "Qualcosa si è rotto",
+    "failedBody": "Impossibile raggiungere il server. Prova a riaprire il link tra un attimo.",
+    "signInCta": "Accedi",
+    "homeCta": "Torna alla home"
+  },
+  "ResetPasswordModal": {
+    "requestTitle": "Reimposta password",
+    "confirmTitle": "Nuova password",
+    "requestCta": "Invia link di reimpostazione",
+    "confirmCta": "Aggiorna password",
+    "requestLead": "Inserisci la tua email e ti invieremo un link se esiste un account.",
+    "confirmLead": "Scegli una nuova password per il tuo account.",
+    "emailPlaceholder": "Email",
+    "newPasswordPlaceholder": "Nuova password",
+    "confirmPasswordPlaceholder": "Conferma password",
+    "invalidEmail": "Inserisci un'email valida",
+    "passwordTooShort": "La password deve avere almeno 8 caratteri",
+    "passwordsDoNotMatch": "Le password non coincidono",
+    "requestSent": "Se esiste un account con questa email, ti abbiamo inviato le istruzioni per la reimpostazione.",
+    "requestFailed": "Richiesta non riuscita. Riprova.",
+    "linkInvalid": "Il link di reimpostazione manca o non è valido.",
+    "confirmSuccess": "Password aggiornata. Ora puoi accedere.",
+    "confirmFailed": "Reimpostazione non riuscita"
+  },
+  "VerifyEmail": {
+    "verifyingTitle": "Verifica della tua email",
+    "verifyingBody": "Attendi mentre convalidiamo il tuo link.",
+    "alreadyVerifiedTitle": "Email già verificata",
+    "alreadyVerifiedBody": "La tua email è già convalidata. Ritorno alla home tra {seconds} secondi.",
+    "resentTitle": "Email di verifica inviata",
+    "expiredTitle": "Link di verifica scaduto",
+    "resentBody": "Ti abbiamo inviato una nuova email di verifica. Controlla la posta in arrivo e usa il link più recente.",
+    "expiredBody": "Questo link di verifica è scaduto.",
+    "resending": "Invio in corso...",
+    "resend": "Invia di nuovo l'email di verifica"
+  },
+  "UserMenu": {
+    "fallbackName": "Utente",
+    "settings": "Impostazioni",
+    "logout": "Esci",
+    "goHome": "Torna alla home",
+    "login": "Accedi",
+    "guest": "Ospite",
+    "logoutQuestion": "Ti sei divertito abbastanza?",
+    "logoutCancel": "Non ancora",
+    "logoutConfirm": "Sì"
+  },
+  "LoginPage": {
+    "title": "Accedi",
+    "completeSetupOnRegistration": "Completa la configurazione dell'account nella pagina di registrazione.",
+    "createAccountLink": "Crea un account",
+    "forgotPassword": "Password dimenticata?"
+  },
+  "RegisterPage": {
+    "title": "Crea account",
+    "haveAccount": "Hai già un account? <link>Accedi</link>"
+  },
+  "CompleteRegistrationPage": {
+    "title": "Completa la registrazione",
+    "loading": "Caricamento…",
+    "lead": "Scegli un nome utente per finire di configurare il tuo account.",
+    "usernameLabel": "Nome utente",
+    "usernamePlaceholder": "il_tuo_nome",
+    "usernameRequired": "Scegli un nome utente",
+    "usernameTooShort": "Almeno {min} caratteri",
+    "usernamePattern": "Solo lettere, numeri e trattini bassi",
+    "usernameUnavailable": "Nome utente non disponibile",
+    "usernameTaken": "Nome utente già in uso",
+    "saveFailed": "Impossibile salvare il nome utente",
+    "success": "È tutto pronto",
+    "continue": "Continua",
+    "backHome": "Torna alla home"
+  },
+  "AuthHooks": {
+    "registrationSent": "Se questa email può essere usata per un nuovo account, ti abbiamo inviato un link di verifica. Controlla la posta in arrivo.",
+    "registrationFailed": "Registrazione non riuscita",
+    "usernameUnavailable": "Nome utente non disponibile",
+    "googleSignInFailed": "Accesso con Google non riuscito"
+  },
+  "HaikuContainer": {
+    "haikuActions": {
+      "deleteLabel": "Elimina",
+      "deleteAriaLabel": "Elimina haiku",
+      "shareLabel": "Condividi",
+      "shareAriaLabel": "Condividi haiku",
+      "labelLabel": "Etichetta",
+      "labelAriaLabel": "Aggiungi etichetta",
+      "copyLabel": "Copia",
+      "copyAriaLabel": "Copia negli appunti",
+      "deleted": "Haiku eliminato",
+      "deleteForbidden": "Non hai il permesso di eliminare questo haiku.",
+      "deleteFailed": "Impossibile eliminare l'haiku.",
+      "saving": "Salvataggio dell'haiku…",
+      "groupAriaLabel": "Azioni haiku",
+      "hideActions": "Nascondi azioni haiku",
+      "showActions": "Mostra azioni haiku"
+    }
+  },
+  "HaikuGenerationStickyNote": {
+    "generationFlow": {
+      "errorTitle": "Niente panico, ma qualcosa è andato storto",
+      "errorDescription": "I nostri schiavi stanno lavorando sodo per risolvere il problema. Presto manderemo qualcuno a frustarli più forte.\nRiprova più tardi."
+    }
+  },
+  "Lantern": {
+    "lantern": {
+      "bodyAriaLabel": "Haiku",
+      "haikuLantern": "Lanterna haiku: {title}",
+      "generating": "Generazione haiku: {subject}",
+      "rotatedLantern": "Lanterna haiku ruotata"
+    },
+    "labelBelt": {
+      "ariaLabel": "Cintura di etichette dell'haiku",
+      "previous": "Etichette precedenti",
+      "next": "Etichette successive"
+    },
+    "lanternDeleteExit": {
+      "deleted": "Haiku eliminato",
+      "deleteForbidden": "Non hai il permesso di eliminare questo haiku.",
+      "deleteFailed": "Impossibile eliminare l'haiku."
+    },
+    "lanternSteppedFlight": {
+      "deleting": "Eliminazione haiku: {title}"
+    },
+    "lanternRotatedShell": {
+      "labels": "Etichette di {label}"
+    },
+    "lanternPath": {
+      "generating": "Generazione: {subject}",
+      "focusPosition": "{title} · {position} / {total}",
+      "untitled": "Haiku",
+      "empty": "Nessun haiku",
+      "previous": "Haiku precedente",
+      "next": "Haiku successivo"
+    },
+    "lanternPathLantern": {
+      "generating": "Generazione haiku: {subject}",
+      "haikuLantern": "Lanterna haiku: {title}",
+      "lantern": "Lanterna haiku",
+      "labels": "Etichette di {label}"
+    },
+    "lanternPathStage": {
+      "ariaLabel": "Percorso di volo delle lanterne"
+    }
+  },
+  "LanternSubmit": {
+    "ariaLabel": "詠む Componi"
+  },
+  "SVGPath": {
+    "svgPath": {
+      "stageAriaLabel": "Percorso SVG delle lanterne"
+    },
+    "svgPathLantern": {
+      "loadingMore": "Caricamento di altri haiku",
+      "generating": "Generazione haiku: {subject}",
+      "haikuLantern": "Lanterna haiku: {title}",
+      "labels": "Etichette di {label}"
+    }
+  },
+  "SavedHaikusLanternPath": {
+    "loading": "Caricamento haiku",
+    "loadError": "Impossibile caricare gli haiku salvati.",
+    "retry": "Riprova",
+    "searching": "Ricerca haiku"
+  },
+  "PathNavigation": {
+    "pathNavigationArrows": {
+      "next": "Lanterna successiva",
+      "previous": "Lanterna precedente"
+    }
+  },
+  "PathOverlay": {
+    "pathOverlay": {
+      "title": "Overlay",
+      "continueJourney": "Resta qui",
+      "goBackToStart": "Torna all'inizio"
+    },
+    "overlayNextLabel": {
+      "label": "Resta qui"
+    },
+    "overlayPrevLabel": {
+      "label": "Torna all'inizio"
+    }
+  },
+  "PostSignInput": {
+    "signAriaLabel": "Cartello del soggetto dell'haiku",
+    "placeholder": "題 Soggetto",
+    "inputAriaLabel": "Soggetto dell'haiku",
+    "submitLabel": "詠む Componi"
+  },
+  "CreationModal": {
+    "generating": "Generazione haiku: {subject}",
+    "haikuLantern": "Lanterna haiku: {title}",
+    "creation": "Creazione haiku"
+  },
+  "DeleteConfirmModal": {
+    "question": "Volevi davvero farlo?",
+    "cancel": "No",
+    "confirm": "Sì"
+  },
+  "DeleteFailedModal": {
+    "title": "Eliminazione non riuscita",
+    "leaveItBe": "Lascia stare",
+    "retry": "Riprova",
+    "body": "Non siamo riusciti a eliminare questo haiku. Puoi riprovare o lasciarlo nella tua lista."
+  },
+  "AwkwardLantern": {
+    "title": "Beh, che imbarazzo..."
+  },
+  "RestartLinkButton": {
+    "expired": "Scaduto",
+    "limitReached": "0 visite rimaste",
+    "revive": "Rianima!",
+    "resurrect": "Resuscita!"
+  },
+  "GoHome": {
+    "label": "Torna alla home"
+  },
+  "NotFoundView": {
+    "toast": "Quel link è passato a miglior vita",
+    "signUp": "Registrati per inviare i tuoi link morti",
+    "copy": "Sembra che qualcuno ti abbia mandato un link che non funziona. \nForse è stato un errore di battitura. Forse qui ci sono problemi di fiducia da affrontare.\nComunque sia, questo link non c'è più."
+  },
+  "Loaders": {
+    "sakuraPetalLoader": {
+      "ariaLabel": "Caricamento"
+    },
+    "wagTailLoader": {
+      "ariaLabel": "Caricamento"
+    },
+    "lanternLoader": {
+      "ariaLabel": "Caricamento"
+    },
+    "loadingText": {
+      "text": "Caricamento"
+    },
+    "fetchingLoader": {
+      "ariaLabel": "Caricamento",
+      "text": "Recupero"
+    }
+  },
+  "MfgDate": {
+    "defaultLabel": "Creato"
+  },
+  "GoldenAgeTitle": {
+    "subtitle": "IL GENERATORE DI HAIKU",
+    "tagline": "IA, MA POCO PRATICA!"
+  },
+  "HaikuHooks": {
+    "deleteController": {
+      "deleted": "Haiku eliminato",
+      "deleteFailed": "Impossibile eliminare l'haiku."
+    }
+  },
+  "ComicLabelCreationModal": {
+    "save": "Salva",
+    "create": "Crea",
+    "loadingLabels": "Caricamento etichette...",
+    "enterName": "Inserisci un nome per l'etichetta",
+    "nameTooShort": "Il nome deve avere almeno {min} caratteri",
+    "alreadyExists": "L'etichetta esiste già in questo account",
+    "updated": "Etichetta aggiornata",
+    "updateError": "Impossibile aggiornare l'etichetta",
+    "created": "Etichetta creata",
+    "createError": "Impossibile creare l'etichetta",
+    "previewTitle": "Questa è",
+    "minChars": "Min {min} caratteri",
+    "nameAriaLabel": "Nome dell'etichetta",
+    "color": "Colore",
+    "colorAriaLabel": "Colore dell'etichetta",
+    "openColorPicker": "Apri il selettore colore",
+    "shapeAriaLabel": "Forma {shape}",
+    "saveAriaLabel": "Salva etichetta",
+    "createAriaLabel": "Crea etichetta",
+    "shapes": {
+      "classic": "Classica",
+      "sharp": "Spigolosa",
+      "soft": "Morbida",
+      "circle": "Cerchio",
+      "square": "Quadrato",
+      "thought": "Pensiero"
+    }
+  },
+  "ComicLabelPickerPanel": {
+    "filterPlaceholder": "Filtra etichette…",
+    "filterAriaLabel": "Filtra etichette",
+    "disabledAriaLabel": "{name} (già usata nell'altro filtro)"
+  },
+  "CreateAddLabelsModal": {
+    "maxLabels": "Un haiku può avere al massimo {max} etichette",
+    "saved": "La poesia è stata etichettata",
+    "saveError": "Un errore ha impedito l'etichettatura",
+    "createTitle": "Crea",
+    "createAriaLabel": "Creane una nuova",
+    "addTitle": "Aggiungi",
+    "addAriaLabel": "Etichetta questo haiku",
+    "save": "Salva"
+  },
+  "LabelHalo": {
+    "halo": {
+      "ariaLabel": "Alone di etichette"
+    },
+    "slot": {
+      "rotateAriaLabel": "Ruota l'etichetta — trascina attorno all'etichetta per regolarla",
+      "ariaLabel": "Etichetta {name}, {degrees} gradi"
+    }
+  },
+  "LabelSort": {
+    "title": "Ordina per",
+    "ariaLabel": "Ordina le etichette",
+    "selectCategory": "Seleziona {title}",
+    "categories": {
+      "creationDate": {
+        "title": "Data di creazione",
+        "ariaLabel": "Ordina per data di creazione"
+      },
+      "alpacabet": {
+        "title": "Alpacabeto",
+        "ariaLabel": "Ordina alfabeticamente"
+      },
+      "connection": {
+        "title": "Collegamenti",
+        "ariaLabel": "Ordina per collegamenti"
+      }
+    }
+  },
+  "LabelsFilterModal": {
+    "filter": "Filtra per etichetta"
+  },
+  "ManageLabel": {
+    "manageLabel": {
+      "deleted": "Etichetta eliminata",
+      "deleteError": "Impossibile eliminare l'etichetta",
+      "edit": "Modifica",
+      "editAriaLabel": "Modifica l'etichetta {name}",
+      "tuneIn": "Sintonizzati",
+      "tuneInAriaLabel": "Sintonizzati sugli haiku con l'etichetta {name}",
+      "deleteQuestion": "Qual è il piano?",
+      "cancel": "Come sono finito qui?",
+      "confirmDelete": "Fai in fretta"
+    },
+    "createPanel": {
+      "ariaLabel": "Crea una nuova etichetta",
+      "create": "Crea"
+    },
+    "connectedHaikus": {
+      "connected": "{total, plural, one {# collegamento} other {# collegamenti}}",
+      "ariaLabel": "Haiku con l'etichetta {name}"
+    },
+    "labelActions": {
+      "tuneInDisabled": "Cercarmi è inutile.",
+      "tuneIn": "Sintonizzati",
+      "tuneInAriaLabel": "Sintonizzati sugli haiku con l'etichetta {name}",
+      "noHaikusAriaLabel": "Nessun haiku con l'etichetta {name}",
+      "groupAriaLabel": "Azioni per {name}",
+      "edit": "Modifica",
+      "editAriaLabel": "Modifica {name}",
+      "delete": "Elimina",
+      "deleteAriaLabel": "Elimina {name}"
+    },
+    "lanternStack": {
+      "notConnected": "non collegato",
+      "lanternAriaLabel": "Lanterna haiku: {title}"
+    },
+    "panel": {
+      "searchPlaceholder": "Cerca etichette…",
+      "searchAriaLabel": "Cerca etichette per nome"
+    }
+  },
+  "HeaderHaikuTools": {
+    "search": {
+      "buttonAriaLabel": "Cerca haiku",
+      "placeholder": "Cerca titoli…",
+      "inputAriaLabel": "Cerca titoli di haiku",
+      "actionName": "Cerca per nome"
+    },
+    "filter": {
+      "buttonAriaLabel": "Filtra haiku per etichette",
+      "actionName": "Filtra per etichetta",
+      "activeFiltersAriaLabel": "Filtri etichetta attivi",
+      "removeFilterAriaLabel": "Rimuovi il filtro {name}",
+      "removeExcludeFilterAriaLabel": "Rimuovi il filtro di esclusione {name}"
+    },
+    "settingsSearch": {
+      "shareLinks": {
+        "placeholder": "Cerca link",
+        "ariaLabel": "Cerca per titolo",
+        "buttonAriaLabel": "Cerca link condivisi"
+      },
+      "labels": {
+        "placeholder": "Cerca etichette",
+        "ariaLabel": "Cerca etichette per nome",
+        "buttonAriaLabel": "Cerca etichette"
+      }
+    }
+  },
+  "IconUploader": {
+    "label": "Cambia immagine del profilo",
+    "alt": "Icona attuale",
+    "uploading": "Caricamento: {progress}%"
+  },
+  "LabelHooks": {
+    "placementError": "Impossibile salvare la posizione dell'etichetta",
+    "uploadComplete": "Caricamento completato",
+    "uploadFailed": "Caricamento dell'immagine non riuscito"
+  },
+  "ShareModal": {
+    "modal": {
+      "defaultSubject": "Haiku",
+      "linkTabTitle": "Link",
+      "linkTabAriaLabel": "Condividi tramite link",
+      "emailTabTitle": "Email",
+      "emailTabAriaLabel": "Condividi via email",
+      "loading": "Caricamento…"
+    },
+    "controller": {
+      "defaultSubject": "Haiku",
+      "postcardsQueued": "Le cartoline sono state imbucate",
+      "loadLinkError": "Impossibile caricare il link condiviso",
+      "sendEmailError": "Impossibile inviare l'email",
+      "addRecipientHint": "Aggiungi almeno un'email destinatario",
+      "fixInvalidHint": "Correggi le email dei destinatari non valide"
+    },
+    "email": {
+      "toPrefix": "A:",
+      "recipientsPlaceholder": "Email dei destinatari (premi Invio dopo ognuna)",
+      "messagePlaceholder": "Volevo condividere con te...",
+      "messageAriaLabel": "Messaggio email",
+      "signature": "Da: {name}",
+      "invalidEmails": "Email non valide: {emails}"
+    },
+    "sendPanel": {
+      "preparingPostcard": "Preparazione della cartolina…",
+      "sendEmail": "Invia email"
+    },
+    "postcardFront": {
+      "prepareError": "Impossibile preparare l'immagine della cartolina"
+    }
+  },
+  "Postcard": {
+    "renderer": {
+      "ariaLabel": "Cartolina haiku",
+      "ariaLabelWithTitle": "Cartolina haiku: {title}"
+    }
+  },
+  "SharedHaikuPage": {
+    "unknownAuthor": "Autore sconosciuto",
+    "lanternAriaLabel": "Lanterna haiku: {subject}",
+    "labelsAriaLabel": "Etichette di {subject}",
+    "createdBy": "Creato da {authorName}"
+  },
+  "CommonHooks": {
+    "useCopy": {
+      "copied": "Il testo è stato copiato",
+      "copyError": "Impossibile copiare"
+    }
+  },
+  "ShareLink": {
+    "lifecycle": {
+      "activating": "Attivazione",
+      "stopping": "Arresto",
+      "stopAriaLabel": "Ferma il link",
+      "stop": "Ferma",
+      "launchAriaLabel": "Avvia il link",
+      "launch": "Avvia"
+    },
+    "settings": {
+      "hitsLimit": "Limite visite:",
+      "timeoutAt": "Scade il:",
+      "timeoutPlaceholder": "Fine dei tempi",
+      "updateAriaLabel": "Aggiorna il link",
+      "updating": "Aggiornamento",
+      "update": "Aggiorna"
+    },
+    "controls": {
+      "stopped": "Link condiviso fermato",
+      "stopError": "Impossibile fermare il link condiviso",
+      "started": "Link condiviso avviato",
+      "startError": "Impossibile avviare il link condiviso",
+      "updated": "Link condiviso aggiornato",
+      "updateError": "Impossibile aggiornare il link condiviso",
+      "labelsError": "Impossibile aggiornare la visibilità delle etichette",
+      "hitsUnlimited": "Visite illimitate",
+      "hitsEmpty": "Nessuna visita rimasta",
+      "hitsRemaining": "{count, plural, one {# visita rimasta} other {# visite rimaste}}",
+      "timeUnlimited": "Nessuna scadenza",
+      "timeLeftWithValue": "Tempo rimasto {time}",
+      "timeLeft": "Tempo rimasto"
+    }
+  },
+  "ShareLinkActions": {
+    "actions": {
+      "groupAriaLabel": "Azioni del link condiviso per {subject}",
+      "preview": "Anteprima",
+      "previewAriaLabel": "Anteprima di {subject}",
+      "delete": "Elimina",
+      "deleteAriaLabel": "Elimina il link condiviso per {subject}"
+    },
+    "previewLabels": {
+      "groupAriaLabel": "Azioni del link condiviso per {subject}",
+      "preview": "Anteprima",
+      "previewAriaLabel": "Anteprima di {subject}"
+    },
+    "done": {
+      "caption": "Fatto",
+      "ariaLabel": "Chiudi l'anteprima del link condiviso per {subject}"
+    },
+    "editLabels": {
+      "caption": "Modifica etichette",
+      "ariaLabel": "Modifica le etichette per {subject}"
+    },
+    "goToLink": {
+      "caption": "Segui il link",
+      "ariaLabel": "Apri il link condiviso per {subject} in una nuova scheda"
+    },
+    "labelsToggle": {
+      "visible": "Etichette visibili",
+      "hidden": "Etichette nascoste",
+      "ariaLabel": "Mostra le etichette sul link condiviso per {subject}"
+    },
+    "update": {
+      "caption": "Aggiorna",
+      "ariaLabel": "Aggiorna il link condiviso per {subject}",
+      "disabledInactive": "Ciò che deve ancora iniziare non si può cambiare",
+      "disabledUnchanged": "Tutto è al suo posto",
+      "unavailableAlt": "Aggiornamento non disponibile per {subject}: {message}",
+      "wakingAlt": "Il link condiviso per {subject} si sta avviando"
+    }
+  },
+  "ShareLinkManagement": {
+    "list": {},
+    "filters": {
+      "groupAriaLabel": "Filtra i link condivisi per stato",
+      "showTitle": "Mostra\r\n {title}",
+      "hideTitle": "Nascondi\r\n {title}",
+      "options": {
+        "active": {
+          "title": "Attivi",
+          "showAriaLabel": "Mostra i link condivisi attivi",
+          "hideAriaLabel": "Nascondi i link condivisi attivi"
+        },
+        "inactive": {
+          "title": "Inattivi",
+          "showAriaLabel": "Mostra i link condivisi inattivi",
+          "hideAriaLabel": "Nascondi i link condivisi inattivi"
+        },
+        "expired": {
+          "title": "Scaduti",
+          "showAriaLabel": "Mostra i link condivisi scaduti",
+          "hideAriaLabel": "Nascondi i link condivisi scaduti"
+        },
+        "viewLimitReached": {
+          "title": "0 visite rimaste",
+          "showAriaLabel": "Mostra i link condivisi che hanno raggiunto il limite di visite",
+          "hideAriaLabel": "Nascondi i link condivisi che hanno raggiunto il limite di visite"
+        }
+      }
+    },
+    "row": {
+      "deleteQuestion": "Vuoi cancellare magicamente questo link dall'esistenza?",
+      "deleteCancel": "No",
+      "deleteConfirm": "Sì",
+      "erased": "Link condiviso cancellato",
+      "eraseError": "Non ha funzionato. L'universo resta invariato."
+    }
+  },
+  "ShareLinkLanternPanel": {
+    "statsAriaLabel": "Statistiche del link condiviso",
+    "panelAriaLabel": "Link condiviso per {subject}",
+    "lanternAriaLabel": "Lanterna haiku: {subject}",
+    "copyTitle": "Copia il link condiviso!",
+    "copyAriaLabel": "Copia il link condiviso per {subject}"
+  },
+  "ShareLinkControlsColumn": {
+    "settingsAriaLabel": "Impostazioni del link condiviso per {subject}"
+  },
+  "ShareLinkPreviewModal": {
+    "panelAriaLabel": "Lanterna condivisa: {subject}",
+    "labelsAriaLabel": "Etichette di {subject}",
+    "lanternAriaLabel": "Lanterna haiku: {subject}",
+    "loading": "In attesa dei dati",
+    "unavailable": "Questo haiku non è più disponibile."
+  },
+  "ShareLinksSort": {
+    "title": "Ordina per",
+    "ariaLabel": "Ordina i link condivisi",
+    "coverAriaLabel": "Seleziona {title}",
+    "categories": {
+      "creationDate": "Data di creazione",
+      "creationDateAriaLabel": "Ordina per data di creazione",
+      "alpacabet": "Alpacabeto",
+      "alpacabetAriaLabel": "Ordina alpacabeticamente",
+      "hitsLeft": "Visite rimaste",
+      "hitsLeftAriaLabel": "Ordina per visite rimaste",
+      "timeLeft": "Tempo rimasto",
+      "timeLeftAriaLabel": "Ordina per tempo rimasto"
+    }
+  },
+  "ShareLinkStatus": {
+    "labels": {
+      "expired": "Scaduto",
+      "viewLimitReached": "Limite di visite raggiunto",
+      "stopped": "Fermato",
+      "expiresIn": "Scade tra",
+      "remainingViews": "Visite rimaste",
+      "active": "Attivo"
+    },
+    "duration": {
+      "lessThanMinute": "meno di un minuto",
+      "minutes": "{count, plural, one {# minuto} other {# minuti}}",
+      "hours": "{count, plural, one {# ora} other {# ore}}",
+      "days": "{count, plural, one {# giorno} other {# giorni}}",
+      "months": "{count, plural, one {# mese} other {# mesi}}"
+    }
+  },
+  "FetchEmptyState": {
+    "caption": "Non c'era niente da recuperare"
   }
 }

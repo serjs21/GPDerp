@@ -3,7 +3,7 @@
 import { useRef, type ComponentType } from "react";
 import { Languages } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { DE, ES, FR, IT, JP, PT, TH, US } from "country-flag-icons/react/3x2";
+import { CN, DE, ES, FR, IT, JP, PT, TH, US, VN } from "country-flag-icons/react/3x2";
 import {
   TextBubbleDropdown,
   type TextBubbleDropDirection,
@@ -31,6 +31,8 @@ const LOCALE_FLAGS: Partial<Record<AppLocale, FlagComponent>> = {
   de: DE,
   it: IT,
   pt: PT,
+  zh: CN,
+  vi: VN,
 };
 
 export type LocaleBubbleSelectorProps = {

@@ -161,7 +161,7 @@ type UserConfigurationDto = {
 };
 
 const SUPPORTED_THEMES = new Set(["tokyo-dusk", "sumie", "night-sky"]);
-const SUPPORTED_LANGUAGES = new Set(["en", "ja", "es", "fr", "th", "de", "it", "pt"]);
+const SUPPORTED_LANGUAGES = new Set(["en", "ja", "es", "fr", "th", "de", "it", "pt", "zh", "vi"]);
 const CELESTIAL_SLOT_MAX = 95;
 
 /** `undefined` = not provided, `null` = reset to clock, number = explicit slot; `false` = invalid. */

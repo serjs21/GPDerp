@@ -18,9 +18,17 @@ import {
 import { startPostcardQueue, stopPostcardQueue } from "./modules/postcard/postcardQueue";
 import { isPostcardDevRouteEnabled, postcardDevPlugin } from "./modules/postcard/postcardDev.controller";
 import { emailPreviewDevPlugin, isEmailPreviewDevRouteEnabled } from "./modules/email/emailPreviewDev.controller";
+import { prismaClient } from "./lib/prisma";
+import { SHUTDOWN_TIMEOUT_MS } from "./consts/server";
 
 const app = Fastify({
   logger: true,
+  // Only reachable through the hosting load balancer: take the client IP from X-Forwarded-For.
+  trustProxy: true,
+});
+
+app.addHook("onClose", async () => {
+  await prismaClient.$disconnect();
 });
 
 /* ----------------------------- Bootstrap ----------------------------- */
@@ -88,9 +96,16 @@ async function run() {
   console.log(`Server ready on http://localhost:${port}`);
 }
 
-/** Let in-flight postcard jobs finish (graceful pg-boss stop via onClose) before exiting. */
+/**
+ * Let in-flight requests and postcard jobs finish (graceful pg-boss stop via onClose) before exiting,
+ * but never past SHUTDOWN_TIMEOUT_MS: the platform kills the container shortly after SIGTERM.
+ */
 const shutdown = (signal: NodeJS.Signals) => {
   console.log(`${signal} received, shutting down...`);
+  setTimeout(() => {
+    console.error(`Shutdown exceeded ${SHUTDOWN_TIMEOUT_MS}ms, forcing exit.`);
+    process.exit(1);
+  }, SHUTDOWN_TIMEOUT_MS).unref();
   app
     .close()
     .then(() => process.exit(0))

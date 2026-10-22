@@ -14,7 +14,7 @@ import {
   type CSSProperties,
   type ReactNode,
 } from "react";
-import { DE, ES, FR, IT, JP, PT, TH, US } from "country-flag-icons/react/3x2";
+import { CN, DE, ES, FR, IT, JP, PT, TH, US, VN } from "country-flag-icons/react/3x2";
 import styles from "./LocaleSelector.module.css";
 
 const ICON_BUTTON_PADDING_PX = 4;
@@ -33,6 +33,8 @@ const LOCALE_FLAGS: Partial<Record<AppLocale, FlagComponent>> = {
   de: DE,
   it: IT,
   pt: PT,
+  zh: CN,
+  vi: VN,
 };
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

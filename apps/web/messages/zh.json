@@ -1,0 +1,878 @@
+{
+  "Profile": {
+    "title": "个人资料",
+    "saveProfile": "保存资料",
+    "theme": "主题",
+    "language": "语言",
+    "languageSearchPlaceholder": "搜索语言",
+    "languageNoMatches": "没有匹配的语言",
+    "languageCurrent": "当前",
+    "preferencesGroupLabel": "显示与语言",
+    "preferencesSaveError": "无法保存你的偏好设置",
+    "languageAriaLabel": "语言：{language}",
+    "userFallback": "用户",
+    "sortAndFilter": "排序与筛选",
+    "tabs": {
+      "profile": {
+        "ariaLabel": "个人资料信息"
+      },
+      "shareLinks": {
+        "title": "分享链接",
+        "ariaLabel": "管理分享链接"
+      },
+      "labels": {
+        "title": "标签",
+        "ariaLabel": "管理标签"
+      }
+    },
+    "toasts": {
+      "loadError": "无法加载个人资料",
+      "updateSuccess": "个人资料已更新",
+      "updateError": "无法更新个人资料",
+      "avatarSaved": "头像已保存",
+      "avatarError": "无法将头像保存到你的账户"
+    }
+  },
+  "BuyGenerations": {
+    "title": "俳句生成次数",
+    "balance": "你有 {count} 个生成点数。",
+    "balanceUnknown": "你的生成点数余额会显示在这里。",
+    "product": "100 次俳句生成——每次购买恰好增加 100 个点数。",
+    "buy": "购买 100 次生成——$3.0",
+    "unavailable": "暂时无法结账。",
+    "error": "无法开始结账。",
+    "success": "购买完成——生成次数已到账。",
+    "confirmError": "付款成功，但暂时无法更新你的余额。请稍后刷新。",
+    "insufficient": "生成次数已用完",
+    "insufficientDescription": "前往设置购买更多生成次数，继续写俳句吧。"
+  },
+  "LibraryCard": {
+    "title": "借书卡",
+    "belongsTo": "此卡持有人",
+    "remaining": "剩余 {count} 次生成",
+    "remainingUnknown": "剩余生成次数会显示在这里。",
+    "buyMore": "购买更多",
+    "profileIconAlt": "{name} 的头像"
+  },
+  "ProfileInfo": {
+    "firstName": "名",
+    "lastName": "姓"
+  },
+  "Themes": {
+    "tokyoDusk": "东京黄昏",
+    "sumie": "墨绘",
+    "nightSky": "夜空"
+  },
+  "Languages": {
+    "codes": {
+      "en": "英语",
+      "ja": "日语",
+      "es": "西班牙语",
+      "fr": "法语",
+      "th": "泰语",
+      "de": "德语",
+      "it": "意大利语",
+      "pt": "葡萄牙语",
+      "zh": "中文",
+      "vi": "越南语"
+    }
+  },
+  "RootLayout": {
+    "description": "AI，但没啥用"
+  },
+  "LegalPages": {
+    "back": "← 返回",
+    "terms": {
+      "title": "服务条款",
+      "description": "关于使用俳句生成服务、通过 Paddle 计费及相关政策的条款。"
+    },
+    "privacy": {
+      "title": "隐私政策",
+      "description": "我们如何为俳句生成服务收集、使用和保护数据，包括通过 Paddle 进行的支付。"
+    },
+    "refund": {
+      "title": "退款政策",
+      "description": "俳句生成服务通过 Paddle 进行的退款、取消订阅和计费说明。"
+    },
+    "cookies": {
+      "title": "Cookie 政策",
+      "description": "俳句生成服务如何使用 Cookie 及类似技术。"
+    },
+    "acceptableUse": {
+      "title": "可接受使用政策",
+      "description": "合理使用俳句生成服务的规则。"
+    }
+  },
+  "SiteFooter": {
+    "legalPolicies": "法律政策",
+    "terms": "服务条款",
+    "privacy": "隐私政策",
+    "refund": "退款政策",
+    "acceptableUse": "可接受使用",
+    "cookies": "Cookie 政策",
+    "paddleNotice": "付款由 <buyerTerms>Paddle</buyerTerms> 作为记录商户处理。购买时适用 Paddle 的<refund>买家退款政策</refund>、<checkout>结账条款</checkout>和<privacy>隐私声明</privacy>。"
+  },
+  "NoCreditsLeft": {
+    "continueGenerationOffer": {
+      "questionWithSubject": "继续生成“{subject}”？",
+      "question": "继续生成？",
+      "confirm": "继续",
+      "cancel": "以后再说"
+    }
+  },
+  "NoGenerationsLeftModal": {
+    "title": "生成次数已用完",
+    "dismiss": "以后再说",
+    "buy": "购买 100 次生成",
+    "fallbackMessage": "购买更多生成次数以继续创作。付款确认后点数即会到账。"
+  },
+  "PurchaseConfirmModal": {
+    "title": "购买成功",
+    "done": "完成"
+  },
+  "CelestialThemeClock": {
+    "ariaLabel": "时段"
+  },
+  "CelestialThemeSelector": {
+    "ariaLabel": "主题时段"
+  },
+  "ComicPageLayout": {
+    "close": "关闭"
+  },
+  "ComicToast": {
+    "notifications": "通知"
+  },
+  "PaperModal": {
+    "dialog": "对话框",
+    "close": "关闭"
+  },
+  "ComicConfirmModal": {
+    "confirm": "确认",
+    "cancel": "取消",
+    "description": "请选择确认或取消。"
+  },
+  "OrderDropdown": {
+    "ariaLabel": "俳句排序",
+    "title": "排序方式",
+    "categories": {
+      "creationDate": {
+        "title": "创建日期",
+        "ariaLabel": "按创建日期排序"
+      },
+      "alpacabet": {
+        "title": "羊驼字母序",
+        "ariaLabel": "按字母顺序排序"
+      }
+    }
+  },
+  "OrderDropdownCover": {
+    "ariaLabel": "更改排序"
+  },
+  "TextBubbleDropdown": {
+    "placeholder": "选择选项"
+  },
+  "DualityButton": {
+    "coverState": {
+      "reveal": "揭晓{title}"
+    }
+  },
+  "BrushMenu": {
+    "placeholder": "选择"
+  },
+  "AuthFlows": {
+    "login": {
+      "emailPlaceholder": "邮箱",
+      "passwordPlaceholder": "密码",
+      "invalidEmail": "需要一个有效的邮箱才行。光靠决心可送不到消息。",
+      "passwordRequired": "请输入密码。沉默可打不开这扇门。",
+      "divider": "或使用邮箱登录",
+      "submit": "登录",
+      "submitting": "正在登录",
+      "useGoogleSignIn": "此账户使用 Google 登录。",
+      "tooManyAttempts": "尝试次数过多，请稍后再试。狂点神功正在休息中。",
+      "invalidCredentials": "邮箱或密码错误",
+      "completeSetupOnRegistration": "请在注册页面完成账户设置。",
+      "googleSignInFailed": "Google 登录失败"
+    },
+    "register": {
+      "emailPlaceholder": "邮箱",
+      "passwordPlaceholder": "密码",
+      "confirmPasswordPlaceholder": "确认密码",
+      "invalidEmail": "需要一个有效的邮箱才行。光靠决心可送不到消息。",
+      "passwordRequired": "请输入密码。沉默可打不开这扇门。",
+      "passwordTooShort": "至少 8 个字符",
+      "passwordsDoNotMatch": "两次密码要一致。我们的机器人可不擅长处理模棱两可。",
+      "divider": "或使用邮箱注册",
+      "submit": "创建账户",
+      "submitting": "正在创建账户",
+      "googleSignUpFailed": "Google 注册失败"
+    },
+    "chrome": {
+      "signInWithGoogle": "使用 Google 登录",
+      "signUpWithGoogle": "使用 Google 注册"
+    }
+  },
+  "AuthGateModal": {
+    "signIn": "登录",
+    "createAccount": "创建账户",
+    "signInTab": "登录",
+    "registerTab": "注册",
+    "forgotPassword": "忘记密码？"
+  },
+  "AuthLanterns": {
+    "login": "登录",
+    "register": "注册",
+    "entryGroupLabel": "账户"
+  },
+  "EmailChangeRevert": {
+    "pageTitle": "撤销邮箱更改",
+    "restoreLabel": "这个是对的",
+    "changedToLabel": "这个不对",
+    "confirmLead": "再确认一下，你确定还要这样做吗？",
+    "confirmConsequences": "这会把邮箱恢复为之前的地址，并让所有设备上的登录全部退出。",
+    "confirmCta": "是的，撤销",
+    "keepCta": "我已经无所谓了",
+    "revertedCaption": "已撤销",
+    "setPasswordLead": "搞定。{email} 已保留在账户上，所有人都已退出登录。",
+    "emailTakenLead": "所有人都已退出登录，但 {email} 现在属于另一个账户，所以无法恢复。",
+    "setPasswordNote": "出于安全考虑，你需要设置一个新密码。毕竟，刚刚有人未经允许用了你的旧密码。",
+    "newPasswordPlaceholder": "新密码",
+    "confirmPasswordPlaceholder": "再次输入新密码",
+    "setPasswordCta": "保存密码",
+    "passwordTooShort": "请至少使用 {min} 个字符。",
+    "passwordsDoNotMatch": "两次输入的密码不一致。",
+    "passwordFailed": "无法保存密码，请重试。",
+    "loadingTitle": "检查中",
+    "loadingBody": "我们的机器人正在搜寻你的数据……",
+    "passwordSavedTitle": "一切就绪",
+    "passwordSavedBody": "新密码已保存。请使用 {email} 和新密码登录。",
+    "revertedTitle": "已撤销",
+    "revertedBody": "{email} 已保留在账户上，所有人都已退出登录。",
+    "emailTakenNoPasswordBody": "所有人都已退出登录，但 {email} 现在属于另一个账户，所以无法恢复。",
+    "invalidTitle": "未知链接",
+    "invalidBody": "此链接没有匹配任何内容。请确认你打开的是邮件中的完整链接。",
+    "expiredTitle": "链接已过期",
+    "expiredBody": "此撤销链接仅在 7 天内有效。如果仍有异常，请在登录页面重置密码。",
+    "usedTitle": "已被使用",
+    "usedBody": "此链接已被使用过，或者该更改已通过另一个链接撤销。",
+    "unavailableTitle": "链接已停用",
+    "unavailableBody": "你的旧地址现在属于另一个已确认它的账户，因此此更改无法再撤销。如果有任何异常，请在登录页面重置密码。",
+    "failedTitle": "出了点问题",
+    "failedBody": "无法连接服务器。请稍后再次打开链接。",
+    "signInCta": "登录",
+    "homeCta": "回首页"
+  },
+  "ResetPasswordModal": {
+    "requestTitle": "重置密码",
+    "confirmTitle": "新密码",
+    "requestCta": "发送重置链接",
+    "confirmCta": "更新密码",
+    "requestLead": "输入你的邮箱，如果账户存在，我们会发送一个链接。",
+    "confirmLead": "为你的账户设置一个新密码。",
+    "emailPlaceholder": "邮箱",
+    "newPasswordPlaceholder": "新密码",
+    "confirmPasswordPlaceholder": "确认密码",
+    "invalidEmail": "请输入有效的邮箱",
+    "passwordTooShort": "密码至少需要 8 个字符",
+    "passwordsDoNotMatch": "两次输入的密码不一致",
+    "requestSent": "如果该邮箱对应的账户存在，我们已发送重置说明。",
+    "requestFailed": "请求失败，请重试。",
+    "linkInvalid": "重置链接缺失或无效。",
+    "confirmSuccess": "密码已更新，现在可以登录了。",
+    "confirmFailed": "重置失败"
+  },
+  "VerifyEmail": {
+    "verifyingTitle": "正在验证你的邮箱",
+    "verifyingBody": "正在验证你的链接，请稍候。",
+    "alreadyVerifiedTitle": "邮箱已验证",
+    "alreadyVerifiedBody": "你的邮箱已通过验证。{seconds} 秒后将跳转到首页。",
+    "resentTitle": "验证邮件已发送",
+    "expiredTitle": "验证链接已过期",
+    "resentBody": "我们已发送一封新的验证邮件。请查看收件箱并使用最新的链接。",
+    "expiredBody": "此验证链接已过期。",
+    "resending": "发送中……",
+    "resend": "重新发送验证邮件"
+  },
+  "UserMenu": {
+    "fallbackName": "用户",
+    "settings": "设置",
+    "logout": "退出登录",
+    "goHome": "回首页",
+    "login": "登录",
+    "guest": "访客",
+    "logoutQuestion": "玩够了吗？",
+    "logoutCancel": "还没",
+    "logoutConfirm": "够了"
+  },
+  "LoginPage": {
+    "title": "登录",
+    "completeSetupOnRegistration": "请在注册页面完成账户设置。",
+    "createAccountLink": "创建账户",
+    "forgotPassword": "忘记密码？"
+  },
+  "RegisterPage": {
+    "title": "创建账户",
+    "haveAccount": "已有账户？<link>登录</link>"
+  },
+  "CompleteRegistrationPage": {
+    "title": "完成注册",
+    "loading": "加载中……",
+    "lead": "选择一个用户名，完成账户设置。",
+    "usernameLabel": "用户名",
+    "usernamePlaceholder": "your_handle",
+    "usernameRequired": "请选择用户名",
+    "usernameTooShort": "至少 {min} 个字符",
+    "usernamePattern": "仅限字母、数字和下划线",
+    "usernameUnavailable": "该用户名不可用",
+    "usernameTaken": "用户名已被占用",
+    "saveFailed": "无法保存用户名",
+    "success": "一切就绪",
+    "continue": "继续",
+    "backHome": "返回首页"
+  },
+  "AuthHooks": {
+    "registrationSent": "如果此邮箱可用于注册新账户，我们已发送验证链接。请查看收件箱。",
+    "registrationFailed": "注册失败",
+    "usernameUnavailable": "该用户名不可用",
+    "googleSignInFailed": "Google 登录失败"
+  },
+  "HaikuContainer": {
+    "haikuActions": {
+      "deleteLabel": "删除",
+      "deleteAriaLabel": "删除俳句",
+      "shareLabel": "分享",
+      "shareAriaLabel": "分享俳句",
+      "labelLabel": "标签",
+      "labelAriaLabel": "添加标签",
+      "copyLabel": "复制",
+      "copyAriaLabel": "复制到剪贴板",
+      "deleted": "俳句已删除",
+      "deleteForbidden": "你无权删除这首俳句。",
+      "deleteFailed": "无法删除俳句。",
+      "saving": "正在保存这首俳句……",
+      "groupAriaLabel": "俳句操作",
+      "hideActions": "隐藏俳句操作",
+      "showActions": "显示俳句操作"
+    }
+  },
+  "HaikuGenerationStickyNote": {
+    "generationFlow": {
+      "errorTitle": "别慌，但出了点问题",
+      "errorDescription": "我们的苦力正在拼命修复这个问题。我们很快就会派人去更狠地鞭策他们。\n请稍后再试。"
+    }
+  },
+  "Lantern": {
+    "lantern": {
+      "bodyAriaLabel": "俳句",
+      "haikuLantern": "俳句灯笼：{title}",
+      "generating": "正在生成俳句：{subject}",
+      "rotatedLantern": "已旋转的俳句灯笼"
+    },
+    "labelBelt": {
+      "ariaLabel": "俳句标签带",
+      "previous": "上一组标签",
+      "next": "下一组标签"
+    },
+    "lanternDeleteExit": {
+      "deleted": "俳句已删除",
+      "deleteForbidden": "你无权删除这首俳句。",
+      "deleteFailed": "无法删除俳句。"
+    },
+    "lanternSteppedFlight": {
+      "deleting": "正在删除俳句：{title}"
+    },
+    "lanternRotatedShell": {
+      "labels": "{label} 的标签"
+    },
+    "lanternPath": {
+      "generating": "正在生成：{subject}",
+      "focusPosition": "{title} · {position} / {total}",
+      "untitled": "俳句",
+      "empty": "没有俳句",
+      "previous": "上一首俳句",
+      "next": "下一首俳句"
+    },
+    "lanternPathLantern": {
+      "generating": "正在生成俳句：{subject}",
+      "haikuLantern": "俳句灯笼：{title}",
+      "lantern": "俳句灯笼",
+      "labels": "{label} 的标签"
+    },
+    "lanternPathStage": {
+      "ariaLabel": "灯笼飞行路径"
+    }
+  },
+  "LanternSubmit": {
+    "ariaLabel": "咏 作诗"
+  },
+  "SVGPath": {
+    "svgPath": {
+      "stageAriaLabel": "灯笼 SVG 路径"
+    },
+    "svgPathLantern": {
+      "loadingMore": "正在加载更多俳句",
+      "generating": "正在生成俳句：{subject}",
+      "haikuLantern": "俳句灯笼：{title}",
+      "labels": "{label} 的标签"
+    }
+  },
+  "SavedHaikusLanternPath": {
+    "loading": "正在加载俳句",
+    "loadError": "无法加载已保存的俳句。",
+    "retry": "重试",
+    "searching": "正在搜索俳句"
+  },
+  "PathNavigation": {
+    "pathNavigationArrows": {
+      "next": "下一盏灯笼",
+      "previous": "上一盏灯笼"
+    }
+  },
+  "PathOverlay": {
+    "pathOverlay": {
+      "title": "浮层",
+      "continueJourney": "留在这里",
+      "goBackToStart": "回到起点"
+    },
+    "overlayNextLabel": {
+      "label": "留在这里"
+    },
+    "overlayPrevLabel": {
+      "label": "回到起点"
+    }
+  },
+  "PostSignInput": {
+    "signAriaLabel": "俳句主题牌",
+    "placeholder": "题 主题",
+    "inputAriaLabel": "俳句主题",
+    "submitLabel": "咏 作诗"
+  },
+  "CreationModal": {
+    "generating": "正在生成俳句：{subject}",
+    "haikuLantern": "俳句灯笼：{title}",
+    "creation": "俳句创作"
+  },
+  "DeleteConfirmModal": {
+    "question": "你是故意的吗？",
+    "cancel": "手滑了",
+    "confirm": "是的"
+  },
+  "DeleteFailedModal": {
+    "title": "删除失败",
+    "leaveItBe": "随它去吧",
+    "retry": "重试",
+    "body": "我们没能删除这首俳句。你可以再试一次，或者把它留在列表里。"
+  },
+  "AwkwardLantern": {
+    "title": "呃，这就尴尬了……"
+  },
+  "RestartLinkButton": {
+    "expired": "已过期",
+    "limitReached": "剩余 0 次访问",
+    "revive": "复活！",
+    "resurrect": "起死回生！"
+  },
+  "GoHome": {
+    "label": "回首页"
+  },
+  "NotFoundView": {
+    "toast": "这个链接已经不复存在了",
+    "signUp": "注册后就能发送你自己的失效链接",
+    "copy": "看起来有人给你发了一个打不开的链接。\n也许是打错字了，也许这里有些信任问题需要解决。\n总之，这个链接已经没了。"
+  },
+  "Loaders": {
+    "sakuraPetalLoader": {
+      "ariaLabel": "加载中"
+    },
+    "wagTailLoader": {
+      "ariaLabel": "加载中"
+    },
+    "lanternLoader": {
+      "ariaLabel": "加载中"
+    },
+    "loadingText": {
+      "text": "加载中"
+    },
+    "fetchingLoader": {
+      "ariaLabel": "加载中",
+      "text": "获取中"
+    }
+  },
+  "MfgDate": {
+    "defaultLabel": "创建于"
+  },
+  "GoldenAgeTitle": {
+    "subtitle": "俳句生成器",
+    "tagline": "AI，但不切实际！"
+  },
+  "HaikuHooks": {
+    "deleteController": {
+      "deleted": "俳句已删除",
+      "deleteFailed": "无法删除俳句。"
+    }
+  },
+  "ComicLabelCreationModal": {
+    "save": "保存",
+    "create": "创建",
+    "loadingLabels": "正在加载标签……",
+    "enterName": "请输入标签名称",
+    "nameTooShort": "名称至少需要 {min} 个字符",
+    "alreadyExists": "此账户中已存在该标签",
+    "updated": "标签已更新",
+    "updateError": "无法更新标签",
+    "created": "标签已创建",
+    "createError": "无法创建标签",
+    "previewTitle": "这是",
+    "minChars": "至少 {min} 个字符",
+    "nameAriaLabel": "标签名称",
+    "color": "颜色",
+    "colorAriaLabel": "标签颜色",
+    "openColorPicker": "打开取色器",
+    "shapeAriaLabel": "{shape}形状",
+    "saveAriaLabel": "保存标签",
+    "createAriaLabel": "创建标签",
+    "shapes": {
+      "classic": "经典",
+      "sharp": "尖锐",
+      "soft": "柔和",
+      "circle": "圆形",
+      "square": "方形",
+      "thought": "思考"
+    }
+  },
+  "ComicLabelPickerPanel": {
+    "filterPlaceholder": "筛选标签……",
+    "filterAriaLabel": "筛选标签",
+    "disabledAriaLabel": "{name}（已在另一个筛选中使用）"
+  },
+  "CreateAddLabelsModal": {
+    "maxLabels": "一首俳句最多只能有 {max} 个标签",
+    "saved": "诗歌已贴上标签",
+    "saveError": "出错了，未能添加标签",
+    "createTitle": "创建",
+    "createAriaLabel": "新建一个",
+    "addTitle": "添加",
+    "addAriaLabel": "为这首俳句添加标签",
+    "save": "保存"
+  },
+  "LabelHalo": {
+    "halo": {
+      "ariaLabel": "标签光环"
+    },
+    "slot": {
+      "rotateAriaLabel": "旋转标签——绕着标签拖动来调整",
+      "ariaLabel": "{name} 标签，{degrees} 度"
+    }
+  },
+  "LabelSort": {
+    "title": "排序依据",
+    "ariaLabel": "标签排序",
+    "selectCategory": "选择{title}",
+    "categories": {
+      "creationDate": {
+        "title": "创建日期",
+        "ariaLabel": "按创建日期排序"
+      },
+      "alpacabet": {
+        "title": "羊驼字母序",
+        "ariaLabel": "按字母顺序排序"
+      },
+      "connection": {
+        "title": "关联数",
+        "ariaLabel": "按关联数排序"
+      }
+    }
+  },
+  "LabelsFilterModal": {
+    "filter": "按标签筛选"
+  },
+  "ManageLabel": {
+    "manageLabel": {
+      "deleted": "标签已删除",
+      "deleteError": "无法删除标签",
+      "edit": "编辑",
+      "editAriaLabel": "编辑标签 {name}",
+      "tuneIn": "收听",
+      "tuneInAriaLabel": "收听标记为 {name} 的俳句",
+      "deleteQuestion": "打算怎么办？",
+      "cancel": "我怎么到这儿来了？",
+      "confirmDelete": "速战速决"
+    },
+    "createPanel": {
+      "ariaLabel": "创建新标签",
+      "create": "创建"
+    },
+    "connectedHaikus": {
+      "connected": "{total, plural, other {# 个关联}}",
+      "ariaLabel": "标记为 {name} 的俳句"
+    },
+    "labelActions": {
+      "tuneInDisabled": "搜我也没用。",
+      "tuneIn": "收听",
+      "tuneInAriaLabel": "收听标记为 {name} 的俳句",
+      "noHaikusAriaLabel": "没有标记为 {name} 的俳句",
+      "groupAriaLabel": "{name} 的操作",
+      "edit": "编辑",
+      "editAriaLabel": "编辑 {name}",
+      "delete": "删除",
+      "deleteAriaLabel": "删除 {name}"
+    },
+    "lanternStack": {
+      "notConnected": "未关联",
+      "lanternAriaLabel": "俳句灯笼：{title}"
+    },
+    "panel": {
+      "searchPlaceholder": "搜索标签……",
+      "searchAriaLabel": "按名称搜索标签"
+    }
+  },
+  "HeaderHaikuTools": {
+    "search": {
+      "buttonAriaLabel": "搜索俳句",
+      "placeholder": "搜索标题……",
+      "inputAriaLabel": "搜索俳句标题",
+      "actionName": "按名称搜索"
+    },
+    "filter": {
+      "buttonAriaLabel": "按标签筛选俳句",
+      "actionName": "按标签筛选",
+      "activeFiltersAriaLabel": "当前标签筛选",
+      "removeFilterAriaLabel": "移除筛选 {name}",
+      "removeExcludeFilterAriaLabel": "移除排除筛选 {name}"
+    },
+    "settingsSearch": {
+      "shareLinks": {
+        "placeholder": "搜索链接",
+        "ariaLabel": "按标题搜索",
+        "buttonAriaLabel": "搜索分享链接"
+      },
+      "labels": {
+        "placeholder": "搜索标签",
+        "ariaLabel": "按名称搜索标签",
+        "buttonAriaLabel": "搜索标签"
+      }
+    }
+  },
+  "IconUploader": {
+    "label": "更换头像",
+    "alt": "当前头像",
+    "uploading": "上传中：{progress}%"
+  },
+  "LabelHooks": {
+    "placementError": "无法保存标签位置",
+    "uploadComplete": "上传完成",
+    "uploadFailed": "图片上传失败"
+  },
+  "ShareModal": {
+    "modal": {
+      "defaultSubject": "俳句",
+      "linkTabTitle": "链接",
+      "linkTabAriaLabel": "通过链接分享",
+      "emailTabTitle": "邮件",
+      "emailTabAriaLabel": "通过邮件分享",
+      "loading": "加载中……"
+    },
+    "controller": {
+      "defaultSubject": "俳句",
+      "postcardsQueued": "明信片已投进邮筒",
+      "loadLinkError": "无法加载分享链接",
+      "sendEmailError": "无法发送邮件",
+      "addRecipientHint": "请至少添加一个收件人邮箱",
+      "fixInvalidHint": "请修正无效的收件人邮箱"
+    },
+    "email": {
+      "toPrefix": "收件人：",
+      "recipientsPlaceholder": "收件人邮箱（每输入一个按回车）",
+      "messagePlaceholder": "我想和你分享……",
+      "messageAriaLabel": "邮件内容",
+      "signature": "来自：{name}",
+      "invalidEmails": "无效邮箱：{emails}"
+    },
+    "sendPanel": {
+      "preparingPostcard": "正在准备明信片……",
+      "sendEmail": "发送邮件"
+    },
+    "postcardFront": {
+      "prepareError": "无法生成明信片图片"
+    }
+  },
+  "Postcard": {
+    "renderer": {
+      "ariaLabel": "俳句明信片",
+      "ariaLabelWithTitle": "俳句明信片：{title}"
+    }
+  },
+  "SharedHaikuPage": {
+    "unknownAuthor": "未知作者",
+    "lanternAriaLabel": "俳句灯笼：{subject}",
+    "labelsAriaLabel": "{subject} 的标签",
+    "createdBy": "作者：{authorName}"
+  },
+  "CommonHooks": {
+    "useCopy": {
+      "copied": "文本已复制",
+      "copyError": "无法复制"
+    }
+  },
+  "ShareLink": {
+    "lifecycle": {
+      "activating": "启动中",
+      "stopping": "停止中",
+      "stopAriaLabel": "停止链接",
+      "stop": "停止",
+      "launchAriaLabel": "启动链接",
+      "launch": "启动"
+    },
+    "settings": {
+      "hitsLimit": "访问次数上限：",
+      "timeoutAt": "到期时间：",
+      "timeoutPlaceholder": "直到时间尽头",
+      "updateAriaLabel": "更新链接",
+      "updating": "更新中",
+      "update": "更新"
+    },
+    "controls": {
+      "stopped": "分享链接已停止",
+      "stopError": "无法停止分享链接",
+      "started": "分享链接已启动",
+      "startError": "无法启动分享链接",
+      "updated": "分享链接已更新",
+      "updateError": "无法更新分享链接",
+      "labelsError": "无法更新标签可见性",
+      "hitsUnlimited": "访问次数不限",
+      "hitsEmpty": "访问次数已用完",
+      "hitsRemaining": "{count, plural, other {剩余 # 次访问}}",
+      "timeUnlimited": "永不过期",
+      "timeLeftWithValue": "剩余时间 {time}",
+      "timeLeft": "剩余时间"
+    }
+  },
+  "ShareLinkActions": {
+    "actions": {
+      "groupAriaLabel": "{subject} 的分享链接操作",
+      "preview": "预览",
+      "previewAriaLabel": "预览 {subject}",
+      "delete": "删除",
+      "deleteAriaLabel": "删除 {subject} 的分享链接"
+    },
+    "previewLabels": {
+      "groupAriaLabel": "{subject} 的分享链接操作",
+      "preview": "预览",
+      "previewAriaLabel": "预览 {subject}"
+    },
+    "done": {
+      "caption": "完成",
+      "ariaLabel": "关闭 {subject} 的分享链接预览"
+    },
+    "editLabels": {
+      "caption": "编辑标签",
+      "ariaLabel": "编辑 {subject} 的标签"
+    },
+    "goToLink": {
+      "caption": "打开链接",
+      "ariaLabel": "在新标签页中打开 {subject} 的分享链接"
+    },
+    "labelsToggle": {
+      "visible": "标签可见",
+      "hidden": "标签已隐藏",
+      "ariaLabel": "在 {subject} 的分享链接上显示标签"
+    },
+    "update": {
+      "caption": "更新",
+      "ariaLabel": "更新 {subject} 的分享链接",
+      "disabledInactive": "尚未开始的事，无从改变",
+      "disabledUnchanged": "一切都在它该在的位置",
+      "unavailableAlt": "{subject} 暂时无法更新：{message}",
+      "wakingAlt": "{subject} 的分享链接正在启动"
+    }
+  },
+  "ShareLinkManagement": {
+    "list": {},
+    "filters": {
+      "groupAriaLabel": "按状态筛选分享链接",
+      "showTitle": "显示\r\n {title}",
+      "hideTitle": "隐藏\r\n {title}",
+      "options": {
+        "active": {
+          "title": "活跃",
+          "showAriaLabel": "显示活跃的分享链接",
+          "hideAriaLabel": "隐藏活跃的分享链接"
+        },
+        "inactive": {
+          "title": "未启用",
+          "showAriaLabel": "显示未启用的分享链接",
+          "hideAriaLabel": "隐藏未启用的分享链接"
+        },
+        "expired": {
+          "title": "已过期",
+          "showAriaLabel": "显示已过期的分享链接",
+          "hideAriaLabel": "隐藏已过期的分享链接"
+        },
+        "viewLimitReached": {
+          "title": "剩余 0 次访问",
+          "showAriaLabel": "显示已达访问上限的分享链接",
+          "hideAriaLabel": "隐藏已达访问上限的分享链接"
+        }
+      }
+    },
+    "row": {
+      "deleteQuestion": "要用魔法把这个链接从世上抹去吗？",
+      "deleteCancel": "不要",
+      "deleteConfirm": "要",
+      "erased": "分享链接已抹去",
+      "eraseError": "失败了。宇宙依旧如初。"
+    }
+  },
+  "ShareLinkLanternPanel": {
+    "statsAriaLabel": "分享链接统计",
+    "panelAriaLabel": "{subject} 的分享链接",
+    "lanternAriaLabel": "俳句灯笼：{subject}",
+    "copyTitle": "复制分享链接！",
+    "copyAriaLabel": "复制 {subject} 的分享链接"
+  },
+  "ShareLinkControlsColumn": {
+    "settingsAriaLabel": "{subject} 的分享链接设置"
+  },
+  "ShareLinkPreviewModal": {
+    "panelAriaLabel": "已分享的灯笼：{subject}",
+    "labelsAriaLabel": "{subject} 的标签",
+    "lanternAriaLabel": "俳句灯笼：{subject}",
+    "loading": "正在等待数据到达",
+    "unavailable": "这首俳句已无法查看。"
+  },
+  "ShareLinksSort": {
+    "title": "排序依据",
+    "ariaLabel": "分享链接排序",
+    "coverAriaLabel": "选择{title}",
+    "categories": {
+      "creationDate": "创建日期",
+      "creationDateAriaLabel": "按创建日期排序",
+      "alpacabet": "羊驼字母序",
+      "alpacabetAriaLabel": "按羊驼字母序排序",
+      "hitsLeft": "剩余访问",
+      "hitsLeftAriaLabel": "按剩余访问次数排序",
+      "timeLeft": "剩余时间",
+      "timeLeftAriaLabel": "按剩余时间排序"
+    }
+  },
+  "ShareLinkStatus": {
+    "labels": {
+      "expired": "已过期",
+      "viewLimitReached": "已达访问上限",
+      "stopped": "已停止",
+      "expiresIn": "到期倒计时",
+      "remainingViews": "剩余访问次数",
+      "active": "活跃"
+    },
+    "duration": {
+      "lessThanMinute": "不到一分钟",
+      "minutes": "{count, plural, other {# 分钟}}",
+      "hours": "{count, plural, other {# 小时}}",
+      "days": "{count, plural, other {# 天}}",
+      "months": "{count, plural, other {# 个月}}"
+    }
+  },
+  "FetchEmptyState": {
+    "caption": "没有可获取的内容"
+  }
+}

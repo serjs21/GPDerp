@@ -1,0 +1,878 @@
+{
+  "Profile": {
+    "title": "Hồ sơ",
+    "saveProfile": "Lưu hồ sơ",
+    "theme": "Giao diện",
+    "language": "Ngôn ngữ",
+    "languageSearchPlaceholder": "Tìm ngôn ngữ",
+    "languageNoMatches": "Không có ngôn ngữ phù hợp",
+    "languageCurrent": "Hiện tại",
+    "preferencesGroupLabel": "Hiển thị và ngôn ngữ",
+    "preferencesSaveError": "Không thể lưu tùy chọn của bạn",
+    "languageAriaLabel": "Ngôn ngữ: {language}",
+    "userFallback": "Người dùng",
+    "sortAndFilter": "Sắp xếp và lọc",
+    "tabs": {
+      "profile": {
+        "ariaLabel": "Thông tin hồ sơ"
+      },
+      "shareLinks": {
+        "title": "Liên kết chia sẻ",
+        "ariaLabel": "Quản lý liên kết chia sẻ"
+      },
+      "labels": {
+        "title": "Nhãn",
+        "ariaLabel": "Quản lý nhãn"
+      }
+    },
+    "toasts": {
+      "loadError": "Không thể tải hồ sơ",
+      "updateSuccess": "Đã cập nhật hồ sơ",
+      "updateError": "Không thể cập nhật hồ sơ",
+      "avatarSaved": "Đã lưu ảnh đại diện",
+      "avatarError": "Không thể lưu ảnh đại diện vào tài khoản của bạn"
+    }
+  },
+  "BuyGenerations": {
+    "title": "Lượt tạo haiku",
+    "balance": "Bạn có {count} lượt tạo.",
+    "balanceUnknown": "Số lượt tạo của bạn sẽ hiện ở đây.",
+    "product": "100 lượt tạo haiku — mỗi lần mua cộng đúng 100 lượt.",
+    "buy": "Mua 100 lượt tạo — $3.0",
+    "unavailable": "Hiện chưa thể thanh toán.",
+    "error": "Không thể bắt đầu thanh toán.",
+    "success": "Mua thành công — đã cộng lượt tạo.",
+    "confirmError": "Thanh toán thành công, nhưng chúng tôi chưa cập nhật được số lượt. Hãy tải lại sau giây lát.",
+    "insufficient": "Hết lượt tạo",
+    "insufficientDescription": "Mua thêm lượt tạo trong Cài đặt để tiếp tục làm thơ haiku."
+  },
+  "LibraryCard": {
+    "title": "Thẻ thư viện",
+    "belongsTo": "Thẻ này thuộc về",
+    "remaining": "Còn {count} lượt tạo",
+    "remainingUnknown": "Số lượt tạo còn lại sẽ hiện ở đây.",
+    "buyMore": "Mua thêm",
+    "profileIconAlt": "Ảnh đại diện của {name}"
+  },
+  "ProfileInfo": {
+    "firstName": "Tên",
+    "lastName": "Họ"
+  },
+  "Themes": {
+    "tokyoDusk": "Hoàng hôn Tokyo",
+    "sumie": "Sumie",
+    "nightSky": "Bầu trời đêm"
+  },
+  "Languages": {
+    "codes": {
+      "en": "Tiếng Anh",
+      "ja": "Tiếng Nhật",
+      "es": "Tiếng Tây Ban Nha",
+      "fr": "Tiếng Pháp",
+      "th": "Tiếng Thái",
+      "de": "Tiếng Đức",
+      "it": "Tiếng Ý",
+      "pt": "Tiếng Bồ Đào Nha",
+      "zh": "Tiếng Trung",
+      "vi": "Tiếng Việt"
+    }
+  },
+  "RootLayout": {
+    "description": "AI, nhưng vô dụng"
+  },
+  "LegalPages": {
+    "back": "← Quay lại",
+    "terms": {
+      "title": "Điều khoản dịch vụ",
+      "description": "Các điều khoản về việc sử dụng dịch vụ tạo haiku, thanh toán qua Paddle và các chính sách liên quan."
+    },
+    "privacy": {
+      "title": "Chính sách quyền riêng tư",
+      "description": "Cách chúng tôi thu thập, sử dụng và bảo vệ dữ liệu cho dịch vụ tạo haiku, bao gồm thanh toán qua Paddle."
+    },
+    "refund": {
+      "title": "Chính sách hoàn tiền",
+      "description": "Hoàn tiền, hủy gói đăng ký và thanh toán cho dịch vụ tạo haiku qua Paddle."
+    },
+    "cookies": {
+      "title": "Chính sách cookie",
+      "description": "Cách dịch vụ tạo haiku sử dụng cookie và các công nghệ tương tự."
+    },
+    "acceptableUse": {
+      "title": "Chính sách sử dụng được chấp nhận",
+      "description": "Quy tắc sử dụng hợp lý dịch vụ tạo haiku."
+    }
+  },
+  "SiteFooter": {
+    "legalPolicies": "Chính sách pháp lý",
+    "terms": "Điều khoản dịch vụ",
+    "privacy": "Chính sách quyền riêng tư",
+    "refund": "Chính sách hoàn tiền",
+    "acceptableUse": "Sử dụng được chấp nhận",
+    "cookies": "Chính sách cookie",
+    "paddleNotice": "Thanh toán được xử lý bởi <buyerTerms>Paddle</buyerTerms> với tư cách bên bán chính thức. <refund>Chính sách hoàn tiền cho người mua</refund>, <checkout>điều khoản thanh toán</checkout> và <privacy>thông báo quyền riêng tư</privacy> của Paddle được áp dụng khi mua hàng."
+  },
+  "NoCreditsLeft": {
+    "continueGenerationOffer": {
+      "questionWithSubject": "Tiếp tục tạo “{subject}”?",
+      "question": "Tiếp tục tạo?",
+      "confirm": "Tiếp tục",
+      "cancel": "Để sau"
+    }
+  },
+  "NoGenerationsLeftModal": {
+    "title": "Hết lượt tạo",
+    "dismiss": "Để sau",
+    "buy": "Mua 100 lượt tạo",
+    "fallbackMessage": "Mua thêm lượt tạo để tiếp tục sáng tác. Lượt sẽ được cộng sau khi thanh toán được xác nhận."
+  },
+  "PurchaseConfirmModal": {
+    "title": "Đã xác nhận mua hàng",
+    "done": "Xong"
+  },
+  "CelestialThemeClock": {
+    "ariaLabel": "Thời điểm trong ngày"
+  },
+  "CelestialThemeSelector": {
+    "ariaLabel": "Thời điểm trong ngày của giao diện"
+  },
+  "ComicPageLayout": {
+    "close": "Đóng"
+  },
+  "ComicToast": {
+    "notifications": "Thông báo"
+  },
+  "PaperModal": {
+    "dialog": "Hộp thoại",
+    "close": "Đóng"
+  },
+  "ComicConfirmModal": {
+    "confirm": "Xác nhận",
+    "cancel": "Hủy",
+    "description": "Chọn xác nhận hoặc hủy."
+  },
+  "OrderDropdown": {
+    "ariaLabel": "Sắp xếp haiku",
+    "title": "Sắp xếp theo",
+    "categories": {
+      "creationDate": {
+        "title": "Ngày tạo",
+        "ariaLabel": "Sắp xếp theo ngày tạo"
+      },
+      "alpacabet": {
+        "title": "Bảng chữ cái",
+        "ariaLabel": "Sắp xếp theo bảng chữ cái"
+      }
+    }
+  },
+  "OrderDropdownCover": {
+    "ariaLabel": "Đổi thứ tự"
+  },
+  "TextBubbleDropdown": {
+    "placeholder": "Chọn tùy chọn"
+  },
+  "DualityButton": {
+    "coverState": {
+      "reveal": "Mở {title}"
+    }
+  },
+  "BrushMenu": {
+    "placeholder": "Chọn"
+  },
+  "AuthFlows": {
+    "login": {
+      "emailPlaceholder": "Email",
+      "passwordPlaceholder": "Mật khẩu",
+      "invalidEmail": "Bạn cần một email hợp lệ để việc này thành công. Chỉ quyết tâm thôi thì không gửi được thư đâu.",
+      "passwordRequired": "Nhập mật khẩu của bạn. Im lặng sẽ không mở được cánh cửa này.",
+      "divider": "hoặc đăng nhập bằng email",
+      "submit": "Đăng nhập",
+      "submitting": "Đang đăng nhập",
+      "useGoogleSignIn": "Tài khoản này dùng đăng nhập bằng Google.",
+      "tooManyAttempts": "Quá nhiều lần thử. Hãy đợi và thử lại sau. Kỹ thuật bấm liên tục đang nghỉ giải lao.",
+      "invalidCredentials": "Email hoặc mật khẩu không đúng",
+      "completeSetupOnRegistration": "Hoàn tất thiết lập tài khoản ở trang đăng ký.",
+      "googleSignInFailed": "Đăng nhập bằng Google thất bại"
+    },
+    "register": {
+      "emailPlaceholder": "Email",
+      "passwordPlaceholder": "Mật khẩu",
+      "confirmPasswordPlaceholder": "Xác nhận mật khẩu",
+      "invalidEmail": "Bạn cần một email hợp lệ để việc này thành công. Chỉ quyết tâm thôi thì không gửi được thư đâu.",
+      "passwordRequired": "Nhập mật khẩu của bạn. Im lặng sẽ không mở được cánh cửa này.",
+      "passwordTooShort": "Ít nhất 8 ký tự",
+      "passwordsDoNotMatch": "Mật khẩu cần nhất quán. Robot của chúng tôi không giỏi xử lý sự mơ hồ.",
+      "divider": "hoặc đăng ký bằng email",
+      "submit": "Tạo tài khoản",
+      "submitting": "Đang tạo tài khoản",
+      "googleSignUpFailed": "Đăng ký bằng Google thất bại"
+    },
+    "chrome": {
+      "signInWithGoogle": "Đăng nhập bằng Google",
+      "signUpWithGoogle": "Đăng ký bằng Google"
+    }
+  },
+  "AuthGateModal": {
+    "signIn": "Đăng nhập",
+    "createAccount": "Tạo tài khoản",
+    "signInTab": "Đăng nhập",
+    "registerTab": "Đăng ký",
+    "forgotPassword": "Quên mật khẩu?"
+  },
+  "AuthLanterns": {
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "entryGroupLabel": "Tài khoản"
+  },
+  "EmailChangeRevert": {
+    "pageTitle": "Hoàn tác thay đổi email",
+    "restoreLabel": "Cái này ổn",
+    "changedToLabel": "Cái này không ổn",
+    "confirmLead": "Chỉ muốn chắc chắn rằng bạn vẫn muốn làm điều này.",
+    "confirmConsequences": "Thao tác này sẽ khôi phục email về như trước và đăng xuất mọi người ở mọi nơi.",
+    "confirmCta": "Có, hoàn tác đi",
+    "keepCta": "Tôi không quan tâm nữa",
+    "revertedCaption": "Đã hoàn tác",
+    "setPasswordLead": "Xong. {email} vẫn được giữ trên tài khoản và mọi người đã bị đăng xuất.",
+    "emailTakenLead": "Mọi người đã bị đăng xuất, nhưng {email} giờ thuộc về một tài khoản khác nên không thể khôi phục.",
+    "setPasswordNote": "Vì lý do an toàn, bạn cần chọn mật khẩu mới. Bạn biết đấy, vì ai đó vừa dùng mật khẩu cũ của bạn mà không xin phép.",
+    "newPasswordPlaceholder": "Mật khẩu mới",
+    "confirmPasswordPlaceholder": "Nhập lại mật khẩu mới",
+    "setPasswordCta": "Lưu mật khẩu",
+    "passwordTooShort": "Dùng ít nhất {min} ký tự.",
+    "passwordsDoNotMatch": "Mật khẩu không khớp.",
+    "passwordFailed": "Không thể lưu mật khẩu. Hãy thử lại.",
+    "loadingTitle": "Đang kiểm tra",
+    "loadingBody": "Robot của chúng tôi đang tìm dữ liệu của bạn...",
+    "passwordSavedTitle": "Xong rồi",
+    "passwordSavedBody": "Đã lưu mật khẩu mới. Hãy đăng nhập bằng {email} và mật khẩu mới.",
+    "revertedTitle": "Đã hoàn tác",
+    "revertedBody": "{email} vẫn được giữ trên tài khoản và mọi người đã bị đăng xuất.",
+    "emailTakenNoPasswordBody": "Mọi người đã bị đăng xuất, nhưng {email} giờ thuộc về một tài khoản khác nên không thể khôi phục.",
+    "invalidTitle": "Liên kết không xác định",
+    "invalidBody": "Liên kết này không khớp với gì cả. Hãy chắc chắn bạn đã mở toàn bộ liên kết trong email.",
+    "expiredTitle": "Liên kết đã hết hạn",
+    "expiredBody": "Liên kết hoàn tác này chỉ có hiệu lực trong 7 ngày. Nếu vẫn thấy có gì bất thường, hãy đặt lại mật khẩu từ màn hình đăng nhập.",
+    "usedTitle": "Đã được dùng",
+    "usedBody": "Liên kết này đã được dùng, hoặc thay đổi đã được hoàn tác bằng một liên kết khác.",
+    "unavailableTitle": "Liên kết đã bị vô hiệu hóa",
+    "unavailableBody": "Địa chỉ cũ của bạn giờ thuộc về một tài khoản khác đã xác nhận nó, nên thay đổi này không thể hoàn tác nữa. Nếu thấy có gì bất thường, hãy đặt lại mật khẩu từ màn hình đăng nhập.",
+    "failedTitle": "Có gì đó hỏng rồi",
+    "failedBody": "Không thể kết nối tới máy chủ. Hãy thử mở lại liên kết sau giây lát.",
+    "signInCta": "Đăng nhập",
+    "homeCta": "Về trang chủ"
+  },
+  "ResetPasswordModal": {
+    "requestTitle": "Đặt lại mật khẩu",
+    "confirmTitle": "Mật khẩu mới",
+    "requestCta": "Gửi liên kết đặt lại",
+    "confirmCta": "Cập nhật mật khẩu",
+    "requestLead": "Nhập email của bạn, chúng tôi sẽ gửi liên kết nếu tài khoản tồn tại.",
+    "confirmLead": "Chọn mật khẩu mới cho tài khoản của bạn.",
+    "emailPlaceholder": "Email",
+    "newPasswordPlaceholder": "Mật khẩu mới",
+    "confirmPasswordPlaceholder": "Xác nhận mật khẩu",
+    "invalidEmail": "Nhập email hợp lệ",
+    "passwordTooShort": "Mật khẩu phải có ít nhất 8 ký tự",
+    "passwordsDoNotMatch": "Mật khẩu không khớp",
+    "requestSent": "Nếu có tài khoản với email đó, chúng tôi đã gửi hướng dẫn đặt lại.",
+    "requestFailed": "Yêu cầu thất bại. Hãy thử lại.",
+    "linkInvalid": "Liên kết đặt lại bị thiếu hoặc không hợp lệ.",
+    "confirmSuccess": "Đã cập nhật mật khẩu. Bạn có thể đăng nhập ngay.",
+    "confirmFailed": "Đặt lại thất bại"
+  },
+  "VerifyEmail": {
+    "verifyingTitle": "Đang xác minh email của bạn",
+    "verifyingBody": "Vui lòng đợi trong khi chúng tôi kiểm tra liên kết của bạn.",
+    "alreadyVerifiedTitle": "Email đã được xác minh",
+    "alreadyVerifiedBody": "Email của bạn đã được xác minh. Sẽ chuyển về trang chủ sau {seconds} giây.",
+    "resentTitle": "Đã gửi email xác minh",
+    "expiredTitle": "Liên kết xác minh đã hết hạn",
+    "resentBody": "Chúng tôi đã gửi email xác minh mới. Hãy kiểm tra hộp thư và dùng liên kết mới nhất.",
+    "expiredBody": "Liên kết xác minh này đã hết hạn.",
+    "resending": "Đang gửi...",
+    "resend": "Gửi lại email xác minh"
+  },
+  "UserMenu": {
+    "fallbackName": "Người dùng",
+    "settings": "Cài đặt",
+    "logout": "Đăng xuất",
+    "goHome": "Về trang chủ",
+    "login": "Đăng nhập",
+    "guest": "Khách",
+    "logoutQuestion": "Bạn đã vui đủ chưa?",
+    "logoutCancel": "Chưa đâu",
+    "logoutConfirm": "Rồi"
+  },
+  "LoginPage": {
+    "title": "Đăng nhập",
+    "completeSetupOnRegistration": "Hoàn tất thiết lập tài khoản ở trang đăng ký.",
+    "createAccountLink": "Tạo tài khoản",
+    "forgotPassword": "Quên mật khẩu?"
+  },
+  "RegisterPage": {
+    "title": "Tạo tài khoản",
+    "haveAccount": "Đã có tài khoản? <link>Đăng nhập</link>"
+  },
+  "CompleteRegistrationPage": {
+    "title": "Hoàn tất đăng ký",
+    "loading": "Đang tải…",
+    "lead": "Chọn tên người dùng để hoàn tất thiết lập tài khoản.",
+    "usernameLabel": "Tên người dùng",
+    "usernamePlaceholder": "ten_cua_ban",
+    "usernameRequired": "Chọn tên người dùng",
+    "usernameTooShort": "Ít nhất {min} ký tự",
+    "usernamePattern": "Chỉ gồm chữ cái, số và dấu gạch dưới",
+    "usernameUnavailable": "Tên người dùng không khả dụng",
+    "usernameTaken": "Tên người dùng đã có người dùng",
+    "saveFailed": "Không thể lưu tên người dùng",
+    "success": "Bạn đã sẵn sàng",
+    "continue": "Tiếp tục",
+    "backHome": "Về trang chủ"
+  },
+  "AuthHooks": {
+    "registrationSent": "Nếu email này có thể dùng cho tài khoản mới, chúng tôi đã gửi liên kết xác minh. Hãy kiểm tra hộp thư.",
+    "registrationFailed": "Đăng ký thất bại",
+    "usernameUnavailable": "Tên người dùng không khả dụng",
+    "googleSignInFailed": "Đăng nhập bằng Google thất bại"
+  },
+  "HaikuContainer": {
+    "haikuActions": {
+      "deleteLabel": "Xóa",
+      "deleteAriaLabel": "Xóa haiku",
+      "shareLabel": "Chia sẻ",
+      "shareAriaLabel": "Chia sẻ haiku",
+      "labelLabel": "Nhãn",
+      "labelAriaLabel": "Thêm nhãn",
+      "copyLabel": "Sao chép",
+      "copyAriaLabel": "Sao chép vào bộ nhớ tạm",
+      "deleted": "Đã xóa haiku",
+      "deleteForbidden": "Bạn không được phép xóa haiku này.",
+      "deleteFailed": "Không thể xóa haiku.",
+      "saving": "Đang lưu haiku này…",
+      "groupAriaLabel": "Thao tác với haiku",
+      "hideActions": "Ẩn thao tác với haiku",
+      "showActions": "Hiện thao tác với haiku"
+    }
+  },
+  "HaikuGenerationStickyNote": {
+    "generationFlow": {
+      "errorTitle": "Đừng hoảng, nhưng có gì đó không ổn rồi",
+      "errorDescription": "Đám nô lệ của chúng tôi đang cật lực sửa lỗi này. Chúng tôi sẽ sớm cử người đến quất họ mạnh tay hơn.\nVui lòng thử lại sau."
+    }
+  },
+  "Lantern": {
+    "lantern": {
+      "bodyAriaLabel": "Haiku",
+      "haikuLantern": "Đèn lồng haiku: {title}",
+      "generating": "Đang tạo haiku: {subject}",
+      "rotatedLantern": "Đèn lồng haiku đã xoay"
+    },
+    "labelBelt": {
+      "ariaLabel": "Dải nhãn haiku",
+      "previous": "Nhãn trước",
+      "next": "Nhãn tiếp"
+    },
+    "lanternDeleteExit": {
+      "deleted": "Đã xóa haiku",
+      "deleteForbidden": "Bạn không được phép xóa haiku này.",
+      "deleteFailed": "Không thể xóa haiku."
+    },
+    "lanternSteppedFlight": {
+      "deleting": "Đang xóa haiku: {title}"
+    },
+    "lanternRotatedShell": {
+      "labels": "Nhãn của {label}"
+    },
+    "lanternPath": {
+      "generating": "Đang tạo: {subject}",
+      "focusPosition": "{title} · {position} / {total}",
+      "untitled": "Haiku",
+      "empty": "Chưa có haiku nào",
+      "previous": "Haiku trước",
+      "next": "Haiku tiếp"
+    },
+    "lanternPathLantern": {
+      "generating": "Đang tạo haiku: {subject}",
+      "haikuLantern": "Đèn lồng haiku: {title}",
+      "lantern": "Đèn lồng haiku",
+      "labels": "Nhãn của {label}"
+    },
+    "lanternPathStage": {
+      "ariaLabel": "Đường bay của đèn lồng"
+    }
+  },
+  "LanternSubmit": {
+    "ariaLabel": "詠む Sáng tác"
+  },
+  "SVGPath": {
+    "svgPath": {
+      "stageAriaLabel": "Đường SVG của đèn lồng"
+    },
+    "svgPathLantern": {
+      "loadingMore": "Đang tải thêm haiku",
+      "generating": "Đang tạo haiku: {subject}",
+      "haikuLantern": "Đèn lồng haiku: {title}",
+      "labels": "Nhãn của {label}"
+    }
+  },
+  "SavedHaikusLanternPath": {
+    "loading": "Đang tải haiku",
+    "loadError": "Không thể tải các haiku đã lưu.",
+    "retry": "Thử lại",
+    "searching": "Đang tìm haiku"
+  },
+  "PathNavigation": {
+    "pathNavigationArrows": {
+      "next": "Đèn lồng tiếp",
+      "previous": "Đèn lồng trước"
+    }
+  },
+  "PathOverlay": {
+    "pathOverlay": {
+      "title": "Lớp phủ",
+      "continueJourney": "Ở lại đây",
+      "goBackToStart": "Quay về điểm đầu"
+    },
+    "overlayNextLabel": {
+      "label": "Ở lại đây"
+    },
+    "overlayPrevLabel": {
+      "label": "Quay về điểm đầu"
+    }
+  },
+  "PostSignInput": {
+    "signAriaLabel": "Biển chủ đề haiku",
+    "placeholder": "題 Chủ đề",
+    "inputAriaLabel": "Chủ đề haiku",
+    "submitLabel": "詠む Sáng tác"
+  },
+  "CreationModal": {
+    "generating": "Đang tạo haiku: {subject}",
+    "haikuLantern": "Đèn lồng haiku: {title}",
+    "creation": "Tạo haiku"
+  },
+  "DeleteConfirmModal": {
+    "question": "Bạn có định làm vậy thật không?",
+    "cancel": "Không",
+    "confirm": "Ừ"
+  },
+  "DeleteFailedModal": {
+    "title": "Xóa thất bại",
+    "leaveItBe": "Cứ để đó",
+    "retry": "Thử lại",
+    "body": "Chúng tôi không thể xóa haiku này. Bạn có thể thử lại, hoặc giữ nó trong danh sách."
+  },
+  "AwkwardLantern": {
+    "title": "Chà, ngại ghê..."
+  },
+  "RestartLinkButton": {
+    "expired": "Đã hết hạn",
+    "limitReached": "Còn 0 lượt xem",
+    "revive": "Hồi sinh!",
+    "resurrect": "Phục sinh!"
+  },
+  "GoHome": {
+    "label": "Về trang chủ"
+  },
+  "NotFoundView": {
+    "toast": "Liên kết đó đã không còn tồn tại",
+    "signUp": "Đăng ký để gửi những liên kết chết của riêng bạn",
+    "copy": "Có vẻ ai đó đã gửi cho bạn một liên kết không hoạt động. \nCó thể là gõ nhầm. Cũng có thể có vài vấn đề lòng tin cần giải quyết ở đây.\nDù sao thì liên kết này đã không còn nữa."
+  },
+  "Loaders": {
+    "sakuraPetalLoader": {
+      "ariaLabel": "Đang tải"
+    },
+    "wagTailLoader": {
+      "ariaLabel": "Đang tải"
+    },
+    "lanternLoader": {
+      "ariaLabel": "Đang tải"
+    },
+    "loadingText": {
+      "text": "Đang tải"
+    },
+    "fetchingLoader": {
+      "ariaLabel": "Đang tải",
+      "text": "Đang lấy dữ liệu"
+    }
+  },
+  "MfgDate": {
+    "defaultLabel": "Ngày tạo"
+  },
+  "GoldenAgeTitle": {
+    "subtitle": "MÁY TẠO THƠ HAIKU",
+    "tagline": "AI, NHƯNG CHẲNG THỰC TẾ!"
+  },
+  "HaikuHooks": {
+    "deleteController": {
+      "deleted": "Đã xóa haiku",
+      "deleteFailed": "Không thể xóa haiku."
+    }
+  },
+  "ComicLabelCreationModal": {
+    "save": "Lưu",
+    "create": "Tạo",
+    "loadingLabels": "Đang tải nhãn...",
+    "enterName": "Nhập tên nhãn",
+    "nameTooShort": "Tên phải có ít nhất {min} ký tự",
+    "alreadyExists": "Nhãn đã tồn tại trong tài khoản này",
+    "updated": "Đã cập nhật nhãn",
+    "updateError": "Không thể cập nhật nhãn",
+    "created": "Đã tạo nhãn",
+    "createError": "Không thể tạo nhãn",
+    "previewTitle": "Đây là",
+    "minChars": "Tối thiểu {min} ký tự",
+    "nameAriaLabel": "Tên nhãn",
+    "color": "Màu",
+    "colorAriaLabel": "Màu nhãn",
+    "openColorPicker": "Mở bảng chọn màu",
+    "shapeAriaLabel": "Hình {shape}",
+    "saveAriaLabel": "Lưu nhãn",
+    "createAriaLabel": "Tạo nhãn",
+    "shapes": {
+      "classic": "Cổ điển",
+      "sharp": "Sắc cạnh",
+      "soft": "Mềm mại",
+      "circle": "Tròn",
+      "square": "Vuông",
+      "thought": "Suy nghĩ"
+    }
+  },
+  "ComicLabelPickerPanel": {
+    "filterPlaceholder": "Lọc nhãn…",
+    "filterAriaLabel": "Lọc nhãn",
+    "disabledAriaLabel": "{name} (đã dùng ở bộ lọc kia)"
+  },
+  "CreateAddLabelsModal": {
+    "maxLabels": "Mỗi haiku có tối đa {max} nhãn",
+    "saved": "Bài thơ đã được gắn nhãn",
+    "saveError": "Có lỗi khiến việc gắn nhãn không thành",
+    "createTitle": "Tạo",
+    "createAriaLabel": "Tạo nhãn mới",
+    "addTitle": "Thêm",
+    "addAriaLabel": "Gắn nhãn cho haiku này",
+    "save": "Lưu"
+  },
+  "LabelHalo": {
+    "halo": {
+      "ariaLabel": "Vòng nhãn"
+    },
+    "slot": {
+      "rotateAriaLabel": "Xoay nhãn — kéo quanh nhãn để điều chỉnh",
+      "ariaLabel": "Nhãn {name}, {degrees} độ"
+    }
+  },
+  "LabelSort": {
+    "title": "Sắp xếp theo",
+    "ariaLabel": "Sắp xếp nhãn",
+    "selectCategory": "Chọn {title}",
+    "categories": {
+      "creationDate": {
+        "title": "Ngày tạo",
+        "ariaLabel": "Sắp xếp theo ngày tạo"
+      },
+      "alpacabet": {
+        "title": "Bảng chữ cái",
+        "ariaLabel": "Sắp xếp theo bảng chữ cái"
+      },
+      "connection": {
+        "title": "Liên kết",
+        "ariaLabel": "Sắp xếp theo số liên kết"
+      }
+    }
+  },
+  "LabelsFilterModal": {
+    "filter": "Lọc theo nhãn"
+  },
+  "ManageLabel": {
+    "manageLabel": {
+      "deleted": "Đã xóa nhãn",
+      "deleteError": "Không thể xóa nhãn",
+      "edit": "Sửa",
+      "editAriaLabel": "Sửa nhãn {name}",
+      "tuneIn": "Dò sóng",
+      "tuneInAriaLabel": "Dò sóng các haiku có nhãn {name}",
+      "deleteQuestion": "Kế hoạch là gì đây?",
+      "cancel": "Sao tôi lại ở đây?",
+      "confirmDelete": "Làm nhanh đi"
+    },
+    "createPanel": {
+      "ariaLabel": "Tạo nhãn mới",
+      "create": "Tạo"
+    },
+    "connectedHaikus": {
+      "connected": "{total, plural, other {# liên kết}}",
+      "ariaLabel": "Các haiku có nhãn {name}"
+    },
+    "labelActions": {
+      "tuneInDisabled": "Tìm tôi cũng vô ích thôi.",
+      "tuneIn": "Dò sóng",
+      "tuneInAriaLabel": "Dò sóng các haiku có nhãn {name}",
+      "noHaikusAriaLabel": "Không có haiku nào có nhãn {name}",
+      "groupAriaLabel": "Thao tác cho {name}",
+      "edit": "Sửa",
+      "editAriaLabel": "Sửa {name}",
+      "delete": "Xóa",
+      "deleteAriaLabel": "Xóa {name}"
+    },
+    "lanternStack": {
+      "notConnected": "chưa liên kết",
+      "lanternAriaLabel": "Đèn lồng haiku: {title}"
+    },
+    "panel": {
+      "searchPlaceholder": "Tìm nhãn…",
+      "searchAriaLabel": "Tìm nhãn theo tên"
+    }
+  },
+  "HeaderHaikuTools": {
+    "search": {
+      "buttonAriaLabel": "Tìm haiku",
+      "placeholder": "Tìm tiêu đề…",
+      "inputAriaLabel": "Tìm tiêu đề haiku",
+      "actionName": "Tìm theo tên"
+    },
+    "filter": {
+      "buttonAriaLabel": "Lọc haiku theo nhãn",
+      "actionName": "Lọc theo nhãn",
+      "activeFiltersAriaLabel": "Bộ lọc nhãn đang bật",
+      "removeFilterAriaLabel": "Bỏ bộ lọc {name}",
+      "removeExcludeFilterAriaLabel": "Bỏ bộ lọc loại trừ {name}"
+    },
+    "settingsSearch": {
+      "shareLinks": {
+        "placeholder": "Tìm liên kết",
+        "ariaLabel": "Tìm theo tiêu đề",
+        "buttonAriaLabel": "Tìm liên kết chia sẻ"
+      },
+      "labels": {
+        "placeholder": "Tìm nhãn",
+        "ariaLabel": "Tìm nhãn theo tên",
+        "buttonAriaLabel": "Tìm nhãn"
+      }
+    }
+  },
+  "IconUploader": {
+    "label": "Đổi ảnh đại diện",
+    "alt": "Biểu tượng hiện tại",
+    "uploading": "Đang tải lên: {progress}%"
+  },
+  "LabelHooks": {
+    "placementError": "Không thể lưu vị trí nhãn",
+    "uploadComplete": "Tải lên hoàn tất",
+    "uploadFailed": "Tải ảnh lên thất bại"
+  },
+  "ShareModal": {
+    "modal": {
+      "defaultSubject": "Haiku",
+      "linkTabTitle": "Liên kết",
+      "linkTabAriaLabel": "Chia sẻ bằng liên kết",
+      "emailTabTitle": "Email",
+      "emailTabAriaLabel": "Chia sẻ qua email",
+      "loading": "Đang tải…"
+    },
+    "controller": {
+      "defaultSubject": "Haiku",
+      "postcardsQueued": "Bưu thiếp đã được bỏ vào hòm thư",
+      "loadLinkError": "Không thể tải liên kết chia sẻ",
+      "sendEmailError": "Không thể gửi email",
+      "addRecipientHint": "Thêm ít nhất một email người nhận",
+      "fixInvalidHint": "Sửa các email người nhận không hợp lệ"
+    },
+    "email": {
+      "toPrefix": "GỬI:",
+      "recipientsPlaceholder": "Email người nhận (nhấn Enter sau mỗi email)",
+      "messagePlaceholder": "Mình muốn chia sẻ với bạn...",
+      "messageAriaLabel": "Nội dung email",
+      "signature": "Từ: {name}",
+      "invalidEmails": "Email không hợp lệ: {emails}"
+    },
+    "sendPanel": {
+      "preparingPostcard": "Đang chuẩn bị bưu thiếp…",
+      "sendEmail": "Gửi email"
+    },
+    "postcardFront": {
+      "prepareError": "Không thể chuẩn bị ảnh bưu thiếp"
+    }
+  },
+  "Postcard": {
+    "renderer": {
+      "ariaLabel": "Bưu thiếp haiku",
+      "ariaLabelWithTitle": "Bưu thiếp haiku: {title}"
+    }
+  },
+  "SharedHaikuPage": {
+    "unknownAuthor": "Tác giả ẩn danh",
+    "lanternAriaLabel": "Đèn lồng haiku: {subject}",
+    "labelsAriaLabel": "Nhãn của {subject}",
+    "createdBy": "Tạo bởi {authorName}"
+  },
+  "CommonHooks": {
+    "useCopy": {
+      "copied": "Đã sao chép văn bản",
+      "copyError": "Không thể sao chép"
+    }
+  },
+  "ShareLink": {
+    "lifecycle": {
+      "activating": "Đang kích hoạt",
+      "stopping": "Đang dừng",
+      "stopAriaLabel": "Dừng liên kết",
+      "stop": "Dừng",
+      "launchAriaLabel": "Khởi chạy liên kết",
+      "launch": "Khởi chạy"
+    },
+    "settings": {
+      "hitsLimit": "Giới hạn lượt xem:",
+      "timeoutAt": "Hết hạn lúc:",
+      "timeoutPlaceholder": "Tận thế",
+      "updateAriaLabel": "Cập nhật liên kết",
+      "updating": "Đang cập nhật",
+      "update": "Cập nhật"
+    },
+    "controls": {
+      "stopped": "Đã dừng liên kết chia sẻ",
+      "stopError": "Không thể dừng liên kết chia sẻ",
+      "started": "Đã khởi chạy liên kết chia sẻ",
+      "startError": "Không thể khởi chạy liên kết chia sẻ",
+      "updated": "Đã cập nhật liên kết chia sẻ",
+      "updateError": "Không thể cập nhật liên kết chia sẻ",
+      "labelsError": "Không thể cập nhật hiển thị nhãn",
+      "hitsUnlimited": "Không giới hạn lượt xem",
+      "hitsEmpty": "Hết lượt xem",
+      "hitsRemaining": "{count, plural, other {Còn # lượt xem}}",
+      "timeUnlimited": "Không hết hạn",
+      "timeLeftWithValue": "Còn lại {time}",
+      "timeLeft": "Thời gian còn lại"
+    }
+  },
+  "ShareLinkActions": {
+    "actions": {
+      "groupAriaLabel": "Thao tác liên kết chia sẻ cho {subject}",
+      "preview": "Xem trước",
+      "previewAriaLabel": "Xem trước {subject}",
+      "delete": "Xóa",
+      "deleteAriaLabel": "Xóa liên kết chia sẻ của {subject}"
+    },
+    "previewLabels": {
+      "groupAriaLabel": "Thao tác liên kết chia sẻ cho {subject}",
+      "preview": "Xem trước",
+      "previewAriaLabel": "Xem trước {subject}"
+    },
+    "done": {
+      "caption": "Xong",
+      "ariaLabel": "Đóng bản xem trước liên kết chia sẻ của {subject}"
+    },
+    "editLabels": {
+      "caption": "Sửa nhãn",
+      "ariaLabel": "Sửa nhãn cho {subject}"
+    },
+    "goToLink": {
+      "caption": "Mở liên kết",
+      "ariaLabel": "Mở liên kết chia sẻ của {subject} trong thẻ mới"
+    },
+    "labelsToggle": {
+      "visible": "Đang hiện nhãn",
+      "hidden": "Đang ẩn nhãn",
+      "ariaLabel": "Hiện nhãn trên liên kết chia sẻ của {subject}"
+    },
+    "update": {
+      "caption": "Cập nhật",
+      "ariaLabel": "Cập nhật liên kết chia sẻ của {subject}",
+      "disabledInactive": "Thứ chưa bắt đầu - thì chưa thể đổi",
+      "disabledUnchanged": "Mọi thứ đều đã đúng chỗ",
+      "unavailableAlt": "Không thể cập nhật {subject}: {message}",
+      "wakingAlt": "Liên kết chia sẻ của {subject} đang khởi động"
+    }
+  },
+  "ShareLinkManagement": {
+    "list": {},
+    "filters": {
+      "groupAriaLabel": "Lọc liên kết chia sẻ theo trạng thái",
+      "showTitle": "Hiện\r\n {title}",
+      "hideTitle": "Ẩn\r\n {title}",
+      "options": {
+        "active": {
+          "title": "Đang hoạt động",
+          "showAriaLabel": "Hiện liên kết chia sẻ đang hoạt động",
+          "hideAriaLabel": "Ẩn liên kết chia sẻ đang hoạt động"
+        },
+        "inactive": {
+          "title": "Chưa hoạt động",
+          "showAriaLabel": "Hiện liên kết chia sẻ chưa hoạt động",
+          "hideAriaLabel": "Ẩn liên kết chia sẻ chưa hoạt động"
+        },
+        "expired": {
+          "title": "Đã hết hạn",
+          "showAriaLabel": "Hiện liên kết chia sẻ đã hết hạn",
+          "hideAriaLabel": "Ẩn liên kết chia sẻ đã hết hạn"
+        },
+        "viewLimitReached": {
+          "title": "Còn 0 lượt xem",
+          "showAriaLabel": "Hiện liên kết chia sẻ đã đạt giới hạn lượt xem",
+          "hideAriaLabel": "Ẩn liên kết chia sẻ đã đạt giới hạn lượt xem"
+        }
+      }
+    },
+    "row": {
+      "deleteQuestion": "Bạn có muốn xóa sổ liên kết này khỏi sự tồn tại một cách thần kỳ không?",
+      "deleteCancel": "Không",
+      "deleteConfirm": "Có",
+      "erased": "Đã xóa sổ liên kết chia sẻ",
+      "eraseError": "Thất bại rồi. Vũ trụ vẫn y nguyên."
+    }
+  },
+  "ShareLinkLanternPanel": {
+    "statsAriaLabel": "Thống kê liên kết chia sẻ",
+    "panelAriaLabel": "Liên kết chia sẻ của {subject}",
+    "lanternAriaLabel": "Đèn lồng haiku: {subject}",
+    "copyTitle": "Sao chép liên kết chia sẻ!",
+    "copyAriaLabel": "Sao chép liên kết chia sẻ của {subject}"
+  },
+  "ShareLinkControlsColumn": {
+    "settingsAriaLabel": "Cài đặt liên kết chia sẻ của {subject}"
+  },
+  "ShareLinkPreviewModal": {
+    "panelAriaLabel": "Đèn lồng được chia sẻ: {subject}",
+    "labelsAriaLabel": "Nhãn của {subject}",
+    "lanternAriaLabel": "Đèn lồng haiku: {subject}",
+    "loading": "Đang chờ dữ liệu tới",
+    "unavailable": "Haiku này không còn khả dụng."
+  },
+  "ShareLinksSort": {
+    "title": "Sắp xếp theo",
+    "ariaLabel": "Sắp xếp liên kết chia sẻ",
+    "coverAriaLabel": "Chọn {title}",
+    "categories": {
+      "creationDate": "Ngày tạo",
+      "creationDateAriaLabel": "Sắp xếp theo ngày tạo",
+      "alpacabet": "Bảng chữ cái",
+      "alpacabetAriaLabel": "Sắp xếp theo bảng chữ cái",
+      "hitsLeft": "Lượt xem còn lại",
+      "hitsLeftAriaLabel": "Sắp xếp theo lượt xem còn lại",
+      "timeLeft": "Thời gian còn lại",
+      "timeLeftAriaLabel": "Sắp xếp theo thời gian còn lại"
+    }
+  },
+  "ShareLinkStatus": {
+    "labels": {
+      "expired": "Đã hết hạn",
+      "viewLimitReached": "Đã đạt giới hạn lượt xem",
+      "stopped": "Đã dừng",
+      "expiresIn": "Hết hạn sau",
+      "remainingViews": "Lượt xem còn lại",
+      "active": "Đang hoạt động"
+    },
+    "duration": {
+      "lessThanMinute": "chưa đầy một phút",
+      "minutes": "{count, plural, other {# phút}}",
+      "hours": "{count, plural, other {# giờ}}",
+      "days": "{count, plural, other {# ngày}}",
+      "months": "{count, plural, other {# tháng}}"
+    }
+  },
+  "FetchEmptyState": {
+    "caption": "Không có gì để lấy cả"
+  }
+}

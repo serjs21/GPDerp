@@ -1,0 +1,27 @@
+# Build context is apps/api. Never ship credentials or host-built artifacts into the image.
+node_modules
+.pnpm-store
+dist
+coverage
+src/generated
+scripts
+
+# Real credentials (local dev / Neon prod)
+.env
+.env.*
+.neon
+
+# Tests and tooling (not needed to build or run)
+**/__tests__
+**/*.test.ts
+jest.config.ts
+eslint.config.mjs
+.prettierrc
+docker-compose.yml
+deploy
+Dockerfile
+.dockerignore
+.gitignore
+neon.ts
+*.md
+!src/modules/payments/confirm_purchase_message.md

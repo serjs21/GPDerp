@@ -2,12 +2,34 @@ import fp from "fastify-plugin";
 import websocket from "@fastify/websocket";
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import type WebSocket from "ws";
+import { WS_HEARTBEAT_INTERVAL_MS, WS_MAX_PAYLOAD_BYTES } from "../../consts/webSocket";
 import { verifyAccessTokenFromRequest } from "../auth/verifyAccessToken";
 import { createShareLinkSubscriberRegistry, parseShareLinkChannelMessage } from "./shareLinkSubscriptions";
 import { createUserSocketRegistry } from "./userSocketRegistry";
 
 const webSocketPluginImpl = async (app: FastifyInstance) => {
-  await app.register(websocket);
+  await app.register(websocket, { options: { maxPayload: WS_MAX_PAYLOAD_BYTES } });
+
+  // Heartbeat: a socket still awaiting the previous pong is dead (half-open); terminating it
+  // fires `close`, which removes it from every registry below.
+  const awaitingPong = new WeakSet<WebSocket>();
+  const heartbeat = setInterval(() => {
+    for (const ws of app.websocketServer.clients) {
+      if (awaitingPong.has(ws)) {
+        ws.terminate();
+        continue;
+      }
+      awaitingPong.add(ws);
+      ws.ping();
+    }
+  }, WS_HEARTBEAT_INTERVAL_MS);
+  heartbeat.unref();
+  app.addHook("onClose", async () => {
+    clearInterval(heartbeat);
+  });
+  app.websocketServer.on("connection", (ws: WebSocket) => {
+    ws.on("pong", () => awaitingPong.delete(ws));
+  });
 
   // Upgrade sockets rejected before the handshake (e.g. by CORS) have no `error` listener;
   // an unhandled client reset on them would crash the process.

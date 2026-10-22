@@ -1,0 +1,44 @@
+{
+  "api": {
+    "image": "${LIGHTSAIL_IMAGE}",
+    "ports": {
+      "8080": "HTTP"
+    },
+    "environment": {
+      "NODE_ENV": "production",
+      "PORT": "8080",
+      "DATABASE_URL": "${DATABASE_URL}",
+      "DATABASE_URL_UNPOOLED": "${DATABASE_URL_UNPOOLED}",
+      "CLIENT_URL": "${CLIENT_URL}",
+      "WEB_APP_URL": "${WEB_APP_URL}",
+      "API_BASE_URL": "${API_BASE_URL}",
+      "COOKIE_DOMAIN": "${COOKIE_DOMAIN}",
+      "COOKIE_SECURE": "true",
+      "COOKIE_SAME_SITE": "lax",
+      "JWT_ACCESS_SECRET": "${JWT_ACCESS_SECRET}",
+      "ACCESS_TOKEN_TTL_SECONDS": "${ACCESS_TOKEN_TTL_SECONDS}",
+      "REFRESH_TOKEN_TTL_SECONDS": "${REFRESH_TOKEN_TTL_SECONDS}",
+      "SESSION_TTL_SECONDS": "${SESSION_TTL_SECONDS}",
+      "TOKEN_HASH_PEPPER": "${TOKEN_HASH_PEPPER}",
+      "GOOGLE_CLIENT_ID": "${GOOGLE_CLIENT_ID}",
+      "R2_ACCOUNT_ID": "${R2_ACCOUNT_ID}",
+      "R2_ACCESS_KEY_ID": "${R2_ACCESS_KEY_ID}",
+      "R2_SECRET_ACCESS_KEY": "${R2_SECRET_ACCESS_KEY}",
+      "R2_BUCKET_NAME": "${R2_BUCKET_NAME}",
+      "R2_PUBLIC_BASE_URL": "${R2_PUBLIC_BASE_URL}",
+      "PADDLE_API_KEY": "${PADDLE_API_KEY}",
+      "PADDLE_WEBHOOK_SECRET": "${PADDLE_WEBHOOK_SECRET}",
+      "PADDLE_ENV": "${PADDLE_ENV}",
+      "PADDLE_PRICE_ID_100_HAIKUS": "${PADDLE_PRICE_ID_100_HAIKUS}",
+      "SMTP_HOST": "${SMTP_HOST}",
+      "SMTP_PORT": "${SMTP_PORT}",
+      "SMTP_SECURE": "${SMTP_SECURE}",
+      "SMTP_USER": "${SMTP_USER}",
+      "SMTP_PASS": "${SMTP_PASS}",
+      "MAIL_FROM": "${MAIL_FROM}",
+      "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+      "DEBUG_AUTH_LOGS": "false",
+      "NODE_OPTIONS": "--max-old-space-size=512"
+    }
+  }
+}

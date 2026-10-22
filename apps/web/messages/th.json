@@ -8,7 +8,30 @@
     "languageNoMatches": "ไม่พบภาษาที่ตรงกัน",
     "languageCurrent": "ปัจจุบัน",
     "preferencesGroupLabel": "การแสดงผลและภาษา",
-    "preferencesSaveError": "บันทึกการตั้งค่าไม่สำเร็จ"
+    "preferencesSaveError": "บันทึกการตั้งค่าไม่สำเร็จ",
+    "languageAriaLabel": "ภาษา: {language}",
+    "userFallback": "ผู้ใช้",
+    "sortAndFilter": "เรียงและกรอง",
+    "tabs": {
+      "profile": {
+        "ariaLabel": "ข้อมูลโปรไฟล์"
+      },
+      "shareLinks": {
+        "title": "ลิงก์แชร์",
+        "ariaLabel": "จัดการลิงก์แชร์"
+      },
+      "labels": {
+        "title": "ป้าย",
+        "ariaLabel": "จัดการป้าย"
+      }
+    },
+    "toasts": {
+      "loadError": "โหลดโปรไฟล์ไม่สำเร็จ",
+      "updateSuccess": "อัปเดตโปรไฟล์แล้ว",
+      "updateError": "อัปเดตโปรไฟล์ไม่สำเร็จ",
+      "avatarSaved": "บันทึกรูปโปรไฟล์แล้ว",
+      "avatarError": "บันทึกรูปโปรไฟล์ลงบัญชีของคุณไม่สำเร็จ"
+    }
   },
   "BuyGenerations": {
     "title": "การสร้างไฮกุ",
@@ -28,7 +51,8 @@
     "belongsTo": "บัตรนี้เป็นของ",
     "remaining": "เหลือ {count} ครั้ง",
     "remainingUnknown": "จำนวนการสร้างที่เหลือจะแสดงที่นี่",
-    "buyMore": "ซื้อเพิ่ม"
+    "buyMore": "ซื้อเพิ่ม",
+    "profileIconAlt": "ไอคอนโปรไฟล์ของ {name}"
   },
   "ProfileInfo": {
     "firstName": "ชื่อ",
@@ -48,7 +72,807 @@
       "th": "ไทย",
       "de": "เยอรมัน",
       "it": "อิตาลี",
-      "pt": "โปรตุเกส"
+      "pt": "โปรตุเกส",
+      "zh": "จีน",
+      "vi": "เวียดนาม"
     }
+  },
+  "RootLayout": {
+    "description": "AI แต่ไร้ประโยชน์"
+  },
+  "LegalPages": {
+    "back": "← กลับ",
+    "terms": {
+      "title": "ข้อกำหนดการให้บริการ",
+      "description": "ข้อกำหนดในการใช้บริการสร้างไฮกุ การเรียกเก็บเงินผ่าน Paddle และนโยบายที่เกี่ยวข้อง"
+    },
+    "privacy": {
+      "title": "นโยบายความเป็นส่วนตัว",
+      "description": "วิธีที่เราเก็บรวบรวม ใช้ และปกป้องข้อมูลสำหรับบริการสร้างไฮกุ รวมถึงการชำระเงินผ่าน Paddle"
+    },
+    "refund": {
+      "title": "นโยบายการคืนเงิน",
+      "description": "การคืนเงิน การยกเลิกการสมัครสมาชิก และการเรียกเก็บเงินสำหรับบริการสร้างไฮกุผ่าน Paddle"
+    },
+    "cookies": {
+      "title": "นโยบายคุกกี้",
+      "description": "วิธีที่บริการสร้างไฮกุใช้คุกกี้และเทคโนโลยีที่คล้ายกัน"
+    },
+    "acceptableUse": {
+      "title": "นโยบายการใช้งานที่ยอมรับได้",
+      "description": "กฎสำหรับการใช้บริการสร้างไฮกุอย่างเป็นธรรม"
+    }
+  },
+  "SiteFooter": {
+    "legalPolicies": "นโยบายทางกฎหมาย",
+    "terms": "ข้อกำหนดการให้บริการ",
+    "privacy": "นโยบายความเป็นส่วนตัว",
+    "refund": "นโยบายการคืนเงิน",
+    "acceptableUse": "การใช้งานที่ยอมรับได้",
+    "cookies": "นโยบายคุกกี้",
+    "paddleNotice": "การชำระเงินดำเนินการโดย <buyerTerms>Paddle</buyerTerms> ในฐานะผู้ขายอย่างเป็นทางการ โดย<refund>นโยบายการคืนเงินสำหรับผู้ซื้อ</refund> <checkout>ข้อกำหนดการชำระเงิน</checkout> และ<privacy>ประกาศความเป็นส่วนตัว</privacy>ของ Paddle จะมีผลเมื่อซื้อ"
+  },
+  "NoCreditsLeft": {
+    "continueGenerationOffer": {
+      "questionWithSubject": "สร้าง “{subject}” ต่อไหม?",
+      "question": "สร้างต่อไหม?",
+      "confirm": "ต่อเลย",
+      "cancel": "ไว้ก่อน"
+    }
+  },
+  "NoGenerationsLeftModal": {
+    "title": "สิทธิ์สร้างหมดแล้ว",
+    "dismiss": "ไว้ก่อน",
+    "buy": "ซื้อการสร้าง 100 ครั้ง",
+    "fallbackMessage": "ซื้อสิทธิ์สร้างเพิ่มเพื่อเขียนต่อ เครดิตจะถูกเพิ่มหลังยืนยันการชำระเงินแล้ว"
+  },
+  "PurchaseConfirmModal": {
+    "title": "ยืนยันการซื้อแล้ว",
+    "done": "เสร็จสิ้น"
+  },
+  "CelestialThemeClock": {
+    "ariaLabel": "ช่วงเวลาของวัน"
+  },
+  "CelestialThemeSelector": {
+    "ariaLabel": "ธีมช่วงเวลาของวัน"
+  },
+  "ComicPageLayout": {
+    "close": "ปิด"
+  },
+  "ComicToast": {
+    "notifications": "การแจ้งเตือน"
+  },
+  "PaperModal": {
+    "dialog": "กล่องโต้ตอบ",
+    "close": "ปิด"
+  },
+  "ComicConfirmModal": {
+    "confirm": "ยืนยัน",
+    "cancel": "ยกเลิก",
+    "description": "เลือกยืนยันหรือยกเลิก"
+  },
+  "OrderDropdown": {
+    "ariaLabel": "เรียงไฮกุ",
+    "title": "เรียงตาม",
+    "categories": {
+      "creationDate": {
+        "title": "วันที่สร้าง",
+        "ariaLabel": "เรียงตามวันที่สร้าง"
+      },
+      "alpacabet": {
+        "title": "ก-ฮ อัลปาก้า",
+        "ariaLabel": "เรียงตามตัวอักษร"
+      }
+    }
+  },
+  "OrderDropdownCover": {
+    "ariaLabel": "เปลี่ยนลำดับ"
+  },
+  "TextBubbleDropdown": {
+    "placeholder": "เลือกตัวเลือก"
+  },
+  "DualityButton": {
+    "coverState": {
+      "reveal": "เปิดเผย {title}"
+    }
+  },
+  "BrushMenu": {
+    "placeholder": "เลือก"
+  },
+  "AuthFlows": {
+    "login": {
+      "emailPlaceholder": "อีเมล",
+      "passwordPlaceholder": "รหัสผ่าน",
+      "invalidEmail": "ต้องใช้อีเมลที่ถูกต้องนะ ลำพังความมุ่งมั่นอย่างเดียวส่งข้อความไม่ถึงหรอก",
+      "passwordRequired": "ใส่รหัสผ่านด้วย ความเงียบเปิดประตูนี้ไม่ได้",
+      "divider": "หรือเข้าสู่ระบบด้วยอีเมล",
+      "submit": "เข้าสู่ระบบ",
+      "submitting": "กำลังเข้าสู่ระบบ",
+      "useGoogleSignIn": "บัญชีนี้ใช้การเข้าสู่ระบบด้วย Google",
+      "tooManyAttempts": "พยายามบ่อยเกินไป รอสักพักแล้วลองใหม่ เทคนิคกดรัวๆ ขอพักก่อน",
+      "invalidCredentials": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+      "completeSetupOnRegistration": "ตั้งค่าบัญชีให้เสร็จในหน้าลงทะเบียน",
+      "googleSignInFailed": "เข้าสู่ระบบด้วย Google ไม่สำเร็จ"
+    },
+    "register": {
+      "emailPlaceholder": "อีเมล",
+      "passwordPlaceholder": "รหัสผ่าน",
+      "confirmPasswordPlaceholder": "ยืนยันรหัสผ่าน",
+      "invalidEmail": "ต้องใช้อีเมลที่ถูกต้องนะ ลำพังความมุ่งมั่นอย่างเดียวส่งข้อความไม่ถึงหรอก",
+      "passwordRequired": "ใส่รหัสผ่านด้วย ความเงียบเปิดประตูนี้ไม่ได้",
+      "passwordTooShort": "อย่างน้อย 8 ตัวอักษร",
+      "passwordsDoNotMatch": "รหัสผ่านต้องตรงกันนะ หุ่นยนต์ของเราไม่ถนัดเรื่องกำกวม",
+      "divider": "หรือลงทะเบียนด้วยอีเมล",
+      "submit": "สร้างบัญชี",
+      "submitting": "กำลังสร้างบัญชี",
+      "googleSignUpFailed": "สมัครด้วย Google ไม่สำเร็จ"
+    },
+    "chrome": {
+      "signInWithGoogle": "เข้าสู่ระบบด้วย Google",
+      "signUpWithGoogle": "สมัครด้วย Google"
+    }
+  },
+  "AuthGateModal": {
+    "signIn": "เข้าสู่ระบบ",
+    "createAccount": "สร้างบัญชี",
+    "signInTab": "เข้าสู่ระบบ",
+    "registerTab": "ลงทะเบียน",
+    "forgotPassword": "ลืมรหัสผ่าน?"
+  },
+  "AuthLanterns": {
+    "login": "เข้าสู่ระบบ",
+    "register": "ลงทะเบียน",
+    "entryGroupLabel": "บัญชี"
+  },
+  "EmailChangeRevert": {
+    "pageTitle": "ยกเลิกการเปลี่ยนอีเมล",
+    "restoreLabel": "อันนี้ใช่",
+    "changedToLabel": "อันนี้ไม่ใช่",
+    "confirmLead": "ขอถามให้แน่ใจว่ายังอยากทำแบบนี้อยู่",
+    "confirmConsequences": "การนี้จะเปลี่ยนอีเมลกลับเป็นอันเดิม และจะออกจากระบบทุกคนในทุกอุปกรณ์",
+    "confirmCta": "ใช่ ยกเลิกเลย",
+    "keepCta": "ช่างมันแล้ว",
+    "revertedCaption": "ยกเลิกแล้ว",
+    "setPasswordLead": "เรียบร้อย {email} ยังอยู่ในบัญชี และทุกคนถูกออกจากระบบแล้ว",
+    "emailTakenLead": "ทุกคนถูกออกจากระบบแล้ว แต่ตอนนี้ {email} เป็นของบัญชีอื่น จึงเปลี่ยนกลับไม่ได้",
+    "setPasswordNote": "เพื่อความปลอดภัย คุณต้องตั้งรหัสผ่านใหม่ ก็เพราะมีคนเพิ่งใช้รหัสผ่านเก่าของคุณโดยไม่ได้รับอนุญาตน่ะสิ",
+    "newPasswordPlaceholder": "รหัสผ่านใหม่",
+    "confirmPasswordPlaceholder": "ใส่รหัสผ่านใหม่อีกครั้ง",
+    "setPasswordCta": "บันทึกรหัสผ่าน",
+    "passwordTooShort": "ใช้อย่างน้อย {min} ตัวอักษร",
+    "passwordsDoNotMatch": "รหัสผ่านไม่ตรงกัน",
+    "passwordFailed": "บันทึกรหัสผ่านไม่สำเร็จ ลองอีกครั้ง",
+    "loadingTitle": "กำลังตรวจสอบ",
+    "loadingBody": "หุ่นยนต์ของเรากำลังค้นหาข้อมูลของคุณ...",
+    "passwordSavedTitle": "เรียบร้อย",
+    "passwordSavedBody": "บันทึกรหัสผ่านใหม่แล้ว เข้าสู่ระบบด้วย {email} และรหัสผ่านใหม่ของคุณ",
+    "revertedTitle": "ยกเลิกแล้ว",
+    "revertedBody": "{email} ยังอยู่ในบัญชี และทุกคนถูกออกจากระบบแล้ว",
+    "emailTakenNoPasswordBody": "ทุกคนถูกออกจากระบบแล้ว แต่ตอนนี้ {email} เป็นของบัญชีอื่น จึงเปลี่ยนกลับไม่ได้",
+    "invalidTitle": "ลิงก์ที่ไม่รู้จัก",
+    "invalidBody": "ลิงก์นี้ไม่ตรงกับอะไรเลย ตรวจดูว่าเปิดลิงก์จากอีเมลครบทั้งลิงก์",
+    "expiredTitle": "ลิงก์หมดอายุ",
+    "expiredBody": "ลิงก์ยกเลิกนี้ใช้ได้แค่ 7 วัน หากยังมีอะไรดูผิดปกติ ให้รีเซ็ตรหัสผ่านจากหน้าเข้าสู่ระบบ",
+    "usedTitle": "ใช้ไปแล้ว",
+    "usedBody": "ลิงก์นี้ถูกใช้ไปแล้ว หรือการเปลี่ยนแปลงถูกยกเลิกด้วยลิงก์อื่นแล้ว",
+    "unavailableTitle": "ลิงก์ถูกปิดใช้งาน",
+    "unavailableBody": "ที่อยู่อีเมลเดิมของคุณตอนนี้เป็นของบัญชีอื่นที่ยืนยันแล้ว จึงยกเลิกการเปลี่ยนแปลงนี้ไม่ได้อีก หากมีอะไรดูผิดปกติ ให้รีเซ็ตรหัสผ่านจากหน้าเข้าสู่ระบบ",
+    "failedTitle": "มีบางอย่างพัง",
+    "failedBody": "ติดต่อเซิร์ฟเวอร์ไม่ได้ ลองเปิดลิงก์อีกครั้งในอีกสักครู่",
+    "signInCta": "เข้าสู่ระบบ",
+    "homeCta": "กลับหน้าแรก"
+  },
+  "ResetPasswordModal": {
+    "requestTitle": "รีเซ็ตรหัสผ่าน",
+    "confirmTitle": "รหัสผ่านใหม่",
+    "requestCta": "ส่งลิงก์รีเซ็ต",
+    "confirmCta": "อัปเดตรหัสผ่าน",
+    "requestLead": "ใส่อีเมลของคุณ แล้วเราจะส่งลิงก์ให้หากมีบัญชีอยู่",
+    "confirmLead": "ตั้งรหัสผ่านใหม่สำหรับบัญชีของคุณ",
+    "emailPlaceholder": "อีเมล",
+    "newPasswordPlaceholder": "รหัสผ่านใหม่",
+    "confirmPasswordPlaceholder": "ยืนยันรหัสผ่าน",
+    "invalidEmail": "ใส่อีเมลที่ถูกต้อง",
+    "passwordTooShort": "รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร",
+    "passwordsDoNotMatch": "รหัสผ่านไม่ตรงกัน",
+    "requestSent": "หากมีบัญชีของอีเมลนี้ เราได้ส่งวิธีรีเซ็ตไปให้แล้ว",
+    "requestFailed": "คำขอไม่สำเร็จ ลองอีกครั้ง",
+    "linkInvalid": "ลิงก์รีเซ็ตหายไปหรือไม่ถูกต้อง",
+    "confirmSuccess": "อัปเดตรหัสผ่านแล้ว เข้าสู่ระบบได้เลย",
+    "confirmFailed": "รีเซ็ตไม่สำเร็จ"
+  },
+  "VerifyEmail": {
+    "verifyingTitle": "กำลังยืนยันอีเมลของคุณ",
+    "verifyingBody": "โปรดรอสักครู่ ขณะเราตรวจสอบลิงก์ของคุณ",
+    "alreadyVerifiedTitle": "ยืนยันอีเมลแล้ว",
+    "alreadyVerifiedBody": "อีเมลของคุณได้รับการยืนยันแล้ว กำลังพาไปหน้าแรกใน {seconds} วินาที",
+    "resentTitle": "ส่งอีเมลยืนยันแล้ว",
+    "expiredTitle": "ลิงก์ยืนยันหมดอายุ",
+    "resentBody": "เราส่งอีเมลยืนยันฉบับใหม่แล้ว โปรดตรวจกล่องจดหมายและใช้ลิงก์ล่าสุด",
+    "expiredBody": "ลิงก์ยืนยันนี้หมดอายุแล้ว",
+    "resending": "กำลังส่ง...",
+    "resend": "ส่งอีเมลยืนยันอีกครั้ง"
+  },
+  "UserMenu": {
+    "fallbackName": "ผู้ใช้",
+    "settings": "ตั้งค่า",
+    "logout": "ออกจากระบบ",
+    "goHome": "กลับหน้าแรก",
+    "login": "เข้าสู่ระบบ",
+    "guest": "ผู้เยี่ยมชม",
+    "logoutQuestion": "สนุกพอแล้วหรือยัง?",
+    "logoutCancel": "ยังเลย",
+    "logoutConfirm": "พอแล้ว"
+  },
+  "LoginPage": {
+    "title": "เข้าสู่ระบบ",
+    "completeSetupOnRegistration": "ตั้งค่าบัญชีให้เสร็จในหน้าลงทะเบียน",
+    "createAccountLink": "สร้างบัญชี",
+    "forgotPassword": "ลืมรหัสผ่าน?"
+  },
+  "RegisterPage": {
+    "title": "สร้างบัญชี",
+    "haveAccount": "มีบัญชีอยู่แล้ว? <link>เข้าสู่ระบบ</link>"
+  },
+  "CompleteRegistrationPage": {
+    "title": "ลงทะเบียนให้เสร็จ",
+    "loading": "กำลังโหลด…",
+    "lead": "เลือกชื่อผู้ใช้เพื่อตั้งค่าบัญชีให้เสร็จ",
+    "usernameLabel": "ชื่อผู้ใช้",
+    "usernamePlaceholder": "your_handle",
+    "usernameRequired": "เลือกชื่อผู้ใช้",
+    "usernameTooShort": "อย่างน้อย {min} ตัวอักษร",
+    "usernamePattern": "ใช้ได้เฉพาะตัวอักษร ตัวเลข และขีดล่าง",
+    "usernameUnavailable": "ชื่อผู้ใช้นี้ใช้ไม่ได้",
+    "usernameTaken": "ชื่อผู้ใช้นี้มีคนใช้แล้ว",
+    "saveFailed": "บันทึกชื่อผู้ใช้ไม่สำเร็จ",
+    "success": "เรียบร้อยแล้ว",
+    "continue": "ต่อไป",
+    "backHome": "กลับหน้าแรก"
+  },
+  "AuthHooks": {
+    "registrationSent": "หากอีเมลนี้ใช้สร้างบัญชีใหม่ได้ เราได้ส่งลิงก์ยืนยันไปแล้ว โปรดตรวจกล่องจดหมาย",
+    "registrationFailed": "ลงทะเบียนไม่สำเร็จ",
+    "usernameUnavailable": "ชื่อผู้ใช้นี้ใช้ไม่ได้",
+    "googleSignInFailed": "เข้าสู่ระบบด้วย Google ไม่สำเร็จ"
+  },
+  "HaikuContainer": {
+    "haikuActions": {
+      "deleteLabel": "ลบ",
+      "deleteAriaLabel": "ลบไฮกุ",
+      "shareLabel": "แชร์",
+      "shareAriaLabel": "แชร์ไฮกุ",
+      "labelLabel": "ป้าย",
+      "labelAriaLabel": "เพิ่มป้าย",
+      "copyLabel": "คัดลอก",
+      "copyAriaLabel": "คัดลอกไปยังคลิปบอร์ด",
+      "deleted": "ลบไฮกุแล้ว",
+      "deleteForbidden": "คุณไม่มีสิทธิ์ลบไฮกุนี้",
+      "deleteFailed": "ลบไฮกุไม่สำเร็จ",
+      "saving": "กำลังบันทึกไฮกุนี้…",
+      "groupAriaLabel": "การทำงานของไฮกุ",
+      "hideActions": "ซ่อนการทำงานของไฮกุ",
+      "showActions": "แสดงการทำงานของไฮกุ"
+    }
+  },
+  "HaikuGenerationStickyNote": {
+    "generationFlow": {
+      "errorTitle": "อย่าเพิ่งตกใจ แต่มีบางอย่างผิดพลาด",
+      "errorDescription": "ลูกมือของเรากำลังเร่งแก้ปัญหานี้อย่างหนัก เดี๋ยวเราจะส่งคนไปตีพวกเขาให้แรงขึ้นอีก\nโปรดลองใหม่ภายหลัง"
+    }
+  },
+  "Lantern": {
+    "lantern": {
+      "bodyAriaLabel": "ไฮกุ",
+      "haikuLantern": "โคมไฮกุ: {title}",
+      "generating": "กำลังสร้างไฮกุ: {subject}",
+      "rotatedLantern": "โคมไฮกุที่หมุนแล้ว"
+    },
+    "labelBelt": {
+      "ariaLabel": "แถบป้ายไฮกุ",
+      "previous": "ป้ายก่อนหน้า",
+      "next": "ป้ายถัดไป"
+    },
+    "lanternDeleteExit": {
+      "deleted": "ลบไฮกุแล้ว",
+      "deleteForbidden": "คุณไม่มีสิทธิ์ลบไฮกุนี้",
+      "deleteFailed": "ลบไฮกุไม่สำเร็จ"
+    },
+    "lanternSteppedFlight": {
+      "deleting": "กำลังลบไฮกุ: {title}"
+    },
+    "lanternRotatedShell": {
+      "labels": "ป้ายของ {label}"
+    },
+    "lanternPath": {
+      "generating": "กำลังสร้าง: {subject}",
+      "focusPosition": "{title} · {position} / {total}",
+      "untitled": "ไฮกุ",
+      "empty": "ไม่มีไฮกุ",
+      "previous": "ไฮกุก่อนหน้า",
+      "next": "ไฮกุถัดไป"
+    },
+    "lanternPathLantern": {
+      "generating": "กำลังสร้างไฮกุ: {subject}",
+      "haikuLantern": "โคมไฮกุ: {title}",
+      "lantern": "โคมไฮกุ",
+      "labels": "ป้ายของ {label}"
+    },
+    "lanternPathStage": {
+      "ariaLabel": "เส้นทางลอยของโคม"
+    }
+  },
+  "LanternSubmit": {
+    "ariaLabel": "詠む แต่ง"
+  },
+  "SVGPath": {
+    "svgPath": {
+      "stageAriaLabel": "เส้นทาง SVG ของโคม"
+    },
+    "svgPathLantern": {
+      "loadingMore": "กำลังโหลดไฮกุเพิ่ม",
+      "generating": "กำลังสร้างไฮกุ: {subject}",
+      "haikuLantern": "โคมไฮกุ: {title}",
+      "labels": "ป้ายของ {label}"
+    }
+  },
+  "SavedHaikusLanternPath": {
+    "loading": "กำลังโหลดไฮกุ",
+    "loadError": "โหลดไฮกุที่บันทึกไว้ไม่สำเร็จ",
+    "retry": "ลองอีกครั้ง",
+    "searching": "กำลังค้นหาไฮกุ"
+  },
+  "PathNavigation": {
+    "pathNavigationArrows": {
+      "next": "โคมถัดไป",
+      "previous": "โคมก่อนหน้า"
+    }
+  },
+  "PathOverlay": {
+    "pathOverlay": {
+      "title": "โอเวอร์เลย์",
+      "continueJourney": "อยู่ตรงนี้",
+      "goBackToStart": "กลับไปจุดเริ่มต้น"
+    },
+    "overlayNextLabel": {
+      "label": "อยู่ตรงนี้"
+    },
+    "overlayPrevLabel": {
+      "label": "กลับไปจุดเริ่มต้น"
+    }
+  },
+  "PostSignInput": {
+    "signAriaLabel": "ป้ายหัวข้อไฮกุ",
+    "placeholder": "題 หัวข้อ",
+    "inputAriaLabel": "หัวข้อไฮกุ",
+    "submitLabel": "詠む แต่ง"
+  },
+  "CreationModal": {
+    "generating": "กำลังสร้างไฮกุ: {subject}",
+    "haikuLantern": "โคมไฮกุ: {title}",
+    "creation": "การสร้างไฮกุ"
+  },
+  "DeleteConfirmModal": {
+    "question": "ตั้งใจจะทำแบบนั้นจริงเหรอ?",
+    "cancel": "ไม่ใช่",
+    "confirm": "ใช่เลย"
+  },
+  "DeleteFailedModal": {
+    "title": "ลบไม่สำเร็จ",
+    "leaveItBe": "ปล่อยไว้แบบนั้น",
+    "retry": "ลองอีกครั้ง",
+    "body": "เราลบไฮกุนี้ไม่ได้ คุณจะลองอีกครั้ง หรือเก็บไว้ในรายการก็ได้"
+  },
+  "AwkwardLantern": {
+    "title": "เอ่อ... แบบนี้ก็เขินนะ..."
+  },
+  "RestartLinkButton": {
+    "expired": "หมดอายุ",
+    "limitReached": "เหลือ 0 ครั้ง",
+    "revive": "ชุบชีวิต!",
+    "resurrect": "ฟื้นคืนชีพ!"
+  },
+  "GoHome": {
+    "label": "กลับหน้าแรก"
+  },
+  "NotFoundView": {
+    "toast": "ลิงก์นั้นได้ลาโลกไปแล้ว",
+    "signUp": "สมัครเพื่อส่งลิงก์ตายของคุณเอง",
+    "copy": "ดูเหมือนมีคนส่งลิงก์ที่ใช้ไม่ได้มาให้คุณ \nอาจพิมพ์ผิด หรืออาจมีปัญหาเรื่องความไว้ใจที่ต้องเคลียร์กันหน่อย\nยังไงก็ตาม ลิงก์นี้ไม่มีอีกแล้ว"
+  },
+  "Loaders": {
+    "sakuraPetalLoader": {
+      "ariaLabel": "กำลังโหลด"
+    },
+    "wagTailLoader": {
+      "ariaLabel": "กำลังโหลด"
+    },
+    "lanternLoader": {
+      "ariaLabel": "กำลังโหลด"
+    },
+    "loadingText": {
+      "text": "กำลังโหลด"
+    },
+    "fetchingLoader": {
+      "ariaLabel": "กำลังโหลด",
+      "text": "กำลังดึงข้อมูล"
+    }
+  },
+  "MfgDate": {
+    "defaultLabel": "สร้างเมื่อ"
+  },
+  "GoldenAgeTitle": {
+    "subtitle": "เครื่องสร้างไฮกุ",
+    "tagline": "AI แต่ใช้งานไม่ได้จริง!"
+  },
+  "HaikuHooks": {
+    "deleteController": {
+      "deleted": "ลบไฮกุแล้ว",
+      "deleteFailed": "ลบไฮกุไม่สำเร็จ"
+    }
+  },
+  "ComicLabelCreationModal": {
+    "save": "บันทึก",
+    "create": "สร้าง",
+    "loadingLabels": "กำลังโหลดป้าย...",
+    "enterName": "ใส่ชื่อป้าย",
+    "nameTooShort": "ชื่อควรมีอย่างน้อย {min} ตัวอักษร",
+    "alreadyExists": "มีป้ายนี้ในบัญชีแล้ว",
+    "updated": "อัปเดตป้ายแล้ว",
+    "updateError": "อัปเดตป้ายไม่สำเร็จ",
+    "created": "สร้างป้ายแล้ว",
+    "createError": "สร้างป้ายไม่สำเร็จ",
+    "previewTitle": "นี่คือ",
+    "minChars": "อย่างน้อย {min} ตัว",
+    "nameAriaLabel": "ชื่อป้าย",
+    "color": "สี",
+    "colorAriaLabel": "สีป้าย",
+    "openColorPicker": "เปิดตัวเลือกสี",
+    "shapeAriaLabel": "รูปทรง {shape}",
+    "saveAriaLabel": "บันทึกป้าย",
+    "createAriaLabel": "สร้างป้าย",
+    "shapes": {
+      "classic": "คลาสสิก",
+      "sharp": "แหลม",
+      "soft": "นุ่มนวล",
+      "circle": "วงกลม",
+      "square": "สี่เหลี่ยม",
+      "thought": "ความคิด"
+    }
+  },
+  "ComicLabelPickerPanel": {
+    "filterPlaceholder": "กรองป้าย…",
+    "filterAriaLabel": "กรองป้าย",
+    "disabledAriaLabel": "{name} (ใช้ในตัวกรองอีกอันแล้ว)"
+  },
+  "CreateAddLabelsModal": {
+    "maxLabels": "ไฮกุหนึ่งบทมีป้ายได้สูงสุด {max} ป้าย",
+    "saved": "ติดป้ายบทกวีแล้ว",
+    "saveError": "เกิดข้อผิดพลาด ติดป้ายไม่สำเร็จ",
+    "createTitle": "สร้าง",
+    "createAriaLabel": "สร้างใหม่",
+    "addTitle": "เพิ่ม",
+    "addAriaLabel": "ติดป้ายไฮกุนี้",
+    "save": "บันทึก"
+  },
+  "LabelHalo": {
+    "halo": {
+      "ariaLabel": "วงรัศมีป้าย"
+    },
+    "slot": {
+      "rotateAriaLabel": "หมุนป้าย — ลากรอบป้ายเพื่อปรับ",
+      "ariaLabel": "ป้าย {name}, {degrees} องศา"
+    }
+  },
+  "LabelSort": {
+    "title": "เรียงตาม",
+    "ariaLabel": "เรียงป้าย",
+    "selectCategory": "เลือก {title}",
+    "categories": {
+      "creationDate": {
+        "title": "วันที่สร้าง",
+        "ariaLabel": "เรียงตามวันที่สร้าง"
+      },
+      "alpacabet": {
+        "title": "ก-ฮ อัลปาก้า",
+        "ariaLabel": "เรียงตามตัวอักษร"
+      },
+      "connection": {
+        "title": "การเชื่อมโยง",
+        "ariaLabel": "เรียงตามการเชื่อมโยง"
+      }
+    }
+  },
+  "LabelsFilterModal": {
+    "filter": "กรองตามป้าย"
+  },
+  "ManageLabel": {
+    "manageLabel": {
+      "deleted": "ลบป้ายแล้ว",
+      "deleteError": "ลบป้ายไม่สำเร็จ",
+      "edit": "แก้ไข",
+      "editAriaLabel": "แก้ไขป้าย {name}",
+      "tuneIn": "จูนเข้า",
+      "tuneInAriaLabel": "จูนเข้าไฮกุที่ติดป้าย {name}",
+      "deleteQuestion": "แผนคืออะไร?",
+      "cancel": "ฉันมาอยู่ตรงนี้ได้ยังไง?",
+      "confirmDelete": "จัดการเร็วๆ เลย"
+    },
+    "createPanel": {
+      "ariaLabel": "สร้างป้ายใหม่",
+      "create": "สร้าง"
+    },
+    "connectedHaikus": {
+      "connected": "{total, plural, other {# การเชื่อมโยง}}",
+      "ariaLabel": "ไฮกุที่ติดป้าย {name}"
+    },
+    "labelActions": {
+      "tuneInDisabled": "ค้นหาฉันไปก็ไร้ประโยชน์",
+      "tuneIn": "จูนเข้า",
+      "tuneInAriaLabel": "จูนเข้าไฮกุที่ติดป้าย {name}",
+      "noHaikusAriaLabel": "ไม่มีไฮกุที่ติดป้าย {name}",
+      "groupAriaLabel": "การทำงานสำหรับ {name}",
+      "edit": "แก้ไข",
+      "editAriaLabel": "แก้ไข {name}",
+      "delete": "ลบ",
+      "deleteAriaLabel": "ลบ {name}"
+    },
+    "lanternStack": {
+      "notConnected": "ไม่ได้เชื่อมโยง",
+      "lanternAriaLabel": "โคมไฮกุ: {title}"
+    },
+    "panel": {
+      "searchPlaceholder": "ค้นหาป้าย…",
+      "searchAriaLabel": "ค้นหาป้ายตามชื่อ"
+    }
+  },
+  "HeaderHaikuTools": {
+    "search": {
+      "buttonAriaLabel": "ค้นหาไฮกุ",
+      "placeholder": "ค้นหาชื่อเรื่อง…",
+      "inputAriaLabel": "ค้นหาชื่อเรื่องไฮกุ",
+      "actionName": "ค้นหาตามชื่อ"
+    },
+    "filter": {
+      "buttonAriaLabel": "กรองไฮกุตามป้าย",
+      "actionName": "กรองตามป้าย",
+      "activeFiltersAriaLabel": "ตัวกรองป้ายที่ใช้อยู่",
+      "removeFilterAriaLabel": "ลบตัวกรอง {name}",
+      "removeExcludeFilterAriaLabel": "ลบตัวกรองยกเว้น {name}"
+    },
+    "settingsSearch": {
+      "shareLinks": {
+        "placeholder": "ค้นหาลิงก์",
+        "ariaLabel": "ค้นหาตามชื่อเรื่อง",
+        "buttonAriaLabel": "ค้นหาลิงก์แชร์"
+      },
+      "labels": {
+        "placeholder": "ค้นหาป้าย",
+        "ariaLabel": "ค้นหาป้ายตามชื่อ",
+        "buttonAriaLabel": "ค้นหาป้าย"
+      }
+    }
+  },
+  "IconUploader": {
+    "label": "เปลี่ยนรูปโปรไฟล์",
+    "alt": "ไอคอนปัจจุบัน",
+    "uploading": "กำลังอัปโหลด: {progress}%"
+  },
+  "LabelHooks": {
+    "placementError": "บันทึกตำแหน่งป้ายไม่สำเร็จ",
+    "uploadComplete": "อัปโหลดเสร็จแล้ว",
+    "uploadFailed": "อัปโหลดรูปภาพไม่สำเร็จ"
+  },
+  "ShareModal": {
+    "modal": {
+      "defaultSubject": "ไฮกุ",
+      "linkTabTitle": "ลิงก์",
+      "linkTabAriaLabel": "แชร์ด้วยลิงก์",
+      "emailTabTitle": "อีเมล",
+      "emailTabAriaLabel": "แชร์ทางอีเมล",
+      "loading": "กำลังโหลด…"
+    },
+    "controller": {
+      "defaultSubject": "ไฮกุ",
+      "postcardsQueued": "หย่อนโปสการ์ดลงตู้ไปรษณีย์แล้ว",
+      "loadLinkError": "โหลดลิงก์แชร์ไม่สำเร็จ",
+      "sendEmailError": "ส่งอีเมลไม่สำเร็จ",
+      "addRecipientHint": "เพิ่มอีเมลผู้รับอย่างน้อยหนึ่งคน",
+      "fixInvalidHint": "แก้ไขอีเมลผู้รับที่ไม่ถูกต้อง"
+    },
+    "email": {
+      "toPrefix": "ถึง:",
+      "recipientsPlaceholder": "อีเมลผู้รับ (กด Enter หลังแต่ละอีเมล)",
+      "messagePlaceholder": "อยากแชร์สิ่งนี้ให้คุณ...",
+      "messageAriaLabel": "ข้อความอีเมล",
+      "signature": "จาก: {name}",
+      "invalidEmails": "อีเมลไม่ถูกต้อง: {emails}"
+    },
+    "sendPanel": {
+      "preparingPostcard": "กำลังเตรียมโปสการ์ด…",
+      "sendEmail": "ส่งอีเมล"
+    },
+    "postcardFront": {
+      "prepareError": "เตรียมรูปโปสการ์ดไม่สำเร็จ"
+    }
+  },
+  "Postcard": {
+    "renderer": {
+      "ariaLabel": "โปสการ์ดไฮกุ",
+      "ariaLabelWithTitle": "โปสการ์ดไฮกุ: {title}"
+    }
+  },
+  "SharedHaikuPage": {
+    "unknownAuthor": "ไม่ทราบผู้แต่ง",
+    "lanternAriaLabel": "โคมไฮกุ: {subject}",
+    "labelsAriaLabel": "ป้ายของ {subject}",
+    "createdBy": "สร้างโดย {authorName}"
+  },
+  "CommonHooks": {
+    "useCopy": {
+      "copied": "คัดลอกข้อความแล้ว",
+      "copyError": "คัดลอกไม่สำเร็จ"
+    }
+  },
+  "ShareLink": {
+    "lifecycle": {
+      "activating": "กำลังเปิดใช้งาน",
+      "stopping": "กำลังหยุด",
+      "stopAriaLabel": "หยุดลิงก์",
+      "stop": "หยุด",
+      "launchAriaLabel": "เปิดใช้ลิงก์",
+      "launch": "เริ่ม"
+    },
+    "settings": {
+      "hitsLimit": "จำกัดการเข้าชม:",
+      "timeoutAt": "หมดเวลาเมื่อ:",
+      "timeoutPlaceholder": "จนสิ้นกาล",
+      "updateAriaLabel": "อัปเดตลิงก์",
+      "updating": "กำลังอัปเดต",
+      "update": "อัปเดต"
+    },
+    "controls": {
+      "stopped": "หยุดลิงก์แชร์แล้ว",
+      "stopError": "หยุดลิงก์แชร์ไม่สำเร็จ",
+      "started": "เริ่มลิงก์แชร์แล้ว",
+      "startError": "เริ่มลิงก์แชร์ไม่สำเร็จ",
+      "updated": "อัปเดตลิงก์แชร์แล้ว",
+      "updateError": "อัปเดตลิงก์แชร์ไม่สำเร็จ",
+      "labelsError": "อัปเดตการแสดงป้ายไม่สำเร็จ",
+      "hitsUnlimited": "เข้าชมได้ไม่จำกัด",
+      "hitsEmpty": "ไม่เหลือการเข้าชม",
+      "hitsRemaining": "{count, plural, other {เหลือ # ครั้ง}}",
+      "timeUnlimited": "ไม่มีวันหมดอายุ",
+      "timeLeftWithValue": "เหลือเวลา {time}",
+      "timeLeft": "เวลาที่เหลือ"
+    }
+  },
+  "ShareLinkActions": {
+    "actions": {
+      "groupAriaLabel": "การทำงานของลิงก์แชร์สำหรับ {subject}",
+      "preview": "ดูตัวอย่าง",
+      "previewAriaLabel": "ดูตัวอย่าง {subject}",
+      "delete": "ลบ",
+      "deleteAriaLabel": "ลบลิงก์แชร์ของ {subject}"
+    },
+    "previewLabels": {
+      "groupAriaLabel": "การทำงานของลิงก์แชร์สำหรับ {subject}",
+      "preview": "ดูตัวอย่าง",
+      "previewAriaLabel": "ดูตัวอย่าง {subject}"
+    },
+    "done": {
+      "caption": "เสร็จสิ้น",
+      "ariaLabel": "ปิดตัวอย่างลิงก์แชร์ของ {subject}"
+    },
+    "editLabels": {
+      "caption": "แก้ไขป้าย",
+      "ariaLabel": "แก้ไขป้ายของ {subject}"
+    },
+    "goToLink": {
+      "caption": "ไปที่ลิงก์",
+      "ariaLabel": "เปิดลิงก์แชร์ของ {subject} ในแท็บใหม่"
+    },
+    "labelsToggle": {
+      "visible": "แสดงป้าย",
+      "hidden": "ซ่อนป้าย",
+      "ariaLabel": "แสดงป้ายบนลิงก์แชร์ของ {subject}"
+    },
+    "update": {
+      "caption": "อัปเดต",
+      "ariaLabel": "อัปเดตลิงก์แชร์ของ {subject}",
+      "disabledInactive": "สิ่งที่ยังไม่เริ่ม - เปลี่ยนไม่ได้",
+      "disabledUnchanged": "ทุกอย่างอยู่ในที่ทางของมันแล้ว",
+      "unavailableAlt": "อัปเดต {subject} ไม่ได้: {message}",
+      "wakingAlt": "ลิงก์แชร์ของ {subject} กำลังเริ่มทำงาน"
+    }
+  },
+  "ShareLinkManagement": {
+    "list": {},
+    "filters": {
+      "groupAriaLabel": "กรองลิงก์แชร์ตามสถานะ",
+      "showTitle": "แสดง\r\n {title}",
+      "hideTitle": "ซ่อน\r\n {title}",
+      "options": {
+        "active": {
+          "title": "ใช้งานอยู่",
+          "showAriaLabel": "แสดงลิงก์แชร์ที่ใช้งานอยู่",
+          "hideAriaLabel": "ซ่อนลิงก์แชร์ที่ใช้งานอยู่"
+        },
+        "inactive": {
+          "title": "ไม่ได้ใช้งาน",
+          "showAriaLabel": "แสดงลิงก์แชร์ที่ไม่ได้ใช้งาน",
+          "hideAriaLabel": "ซ่อนลิงก์แชร์ที่ไม่ได้ใช้งาน"
+        },
+        "expired": {
+          "title": "หมดอายุ",
+          "showAriaLabel": "แสดงลิงก์แชร์ที่หมดอายุ",
+          "hideAriaLabel": "ซ่อนลิงก์แชร์ที่หมดอายุ"
+        },
+        "viewLimitReached": {
+          "title": "เหลือ 0 ครั้ง",
+          "showAriaLabel": "แสดงลิงก์แชร์ที่ครบจำนวนการเข้าชมแล้ว",
+          "hideAriaLabel": "ซ่อนลิงก์แชร์ที่ครบจำนวนการเข้าชมแล้ว"
+        }
+      }
+    },
+    "row": {
+      "deleteQuestion": "อยากเสกให้ลิงก์นี้หายไปจากโลกเลยไหม?",
+      "deleteCancel": "ไม่",
+      "deleteConfirm": "ใช่",
+      "erased": "ลบลิงก์แชร์แล้ว",
+      "eraseError": "ล้มเหลว จักรวาลยังคงเหมือนเดิม"
+    }
+  },
+  "ShareLinkLanternPanel": {
+    "statsAriaLabel": "สถิติลิงก์แชร์",
+    "panelAriaLabel": "ลิงก์แชร์ของ {subject}",
+    "lanternAriaLabel": "โคมไฮกุ: {subject}",
+    "copyTitle": "คัดลอกลิงก์แชร์!",
+    "copyAriaLabel": "คัดลอกลิงก์แชร์ของ {subject}"
+  },
+  "ShareLinkControlsColumn": {
+    "settingsAriaLabel": "การตั้งค่าลิงก์แชร์ของ {subject}"
+  },
+  "ShareLinkPreviewModal": {
+    "panelAriaLabel": "โคมที่แชร์: {subject}",
+    "labelsAriaLabel": "ป้ายของ {subject}",
+    "lanternAriaLabel": "โคมไฮกุ: {subject}",
+    "loading": "กำลังรอข้อมูลมาถึง",
+    "unavailable": "ไฮกุนี้ไม่มีให้ดูแล้ว"
+  },
+  "ShareLinksSort": {
+    "title": "เรียงตาม",
+    "ariaLabel": "เรียงลิงก์แชร์",
+    "coverAriaLabel": "เลือก {title}",
+    "categories": {
+      "creationDate": "วันที่สร้าง",
+      "creationDateAriaLabel": "เรียงตามวันที่สร้าง",
+      "alpacabet": "ก-ฮ อัลปาก้า",
+      "alpacabetAriaLabel": "เรียงตามตัวอักษร",
+      "hitsLeft": "การเข้าชมที่เหลือ",
+      "hitsLeftAriaLabel": "เรียงตามการเข้าชมที่เหลือ",
+      "timeLeft": "เวลาที่เหลือ",
+      "timeLeftAriaLabel": "เรียงตามเวลาที่เหลือ"
+    }
+  },
+  "ShareLinkStatus": {
+    "labels": {
+      "expired": "หมดอายุ",
+      "viewLimitReached": "ครบจำนวนการเข้าชมแล้ว",
+      "stopped": "หยุดแล้ว",
+      "expiresIn": "หมดอายุใน",
+      "remainingViews": "การเข้าชมที่เหลือ",
+      "active": "ใช้งานอยู่"
+    },
+    "duration": {
+      "lessThanMinute": "ไม่ถึงหนึ่งนาที",
+      "minutes": "{count, plural, other {# นาที}}",
+      "hours": "{count, plural, other {# ชั่วโมง}}",
+      "days": "{count, plural, other {# วัน}}",
+      "months": "{count, plural, other {# เดือน}}"
+    }
+  },
+  "FetchEmptyState": {
+    "caption": "ไม่มีอะไรให้ดึงมาเลย"
   }
 }

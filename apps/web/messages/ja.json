@@ -8,7 +8,30 @@
     "languageNoMatches": "該当する言語がありません",
     "languageCurrent": "現在",
     "preferencesGroupLabel": "表示と言語",
-    "preferencesSaveError": "設定を保存できませんでした"
+    "preferencesSaveError": "設定を保存できませんでした",
+    "languageAriaLabel": "言語: {language}",
+    "userFallback": "ユーザー",
+    "sortAndFilter": "並べ替えと絞り込み",
+    "tabs": {
+      "profile": {
+        "ariaLabel": "プロフィール情報"
+      },
+      "shareLinks": {
+        "title": "共有リンク",
+        "ariaLabel": "共有リンクを管理"
+      },
+      "labels": {
+        "title": "ラベル",
+        "ariaLabel": "ラベルを管理"
+      }
+    },
+    "toasts": {
+      "loadError": "プロフィールを読み込めませんでした",
+      "updateSuccess": "プロフィールを更新しました",
+      "updateError": "プロフィールを更新できませんでした",
+      "avatarSaved": "プロフィール画像を保存しました",
+      "avatarError": "プロフィール画像をアカウントに保存できませんでした"
+    }
   },
   "BuyGenerations": {
     "title": "俳句の生成",
@@ -28,7 +51,8 @@
     "belongsTo": "このカードの持ち主",
     "remaining": "残り {count} 回",
     "remainingUnknown": "残りの生成回数はここに表示されます。",
-    "buyMore": "追加購入"
+    "buyMore": "追加購入",
+    "profileIconAlt": "{name} のプロフィールアイコン"
   },
   "ProfileInfo": {
     "firstName": "名",
@@ -48,7 +72,807 @@
       "th": "タイ語",
       "de": "ドイツ語",
       "it": "イタリア語",
-      "pt": "ポルトガル語"
+      "pt": "ポルトガル語",
+      "zh": "中国語",
+      "vi": "ベトナム語"
     }
+  },
+  "RootLayout": {
+    "description": "AI、でも役に立たない"
+  },
+  "LegalPages": {
+    "back": "← 戻る",
+    "terms": {
+      "title": "利用規約",
+      "description": "俳句生成サービスのご利用、Paddle による請求、および関連ポリシーに関する規約です。"
+    },
+    "privacy": {
+      "title": "プライバシーポリシー",
+      "description": "Paddle を通じたお支払いを含め、俳句生成サービスにおけるデータの収集・利用・保護の方法について説明します。"
+    },
+    "refund": {
+      "title": "返金ポリシー",
+      "description": "Paddle を通じた俳句生成サービスの返金、サブスクリプションの解約、請求について説明します。"
+    },
+    "cookies": {
+      "title": "Cookie ポリシー",
+      "description": "俳句生成サービスにおける Cookie および類似技術の利用方法について説明します。"
+    },
+    "acceptableUse": {
+      "title": "利用ポリシー",
+      "description": "俳句生成サービスを公正に利用するためのルールです。"
+    }
+  },
+  "SiteFooter": {
+    "legalPolicies": "法的ポリシー",
+    "terms": "利用規約",
+    "privacy": "プライバシーポリシー",
+    "refund": "返金ポリシー",
+    "acceptableUse": "利用ポリシー",
+    "cookies": "Cookie ポリシー",
+    "paddleNotice": "お支払いは販売事業者(Merchant of Record)である <buyerTerms>Paddle</buyerTerms> が処理します。購入時には Paddle の<refund>購入者向け返金ポリシー</refund>、<checkout>決済規約</checkout>、<privacy>プライバシー通知</privacy>が適用されます。"
+  },
+  "NoCreditsLeft": {
+    "continueGenerationOffer": {
+      "questionWithSubject": "「{subject}」の生成を続けますか?",
+      "question": "生成を続けますか?",
+      "confirm": "続ける",
+      "cancel": "またあとで"
+    }
+  },
+  "NoGenerationsLeftModal": {
+    "title": "生成回数がなくなりました",
+    "dismiss": "またあとで",
+    "buy": "生成 100 回を購入",
+    "fallbackMessage": "生成回数を追加購入して、書き続けましょう。クレジットはお支払いの確認後に追加されます。"
+  },
+  "PurchaseConfirmModal": {
+    "title": "購入が完了しました",
+    "done": "完了"
+  },
+  "CelestialThemeClock": {
+    "ariaLabel": "時間帯"
+  },
+  "CelestialThemeSelector": {
+    "ariaLabel": "テーマの時間帯"
+  },
+  "ComicPageLayout": {
+    "close": "閉じる"
+  },
+  "ComicToast": {
+    "notifications": "通知"
+  },
+  "PaperModal": {
+    "dialog": "ダイアログ",
+    "close": "閉じる"
+  },
+  "ComicConfirmModal": {
+    "confirm": "確定",
+    "cancel": "キャンセル",
+    "description": "確定かキャンセルを選んでください。"
+  },
+  "OrderDropdown": {
+    "ariaLabel": "俳句を並べ替え",
+    "title": "並び順",
+    "categories": {
+      "creationDate": {
+        "title": "作成日",
+        "ariaLabel": "作成日で並べ替え"
+      },
+      "alpacabet": {
+        "title": "アルパカベット",
+        "ariaLabel": "アルファベット順で並べ替え"
+      }
+    }
+  },
+  "OrderDropdownCover": {
+    "ariaLabel": "並び順を変更"
+  },
+  "TextBubbleDropdown": {
+    "placeholder": "選択してください"
+  },
+  "DualityButton": {
+    "coverState": {
+      "reveal": "{title} を表示"
+    }
+  },
+  "BrushMenu": {
+    "placeholder": "選択"
+  },
+  "AuthFlows": {
+    "login": {
+      "emailPlaceholder": "メールアドレス",
+      "passwordPlaceholder": "パスワード",
+      "invalidEmail": "有効なメールアドレスが必要です。気合いだけではメッセージは届きません。",
+      "passwordRequired": "パスワードを入力してください。沈黙ではこの扉は開きません。",
+      "divider": "またはメールアドレスでログイン",
+      "submit": "ログイン",
+      "submitting": "ログイン中",
+      "useGoogleSignIn": "このアカウントは Google ログインを使用しています。",
+      "tooManyAttempts": "試行回数が多すぎます。しばらく待ってからもう一度お試しください。連打の技は休憩中です。",
+      "invalidCredentials": "メールアドレスまたはパスワードが正しくありません",
+      "completeSetupOnRegistration": "登録ページでアカウントの設定を完了してください。",
+      "googleSignInFailed": "Google ログインに失敗しました"
+    },
+    "register": {
+      "emailPlaceholder": "メールアドレス",
+      "passwordPlaceholder": "パスワード",
+      "confirmPasswordPlaceholder": "パスワード(確認)",
+      "invalidEmail": "有効なメールアドレスが必要です。気合いだけではメッセージは届きません。",
+      "passwordRequired": "パスワードを入力してください。沈黙ではこの扉は開きません。",
+      "passwordTooShort": "8文字以上",
+      "passwordsDoNotMatch": "パスワードは一貫性が大事です。うちのロボットは曖昧さが苦手なんです。",
+      "divider": "またはメールアドレスで登録",
+      "submit": "アカウントを作成",
+      "submitting": "アカウントを作成中",
+      "googleSignUpFailed": "Google での登録に失敗しました"
+    },
+    "chrome": {
+      "signInWithGoogle": "Google でログイン",
+      "signUpWithGoogle": "Google で登録"
+    }
+  },
+  "AuthGateModal": {
+    "signIn": "ログイン",
+    "createAccount": "アカウントを作成",
+    "signInTab": "ログイン",
+    "registerTab": "新規登録",
+    "forgotPassword": "パスワードをお忘れですか?"
+  },
+  "AuthLanterns": {
+    "login": "ログイン",
+    "register": "新規登録",
+    "entryGroupLabel": "アカウント"
+  },
+  "EmailChangeRevert": {
+    "pageTitle": "メールアドレスの変更を取り消す",
+    "restoreLabel": "こっちが正しい",
+    "changedToLabel": "こっちはダメ",
+    "confirmLead": "念のため、本当に実行するか確認させてください。",
+    "confirmConsequences": "メールアドレスが以前のものに戻り、すべての端末で全員がログアウトされます。",
+    "confirmCta": "はい、取り消します",
+    "keepCta": "もうどうでもいい",
+    "revertedCaption": "取り消しました",
+    "setPasswordLead": "完了しました。{email} はアカウントに残り、全員がログアウトされました。",
+    "emailTakenLead": "全員をログアウトしましたが、{email} は現在別のアカウントのものになっているため、元に戻せませんでした。",
+    "setPasswordNote": "安全のため、新しいパスワードを設定してください。なにしろ、誰かがあなたの古いパスワードを無断で使ったばかりですから。",
+    "newPasswordPlaceholder": "新しいパスワード",
+    "confirmPasswordPlaceholder": "新しいパスワードをもう一度",
+    "setPasswordCta": "パスワードを保存",
+    "passwordTooShort": "{min}文字以上にしてください。",
+    "passwordsDoNotMatch": "パスワードが一致しません。",
+    "passwordFailed": "パスワードを保存できませんでした。もう一度お試しください。",
+    "loadingTitle": "確認中",
+    "loadingBody": "ロボットがあなたのデータを探しています…",
+    "passwordSavedTitle": "準備完了",
+    "passwordSavedBody": "新しいパスワードを保存しました。{email} と新しいパスワードでログインしてください。",
+    "revertedTitle": "取り消しました",
+    "revertedBody": "{email} はアカウントに残り、全員がログアウトされました。",
+    "emailTakenNoPasswordBody": "全員をログアウトしましたが、{email} は現在別のアカウントのものになっているため、元に戻せませんでした。",
+    "invalidTitle": "不明なリンク",
+    "invalidBody": "このリンクは何にも一致しません。メールに記載されたリンクを省略せずに開いたか確認してください。",
+    "expiredTitle": "リンクの有効期限切れ",
+    "expiredBody": "この取り消しリンクの有効期限は7日間でした。まだ何かおかしいと感じる場合は、ログイン画面からパスワードを再設定してください。",
+    "usedTitle": "使用済み",
+    "usedBody": "このリンクはすでに使用されたか、別のリンクで変更が取り消されています。",
+    "unavailableTitle": "リンクは無効です",
+    "unavailableBody": "以前のアドレスは、それを確認済みの別のアカウントのものになったため、この変更はもう取り消せません。何かおかしいと感じたら、ログイン画面からパスワードを再設定してください。",
+    "failedTitle": "何かが壊れました",
+    "failedBody": "サーバーに接続できませんでした。少し待ってからもう一度リンクを開いてください。",
+    "signInCta": "ログイン",
+    "homeCta": "ホームへ"
+  },
+  "ResetPasswordModal": {
+    "requestTitle": "パスワードの再設定",
+    "confirmTitle": "新しいパスワード",
+    "requestCta": "再設定リンクを送信",
+    "confirmCta": "パスワードを更新",
+    "requestLead": "メールアドレスを入力してください。アカウントが存在する場合はリンクをお送りします。",
+    "confirmLead": "アカウントの新しいパスワードを決めてください。",
+    "emailPlaceholder": "メールアドレス",
+    "newPasswordPlaceholder": "新しいパスワード",
+    "confirmPasswordPlaceholder": "パスワード(確認)",
+    "invalidEmail": "有効なメールアドレスを入力してください",
+    "passwordTooShort": "パスワードは8文字以上にしてください",
+    "passwordsDoNotMatch": "パスワードが一致しません",
+    "requestSent": "そのメールアドレスのアカウントが存在する場合、再設定の手順をお送りしました。",
+    "requestFailed": "リクエストに失敗しました。もう一度お試しください。",
+    "linkInvalid": "再設定リンクがないか、無効です。",
+    "confirmSuccess": "パスワードを更新しました。ログインできます。",
+    "confirmFailed": "再設定に失敗しました"
+  },
+  "VerifyEmail": {
+    "verifyingTitle": "メールアドレスを確認中",
+    "verifyingBody": "リンクを確認しています。しばらくお待ちください。",
+    "alreadyVerifiedTitle": "メールアドレスは確認済みです",
+    "alreadyVerifiedBody": "メールアドレスはすでに確認済みです。{seconds} 秒後にホームページへ移動します。",
+    "resentTitle": "確認メールを送信しました",
+    "expiredTitle": "確認リンクの有効期限が切れています",
+    "resentBody": "新しい確認メールを送信しました。受信トレイを確認し、最新のリンクを使ってください。",
+    "expiredBody": "この確認リンクは有効期限が切れています。",
+    "resending": "送信中…",
+    "resend": "確認メールを再送信"
+  },
+  "UserMenu": {
+    "fallbackName": "ユーザー",
+    "settings": "設定",
+    "logout": "ログアウト",
+    "goHome": "ホームへ",
+    "login": "ログイン",
+    "guest": "ゲスト",
+    "logoutQuestion": "もう十分楽しみましたか?",
+    "logoutCancel": "まだまだ",
+    "logoutConfirm": "はい"
+  },
+  "LoginPage": {
+    "title": "ログイン",
+    "completeSetupOnRegistration": "登録ページでアカウントの設定を完了してください。",
+    "createAccountLink": "アカウントを作成",
+    "forgotPassword": "パスワードをお忘れですか?"
+  },
+  "RegisterPage": {
+    "title": "アカウントを作成",
+    "haveAccount": "すでにアカウントをお持ちですか? <link>ログイン</link>"
+  },
+  "CompleteRegistrationPage": {
+    "title": "登録を完了",
+    "loading": "読み込み中…",
+    "lead": "ユーザー名を決めて、アカウントの設定を完了しましょう。",
+    "usernameLabel": "ユーザー名",
+    "usernamePlaceholder": "your_handle",
+    "usernameRequired": "ユーザー名を決めてください",
+    "usernameTooShort": "{min}文字以上",
+    "usernamePattern": "英数字とアンダースコアのみ",
+    "usernameUnavailable": "このユーザー名は使用できません",
+    "usernameTaken": "このユーザー名はすでに使われています",
+    "saveFailed": "ユーザー名を保存できませんでした",
+    "success": "準備完了です",
+    "continue": "続ける",
+    "backHome": "ホームに戻る"
+  },
+  "AuthHooks": {
+    "registrationSent": "このメールアドレスで新しいアカウントを作成できる場合は、確認リンクをお送りしました。受信トレイを確認してください。",
+    "registrationFailed": "登録に失敗しました",
+    "usernameUnavailable": "このユーザー名は使用できません",
+    "googleSignInFailed": "Google ログインに失敗しました"
+  },
+  "HaikuContainer": {
+    "haikuActions": {
+      "deleteLabel": "削除",
+      "deleteAriaLabel": "俳句を削除",
+      "shareLabel": "共有",
+      "shareAriaLabel": "俳句を共有",
+      "labelLabel": "ラベル",
+      "labelAriaLabel": "ラベルを追加",
+      "copyLabel": "コピー",
+      "copyAriaLabel": "クリップボードにコピー",
+      "deleted": "俳句を削除しました",
+      "deleteForbidden": "この俳句を削除する権限がありません。",
+      "deleteFailed": "俳句を削除できませんでした。",
+      "saving": "この俳句を保存中…",
+      "groupAriaLabel": "俳句の操作",
+      "hideActions": "俳句の操作を隠す",
+      "showActions": "俳句の操作を表示"
+    }
+  },
+  "HaikuGenerationStickyNote": {
+    "generationFlow": {
+      "errorTitle": "慌てないで。でも、何か問題が起きました",
+      "errorDescription": "うちの下っ端たちが全力で修正中です。もうすぐ、もっと強くムチを入れる係を派遣します。\nしばらくしてからもう一度お試しください。"
+    }
+  },
+  "Lantern": {
+    "lantern": {
+      "bodyAriaLabel": "俳句",
+      "haikuLantern": "俳句の提灯: {title}",
+      "generating": "俳句を生成中: {subject}",
+      "rotatedLantern": "回転した俳句の提灯"
+    },
+    "labelBelt": {
+      "ariaLabel": "俳句のラベルベルト",
+      "previous": "前のラベル",
+      "next": "次のラベル"
+    },
+    "lanternDeleteExit": {
+      "deleted": "俳句を削除しました",
+      "deleteForbidden": "この俳句を削除する権限がありません。",
+      "deleteFailed": "俳句を削除できませんでした。"
+    },
+    "lanternSteppedFlight": {
+      "deleting": "俳句を削除中: {title}"
+    },
+    "lanternRotatedShell": {
+      "labels": "{label} のラベル"
+    },
+    "lanternPath": {
+      "generating": "生成中: {subject}",
+      "focusPosition": "{title} · {position} / {total}",
+      "untitled": "俳句",
+      "empty": "俳句がありません",
+      "previous": "前の俳句",
+      "next": "次の俳句"
+    },
+    "lanternPathLantern": {
+      "generating": "俳句を生成中: {subject}",
+      "haikuLantern": "俳句の提灯: {title}",
+      "lantern": "俳句の提灯",
+      "labels": "{label} のラベル"
+    },
+    "lanternPathStage": {
+      "ariaLabel": "提灯の飛行ルート"
+    }
+  },
+  "LanternSubmit": {
+    "ariaLabel": "詠む"
+  },
+  "SVGPath": {
+    "svgPath": {
+      "stageAriaLabel": "提灯の SVG パス"
+    },
+    "svgPathLantern": {
+      "loadingMore": "俳句をさらに読み込み中",
+      "generating": "俳句を生成中: {subject}",
+      "haikuLantern": "俳句の提灯: {title}",
+      "labels": "{label} のラベル"
+    }
+  },
+  "SavedHaikusLanternPath": {
+    "loading": "俳句を読み込み中",
+    "loadError": "保存した俳句を読み込めませんでした。",
+    "retry": "もう一度試す",
+    "searching": "俳句を検索中"
+  },
+  "PathNavigation": {
+    "pathNavigationArrows": {
+      "next": "次の提灯",
+      "previous": "前の提灯"
+    }
+  },
+  "PathOverlay": {
+    "pathOverlay": {
+      "title": "オーバーレイ",
+      "continueJourney": "ここにとどまる",
+      "goBackToStart": "最初に戻る"
+    },
+    "overlayNextLabel": {
+      "label": "ここにとどまる"
+    },
+    "overlayPrevLabel": {
+      "label": "最初に戻る"
+    }
+  },
+  "PostSignInput": {
+    "signAriaLabel": "俳句のお題の看板",
+    "placeholder": "題",
+    "inputAriaLabel": "俳句のお題",
+    "submitLabel": "詠む"
+  },
+  "CreationModal": {
+    "generating": "俳句を生成中: {subject}",
+    "haikuLantern": "俳句の提灯: {title}",
+    "creation": "俳句の作成"
+  },
+  "DeleteConfirmModal": {
+    "question": "本気でやるつもりでした?",
+    "cancel": "やめとく",
+    "confirm": "やる"
+  },
+  "DeleteFailedModal": {
+    "title": "削除に失敗しました",
+    "leaveItBe": "そのままにする",
+    "retry": "再試行",
+    "body": "この俳句を削除できませんでした。もう一度試すか、リストに残しておくこともできます。"
+  },
+  "AwkwardLantern": {
+    "title": "えーと、これは気まずい…"
+  },
+  "RestartLinkButton": {
+    "expired": "期限切れ",
+    "limitReached": "残りアクセス 0",
+    "revive": "復活!",
+    "resurrect": "よみがえれ!"
+  },
+  "GoHome": {
+    "label": "ホームへ"
+  },
+  "NotFoundView": {
+    "toast": "そのリンクはもうこの世にいません",
+    "signUp": "登録して、あなたも死んだリンクを送ろう",
+    "copy": "誰かが動かないリンクを送ってきたようです。\nタイプミスかもしれません。あるいは、ここには向き合うべき信頼の問題があるのかもしれません。\nとにかく、このリンクはもうありません。"
+  },
+  "Loaders": {
+    "sakuraPetalLoader": {
+      "ariaLabel": "読み込み中"
+    },
+    "wagTailLoader": {
+      "ariaLabel": "読み込み中"
+    },
+    "lanternLoader": {
+      "ariaLabel": "読み込み中"
+    },
+    "loadingText": {
+      "text": "読み込み中"
+    },
+    "fetchingLoader": {
+      "ariaLabel": "読み込み中",
+      "text": "取ってきます"
+    }
+  },
+  "MfgDate": {
+    "defaultLabel": "作成日"
+  },
+  "GoldenAgeTitle": {
+    "subtitle": "俳句ジェネレーター",
+    "tagline": "AI、でも実用性ゼロ!"
+  },
+  "HaikuHooks": {
+    "deleteController": {
+      "deleted": "俳句を削除しました",
+      "deleteFailed": "俳句を削除できませんでした。"
+    }
+  },
+  "ComicLabelCreationModal": {
+    "save": "保存",
+    "create": "作成",
+    "loadingLabels": "ラベルを読み込み中…",
+    "enterName": "ラベル名を入力してください",
+    "nameTooShort": "名前は{min}文字以上にしてください",
+    "alreadyExists": "このラベルはすでにこのアカウントにあります",
+    "updated": "ラベルを更新しました",
+    "updateError": "ラベルを更新できませんでした",
+    "created": "ラベルを作成しました",
+    "createError": "ラベルを作成できませんでした",
+    "previewTitle": "これは",
+    "minChars": "最低{min}文字",
+    "nameAriaLabel": "ラベル名",
+    "color": "色",
+    "colorAriaLabel": "ラベルの色",
+    "openColorPicker": "カラーピッカーを開く",
+    "shapeAriaLabel": "{shape}の形",
+    "saveAriaLabel": "ラベルを保存",
+    "createAriaLabel": "ラベルを作成",
+    "shapes": {
+      "classic": "クラシック",
+      "sharp": "シャープ",
+      "soft": "ソフト",
+      "circle": "円",
+      "square": "四角",
+      "thought": "もくもく"
+    }
+  },
+  "ComicLabelPickerPanel": {
+    "filterPlaceholder": "ラベルを絞り込み…",
+    "filterAriaLabel": "ラベルを絞り込み",
+    "disabledAriaLabel": "{name}(もう一方のフィルターで使用中)"
+  },
+  "CreateAddLabelsModal": {
+    "maxLabels": "1つの俳句に付けられるラベルは最大{max}個です",
+    "saved": "詩にラベルが付きました",
+    "saveError": "エラーのためラベルを付けられませんでした",
+    "createTitle": "作成",
+    "createAriaLabel": "新しく作成",
+    "addTitle": "追加",
+    "addAriaLabel": "この俳句にラベルを付ける",
+    "save": "保存"
+  },
+  "LabelHalo": {
+    "halo": {
+      "ariaLabel": "ラベルの光輪"
+    },
+    "slot": {
+      "rotateAriaLabel": "ラベルを回転 — ラベルの周りをドラッグして調整",
+      "ariaLabel": "{name} ラベル、{degrees}度"
+    }
+  },
+  "LabelSort": {
+    "title": "並べ替え",
+    "ariaLabel": "ラベルを並べ替え",
+    "selectCategory": "{title}を選択",
+    "categories": {
+      "creationDate": {
+        "title": "作成日",
+        "ariaLabel": "作成日で並べ替え"
+      },
+      "alpacabet": {
+        "title": "アルパカベット",
+        "ariaLabel": "アルファベット順で並べ替え"
+      },
+      "connection": {
+        "title": "つながり",
+        "ariaLabel": "つながりで並べ替え"
+      }
+    }
+  },
+  "LabelsFilterModal": {
+    "filter": "ラベルで絞り込み"
+  },
+  "ManageLabel": {
+    "manageLabel": {
+      "deleted": "ラベルを削除しました",
+      "deleteError": "ラベルを削除できませんでした",
+      "edit": "編集",
+      "editAriaLabel": "ラベル {name} を編集",
+      "tuneIn": "チューニング",
+      "tuneInAriaLabel": "{name} のラベルが付いた俳句にチューニング",
+      "deleteQuestion": "どうするつもり?",
+      "cancel": "なんでここに来たんだっけ?",
+      "confirmDelete": "ひと思いにやって"
+    },
+    "createPanel": {
+      "ariaLabel": "新しいラベルを作成",
+      "create": "作成"
+    },
+    "connectedHaikus": {
+      "connected": "{total, plural, other {#件のつながり}}",
+      "ariaLabel": "{name} のラベルが付いた俳句"
+    },
+    "labelActions": {
+      "tuneInDisabled": "私を探しても無駄ですよ。",
+      "tuneIn": "チューニング",
+      "tuneInAriaLabel": "{name} のラベルが付いた俳句にチューニング",
+      "noHaikusAriaLabel": "{name} のラベルが付いた俳句はありません",
+      "groupAriaLabel": "{name} の操作",
+      "edit": "編集",
+      "editAriaLabel": "{name} を編集",
+      "delete": "削除",
+      "deleteAriaLabel": "{name} を削除"
+    },
+    "lanternStack": {
+      "notConnected": "つながりなし",
+      "lanternAriaLabel": "俳句の提灯: {title}"
+    },
+    "panel": {
+      "searchPlaceholder": "ラベルを検索…",
+      "searchAriaLabel": "名前でラベルを検索"
+    }
+  },
+  "HeaderHaikuTools": {
+    "search": {
+      "buttonAriaLabel": "俳句を検索",
+      "placeholder": "タイトルを検索…",
+      "inputAriaLabel": "俳句のタイトルを検索",
+      "actionName": "名前で検索"
+    },
+    "filter": {
+      "buttonAriaLabel": "ラベルで俳句を絞り込み",
+      "actionName": "ラベルで絞り込み",
+      "activeFiltersAriaLabel": "適用中のラベルフィルター",
+      "removeFilterAriaLabel": "フィルター {name} を解除",
+      "removeExcludeFilterAriaLabel": "除外フィルター {name} を解除"
+    },
+    "settingsSearch": {
+      "shareLinks": {
+        "placeholder": "リンクを検索",
+        "ariaLabel": "タイトルで検索",
+        "buttonAriaLabel": "共有リンクを検索"
+      },
+      "labels": {
+        "placeholder": "ラベルを検索",
+        "ariaLabel": "名前でラベルを検索",
+        "buttonAriaLabel": "ラベルを検索"
+      }
+    }
+  },
+  "IconUploader": {
+    "label": "プロフィール画像を変更",
+    "alt": "現在のアイコン",
+    "uploading": "アップロード中: {progress}%"
+  },
+  "LabelHooks": {
+    "placementError": "ラベルの配置を保存できませんでした",
+    "uploadComplete": "アップロード完了",
+    "uploadFailed": "画像をアップロードできませんでした"
+  },
+  "ShareModal": {
+    "modal": {
+      "defaultSubject": "俳句",
+      "linkTabTitle": "リンク",
+      "linkTabAriaLabel": "リンクで共有",
+      "emailTabTitle": "メール",
+      "emailTabAriaLabel": "メールで共有",
+      "loading": "読み込み中…"
+    },
+    "controller": {
+      "defaultSubject": "俳句",
+      "postcardsQueued": "ポストカードをポストに投函しました",
+      "loadLinkError": "共有リンクを読み込めませんでした",
+      "sendEmailError": "メールを送信できませんでした",
+      "addRecipientHint": "宛先のメールアドレスを1件以上追加してください",
+      "fixInvalidHint": "無効な宛先メールアドレスを修正してください"
+    },
+    "email": {
+      "toPrefix": "宛先:",
+      "recipientsPlaceholder": "宛先のメールアドレス(1件ごとに Enter)",
+      "messagePlaceholder": "あなたにシェアしたくて…",
+      "messageAriaLabel": "メール本文",
+      "signature": "差出人: {name}",
+      "invalidEmails": "無効なメールアドレス: {emails}"
+    },
+    "sendPanel": {
+      "preparingPostcard": "ポストカードを準備中…",
+      "sendEmail": "メールを送信"
+    },
+    "postcardFront": {
+      "prepareError": "ポストカード画像を準備できませんでした"
+    }
+  },
+  "Postcard": {
+    "renderer": {
+      "ariaLabel": "俳句のポストカード",
+      "ariaLabelWithTitle": "俳句のポストカード: {title}"
+    }
+  },
+  "SharedHaikuPage": {
+    "unknownAuthor": "作者不明",
+    "lanternAriaLabel": "俳句の提灯: {subject}",
+    "labelsAriaLabel": "{subject} のラベル",
+    "createdBy": "作: {authorName}"
+  },
+  "CommonHooks": {
+    "useCopy": {
+      "copied": "テキストをコピーしました",
+      "copyError": "コピーできませんでした"
+    }
+  },
+  "ShareLink": {
+    "lifecycle": {
+      "activating": "起動中",
+      "stopping": "停止中",
+      "stopAriaLabel": "リンクを停止",
+      "stop": "停止",
+      "launchAriaLabel": "リンクを開始",
+      "launch": "開始"
+    },
+    "settings": {
+      "hitsLimit": "アクセス上限:",
+      "timeoutAt": "期限:",
+      "timeoutPlaceholder": "時の終わりまで",
+      "updateAriaLabel": "リンクを更新",
+      "updating": "更新中",
+      "update": "更新"
+    },
+    "controls": {
+      "stopped": "共有リンクを停止しました",
+      "stopError": "共有リンクを停止できませんでした",
+      "started": "共有リンクを開始しました",
+      "startError": "共有リンクを開始できませんでした",
+      "updated": "共有リンクを更新しました",
+      "updateError": "共有リンクを更新できませんでした",
+      "labelsError": "ラベルの表示設定を更新できませんでした",
+      "hitsUnlimited": "アクセス無制限",
+      "hitsEmpty": "残りアクセスなし",
+      "hitsRemaining": "{count, plural, other {残りアクセス#回}}",
+      "timeUnlimited": "期限なし",
+      "timeLeftWithValue": "残り時間 {time}",
+      "timeLeft": "残り時間"
+    }
+  },
+  "ShareLinkActions": {
+    "actions": {
+      "groupAriaLabel": "{subject} の共有リンク操作",
+      "preview": "プレビュー",
+      "previewAriaLabel": "{subject} をプレビュー",
+      "delete": "削除",
+      "deleteAriaLabel": "{subject} の共有リンクを削除"
+    },
+    "previewLabels": {
+      "groupAriaLabel": "{subject} の共有リンク操作",
+      "preview": "プレビュー",
+      "previewAriaLabel": "{subject} をプレビュー"
+    },
+    "done": {
+      "caption": "完了",
+      "ariaLabel": "{subject} の共有リンクのプレビューを閉じる"
+    },
+    "editLabels": {
+      "caption": "ラベルを編集",
+      "ariaLabel": "{subject} のラベルを編集"
+    },
+    "goToLink": {
+      "caption": "リンクを開く",
+      "ariaLabel": "{subject} の共有リンクを新しいタブで開く"
+    },
+    "labelsToggle": {
+      "visible": "ラベル表示中",
+      "hidden": "ラベル非表示",
+      "ariaLabel": "{subject} の共有リンクにラベルを表示"
+    },
+    "update": {
+      "caption": "更新",
+      "ariaLabel": "{subject} の共有リンクを更新",
+      "disabledInactive": "まだ始まっていないものは、変えられません",
+      "disabledUnchanged": "すべてはあるべき場所に",
+      "unavailableAlt": "{subject} は更新できません: {message}",
+      "wakingAlt": "{subject} の共有リンクを起動中"
+    }
+  },
+  "ShareLinkManagement": {
+    "list": {},
+    "filters": {
+      "groupAriaLabel": "ステータスで共有リンクを絞り込み",
+      "showTitle": "表示\r\n {title}",
+      "hideTitle": "非表示\r\n {title}",
+      "options": {
+        "active": {
+          "title": "有効",
+          "showAriaLabel": "有効な共有リンクを表示",
+          "hideAriaLabel": "有効な共有リンクを隠す"
+        },
+        "inactive": {
+          "title": "無効",
+          "showAriaLabel": "無効な共有リンクを表示",
+          "hideAriaLabel": "無効な共有リンクを隠す"
+        },
+        "expired": {
+          "title": "期限切れ",
+          "showAriaLabel": "期限切れの共有リンクを表示",
+          "hideAriaLabel": "期限切れの共有リンクを隠す"
+        },
+        "viewLimitReached": {
+          "title": "残りアクセス 0",
+          "showAriaLabel": "閲覧上限に達した共有リンクを表示",
+          "hideAriaLabel": "閲覧上限に達した共有リンクを隠す"
+        }
+      }
+    },
+    "row": {
+      "deleteQuestion": "このリンクを魔法でこの世から消し去りますか?",
+      "deleteCancel": "いいえ",
+      "deleteConfirm": "はい",
+      "erased": "共有リンクを消去しました",
+      "eraseError": "失敗しました。宇宙は何も変わっていません。"
+    }
+  },
+  "ShareLinkLanternPanel": {
+    "statsAriaLabel": "共有リンクの統計",
+    "panelAriaLabel": "{subject} の共有リンク",
+    "lanternAriaLabel": "俳句の提灯: {subject}",
+    "copyTitle": "共有リンクをコピー!",
+    "copyAriaLabel": "{subject} の共有リンクをコピー"
+  },
+  "ShareLinkControlsColumn": {
+    "settingsAriaLabel": "{subject} の共有リンク設定"
+  },
+  "ShareLinkPreviewModal": {
+    "panelAriaLabel": "共有された提灯: {subject}",
+    "labelsAriaLabel": "{subject} のラベル",
+    "lanternAriaLabel": "俳句の提灯: {subject}",
+    "loading": "データの到着を待っています",
+    "unavailable": "この俳句はもう利用できません。"
+  },
+  "ShareLinksSort": {
+    "title": "並べ替え",
+    "ariaLabel": "共有リンクを並べ替え",
+    "coverAriaLabel": "{title}を選択",
+    "categories": {
+      "creationDate": "作成日",
+      "creationDateAriaLabel": "作成日で並べ替え",
+      "alpacabet": "アルパカベット",
+      "alpacabetAriaLabel": "アルパカベット順で並べ替え",
+      "hitsLeft": "残りアクセス",
+      "hitsLeftAriaLabel": "残りアクセス数で並べ替え",
+      "timeLeft": "残り時間",
+      "timeLeftAriaLabel": "残り時間で並べ替え"
+    }
+  },
+  "ShareLinkStatus": {
+    "labels": {
+      "expired": "期限切れ",
+      "viewLimitReached": "閲覧上限に到達",
+      "stopped": "停止中",
+      "expiresIn": "有効期限まで",
+      "remainingViews": "残り閲覧数",
+      "active": "有効"
+    },
+    "duration": {
+      "lessThanMinute": "1分未満",
+      "minutes": "{count, plural, other {#分}}",
+      "hours": "{count, plural, other {#時間}}",
+      "days": "{count, plural, other {#日}}",
+      "months": "{count, plural, other {#か月}}"
+    }
+  },
+  "FetchEmptyState": {
+    "caption": "取ってくるものが何もありませんでした"
   }
 }

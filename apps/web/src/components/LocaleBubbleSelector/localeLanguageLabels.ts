@@ -10,6 +10,8 @@ const NATIVE_LABELS: Record<AppLocale, string> = {
   de: "Deutsch",
   it: "Italiano",
   pt: "Português",
+  zh: "中文",
+  vi: "Tiếng Việt",
 };
 
 /** Extra aliases Intl may miss (accents, common spellings). */
@@ -22,6 +24,8 @@ const EXTRA_SEARCH_ALIASES: Partial<Record<AppLocale, readonly string[]>> = {
   th: ["thai", "thailandese", "tailandes"],
   en: ["english", "ingles", "anglais", "inglese"],
   it: ["italiano", "italian", "italien"],
+  zh: ["chinese", "zhongwen", "mandarin", "chinois", "cinese", "chino"],
+  vi: ["vietnamese", "tieng viet", "vietnamien", "vietnamita"],
 };
 
 export function capitalizeLanguageLabel(name: string): string {

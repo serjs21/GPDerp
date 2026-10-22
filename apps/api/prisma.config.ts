@@ -1,6 +1,5 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
-import { env } from "./src/env";
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -9,6 +8,7 @@ export default defineConfig({
   },
   datasource: {
     // Migrations need a direct connection; the pooled one breaks Prisma Migrate.
-    url: env.DATABASE_URL_UNPOOLED,
+    // Read directly (not via src/env) so `prisma generate` runs in the Docker build without app secrets.
+    url: process.env.DATABASE_URL_UNPOOLED ?? "",
   },
 });

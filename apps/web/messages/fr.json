@@ -8,7 +8,30 @@
     "languageNoMatches": "Aucune langue correspondante",
     "languageCurrent": "Actuelle",
     "preferencesGroupLabel": "Affichage et langue",
-    "preferencesSaveError": "Impossible d'enregistrer les preferences"
+    "preferencesSaveError": "Impossible d'enregistrer les preferences",
+    "languageAriaLabel": "Langue : {language}",
+    "userFallback": "Utilisateur",
+    "sortAndFilter": "Trier et filtrer",
+    "tabs": {
+      "profile": {
+        "ariaLabel": "Informations du profil"
+      },
+      "shareLinks": {
+        "title": "Liens de partage",
+        "ariaLabel": "Gérer les liens de partage"
+      },
+      "labels": {
+        "title": "Étiquettes",
+        "ariaLabel": "Gérer les étiquettes"
+      }
+    },
+    "toasts": {
+      "loadError": "Impossible de charger le profil",
+      "updateSuccess": "Profil mis à jour",
+      "updateError": "Impossible de mettre à jour le profil",
+      "avatarSaved": "Photo de profil enregistrée",
+      "avatarError": "Impossible d'enregistrer la photo de profil sur votre compte"
+    }
   },
   "BuyGenerations": {
     "title": "Generations de haiku",
@@ -28,7 +51,8 @@
     "belongsTo": "Cette carte appartient a",
     "remaining": "{count} generations restantes",
     "remainingUnknown": "Les generations restantes apparaitront ici.",
-    "buyMore": "Acheter plus"
+    "buyMore": "Acheter plus",
+    "profileIconAlt": "Icône de profil de {name}"
   },
   "ProfileInfo": {
     "firstName": "Prenom",
@@ -48,7 +72,807 @@
       "th": "Thai",
       "de": "Allemand",
       "it": "Italien",
-      "pt": "Portugais"
+      "pt": "Portugais",
+      "zh": "Chinois",
+      "vi": "Vietnamien"
     }
+  },
+  "RootLayout": {
+    "description": "L'IA, mais inutile"
+  },
+  "LegalPages": {
+    "back": "← Retour",
+    "terms": {
+      "title": "Conditions d'utilisation",
+      "description": "Conditions régissant l'utilisation du service de génération de haïkus, la facturation via Paddle et les politiques associées."
+    },
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "description": "Comment nous collectons, utilisons et protégeons les données du service de génération de haïkus, y compris les paiements via Paddle."
+    },
+    "refund": {
+      "title": "Politique de remboursement",
+      "description": "Remboursements, résiliation d'abonnement et facturation du service de génération de haïkus via Paddle."
+    },
+    "cookies": {
+      "title": "Politique relative aux cookies",
+      "description": "Comment le service de génération de haïkus utilise les cookies et technologies similaires."
+    },
+    "acceptableUse": {
+      "title": "Politique d'utilisation acceptable",
+      "description": "Règles d'utilisation équitable du service de génération de haïkus."
+    }
+  },
+  "SiteFooter": {
+    "legalPolicies": "Informations légales",
+    "terms": "Conditions d'utilisation",
+    "privacy": "Politique de confidentialité",
+    "refund": "Politique de remboursement",
+    "acceptableUse": "Utilisation acceptable",
+    "cookies": "Politique relative aux cookies",
+    "paddleNotice": "Les paiements sont traités par <buyerTerms>Paddle</buyerTerms> en tant que marchand officiel. La <refund>politique de remboursement acheteur</refund>, les <checkout>conditions de paiement</checkout> et la <privacy>politique de confidentialité</privacy> de Paddle s'appliquent lors de l'achat."
+  },
+  "NoCreditsLeft": {
+    "continueGenerationOffer": {
+      "questionWithSubject": "Continuer à générer « {subject} » ?",
+      "question": "Continuer à générer ?",
+      "confirm": "Continuer",
+      "cancel": "Pas maintenant"
+    }
+  },
+  "NoGenerationsLeftModal": {
+    "title": "Plus de générations",
+    "dismiss": "Pas maintenant",
+    "buy": "Acheter 100 générations",
+    "fallbackMessage": "Achetez plus de générations pour continuer à écrire. Les crédits sont ajoutés une fois le paiement confirmé."
+  },
+  "PurchaseConfirmModal": {
+    "title": "Achat confirmé",
+    "done": "Terminé"
+  },
+  "CelestialThemeClock": {
+    "ariaLabel": "Moment de la journée"
+  },
+  "CelestialThemeSelector": {
+    "ariaLabel": "Moment de la journée du thème"
+  },
+  "ComicPageLayout": {
+    "close": "Fermer"
+  },
+  "ComicToast": {
+    "notifications": "Notifications"
+  },
+  "PaperModal": {
+    "dialog": "Boîte de dialogue",
+    "close": "Fermer"
+  },
+  "ComicConfirmModal": {
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "description": "Choisissez de confirmer ou d'annuler."
+  },
+  "OrderDropdown": {
+    "ariaLabel": "Trier les haïkus",
+    "title": "Trier par",
+    "categories": {
+      "creationDate": {
+        "title": "Date de création",
+        "ariaLabel": "Trier par date de création"
+      },
+      "alpacabet": {
+        "title": "Alpagabet",
+        "ariaLabel": "Trier par ordre alphabétique"
+      }
+    }
+  },
+  "OrderDropdownCover": {
+    "ariaLabel": "Changer l'ordre"
+  },
+  "TextBubbleDropdown": {
+    "placeholder": "Choisir une option"
+  },
+  "DualityButton": {
+    "coverState": {
+      "reveal": "Révéler {title}"
+    }
+  },
+  "BrushMenu": {
+    "placeholder": "Choisir"
+  },
+  "AuthFlows": {
+    "login": {
+      "emailPlaceholder": "E-mail",
+      "passwordPlaceholder": "Mot de passe",
+      "invalidEmail": "Il vous faut un e-mail valide pour que ça marche. La détermination seule ne suffira pas à délivrer le message.",
+      "passwordRequired": "Saisissez votre mot de passe. Le silence n'ouvrira pas cette porte.",
+      "divider": "ou connectez-vous par e-mail",
+      "submit": "Se connecter",
+      "submitting": "Connexion",
+      "useGoogleSignIn": "Ce compte utilise la connexion Google.",
+      "tooManyAttempts": "Trop de tentatives. Patientez et réessayez plus tard. La technique du tapotement frénétique est en pause.",
+      "invalidCredentials": "E-mail ou mot de passe incorrect",
+      "completeSetupOnRegistration": "Finalisez la configuration du compte sur la page d'inscription.",
+      "googleSignInFailed": "Échec de la connexion Google"
+    },
+    "register": {
+      "emailPlaceholder": "E-mail",
+      "passwordPlaceholder": "Mot de passe",
+      "confirmPasswordPlaceholder": "Confirmer le mot de passe",
+      "invalidEmail": "Il vous faut un e-mail valide pour que ça marche. La détermination seule ne suffira pas à délivrer le message.",
+      "passwordRequired": "Saisissez votre mot de passe. Le silence n'ouvrira pas cette porte.",
+      "passwordTooShort": "Au moins 8 caractères",
+      "passwordsDoNotMatch": "Les mots de passe doivent concorder. Nos robots gèrent mal l'ambiguïté.",
+      "divider": "ou inscrivez-vous par e-mail",
+      "submit": "Créer un compte",
+      "submitting": "Création du compte",
+      "googleSignUpFailed": "Échec de l'inscription Google"
+    },
+    "chrome": {
+      "signInWithGoogle": "Se connecter avec Google",
+      "signUpWithGoogle": "S'inscrire avec Google"
+    }
+  },
+  "AuthGateModal": {
+    "signIn": "Se connecter",
+    "createAccount": "Créer un compte",
+    "signInTab": "Connexion",
+    "registerTab": "Inscription",
+    "forgotPassword": "Mot de passe oublié ?"
+  },
+  "AuthLanterns": {
+    "login": "Connexion",
+    "register": "Inscription",
+    "entryGroupLabel": "Compte"
+  },
+  "EmailChangeRevert": {
+    "pageTitle": "Annuler le changement d'e-mail",
+    "restoreLabel": "Celui-ci est bon",
+    "changedToLabel": "Celui-ci est mauvais",
+    "confirmLead": "On vérifie juste que vous voulez toujours le faire.",
+    "confirmConsequences": "Cela rétablira l'ancien e-mail et déconnectera tout le monde, partout.",
+    "confirmCta": "Oui, annuler",
+    "keepCta": "Ça m'est égal maintenant",
+    "revertedCaption": "Annulé",
+    "setPasswordLead": "C'est fait. {email} reste sur le compte et tout le monde a été déconnecté.",
+    "emailTakenLead": "Tout le monde a été déconnecté, mais {email} appartient désormais à un autre compte, il n'a donc pas pu être rétabli.",
+    "setPasswordNote": "Par sécurité, vous devez choisir un nouveau mot de passe. Vu que quelqu'un vient d'utiliser l'ancien sans permission.",
+    "newPasswordPlaceholder": "Nouveau mot de passe",
+    "confirmPasswordPlaceholder": "Répétez le nouveau mot de passe",
+    "setPasswordCta": "Enregistrer le mot de passe",
+    "passwordTooShort": "Utilisez au moins {min} caractères.",
+    "passwordsDoNotMatch": "Les mots de passe ne correspondent pas.",
+    "passwordFailed": "Impossible d'enregistrer le mot de passe. Réessayez.",
+    "loadingTitle": "Vérification",
+    "loadingBody": "Nos robots recherchent vos données...",
+    "passwordSavedTitle": "Tout est prêt",
+    "passwordSavedBody": "Nouveau mot de passe enregistré. Connectez-vous avec {email} et votre nouveau mot de passe.",
+    "revertedTitle": "Annulé",
+    "revertedBody": "{email} reste sur le compte, et tout le monde a été déconnecté.",
+    "emailTakenNoPasswordBody": "Tout le monde a été déconnecté, mais {email} appartient désormais à un autre compte, il n'a donc pas pu être rétabli.",
+    "invalidTitle": "Lien inconnu",
+    "invalidBody": "Ce lien ne correspond à rien. Vérifiez que vous avez ouvert le lien complet depuis l'e-mail.",
+    "expiredTitle": "Lien expiré",
+    "expiredBody": "Ce lien d'annulation n'était valable que 7 jours. Si quelque chose semble encore anormal, réinitialisez votre mot de passe depuis l'écran de connexion.",
+    "usedTitle": "Déjà utilisé",
+    "usedBody": "Ce lien a déjà été utilisé, ou le changement a été annulé avec un autre lien.",
+    "unavailableTitle": "Lien désactivé",
+    "unavailableBody": "Votre ancienne adresse appartient désormais à un autre compte qui l'a confirmée, ce changement ne peut donc plus être annulé. Si quelque chose semble anormal, réinitialisez votre mot de passe depuis l'écran de connexion.",
+    "failedTitle": "Quelque chose a cassé",
+    "failedBody": "Impossible de joindre le serveur. Réessayez d'ouvrir le lien dans un instant.",
+    "signInCta": "Se connecter",
+    "homeCta": "Retour à l'accueil"
+  },
+  "ResetPasswordModal": {
+    "requestTitle": "Réinitialiser le mot de passe",
+    "confirmTitle": "Nouveau mot de passe",
+    "requestCta": "Envoyer le lien",
+    "confirmCta": "Mettre à jour le mot de passe",
+    "requestLead": "Saisissez votre e-mail et nous vous enverrons un lien si un compte existe.",
+    "confirmLead": "Choisissez un nouveau mot de passe pour votre compte.",
+    "emailPlaceholder": "E-mail",
+    "newPasswordPlaceholder": "Nouveau mot de passe",
+    "confirmPasswordPlaceholder": "Confirmer le mot de passe",
+    "invalidEmail": "Saisissez un e-mail valide",
+    "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères",
+    "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+    "requestSent": "Si un compte existe pour cet e-mail, nous avons envoyé les instructions de réinitialisation.",
+    "requestFailed": "La demande a échoué. Réessayez.",
+    "linkInvalid": "Le lien de réinitialisation est manquant ou invalide.",
+    "confirmSuccess": "Mot de passe mis à jour. Vous pouvez maintenant vous connecter.",
+    "confirmFailed": "Échec de la réinitialisation"
+  },
+  "VerifyEmail": {
+    "verifyingTitle": "Vérification de votre e-mail",
+    "verifyingBody": "Veuillez patienter pendant la validation de votre lien.",
+    "alreadyVerifiedTitle": "E-mail déjà vérifié",
+    "alreadyVerifiedBody": "Votre e-mail est déjà validé. Redirection vers l'accueil dans {seconds} secondes.",
+    "resentTitle": "E-mail de vérification envoyé",
+    "expiredTitle": "Lien de vérification expiré",
+    "resentBody": "Nous avons envoyé un nouvel e-mail de vérification. Consultez votre boîte de réception et utilisez le lien le plus récent.",
+    "expiredBody": "Ce lien de vérification a expiré.",
+    "resending": "Envoi...",
+    "resend": "Renvoyer l'e-mail de vérification"
+  },
+  "UserMenu": {
+    "fallbackName": "Utilisateur",
+    "settings": "Paramètres",
+    "logout": "Déconnexion",
+    "goHome": "Accueil",
+    "login": "Connexion",
+    "guest": "Invité",
+    "logoutQuestion": "Vous avez eu votre dose de fun ?",
+    "logoutCancel": "Pas encore",
+    "logoutConfirm": "Oui"
+  },
+  "LoginPage": {
+    "title": "Connexion",
+    "completeSetupOnRegistration": "Finalisez la configuration du compte sur la page d'inscription.",
+    "createAccountLink": "Créer un compte",
+    "forgotPassword": "Mot de passe oublié ?"
+  },
+  "RegisterPage": {
+    "title": "Créer un compte",
+    "haveAccount": "Vous avez déjà un compte ? <link>Se connecter</link>"
+  },
+  "CompleteRegistrationPage": {
+    "title": "Finaliser l'inscription",
+    "loading": "Chargement…",
+    "lead": "Choisissez un nom d'utilisateur pour finaliser votre compte.",
+    "usernameLabel": "Nom d'utilisateur",
+    "usernamePlaceholder": "votre_pseudo",
+    "usernameRequired": "Choisissez un nom d'utilisateur",
+    "usernameTooShort": "Au moins {min} caractères",
+    "usernamePattern": "Lettres, chiffres et tirets bas uniquement",
+    "usernameUnavailable": "Nom d'utilisateur indisponible",
+    "usernameTaken": "Nom d'utilisateur déjà pris",
+    "saveFailed": "Impossible d'enregistrer le nom d'utilisateur",
+    "success": "Tout est prêt",
+    "continue": "Continuer",
+    "backHome": "Retour à l'accueil"
+  },
+  "AuthHooks": {
+    "registrationSent": "Si cet e-mail peut servir à un nouveau compte, nous avons envoyé un lien de vérification. Consultez votre boîte de réception.",
+    "registrationFailed": "Échec de l'inscription",
+    "usernameUnavailable": "Nom d'utilisateur indisponible",
+    "googleSignInFailed": "Échec de la connexion Google"
+  },
+  "HaikuContainer": {
+    "haikuActions": {
+      "deleteLabel": "Supprimer",
+      "deleteAriaLabel": "Supprimer le haïku",
+      "shareLabel": "Partager",
+      "shareAriaLabel": "Partager le haïku",
+      "labelLabel": "Étiqueter",
+      "labelAriaLabel": "Ajouter une étiquette",
+      "copyLabel": "Copier",
+      "copyAriaLabel": "Copier dans le presse-papiers",
+      "deleted": "Haïku supprimé",
+      "deleteForbidden": "Vous n'êtes pas autorisé à supprimer ce haïku.",
+      "deleteFailed": "Impossible de supprimer le haïku.",
+      "saving": "Enregistrement du haïku…",
+      "groupAriaLabel": "Actions du haïku",
+      "hideActions": "Masquer les actions du haïku",
+      "showActions": "Afficher les actions du haïku"
+    }
+  },
+  "HaikuGenerationStickyNote": {
+    "generationFlow": {
+      "errorTitle": "Pas de panique, mais quelque chose a mal tourné",
+      "errorDescription": "Nos esclaves travaillent dur pour régler ce problème. Nous enverrons bientôt quelqu'un pour les taper plus fort.\nVeuillez réessayer plus tard."
+    }
+  },
+  "Lantern": {
+    "lantern": {
+      "bodyAriaLabel": "Haïku",
+      "haikuLantern": "Lanterne haïku : {title}",
+      "generating": "Génération du haïku : {subject}",
+      "rotatedLantern": "Lanterne haïku pivotée"
+    },
+    "labelBelt": {
+      "ariaLabel": "Ceinture d'étiquettes du haïku",
+      "previous": "Étiquettes précédentes",
+      "next": "Étiquettes suivantes"
+    },
+    "lanternDeleteExit": {
+      "deleted": "Haïku supprimé",
+      "deleteForbidden": "Vous n'êtes pas autorisé à supprimer ce haïku.",
+      "deleteFailed": "Impossible de supprimer le haïku."
+    },
+    "lanternSteppedFlight": {
+      "deleting": "Suppression du haïku : {title}"
+    },
+    "lanternRotatedShell": {
+      "labels": "Étiquettes de {label}"
+    },
+    "lanternPath": {
+      "generating": "Génération : {subject}",
+      "focusPosition": "{title} · {position} / {total}",
+      "untitled": "Haïku",
+      "empty": "Aucun haïku",
+      "previous": "Haïku précédent",
+      "next": "Haïku suivant"
+    },
+    "lanternPathLantern": {
+      "generating": "Génération du haïku : {subject}",
+      "haikuLantern": "Lanterne haïku : {title}",
+      "lantern": "Lanterne haïku",
+      "labels": "Étiquettes de {label}"
+    },
+    "lanternPathStage": {
+      "ariaLabel": "Trajectoire des lanternes"
+    }
+  },
+  "LanternSubmit": {
+    "ariaLabel": "詠む Composer"
+  },
+  "SVGPath": {
+    "svgPath": {
+      "stageAriaLabel": "Tracé SVG des lanternes"
+    },
+    "svgPathLantern": {
+      "loadingMore": "Chargement d'autres haïkus",
+      "generating": "Génération du haïku : {subject}",
+      "haikuLantern": "Lanterne haïku : {title}",
+      "labels": "Étiquettes de {label}"
+    }
+  },
+  "SavedHaikusLanternPath": {
+    "loading": "Chargement des haïkus",
+    "loadError": "Impossible de charger les haïkus enregistrés.",
+    "retry": "Réessayer",
+    "searching": "Recherche de haïkus"
+  },
+  "PathNavigation": {
+    "pathNavigationArrows": {
+      "next": "Lanterne suivante",
+      "previous": "Lanterne précédente"
+    }
+  },
+  "PathOverlay": {
+    "pathOverlay": {
+      "title": "Superposition",
+      "continueJourney": "Rester ici",
+      "goBackToStart": "Retour au début"
+    },
+    "overlayNextLabel": {
+      "label": "Rester ici"
+    },
+    "overlayPrevLabel": {
+      "label": "Retour au début"
+    }
+  },
+  "PostSignInput": {
+    "signAriaLabel": "Panneau du sujet du haïku",
+    "placeholder": "題 Sujet",
+    "inputAriaLabel": "Sujet du haïku",
+    "submitLabel": "詠む Composer"
+  },
+  "CreationModal": {
+    "generating": "Génération du haïku : {subject}",
+    "haikuLantern": "Lanterne haïku : {title}",
+    "creation": "Création de haïku"
+  },
+  "DeleteConfirmModal": {
+    "question": "Vous vouliez vraiment faire ça ?",
+    "cancel": "Nan",
+    "confirm": "Ouais"
+  },
+  "DeleteFailedModal": {
+    "title": "Échec de la suppression",
+    "leaveItBe": "Laisser tel quel",
+    "retry": "Réessayer",
+    "body": "Impossible de supprimer ce haïku. Vous pouvez réessayer, ou le laisser dans votre liste."
+  },
+  "AwkwardLantern": {
+    "title": "Bon, c'est gênant..."
+  },
+  "RestartLinkButton": {
+    "expired": "Expiré",
+    "limitReached": "0 visite restante",
+    "revive": "Ranimer !",
+    "resurrect": "Ressusciter !"
+  },
+  "GoHome": {
+    "label": "Accueil"
+  },
+  "NotFoundView": {
+    "toast": "Ce lien a cessé d'exister",
+    "signUp": "Inscrivez-vous pour envoyer vos propres liens morts",
+    "copy": "On dirait que quelqu'un vous a envoyé un lien qui ne marche pas. \nPeut-être une faute de frappe. Peut-être y a-t-il des problèmes de confiance à régler ici.\nQuoi qu'il en soit, ce lien n'est plus."
+  },
+  "Loaders": {
+    "sakuraPetalLoader": {
+      "ariaLabel": "Chargement"
+    },
+    "wagTailLoader": {
+      "ariaLabel": "Chargement"
+    },
+    "lanternLoader": {
+      "ariaLabel": "Chargement"
+    },
+    "loadingText": {
+      "text": "Chargement"
+    },
+    "fetchingLoader": {
+      "ariaLabel": "Chargement",
+      "text": "Récupération"
+    }
+  },
+  "MfgDate": {
+    "defaultLabel": "Créé le"
+  },
+  "GoldenAgeTitle": {
+    "subtitle": "LE GÉNÉRATEUR DE HAÏKUS",
+    "tagline": "L'IA, MAIS PEU PRATIQUE !"
+  },
+  "HaikuHooks": {
+    "deleteController": {
+      "deleted": "Haïku supprimé",
+      "deleteFailed": "Impossible de supprimer le haïku."
+    }
+  },
+  "ComicLabelCreationModal": {
+    "save": "Enregistrer",
+    "create": "Créer",
+    "loadingLabels": "Chargement des étiquettes...",
+    "enterName": "Saisissez un nom d'étiquette",
+    "nameTooShort": "Le nom doit contenir au moins {min} caractères",
+    "alreadyExists": "Cette étiquette existe déjà sur ce compte",
+    "updated": "Étiquette mise à jour",
+    "updateError": "Impossible de mettre à jour l'étiquette",
+    "created": "Étiquette créée",
+    "createError": "Impossible de créer l'étiquette",
+    "previewTitle": "Voici",
+    "minChars": "Min. {min} caractères",
+    "nameAriaLabel": "Nom de l'étiquette",
+    "color": "Couleur",
+    "colorAriaLabel": "Couleur de l'étiquette",
+    "openColorPicker": "Ouvrir le sélecteur de couleur",
+    "shapeAriaLabel": "Forme {shape}",
+    "saveAriaLabel": "Enregistrer l'étiquette",
+    "createAriaLabel": "Créer l'étiquette",
+    "shapes": {
+      "classic": "Classique",
+      "sharp": "Pointue",
+      "soft": "Douce",
+      "circle": "Cercle",
+      "square": "Carré",
+      "thought": "Pensée"
+    }
+  },
+  "ComicLabelPickerPanel": {
+    "filterPlaceholder": "Filtrer les étiquettes…",
+    "filterAriaLabel": "Filtrer les étiquettes",
+    "disabledAriaLabel": "{name} (déjà utilisée dans l'autre filtre)"
+  },
+  "CreateAddLabelsModal": {
+    "maxLabels": "Un haïku peut avoir au plus {max} étiquettes",
+    "saved": "La poésie a été étiquetée",
+    "saveError": "Une erreur a empêché l'étiquetage",
+    "createTitle": "Créer",
+    "createAriaLabel": "En créer une nouvelle",
+    "addTitle": "Ajouter",
+    "addAriaLabel": "Étiqueter ce haïku",
+    "save": "Enregistrer"
+  },
+  "LabelHalo": {
+    "halo": {
+      "ariaLabel": "Halo d'étiquettes"
+    },
+    "slot": {
+      "rotateAriaLabel": "Faire pivoter l'étiquette — faites glisser autour de l'étiquette pour ajuster",
+      "ariaLabel": "Étiquette {name}, {degrees} degrés"
+    }
+  },
+  "LabelSort": {
+    "title": "Trier par",
+    "ariaLabel": "Trier les étiquettes",
+    "selectCategory": "Choisir {title}",
+    "categories": {
+      "creationDate": {
+        "title": "Date de création",
+        "ariaLabel": "Trier par date de création"
+      },
+      "alpacabet": {
+        "title": "Alpagabet",
+        "ariaLabel": "Trier par ordre alphabétique"
+      },
+      "connection": {
+        "title": "Connexions",
+        "ariaLabel": "Trier par connexions"
+      }
+    }
+  },
+  "LabelsFilterModal": {
+    "filter": "Filtrer par étiquette"
+  },
+  "ManageLabel": {
+    "manageLabel": {
+      "deleted": "Étiquette supprimée",
+      "deleteError": "Impossible de supprimer l'étiquette",
+      "edit": "Modifier",
+      "editAriaLabel": "Modifier l'étiquette {name}",
+      "tuneIn": "Syntoniser",
+      "tuneInAriaLabel": "Syntoniser les haïkus étiquetés {name}",
+      "deleteQuestion": "C'est quoi le plan ?",
+      "cancel": "Mais qu'est-ce que je fais là ?",
+      "confirmDelete": "Faites vite"
+    },
+    "createPanel": {
+      "ariaLabel": "Créer une étiquette",
+      "create": "Créer"
+    },
+    "connectedHaikus": {
+      "connected": "{total, plural, one {# connexion} other {# connexions}}",
+      "ariaLabel": "Haïkus étiquetés {name}"
+    },
+    "labelActions": {
+      "tuneInDisabled": "Me chercher ne sert à rien.",
+      "tuneIn": "Syntoniser",
+      "tuneInAriaLabel": "Syntoniser les haïkus étiquetés {name}",
+      "noHaikusAriaLabel": "Aucun haïku étiqueté {name}",
+      "groupAriaLabel": "Actions pour {name}",
+      "edit": "Modifier",
+      "editAriaLabel": "Modifier {name}",
+      "delete": "Supprimer",
+      "deleteAriaLabel": "Supprimer {name}"
+    },
+    "lanternStack": {
+      "notConnected": "non connecté",
+      "lanternAriaLabel": "Lanterne haïku : {title}"
+    },
+    "panel": {
+      "searchPlaceholder": "Rechercher des étiquettes…",
+      "searchAriaLabel": "Rechercher des étiquettes par nom"
+    }
+  },
+  "HeaderHaikuTools": {
+    "search": {
+      "buttonAriaLabel": "Rechercher des haïkus",
+      "placeholder": "Rechercher des titres…",
+      "inputAriaLabel": "Rechercher dans les titres de haïkus",
+      "actionName": "Rechercher par nom"
+    },
+    "filter": {
+      "buttonAriaLabel": "Filtrer les haïkus par étiquettes",
+      "actionName": "Filtrer par étiquette",
+      "activeFiltersAriaLabel": "Filtres d'étiquettes actifs",
+      "removeFilterAriaLabel": "Retirer le filtre {name}",
+      "removeExcludeFilterAriaLabel": "Retirer le filtre d'exclusion {name}"
+    },
+    "settingsSearch": {
+      "shareLinks": {
+        "placeholder": "Rechercher des liens",
+        "ariaLabel": "Rechercher par titre",
+        "buttonAriaLabel": "Rechercher des liens de partage"
+      },
+      "labels": {
+        "placeholder": "Rechercher des étiquettes",
+        "ariaLabel": "Rechercher des étiquettes par nom",
+        "buttonAriaLabel": "Rechercher des étiquettes"
+      }
+    }
+  },
+  "IconUploader": {
+    "label": "Changer la photo de profil",
+    "alt": "Icône actuelle",
+    "uploading": "Envoi : {progress} %"
+  },
+  "LabelHooks": {
+    "placementError": "Impossible d'enregistrer la position de l'étiquette",
+    "uploadComplete": "Envoi terminé",
+    "uploadFailed": "Échec de l'envoi de l'image"
+  },
+  "ShareModal": {
+    "modal": {
+      "defaultSubject": "Haïku",
+      "linkTabTitle": "Lien",
+      "linkTabAriaLabel": "Partager par lien",
+      "emailTabTitle": "E-mail",
+      "emailTabAriaLabel": "Partager par e-mail",
+      "loading": "Chargement…"
+    },
+    "controller": {
+      "defaultSubject": "Haïku",
+      "postcardsQueued": "Les cartes postales ont été déposées dans la boîte aux lettres",
+      "loadLinkError": "Impossible de charger le lien de partage",
+      "sendEmailError": "Impossible d'envoyer l'e-mail",
+      "addRecipientHint": "Ajoutez au moins un e-mail de destinataire",
+      "fixInvalidHint": "Corrigez les e-mails de destinataires invalides"
+    },
+    "email": {
+      "toPrefix": "À :",
+      "recipientsPlaceholder": "E-mails des destinataires (appuyez sur Entrée après chacun)",
+      "messagePlaceholder": "Je voulais partager avec toi...",
+      "messageAriaLabel": "Message de l'e-mail",
+      "signature": "De : {name}",
+      "invalidEmails": "E-mails invalides : {emails}"
+    },
+    "sendPanel": {
+      "preparingPostcard": "Préparation de la carte postale…",
+      "sendEmail": "Envoyer l'e-mail"
+    },
+    "postcardFront": {
+      "prepareError": "Impossible de préparer l'image de la carte postale"
+    }
+  },
+  "Postcard": {
+    "renderer": {
+      "ariaLabel": "Carte postale haïku",
+      "ariaLabelWithTitle": "Carte postale haïku : {title}"
+    }
+  },
+  "SharedHaikuPage": {
+    "unknownAuthor": "Auteur inconnu",
+    "lanternAriaLabel": "Lanterne haïku : {subject}",
+    "labelsAriaLabel": "Étiquettes de {subject}",
+    "createdBy": "Créé par {authorName}"
+  },
+  "CommonHooks": {
+    "useCopy": {
+      "copied": "Le texte a été copié",
+      "copyError": "Impossible de copier"
+    }
+  },
+  "ShareLink": {
+    "lifecycle": {
+      "activating": "Activation",
+      "stopping": "Arrêt",
+      "stopAriaLabel": "Arrêter le lien",
+      "stop": "Arrêter",
+      "launchAriaLabel": "Lancer le lien",
+      "launch": "Lancer"
+    },
+    "settings": {
+      "hitsLimit": "Limite de visites :",
+      "timeoutAt": "Expire le :",
+      "timeoutPlaceholder": "La fin des temps",
+      "updateAriaLabel": "Mettre à jour le lien",
+      "updating": "Mise à jour",
+      "update": "Mettre à jour"
+    },
+    "controls": {
+      "stopped": "Lien de partage arrêté",
+      "stopError": "Impossible d'arrêter le lien de partage",
+      "started": "Lien de partage lancé",
+      "startError": "Impossible de lancer le lien de partage",
+      "updated": "Lien de partage mis à jour",
+      "updateError": "Impossible de mettre à jour le lien de partage",
+      "labelsError": "Impossible de mettre à jour la visibilité des étiquettes",
+      "hitsUnlimited": "Visites illimitées",
+      "hitsEmpty": "Plus aucune visite",
+      "hitsRemaining": "{count, plural, one {# visite restante} other {# visites restantes}}",
+      "timeUnlimited": "Sans expiration",
+      "timeLeftWithValue": "Temps restant {time}",
+      "timeLeft": "Temps restant"
+    }
+  },
+  "ShareLinkActions": {
+    "actions": {
+      "groupAriaLabel": "Actions du lien de partage pour {subject}",
+      "preview": "Aperçu",
+      "previewAriaLabel": "Aperçu de {subject}",
+      "delete": "Supprimer",
+      "deleteAriaLabel": "Supprimer le lien de partage de {subject}"
+    },
+    "previewLabels": {
+      "groupAriaLabel": "Actions du lien de partage pour {subject}",
+      "preview": "Aperçu",
+      "previewAriaLabel": "Aperçu de {subject}"
+    },
+    "done": {
+      "caption": "Terminé",
+      "ariaLabel": "Fermer l'aperçu du lien de partage de {subject}"
+    },
+    "editLabels": {
+      "caption": "Modifier les étiquettes",
+      "ariaLabel": "Modifier les étiquettes de {subject}"
+    },
+    "goToLink": {
+      "caption": "Suivre le lien",
+      "ariaLabel": "Ouvrir le lien de partage de {subject} dans un nouvel onglet"
+    },
+    "labelsToggle": {
+      "visible": "Étiquettes visibles",
+      "hidden": "Étiquettes masquées",
+      "ariaLabel": "Afficher les étiquettes sur le lien de partage de {subject}"
+    },
+    "update": {
+      "caption": "Mettre à jour",
+      "ariaLabel": "Mettre à jour le lien de partage de {subject}",
+      "disabledInactive": "Ce qui n'a pas encore commencé ne peut être changé",
+      "disabledUnchanged": "Tout est à sa place",
+      "unavailableAlt": "Mise à jour indisponible pour {subject} : {message}",
+      "wakingAlt": "Le lien de partage de {subject} démarre"
+    }
+  },
+  "ShareLinkManagement": {
+    "list": {},
+    "filters": {
+      "groupAriaLabel": "Filtrer les liens de partage par statut",
+      "showTitle": "Afficher\r\n {title}",
+      "hideTitle": "Masquer\r\n {title}",
+      "options": {
+        "active": {
+          "title": "Actifs",
+          "showAriaLabel": "Afficher les liens de partage actifs",
+          "hideAriaLabel": "Masquer les liens de partage actifs"
+        },
+        "inactive": {
+          "title": "Inactifs",
+          "showAriaLabel": "Afficher les liens de partage inactifs",
+          "hideAriaLabel": "Masquer les liens de partage inactifs"
+        },
+        "expired": {
+          "title": "Expirés",
+          "showAriaLabel": "Afficher les liens de partage expirés",
+          "hideAriaLabel": "Masquer les liens de partage expirés"
+        },
+        "viewLimitReached": {
+          "title": "0 visite restante",
+          "showAriaLabel": "Afficher les liens de partage ayant atteint leur limite de vues",
+          "hideAriaLabel": "Masquer les liens de partage ayant atteint leur limite de vues"
+        }
+      }
+    },
+    "row": {
+      "deleteQuestion": "Voulez-vous effacer magiquement ce lien de l'existence ?",
+      "deleteCancel": "Non",
+      "deleteConfirm": "Oui",
+      "erased": "Lien de partage effacé",
+      "eraseError": "Échec. L'univers reste inchangé."
+    }
+  },
+  "ShareLinkLanternPanel": {
+    "statsAriaLabel": "Statistiques du lien de partage",
+    "panelAriaLabel": "Lien de partage de {subject}",
+    "lanternAriaLabel": "Lanterne haïku : {subject}",
+    "copyTitle": "Copier le lien de partage !",
+    "copyAriaLabel": "Copier le lien de partage de {subject}"
+  },
+  "ShareLinkControlsColumn": {
+    "settingsAriaLabel": "Paramètres du lien de partage de {subject}"
+  },
+  "ShareLinkPreviewModal": {
+    "panelAriaLabel": "Lanterne partagée : {subject}",
+    "labelsAriaLabel": "Étiquettes de {subject}",
+    "lanternAriaLabel": "Lanterne haïku : {subject}",
+    "loading": "En attente des données",
+    "unavailable": "Ce haïku n'est plus disponible."
+  },
+  "ShareLinksSort": {
+    "title": "Trier par",
+    "ariaLabel": "Trier les liens de partage",
+    "coverAriaLabel": "Choisir {title}",
+    "categories": {
+      "creationDate": "Date de création",
+      "creationDateAriaLabel": "Trier par date de création",
+      "alpacabet": "Alpagabet",
+      "alpacabetAriaLabel": "Trier alpagabétiquement",
+      "hitsLeft": "Visites restantes",
+      "hitsLeftAriaLabel": "Trier par visites restantes",
+      "timeLeft": "Temps restant",
+      "timeLeftAriaLabel": "Trier par temps restant"
+    }
+  },
+  "ShareLinkStatus": {
+    "labels": {
+      "expired": "Expiré",
+      "viewLimitReached": "Limite de vues atteinte",
+      "stopped": "Arrêté",
+      "expiresIn": "Expire dans",
+      "remainingViews": "Vues restantes",
+      "active": "Actif"
+    },
+    "duration": {
+      "lessThanMinute": "moins d'une minute",
+      "minutes": "{count, plural, one {# minute} other {# minutes}}",
+      "hours": "{count, plural, one {# heure} other {# heures}}",
+      "days": "{count, plural, one {# jour} other {# jours}}",
+      "months": "{count, plural, one {# mois} other {# mois}}"
+    }
+  },
+  "FetchEmptyState": {
+    "caption": "Il n'y avait rien à récupérer"
   }
 }

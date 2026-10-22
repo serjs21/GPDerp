@@ -72,7 +72,9 @@
       "th": "Thai",
       "de": "German",
       "it": "Italian",
-      "pt": "Portuguese"
+      "pt": "Portuguese",
+      "zh": "Chinese",
+      "vi": "Vietnamese"
     }
   },
   "RootLayout": {
