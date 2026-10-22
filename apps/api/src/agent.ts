@@ -36,10 +36,15 @@ export const beerMeAnHaikuAgent = () => {
 
   return agent;
 };
-export const runHaikuAgentStream = async (
+/**
+ * Yields the model's text deltas as they arrive (Agents SDK streaming guide: `toTextStream()`, then
+ * `await completed`). Reads the web stream directly so each delta stays a separate chunk, rather than
+ * the Node Readable variant, which may concatenate buffered deltas.
+ */
+export async function* runHaikuAgentStream(
   command: string,
   options?: AgentRunOptions,
-) => {
+): AsyncGenerator<string> {
   const context = options?.context ?? {
     uid: options?.uid ?? "anonymous",
     isProUser: true,
@@ -53,5 +58,10 @@ export const runHaikuAgentStream = async (
     stream: true,
   });
 
-  return streamed.toTextStream({ compatibleWithNodeStreams: true });
-};
+  for await (const delta of streamed.toTextStream()) {
+    if (delta) yield delta;
+  }
+
+  // Resolves once the run and its post-processing finish; rejects if the run failed.
+  await streamed.completed;
+}

@@ -14,6 +14,7 @@ import { insufficientCreditsBody } from "../payments/utils/purchaseResponses";
 import { haikuService, type HaikuStreamYield } from "./haiku.service";
 import { readShareHaikuEmailRequest } from "./utils/shareHaikuEmailRequest";
 import { parseHaikuListSort } from "./utils/haikuListSort";
+import { createHaikuStreamChunkLogger } from "./utils/haikuStreamLog";
 
 type ShareEmailFailureReason = Extract<
   Awaited<ReturnType<typeof haikuService.shareHaikuByEmailForUser>>,
@@ -447,6 +448,7 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
         return;
       }
 
+      const logStreamChunk = createHaikuStreamChunkLogger(req.id);
       try {
         const subject = body?.subject || DEFAULT_HAIKU_SUBJECT;
         app.log.info({ subject }, "Creating haiku");
@@ -484,7 +486,7 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
                 data: { delta: chunk, subject },
               });
             }
-            process.stdout.write(chunk);
+            logStreamChunk(chunk);
           } else if (chunk.type === "saved") {
             savedCreditsRemaining = chunk.creditsRemaining;
             if (broadcastToUser) {

@@ -23,7 +23,7 @@ const context = { accountId: "acc-1", createdById: "user-1" };
 describe("haikuService.createHaikuStream generation backend", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    runHaikuAgentStream.mockResolvedValue([]);
+    runHaikuAgentStream.mockReturnValue([]);
     runHaikuAgentStreamMock.mockReturnValue([]);
   });
 

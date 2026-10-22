@@ -1,9 +1,5 @@
 import type { FastifyRequest } from "fastify";
-import {
-  HAIKU_STREAM_ANONYMOUS_UID,
-  HAIKU_STREAM_CHAR_DELAY_MAX_MS,
-  HAIKU_STREAM_CHAR_DELAY_MIN_MS,
-} from "../../consts/haiku";
+import { HAIKU_STREAM_ANONYMOUS_UID } from "../../consts/haiku";
 import { TAB_HEADER_KEY } from "../../consts/ids";
 import { runHaikuAgentStream } from "../../agent";
 import { runHaikuAgentStreamMock } from "../../mocks/textStream";
@@ -19,8 +15,6 @@ import { enqueuePostcardEmails } from "../postcard/postcardQueue";
 import { postcardMessageFits } from "../postcard/postcardTextWrap";
 import { normalizeShareRecipient } from "./utils/shareHaikuEmailRequest";
 import type { HaikuListSort } from "./utils/haikuListSort";
-import { pacedTextStream } from "./utils/pacedTextStream";
-
 const chunkToString = (chunk: string | Buffer): string =>
   typeof chunk === "string" ? chunk : Buffer.from(chunk).toString("utf-8");
 
@@ -241,15 +235,12 @@ export const haikuService = {
 
     const baseStream = !useRealAgent
       ? runHaikuAgentStreamMock()
-      : pacedTextStream(
-          await runHaikuAgentStream(subject, {
-            context: {
-              uid: uid ?? HAIKU_STREAM_ANONYMOUS_UID,
-              isProUser: true,
-            },
-          }),
-          { minDelayMs: HAIKU_STREAM_CHAR_DELAY_MIN_MS, maxDelayMs: HAIKU_STREAM_CHAR_DELAY_MAX_MS },
-        );
+      : runHaikuAgentStream(subject, {
+          context: {
+            uid: uid ?? HAIKU_STREAM_ANONYMOUS_UID,
+            isProUser: true,
+          },
+        });
 
     return (async function* (): AsyncGenerator<HaikuStreamYield> {
       const assembled: string[] = [];
