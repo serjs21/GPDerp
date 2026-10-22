@@ -68,12 +68,10 @@ export const env = {
   SMTP_USER: process.env.SMTP_USER ?? "",
   SMTP_PASS: process.env.SMTP_PASS ?? "",
   MAIL_FROM: process.env.MAIL_FROM ?? "",
-  POSTGRES_USER: process.env.POSTGRES_USER ?? "haiku_user",
-POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD ?? "haiku_pass_123",
-POSTGRES_DB: process.env.POSTGRES_DB ?? "haiku_db",
-
-POSTGRES_HOST: process.env.POSTGRES_HOST ?? "localhost",
-POSTGRES_PORT: process.env.POSTGRES_PORT ?? "5433",
+  /** Neon pooled connection (PgBouncer, `-pooler` host): app query traffic through Prisma. */
+  DATABASE_URL: requireEnv("DATABASE_URL"),
+  /** Neon direct connection: Prisma Migrate and pg-boss (long-lived sessions). */
+  DATABASE_URL_UNPOOLED: requireEnv("DATABASE_URL_UNPOOLED"),
 
   COOKIE_DOMAIN: process.env.COOKIE_DOMAIN || undefined,
   COOKIE_SECURE: toBool(process.env.COOKIE_SECURE, process.env.NODE_ENV === "production"),

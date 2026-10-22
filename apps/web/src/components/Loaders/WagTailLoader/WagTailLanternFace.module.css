@@ -11,11 +11,6 @@
   line-height: 0;
 }
 
-/*
- * The static dog's geometry is fixed in rem for a 12rem stage; restate it relative to the dog so it scales
- * with the panel. Percentages are WAG_TAIL_LOADER_DEFAULTS (tail / lines); wagTailLanternFaceCss.test.ts
- * fails if they drift. `--wag-width` resolves against the panel (.root), the rest against the dog.
- */
 .root .dog {
   --wag-width: 40cqw;
   --wag-tail-width: 17cqw;
@@ -26,8 +21,6 @@
   container-type: inline-size;
 }
 
-/* LoadingText's lettering; may wrap to two lines. Spacing is a margin: cq units in .root's own gap would
-   resolve against .root's ancestor, not .root. */
 .caption {
   margin: 4cqw 0 0;
   color: #181713;

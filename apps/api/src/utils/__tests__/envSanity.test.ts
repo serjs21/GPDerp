@@ -10,11 +10,15 @@ describe("envSanity", () => {
     expect(result.missing).toContain("REFRESH_TOKEN_TTL_SECONDS");
     expect(result.missing).toContain("R2_PUBLIC_BASE_URL");
     expect(result.missing).toContain("PADDLE_WEBHOOK_SECRET");
+    expect(result.missing).toContain("DATABASE_URL");
+    expect(result.missing).toContain("DATABASE_URL_UNPOOLED");
   });
 
   it("passes when all required keys are present", () => {
     expect(() =>
       assertRequiredEnv({
+        DATABASE_URL: "postgresql://user:pass@ep-x-pooler.example.neon.tech/db",
+        DATABASE_URL_UNPOOLED: "postgresql://user:pass@ep-x.example.neon.tech/db",
         JWT_ACCESS_SECRET: "secret",
         ACCESS_TOKEN_TTL_SECONDS: "900",
         REFRESH_TOKEN_TTL_SECONDS: "900",
