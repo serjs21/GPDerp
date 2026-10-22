@@ -37,7 +37,8 @@ Frontend Worker `gpderp-party` is live at https://gpderp.party via OpenNext. The
 ## Strongly recommended
 
 6. **Production secrets on the API host** (Lightsail deployment env; names only — rotate away from any example/dev values):  
-   `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `JWT_ACCESS_SECRET`, `TOKEN_HASH_PEPPER`, `SMTP_*`, `MAIL_FROM`, R2 credentials (`R2_*`), `PADDLE_*`, `OPENAI_API_KEY`. Lightsail stores them as plain deployment env: restrict who has Lightsail access.
+   `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `JWT_ACCESS_SECRET`, `TOKEN_HASH_PEPPER`, `SMTP_*`, `MAIL_FROM`, R2 credentials (`R2_*`), `PADDLE_*`, `OPENAI_API_KEY`. Lightsail stores them as plain deployment env: restrict who has Lightsail access.  
+   `HAIKU_GENERATION_API=prod` (set in the Lightsail template) switches haiku generation to the real OpenAI agent; local dev keeps `dev` (mock stream, no OpenAI calls).
 
 7. **R2**  
    Confirm the live `icons` (or production) bucket + `R2_PUBLIC_BASE_URL` match what the API uses in prod.

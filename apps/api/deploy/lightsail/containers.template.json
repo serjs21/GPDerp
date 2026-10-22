@@ -37,6 +37,7 @@
       "SMTP_PASS": "${SMTP_PASS}",
       "MAIL_FROM": "${MAIL_FROM}",
       "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+      "HAIKU_GENERATION_API": "prod",
       "DEBUG_AUTH_LOGS": "false",
       "NODE_OPTIONS": "--max-old-space-size=512"
     }

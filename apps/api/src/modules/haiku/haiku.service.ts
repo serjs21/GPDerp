@@ -3,6 +3,7 @@ import { HAIKU_STREAM_ANONYMOUS_UID } from "../../consts/haiku";
 import { TAB_HEADER_KEY } from "../../consts/ids";
 import { runHaikuAgentStream } from "../../agent";
 import { runHaikuAgentStreamMock } from "../../mocks/textStream";
+import { env } from "../../env";
 import { authRepository } from "../auth/repository";
 import { haikuRepository, type GeneratedHaikuRow } from "./haiku.repository";
 import type { HaikuLinkedLabel } from "./haikuLabelPlacement";
@@ -229,12 +230,10 @@ export const haikuService = {
     subject: string,
     request: FastifyRequest,
     streamContext: HaikuStreamContext,
-    useRealAgent: boolean = false,
+    useRealAgent: boolean = env.HAIKU_GENERATION_API === "prod",
   ): Promise<AsyncIterable<HaikuStreamYield>> {
     const uid = request.headers?.[TAB_HEADER_KEY]?.toString();
 
-    // Default behavior: use the mock stream.
-    // Enable the real agent by setting `USE_HAIKU_AGENT=true`.
     const baseStream = !useRealAgent
       ? runHaikuAgentStreamMock()
       : await runHaikuAgentStream(subject, {

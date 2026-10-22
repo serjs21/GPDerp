@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { parseHaikuGenerationApi } from "./utils/haikuGenerationApi";
 
 const toList = (value: string) => value.split(",").map((s) => s.trim());
 /** Headers the web client always sends; must survive any CORS_HEADERS override. */
@@ -94,4 +95,7 @@ export const env = {
   PADDLE_WEBHOOK_SECRET: requireEnv("PADDLE_WEBHOOK_SECRET"),
   PADDLE_ENV: requirePaddleEnv("PADDLE_ENV"),
   PADDLE_PRICE_ID_100_HAIKUS: requireEnv("PADDLE_PRICE_ID_100_HAIKUS"),
+
+  /** Haiku generation backend: `prod` streams from OpenAI, `dev` (default) streams the local mock. */
+  HAIKU_GENERATION_API: parseHaikuGenerationApi(),
 };
