@@ -476,6 +476,15 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
         const sendToUid = app.sendToUid;
         const broadcastToUser = app.broadcastToUser;
 
+        // Lets the tab show the lantern with its title before the model's first token arrives.
+        if (uid && sendToUid) {
+          sendToUid(uid, {
+            id: req.id,
+            kind: "start",
+            data: { subject },
+          });
+        }
+
         let savedCreditsRemaining: number | null = null;
         for await (const chunk of stream as AsyncIterable<HaikuStreamYield>) {
           if (typeof chunk === "string") {

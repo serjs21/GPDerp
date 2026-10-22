@@ -75,6 +75,34 @@ describe("haiku.controller POST /beer_me_haiku", () => {
     await app.close();
   });
 
+  it("sends a start message before the first delta, then each delta as it is yielded", async () => {
+    paymentsService.getCredits.mockResolvedValue({ ok: true, credits: 5 });
+    haikuService.createHaikuStream.mockResolvedValue(
+      (async function* () {
+        yield "Morn";
+        yield "ing";
+      })(),
+    );
+    const app = await buildApp();
+    const sendToUid = (app as unknown as { sendToUid: jest.Mock }).sendToUid;
+
+    await app.inject({
+      method: "POST",
+      url: "/beer_me_haiku",
+      headers: { "x-tab-id": "tab-1" },
+      payload: { subject: "Morning mist" },
+    });
+
+    const sent = sendToUid.mock.calls.map(([uid, msg]) => [uid, msg.kind, msg.data]);
+    expect(sent).toEqual([
+      ["tab-1", "start", { subject: "Morning mist" }],
+      ["tab-1", "delta", { delta: "Morn", subject: "Morning mist" }],
+      ["tab-1", "delta", { delta: "ing", subject: "Morning mist" }],
+      ["tab-1", "complete", { subject: "Morning mist" }],
+    ]);
+    await app.close();
+  });
+
   it("returns remaining credits after a saved generation", async () => {
     paymentsService.getCredits.mockResolvedValue({ ok: true, credits: 5 });
     haikuService.createHaikuStream.mockResolvedValue(

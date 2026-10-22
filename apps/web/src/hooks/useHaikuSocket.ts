@@ -33,7 +33,14 @@ type CompletePayload = {
   data: { subject: string };
 };
 
-type WsHaikuMessage = DeltaPayload | SavedPayload | CompletePayload;
+/** Sent before the model's first token so the lantern (with its title) shows immediately. */
+type StartPayload = {
+  id: string;
+  kind: "start";
+  data: { subject: string };
+};
+
+type WsHaikuMessage = StartPayload | DeltaPayload | SavedPayload | CompletePayload;
 
 function parseMessage(raw: string): WsHaikuMessage | null {
   try {
@@ -52,9 +59,9 @@ function parseMessage(raw: string): WsHaikuMessage | null {
       return { id, kind: "saved", data: { haiku, subject } };
     }
 
-    if (kind === "complete") {
+    if (kind === "complete" || kind === "start") {
       const subject = typeof data.subject === "string" ? data.subject : "";
-      return { id, kind: "complete", data: { subject } };
+      return { id, kind, data: { subject } };
     }
 
     const subject = typeof data.subject === "string" ? data.subject : "";
@@ -93,6 +100,20 @@ export const useHaikuSocket = (options?: UseHaikuSocketOptions) => {
 
       if (msg.kind === "complete") {
         setGeneratingDraft((d) => (d?.requestId === msg.id ? null : d));
+        return;
+      }
+
+      if (msg.kind === "start") {
+        setGeneratingDraft((prev) =>
+          prev?.requestId === msg.id
+            ? prev
+            : {
+                requestId: msg.id,
+                subject: msg.data.subject,
+                content: "",
+                createdAtLabel: formatChatTime(new Date()),
+              },
+        );
         return;
       }
 
