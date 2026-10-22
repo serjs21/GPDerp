@@ -545,12 +545,12 @@
   },
   "CreateAddLabelsModal": {
     "maxLabels": "A haiku can have at most {max} labels",
-    "saved": "Labels saved",
-    "saveError": "Could not save labels",
+    "saved": "Poetry was labeled",
+    "saveError": "An error prevented the labeling",
     "createTitle": "Create",
     "createAriaLabel": "Create a new one",
     "addTitle": "Add",
-    "addAriaLabel": "Add labels to this haiku",
+    "addAriaLabel": "Label this haiku",
     "save": "Save"
   },
   "LabelHalo": {

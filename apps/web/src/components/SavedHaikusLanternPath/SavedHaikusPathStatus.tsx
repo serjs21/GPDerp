@@ -2,7 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/StyledComponents";
-import { FetchingLanternLoader } from "@/components/Loaders/FetchingLoader";
+import { SakuraPetalLoader } from "@/components/Loaders";
+import { LanternBaseLoaderShell } from "@/components/Loaders/LanternBaseLoaderShell";
 import type { SavedHaikusPathStatusProps } from "./SavedHaikusPathStatus.types";
 import { savedHaikusPathLoaderStyle } from "./utils/savedHaikusPathUtils";
 import styles from "@/components/Lantern/LanternPath/LanternPath.module.css";
@@ -29,7 +30,9 @@ export function SavedHaikusPathStatus({ phase, onRetry }: SavedHaikusPathStatusP
       aria-busy="true"
       aria-label={t(phase === "loading" ? "loading" : "searching")}
     >
-      <FetchingLanternLoader />
+      <LanternBaseLoaderShell>
+        <SakuraPetalLoader />
+      </LanternBaseLoaderShell>
     </div>
   );
 }

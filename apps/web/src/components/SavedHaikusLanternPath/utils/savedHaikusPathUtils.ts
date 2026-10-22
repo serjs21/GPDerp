@@ -3,7 +3,7 @@ import { SVG_PATH_LANTERN_WIDTH_REM } from "@/components/SVGPath";
 
 /** Loader lantern at the size of the path's first (focused, unscaled) lantern. */
 export function savedHaikusPathLoaderStyle(): CSSProperties {
-  return { "--fetching-lantern-width": `${SVG_PATH_LANTERN_WIDTH_REM}rem` } as CSSProperties;
+  return { "--lantern-loader-width": `${SVG_PATH_LANTERN_WIDTH_REM}rem` } as CSSProperties;
 }
 
 export type HaikuPaging = {

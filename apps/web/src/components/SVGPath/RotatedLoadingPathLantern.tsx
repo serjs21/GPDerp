@@ -1,12 +1,13 @@
 "use client";
 
 import { LanternRotatedShell } from "@/components/Lantern/LanternRotatedShell";
-import { FetchingLanternFace } from "@/components/Loaders/FetchingLoader";
+import { SakuraPetalLoader } from "@/components/Loaders";
 import { ROTATED_PATH_LANTERN_STYLE, SVG_PATH_LANTERN_WIDTH_REM } from "./consts/pathLanternLayoutConsts";
 import { RotatedPathAnchor } from "./RotatedPathAnchor";
 import type { RotatedLoadingPathLanternProps } from "./SVGPathLantern.types";
+import styles from "./SVGPath.module.css";
 
-/** Loading slot on a rotated stop: the stop's rotated base with the loader on its (skewed) paper face. */
+/** Loading slot on a rotated stop: the stop's rotated base with the petal loader on its (skewed) paper face. */
 export function RotatedLoadingPathLantern({
   transform,
   face,
@@ -28,7 +29,7 @@ export function RotatedLoadingPathLantern({
         style={ROTATED_PATH_LANTERN_STYLE}
         ariaLabel={ariaLabel}
       >
-        <FetchingLanternFace />
+        <SakuraPetalLoader className={styles.lanternLoader} />
       </LanternRotatedShell>
     </RotatedPathAnchor>
   );

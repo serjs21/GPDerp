@@ -1,8 +1,8 @@
-/* Sized by --fetching-lantern-width; the face scales with it. */
+/* Sized by --lantern-loader-width. */
 .root {
   position: relative;
   display: inline-block;
-  width: var(--fetching-lantern-width, 11.5rem);
+  width: var(--lantern-loader-width, 11.5rem);
   /* LANTERN_IMAGE_WIDTH / LANTERN_IMAGE_HEIGHT */
   aspect-ratio: 368 / 391;
   line-height: 0;
@@ -21,10 +21,9 @@
   pointer-events: none;
 }
 
-/* Lantern's text inset (`.content` in Lantern.module.css): the front panel of the lantern base. */
-.root .face {
+/* Lantern's text inset (`.content` in Lantern.module.css): the front panel of the lantern base. Grid so the loader stretches to fill it. */
+.panel {
   position: absolute;
   inset: 8% 10% 21%;
-  width: auto;
-  height: auto;
+  display: grid;
 }

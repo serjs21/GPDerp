@@ -64,3 +64,8 @@
 .lanternAnimating {
   pointer-events: none;
 }
+
+/* Petal loader filling a loading slot's lantern panel (upright frame or rotated face) so the ring centers on it. */
+.lanternLoader {
+  height: 100%;
+}

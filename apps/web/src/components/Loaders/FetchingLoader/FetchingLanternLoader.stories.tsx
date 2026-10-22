@@ -5,7 +5,7 @@ import { FetchingLanternLoader } from "./FetchingLanternLoader";
 const STAGE_STYLE = { padding: "3rem", background: "#2b3150" } as const;
 const ROW_STYLE = { display: "flex", gap: "3rem", alignItems: "flex-end", flexWrap: "wrap" } as const;
 
-const sized = (width: string) => ({ "--fetching-lantern-width": width }) as CSSProperties;
+const sized = (width: string) => ({ "--lantern-loader-width": width }) as CSSProperties;
 
 const meta = {
   title: "Loaders/FetchingLanternLoader",
@@ -26,7 +26,7 @@ type Story = StoryObj<typeof meta>;
 /** Default size (Lantern's default width). */
 export const Default: Story = {};
 
-/** Everything scales with --fetching-lantern-width: small, default, share link preview, path focus lantern. */
+/** Everything scales with --lantern-loader-width: small, default, share link preview, path focus lantern. */
 export const Sizes: Story = {
   render: () => (
     <div style={ROW_STYLE}>
