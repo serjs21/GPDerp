@@ -1,7 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { FetchingLanternLoader } from "@/components/Loaders/FetchingLoader";
+import { WagTailLanternFace } from "@/components/Loaders";
+import { LanternBaseLoaderShell } from "@/components/Loaders/LanternBaseLoaderShell";
 import type { ShareLinkPreviewBodyProps } from "./ShareLinkPreviewModal.types";
 import { ShareLinkPreviewLantern } from "./ShareLinkPreviewLantern";
 import styles from "./ShareLinkPreviewModal.module.css";
@@ -24,7 +25,9 @@ export function ShareLinkPreviewBody({ subject, haiku, loading, showLabels, onHa
   if (loading) {
     return (
       <div className={styles.loader}>
-        <FetchingLanternLoader className={styles.lanternLoader} />
+        <LanternBaseLoaderShell className={styles.lanternLoader}>
+          <WagTailLanternFace caption={t("loading")} />
+        </LanternBaseLoaderShell>
       </div>
     );
   }

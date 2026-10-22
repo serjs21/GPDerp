@@ -1,0 +1,42 @@
+/* Sizes below are fractions of this box's width (a lantern's front panel). */
+.root {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  container-type: inline-size;
+  line-height: 0;
+}
+
+/*
+ * The static dog's geometry is fixed in rem for a 12rem stage; restate it relative to the dog so it scales
+ * with the panel. Percentages are WAG_TAIL_LOADER_DEFAULTS (tail / lines); wagTailLanternFaceCss.test.ts
+ * fails if they drift. `--wag-width` resolves against the panel (.root), the rest against the dog.
+ */
+.root .dog {
+  --wag-width: 40cqw;
+  --wag-tail-width: 17cqw;
+  --wag-lines-x: -4.5cqw;
+  --wag-lines-y: 1.5cqw;
+  --wag-lines-width: 27cqw;
+
+  container-type: inline-size;
+}
+
+/* LoadingText's lettering; may wrap to two lines. Spacing is a margin: cq units in .root's own gap would
+   resolve against .root's ancestor, not .root. */
+.caption {
+  margin: 4cqw 0 0;
+  color: #181713;
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: 10cqw;
+  letter-spacing: 0.04em;
+  line-height: 1.05;
+  text-align: center;
+  -webkit-text-stroke: 0.12em #fff;
+  paint-order: stroke fill;
+  user-select: none;
+}

@@ -32,11 +32,6 @@
   gap: 0.35rem;
 }
 
-/* Optional sizing hooks (e.g. container units from FetchingLanternFace); unset = the defaults above. */
-.wrap .defaults {
-  width: var(--fetching-static-width, var(--fetching-width));
-}
-
 .caption {
   /* FETCHING_LOADER_DOT_COUNT x FETCHING_LOADER_DOT_STEP_MS (checked by fetchingStaticLoaderCss.test.ts). */
   --fetching-dots-duration: 1200ms;
@@ -44,7 +39,7 @@
   margin: 0;
   color: var(--comic-ink, #2d2d2d);
   font-family: var(--font-comic-label), "Bangers", sans-serif;
-  font-size: var(--fetching-static-caption-size, 1.35rem);
+  font-size: 1.35rem;
   letter-spacing: 0.06em;
   line-height: 1;
   white-space: nowrap;

@@ -854,6 +854,7 @@
     "panelAriaLabel": "Shared lantern: {subject}",
     "labelsAriaLabel": "{subject} labels",
     "lanternAriaLabel": "Haiku lantern: {subject}",
+    "loading": "Waiting for data to arrive",
     "unavailable": "This haiku is no longer available. Its scene appears to be over."
   },
   "ShareLinksSort": {
