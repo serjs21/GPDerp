@@ -1,1 +1,1 @@
-export const HAIKU_TITLE_MAX_CHARS = 110;
+export const HAIKU_TITLE_MAX_CHARS = 74;
