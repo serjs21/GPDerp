@@ -25,3 +25,12 @@ Dockerfile
 neon.ts
 *.md
 !src/modules/payments/confirm_purchase_message.md
+**/*.stories.*
+*.tsbuildinfo
+
+# Local noise
+**/*.log
+**/.DS_Store
+.cursor
+.vscode
+.idea

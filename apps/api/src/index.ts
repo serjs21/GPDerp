@@ -18,6 +18,7 @@ import {
 import { startPostcardQueue, stopPostcardQueue } from "./modules/postcard/postcardQueue";
 import { isPostcardDevRouteEnabled, postcardDevPlugin } from "./modules/postcard/postcardDev.controller";
 import { emailPreviewDevPlugin, isEmailPreviewDevRouteEnabled } from "./modules/email/emailPreviewDev.controller";
+import { healthPlugin } from "./modules/health/health.controller";
 import { prismaClient } from "./lib/prisma";
 import { SHUTDOWN_TIMEOUT_MS } from "./consts/server";
 
@@ -77,6 +78,8 @@ async function run() {
 
   /* ------------------------------ Routes ------------------------------ */
 
+  await app.register(healthPlugin);
+  // Backward-compatible alias of /healthz.
   app.get("/health", async () => ({ ok: true }));
 
   console.log(app.printRoutes());

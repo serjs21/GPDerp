@@ -5,18 +5,19 @@ Frontend Worker `gpderp-party` is live at https://gpderp.party via OpenNext. The
 ## Blockers (app will not fully work without these)
 
 1. **Host the Fastify API on AWS Lightsail Containers** (scaffolding ready; needs an AWS account)  
+   Full guide: [infra/aws/README.md](infra/aws/README.md); local image checks: [infra/aws/local-docker-testing.md](infra/aws/local-docker-testing.md).  
    Image: `apps/api/Dockerfile` (verified locally: builds for linux/amd64, ~325 MB, ~225 MiB RSS idle). Database: Neon (`apps/api/.env.neon`, schema already at the latest migration).
    1. Install AWS CLI v2 + the `lightsailctl` plugin; sign in with a least-privilege IAM user.
    2. `aws lightsail create-container-service --service-name gpderp-api --power micro --scale 1`  
       Keep scale at **1**: WebSocket registries and in-flight generations are process-local.
    3. Create `apps/api/.env.lightsail` (gitignored) from `apps/api/.env.example` with production values:
       `DATABASE_URL` / `DATABASE_URL_UNPOOLED` from `.env.neon`, new `JWT_ACCESS_SECRET` (32+) and `TOKEN_HASH_PEPPER` (16+), R2, Paddle, SMTP, `OPENAI_API_KEY`, and the URLs from item 3.
-   4. `apps/api/deploy/lightsail/deploy.sh` — builds, pushes, renders `containers.template.json` (fails on any unset variable) and deploys with `public-endpoint.json` (port 8080, health check `/health`).
+   4. `apps/api/deploy/lightsail/deploy.sh` — builds, pushes, renders `containers.template.json` (fails on any unset variable) and deploys with `public-endpoint.json` (port 8080, health check `/healthz`).
    5. Custom domain: Lightsail → Certificates → create for `api.gpderp.party`; add the validation CNAMEs in Cloudflare DNS; attach the certificate to the service; add CNAME `api` → the service's default domain as **DNS only** (grey cloud) to start.
-   6. Smoke: `curl https://api.gpderp.party/health`, then confirm a `wss://api.gpderp.party/ws` connection stays open past 60 s (server pings every 25 s).
+   6. Smoke: `curl https://api.gpderp.party/healthz` and `/readyz`, then confirm a `wss://api.gpderp.party/ws` connection stays open past 60 s (server pings every 25 s).
    - Migrations are never run in the container: run `pnpm migrate:prod` in `apps/api` before deploying an image that needs a new migration.
 
-2. **Set production frontend API URLs and redeploy the Worker** (after item 1 serves `/health`)  
+2. **Set production frontend API URLs and redeploy the Worker** (after item 1 serves `/healthz`)  
    In `apps/web` production env (build-time `NEXT_PUBLIC_*`; currently forced empty by gitignored `.env.production.local`):
    - `NEXT_PUBLIC_API_BASE_URL=https://api.gpderp.party`
    - `NEXT_PUBLIC_WS_URL=wss://api.gpderp.party/ws`  
