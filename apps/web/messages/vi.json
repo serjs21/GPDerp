@@ -38,7 +38,7 @@
     "balance": "Bạn có {count} lượt tạo.",
     "balanceUnknown": "Số lượt tạo của bạn sẽ hiện ở đây.",
     "product": "100 lượt tạo haiku — mỗi lần mua cộng đúng 100 lượt.",
-    "buy": "Mua 100 lượt tạo — $3.0",
+    "buy": "Mua 100 lượt tạo — $3.00",
     "unavailable": "Hiện chưa thể thanh toán.",
     "error": "Không thể bắt đầu thanh toán.",
     "success": "Mua thành công — đã cộng lượt tạo.",
@@ -78,7 +78,7 @@
     }
   },
   "RootLayout": {
-    "description": "AI, nhưng vô dụng"
+    "description": "AI, nhưng vô dụng: nhập một chủ đề, nhận đèn lồng thơ haiku do AI viết."
   },
   "LegalPages": {
     "back": "← Quay lại",
@@ -110,7 +110,9 @@
     "refund": "Chính sách hoàn tiền",
     "acceptableUse": "Sử dụng được chấp nhận",
     "cookies": "Chính sách cookie",
-    "paddleNotice": "Thanh toán được xử lý bởi <buyerTerms>Paddle</buyerTerms> với tư cách bên bán chính thức. <refund>Chính sách hoàn tiền cho người mua</refund>, <checkout>điều khoản thanh toán</checkout> và <privacy>thông báo quyền riêng tư</privacy> của Paddle được áp dụng khi mua hàng."
+    "paddleNotice": "Thanh toán được xử lý bởi <buyerTerms>Paddle</buyerTerms> với tư cách bên bán chính thức. <refund>Chính sách hoàn tiền cho người mua</refund>, <checkout>điều khoản thanh toán</checkout> và <privacy>thông báo quyền riêng tư</privacy> của Paddle được áp dụng khi mua hàng.",
+    "about": "GPDerp biến mọi chủ đề thành một chiếc đèn lồng thơ haiku do AI viết. Tài khoản mới được 5 lượt tạo miễn phí; thêm 100 lượt có giá $3.00 (thanh toán một lần, chưa gồm thuế áp dụng).",
+    "contact": "Liên hệ: <email>support@gpderp.party</email>"
   },
   "NoCreditsLeft": {
     "continueGenerationOffer": {

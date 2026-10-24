@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, useContext, useRef, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, type ReactNode } from "react";
 import type { Paddle } from "@paddle/paddle-js";
+import { hasPaddleTransactionLink } from "@/utils/paddle/paddleTransactionLink";
 import { readPaddleClientEnv } from "./paddleClientEnv";
 import { PADDLE_CHECKOUT_LOADED_EVENT } from "./openPaddleCheckoutWithFallback";
 import {
@@ -42,6 +43,12 @@ export const PaddleProvider = ({ children }: { children: ReactNode }) => {
     );
     return paddleRef.current;
   };
+
+  // Paddle's default payment link lands here with ?_ptxn=…; Paddle.js opens that checkout once initialized.
+  const ensurePaddleRef = useRef(ensurePaddle);
+  useEffect(() => {
+    if (hasPaddleTransactionLink(window.location.search)) void ensurePaddleRef.current();
+  }, []);
 
   return (
     <PaddleContext.Provider value={{ configured, ensurePaddle }}>{children}</PaddleContext.Provider>

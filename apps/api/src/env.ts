@@ -111,6 +111,9 @@ export const env = {
   PADDLE_API_KEY: requireEnv("PADDLE_API_KEY"),
   PADDLE_WEBHOOK_SECRET: requireEnv("PADDLE_WEBHOOK_SECRET"),
   PADDLE_ENV: requirePaddleEnv("PADDLE_ENV"),
+  /** Reject webhook deliveries not coming from Paddle's published IPs. Can only be disabled outside production. */
+  PADDLE_WEBHOOK_IP_ALLOWLIST:
+    process.env.NODE_ENV === "production" || toBool(process.env.PADDLE_WEBHOOK_IP_ALLOWLIST, true),
   PADDLE_PRICE_ID_100_HAIKUS: requireEnv("PADDLE_PRICE_ID_100_HAIKUS"),
 
   /** Haiku generation backend: `prod` streams from OpenAI, `dev` (default) streams the local mock. */

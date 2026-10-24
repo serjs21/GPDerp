@@ -1,6 +1,6 @@
 # Terms of Service
 
-**Last updated:** April 12, 2026
+**Last updated:** October 24, 2026
 
 These Terms of Service (“Terms”) govern your access to and use of the Haiku generation service (the website, application, and related features we offer). By using the Haiku generation service, you agree to these Terms. If you do not agree, do not use the Haiku generation service.
 
@@ -48,11 +48,11 @@ A standalone summary of these rules is in our [Acceptable Use Policy](/acceptabl
 
 ## 4. Payments and billing
 
-**Processor.** Payments for subscriptions, one-time purchases, credits, or similar offerings are processed by **Paddle**, our payment provider. Paddle acts as the **merchant of record** for those transactions. That means Paddle handles checkout, payment collection, and certain tax and compliance obligations associated with the sale, as described in Paddle’s terms and policies at checkout.
+**Processor.** Payments for one-time purchases of credits are processed by **Paddle**, our payment provider. Paddle acts as the **merchant of record** for those transactions. That means Paddle handles checkout, payment collection, and certain tax and compliance obligations associated with the sale, as described in Paddle’s terms and policies at checkout.
 
 **Prices and taxes.** Prices are shown before you complete a purchase. Taxes, currency, and invoicing may be handled according to Paddle’s checkout and your location.
 
-**Subscriptions.** If you purchase a subscription, it renews according to the plan and billing interval you select unless you cancel before the renewal date through the method we or Paddle provide.
+**No subscriptions.** We currently sell one-time credit packs only (100 haiku generations for USD 3.00, plus applicable tax). Nothing renews automatically and there are no recurring charges.
 
 **Refunds.** Refund eligibility is governed by the refund and cancellation terms presented at purchase and by Paddle’s applicable policies. Where we offer a refund in line with those terms, Paddle may process it on our behalf.
 
@@ -115,4 +115,4 @@ We may modify or discontinue parts of the Haiku generation service. We may updat
 
 ## 12. Contact
 
-Questions about these Terms or the Haiku generation service: use the contact method shown in the Haiku generation service (for example, a support email or form on the site). We aim to respond within a reasonable time.
+Questions about these Terms or the Haiku generation service: email [support@gpderp.party](mailto:support@gpderp.party). We aim to respond within a reasonable time.

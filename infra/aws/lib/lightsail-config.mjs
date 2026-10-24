@@ -104,9 +104,30 @@ const applyRule = (rule, value) => {
   return check(value);
 };
 
-/** "NAME: reason" problems for locked defaults and rule violations. Never includes values. */
-export const invalidValues = (manifest, environment) => {
+const PADDLE_ID_MAP_PATH = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../paddle/live-id-map.json");
+
+/** Paddle key and price must belong to PADDLE_ENV (sandbox: pdl_sdbx + sandbox price; production: pdl_live + live price). */
+const paddleEnvironmentProblems = (environment, idMap) => {
+  const mode = environment.PADDLE_ENV;
+  const key = environment.PADDLE_API_KEY ?? "";
+  const price = environment.PADDLE_PRICE_ID_100_HAIKUS ?? "";
+  const livePrices = new Set(Object.values(idMap?.prices ?? {}));
   const problems = [];
+  if (mode === "production") {
+    if (key && !key.startsWith("pdl_live")) problems.push("PADDLE_API_KEY: must be a live key (pdl_live) when PADDLE_ENV=production");
+    if (price && idMap && !livePrices.has(price)) problems.push("PADDLE_PRICE_ID_100_HAIKUS: not a live price (infra/paddle/live-id-map.json)");
+  } else if (mode === "sandbox") {
+    if (key && !key.startsWith("pdl_sdbx")) problems.push("PADDLE_API_KEY: must be a sandbox key (pdl_sdbx) when PADDLE_ENV=sandbox");
+    if (price && livePrices.has(price)) problems.push("PADDLE_PRICE_ID_100_HAIKUS: is a LIVE price but PADDLE_ENV=sandbox");
+  }
+  return problems;
+};
+
+const loadPaddleIdMap = () => (fs.existsSync(PADDLE_ID_MAP_PATH) ? JSON.parse(fs.readFileSync(PADDLE_ID_MAP_PATH, "utf8")) : null);
+
+/** "NAME: reason" problems for locked defaults and rule violations. Never includes values. */
+export const invalidValues = (manifest, environment, idMap = loadPaddleIdMap()) => {
+  const problems = [...paddleEnvironmentProblems(environment, idMap)];
   for (const name of manifest.locked ?? []) {
     if (name in environment && environment[name] !== manifest.defaults[name]) {
       problems.push(`${name}: locked to its default (${manifest.defaults[name]})`);

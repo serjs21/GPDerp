@@ -38,7 +38,7 @@
     "balance": "Tienes {count} créditos de generación.",
     "balanceUnknown": "Tu saldo de créditos aparecerá aquí.",
     "product": "100 generaciones de haiku — una compra añade exactamente 100 créditos.",
-    "buy": "Comprar 100 generaciones — $3.0",
+    "buy": "Comprar 100 generaciones — $3.00",
     "unavailable": "El pago no está disponible ahora.",
     "error": "No se pudo iniciar el pago.",
     "success": "Compra completada: generaciones añadidas.",
@@ -78,7 +78,7 @@
     }
   },
   "RootLayout": {
-    "description": "IA, pero inútil"
+    "description": "IA, pero inútil: escribe un tema y recibe una linterna con un haiku escrito por IA."
   },
   "LegalPages": {
     "back": "← Volver",
@@ -110,7 +110,9 @@
     "refund": "Política de reembolso",
     "acceptableUse": "Uso aceptable",
     "cookies": "Política de cookies",
-    "paddleNotice": "Los pagos los procesa <buyerTerms>Paddle</buyerTerms> como comerciante registrado. Al comprar se aplican la <refund>política de reembolso para compradores</refund>, los <checkout>términos de pago</checkout> y el <privacy>aviso de privacidad</privacy> de Paddle."
+    "paddleNotice": "Los pagos los procesa <buyerTerms>Paddle</buyerTerms> como comerciante registrado. Al comprar se aplican la <refund>política de reembolso para compradores</refund>, los <checkout>términos de pago</checkout> y el <privacy>aviso de privacidad</privacy> de Paddle.",
+    "about": "GPDerp convierte cualquier tema en una linterna con un haiku escrito por IA. Las cuentas nuevas reciben 5 generaciones gratis; 100 más cuestan $3.00 (pago único, más impuestos aplicables).",
+    "contact": "Contacto: <email>support@gpderp.party</email>"
   },
   "NoCreditsLeft": {
     "continueGenerationOffer": {

@@ -38,7 +38,7 @@
     "balance": "Voce tem {count} creditos de geracao.",
     "balanceUnknown": "Seu saldo de creditos aparecera aqui.",
     "product": "100 geracoes de haiku — uma compra adiciona exatamente 100 creditos.",
-    "buy": "Comprar 100 geracoes — $3.0",
+    "buy": "Comprar 100 geracoes — $3.00",
     "unavailable": "O checkout nao esta disponivel agora.",
     "error": "Nao foi possivel iniciar o checkout.",
     "success": "Compra concluída — gerações adicionadas.",
@@ -78,7 +78,7 @@
     }
   },
   "RootLayout": {
-    "description": "IA, mas inútil"
+    "description": "IA, mas inútil: digite um tema e receba uma lanterna com um haicai escrito por IA."
   },
   "LegalPages": {
     "back": "← Voltar",
@@ -110,7 +110,9 @@
     "refund": "Política de Reembolso",
     "acceptableUse": "Uso Aceitável",
     "cookies": "Política de Cookies",
-    "paddleNotice": "Os pagamentos são processados pela <buyerTerms>Paddle</buyerTerms> como revendedora oficial. A <refund>política de reembolso ao comprador</refund>, os <checkout>termos de checkout</checkout> e o <privacy>aviso de privacidade</privacy> da Paddle se aplicam à compra."
+    "paddleNotice": "Os pagamentos são processados pela <buyerTerms>Paddle</buyerTerms> como revendedora oficial. A <refund>política de reembolso ao comprador</refund>, os <checkout>termos de checkout</checkout> e o <privacy>aviso de privacidade</privacy> da Paddle se aplicam à compra.",
+    "about": "GPDerp transforma qualquer tema em uma lanterna com um haicai escrito por IA. Contas novas recebem 5 gerações grátis; mais 100 custam $3.00 (pagamento único, mais impostos aplicáveis).",
+    "contact": "Contato: <email>support@gpderp.party</email>"
   },
   "NoCreditsLeft": {
     "continueGenerationOffer": {

@@ -29,6 +29,7 @@ const validValue = (name) => {
   if (rule.startsWith("min-length")) return `${SECRET}-${SECRET}`;
   if (rule === "positive-int" || rule === "non-negative-int") return "900";
   if (rule.startsWith("one-of:")) return rule.slice(7).split(",")[0];
+  if (name === "PADDLE_API_KEY") return `pdl_sdbx_${SECRET}`;
   return `${SECRET}-${name}`;
 };
 
@@ -150,6 +151,21 @@ test("rules reject production-unsafe values by name only", () => {
   }
   const insecure = { ...base, DATABASE_URL: base.DATABASE_URL.replace("sslmode=require", "sslmode=disable") };
   assert.match(invalidValues(manifest, insecure)[0], /sslmode/);
+});
+
+test("Paddle key and price must match PADDLE_ENV", () => {
+  const idMap = { prices: { pri_sandbox: "pri_live" } };
+  const base = { ...manifest.defaults, ...completeEnv() };
+  const sandbox = { ...base, PADDLE_ENV: "sandbox", PADDLE_API_KEY: `pdl_sdbx_${SECRET}`, PADDLE_PRICE_ID_100_HAIKUS: "pri_sandbox" };
+  const live = { ...base, PADDLE_ENV: "production", PADDLE_API_KEY: `pdl_live_${SECRET}`, PADDLE_PRICE_ID_100_HAIKUS: "pri_live" };
+  assert.deepEqual(invalidValues(manifest, sandbox, idMap), []);
+  assert.deepEqual(invalidValues(manifest, live, idMap), []);
+  const mixed = invalidValues(manifest, { ...live, PADDLE_API_KEY: `pdl_sdbx_${SECRET}`, PADDLE_PRICE_ID_100_HAIKUS: "pri_sandbox" }, idMap);
+  assert.equal(mixed.length, 2);
+  assert.match(mixed.join(" "), /live key/);
+  assert.match(mixed.join(" "), /not a live price/);
+  assert.match(invalidValues(manifest, { ...sandbox, PADDLE_PRICE_ID_100_HAIKUS: "pri_live" }, idMap)[0], /LIVE price/);
+  assert.ok(!mixed.join(" ").includes(SECRET));
 });
 
 test("later deployments refuse overrides that would break production (dev env file by mistake)", () => {

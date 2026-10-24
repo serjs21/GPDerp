@@ -38,7 +38,7 @@
     "balance": "你有 {count} 个生成点数。",
     "balanceUnknown": "你的生成点数余额会显示在这里。",
     "product": "100 次俳句生成——每次购买恰好增加 100 个点数。",
-    "buy": "购买 100 次生成——$3.0",
+    "buy": "购买 100 次生成——$3.00",
     "unavailable": "暂时无法结账。",
     "error": "无法开始结账。",
     "success": "购买完成——生成次数已到账。",
@@ -78,7 +78,7 @@
     }
   },
   "RootLayout": {
-    "description": "AI，但没啥用"
+    "description": "AI，但没啥用：输入一个主题，收获一盏 AI 写的俳句灯笼。"
   },
   "LegalPages": {
     "back": "← 返回",
@@ -110,7 +110,9 @@
     "refund": "退款政策",
     "acceptableUse": "可接受使用",
     "cookies": "Cookie 政策",
-    "paddleNotice": "付款由 <buyerTerms>Paddle</buyerTerms> 作为记录商户处理。购买时适用 Paddle 的<refund>买家退款政策</refund>、<checkout>结账条款</checkout>和<privacy>隐私声明</privacy>。"
+    "paddleNotice": "付款由 <buyerTerms>Paddle</buyerTerms> 作为记录商户处理。购买时适用 Paddle 的<refund>买家退款政策</refund>、<checkout>结账条款</checkout>和<privacy>隐私声明</privacy>。",
+    "about": "GPDerp 能把任何主题变成一盏由 AI 写下俳句的灯笼。新账户可免费生成 5 次；再购买 100 次只需 $3.00（一次性付款，另加适用税费）。",
+    "contact": "联系我们：<email>support@gpderp.party</email>"
   },
   "NoCreditsLeft": {
     "continueGenerationOffer": {

@@ -6,6 +6,28 @@
   border-top: 1px solid var(--footer-border);
 }
 
+.about {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--highlight-on-sky, var(--sumi-ink));
+  max-width: 36rem;
+  margin: 0 auto 0.35rem;
+}
+
+.contact {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--highlight-on-sky, var(--sumi-ink));
+  margin: 0 0 0.6rem;
+}
+
+.contact a {
+  color: var(--highlight-on-sky, var(--accent-red));
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .links {
   display: flex;
   flex-wrap: wrap;

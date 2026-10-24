@@ -38,7 +38,7 @@
     "balance": "Du hast {count} Generierungs-Credits.",
     "balanceUnknown": "Dein Credit-Stand erscheint hier.",
     "product": "100 Haiku-Generierungen — ein Kauf fügt genau 100 Credits hinzu.",
-    "buy": "100 Generierungen kaufen — $3.0",
+    "buy": "100 Generierungen kaufen — $3.00",
     "unavailable": "Checkout ist gerade nicht verfügbar.",
     "error": "Checkout konnte nicht gestartet werden.",
     "success": "Kauf abgeschlossen — Generierungen hinzugefügt.",
@@ -78,7 +78,7 @@
     }
   },
   "RootLayout": {
-    "description": "KI, aber nutzlos"
+    "description": "KI, aber nutzlos: Thema eingeben, KI-geschriebene Haiku-Laterne erhalten."
   },
   "LegalPages": {
     "back": "← Zurück",
@@ -110,7 +110,9 @@
     "refund": "Erstattungsrichtlinie",
     "acceptableUse": "Akzeptable Nutzung",
     "cookies": "Cookie-Richtlinie",
-    "paddleNotice": "Zahlungen werden von <buyerTerms>Paddle</buyerTerms> als Händler (Merchant of Record) abgewickelt. Beim Kauf gelten Paddles <refund>Erstattungsrichtlinie für Käufer</refund>, <checkout>Checkout-Bedingungen</checkout> und <privacy>Datenschutzhinweise</privacy>."
+    "paddleNotice": "Zahlungen werden von <buyerTerms>Paddle</buyerTerms> als Händler (Merchant of Record) abgewickelt. Beim Kauf gelten Paddles <refund>Erstattungsrichtlinie für Käufer</refund>, <checkout>Checkout-Bedingungen</checkout> und <privacy>Datenschutzhinweise</privacy>.",
+    "about": "GPDerp verwandelt jedes Thema in eine KI-geschriebene Haiku-Laterne. Neue Konten erhalten 5 kostenlose Generierungen; 100 weitere kosten $3.00 (einmalig, zzgl. anfallender Steuern).",
+    "contact": "Kontakt: <email>support@gpderp.party</email>"
   },
   "NoCreditsLeft": {
     "continueGenerationOffer": {

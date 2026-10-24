@@ -7,6 +7,8 @@ jest.mock("fastify-raw-body", () => ({
   default: async () => {},
 }));
 
+jest.mock("../../../env", () => ({ env: { PADDLE_ENV: "sandbox", PADDLE_WEBHOOK_IP_ALLOWLIST: false } }));
+
 jest.mock("../paddleWebhook", () => ({
   verifyPaddleWebhook: jest.fn(),
 }));

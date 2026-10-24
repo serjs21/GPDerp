@@ -38,7 +38,7 @@
     "balance": "You have {count} generation credits.",
     "balanceUnknown": "Your generation credit balance will appear here.",
     "product": "100 Haiku Generations — one purchase adds exactly 100 credits.",
-    "buy": "Buy 100 generations — $3.0",
+    "buy": "Buy 100 generations — $3.00",
     "unavailable": "Checkout is not available right now.",
     "error": "Could not start checkout.",
     "success": "Purchase complete — generations added.",
@@ -78,7 +78,7 @@
     }
   },
   "RootLayout": {
-    "description": "AI, but useless"
+    "description": "AI, but useless: type a subject, get an AI-written haiku lantern."
   },
   "LegalPages": {
     "back": "← Back",
@@ -110,7 +110,9 @@
     "refund": "Refund Policy",
     "acceptableUse": "Acceptable Use",
     "cookies": "Cookie Policy",
-    "paddleNotice": "Payments are processed by <buyerTerms>Paddle</buyerTerms> as merchant of record. Paddle's <refund>buyer refund policy</refund>, <checkout>checkout terms</checkout>, and <privacy>privacy notice</privacy> apply at purchase."
+    "paddleNotice": "Payments are processed by <buyerTerms>Paddle</buyerTerms> as merchant of record. Paddle's <refund>buyer refund policy</refund>, <checkout>checkout terms</checkout>, and <privacy>privacy notice</privacy> apply at purchase.",
+    "about": "GPDerp turns any subject into an AI-written haiku lantern. New accounts get 5 free generations; 100 more cost $3.00 (one-time, plus applicable tax).",
+    "contact": "Contact: <email>support@gpderp.party</email>"
   },
   "NoCreditsLeft": {
     "continueGenerationOffer": {

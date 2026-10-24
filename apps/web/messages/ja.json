@@ -38,7 +38,7 @@
     "balance": "生成クレジットが {count} あります。",
     "balanceUnknown": "生成クレジット残高はここに表示されます。",
     "product": "俳句生成 100 回 — 1回の購入でちょうど 100 クレジットが追加されます。",
-    "buy": "生成 100 回を購入 — $3.0",
+    "buy": "生成 100 回を購入 — $3.00",
     "unavailable": "ただいま決済を利用できません。",
     "error": "決済を開始できませんでした。",
     "success": "購入完了 — 生成回数が追加されました。",
@@ -78,7 +78,7 @@
     }
   },
   "RootLayout": {
-    "description": "AI、でも役に立たない"
+    "description": "AI、でも役に立たない: お題を入力すると AI が詠んだ俳句の灯籠が届きます。"
   },
   "LegalPages": {
     "back": "← 戻る",
@@ -110,7 +110,9 @@
     "refund": "返金ポリシー",
     "acceptableUse": "利用ポリシー",
     "cookies": "Cookie ポリシー",
-    "paddleNotice": "お支払いは販売事業者(Merchant of Record)である <buyerTerms>Paddle</buyerTerms> が処理します。購入時には Paddle の<refund>購入者向け返金ポリシー</refund>、<checkout>決済規約</checkout>、<privacy>プライバシー通知</privacy>が適用されます。"
+    "paddleNotice": "お支払いは販売事業者(Merchant of Record)である <buyerTerms>Paddle</buyerTerms> が処理します。購入時には Paddle の<refund>購入者向け返金ポリシー</refund>、<checkout>決済規約</checkout>、<privacy>プライバシー通知</privacy>が適用されます。",
+    "about": "GPDerp はどんなお題も AI が詠む俳句の灯籠に変えます。新規アカウントは 5 回まで無料で生成でき、追加の 100 回は $3.00（買い切り、税別）です。",
+    "contact": "お問い合わせ: <email>support@gpderp.party</email>"
   },
   "NoCreditsLeft": {
     "continueGenerationOffer": {

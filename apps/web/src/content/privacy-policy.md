@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Last updated:** April 12, 2026
+**Last updated:** October 24, 2026
 
 This Privacy Policy describes how we handle personal information when you use the Haiku generation service (the site, app, and related features). We keep collection limited to what we need to run the product, support accounts, and understand usage at a basic level.
 
@@ -38,7 +38,7 @@ We use the information above to:
 
 - Provide, maintain, and improve the Haiku generation service  
 - Authenticate users and protect accounts  
-- Process transactions and manage access tied to subscriptions or purchases  
+- Process transactions and manage access tied to purchases  
 - Send service-related messages (such as security notices, receipts, or responses to support)  
 - Understand aggregate or basic usage patterns and fix technical issues  
 - Comply with legal obligations and enforce our terms  
@@ -123,7 +123,7 @@ The Haiku generation service is not directed at children under the age where par
 
 ## 12. Contact
 
-For privacy questions or requests about your personal information, use the contact method shown in the Haiku generation service (for example, a support email or form). We aim to respond within a reasonable time.
+For privacy questions or requests about your personal information, email [support@gpderp.party](mailto:support@gpderp.party). We aim to respond within a reasonable time.
 
 ---
 

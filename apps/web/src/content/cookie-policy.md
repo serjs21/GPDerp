@@ -1,6 +1,6 @@
 # Cookie Policy
 
-**Last updated:** April 12, 2026
+**Last updated:** October 24, 2026
 
 This Cookie Policy explains how the Haiku generation service uses cookies and similar technologies. It is a short companion to our [Privacy Policy](/privacy), which has more detail on personal data overall.
 
@@ -38,4 +38,4 @@ We may update this Policy from time to time. The “Last updated” date above w
 
 ## Contact
 
-Questions: use the contact method shown in the Haiku generation service, or see the [Privacy Policy](/privacy) for more on your rights and our practices.
+Questions: email [support@gpderp.party](mailto:support@gpderp.party), or see the [Privacy Policy](/privacy) for more on your rights and our practices.
