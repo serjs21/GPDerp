@@ -81,8 +81,11 @@ export const env = {
   SMTP_USER: process.env.SMTP_USER ?? "",
   SMTP_PASS: process.env.SMTP_PASS ?? "",
   MAIL_FROM: process.env.MAIL_FROM ?? "",
-  /** Sender display name shown by mail clients next to MAIL_FROM (empty = bare address). */
-  MAIL_FROM_NAME: process.env.MAIL_FROM_NAME ?? "GPDerp",
+  /**
+   * Sender display name shown by mail clients next to MAIL_FROM (empty = bare address). Defaults to the
+   * display name of the toaster@gpderp.party Google account, whose profile photo Gmail shows as the avatar.
+   */
+  MAIL_FROM_NAME: process.env.MAIL_FROM_NAME ?? "Notification Toaster",
   /** Neon pooled connection (PgBouncer, `-pooler` host): app query traffic through Prisma. */
   DATABASE_URL: parseDatabaseUrl("DATABASE_URL", requireEnv("DATABASE_URL")),
   /** Neon direct connection: Prisma Migrate and pg-boss (long-lived sessions). */
