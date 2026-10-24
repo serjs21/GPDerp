@@ -5,6 +5,9 @@ export const GMAIL_DATE_LABEL = { desktop: "Tue, Oct 20, 2026, 9:41 AM", mobile:
 
 export const GMAIL_FROM_FALLBACK = { name: "GPDerp", address: "MAIL_FROM is not set" } as const;
 
+/** Profile photo of the sending Google account (poetic toaster), as Gmail shows it next to GPDerp mail. */
+export const GMAIL_SENDER_AVATAR_SRC = "/email/sender_avatar.png";
+
 export const GMAIL_BODY_TABS = [
   { id: "html", label: "HTML" },
   { id: "text", label: "Plain text" },

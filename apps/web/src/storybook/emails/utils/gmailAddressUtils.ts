@@ -13,7 +13,3 @@ export function parseMailbox(raw: string): Mailbox {
   }
   return { name: trimmed.split("@")[0], address: trimmed };
 }
-
-export function avatarInitial(name: string): string {
-  return (name.trim()[0] ?? "?").toUpperCase();
-}

@@ -124,17 +124,15 @@
   padding: 12px 8px 4px 16px;
 }
 
+/* Sender profile photo, cropped to Gmail's circle (grey while it loads). */
 .avatar {
-  display: inline-flex;
+  display: block;
   flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #7b1fa2;
-  color: #fff;
-  font: 500 18px/1 Roboto, Arial, sans-serif;
+  object-fit: cover;
+  background: #e8eaed;
 }
 
 .senderText {

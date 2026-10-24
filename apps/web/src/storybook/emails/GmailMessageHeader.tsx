@@ -1,7 +1,7 @@
-import { GMAIL_DATE_LABEL } from "./consts/gmailPreviewConsts";
+import { GMAIL_DATE_LABEL, GMAIL_SENDER_AVATAR_SRC } from "./consts/gmailPreviewConsts";
 import { GmailIcon } from "./GmailIcon";
 import type { GmailMessageHeaderProps } from "./GmailMessageHeader.types";
-import { avatarInitial, parseMailbox } from "./utils/gmailAddressUtils";
+import { parseMailbox } from "./utils/gmailAddressUtils";
 import styles from "./GmailMessageView.module.css";
 
 /** Sender row: avatar, name <address>, "to me", reply-to, date and quick actions. */
@@ -10,9 +10,8 @@ export function GmailMessageHeader({ email, viewport }: GmailMessageHeaderProps)
 
   return (
     <div className={styles.sender}>
-      <span className={styles.avatar} aria-hidden>
-        {avatarInitial(sender.name)}
-      </span>
+      {/* eslint-disable-next-line @next/next/no-img-element -- static public PNG in a Storybook-only preview */}
+      <img className={styles.avatar} src={GMAIL_SENDER_AVATAR_SRC} alt="" width={40} height={40} aria-hidden />
       <div className={styles.senderText}>
         <div className={styles.senderLine}>
           <span className={styles.senderName}>{sender.name}</span>
