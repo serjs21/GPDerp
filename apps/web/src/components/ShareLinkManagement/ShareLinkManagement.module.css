@@ -62,6 +62,12 @@
   justify-content: center;
 }
 
+/* Tops up .listShell's 0.15rem padding to ManageLabelsPanel's 1rem .listScroll padding,
+   so both settings empty states sit the same distance below their sort panel. */
+.emptyState {
+  margin-top: 0.85rem;
+}
+
 /* Fetching loader on the empty list (first load / filter change). */
 .initialFetch {
   margin-top: 5rem;

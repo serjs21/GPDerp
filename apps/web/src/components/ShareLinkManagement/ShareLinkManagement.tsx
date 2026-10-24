@@ -47,7 +47,7 @@ function ShareLinkListBody({
   return (
     <>
       {showEmpty ? (
-        <FetchEmptyState />
+        <FetchEmptyState className={styles.emptyState} />
       ) : (
         items.map((link) => {
           const haikuId = link.sharedHaikuId;
