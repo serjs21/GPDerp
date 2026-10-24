@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import type { SendMailOptions } from "nodemailer";
 import { env } from "../../env";
+import { formatMailFrom } from "../../utils/mailFrom";
 
 const transporter = nodemailer.createTransport({
   host: env.SMTP_HOST,
@@ -36,7 +37,7 @@ export const mailService = {
   }) {
     assertMailConfig();
     await transporter.sendMail({
-      from: env.MAIL_FROM,
+      from: formatMailFrom(env.MAIL_FROM, env.MAIL_FROM_NAME),
       to: params.to,
       subject: params.subject,
       text: params.text,

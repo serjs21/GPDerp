@@ -2,6 +2,7 @@ import fp from "fastify-plugin";
 import type { FastifyInstance } from "fastify";
 import { env } from "../../env";
 import { POSTCARD_BACK_CID, POSTCARD_FRONT_CID } from "../../consts/postcard";
+import { formatMailFrom } from "../../utils/mailFrom";
 import { formatCountryLabel } from "../../utils/requestCountry";
 import {
   buildEmailChangePreviousAddressAlert,
@@ -52,7 +53,7 @@ const preview = (
 ): EmailPreview => ({
   id,
   label,
-  from: env.MAIL_FROM,
+  from: formatMailFrom(env.MAIL_FROM, env.MAIL_FROM_NAME),
   to: SAMPLE_RECIPIENT,
   inlineImages: [],
   ...email,
