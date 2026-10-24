@@ -3,6 +3,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { continueWithGoogleCredential } from "@/api/authentication";
 import { useGoogleOAuthAvailability } from "@/app/providers/GoogleOAuthAvailabilityProvider";
 import type { LoginFlowProps } from "./LoginFlow.types";
 import { loginFormErrorKey } from "./utils/authFlowValidation";
@@ -68,10 +69,10 @@ export function useLoginForm({
       return;
     }
     try {
-      await axios.post("/auth/google/login", { token: credential });
+      await continueWithGoogleCredential(credential);
       onSuccess();
     } catch (e: unknown) {
-      logAxiosAuthError("google_login_request_error", "/auth/google/login", e);
+      logAxiosAuthError("google_login_request_error", "/auth/google", e);
       notifyGoogleLoginError(e, t, onGoogleSignupRequired);
     }
   };

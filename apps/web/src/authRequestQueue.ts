@@ -24,7 +24,7 @@ const AUTH_BOOTSTRAP_PREFIXES = [
   "/auth/logout",
   "/auth/login",
   "/auth/register",
-  "/auth/google/login",
+  "/auth/google",
   "/auth/complete-registration",
 ] as const;
 

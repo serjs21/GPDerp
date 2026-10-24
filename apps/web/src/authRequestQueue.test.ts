@@ -50,6 +50,9 @@ describe("authRequestQueue", () => {
       expect(
         shouldEnqueueAuthRequest({ method: "post", url: "/auth/google/login" }),
       ).toBe(false);
+      expect(
+        shouldEnqueueAuthRequest({ method: "post", url: "/auth/google" }),
+      ).toBe(false);
     });
 
     it("does not enqueue replayed requests", () => {
