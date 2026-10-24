@@ -5,6 +5,7 @@
 //   must all belong to the same environment.
 // - A live (production) deploy additionally requires PADDLE_LIVE_DEPLOY_APPROVED=yes, so live checkout is never
 //   shipped by accident before Paddle verification and website approval are complete.
+// - Empty PADDLE_CLIENT_TOKEN and PADDLE_PRICE_ID_100_HAIKUS (e.g. passed as empty env vars) = checkout disabled.
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
@@ -40,6 +41,12 @@ const price = effective.PADDLE_PRICE_ID_100_HAIKUS || "";
 const map = fs.existsSync(ID_MAP) ? JSON.parse(fs.readFileSync(ID_MAP, "utf8")) : { prices: {} };
 const livePrices = new Set(Object.values(map.prices ?? {}));
 const sandboxPrices = new Set(Object.keys(map.prices ?? {}));
+
+// Checkout disabled on purpose (e.g. before Paddle approval): no token and no price, Buy buttons stay disabled.
+if (!token && !price) {
+  console.log("OK Paddle web config: checkout DISABLED (no client token / price in this build)");
+  process.exit(0);
+}
 
 const problems = [];
 if (env !== "sandbox" && env !== "production") problems.push(`PADDLE_ENV must be sandbox or production (got ${env})`);
