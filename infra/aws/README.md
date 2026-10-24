@@ -1,8 +1,224 @@
 # API on AWS Lightsail Containers
 
-Production deployment of the Fastify API (`apps/api`) as a single Lightsail container.
-Local verification of the image: [local-docker-testing.md](local-docker-testing.md). WebSocket behaviour, limits,
-metrics and the integration test: [websockets.md](websockets.md).
+Production deployment of the Fastify API (`apps/api`) as a single container on the **existing** Lightsail container
+service `container-service-1` (us-east-2, Micro: 1 GB / 0.25 vCPU, scale 1).
+
+Related: [local-docker-testing.md](local-docker-testing.md) (full local image test) ·
+[websockets.md](websockets.md) (WebSocket behaviour, limits, metrics, multi-replica limitations).
+
+| Script | What it does | Changes AWS? |
+|---|---|---|
+| [build.sh](build.sh) | `docker buildx` linux/amd64 image tagged with the git SHA, local smoke test | no |
+| [push.sh](push.sh) | `push-container-image` (label `api`), prints the stored image id | uploads an image |
+| [deploy.sh](deploy.sh) | composes the config, shows a names-only diff, **asks for confirmation**, deploys, waits, verifies | yes (confirmed) |
+| [verify.sh](verify.sh) | deployment ACTIVE, HTTPS REST, DB via `/readyz`, WSS integration test, container logs | no |
+| [rollback.sh](rollback.sh) | redeploys a previous version's configuration (**asks for confirmation**), verifies | yes (confirmed) |
+| [release.sh](release.sh) | `build` → `push` → `deploy` (confirmation) → `verify` | yes (confirmed) |
+
+None of the scripts creates, resizes or deletes a Lightsail service, deletes images or deployments, or runs Prisma
+migrations.
+
+## 1. Local tooling
+
+- AWS CLI v2 (`brew install awscli`) and the **lightsailctl** plugin (`brew install aws/tap/lightsailctl`), which
+  `push-container-image` needs.
+- Docker Desktop with **Buildx** (on Apple Silicon the image is cross-built / emulated as linux/amd64).
+- Node 22+ and pnpm (only for the local smoke test, `ws-integration-test.mjs` and migrations), `curl`, `git`.
+- For the build smoke test: the local Postgres from `apps/api/docker-compose.yml` and `apps/api/.env`.
+
+## 2. AWS authentication
+
+The scripts use the normal AWS CLI credential chain; pick the profile with `AWS_PROFILE`:
+
+```bash
+aws login --profile gpderp          # or: aws configure sso / aws sso login --profile gpderp
+export AWS_PROFILE=gpderp
+aws sts get-caller-identity         # account must be 311883575175
+```
+
+Every script starts with a **preflight**: it prints the caller identity, refuses any account other than
+`EXPECTED_ACCOUNT_ID`, checks that `container-service-1` exists in us-east-2 with power `micro` and scale `1`, and
+continues only while the service is `READY` or `RUNNING` (it stops on `PENDING`, `DEPLOYING`, `UPDATING`, `DISABLED`).
+
+The current profile signs in as the account **root** user (preflight warns about it). Prefer an IAM user or role with
+only the Lightsail container permissions (`lightsail:GetContainer*`, `lightsail:PushContainerImage`,
+`lightsail:RegisterContainerImage`, `lightsail:CreateContainerServiceDeployment`, `lightsail:CreateContainerServiceRegistryLogin`)
+plus `sts:GetCallerIdentity`.
+
+## 3. Service and region configuration
+
+[config/lightsail.env](config/lightsail.env) (committed, no secrets; every value can be overridden from the environment):
+
+| Setting | Value |
+|---|---|
+| `LIGHTSAIL_SERVICE` / `AWS_REGION` | `container-service-1` / `us-east-2` |
+| `CONTAINER_NAME` / `IMAGE_LABEL` / `CONTAINER_PORT` | `api` / `api` / `8080` |
+| `EXPECTED_POWER` / `EXPECTED_SCALE` / `EXPECTED_ACCOUNT_ID` | `micro` / `1` / `311883575175` |
+| `RUNTIME_ENV_FILE` | `apps/api/.env.lightsail` (gitignored) |
+| `WEB_ORIGIN` | `https://gpderp.party` (Origin used by the WebSocket checks) |
+
+Public endpoint ([config/public-endpoint.json](config/public-endpoint.json)): container `api`, port 8080, health check
+`GET /healthz` (200–299, every 10 s). Default domain:
+`https://container-service-1.drt7c1fgdcdhp.us-east-2.cs.amazonlightsail.com` (preflight prints it). The custom domain
+`api.gpderp.party` comes later (see [Remaining manual steps](#remaining-manual-steps)).
+
+## 4. Runtime environment variables
+
+Defined in [config/runtime-env.json](config/runtime-env.json) — the only names the tooling ever sends to Lightsail.
+Values are never printed: the scripts show variable **names** (set / missing / added / removed / changed) only.
+
+| Group | Variables (required unless marked optional) |
+|---|---|
+| Fixed defaults | `NODE_ENV=production`, `PORT=8080`, `TRUST_PROXY_HOPS=1`, `NODE_OPTIONS=--max-old-space-size=512`, `COOKIE_SECURE=true`, `COOKIE_SAME_SITE=lax`, `DEBUG_AUTH_LOGS=false`, `HAIKU_GENERATION_API=prod` |
+| Database (secret) | `DATABASE_URL` (Neon pooled, `-pooler` host), `DATABASE_URL_UNPOOLED` (Neon direct) — from `apps/api/.env.neon` |
+| URLs / cookies | `CLIENT_URL`, `WEB_APP_URL` (`https://gpderp.party`), `API_BASE_URL`, `COOKIE_DOMAIN` (`.gpderp.party`) |
+| Auth | `JWT_ACCESS_SECRET` (secret, 32+), `TOKEN_HASH_PEPPER` (secret, 16+), `ACCESS_TOKEN_TTL_SECONDS`, `REFRESH_TOKEN_TTL_SECONDS`, `SESSION_TTL_SECONDS`, `GOOGLE_CLIENT_ID` (optional) |
+| R2 | `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID` (secret), `R2_SECRET_ACCESS_KEY` (secret), `R2_BUCKET_NAME`, `R2_PUBLIC_BASE_URL`, `R2_REGION` / `R2_S3_ENDPOINT` (optional) |
+| Paddle | `PADDLE_API_KEY` (secret), `PADDLE_WEBHOOK_SECRET` (secret), `PADDLE_ENV`, `PADDLE_PRICE_ID_100_HAIKUS` |
+| Email | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` (secret), `MAIL_FROM`, `SMTP_SECURE` (optional) |
+| AI | `OPENAI_API_KEY` (secret) |
+| Optional | `CORS_METHODS`, `CORS_HEADERS`, `CORS_CREDENTIALS`, `ICON_UPLOAD_DEBUG` |
+
+Lightsail stores these as deployment configuration (visible to anyone with Lightsail read access).
+`aws lightsail get-container-services` without `--query` prints every value — the scripts never do that.
+
+## 5. Build an image
+
+```bash
+infra/aws/build.sh                 # buildx --platform linux/amd64 --load, tags gpderp-api:<sha> and :latest
+infra/aws/build.sh --skip-smoke    # build only
+```
+
+Build context is `apps/api` ([Dockerfile](../../apps/api/Dockerfile): pnpm `--frozen-lockfile`, `prisma generate`,
+`tsc`, then a runtime stage with production dependencies only, the generated Prisma client, `USER node`). `.env*`,
+`.neon`, tests, scripts and dev tooling are excluded by [.dockerignore](../../apps/api/.dockerignore); no secret is
+a build argument. Uncommitted changes in `apps/api` produce a `-dirty` tag (with a warning).
+
+The smoke test runs the image (amd64 emulation, 1 GB limit) against the local Postgres, requires `/healthz` and
+`/readyz` to return 200, checks that the image carries no runtime env and no `.env` files, and checks a clean
+SIGTERM shutdown. The full local suite (REST, WebSockets, Neon read-only, secret scan) is
+`infra/aws/scripts/local-docker-test.sh`.
+
+## 6. Push an image
+
+```bash
+infra/aws/push.sh                          # image for the current commit
+infra/aws/push.sh gpderp-api:<sha>         # a specific local tag
+```
+
+Runs `aws lightsail push-container-image --service-name container-service-1 --label api --region us-east-2`,
+captures the stored identifier (`:container-service-1.api.<N>`), confirms it is listed by `get-container-images`,
+and records it in `infra/aws/.state/last-image` (gitignored, used by `deploy.sh`). Older images are kept.
+
+## 7. First deployment
+
+Option A — runtime env file (recommended):
+
+1. Create `apps/api/.env.lightsail` (gitignored; `chmod 600`) with every required variable from section 4. The
+   database values come from `apps/api/.env.neon`; generate new `JWT_ACCESS_SECRET` / `TOKEN_HASH_PEPPER`
+   (`openssl rand -base64 48`). Other keys in the file are ignored.
+2. Check the migrations are applied: `(cd apps/api && pnpm migrate:status:prod)`.
+3. Dry run (reads AWS only, validates the file, prints names):
+
+   ```bash
+   AWS_PROFILE=gpderp infra/aws/deploy.sh --dry-run
+   ```
+
+4. Release (build → push → deploy with confirmation → verify):
+
+   ```bash
+   AWS_PROFILE=gpderp infra/aws/release.sh
+   ```
+
+   or step by step: `build.sh`, `push.sh`, `deploy.sh` (type `container-service-1` to confirm), `verify.sh`.
+
+Option B — Lightsail console: create the first deployment by hand (Lightsail → Containers → container-service-1 →
+Deployments → Create your first deployment): container name `api`, image `:container-service-1.api.<N>` (from
+`push.sh`), add each variable from section 4 under **Environment variables**, open port `8080` / `HTTP`, public
+endpoint `api` with health check path `/healthz`. Later deployments with `deploy.sh` then keep that configuration.
+
+## 8. Later deployments
+
+```bash
+AWS_PROFILE=gpderp infra/aws/release.sh
+# or: infra/aws/build.sh && infra/aws/push.sh && infra/aws/deploy.sh
+```
+
+`deploy.sh` reads the **current** deployment's configuration (into a private 0600 temp file, never printed), keeps
+every value, and only swaps the image. To change configuration, pass an env file containing just the variables to
+change: `infra/aws/deploy.sh --env-file /path/to/changes.env` — empty values never overwrite existing ones, and the
+deployment is refused if any required variable would be missing. Before confirming you see the image change and the
+variable names added / removed / changed. Non-interactive confirmation: `CONFIRM_DEPLOY=container-service-1`.
+
+Lightsail keeps serving the previous deployment until the new one passes its health check; a `FAILED` deployment
+leaves the old one active.
+
+## 9. Verify REST, WebSockets and streaming
+
+```bash
+infra/aws/verify.sh                                   # runs automatically after deploy / rollback
+infra/aws/verify.sh --idle 125m                       # long idle WebSocket test (5 / 30 / 120 min checkpoints)
+TEST_EMAIL=you@example.com TEST_PASSWORD_FILE=~/.gpderp-test-password infra/aws/verify.sh --allow-writes
+infra/aws/verify.sh --generate                        # also streams one real haiku (one credit, OpenAI call)
+```
+
+Checks: deployment `ACTIVE`; `GET /healthz` 200 and `GET /readyz` 200 (database round trip through the app) over
+HTTPS with a verified certificate; CORS preflight for `WEB_ORIGIN`; `/ws-check` client IP equals your public IP
+(validates `TRUST_PROXY_HOPS`); [ws-integration-test.mjs](scripts/ws-integration-test.mjs) over `wss://`
+(upgrade through the Lightsail proxy, ping/pong, Origin enforcement, authenticated tabs when credentials are given,
+idle connections, reconnect after loss — upgrade rejections and idle closes are reported as failures); container
+logs since the deployment scanned for fatal errors (shown redacted). **SSE:** the API has no SSE routes; streamed
+output is the WebSocket `delta` sequence (`--generate`). Authentication is never bypassed; passwords come from
+`TEST_PASSWORD`, `TEST_PASSWORD_FILE` (chmod 600) or a hidden prompt and are never printed.
+
+## 10. Logs
+
+```bash
+aws lightsail get-container-log --region us-east-2 --service-name container-service-1 --container-name api \
+  --start-time "$(date -u -v-1H +%Y-%m-%dT%H:%M:%SZ)" --query 'logEvents[].message' --output text | tr '\t' '\n'
+```
+
+Logs are JSON (pino); cookies, `authorization`, CSRF / tab headers and database URLs are redacted by the app. A
+`WS metrics` line every minute summarises WebSocket connections. Console: Lightsail → container-service-1 → Logs.
+
+## 11. Roll back
+
+```bash
+infra/aws/rollback.sh                 # lists versions, marks the current one, asks which to restore
+infra/aws/rollback.sh --version 3     # or pick directly; --dry-run shows the change only
+```
+
+Restores the selected previous successful deployment's image, environment and endpoint as a **new** deployment
+(after showing names-only differences and asking for confirmation), waits for `ACTIVE` and runs `verify.sh`. Data is
+never touched and **migrations are not reverted** — an older image must still work with the current schema (write
+migrations expand-first, see below). No deployment version or image is deleted.
+
+## 12. Troubleshooting
+
+| Symptom | Check |
+|---|---|
+| Preflight: `PENDING` / `DEPLOYING` | wait; another change is in progress. The scripts never force it. |
+| Deployment `FAILED` | `deploy.sh` prints the last log lines. Usual causes: a missing / invalid variable (the app exits with `Missing required environment variable: …`), Neon unreachable, image not amd64. The previous deployment keeps serving. |
+| Health check failing | the container must answer `GET /healthz` on 8080 within 5 s; `/healthz` never touches the DB. Check logs for startup errors. |
+| Memory | Micro has 1 GB; the heap is capped at 512 MB (`NODE_OPTIONS`). Watch Lightsail metrics; scale **power** (not nodes) if needed — manually, never via these scripts. |
+| `/readyz` 503 | database unreachable: Neon status, `DATABASE_URL` (`-pooler` host, `sslmode=require`), `pnpm check-db` from a workstation. Neon cold starts are absorbed by a 15 s connect timeout. |
+| `/ws` 403 | `Origin` not in `CLIENT_URL` (CSWSH guard for cookie-bearing handshakes). |
+| `/ws` 429 | per-IP (60) / per-user (20) / per-tab (2) limits; see `/ws-check` → `ws.rejected`. |
+| Client IP wrong in `/ws-check` | set `TRUST_PROXY_HOPS` to the number of proxies in front of the container. |
+| Idle WebSockets closing | the server pings every 25 s; if `verify.sh --idle` still reports closes, the proxy idle timeout is shorter — report it with the timing printed by the test. |
+| Push fails | `lightsailctl` installed? Docker running? Image built for amd64 (`build.sh` checks)? |
+
+## 13. Migrating away from AWS later
+
+The deployable unit is a plain OCI image (`gpderp-api:<sha>`) configured only through the environment variables in
+section 4, with `/healthz` for liveness and `/readyz` for readiness, listening on `$PORT`, handling `SIGTERM`. The
+database stays on Neon and files on R2, so moving to any container host (Fly.io, Render, Railway, ECS/Fargate, a VM
+with Docker) means: push the same image to that host's registry, set the same variables (+ `TRUST_PROXY_HOPS` for its
+proxy chain), point the health check at `/healthz`, keep a single instance (or add cross-instance fan-out first, see
+[websockets.md](websockets.md#multiple-replicas-limitations)), then switch the `api` DNS record. Nothing in the
+application is Lightsail-specific; only `infra/aws/` is.
+
+---
 
 ## Architecture
 
@@ -10,7 +226,7 @@ metrics and the integration test: [websockets.md](websockets.md).
 Browser / gpderp.party (Cloudflare Worker)
         │  HTTPS + WSS (cookies on .gpderp.party)
         ▼
-Lightsail public endpoint  api.gpderp.party  ── TLS terminates here
+Lightsail public endpoint (default domain, later api.gpderp.party) ── TLS terminates here
         │  HTTP :8080
         ▼
 Fastify container (1 instance, Micro: 1 GB / 0.25 vCPU)
@@ -26,24 +242,6 @@ Fastify container (1 instance, Micro: 1 GB / 0.25 vCPU)
   `POST /beer_me_haiku` is in flight.
 - WebSocket registries and in-flight generations are in process memory: **keep scale at 1** (see
   [websockets.md](websockets.md#multiple-replicas-limitations)).
-  The server pings sockets every 25 s (keeps them alive through the load balancer, evicts dead ones).
-
-## Image
-
-Built from [apps/api/Dockerfile](../../apps/api/Dockerfile) with build context `apps/api` (a standalone pnpm project
-with its own lockfile and no `workspace:` dependencies; the frontend is never in the context).
-
-| Stage | What happens |
-|---|---|
-| `build` | `pnpm install --frozen-lockfile` (pnpm 10.27 via corepack), `prisma generate`, `pnpm build` (tsc → `dist/`, copies assets, the payments prompt and the generated Prisma client) |
-| `prod-deps` | `pnpm install --prod --frozen-lockfile` on Linux, so native binaries (argon2, @resvg/resvg-js) match the image |
-| `runtime` | `node:22-bookworm-slim` (Node 22 LTS, supported by Prisma 7.5), `dist/` + production `node_modules` + `package.json`, `USER node`, `NODE_ENV=production`, `PORT=8080`, `NODE_OPTIONS=--max-old-space-size=512` |
-
-Not in the image: sources, tests, Prisma CLI / schema engine, dev tooling, `scripts/`, `deploy/`, and every `.env*` /
-`.neon` file ([apps/api/.dockerignore](../../apps/api/.dockerignore)). No secret is passed as a build argument; all
-credentials are runtime environment variables. Compressed size is about 325 MB.
-
-Fastify listens on `0.0.0.0:$PORT` and trusts `X-Forwarded-For` from the endpoint (`trustProxy`).
 
 ## Health
 
@@ -52,36 +250,17 @@ Fastify listens on `0.0.0.0:$PORT` and trusts `X-Forwarded-For` from the endpoin
 | `GET /healthz` | Liveness; **Lightsail health check** | `200 {"ok":true}`, never touches the database |
 | `GET /readyz` | Readiness / diagnostics | `SELECT 1` through Prisma with a 3 s timeout: `200 {"ok":true,"db":"up"}` or `503 {"ok":false,"db":"down"}` (details only in logs) |
 | `GET /health` | Legacy alias of `/healthz` | `200 {"ok":true}` |
+| `GET /ws-check` | WebSocket diagnostics | `{ ok, pid, clientIp, ws: {counts} }` — no identifiers |
 
 Lightsail restarts containers that fail its health check, so it points at `/healthz` rather than `/readyz`: a Neon
 cold start or blip should not cause a restart loop. During shutdown Fastify answers new requests with 503.
 
 ## Shutdown
 
-On `SIGTERM` (deploys, restarts) the server calls `app.close()`, which stops accepting requests, closes WebSocket
-clients (they reconnect with backoff), stops pg-boss gracefully (in-flight postcard jobs finish), clears the socket
-heartbeat and disconnects Prisma. If that takes more than 25 s the process force-exits. Deploys therefore drop open
-sockets and interrupt in-flight generations.
-
-## Environment variables
-
-Set on the container deployment (never in the image). The full list with placeholders is
-[apps/api/.env.example](../../apps/api/.env.example); the deployment template is
-[apps/api/deploy/lightsail/containers.template.json](../../apps/api/deploy/lightsail/containers.template.json).
-
-- Platform: `NODE_ENV=production`, `PORT=8080`, `TRUST_PROXY_HOPS=1` (proxies whose `X-Forwarded-For` entry is trusted; the Lightsail load balancer)
-- Database: `DATABASE_URL` (Neon pooled), `DATABASE_URL_UNPOOLED` (Neon direct) — values from `apps/api/.env.neon`
-- URLs: `CLIENT_URL`, `WEB_APP_URL` (`https://gpderp.party`), `API_BASE_URL` (`https://api.gpderp.party`)
-- Cookies: `COOKIE_DOMAIN=.gpderp.party`, `COOKIE_SECURE=true`, `COOKIE_SAME_SITE=lax`
-- Auth: `JWT_ACCESS_SECRET`, `TOKEN_HASH_PEPPER`, `ACCESS_TOKEN_TTL_SECONDS`, `REFRESH_TOKEN_TTL_SECONDS`, `SESSION_TTL_SECONDS`, `GOOGLE_CLIENT_ID`
-- R2: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_BASE_URL`
-- Paddle: `PADDLE_API_KEY`, `PADDLE_WEBHOOK_SECRET`, `PADDLE_ENV`, `PADDLE_PRICE_ID_100_HAIKUS`
-- Email: `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`
-- AI: `OPENAI_API_KEY`, `HAIKU_GENERATION_API=prod`
-
-Lightsail stores these as plain deployment configuration: restrict Lightsail access with a least-privilege IAM user.
-`aws lightsail get-container-services` and the raw `create-container-service-deployment` response print every value
-(including the database URLs); `deploy.sh` and the commands below use `--query` so they never reach a terminal or CI log.
+On `SIGTERM` (deploys, restarts) the server calls `app.close()`: WebSocket clients get close code 1012 and reconnect
+with jitter, pg-boss stops gracefully (in-flight postcard jobs finish), Prisma disconnects. If that takes more than
+25 s the process force-exits. Deploys therefore drop open sockets and interrupt in-flight generations (the web client
+recovers the saved haiku over REST).
 
 ## Database (Prisma 7.5 + Neon)
 
@@ -118,47 +297,11 @@ cd apps/api
 sh -c 'set -a && . ./.env.neon && set +a && pnpm check-db'
 ```
 
-## Deploy
-
-Prerequisites: AWS CLI v2 with the `lightsailctl` plugin, Docker, Node.
-
-1. Create the service (once):
-
-   ```bash
-   aws lightsail create-container-service --service-name gpderp-api --power micro --scale 1
-   ```
-
-2. Fill `apps/api/.env.lightsail` (gitignored by `.env*`) from `apps/api/.env.example` with production values.
-3. Build, push and deploy:
-
-   ```bash
-   apps/api/deploy/lightsail/deploy.sh            # uses apps/api/.env.lightsail
-   ```
-
-   This runs `docker build --platform linux/amd64`, `aws lightsail push-container-image`, renders
-   `containers.template.json` (fails on any unset variable; the rendered file is a 0600 temp file removed on exit)
-   and `aws lightsail create-container-service-deployment` with
-   [public-endpoint.json](../../apps/api/deploy/lightsail/public-endpoint.json) (container `api`, port 8080,
-   health check `/healthz`).
-4. Custom domain (once): create a Lightsail certificate for `api.gpderp.party`, add its validation CNAMEs in
-   Cloudflare DNS, attach it to the service, then point a **DNS-only** CNAME `api` at the service's default domain.
-5. Cut over integrations: Paddle notification URL `https://api.gpderp.party/webhooks/paddle`; web build env
-   `NEXT_PUBLIC_API_BASE_URL=https://api.gpderp.party`, `NEXT_PUBLIC_WS_URL=wss://api.gpderp.party/ws`, then
-   redeploy the Worker (`pnpm deploy` in `apps/web`).
-
-Smoke test after a deploy:
-
-```bash
-curl -i https://api.gpderp.party/healthz
-curl -i https://api.gpderp.party/readyz
-```
-
-Then log in on https://gpderp.party, generate a haiku (WebSocket deltas arrive) and leave a tab idle for > 60 s.
-
 ## Database migrations
 
-Migrations never run on container start. Apply them from a workstation (or CI) **before** deploying an image that
-needs them, with [scripts/migrate-deploy-prod.sh](../../apps/api/scripts/migrate-deploy-prod.sh):
+Migrations never run on container start and are never run by the deployment scripts. Apply them from a workstation
+(or CI) **before** deploying an image that needs them, with
+[scripts/migrate-deploy-prod.sh](../../apps/api/scripts/migrate-deploy-prod.sh):
 
 ```bash
 cd apps/api
@@ -173,16 +316,15 @@ the Neon endpoint id from its output. It only runs `prisma migrate status` and `
 `db push`, `migrate reset`, `migrate dev` or seeds. Optionally create a Neon branch (point-in-time backup) in the
 console before applying a destructive migration.
 
-Status at the time of writing: 31 migrations in `prisma/migrations`, all applied on Neon (`Database schema is up to date!`).
-
 Write migrations to be compatible with the previous image (expand first, contract in a later release) so the old
-container keeps working during the switch.
+container keeps working during the switch and after a rollback.
 
-## Operations
+## Remaining manual steps
 
-- Logs: `aws lightsail get-container-log --service-name gpderp-api --container-name api`
-- State: `aws lightsail get-container-services --service-name gpderp-api --query 'containerServices[0].{state:state,deployment:currentDeployment.state}'`
-  (without `--query` the output includes every env value)
-- Rollback: redeploy a previous image label (`aws lightsail get-container-images --service-name gpderp-api`), using
-  the same env, e.g. `LIGHTSAIL_IMAGE=:gpderp-api.api.<n>` with the rendered template.
-- Scale up resources (not instances) if login latency or memory is tight: `--power small` (2 GB / 0.5 vCPU).
+1. Fill `apps/api/.env.lightsail` (production values) — or use the console (section 7, option B).
+2. Approve and run the first release (`infra/aws/release.sh`).
+3. Replace the root credentials with a least-privilege IAM user / role (section 2).
+4. Custom domain: Lightsail → Certificates → create for `api.gpderp.party`, add the validation CNAMEs in Cloudflare
+   DNS, attach the certificate to `container-service-1`, then a **DNS-only** CNAME `api` → the service's default domain.
+5. Afterwards (not yet): Paddle notification URL `https://api.gpderp.party/webhooks/paddle`; web build env
+   `NEXT_PUBLIC_API_BASE_URL=https://api.gpderp.party`, `NEXT_PUBLIC_WS_URL=wss://api.gpderp.party/ws`, redeploy the Worker.

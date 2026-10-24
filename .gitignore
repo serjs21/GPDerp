@@ -66,6 +66,9 @@ web_modules/
 # Yarn Integrity file
 .yarn-integrity
 
+# Lightsail deployment tooling state (last pushed image, temporary rendered configs)
+infra/aws/.state/
+
 # dotenv environment variable files
 **/.env
 **/.env.*

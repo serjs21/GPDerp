@@ -4,15 +4,15 @@ Frontend Worker `gpderp-party` is live at https://gpderp.party via OpenNext. The
 
 ## Blockers (app will not fully work without these)
 
-1. **Host the Fastify API on AWS Lightsail Containers** (scaffolding ready; needs an AWS account)  
+1. **Host the Fastify API on AWS Lightsail Containers** (service `container-service-1` exists in us-east-2, READY, no deployment yet; tooling in `infra/aws/`)  
    Full guide: [infra/aws/README.md](infra/aws/README.md); local image checks: [infra/aws/local-docker-testing.md](infra/aws/local-docker-testing.md).  
    Image: `apps/api/Dockerfile` (verified locally: builds for linux/amd64, ~325 MB, ~225 MiB RSS idle). Database: Neon (`apps/api/.env.neon`, schema already at the latest migration).
-   1. Install AWS CLI v2 + the `lightsailctl` plugin; sign in with a least-privilege IAM user.
-   2. `aws lightsail create-container-service --service-name gpderp-api --power micro --scale 1`  
+   1. AWS CLI v2 + `lightsailctl` are installed; `AWS_PROFILE=gpderp` reaches account 311883575175 (currently root credentials — replace with a least-privilege IAM user).
+   2. Service `container-service-1` (Micro, scale 1) already exists — never recreate or rescale it.  
       Keep scale at **1**: WebSocket registries and in-flight generations are process-local.
    3. Create `apps/api/.env.lightsail` (gitignored) from `apps/api/.env.example` with production values:
       `DATABASE_URL` / `DATABASE_URL_UNPOOLED` from `.env.neon`, new `JWT_ACCESS_SECRET` (32+) and `TOKEN_HASH_PEPPER` (16+), R2, Paddle, SMTP, `OPENAI_API_KEY`, and the URLs from item 3.
-   4. `apps/api/deploy/lightsail/deploy.sh` — builds, pushes, renders `containers.template.json` (fails on any unset variable) and deploys with `public-endpoint.json` (port 8080, health check `/healthz`).
+   4. `infra/aws/release.sh` — build + local smoke test, push, deploy (asks for confirmation; validates every required variable from `infra/aws/config/runtime-env.json`), verify. Step by step: `build.sh`, `push.sh`, `deploy.sh`, `verify.sh`; `rollback.sh` restores a previous version.
    5. Custom domain: Lightsail → Certificates → create for `api.gpderp.party`; add the validation CNAMEs in Cloudflare DNS; attach the certificate to the service; add CNAME `api` → the service's default domain as **DNS only** (grey cloud) to start.
    6. Smoke: `curl https://api.gpderp.party/healthz` and `/readyz`, then confirm a `wss://api.gpderp.party/ws` connection stays open past 60 s (server pings every 25 s).
    - Migrations are never run in the container: run `pnpm migrate:status:prod`, then `pnpm migrate:prod` (asks for confirmation) in `apps/api` before deploying an image that needs a new migration.
@@ -53,7 +53,7 @@ Frontend Worker `gpderp-party` is live at https://gpderp.party via OpenNext. The
    - Redeploy once and confirm the logs show `SIGTERM received, shutting down...`
 
 9. **Commit deploy scaffolding** (if not already):  
-   `wrangler.jsonc`, `open-next.config.ts`, `public/_headers`, package scripts, `.gitignore` OpenNext entries, `apps/api/Dockerfile`, `apps/api/.dockerignore`, `apps/api/deploy/lightsail/*` — **never** commit `.env*`, `.dev.vars`, or secrets.
+   `wrangler.jsonc`, `open-next.config.ts`, `public/_headers`, package scripts, `.gitignore` OpenNext entries, `apps/api/Dockerfile`, `apps/api/.dockerignore`, `infra/aws/*` — **never** commit `.env*`, `.dev.vars`, or secrets.
 
 ## Optional / polish
 
@@ -70,4 +70,4 @@ Frontend Worker `gpderp-party` is live at https://gpderp.party via OpenNext. The
 - Custom domain `gpderp.party` bound and serving Next/OpenNext (`x-opennext: 1`)  
 - Homepage, `/login`, and static `/_next` assets verified over HTTPS  
 - Fastify API intentionally left off Workers  
-- API container scaffolding: `apps/api/Dockerfile` (node:22-bookworm-slim, linux/amd64, non-root, port 8080), `.dockerignore`, `.env.example`, `deploy/lightsail/` (templates, renderer, `deploy.sh`); proxy IPs (`trustProxy`), bounded graceful shutdown, Prisma disconnect, WebSocket 25 s heartbeat + 64 KB frame cap — verified in a local container  
+- API container scaffolding: `apps/api/Dockerfile` (node:22-bookworm-slim, linux/amd64, non-root, port 8080), `.dockerignore`, `.env.example`, Lightsail tooling in `infra/aws/` (build / push / deploy / verify / rollback); proxy IPs (`trustProxy`), bounded graceful shutdown, Prisma disconnect, WebSocket 25 s heartbeat + 64 KB frame cap — verified in a local container  

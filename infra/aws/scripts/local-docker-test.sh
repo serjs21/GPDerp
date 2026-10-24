@@ -68,51 +68,7 @@ SIZE="$(docker image ls "$IMAGE" --format '{{.Size}}')"
 
 # ---------------------------------------------------------------------------------------------
 step "2. Prepare run-time env (from apps/api/.env; local Postgres; never baked into the image)"
-(
-  cd "$API_DIR"
-  APP_ENV_FILE="$APP_ENV_FILE" NEON_ENV_FILE="$NEON_ENV_FILE" SECRETS_FILE="$SECRETS_FILE" node -e '
-    const fs = require("fs");
-    const dotenv = require("dotenv");
-    const env = dotenv.parse(fs.readFileSync(".env"));
-    const neon = fs.existsSync(".env.neon") ? dotenv.parse(fs.readFileSync(".env.neon")) : {};
-    const toDocker = (url) => url.replace(/@(localhost|127\.0\.0\.1)(?=[:/])/, "@host.docker.internal");
-    const app = {
-      ...env,
-      NODE_ENV: "production",
-      PORT: "8080",
-      DATABASE_URL: toDocker(env.DATABASE_URL),
-      DATABASE_URL_UNPOOLED: toDocker(env.DATABASE_URL_UNPOOLED || env.DATABASE_URL),
-      HAIKU_GENERATION_API: "dev",
-      // Local plain-HTTP only: production keeps Secure cookies and its own domain.
-      COOKIE_SECURE: "false",
-      COOKIE_DOMAIN: "",
-      CLIENT_URL: "http://localhost:3000",
-      // No outbound email from smoke tests.
-      SMTP_HOST: "",
-      MAIL_FROM: "",
-    };
-    for (const k of ["POSTGRES_USER","POSTGRES_PASSWORD","POSTGRES_DB","POSTGRES_HOST","POSTGRES_PORT","HOST","CORS_ORIGIN","NEON_BRANCH"]) delete app[k];
-    const line = ([k, v]) => { if (/\n/.test(v)) throw new Error("multi-line value for " + k); return k + "=" + v; };
-    fs.writeFileSync(process.env.APP_ENV_FILE, Object.entries(app).map(line).join("\n") + "\n", { mode: 0o600 });
-    if (neon.DATABASE_URL) {
-      // Same app env, Neon URLs: lets the image load its real env + Prisma singleton against Neon.
-      const neonApp = { ...app, DATABASE_URL: neon.DATABASE_URL, DATABASE_URL_UNPOOLED: neon.DATABASE_URL_UNPOOLED || neon.DATABASE_URL };
-      fs.writeFileSync(process.env.NEON_ENV_FILE, Object.entries(neonApp).map(line).join("\n") + "\n", { mode: 0o600 });
-    }
-    const secretKey = /(SECRET|PASS|PASSWORD|KEY|TOKEN|PEPPER|DATABASE_URL|PRIVATE)/;
-    // Short or digit-only values (dev placeholders) also occur in library code and would only produce noise.
-    const scannable = (v) => v.length >= 12 && !/^\d+$/.test(v);
-    const values = new Set();
-    const skipped = new Set();
-    for (const src of [env, neon]) for (const [k, v] of Object.entries(src)) {
-      if (!secretKey.test(k) || !v) continue;
-      if (scannable(v)) values.add(v); else skipped.add(k);
-    }
-    fs.writeFileSync(process.env.SECRETS_FILE, [...values].join("\n") + "\n", { mode: 0o600 });
-    console.log("INFO app env keys: " + Object.keys(app).length + ", secret values to scan: " + values.size + ", neon check: " + Boolean(neon.DATABASE_URL));
-    if (skipped.size) console.log("INFO not scanned (short or digit-only placeholder values): " + [...skipped].sort().join(", "));
-  '
-)
+node "$SCRIPTS_DIR/prepare-local-env.mjs" --app-env "$APP_ENV_FILE" --neon-env "$NEON_ENV_FILE" --secrets "$SECRETS_FILE"
 
 # ---------------------------------------------------------------------------------------------
 step "3. Start container (1 GB, port 8080 -> $HOST_PORT)"
