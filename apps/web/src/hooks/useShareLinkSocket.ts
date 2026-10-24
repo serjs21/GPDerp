@@ -11,9 +11,6 @@ import {
   SHARE_LINKS_QUERY_KEY,
   type ShareLinksInfiniteData,
 } from "./shareLinksCache";
-
-const SOCKET_URL = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:4000/ws";
-
 function parseShareLinkSocketMessage(
   raw: string,
 ):
@@ -74,9 +71,7 @@ export function useShareLinkSocket(
   );
 
   useWebSocket({
-    url: SOCKET_URL,
     enabled: active,
-    reconnect: true,
     onOpen: (ws) => {
       ws.send(JSON.stringify({ type: "subscribe", channel: "share-links" }));
     },

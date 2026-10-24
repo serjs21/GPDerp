@@ -35,6 +35,15 @@ const requireMinLengthEnv = (key: string, minLength: number) => {
   }
   return value;
 };
+const optionalNonNegativeIntEnv = (key: string, fallback: number) => {
+  const raw = process.env[key];
+  if (raw === undefined || raw === "") return fallback;
+  const parsed = Number(raw);
+  if (!Number.isInteger(parsed) || parsed < 0) {
+    throw new Error(`Invalid environment variable ${key}: expected a non-negative integer`);
+  }
+  return parsed;
+};
 const requirePaddleEnv = (key: string) => {
   const value = requireEnv(key);
   if (value !== "sandbox" && value !== "production") {
@@ -47,6 +56,8 @@ export const env = {
   PORT: Number(process.env.PORT ?? 3001),
   HOST: process.env.HOST ?? "0.0.0.0",
   CLIENT_URL: process.env.CLIENT_URL ?? "http://localhost:3000",
+  /** Proxies in front of the API whose X-Forwarded-For entry is trusted (Lightsail: its load balancer). */
+  TRUST_PROXY_HOPS: optionalNonNegativeIntEnv("TRUST_PROXY_HOPS", 1),
 
   CORS_ORIGIN: toList(process.env.CLIENT_URL ?? "http://localhost:3000"),
   CORS_METHODS: toList(process.env.CORS_METHODS ?? "GET,POST,OPTIONS,PATCH,PUT,DELETE"),

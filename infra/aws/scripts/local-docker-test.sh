@@ -7,8 +7,9 @@
 #   IMAGE=gpderp-api:local     image tag to build/test
 #   HOST_PORT=18080            host port mapped to the container's 8080
 #   SKIP_BUILD=1               reuse an existing $IMAGE
-#   TEST_EMAIL / TEST_PASSWORD local-DB user for the streamed-generation check
-#                              (unset: a disposable docker-smoke+<ts>@example.com user is created locally)
+#   TEST_EMAIL / TEST_PASSWORD local-DB user for the authenticated WebSocket checks
+#                              (unset: a disposable ws-test+<ts>@example.com user is created locally)
+#   WS_TEST_DURATION=1m        idle phase of ws-integration-test.mjs (e.g. 125m for the 5/30/120 min checkpoints)
 #
 # Requires: docker, node, curl; local Postgres (apps/api docker-compose) on localhost:5433;
 #           apps/api/.env (dev) and apps/api/.env.neon (Neon, read-only check). Secrets are never printed.
@@ -140,15 +141,16 @@ expect_status 401 GET /auth/me
 expect_status 404 GET /dev/postcard_back.png
 
 # ---------------------------------------------------------------------------------------------
-step "5. WebSocket upgrade + heartbeat, and streamed generation over the same server"
-WS_NODE_PATH="$(ls -d "$API_DIR"/node_modules/.pnpm/ws@8*/node_modules 2>/dev/null | tail -1)"
-if [ -z "$WS_NODE_PATH" ]; then
-  fail "ws package not found under apps/api/node_modules (run pnpm install in apps/api)"
+step "5. WebSocket integration test (same server/port: upgrade, auth, Origin, two tabs, stream, idle, reconnect)"
+WS_TEST_ARGS=(--api "$BASE_URL" --origin "http://localhost:3000" --duration "${WS_TEST_DURATION:-1m}"
+  --allow-writes --generate --expect-isolated)
+[ -z "${TEST_EMAIL:-}" ] && WS_TEST_ARGS+=(--provision-local-user)
+echo "\$ node infra/aws/scripts/ws-integration-test.mjs ${WS_TEST_ARGS[*]}"
+if node "$SCRIPTS_DIR/ws-integration-test.mjs" "${WS_TEST_ARGS[@]}" | sed 's/^/    /'; then
+  pass "WebSocket integration test"
 else
-  NODE_PATH="$WS_NODE_PATH" node "$SCRIPTS_DIR/stream-check.mjs" ws "$BASE_URL" || FAILURES=$((FAILURES + 1))
-  NODE_PATH="$WS_NODE_PATH" node "$SCRIPTS_DIR/stream-check.mjs" generate "$BASE_URL" || FAILURES=$((FAILURES + 1))
+  fail "WebSocket integration test (see the indented output above)"
 fi
-info "SSE: the API has no SSE routes (no text/event-stream); haiku streaming uses WebSocket deltas (checked above)."
 
 # ---------------------------------------------------------------------------------------------
 step "5b. Reconnect after dropped database connections (simulates Neon suspend / restart)"

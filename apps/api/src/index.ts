@@ -24,9 +24,22 @@ import { SHUTDOWN_TIMEOUT_MS } from "./consts/server";
 import { redactDatabaseUrls, sanitizeDbError } from "./utils/databaseUrl";
 
 const app = Fastify({
-  logger: true,
-  // Only reachable through the hosting load balancer: take the client IP from X-Forwarded-For.
-  trustProxy: true,
+  logger: {
+    // Credentials and session/tab identifiers never reach the logs, even when headers are serialized.
+    redact: {
+      paths: [
+        "req.headers.cookie",
+        "req.headers.authorization",
+        'req.headers["x-csrf-token"]',
+        'req.headers["x-tab-id"]',
+        'req.headers["sec-websocket-protocol"]',
+        'res.headers["set-cookie"]',
+      ],
+      censor: "[redacted]",
+    },
+  },
+  // Trust only the configured proxy hops (Lightsail load balancer) so X-Forwarded-For cannot be spoofed.
+  trustProxy: env.TRUST_PROXY_HOPS,
 });
 
 app.addHook("onClose", async () => {

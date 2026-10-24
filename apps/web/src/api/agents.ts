@@ -1,5 +1,7 @@
 import axios from "axios";
 import { notifyGenerationCreditsUpdated } from "@/api/payments";
+import { HAIKU_STREAM_SOCKET_WAIT_MS } from "@/consts/webSocket/webSocketConsts";
+import { getSharedSocket } from "@/utils/webSocket/sharedSocketManager";
 
 export type RunHaikuAgentResponse = {
   ok: boolean;
@@ -25,6 +27,8 @@ export function insufficientCreditsMessage(error: unknown): string | null {
 }
 
 export const runHaikuAgent = async (subject: string): Promise<RunHaikuAgentResponse> => {
+  // The stream is pushed to this tab's socket: give a (re)connecting socket a moment, but never block generation on it.
+  await getSharedSocket().whenOpen(HAIKU_STREAM_SOCKET_WAIT_MS);
   const { data } = await axios.post<RunHaikuAgentResponse>("beer_me_haiku", { subject });
   if (typeof data.creditsRemaining === "number") {
     notifyGenerationCreditsUpdated(data.creditsRemaining);

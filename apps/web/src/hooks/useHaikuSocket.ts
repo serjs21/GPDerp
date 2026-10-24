@@ -2,15 +2,15 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
-import type { HaikuDto } from "@/api/haikus";
+import { useQueryClient } from "@tanstack/react-query";
+import { haikuQueryKeys, type HaikuDto } from "@/api/haikus";
 import { HAIKU_TYPING_PIECE_SIZES } from "@/consts/haiku/haikuTypingConsts";
 import { haikuTitleTypingDurationMs, haikuTypingCharDelayMs } from "@/utils/haikuTyping/haikuTypingUtils";
 import { createTypingPacer, type TypingPacer } from "@/utils/haikuTyping/typingPacer";
+import { getSharedSocket } from "@/utils/webSocket/sharedSocketManager";
 import { formatChatTime } from "../utils/date";
 import { formatHaikuTitleText } from "../utils/strings";
 import { useWebSocket } from "./useWebSocket";
-
-const SOCKET_URL = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:4000/ws";
 
 export type GeneratingDraft = {
   requestId: string;
@@ -99,7 +99,14 @@ const emptyDraft = (requestId: string, subject: string): GeneratingDraft => ({
 
 export const useHaikuSocket = (options?: UseHaikuSocketOptions) => {
   const { onHaikuSaved } = options ?? {};
+  const queryClient = useQueryClient();
   const [generatingDraft, setGeneratingDraft] = useState<GeneratingDraft | null>(null);
+  const draftRef = useRef<GeneratingDraft | null>(null);
+  useEffect(() => {
+    draftRef.current = generatingDraft;
+  }, [generatingDraft]);
+  // Requests whose stream was cut by a reconnect: their remaining messages are ignored and REST supplies the result.
+  const abandonedRequestsRef = useRef(new Set<string>());
   // Streamed text is revealed through a pacer at the mock typing speed, whatever the chunk size.
   const pacerRef = useRef<ActivePacer | null>(null);
 
@@ -146,7 +153,7 @@ export const useHaikuSocket = (options?: UseHaikuSocketOptions) => {
   const logMessage = useCallback(
     (event: MessageEvent) => {
       const msg = parseMessage(String(event.data ?? ""));
-      if (!msg) return;
+      if (!msg || abandonedRequestsRef.current.has(msg.id)) return;
 
       if (msg.kind === "saved") {
         afterTyping(msg.id, () => {
@@ -182,18 +189,25 @@ export const useHaikuSocket = (options?: UseHaikuSocketOptions) => {
     [afterTyping, onHaikuSaved, pacerFor],
   );
 
-  const { connected, send } = useWebSocket({
-    url: SOCKET_URL,
-    enabled: true,
-    reconnect: true,
-    onMessage: logMessage,
-  });
+  const { connected, send } = useWebSocket({ onMessage: logMessage });
 
   const resetGenerating = useCallback(() => {
     pacerRef.current?.pacer.dispose();
     pacerRef.current = null;
     setGeneratingDraft(null);
   }, []);
+
+  useEffect(
+    () =>
+      getSharedSocket().onReconnected(() => {
+        const draft = draftRef.current;
+        if (!draft) return;
+        abandonedRequestsRef.current.add(draft.requestId);
+        resetGenerating();
+        void queryClient.invalidateQueries({ queryKey: haikuQueryKeys.all });
+      }),
+    [queryClient, resetGenerating],
+  );
 
   return {
     connected,

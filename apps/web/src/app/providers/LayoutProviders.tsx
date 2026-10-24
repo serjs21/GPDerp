@@ -18,6 +18,7 @@ import { NoCreditsLeftHost } from "@/components/NoCreditsLeft/NoCreditsLeftHost"
 import { PurchaseConfirmHost } from "@/components/NoCreditsLeft/PurchaseConfirmHost";
 import { ContinueGenerationOffer } from "@/components/NoCreditsLeft/ContinueGenerationOffer";
 import { GenerationCreditsSocket } from "@/hooks/useGenerationCreditsSocket";
+import { WebSocketSessionSync } from "@/components/WebSocketSessionSync";
 
 export interface LayoutProviderProps {
   children: React.ReactNode;
@@ -36,6 +37,7 @@ export const LayoutProvider = ({ children, googleClientId }: LayoutProviderProps
           <HaikuFiltersProvider>
             <>
               <AxiosInit />
+              <WebSocketSessionSync />
               <GenerationCreditsSocket />
               <NoCreditsLeftHost />
               <PurchaseConfirmHost />

@@ -1,7 +1,8 @@
 # API on AWS Lightsail Containers
 
 Production deployment of the Fastify API (`apps/api`) as a single Lightsail container.
-Local verification of the image: [local-docker-testing.md](local-docker-testing.md).
+Local verification of the image: [local-docker-testing.md](local-docker-testing.md). WebSocket behaviour, limits,
+metrics and the integration test: [websockets.md](websockets.md).
 
 ## Architecture
 
@@ -23,7 +24,8 @@ Fastify container (1 instance, Micro: 1 GB / 0.25 vCPU)
 - One HTTP server serves REST and WebSocket (`@fastify/websocket` on `/ws`); there is no separate socket server.
 - There are no SSE routes. Haiku generation streams `start` / `delta` / `saved` messages over the WebSocket while
   `POST /beer_me_haiku` is in flight.
-- WebSocket registries and in-flight generations are in process memory: **keep scale at 1**.
+- WebSocket registries and in-flight generations are in process memory: **keep scale at 1** (see
+  [websockets.md](websockets.md#multiple-replicas-limitations)).
   The server pings sockets every 25 s (keeps them alive through the load balancer, evicts dead ones).
 
 ## Image
@@ -67,7 +69,7 @@ Set on the container deployment (never in the image). The full list with placeho
 [apps/api/.env.example](../../apps/api/.env.example); the deployment template is
 [apps/api/deploy/lightsail/containers.template.json](../../apps/api/deploy/lightsail/containers.template.json).
 
-- Platform: `NODE_ENV=production`, `PORT=8080`
+- Platform: `NODE_ENV=production`, `PORT=8080`, `TRUST_PROXY_HOPS=1` (proxies whose `X-Forwarded-For` entry is trusted; the Lightsail load balancer)
 - Database: `DATABASE_URL` (Neon pooled), `DATABASE_URL_UNPOOLED` (Neon direct) — values from `apps/api/.env.neon`
 - URLs: `CLIENT_URL`, `WEB_APP_URL` (`https://gpderp.party`), `API_BASE_URL` (`https://api.gpderp.party`)
 - Cookies: `COOKIE_DOMAIN=.gpderp.party`, `COOKIE_SECURE=true`, `COOKIE_SAME_SITE=lax`
