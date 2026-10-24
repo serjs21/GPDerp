@@ -35,9 +35,12 @@ set -a
 set +a
 node deploy/lightsail/renderTemplate.mjs deploy/lightsail/containers.template.json > "$RENDERED"
 
-aws lightsail create-container-service-deployment \
+# The full response echoes every container env value (database URLs, secrets): print only the state.
+STATE="$(aws lightsail create-container-service-deployment \
   --service-name "$SERVICE" \
   --containers "file://$RENDERED" \
-  --public-endpoint "file://deploy/lightsail/public-endpoint.json"
+  --public-endpoint "file://deploy/lightsail/public-endpoint.json" \
+  --query 'containerService.state' --output text)"
 
-echo "Deployment of $LIGHTSAIL_IMAGE requested. Watch: aws lightsail get-container-services --service-name $SERVICE"
+echo "Deployment of $LIGHTSAIL_IMAGE requested (service state: $STATE)."
+echo "Watch: aws lightsail get-container-services --service-name $SERVICE --query 'containerServices[0].{state:state,deployment:currentDeployment.state}'"

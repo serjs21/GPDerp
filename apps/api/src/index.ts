@@ -21,6 +21,7 @@ import { emailPreviewDevPlugin, isEmailPreviewDevRouteEnabled } from "./modules/
 import { healthPlugin } from "./modules/health/health.controller";
 import { prismaClient } from "./lib/prisma";
 import { SHUTDOWN_TIMEOUT_MS } from "./consts/server";
+import { redactDatabaseUrls, sanitizeDbError } from "./utils/databaseUrl";
 
 const app = Fastify({
   logger: true,
@@ -123,6 +124,7 @@ process.once("SIGINT", shutdown);
 /* --------------------------- Entrypoint --------------------------- */
 
 run().catch((err) => {
-  console.error("❌ Failed to start server:", err);
+  const stack = err instanceof Error && err.stack ? redactDatabaseUrls(err.stack) : undefined;
+  console.error("❌ Failed to start server:", sanitizeDbError(err), stack ?? "");
   process.exit(1);
 });

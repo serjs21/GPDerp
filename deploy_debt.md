@@ -15,7 +15,7 @@ Frontend Worker `gpderp-party` is live at https://gpderp.party via OpenNext. The
    4. `apps/api/deploy/lightsail/deploy.sh` — builds, pushes, renders `containers.template.json` (fails on any unset variable) and deploys with `public-endpoint.json` (port 8080, health check `/healthz`).
    5. Custom domain: Lightsail → Certificates → create for `api.gpderp.party`; add the validation CNAMEs in Cloudflare DNS; attach the certificate to the service; add CNAME `api` → the service's default domain as **DNS only** (grey cloud) to start.
    6. Smoke: `curl https://api.gpderp.party/healthz` and `/readyz`, then confirm a `wss://api.gpderp.party/ws` connection stays open past 60 s (server pings every 25 s).
-   - Migrations are never run in the container: run `pnpm migrate:prod` in `apps/api` before deploying an image that needs a new migration.
+   - Migrations are never run in the container: run `pnpm migrate:status:prod`, then `pnpm migrate:prod` (asks for confirmation) in `apps/api` before deploying an image that needs a new migration.
 
 2. **Set production frontend API URLs and redeploy the Worker** (after item 1 serves `/healthz`)  
    In `apps/web` production env (build-time `NEXT_PUBLIC_*`; currently forced empty by gitignored `.env.production.local`):

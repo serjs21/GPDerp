@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { parseHaikuGenerationApi } from "./utils/haikuGenerationApi";
+import { parseDatabaseUrl } from "./utils/databaseUrl";
 
 const toList = (value: string) => value.split(",").map((s) => s.trim());
 /** Headers the web client always sends; must survive any CORS_HEADERS override. */
@@ -70,9 +71,9 @@ export const env = {
   SMTP_PASS: process.env.SMTP_PASS ?? "",
   MAIL_FROM: process.env.MAIL_FROM ?? "",
   /** Neon pooled connection (PgBouncer, `-pooler` host): app query traffic through Prisma. */
-  DATABASE_URL: requireEnv("DATABASE_URL"),
+  DATABASE_URL: parseDatabaseUrl("DATABASE_URL", requireEnv("DATABASE_URL")),
   /** Neon direct connection: Prisma Migrate and pg-boss (long-lived sessions). */
-  DATABASE_URL_UNPOOLED: requireEnv("DATABASE_URL_UNPOOLED"),
+  DATABASE_URL_UNPOOLED: parseDatabaseUrl("DATABASE_URL_UNPOOLED", requireEnv("DATABASE_URL_UNPOOLED")),
 
   COOKIE_DOMAIN: process.env.COOKIE_DOMAIN || undefined,
   COOKIE_SECURE: toBool(process.env.COOKIE_SECURE, process.env.NODE_ENV === "production"),

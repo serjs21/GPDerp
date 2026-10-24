@@ -78,6 +78,43 @@ Set on the container deployment (never in the image). The full list with placeho
 - AI: `OPENAI_API_KEY`, `HAIKU_GENERATION_API=prod`
 
 Lightsail stores these as plain deployment configuration: restrict Lightsail access with a least-privilege IAM user.
+`aws lightsail get-container-services` and the raw `create-container-service-deployment` response print every value
+(including the database URLs); `deploy.sh` and the commands below use `--query` so they never reach a terminal or CI log.
+
+## Database (Prisma 7.5 + Neon)
+
+Follows Neon's Prisma 7 setup: no `url` in `schema.prisma`, the CLI reads `DATABASE_URL_UNPOOLED` through
+[prisma.config.ts](../../apps/api/prisma.config.ts), the app uses the pooled `DATABASE_URL`. The runtime uses
+`@prisma/adapter-pg` (TCP, node-postgres) rather than Neon's serverless WebSocket adapter because the API is a
+long-lived container. `prisma`, `@prisma/client` and `@prisma/adapter-pg` are all pinned to 7.5.0.
+
+| Client | URL | Pool (per container) | Notes |
+|---|---|---|---|
+| Prisma singleton ([src/lib/prisma.ts](../../apps/api/src/lib/prisma.ts)) | `DATABASE_URL` (pooler) | max 5, idle 30 s, connect timeout 15 s, keep-alive | `application_name=gpderp-api` |
+| pg-boss (postcard queue) | `DATABASE_URL_UNPOOLED` (direct) | max 3, idle 10 s, connect timeout 10 s | `application_name=pgboss`; needs session features, so not the pooler |
+| Prisma CLI (migrations, workstation only) | `DATABASE_URL_UNPOOLED` | — | never runs in the container |
+
+Values live in [src/consts/database.ts](../../apps/api/src/consts/database.ts). At most 3 direct sessions per
+container (6 briefly during a deploy while old and new containers overlap), far below a 0.25 CU compute's
+`max_connections`; the pooled side is multiplexed by PgBouncer.
+
+- **TLS:** for every non-local host the runtime pins `sslmode=verify-full` (certificate + hostname verified) and
+  refuses `disable` / `allow` / `prefer` ([src/utils/databaseUrl.ts](../../apps/api/src/utils/databaseUrl.ts)).
+  The env values can keep Neon's default `sslmode=require&channel_binding=require`.
+- **Scale to zero:** idle sockets close after 30 s (before Neon suspends an idle compute after 5 min), dropped
+  sockets are evicted by the pool's error handler (logged as `[prisma] pool error {code, message}` without URLs) and
+  the next query reconnects, waiting up to 15 s for the compute to wake. Queries are not retried automatically
+  (writes are not idempotent); `/readyz` shows the current state. pg-boss polls every few seconds, which keeps the
+  compute awake while the API runs — expect it to bill compute time continuously.
+- **Logging:** database URLs are validated without echoing their values, and startup / pool / pg-boss errors are
+  logged as code + message with any `postgres://…` redacted.
+
+Read-only connection check (Prisma singleton, TLS protocol/cipher, masked host):
+
+```bash
+cd apps/api
+sh -c 'set -a && . ./.env.neon && set +a && pnpm check-db'
+```
 
 ## Deploy
 
@@ -119,13 +156,22 @@ Then log in on https://gpderp.party, generate a haiku (WebSocket deltas arrive) 
 ## Database migrations
 
 Migrations never run on container start. Apply them from a workstation (or CI) **before** deploying an image that
-needs them, over the direct Neon URL:
+needs them, with [scripts/migrate-deploy-prod.sh](../../apps/api/scripts/migrate-deploy-prod.sh):
 
 ```bash
 cd apps/api
-pnpm migrate:prod        # sources .env.neon, runs prisma migrate deploy
-npx prisma migrate status
+pnpm migrate:status:prod                        # read-only; exit 0 = up to date, 2 = pending
+pnpm migrate:prod                               # status, then type the database name to confirm, then deploy
+CONFIRM_PROD_MIGRATE=neondb pnpm migrate:prod   # non-interactive (CI)
 ```
+
+The script reads only `DATABASE_URL_UNPOOLED` from `.env.neon` (override with `MIGRATE_ENV_FILE`), refuses a
+`-pooler` host or a URL without TLS, stops on failed migrations / drift / connectivity errors, and redacts URLs and
+the Neon endpoint id from its output. It only runs `prisma migrate status` and `prisma migrate deploy` — never
+`db push`, `migrate reset`, `migrate dev` or seeds. Optionally create a Neon branch (point-in-time backup) in the
+console before applying a destructive migration.
+
+Status at the time of writing: 31 migrations in `prisma/migrations`, all applied on Neon (`Database schema is up to date!`).
 
 Write migrations to be compatible with the previous image (expand first, contract in a later release) so the old
 container keeps working during the switch.
@@ -133,7 +179,8 @@ container keeps working during the switch.
 ## Operations
 
 - Logs: `aws lightsail get-container-log --service-name gpderp-api --container-name api`
-- State: `aws lightsail get-container-services --service-name gpderp-api`
+- State: `aws lightsail get-container-services --service-name gpderp-api --query 'containerServices[0].{state:state,deployment:currentDeployment.state}'`
+  (without `--query` the output includes every env value)
 - Rollback: redeploy a previous image label (`aws lightsail get-container-images --service-name gpderp-api`), using
   the same env, e.g. `LIGHTSAIL_IMAGE=:gpderp-api.api.<n>` with the rendered template.
 - Scale up resources (not instances) if login latency or memory is tight: `--power small` (2 GB / 0.5 vCPU).

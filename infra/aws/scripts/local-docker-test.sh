@@ -94,8 +94,9 @@ step "2. Prepare run-time env (from apps/api/.env; local Postgres; never baked i
     const line = ([k, v]) => { if (/\n/.test(v)) throw new Error("multi-line value for " + k); return k + "=" + v; };
     fs.writeFileSync(process.env.APP_ENV_FILE, Object.entries(app).map(line).join("\n") + "\n", { mode: 0o600 });
     if (neon.DATABASE_URL) {
-      fs.writeFileSync(process.env.NEON_ENV_FILE,
-        "NEON_POOLED=" + neon.DATABASE_URL + "\nNEON_DIRECT=" + (neon.DATABASE_URL_UNPOOLED || neon.DATABASE_URL) + "\n", { mode: 0o600 });
+      // Same app env, Neon URLs: lets the image load its real env + Prisma singleton against Neon.
+      const neonApp = { ...app, DATABASE_URL: neon.DATABASE_URL, DATABASE_URL_UNPOOLED: neon.DATABASE_URL_UNPOOLED || neon.DATABASE_URL };
+      fs.writeFileSync(process.env.NEON_ENV_FILE, Object.entries(neonApp).map(line).join("\n") + "\n", { mode: 0o600 });
     }
     const secretKey = /(SECRET|PASS|PASSWORD|KEY|TOKEN|PEPPER|DATABASE_URL|PRIVATE)/;
     // Short or digit-only values (dev placeholders) also occur in library code and would only produce noise.
@@ -150,22 +151,68 @@ fi
 info "SSE: the API has no SSE routes (no text/event-stream); haiku streaming uses WebSocket deltas (checked above)."
 
 # ---------------------------------------------------------------------------------------------
-step "6. Prisma queries against Neon (read-only, from inside the image)"
+step "5b. Reconnect after dropped database connections (simulates Neon suspend / restart)"
+curl -fsS "$BASE_URL/readyz" >/dev/null 2>&1 || true
+TERMINATED="$(docker exec -e NODE_NO_WARNINGS=1 "$CONTAINER" node -e '
+  const { Client } = require("pg");
+  (async () => {
+    const c = new Client({ connectionString: process.env.DATABASE_URL_UNPOOLED });
+    await c.connect();
+    const { rows } = await c.query(
+      "SELECT count(pg_terminate_backend(pid))::int AS n FROM pg_stat_activity WHERE application_name IN ($1, $2) AND pid <> pg_backend_pid()",
+      ["gpderp-api", "pgboss"]);
+    await c.end();
+    process.stdout.write(String(rows[0].n));
+  })().catch((e) => { console.error(e.code || e.message); process.exit(1); });
+' || echo "error")"
+if [ "$TERMINATED" = "error" ] || [ -z "$TERMINATED" ]; then
+  fail "could not terminate the app's database sessions"
+else
+  info "terminated $TERMINATED app/pg-boss database session(s)"
+  RECOVERED=""
+  for attempt in $(seq 1 15); do
+    if [ "$(curl -s -o /dev/null -w '%{http_code}' "$BASE_URL/readyz")" = "200" ]; then RECOVERED="$attempt"; break; fi
+    sleep 1
+  done
+  sleep 3
+  RUNNING="$(docker inspect -f '{{.State.Running}}' "$CONTAINER")"
+  if [ -n "$RECOVERED" ] && [ "$RUNNING" = "true" ]; then
+    pass "/readyz 200 again on attempt $RECOVERED; process still running (pool evicted dead sockets and reconnected)"
+  else
+    fail "no recovery after dropped connections (readyz attempt: ${RECOVERED:-none}, running: $RUNNING)"
+  fi
+  expect_status 200 GET "/auth/check-username?username=docker_smoke_reconnect"
+fi
+
+# ---------------------------------------------------------------------------------------------
+step "6. Neon through the app's Prisma singleton + TLS (read-only, from inside the image)"
 if [ -s "$NEON_ENV_FILE" ]; then
   if docker run --rm --platform linux/amd64 --env-file "$NEON_ENV_FILE" -e NODE_NO_WARNINGS=1 "$IMAGE" node -e '
-    const { PrismaClient } = require("./dist/generated/prisma");
-    const { PrismaPg } = require("@prisma/adapter-pg");
+    const { Client } = require("pg");
+    const { env } = require("./dist/env");
+    const { prismaClient } = require("./dist/lib/prisma");
+    const { describeDatabaseUrl, withVerifiedTls } = require("./dist/utils/databaseUrl");
     (async () => {
-      for (const [label, url] of [["pooled", process.env.NEON_POOLED], ["direct", process.env.NEON_DIRECT]]) {
-        const prisma = new PrismaClient({ adapter: new PrismaPg(url) });
-        const started = Date.now();
-        const [{ ok }] = await prisma.$queryRaw`SELECT 1::int AS ok`;
-        const users = await prisma.user.count();
-        const haikus = await prisma.haiku.count();
-        console.log("PASS Neon " + label + " (" + new URL(url).hostname + "): SELECT 1=" + ok + ", users=" + users + ", haikus=" + haikus + " in " + (Date.now() - started) + "ms");
-        await prisma.$disconnect();
+      const started = Date.now();
+      const [{ ok }] = await prismaClient.$queryRaw`SELECT 1::int AS ok`;
+      const users = await prismaClient.user.count();
+      const haikus = await prismaClient.haiku.count();
+      console.log("PASS Neon via app Prisma singleton (" + describeDatabaseUrl(env.DATABASE_URL) + "): SELECT 1=" + ok +
+        ", users=" + users + ", haikus=" + haikus + " in " + (Date.now() - started) + "ms");
+      await prismaClient.$disconnect();
+      for (const [label, url] of [["pooled", env.DATABASE_URL], ["direct", env.DATABASE_URL_UNPOOLED]]) {
+        const client = new Client({ connectionString: withVerifiedTls(url), connectionTimeoutMillis: 15000 });
+        await client.connect();
+        const socket = client.connection.stream;
+        const tls = { encrypted: socket.encrypted, authorized: socket.authorized, protocol: socket.getProtocol?.(), cipher: socket.getCipher?.()?.name };
+        await client.query("SELECT 1");
+        await client.end();
+        // Neon terminates TLS at its proxy, so server-side pg_stat_ssl reports false; the client socket is what counts.
+        if (!tls.encrypted || !tls.authorized) throw new Error(label + " connection is not TLS-verified");
+        console.log("PASS Neon " + label + " TLS (" + describeDatabaseUrl(url) + "): " + tls.protocol + " " +
+          tls.cipher + ", certificate + hostname verified");
       }
-    })().catch((e) => { console.error("FAIL Neon query: " + e.message); process.exit(1); });
+    })().catch((e) => { console.error("FAIL Neon check: " + (e.code || "") + " " + e.message.replace(/postgres(ql)?:\/\/\S+/g, "<redacted>")); process.exit(1); });
   '; then :; else FAILURES=$((FAILURES + 1)); fi
 else
   info "SKIP Neon check: apps/api/.env.neon not found"
@@ -201,6 +248,16 @@ if [ "$EXIT_CODE" = "0" ] && docker logs "$CONTAINER" 2>&1 | grep -q "SIGTERM re
 else
   fail "shutdown exit code $EXIT_CODE after ${STOP_SECONDS}s"; docker logs "$CONTAINER" 2>&1 | tail -10
 fi
+
+# ---------------------------------------------------------------------------------------------
+step "9. Container logs contain no database URLs or secret values"
+docker logs "$CONTAINER" > "$TMP_DIR/container.log" 2>&1
+URL_HITS="$(grep -c -E 'postgres(ql)?://' "$TMP_DIR/container.log" || true)"
+SECRET_HITS="$(grep -c -F -f "$SECRETS_FILE" "$TMP_DIR/container.log" || true)"
+DB_ERROR_LINES="$(grep -c -E '\[prisma\] (pool|connection) error' "$TMP_DIR/container.log" || true)"
+[ "$URL_HITS" = "0" ] && pass "no postgres:// URLs in $(wc -l < "$TMP_DIR/container.log" | tr -d ' ') log lines" || fail "logs contain $URL_HITS line(s) with a postgres:// URL"
+[ "$SECRET_HITS" = "0" ] && pass "no secret values in logs" || fail "logs matched $SECRET_HITS secret value line(s)"
+info "sanitized database pool/connection error lines logged during the reconnect check: $DB_ERROR_LINES"
 
 echo
 if [ "$FAILURES" -eq 0 ]; then

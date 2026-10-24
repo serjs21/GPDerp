@@ -12,7 +12,9 @@ import {
   POSTCARD_EMAIL_RETRY_LIMIT,
   POSTCARD_QUEUE_SCHEMA,
 } from "../../consts/postcardQueue";
+import { PG_BOSS_POOL_MAX } from "../../consts/database";
 import { postgresConnectionString } from "../../lib/postgresConnectionString";
+import { sanitizeDbError } from "../../utils/databaseUrl";
 import { postcardBatchRepository } from "./postcardBatch.repository";
 import {
   processPostcardEmailDeadLetter,
@@ -54,8 +56,13 @@ export async function startPostcardQueue(): Promise<void> {
   if (boss) return;
   // pg-boss is ESM-only; the API compiles to CommonJS.
   const { PgBoss: PgBossClass } = await import("pg-boss");
-  const instance = new PgBossClass({ connectionString: postgresConnectionString(), schema: POSTCARD_QUEUE_SCHEMA });
-  instance.on("error", (err) => console.error(LOG_PREFIX, err));
+  // pg-boss's own pool defaults (10s connect timeout, pg's 10s idle timeout) already sit well inside Neon's suspend window.
+  const instance = new PgBossClass({
+    connectionString: postgresConnectionString(),
+    schema: POSTCARD_QUEUE_SCHEMA,
+    max: PG_BOSS_POOL_MAX,
+  });
+  instance.on("error", (err) => console.error(LOG_PREFIX, sanitizeDbError(err)));
   await instance.start();
 
   await ensureQueue(instance, POSTCARD_EMAIL_DLQ, DLQ_OPTIONS);
