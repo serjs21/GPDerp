@@ -23,8 +23,14 @@ export async function completeRegistrationUsername(body: { userName: string }): 
   await axios.post("/auth/complete-registration", body);
 }
 
+/** Sign in only: answers 409 GOOGLE_SIGNUP_REQUIRED when no account exists for this Google identity. */
 export async function loginWithGoogleCredential(credential: string): Promise<void> {
   await axios.post("/auth/google/login", { token: credential });
+}
+
+/** Sign up (or sign in): creates the account on first use, with a username derived from the email. */
+export async function signUpWithGoogleCredential(credential: string): Promise<void> {
+  await axios.post("/auth/google", { token: credential });
 }
 
 export type PostDebugAuthLogBody = {

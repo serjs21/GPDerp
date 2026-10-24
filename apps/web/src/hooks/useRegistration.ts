@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   fetchUsernameAvailability,
-  loginWithGoogleCredential,
   registerWithEmailAndPassword,
+  signUpWithGoogleCredential,
 } from "@/api/authentication";
 
 export const MIN_USERNAME_LENGTH = 3;
@@ -59,7 +59,7 @@ export function useRegistration({ onSuccess, afterAccountCreated }: UseRegistrat
   const signUpWithGoogle = async (credential: string | undefined) => {
     if (!credential) return;
     try {
-      await loginWithGoogleCredential(credential);
+      await signUpWithGoogleCredential(credential);
       onSuccess();
     } catch {
       comicToast.error(t("googleSignInFailed"));
