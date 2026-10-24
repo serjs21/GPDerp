@@ -10,6 +10,7 @@ import {
   diffEnvironments,
   environmentFromCurrent,
   environmentFromEnvFile,
+  invalidValues,
   loadManifest,
   missingRequired,
   parseEnvFile,
@@ -19,8 +20,19 @@ const TOOL = fileURLToPath(new URL("./lightsail-config.mjs", import.meta.url));
 const manifest = loadManifest();
 const SECRET = "s3cr3t-value-that-must-never-print";
 
-const completeEnv = () =>
-  Object.fromEntries(manifest.variables.filter((v) => v.required).map((v) => [v.name, `${SECRET}-${v.name}`]));
+/** A valid production-shaped value per rule; secrets carry the SECRET marker so leaks are detectable. */
+const validValue = (name) => {
+  const rule = manifest.rules?.[name] ?? "";
+  if (rule === "postgres-pooled") return `postgresql://app:${SECRET}@ep-x-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require`;
+  if (rule === "postgres-direct") return `postgresql://app:${SECRET}@ep-x.us-east-2.aws.neon.tech/neondb?sslmode=require`;
+  if (rule.startsWith("https-url")) return "https://gpderp.example";
+  if (rule.startsWith("min-length")) return `${SECRET}-${SECRET}`;
+  if (rule === "positive-int" || rule === "non-negative-int") return "900";
+  if (rule.startsWith("one-of:")) return rule.slice(7).split(",")[0];
+  return `${SECRET}-${name}`;
+};
+
+const completeEnv = () => Object.fromEntries(manifest.variables.filter((v) => v.required).map((v) => [v.name, validValue(v.name)]));
 
 const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), "ls-config-"));
 
@@ -114,4 +126,56 @@ test("CLI fails safely when required config is missing", () => {
   assert.equal(current.status, 1);
   assert.match(current.stderr, /no deployment/);
   execFileSync("rm", ["-rf", dir]);
+});
+
+test("rules reject production-unsafe values by name only", () => {
+  const base = { ...manifest.defaults, ...completeEnv() };
+  assert.deepEqual(invalidValues(manifest, base), []);
+  const cases = {
+    DATABASE_URL: ["postgresql://u:p@localhost:5433/db?sslmode=require", /local database/],
+    DATABASE_URL_UNPOOLED: [base.DATABASE_URL, /direct host/],
+    CLIENT_URL: ["http://localhost:3000", /https/],
+    JWT_ACCESS_SECRET: ["short", /at least 32/],
+    PADDLE_ENV: ["live", /one of sandbox,production/],
+    NODE_ENV: ["development", /locked/],
+    PORT: ["3000", /locked/],
+    COOKIE_SECURE: ["false", /locked/],
+  };
+  for (const [name, [value, reason]] of Object.entries(cases)) {
+    const problems = invalidValues(manifest, { ...base, [name]: value });
+    assert.equal(problems.length, 1, `${name}: ${problems}`);
+    assert.match(problems[0], new RegExp(`^${name}: `));
+    assert.match(problems[0], reason);
+    assert.ok(!problems[0].includes(value) || value.length < 6, "a rejected value was echoed");
+  }
+  const insecure = { ...base, DATABASE_URL: base.DATABASE_URL.replace("sslmode=require", "sslmode=disable") };
+  assert.match(invalidValues(manifest, insecure)[0], /sslmode/);
+});
+
+test("later deployments refuse overrides that would break production (dev env file by mistake)", () => {
+  const dir = tmp();
+  const deployment = path.join(dir, "current.json");
+  fs.writeFileSync(deployment, JSON.stringify({ version: 4, containers: { api: { image: ":x.api.4", environment: { ...manifest.defaults, ...completeEnv() } } } }));
+  const devFile = path.join(dir, "dev.env");
+  fs.writeFileSync(devFile, `NODE_ENV=development\nDATABASE_URL=postgresql://u:${SECRET}@localhost:5433/db\nCLIENT_URL=http://localhost:3000\n`);
+  const out = path.join(dir, "next.json");
+  const result = run(["from-current", "--current", deployment, "--image", ":x.api.5", "--overrides", devFile, "--out", out]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /NODE_ENV: locked/);
+  assert.match(result.stderr, /DATABASE_URL: points at a local database/);
+  assert.match(result.stderr, /CLIENT_URL: must be an https/);
+  assert.ok(!`${result.stdout}${result.stderr}`.includes(SECRET));
+  assert.ok(!fs.existsSync(out), "nothing may be written for a refused deployment");
+});
+
+test("redact hides every sensitive value of a config in arbitrary text", () => {
+  const dir = tmp();
+  const env = { ...manifest.defaults, ...completeEnv() };
+  const containers = path.join(dir, "containers.json");
+  fs.writeFileSync(containers, JSON.stringify({ api: { image: ":x", environment: env } }));
+  const text = `error for ${env.DATABASE_URL} and key ${env.OPENAI_API_KEY} on port ${env.PORT}`;
+  const result = spawnSync("node", [TOOL, "redact", "--containers", containers], { input: text, encoding: "utf8" });
+  assert.equal(result.status, 0, result.stderr);
+  assert.ok(!result.stdout.includes(SECRET));
+  assert.match(result.stdout, /error for <redacted> and key <redacted> on port 8080/);
 });

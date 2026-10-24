@@ -12,7 +12,7 @@ Related: [local-docker-testing.md](local-docker-testing.md) (full local image te
 | [push.sh](push.sh) | `push-container-image` (label `api`), prints the stored image id | uploads an image |
 | [deploy.sh](deploy.sh) | composes the config, shows a names-only diff, **asks for confirmation**, deploys, waits, verifies | yes (confirmed) |
 | [verify.sh](verify.sh) | deployment ACTIVE, HTTPS REST, DB via `/readyz`, WSS integration test, container logs | no |
-| [rollback.sh](rollback.sh) | redeploys a previous version's configuration (**asks for confirmation**), verifies | yes (confirmed) |
+| [rollback.sh](rollback.sh) | redeploys a previous version's image with the current configuration (**asks for confirmation**), verifies | yes (confirmed) |
 | [release.sh](release.sh) | `build` → `push` → `deploy` (confirmation) → `verify` | yes (confirmed) |
 
 None of the scripts creates, resizes or deletes a Lightsail service, deletes images or deployments, or runs Prisma
@@ -119,7 +119,8 @@ a build argument. Uncommitted changes in `apps/api` produce a `-dirty` tag (with
 
 The smoke test runs the image (amd64 emulation, 1 GB limit) against the local Postgres, requires `/healthz` and
 `/readyz` to return 200, checks that the image carries no runtime env and no `.env` files, and checks a clean
-SIGTERM shutdown. The full local suite (REST, WebSockets, Neon read-only, secret scan) is
+SIGTERM shutdown. Before that, the image history and an export of its filesystem are scanned for every secret value
+in `apps/api/.env`, `.env.neon` and `.env.lightsail` (counts only; the build fails on any hit). The full local suite (REST, WebSockets, Neon read-only, secret scan) is
 `infra/aws/scripts/local-docker-test.sh`.
 
 ## 6. Push an image
@@ -168,10 +169,45 @@ AWS_PROFILE=gpderp-deployer infra/aws/release.sh
 ```
 
 `deploy.sh` reads the **current** deployment's configuration (into a private 0600 temp file, never printed), keeps
-every value, and only swaps the image. To change configuration, pass an env file containing just the variables to
-change: `infra/aws/deploy.sh --env-file /path/to/changes.env` — empty values never overwrite existing ones, and the
-deployment is refused if any required variable would be missing. Before confirming you see the image change and the
-variable names added / removed / changed. Non-interactive confirmation: `CONFIRM_DEPLOY=container-service-1`.
+every value, and only swaps the image. Before approving you see the image change and the variable names
+added / removed / changed (never values). Approval: type the service name, or for non-interactive runs set
+`CONFIRM_DEPLOY` to the exact change the script names, e.g. `CONFIRM_DEPLOY=container-service-1:deploy-3`
+(`deploy-3+env` when the environment changes) — a leftover value can never approve a different change.
+
+A deployment is **refused** (nothing changed in AWS) when a required variable is missing or empty, a locked value
+(`NODE_ENV=production`, `PORT=8080`, `COOKIE_SECURE=true`) would change, or a value breaks a rule in
+[config/runtime-env.json](config/runtime-env.json): `DATABASE_URL` must be the Neon `-pooler` host and
+`DATABASE_URL_UNPOOLED` the direct host, both non-local with `sslmode=require|verify-full`; public URLs must be https
+and not localhost; `JWT_ACCESS_SECRET` ≥ 32 and `TOKEN_HASH_PEPPER` ≥ 16 characters; TTLs and ports positive
+integers; `PADDLE_ENV` `sandbox|production`. Errors name the variable and the rule, never the value.
+
+### Updating environment variables safely
+
+1. Put **only the variables to change** in a private file outside git (or a gitignored path), `chmod 600`:
+
+   ```bash
+   umask 077; printf 'OPENAI_API_KEY=%s\n' "$NEW_KEY" > /tmp/api-env-change.env
+   ```
+
+2. Dry run — reads AWS, validates, shows which names change:
+
+   ```bash
+   AWS_PROFILE=gpderp infra/aws/deploy.sh --image :container-service-1.api.<current N> --env-file /tmp/api-env-change.env --dry-run
+   ```
+
+3. Apply (same image, new environment; approve when asked), then delete the file:
+
+   ```bash
+   AWS_PROFILE=gpderp infra/aws/deploy.sh --image :container-service-1.api.<current N> --env-file /tmp/api-env-change.env
+   rm /tmp/api-env-change.env
+   ```
+
+Rules: every other variable keeps its current production value; empty values (`NAME=`) are ignored and never clear
+a variable; names not listed in `config/runtime-env.json` are ignored; a full env file (e.g. `.env.lightsail`) also
+works but overwrites every non-empty value it contains, including values changed in the console since. To **add** a
+new variable, add it to `config/runtime-env.json` first. Removing a variable is not supported by the scripts (use the
+console). Console changes are kept by later `deploy.sh` runs (they become the current configuration) but must still
+pass the rules above. `apps/api/.env.lightsail` is only read for the first deployment or when passed explicitly.
 
 Lightsail keeps serving the previous deployment until the new one passes its health check; a `FAILED` deployment
 leaves the old one active.
@@ -211,10 +247,14 @@ infra/aws/rollback.sh                 # lists versions, marks the current one, a
 infra/aws/rollback.sh --version 3     # or pick directly; --dry-run shows the change only
 ```
 
-Restores the selected previous successful deployment's image, environment and endpoint as a **new** deployment
-(after showing names-only differences and asking for confirmation), waits for `ACTIVE` and runs `verify.sh`. Data is
-never touched and **migrations are not reverted** — an older image must still work with the current schema (write
-migrations expand-first, see below). No deployment version or image is deleted.
+Redeploys the selected previous successful deployment's **image** with the **current** environment and endpoint as a
+**new** deployment (after showing names-only differences and asking for approval; non-interactive:
+`CONFIRM_DEPLOY=container-service-1:rollback-<N>`), waits for `ACTIVE` and runs `verify.sh`. Keeping the current
+environment means rotated secrets and newly added variables are not undone. `--restore-config` also restores that
+version's environment (old secret values included) — only for when the configuration itself is the problem (approval
+token `rollback-<N>+config`). Both modes validate the configuration first. Data is never touched and **migrations are
+not reverted** — an older image must still work with the current schema (write migrations expand-first, see below).
+No deployment version or image is deleted.
 
 ## 12. Troubleshooting
 

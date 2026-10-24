@@ -41,10 +41,21 @@ ENV_FILES="$(docker run --rm --platform linux/amd64 --entrypoint sh "$IMAGE" -c 
 [ -z "$ENV_FILES" ] || die "env files inside the image: $ENV_FILES"
 ok "no .env / .neon files in the image"
 
+step "Secret scan (image history + filesystem vs. values in apps/api/.env, .env.neon, .env.lightsail)"
+make_private_tmp
+node "$AWS_DIR/scripts/prepare-local-env.mjs" --app-env "$PRIVATE_TMP/app.env" --secrets "$PRIVATE_TMP/secrets.txt" >"$PRIVATE_TMP/prepare.log" ||
+  die "could not collect secret values to scan for"
+grep -v '^INFO app env' "$PRIVATE_TMP/prepare.log" || true
+HISTORY_HITS="$(docker history --no-trunc --format '{{.CreatedBy}}' "$IMAGE" | grep -c -F -f "$PRIVATE_TMP/secrets.txt" || true)"
+[ "$HISTORY_HITS" = "0" ] || die "image history contains $HISTORY_HITS secret value(s) (values not shown)"
+SCAN_CID="$(docker create --platform linux/amd64 "$IMAGE")"
+FS_HITS="$(docker export "$SCAN_CID" | grep -a -c -F -f "$PRIVATE_TMP/secrets.txt" || true)"
+docker rm "$SCAN_CID" >/dev/null
+[ "$FS_HITS" = "0" ] || die "image filesystem contains $FS_HITS line(s) with secret values (values not shown)"
+ok "no secret value in any image layer or file ($(grep -c . "$PRIVATE_TMP/secrets.txt" || true) values checked)"
+
 if [ "$SMOKE" = "1" ]; then
   step "Local smoke test (local Postgres; nothing is sent to AWS)"
-  make_private_tmp
-  node "$AWS_DIR/scripts/prepare-local-env.mjs" --app-env "$PRIVATE_TMP/app.env" >/dev/null
   CONTAINER="gpderp-api-build-smoke-$$"
   trap 'docker rm -f "$CONTAINER" >/dev/null 2>&1 || true; rm -rf "$PRIVATE_TMP"' EXIT
   PORT_ON_HOST="${SMOKE_PORT:-18081}"

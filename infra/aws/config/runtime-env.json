@@ -10,6 +10,26 @@
     "DEBUG_AUTH_LOGS": "false",
     "HAIKU_GENERATION_API": "prod"
   },
+  "$locked": "Defaults that no env file or current deployment may change (the container listens on 8080 behind HTTPS).",
+  "locked": ["NODE_ENV", "PORT", "COOKIE_SECURE"],
+  "$rules": "Value checks run before every deployment; failures name the variable and the rule, never the value.",
+  "rules": {
+    "DATABASE_URL": "postgres-pooled",
+    "DATABASE_URL_UNPOOLED": "postgres-direct",
+    "CLIENT_URL": "https-url-list",
+    "WEB_APP_URL": "https-url",
+    "API_BASE_URL": "https-url",
+    "R2_PUBLIC_BASE_URL": "https-url",
+    "JWT_ACCESS_SECRET": "min-length:32",
+    "TOKEN_HASH_PEPPER": "min-length:16",
+    "ACCESS_TOKEN_TTL_SECONDS": "positive-int",
+    "REFRESH_TOKEN_TTL_SECONDS": "positive-int",
+    "SESSION_TTL_SECONDS": "positive-int",
+    "SMTP_PORT": "positive-int",
+    "TRUST_PROXY_HOPS": "non-negative-int",
+    "PADDLE_ENV": "one-of:sandbox,production",
+    "HAIKU_GENERATION_API": "one-of:prod,dev"
+  },
   "variables": [
     { "name": "DATABASE_URL", "required": true, "secret": true, "description": "Neon pooled connection (-pooler host), Prisma runtime" },
     { "name": "DATABASE_URL_UNPOOLED", "required": true, "secret": true, "description": "Neon direct connection, pg-boss" },

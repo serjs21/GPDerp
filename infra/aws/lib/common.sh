@@ -61,14 +61,25 @@ local_image_tag() {
   echo "$LOCAL_IMAGE_REPO:$sha"
 }
 
-# Requires the operator to type the service name (or CONFIRM_DEPLOY=<service> for non-interactive runs).
-confirm_service() {
-  local prompt="$1" answer="${CONFIRM_DEPLOY:-}"
-  if [ -z "$answer" ]; then
-    [ -t 0 ] || die "confirmation required: re-run interactively or set CONFIRM_DEPLOY=$LIGHTSAIL_SERVICE"
-    read -r -p "$prompt Type the service name ($LIGHTSAIL_SERVICE) to continue: " answer
+# Explicit approval for one specific production change. Interactive: type the service name.
+# Non-interactive: CONFIRM_DEPLOY must name THIS change (e.g. container-service-1:deploy-3), so a value
+# left in the environment can never approve a different deployment or rollback.
+confirm_change() {
+  local prompt="$1" change="$2" expected answer
+  expected="$LIGHTSAIL_SERVICE:$change"
+  if [ -n "${CONFIRM_DEPLOY:-}" ]; then
+    [ "$CONFIRM_DEPLOY" = "$expected" ] || die "CONFIRM_DEPLOY does not match this change (expected $expected); nothing changed"
+    info "approved non-interactively for $expected"
+    return 0
   fi
-  [ "$answer" = "$LIGHTSAIL_SERVICE" ] || die "not confirmed; nothing changed"
+  [ -t 0 ] || die "explicit approval required: re-run interactively or set CONFIRM_DEPLOY=$expected"
+  read -r -p "$prompt Type the service name ($LIGHTSAIL_SERVICE) to approve: " answer
+  [ "$answer" = "$LIGHTSAIL_SERVICE" ] || die "not approved; nothing changed"
+}
+
+# Pattern redaction plus every sensitive value of the given config file (secrets, DB URLs).
+redact_with() {
+  redact | node "$CONFIG_TOOL" redact --containers "$1"
 }
 
 # Read-only checks before any push/deploy. Never creates, resizes or deletes anything.

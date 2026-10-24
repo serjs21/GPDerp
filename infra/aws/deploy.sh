@@ -10,6 +10,9 @@
 #                      every required variable in config/runtime-env.json must be set.
 #   later deployments  the CURRENT deployment's environment is kept as is; --env-file (explicit only)
 #                      overrides just the non-empty values it contains. Empty values never overwrite.
+# Refused (nothing changed) when a required variable is missing/empty, a locked value (NODE_ENV, PORT,
+# COOKIE_SECURE) would change, or a value breaks a rule in config/runtime-env.json.
+# Approval: type the service name, or CONFIRM_DEPLOY=container-service-1:deploy-<N>[+env] for this change only.
 # Values are only written to a private temp file for the AWS call and are never printed.
 set -euo pipefail
 . "$(dirname "$0")/lib/common.sh"
@@ -85,11 +88,19 @@ if [ "$DRY_RUN" = "1" ]; then
 fi
 
 step "Deploy to $LIGHTSAIL_SERVICE ($AWS_REGION) — production"
-confirm_service "Deploy $IMAGE to $SERVICE_URL?"
-# --query keeps the response (which echoes every environment value) off the terminal.
+# The approval names the image version and whether the environment changes, e.g. deploy-3 / deploy-3+env.
+ENV_CHANGE="$(node -e '
+  const fs = require("fs"); const [cur, next, name] = process.argv.slice(1);
+  const a = JSON.parse(fs.readFileSync(cur, "utf8"))?.containers?.[name]?.environment ?? null;
+  const b = JSON.parse(fs.readFileSync(next, "utf8"))[name].environment;
+  const same = a && JSON.stringify(Object.entries(a).sort()) === JSON.stringify(Object.entries(b).sort());
+  process.stdout.write(same ? "" : "+env");' "$CURRENT" "$NEXT" "$CONTAINER_NAME")"
+confirm_change "Deploy $IMAGE${ENV_CHANGE:+ with environment changes} to $SERVICE_URL?" "deploy-${IMAGE##*.}$ENV_CHANGE"
+# --query keeps the response (which echoes every environment value) off the terminal; errors are
+# redacted by pattern and by the actual values being deployed.
 STATE="$(aws_ls create-container-service-deployment --service-name "$LIGHTSAIL_SERVICE" \
   --containers "file://$NEXT" --public-endpoint "file://$PUBLIC_ENDPOINT_FILE" \
-  --query 'containerService.state' --output text 2>&1)" || die "create-container-service-deployment failed: $(echo "$STATE" | redact | tail -3)"
+  --query 'containerService.state' --output text 2>&1)" || die "create-container-service-deployment failed: $(echo "$STATE" | redact_with "$NEXT" | tail -3)"
 NEW_VERSION="$(aws_ls get-container-service-deployments --service-name "$LIGHTSAIL_SERVICE" --query 'max(deployments[].version)' --output text)"
 ok "deployment $NEW_VERSION requested (service state $STATE)"
 DEPLOY_STARTED="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -97,7 +108,7 @@ DEPLOY_STARTED="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 if ! wait_for_deployment "$NEW_VERSION"; then
   warn "recent container log lines:"
   aws_ls get-container-log --service-name "$LIGHTSAIL_SERVICE" --container-name "$CONTAINER_NAME" \
-    --start-time "$DEPLOY_STARTED" --query 'logEvents[-30:].message' --output text 2>/dev/null | tr '\t' '\n' | redact || true
+    --start-time "$DEPLOY_STARTED" --query 'logEvents[-30:].message' --output text 2>/dev/null | tr '\t' '\n' | redact_with "$NEXT" || true
   die "deployment $NEW_VERSION did not become ACTIVE; Lightsail keeps serving the previous deployment (if any). See infra/aws/README.md#troubleshooting"
 fi
 

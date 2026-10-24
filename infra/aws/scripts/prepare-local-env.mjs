@@ -31,6 +31,8 @@ if (!env) {
   process.exit(1);
 }
 const neon = readEnv(".env.neon") ?? {};
+// Production values: only used to scan images and logs for leaks, never written to the local env files.
+const production = readEnv(".env.lightsail") ?? {};
 
 const toDocker = (url = "") => url.replace(/@(localhost|127\.0\.0\.1)(?=[:/])/, "@host.docker.internal");
 const app = {
@@ -74,14 +76,15 @@ if (args.secrets) {
   const scannable = (value) => value.length >= 12 && !/^\d+$/.test(value);
   const values = new Set();
   const skipped = new Set();
-  for (const source of [env, neon]) {
+  for (const source of [env, neon, production]) {
     for (const [key, value] of Object.entries(source)) {
       if (!secretKey.test(key) || !value) continue;
       if (scannable(value)) values.add(value);
       else skipped.add(key);
     }
   }
-  fs.writeFileSync(args.secrets, [...values].join("\n") + "\n", { mode: 0o600 });
+  // An empty pattern line would make `grep -F -f` match everything.
+  fs.writeFileSync(args.secrets, values.size ? [...values].join("\n") + "\n" : "", { mode: 0o600 });
   console.log(`INFO secret values to scan: ${values.size}`);
   if (skipped.size) console.log(`INFO not scanned (short or digit-only placeholder values): ${[...skipped].sort().join(", ")}`);
 }

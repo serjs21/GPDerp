@@ -9,7 +9,11 @@
 //   from-deployment --deployment <deployment.json> --out <containers.json> --endpoint-out <endpoint.json>
 //       Rollback: reuse a previous deployment's containers and public endpoint unchanged.
 //   summary --containers <containers.json> [--against <deployment.json>]
-//       Image and variable names (set / missing / added / removed / changed), never values.
+//       Image and variable names (set / missing / invalid / added / removed / changed), never values.
+//   redact --containers <containers.json|deployment.json>  (stdin -> stdout)
+//       Replaces every secret / long value of that config in arbitrary text (AWS errors, logs).
+// Every builder refuses (exit 1, names only) when a required variable is missing or empty, a locked
+// default (NODE_ENV, PORT, COOKIE_SECURE) is changed, or a value breaks a rule in runtime-env.json.
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
@@ -49,6 +53,84 @@ const allowedNames = (manifest) => new Set([...Object.keys(manifest.defaults), .
 
 export const missingRequired = (manifest, environment) =>
   manifest.variables.filter((v) => v.required && !(environment[v.name] ?? "").trim()).map((v) => v.name);
+
+const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "0.0.0.0", "host.docker.internal", "::1"]);
+const TLS_SSL_MODES = new Set(["require", "verify-ca", "verify-full"]);
+
+const parseUrl = (value) => {
+  try {
+    return new URL(value);
+  } catch {
+    return null;
+  }
+};
+
+const checkPostgres = (value, pooled) => {
+  const url = parseUrl(value);
+  if (!url || !["postgres:", "postgresql:"].includes(url.protocol)) return "not a postgres:// URL";
+  if (LOCAL_HOSTS.has(url.hostname)) return "points at a local database";
+  const isPooler = url.hostname.includes("-pooler");
+  if (pooled && !isPooler) return "must be the Neon pooled host (-pooler)";
+  if (!pooled && isPooler) return "must be the Neon direct host (no -pooler)";
+  if (!TLS_SSL_MODES.has(url.searchParams.get("sslmode") ?? "")) return "sslmode must be require or verify-full";
+  return null;
+};
+
+const checkHttps = (value) => {
+  const url = parseUrl(value.trim());
+  if (!url || url.protocol !== "https:") return "must be an https:// URL";
+  if (LOCAL_HOSTS.has(url.hostname)) return "points at localhost";
+  return null;
+};
+
+const RULES = {
+  "postgres-pooled": (v) => checkPostgres(v, true),
+  "postgres-direct": (v) => checkPostgres(v, false),
+  "https-url": checkHttps,
+  "https-url-list": (v) => {
+    const parts = v.split(",").map((s) => s.trim()).filter(Boolean);
+    return parts.length ? (parts.map(checkHttps).find(Boolean) ?? null) : "empty list";
+  },
+  "positive-int": (v) => (/^[1-9]\d*$/.test(v) ? null : "must be a positive integer"),
+  "non-negative-int": (v) => (/^\d+$/.test(v) ? null : "must be a non-negative integer"),
+};
+
+const applyRule = (rule, value) => {
+  const [name, arg] = rule.split(":");
+  if (name === "min-length") return value.length >= Number(arg) ? null : `must be at least ${arg} characters`;
+  if (name === "one-of") return arg.split(",").includes(value) ? null : `must be one of ${arg}`;
+  const check = RULES[name];
+  if (!check) throw new Error(`unknown rule ${rule}`);
+  return check(value);
+};
+
+/** "NAME: reason" problems for locked defaults and rule violations. Never includes values. */
+export const invalidValues = (manifest, environment) => {
+  const problems = [];
+  for (const name of manifest.locked ?? []) {
+    if (name in environment && environment[name] !== manifest.defaults[name]) {
+      problems.push(`${name}: locked to its default (${manifest.defaults[name]})`);
+    }
+  }
+  for (const [name, rule] of Object.entries(manifest.rules ?? {})) {
+    const value = environment[name];
+    if (value === undefined || value === "") continue;
+    const problem = applyRule(rule, value);
+    if (problem) problems.push(`${name}: ${problem}`);
+  }
+  return problems;
+};
+
+/** Values worth hiding in any text shown on a terminal: secrets, database URLs and long values. */
+export const sensitiveValues = (manifest, environment) => {
+  const secret = new Set(manifest.variables.filter((v) => v.secret).map((v) => v.name));
+  return Object.entries(environment)
+    .filter(([name, value]) => value && (secret.has(name) ? value.length >= 4 : value.length >= 16))
+    .map(([, value]) => value)
+    .sort((a, b) => b.length - a.length);
+};
+
+export const redactValues = (text, values) => values.reduce((out, value) => out.split(value).join("<redacted>"), text);
 
 /** First deployment: manifest names only (other keys in the file are ignored), defaults filled in. */
 export const environmentFromEnvFile = (manifest, fileEnv) => {
@@ -112,9 +194,12 @@ const readJson = (file, label) => {
 
 const containerOf = (deployment) => deployment?.containers?.[CONTAINER_NAME] ?? null;
 
-const requireComplete = (manifest, environment) => {
+/** Refuses the deployment when anything required is missing or a value breaks a rule (names only). */
+const requireValid = (manifest, environment) => {
   const missing = missingRequired(manifest, environment);
   if (missing.length) fail(`required variables missing or empty: ${missing.join(", ")}`);
+  const invalid = invalidValues(manifest, environment);
+  if (invalid.length) fail(`invalid configuration (values hidden):\n  ${invalid.join("\n  ")}`);
 };
 
 const commands = {
@@ -123,7 +208,7 @@ const commands = {
     if (!fs.existsSync(envFile)) fail(`env file not found: ${envFile}`);
     const manifest = loadManifest();
     const { environment, ignored } = environmentFromEnvFile(manifest, parseEnvFile(fs.readFileSync(envFile, "utf8")));
-    requireComplete(manifest, environment);
+    requireValid(manifest, environment);
     writePrivate(out, containersFor(image, environment));
     console.log(`config: ${Object.keys(environment).length} variables from ${path.basename(envFile)} + defaults`);
     if (ignored.length) console.log(`ignored (not in runtime-env.json): ${ignored.sort().join(", ")}`);
@@ -136,7 +221,7 @@ const commands = {
     if (!container) fail(`current deployment has no "${CONTAINER_NAME}" container`);
     const overrideEnv = overrides ? parseEnvFile(fs.readFileSync(overrides, "utf8")) : {};
     const result = environmentFromCurrent(manifest, container.environment ?? {}, overrideEnv);
-    requireComplete(manifest, result.environment);
+    requireValid(manifest, result.environment);
     writePrivate(out, containersFor(image, result.environment));
     console.log(`config: current environment kept (${Object.keys(result.environment).length} variables)`);
     if (result.overridden.length) console.log(`overridden from ${path.basename(overrides)}: ${result.overridden.join(", ")}`);
@@ -154,6 +239,7 @@ const commands = {
         { image: c.image, ...(c.command?.length ? { command: c.command } : {}), environment: c.environment ?? {}, ports: c.ports ?? {} },
       ]),
     );
+    requireValid(loadManifest(), containerOf(source).environment ?? {});
     const { containerName, containerPort, healthCheck } = source.publicEndpoint;
     writePrivate(out, containers);
     writePrivate(endpointOut, { containerName, containerPort, healthCheck });
@@ -173,7 +259,9 @@ const commands = {
     console.log(`variables:  ${names.length} set (${names.filter((n) => secrets.has(n)).length} secret; values hidden)`);
     console.log(`            ${names.join(" ")}`);
     const missing = missingRequired(manifest, environment);
+    const invalid = invalidValues(manifest, environment);
     console.log(`missing:    ${missing.length ? missing.join(", ") : "none"}`);
+    console.log(`invalid:    ${invalid.length ? invalid.join("; ") : "none"}`);
     if (against && fs.existsSync(against)) {
       const previous = JSON.parse(fs.readFileSync(against, "utf8"));
       const before = containerOf(previous);
@@ -186,7 +274,17 @@ const commands = {
         console.log(`unchanged:  ${diff.unchanged.length} variables`);
       }
     }
-    if (missing.length) process.exit(1);
+    if (missing.length || invalid.length) process.exit(1);
+  },
+
+  /** stdin -> stdout with every sensitive value of the given config replaced by <redacted>. */
+  redact({ containers }) {
+    if (!containers) fail("usage: redact --containers <file> < text");
+    const manifest = loadManifest();
+    const parsed = fs.existsSync(containers) ? JSON.parse(fs.readFileSync(containers, "utf8")) : null;
+    const container = parsed?.[CONTAINER_NAME] ?? parsed?.containers?.[CONTAINER_NAME];
+    const values = sensitiveValues(manifest, container?.environment ?? {});
+    process.stdout.write(redactValues(fs.readFileSync(0, "utf8"), values));
   },
 };
 

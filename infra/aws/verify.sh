@@ -42,6 +42,18 @@ preflight
 [ "$CURRENT_STATE" = "ACTIVE" ] && pass "deployment $CURRENT_VERSION is ACTIVE (service $SERVICE_STATE)" ||
   fail "current deployment is ${CURRENT_STATE/None/missing}"
 BASE="$SERVICE_URL"
+# Endpoint, container names and ports only (the query never selects environments).
+ENDPOINT_JSON="$(aws_ls get-container-services --service-name "$LIGHTSAIL_SERVICE" --output json \
+  --query "containerServices[0].currentDeployment.{name:publicEndpoint.containerName,port:publicEndpoint.containerPort,path:publicEndpoint.healthCheck.path,containers:keys(containers),ports:containers.${CONTAINER_NAME}.ports}")"
+ENDPOINT_PROBLEMS="$(node -e '
+  const e = JSON.parse(process.argv[1]); const [name, port] = process.argv.slice(2); const p = [];
+  if (e.name !== name || String(e.port) !== port) p.push(`public endpoint targets ${e.name}:${e.port}`);
+  if (e.path !== "/healthz") p.push(`health check path ${e.path}`);
+  if (JSON.stringify(e.containers) !== JSON.stringify([name])) p.push(`containers ${JSON.stringify(e.containers)}`);
+  if (JSON.stringify(e.ports) !== JSON.stringify({ [port]: "HTTP" })) p.push(`ports ${JSON.stringify(e.ports)}`);
+  process.stdout.write(p.join("; "));' "$ENDPOINT_JSON" "$CONTAINER_NAME" "$CONTAINER_PORT")"
+[ -z "$ENDPOINT_PROBLEMS" ] && pass "public endpoint $CONTAINER_NAME:$CONTAINER_PORT, health check /healthz, single container $CONTAINER_NAME ($CONTAINER_PORT/HTTP)" ||
+  fail "deployment shape: $ENDPOINT_PROBLEMS"
 
 step "2. REST over HTTPS ($BASE)"
 http_check() { # http_check <path> <expected status>
