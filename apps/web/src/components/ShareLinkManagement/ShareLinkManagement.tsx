@@ -1,88 +1,21 @@
 "use client";
 
-import { useRef, type RefObject } from "react";
-import { FetchEmptyState } from "@/components/FetchEmptyState";
-import { FetchingStaticLoader } from "@/components/Loaders/FetchingLoader";
+import { useRef } from "react";
 import { ShareLinksSort } from "@/components/ShareLinksSort";
-import type { ShareLinkListItem } from "@/api/shareLinks";
+import { LIST_REVEAL_MAX_WAIT_MS } from "@/consts/visualReadiness/criticalAssets";
 import { useEndOfContentScroll } from "@/hooks/useEndOfContentScroll";
+import { useRenderedContentReveal } from "@/hooks/useRenderedContentReveal";
 import { useShareLinks } from "@/hooks/useShareLinks";
 import { useShareLinkSocket } from "@/hooks/useShareLinkSocket";
 import { ShareLinkFilterPanels } from "./ShareLinkFilterPanels";
-import { ShareLinkManagementRow } from "./ShareLinkManagementRow";
+import { ShareLinkListBody } from "./ShareLinkListBody";
 import { useShareLinkHaikuEnrichment } from "./useShareLinkHaikuEnrichment";
+import { canLoadNextShareLinkPage, resolveShareLinkListFlags } from "./utils/shareLinkListUtils";
 import styles from "./ShareLinkManagement.module.css";
 
 export type ShareLinkManagementProps = {
   active?: boolean;
 };
-
-function ShareLinkListBody({
-  showCenterLoader,
-  showEmpty,
-  showBottomLoader,
-  items,
-  getHaiku,
-  haikusLoading,
-  onChanged,
-  sentinelRef,
-}: {
-  showCenterLoader: boolean;
-  showEmpty: boolean;
-  showBottomLoader: boolean;
-  items: ShareLinkListItem[];
-  getHaiku: ReturnType<typeof useShareLinkHaikuEnrichment>["getHaiku"];
-  haikusLoading: boolean;
-  onChanged: () => void;
-  sentinelRef: RefObject<HTMLDivElement | null>;
-}) {
-  if (showCenterLoader) {
-    return (
-      <div className={styles.loaderRow}>
-        <FetchingStaticLoader className={styles.initialFetch} />
-      </div>
-    );
-  }
-
-  return (
-    <>
-      {showEmpty ? (
-        <FetchEmptyState className={styles.emptyState} />
-      ) : (
-        items.map((link) => {
-          const haikuId = link.sharedHaikuId;
-          const haiku = getHaiku(haikuId);
-          return (
-            <ShareLinkManagementRow
-              key={link.id}
-              link={link}
-              haiku={haiku}
-              haikuLoading={Boolean(haikuId) && !haiku && haikusLoading}
-              onChanged={onChanged}
-            />
-          );
-        })
-      )}
-      <div ref={sentinelRef} className={styles.sentinel} aria-hidden />
-      {showBottomLoader ? (
-        <div className={styles.loaderRow}>
-          <FetchingStaticLoader className={styles.nextPageFetch} />
-        </div>
-      ) : null}
-    </>
-  );
-}
-
-function resolveListFlags(query: ReturnType<typeof useShareLinks>["query"], itemCount: number) {
-  const isInitialPending = query.isPending && !query.isPlaceholderData;
-  const isFilterRefetching =
-    query.isFetching && !query.isFetchingNextPage && !isInitialPending;
-  return {
-    showCenterLoader: isInitialPending || (itemCount === 0 && isFilterRefetching),
-    showEmpty: itemCount === 0 && !query.isFetching && !isInitialPending,
-    showBottomLoader: query.isFetchingNextPage || (itemCount > 0 && isFilterRefetching),
-  };
-}
 
 export function ShareLinkManagement({ active = true }: ShareLinkManagementProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -100,19 +33,26 @@ export function ShareLinkManagement({ active = true }: ShareLinkManagementProps)
 
   useShareLinkSocket(active);
 
-  const { getHaiku, isLoading: haikusLoading } = useShareLinkHaikuEnrichment(
-    items,
-    active,
-  );
+  const { getHaiku, isHaikuSettled } = useShareLinkHaikuEnrichment(items, active);
+  const readyItems = items.filter((item) => isHaikuSettled(item.sharedHaikuId));
 
-  useEndOfContentScroll(scrollRef, sentinelRef, onEnd, {
-    enabled: Boolean(active && query.hasNextPage && !query.isFetchingNextPage),
-  });
-
-  const { showCenterLoader, showEmpty, showBottomLoader } = resolveListFlags(
+  const { showCenterLoader, showEmpty, showBottomLoader } = resolveShareLinkListFlags(
     query,
     items.length,
+    readyItems.length,
   );
+  const revealed = useRenderedContentReveal(scrollRef, {
+    pending: showCenterLoader,
+    maxWaitMs: LIST_REVEAL_MAX_WAIT_MS,
+  });
+
+  useEndOfContentScroll(scrollRef, sentinelRef, onEnd, {
+    enabled: canLoadNextShareLinkPage(query, {
+      active,
+      revealed,
+      allRowsReady: readyItems.length === items.length,
+    }),
+  });
 
   return (
     <div className={styles.root}>
@@ -132,14 +72,14 @@ export function ShareLinkManagement({ active = true }: ShareLinkManagementProps)
         />
       </div>
 
-      <div ref={scrollRef} className={styles.listShell}>
+      <div ref={scrollRef} className={styles.listShell} aria-busy={!revealed}>
         <ShareLinkListBody
           showCenterLoader={showCenterLoader}
+          revealed={revealed}
           showEmpty={showEmpty}
           showBottomLoader={showBottomLoader}
-          items={items}
+          items={readyItems}
           getHaiku={getHaiku}
-          haikusLoading={haikusLoading}
           onChanged={() => void query.refetch()}
           sentinelRef={sentinelRef}
         />

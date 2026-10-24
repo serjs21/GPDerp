@@ -48,5 +48,8 @@ export const MAIN_MEMBER_CRITICAL_ASSETS: readonly CriticalImage[] = [
  */
 export const FIRST_REVEAL_MAX_WAIT_MS = 5000;
 
+/** Upper bound on holding a list's loader over freshly rendered rows while their art and fonts load. */
+export const LIST_REVEAL_MAX_WAIT_MS = 4000;
+
 /** Upper bound on hiding an in-page control cluster (e.g. sort coins) while its art decodes. */
 export const CONTROL_ART_MAX_WAIT_MS = 2000;

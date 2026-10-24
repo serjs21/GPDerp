@@ -13,7 +13,7 @@ import {
   POSTCARD_WIDTH,
 } from "../consts/postcardConsts";
 import { buildPostcardFontEmbedCSS } from "./postcardFontEmbed";
-import { waitForPostcardAssets } from "./waitForPostcardAssets";
+import { waitForRenderedAssets } from "@/utils/visualReadiness/waitForRenderedAssets";
 
 function createOffscreenHost(): HTMLDivElement {
   const host = document.createElement("div");
@@ -60,7 +60,7 @@ export async function renderOffscreenImage(element: ReactElement): Promise<Blob>
       throw new Error("Postcard renderer did not mount");
     }
 
-    await waitForPostcardAssets(node);
+    await waitForRenderedAssets(node);
     const fontEmbedCSS = await resolveFontEmbedCSS(node);
 
     // html-to-image's toBlob drops `type`/`quality` (always PNG), so encode the canvas here.

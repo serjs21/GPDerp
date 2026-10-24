@@ -72,6 +72,7 @@
 }
 
 .listScroll {
+  position: relative;
   padding-top: 1rem;
   --manage-label-list-gap: 1.75rem;
   flex: 1 1 auto;
@@ -88,6 +89,25 @@
 
 .listScroll::-webkit-scrollbar {
   display: none;
+}
+
+/* Rows stay flex items of .listScroll; hidden ones still lay out and load their art. */
+.listContent {
+  display: contents;
+}
+
+.listContent[data-revealed="false"] {
+  visibility: hidden;
+}
+
+/* First-page loader kept over the hidden rows, at the same spot as the loading state's row. */
+.revealOverlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  padding-top: inherit;
+  pointer-events: none;
 }
 
 .emptyLayout {

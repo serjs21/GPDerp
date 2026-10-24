@@ -1,12 +1,23 @@
 "use client";
 
-import { useQueries } from "@tanstack/react-query";
+import { keepPreviousData, useQueries, type UseQueryResult } from "@tanstack/react-query";
 import { useMemo } from "react";
 import type { ShareLinkListItem } from "@/api/shareLinks";
 import { fetchHaikusByIds, type HaikuDto } from "@/api/haikus";
 
 const CHUNK_SIZE = 50;
 export const SHARE_LINK_HAIKUS_QUERY_KEY = "share-link-haikus";
+
+/** Module-level so TanStack only re-runs it when a chunk result changes. */
+function combineChunks(results: UseQueryResult<HaikuDto[]>[]) {
+  const byId = new Map<string, HaikuDto>();
+  for (const result of results) {
+    for (const haiku of result.data ?? []) {
+      byId.set(haiku.id, haiku);
+    }
+  }
+  return { byId, anyFetching: results.some((result) => result.isFetching) };
+}
 
 function chunkIds(ids: string[]): string[][] {
   const chunks: string[][] = [];
@@ -26,32 +37,21 @@ export function useShareLinkHaikuEnrichment(items: ShareLinkListItem[], enabled:
 
   const chunks = useMemo(() => chunkIds(haikuIds), [haikuIds]);
 
-  const queries = useQueries({
+  const { byId, anyFetching } = useQueries({
     queries: chunks.map((ids) => ({
       queryKey: [SHARE_LINK_HAIKUS_QUERY_KEY, ids.join(",")] as const,
       queryFn: () => fetchHaikusByIds(ids),
       enabled: enabled && ids.length > 0,
       staleTime: 60_000,
+      // Chunk keys change as pages add ids; keep the loaded haikus while the new chunk fetches.
+      placeholderData: keepPreviousData,
     })),
+    combine: combineChunks,
   });
-
-  const byId = useMemo(() => {
-    const map = new Map<string, HaikuDto>();
-    for (const query of queries) {
-      for (const haiku of query.data ?? []) {
-        map.set(haiku.id, haiku);
-      }
-    }
-    return map;
-  }, [queries.map((query) => query.dataUpdatedAt).join("|")]);
-
-  const isLoading =
-    enabled &&
-    haikuIds.length > 0 &&
-    queries.some((query) => query.isPending || (query.isFetching && !query.data));
 
   return {
     getHaiku: (haikuId: string | undefined) => (haikuId ? byId.get(haikuId) : undefined),
-    isLoading,
+    /** Loaded, not needed, or the fetch finished without it (deleted haiku → title-only lantern). */
+    isHaikuSettled: (haikuId: string | undefined) => !haikuId || byId.has(haikuId) || !anyFetching,
   };
 }

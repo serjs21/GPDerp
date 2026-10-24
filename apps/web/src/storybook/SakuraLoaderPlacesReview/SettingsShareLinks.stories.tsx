@@ -47,7 +47,7 @@ export const NextPageLoading: Story = {
   play: () => scrollToEnd('[class*="listShell"]'),
 };
 
-/** ShareLinkLanternPanel (ShareLinkLanternContent): each row's lantern loader while the shared haikus load. */
+/** ShareLinkManagement: the centered loader stays up while the rows' shared haikus load (rows never show their own lantern loader). */
 export const RowLanternsLoading: Story = {
   decorators: [withMockApi([manageLabelsAccountRoute, shareLinksRoute(STORY_SHARE_LINKS), pendingRoute("/haiku/batch", "post")])],
 };

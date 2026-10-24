@@ -40,6 +40,7 @@
 }
 
 .listShell {
+  position: relative;
   grid-column: 1 / -1;
   grid-row: 2;
   display: flex;
@@ -60,6 +61,25 @@
 .loaderRow {
   display: flex;
   justify-content: center;
+}
+
+/* Rows stay flex items of .listShell; hidden ones still lay out and load their art. */
+.listContent {
+  display: contents;
+}
+
+.listContent[data-revealed="false"] {
+  visibility: hidden;
+}
+
+/* First-load loader kept over the hidden rows, at the same spot as the loading state's row. */
+.revealOverlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  padding-top: inherit;
+  pointer-events: none;
 }
 
 /* Tops up .listShell's 0.15rem padding to ManageLabelsPanel's 1rem .listScroll padding,

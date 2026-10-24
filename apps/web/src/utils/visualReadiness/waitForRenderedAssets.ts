@@ -40,7 +40,7 @@ function preloadImage(url: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const image = new Image();
     image.onload = () => resolve();
-    image.onerror = () => reject(new Error(`Postcard asset failed to load: ${url}`));
+    image.onerror = () => reject(new Error(`Asset failed to load: ${url}`));
     image.src = url;
   });
 }
@@ -50,13 +50,13 @@ async function decodeImage(image: HTMLImageElement): Promise<void> {
   if (!image.complete) {
     await new Promise<void>((resolve, reject) => {
       image.addEventListener("load", () => resolve(), { once: true });
-      image.addEventListener("error", () => reject(new Error(`Postcard image failed to load: ${image.src}`)), {
+      image.addEventListener("error", () => reject(new Error(`Image failed to load: ${image.src}`)), {
         once: true,
       });
     });
   }
   if (image.naturalWidth === 0) {
-    throw new Error(`Postcard image failed to load: ${image.src}`);
+    throw new Error(`Image failed to load: ${image.src}`);
   }
   await image.decode().catch(() => undefined);
 }
@@ -87,7 +87,7 @@ async function loadUsedFonts(root: HTMLElement): Promise<void> {
  * Resolve once fonts, `<img>` elements, and CSS background/mask images inside
  * `root` are loaded and layout has settled. Rejects if any image fails.
  */
-export async function waitForPostcardAssets(root: HTMLElement): Promise<void> {
+export async function waitForRenderedAssets(root: HTMLElement): Promise<void> {
   await nextFrame();
   const images = Array.from(root.querySelectorAll("img"));
   await Promise.all([
