@@ -21,7 +21,17 @@ step "Push $IMAGE to $LIGHTSAIL_SERVICE (label $IMAGE_LABEL)"
 mkdir -p "$STATE_DIR"
 LOG="$(mktemp)"
 trap 'rm -f "$LOG"' EXIT
-if ! aws_ls push-container-image --service-name "$LIGHTSAIL_SERVICE" --label "$IMAGE_LABEL" --image "$IMAGE" 2>&1 | tee "$LOG" | redact; then
+# lightsailctl (Go SDK) cannot read `aws login` / SSO session credentials, so it gets the current
+# short-lived credentials as environment variables, scoped to this subshell and never printed.
+if ! (
+  CREDS="$(aws configure export-credentials --format env-no-export 2>/dev/null)" || die "cannot export the current AWS credentials for lightsailctl"
+  while IFS= read -r line; do
+    case "$line" in AWS_ACCESS_KEY_ID=* | AWS_SECRET_ACCESS_KEY=* | AWS_SESSION_TOKEN=* | AWS_CREDENTIAL_EXPIRATION=*) export "${line?}" ;; esac
+  done <<<"$CREDS"
+  # A profile name would be forwarded to lightsailctl, which then ignores the exported credentials.
+  unset AWS_PROFILE AWS_DEFAULT_PROFILE
+  aws_ls push-container-image --service-name "$LIGHTSAIL_SERVICE" --label "$IMAGE_LABEL" --image "$IMAGE"
+) 2>&1 | tee "$LOG" | redact; then
   die "push-container-image failed"
 fi
 
