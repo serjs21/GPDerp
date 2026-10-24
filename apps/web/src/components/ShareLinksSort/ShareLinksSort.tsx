@@ -80,6 +80,7 @@ export function ShareLinksSort(props: ShareLinksSortProps) {
         style={layout.clusterStyle}
         role="radiogroup"
         aria-label={ariaLabel}
+        aria-busy={coverArt.status === "loading"}
       >
         {categories.map((category) => (
           <ShareLinksSortCoin

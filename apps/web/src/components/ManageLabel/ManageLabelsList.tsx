@@ -23,7 +23,7 @@ export function ManageLabelsList({ loading, onScroll, ...rows }: ManageLabelsLis
 
   if (loading) {
     return (
-      <div className={styles.listScroll} onScroll={onScroll}>
+      <div className={styles.listScroll} onScroll={onScroll} aria-busy>
         {loader}
       </div>
     );

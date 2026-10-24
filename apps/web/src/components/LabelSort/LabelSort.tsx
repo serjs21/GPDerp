@@ -96,6 +96,7 @@ export function LabelSort(props: LabelSortProps) {
         style={layout.clusterStyle}
         role="radiogroup"
         aria-label={ariaLabel}
+        aria-busy={coverArt.status === "loading"}
       >
         {categories.map((category) => {
           const selected = category.id === value.categoryId;

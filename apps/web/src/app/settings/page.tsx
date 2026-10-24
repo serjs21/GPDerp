@@ -13,6 +13,7 @@ import { ProfileTabs } from "./components/ProfileTabs";
 import { useOwnProfile } from "./hooks/useOwnProfile";
 import { useProfileContextValue } from "./hooks/useProfileContextValue";
 import { useProfileTab } from "./hooks/useProfileTab";
+import { useReportSettingsViewReady } from "./hooks/useReportSettingsViewReady";
 import { useSettingsTabArt } from "./hooks/useSettingsTabArt";
 import { isProfilePageReady } from "./utils/profileUtils";
 import styles from "./profilePage.module.css";
@@ -27,6 +28,7 @@ export default function ProfilePage() {
   const { data: labelsAccountId } = useManageLabelsAccount();
   const { tab, setTab, searchQuery } = useProfileTab();
   const tabArtStatus = useSettingsTabArt(tab);
+  useReportSettingsViewReady(pageNode, tab, labelsAccountId);
   const { profile, setProfile, loading } = useOwnProfile(initialized, isLoggedIn);
   const profileContextValue = useProfileContextValue(profile, setProfile, checkAuthentication);
 
