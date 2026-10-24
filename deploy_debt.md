@@ -7,7 +7,7 @@ Frontend Worker `gpderp-party` is live at https://gpderp.party via OpenNext. The
 1. **Host the Fastify API on AWS Lightsail Containers** (service `container-service-1` exists in us-east-2, READY, no deployment yet; tooling in `infra/aws/`)  
    Full guide: [infra/aws/README.md](infra/aws/README.md); local image checks: [infra/aws/local-docker-testing.md](infra/aws/local-docker-testing.md).  
    Image: `apps/api/Dockerfile` (verified locally: builds for linux/amd64, ~325 MB, ~225 MiB RSS idle). Database: Neon (`apps/api/.env.neon`, schema already at the latest migration).
-   1. AWS CLI v2 + `lightsailctl` are installed; `AWS_PROFILE=gpderp` reaches account 311883575175 (currently root credentials — replace with a least-privilege IAM user).
+   1. AWS CLI v2 + `lightsailctl` are installed; deploy as `AWS_PROFILE=gpderp-deployer` (role `GpderpLightsailDeployer` in the management account 311883575175, assumed from `aws login --profile gpderp-member`; root only for administration).
    2. Service `container-service-1` (Micro, scale 1) already exists — never recreate or rescale it.  
       Keep scale at **1**: WebSocket registries and in-flight generations are process-local.
    3. Create `apps/api/.env.lightsail` (gitignored) from `apps/api/.env.example` with production values:

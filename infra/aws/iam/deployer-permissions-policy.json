@@ -1,0 +1,31 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadContainerServicesInUsEast2",
+      "Effect": "Allow",
+      "Action": [
+        "lightsail:GetContainerServices",
+        "lightsail:GetContainerImages",
+        "lightsail:GetContainerServiceDeployments",
+        "lightsail:GetContainerLog",
+        "lightsail:GetContainerServiceMetricData"
+      ],
+      "Resource": "*",
+      "Condition": { "StringEquals": { "aws:RequestedRegion": "us-east-2" } }
+    },
+    {
+      "Sid": "PushImagesAndDeployToContainerService1",
+      "Effect": "Allow",
+      "Action": ["lightsail:RegisterContainerImage", "lightsail:CreateContainerServiceDeployment"],
+      "Resource": "arn:aws:lightsail:us-east-2:311883575175:ContainerService/accbea5e-a0f4-4d12-9eb6-7c5bc1107361"
+    },
+    {
+      "Sid": "RegistryLoginForImagePush",
+      "Effect": "Allow",
+      "Action": "lightsail:CreateContainerServiceRegistryLogin",
+      "Resource": "*",
+      "Condition": { "StringEquals": { "aws:RequestedRegion": "us-east-2" } }
+    }
+  ]
+}

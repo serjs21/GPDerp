@@ -28,22 +28,45 @@ migrations.
 
 ## 2. AWS authentication
 
-The scripts use the normal AWS CLI credential chain; pick the profile with `AWS_PROFILE`:
+The scripts use the normal AWS CLI credential chain; pick the profile with `AWS_PROFILE`. The service runs in the
+Organizations **management account** (311883575175; member accounts are limited to us-east-1 / us-west-2 /
+eu-north-1 by the org's region SCP). Deploys use the least-privilege role **`GpderpLightsailDeployer`** in that account,
+assumed from your login to the `gpderp` member account (267950238053) — no root, no long-term keys:
 
 ```bash
-aws login --profile gpderp          # or: aws configure sso / aws sso login --profile gpderp
-export AWS_PROFILE=gpderp
-aws sts get-caller-identity         # account must be 311883575175
+aws login --profile gpderp-member            # browser sign-in to the gpderp member account
+export AWS_PROFILE=gpderp-deployer           # assumes arn:aws:iam::311883575175:role/GpderpLightsailDeployer
+aws sts get-caller-identity                  # account 311883575175, assumed-role/GpderpLightsailDeployer/...
 ```
+
+`~/.aws/config`:
+
+```ini
+[profile gpderp-member]
+region = us-east-1
+
+[profile gpderp-deployer]
+role_arn = arn:aws:iam::311883575175:role/GpderpLightsailDeployer
+source_profile = gpderp-member
+role_session_name = gpderp-lightsail-deploy
+region = us-east-2
+```
+
+The role ([iam/deployer-trust-policy.json](iam/deployer-trust-policy.json),
+[iam/deployer-permissions-policy.json](iam/deployer-permissions-policy.json)) can only be assumed by the member
+account's `AccountFullAccessRole` inside org `o-4uj1odpsdw`, sessions last 1 h, and it allows exactly: reading
+container services / images / deployments / logs / metrics in us-east-2, registry login, and registering images and
+creating deployments on `container-service-1`. It cannot create, resize, disable or delete services or images, or
+touch anything outside Lightsail containers. Update it with
+`aws iam put-role-policy --role-name GpderpLightsailDeployer --policy-name LightsailContainerService1Deploy --policy-document file://infra/aws/iam/deployer-permissions-policy.json`
+(as an admin of the management account).
 
 Every script starts with a **preflight**: it prints the caller identity, refuses any account other than
 `EXPECTED_ACCOUNT_ID`, checks that `container-service-1` exists in us-east-2 with power `micro` and scale `1`, and
 continues only while the service is `READY` or `RUNNING` (it stops on `PENDING`, `DEPLOYING`, `UPDATING`, `DISABLED`).
 
-The current profile signs in as the account **root** user (preflight warns about it). Prefer an IAM user or role with
-only the Lightsail container permissions (`lightsail:GetContainer*`, `lightsail:PushContainerImage`,
-`lightsail:RegisterContainerImage`, `lightsail:CreateContainerServiceDeployment`, `lightsail:CreateContainerServiceRegistryLogin`)
-plus `sts:GetCallerIdentity`.
+Root credentials (`aws login` as the management account root) still work but preflight warns about them; keep root
+for account administration only.
 
 ## 3. Service and region configuration
 
@@ -121,13 +144,13 @@ Option A — runtime env file (recommended):
 3. Dry run (reads AWS only, validates the file, prints names):
 
    ```bash
-   AWS_PROFILE=gpderp infra/aws/deploy.sh --dry-run
+   AWS_PROFILE=gpderp-deployer infra/aws/deploy.sh --dry-run
    ```
 
 4. Release (build → push → deploy with confirmation → verify):
 
    ```bash
-   AWS_PROFILE=gpderp infra/aws/release.sh
+   AWS_PROFILE=gpderp-deployer infra/aws/release.sh
    ```
 
    or step by step: `build.sh`, `push.sh`, `deploy.sh` (type `container-service-1` to confirm), `verify.sh`.
@@ -140,7 +163,7 @@ endpoint `api` with health check path `/healthz`. Later deployments with `deploy
 ## 8. Later deployments
 
 ```bash
-AWS_PROFILE=gpderp infra/aws/release.sh
+AWS_PROFILE=gpderp-deployer infra/aws/release.sh
 # or: infra/aws/build.sh && infra/aws/push.sh && infra/aws/deploy.sh
 ```
 
@@ -323,7 +346,7 @@ container keeps working during the switch and after a rollback.
 
 1. Fill `apps/api/.env.lightsail` (production values) — or use the console (section 7, option B).
 2. Approve and run the first release (`infra/aws/release.sh`).
-3. Replace the root credentials with a least-privilege IAM user / role (section 2).
+3. Deploy with `AWS_PROFILE=gpderp-deployer` (section 2) instead of root.
 4. Custom domain: Lightsail → Certificates → create for `api.gpderp.party`, add the validation CNAMEs in Cloudflare
    DNS, attach the certificate to `container-service-1`, then a **DNS-only** CNAME `api` → the service's default domain.
 5. Afterwards (not yet): Paddle notification URL `https://api.gpderp.party/webhooks/paddle`; web build env
