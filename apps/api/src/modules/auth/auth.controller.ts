@@ -419,6 +419,28 @@ const authPluginImpl = async (app: FastifyInstance) => {
     return reply.send({ ok: true });
   });
 
+  app.post(
+    "/auth/verify-email/resend-current",
+    { preHandler: [requireCsrf, app.requireAuthenticated] },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const userId = request.user?.sub;
+      if (!userId) return reply.code(401).send({ ok: false, error: AUTH_MESSAGES.unauthorized });
+      try {
+        const result = await authService.resendVerificationForUser(app, userId);
+        if (result.status === "cooldown") {
+          return reply.code(429).send({
+            ok: false,
+            error: AUTH_MESSAGES.verificationResendCooldown,
+            code: AUTH_CODES.VERIFICATION_RESEND_COOLDOWN,
+          });
+        }
+        return reply.send({ ok: true, data: result });
+      } catch (error) {
+        return respondAuthError(request, reply, error, "resend_verification_current");
+      }
+    },
+  );
+
   app.get("/auth/verify-email", async (request: FastifyRequest, reply: FastifyReply) => {
     const q = request.query as { token?: string };
     if (!q.token) {

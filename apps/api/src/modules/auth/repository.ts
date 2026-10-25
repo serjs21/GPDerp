@@ -19,6 +19,14 @@ export const authRepository = {
     });
   },
 
+  async isUserEmailVerified(userId: string): Promise<boolean> {
+    const user = await prismaClient.user.findUnique({
+      where: { id: userId },
+      select: { emailVerifiedAt: true },
+    });
+    return Boolean(user?.emailVerifiedAt);
+  },
+
   findUserById(userId: string) {
     return prismaClient.user.findUnique({
       where: { id: userId },
@@ -341,6 +349,15 @@ export const authRepository = {
     return prismaClient.emailActionToken.create({
       data: params,
     });
+  },
+
+  async findLatestEmailActionTokenCreatedAt(params: { userId: string; type: EmailActionType }) {
+    const latest = await prismaClient.emailActionToken.findFirst({
+      where: { userId: params.userId, type: params.type },
+      orderBy: { createdAt: "desc" },
+      select: { createdAt: true },
+    });
+    return latest?.createdAt ?? null;
   },
 
   invalidateEmailActionTokens(params: { userId: string; type: EmailActionType }) {

@@ -7,6 +7,7 @@ import {
 } from "../../consts/haiku";
 import { ACCOUNT_HEADER_KEY, TAB_HEADER_KEY } from "../../consts/ids";
 import { isUuid } from "../../utils/uuid";
+import { AUTH_CODES, AUTH_MESSAGES } from "../auth/constants";
 import { authRepository } from "../auth/repository";
 import { GENERATION_CREDITS_SOCKET_KIND, HAIKU_GENERATION_CREDIT_COST } from "../payments/constants";
 import { paymentsService } from "../payments/payments.service";
@@ -427,6 +428,15 @@ const haikuPluginImpl = async (app: FastifyInstance) => {
       const userId = req.user?.sub;
       if (!userId) {
         res.code(401).send({ ok: false, error: "Unauthorized" });
+        return;
+      }
+
+      if (!(await authRepository.isUserEmailVerified(userId))) {
+        res.code(403).send({
+          ok: false,
+          error: AUTH_MESSAGES.emailNotVerified,
+          code: AUTH_CODES.EMAIL_NOT_VERIFIED,
+        });
         return;
       }
 

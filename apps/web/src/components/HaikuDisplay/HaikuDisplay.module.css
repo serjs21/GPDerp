@@ -21,6 +21,15 @@
   overflow: visible;
 }
 
+/* Email-verification Main: the resend CTA takes the pinned subject input's place under the lantern. */
+.verificationCta {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--verification-cta-bottom, 20px) + env(safe-area-inset-bottom, 0px));
+  z-index: 900;
+  transform: translateX(-50%);
+}
+
 .inputSection {
   /* Flatten so overlay PostSignInput positions against .wrapper without taking flex space. */
   display: contents;

@@ -2,6 +2,16 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { HaikuDisplay } from "./HaikuDisplay";
 
+let mockEmailVerifiedAt: string | null = "2026-01-01T00:00:00.000Z";
+
+jest.mock("@/app/providers/AuthenticationProvider", () => ({
+  useAuthenticationState: () => ({ user: { emailVerifiedAt: mockEmailVerifiedAt } }),
+}));
+
+jest.mock("./EmailVerificationView", () => ({
+  EmailVerificationView: () => <div data-testid="email-verification-view" />,
+}));
+
 jest.mock("@/components/CreationModal", () => ({
   CreationModal: () => null,
 }));
@@ -60,10 +70,21 @@ jest.mock("@/app/providers/HaikuFiltersProvider", () => ({
 }));
 
 describe("HaikuDisplay", () => {
-  it("renders the lantern path and post-sign input shell", () => {
+  it("renders the lantern path and post-sign input shell for a verified account", () => {
+    mockEmailVerifiedAt = "2026-01-01T00:00:00.000Z";
     render(<HaikuDisplay />);
 
     expect(screen.getByTestId("lantern-path")).toBeInTheDocument();
     expect(screen.getByTestId("post-sign-input")).toBeInTheDocument();
+    expect(screen.queryByTestId("email-verification-view")).not.toBeInTheDocument();
+  });
+
+  it("shows only the verification view (no path, no input) until the email is verified", () => {
+    mockEmailVerifiedAt = null;
+    render(<HaikuDisplay />);
+
+    expect(screen.getByTestId("email-verification-view")).toBeInTheDocument();
+    expect(screen.queryByTestId("lantern-path")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("post-sign-input")).not.toBeInTheDocument();
   });
 });

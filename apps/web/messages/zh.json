@@ -387,7 +387,8 @@
   "HaikuGenerationStickyNote": {
     "generationFlow": {
       "errorTitle": "别慌，但出了点问题",
-      "errorDescription": "我们的苦力正在拼命修复这个问题。我们很快就会派人去更狠地鞭策他们。\n请稍后再试。"
+      "errorDescription": "我们的苦力正在拼命修复这个问题。我们很快就会派人去更狠地鞭策他们。\n请稍后再试。",
+      "emailNotVerified": "验证邮箱后才能写俳句"
     }
   },
   "Lantern": {
@@ -447,6 +448,11 @@
     "emptyPlaceholder": {
       "body": "只是个占位，\n选一个你自己的主题，\n你的俳句在等你。",
       "ariaLabel": "占位灯笼：在下方选择主题，创作你的第一首俳句"
+    },
+    "verifyEmailPlaceholder": {
+      "title": "需要验证邮箱",
+      "body": "只差一小步，\n确认你的邮箱地址，\n然后继续前行。",
+      "ariaLabel": "需要验证邮箱：点击下方按钮给自己发送验证邮件"
     }
   },
   "SavedHaikusLanternPath": {
@@ -907,5 +913,11 @@
   },
   "FetchEmptyState": {
     "caption": "没有可获取的内容"
+  },
+  "EmailVerificationView": {
+    "send": "给我发送验证邮件",
+    "sent": "验证邮件已发送，请查收",
+    "cooldown": "刚刚已发送，请一分钟后再试",
+    "error": "无法发送验证邮件"
   }
 }

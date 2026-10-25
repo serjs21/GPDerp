@@ -74,7 +74,7 @@ function EmptyPlaceholderDemo({ initialHaikus }: { initialHaikus: HaikuDto[] }):
         ref={pathRef}
         haikus={haikus}
         generatingDraft={draft}
-        showEmptyPlaceholder
+        emptyPlaceholder="createFirst"
         onHaikuDeleted={(deleted) => setHaikus((list) => list.filter((haiku) => haiku.id !== deleted.id))}
       />
     </div>

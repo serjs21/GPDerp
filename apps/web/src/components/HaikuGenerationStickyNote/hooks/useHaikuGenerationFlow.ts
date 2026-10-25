@@ -9,7 +9,7 @@ import {
   HAIKU_LIST_PAGE_SIZE,
   prependHaikuToInfiniteCache,
 } from "@/api/haikus";
-import { isInsufficientCreditsError } from "@/api/agents";
+import { isEmailNotVerifiedError, isInsufficientCreditsError } from "@/api/agents";
 import { useHaikuSocket } from "@/hooks/useHaikuSocket";
 import { useAuthenticationVerification } from "@/app/providers/AuthenticationVerificationProvider";
 import { usePendingHaikuSubmit } from "./usePendingHaikuSubmit";
@@ -38,6 +38,10 @@ export function useHaikuGenerationFlow(options?: UseHaikuGenerationFlowOptions) 
   const onError = useCallback(
     (error?: unknown) => {
       if (isInsufficientCreditsError(error)) return;
+      if (isEmailNotVerifiedError(error)) {
+        comicToast.error(t("emailNotVerified"));
+        return;
+      }
       comicToast.error(t("errorTitle"), {
         description: t("errorDescription"),
         duration: 3000,

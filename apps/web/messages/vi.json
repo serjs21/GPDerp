@@ -387,7 +387,8 @@
   "HaikuGenerationStickyNote": {
     "generationFlow": {
       "errorTitle": "Đừng hoảng, nhưng có gì đó không ổn rồi",
-      "errorDescription": "Đám nô lệ của chúng tôi đang cật lực sửa lỗi này. Chúng tôi sẽ sớm cử người đến quất họ mạnh tay hơn.\nVui lòng thử lại sau."
+      "errorDescription": "Đám nô lệ của chúng tôi đang cật lực sửa lỗi này. Chúng tôi sẽ sớm cử người đến quất họ mạnh tay hơn.\nVui lòng thử lại sau.",
+      "emailNotVerified": "Hãy xác minh email để viết haiku"
     }
   },
   "Lantern": {
@@ -447,6 +448,11 @@
     "emptyPlaceholder": {
       "body": "Chỉ là chỗ giữ,\nHãy chọn chủ đề của bạn,\nHaiku đang chờ bạn.",
       "ariaLabel": "Đèn lồng mẫu: chọn một chủ đề bên dưới để tạo haiku đầu tiên"
+    },
+    "verifyEmailPlaceholder": {
+      "title": "Cần xác minh email",
+      "body": "Còn một bước nhỏ,\nXác nhận email của bạn,\nRồi ta đi tiếp.",
+      "ariaLabel": "Cần xác minh email: gửi email xác minh cho chính bạn bằng nút bên dưới"
     }
   },
   "SavedHaikusLanternPath": {
@@ -907,5 +913,11 @@
   },
   "FetchEmptyState": {
     "caption": "Không có gì để lấy cả"
+  },
+  "EmailVerificationView": {
+    "send": "Gửi email xác minh cho tôi",
+    "sent": "Đã gửi email xác minh — hãy kiểm tra hộp thư",
+    "cooldown": "Chúng tôi vừa gửi — thử lại sau một phút",
+    "error": "Không gửi được email xác minh"
   }
 }

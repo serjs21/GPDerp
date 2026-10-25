@@ -8,6 +8,13 @@ export type RunHaikuAgentResponse = {
   creditsRemaining?: number;
 };
 
+/** 403 from generation while the account's email is unverified. */
+export function isEmailNotVerifiedError(error: unknown): boolean {
+  if (!axios.isAxiosError(error)) return false;
+  const body = error.response?.data as { code?: string } | undefined;
+  return error.response?.status === 403 && body?.code === "EMAIL_NOT_VERIFIED";
+}
+
 export function isInsufficientCreditsError(error: unknown): boolean {
   if (!axios.isAxiosError(error)) return false;
   if (error.response?.status === 402) return true;

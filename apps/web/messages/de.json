@@ -387,7 +387,8 @@
   "HaikuGenerationStickyNote": {
     "generationFlow": {
       "errorTitle": "Keine Panik, aber etwas ist schiefgelaufen",
-      "errorDescription": "Unsere Sklaven arbeiten hart daran, das Problem zu beheben. Wir schicken bald jemanden, der sie härter antreibt.\nBitte versuch es später noch mal."
+      "errorDescription": "Unsere Sklaven arbeiten hart daran, das Problem zu beheben. Wir schicken bald jemanden, der sie härter antreibt.\nBitte versuch es später noch mal.",
+      "emailNotVerified": "Bestätige deine E-Mail-Adresse, um Haiku zu schreiben"
     }
   },
   "Lantern": {
@@ -447,6 +448,11 @@
     "emptyPlaceholder": {
       "body": "Nur ein Platzhalter,\nWähle dein eigenes Thema,\nDein Haiku wartet.",
       "ariaLabel": "Platzhalter-Laterne: Wähle unten ein Thema für dein erstes Haiku"
+    },
+    "verifyEmailPlaceholder": {
+      "title": "E-Mail-Bestätigung erforderlich",
+      "body": "Ein kleiner Schritt noch,\nBestätige deine E-Mail,\nDann geht es weiter.",
+      "ariaLabel": "E-Mail-Bestätigung erforderlich: Fordere unten eine Bestätigungs-E-Mail an"
     }
   },
   "SavedHaikusLanternPath": {
@@ -907,5 +913,11 @@
   },
   "FetchEmptyState": {
     "caption": "Es gab nichts zu holen"
+  },
+  "EmailVerificationView": {
+    "send": "Bestätigungs-E-Mail senden",
+    "sent": "Bestätigungs-E-Mail gesendet – sieh in deinem Posteingang nach",
+    "cooldown": "Wir haben gerade eine gesendet – versuche es in einer Minute erneut",
+    "error": "Die Bestätigungs-E-Mail konnte nicht gesendet werden"
   }
 }

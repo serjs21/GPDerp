@@ -6,6 +6,7 @@ import { noGenerationsLeftMessage } from "../../payments/utils/purchaseMessages"
 jest.mock("../../auth/repository", () => ({
   authRepository: {
     findAccountIdForUser: jest.fn(),
+    isUserEmailVerified: jest.fn(),
   },
 }));
 
@@ -23,7 +24,7 @@ jest.mock("../haiku.service", () => ({
 }));
 
 const { authRepository } = jest.requireMock("../../auth/repository") as {
-  authRepository: { findAccountIdForUser: jest.Mock };
+  authRepository: { findAccountIdForUser: jest.Mock; isUserEmailVerified: jest.Mock };
 };
 const { paymentsService } = jest.requireMock("../../payments/payments.service") as {
   paymentsService: { getCredits: jest.Mock; countCompletedPurchases: jest.Mock };
@@ -51,6 +52,25 @@ describe("haiku.controller POST /beer_me_haiku", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     authRepository.findAccountIdForUser.mockResolvedValue("account-1");
+    authRepository.isUserEmailVerified.mockResolvedValue(true);
+  });
+
+  it("returns 403 EMAIL_NOT_VERIFIED before touching credits when the email is unverified", async () => {
+    authRepository.isUserEmailVerified.mockResolvedValue(false);
+    const app = await buildApp();
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/beer_me_haiku",
+      payload: { subject: "Morning mist" },
+    });
+
+    expect(response.statusCode).toBe(403);
+    expect(response.json()).toMatchObject({ ok: false, code: "EMAIL_NOT_VERIFIED" });
+    expect(authRepository.isUserEmailVerified).toHaveBeenCalledWith(sessionUserId);
+    expect(paymentsService.getCredits).not.toHaveBeenCalled();
+    expect(haikuService.createHaikuStream).not.toHaveBeenCalled();
+    await app.close();
   });
 
   it("returns 402 when the user has no generation credits", async () => {

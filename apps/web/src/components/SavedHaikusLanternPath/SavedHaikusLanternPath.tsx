@@ -86,7 +86,7 @@ export const SavedHaikusLanternPath = forwardRef<
         onHaikuDeleteFailed={onHaikuDeleteFailed}
         onHaikuChanged={handleHaikuChanged}
         excludeLabelIds={search.selectedLabelIds}
-        showEmptyPlaceholder={!search.isFiltering}
+        emptyPlaceholder={search.isFiltering ? undefined : "createFirst"}
       />
       {deleteFailedModal}
     </>

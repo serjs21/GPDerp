@@ -387,7 +387,8 @@
   "HaikuGenerationStickyNote": {
     "generationFlow": {
       "errorTitle": "Don't panic, but something went wrong",
-      "errorDescription": "Our slaves are working hard on fixing this issue. We will dispatch someone to hit them harder soon.\nPlease try again later."
+      "errorDescription": "Our slaves are working hard on fixing this issue. We will dispatch someone to hit them harder soon.\nPlease try again later.",
+      "emailNotVerified": "Verify your email address to write haiku"
     }
   },
   "Lantern": {
@@ -447,6 +448,11 @@
     "emptyPlaceholder": {
       "body": "Just a placeholder,\nChoose a subject of your own,\nYour haiku awaits.",
       "ariaLabel": "Placeholder lantern: choose a subject below to create your first haiku"
+    },
+    "verifyEmailPlaceholder": {
+      "title": "Email verification is required",
+      "body": "One small step remains,\nConfirm your email address,\nThen we can go on.",
+      "ariaLabel": "Email verification is required: send yourself a verification email below"
     }
   },
   "SavedHaikusLanternPath": {
@@ -907,5 +913,11 @@
   },
   "FetchEmptyState": {
     "caption": "There was nothing to fetch"
+  },
+  "EmailVerificationView": {
+    "send": "Send me verification email",
+    "sent": "Verification email sent — check your inbox",
+    "cooldown": "We just sent one — try again in a minute",
+    "error": "Could not send the verification email"
   }
 }

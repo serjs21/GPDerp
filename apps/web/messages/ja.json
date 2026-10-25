@@ -387,7 +387,8 @@
   "HaikuGenerationStickyNote": {
     "generationFlow": {
       "errorTitle": "慌てないで。でも、何か問題が起きました",
-      "errorDescription": "うちの下っ端たちが全力で修正中です。もうすぐ、もっと強くムチを入れる係を派遣します。\nしばらくしてからもう一度お試しください。"
+      "errorDescription": "うちの下っ端たちが全力で修正中です。もうすぐ、もっと強くムチを入れる係を派遣します。\nしばらくしてからもう一度お試しください。",
+      "emailNotVerified": "俳句を詠むにはメールアドレスの確認が必要です"
     }
   },
   "Lantern": {
@@ -447,6 +448,11 @@
     "emptyPlaceholder": {
       "body": "ただの仮置き\n好きなお題を選んでね\n俳句が待ってる",
       "ariaLabel": "仮置きの提灯：下でお題を選んで最初の俳句を詠もう"
+    },
+    "verifyEmailPlaceholder": {
+      "title": "メールアドレスの確認が必要です",
+      "body": "あと一歩だけ\nメールの確認をすませて\nそれから始めよう",
+      "ariaLabel": "メールアドレスの確認が必要です：下のボタンで確認メールを送れます"
     }
   },
   "SavedHaikusLanternPath": {
@@ -907,5 +913,11 @@
   },
   "FetchEmptyState": {
     "caption": "取ってくるものが何もありませんでした"
+  },
+  "EmailVerificationView": {
+    "send": "確認メールを送る",
+    "sent": "確認メールを送信しました。受信トレイをご確認ください",
+    "cooldown": "先ほど送信しました。1 分ほどしてから再度お試しください",
+    "error": "確認メールを送信できませんでした"
   }
 }

@@ -626,6 +626,24 @@ export const authService = {
     await sendVerificationEmail(app.log, normalizedEmail, user.id);
   },
 
+  /** Signed-in resend: the session's own address, at most once per cooldown window. */
+  async resendVerificationForUser(
+    app: FastifyInstance,
+    userId: string,
+  ): Promise<{ status: "sent" } | { status: "already_verified" } | { status: "cooldown" }> {
+    const user = await authRepository.findUserById(userId);
+    if (!user) throw unauthorizedError();
+    if (user.emailVerifiedAt) return { status: "already_verified" };
+    const lastSentAt = await authRepository.findLatestEmailActionTokenCreatedAt({
+      userId,
+      type: EmailActionType.EMAIL_VERIFICATION,
+    });
+    const cooldownMs = AUTH_TTL.verificationResendCooldownSeconds * 1000;
+    if (lastSentAt && Date.now() - lastSentAt.getTime() < cooldownMs) return { status: "cooldown" };
+    await sendVerificationEmail(app.log, user.email, user.id);
+    return { status: "sent" };
+  },
+
   async verifyEmail(
     app: FastifyInstance,
     rawToken: string,

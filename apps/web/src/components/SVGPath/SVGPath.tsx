@@ -9,6 +9,7 @@ import { useScrollBlocking } from "@/hooks/useScrollBlocking";
 import { withDefaults } from "@/utils/props/withDefaults";
 import { CreationPathLantern } from "./CreationPathLantern";
 import { CREATION_ENTER_MS } from "./consts/creationPathLanternConsts";
+import type { EmptyPathPlaceholderVariant } from "./consts/emptyPathPlaceholderConsts";
 import { EmptyPathPlaceholder } from "./EmptyPathPlaceholder";
 import { ExitingPathLantern } from "./ExitingPathLantern";
 import { SvgPathGuide } from "./SvgPathGuide";
@@ -59,23 +60,25 @@ export type SVGPathProps = {
   onHaikuChanged?: () => void;
   /** Label ids to omit from lantern belts (e.g. active filters). */
   excludeLabelIds?: string[];
-  /** Show the placeholder lantern while `haikus` is empty (off for filtered lists with no matches). */
-  showEmptyPlaceholder?: boolean;
+  /** Placeholder lantern shown while `haikus` is empty; omit for none (e.g. filtered lists with no matches). */
+  emptyPlaceholder?: EmptyPathPlaceholderVariant;
   className?: string;
   showGuides?: boolean;
 };
 
 const SVG_PATH_DEFAULTS = {
   creationChromeOpen: false,
-  showEmptyPlaceholder: false,
   hasNextPage: false,
   isFetchingNextPage: false,
   showGuides: false,
 };
 
 export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(props, ref) {
-  const { creationChromeOpen, hasNextPage, isFetchingNextPage, showGuides, showEmptyPlaceholder, className } =
-    withDefaults(props, SVG_PATH_DEFAULTS);
+  const { creationChromeOpen, hasNextPage, isFetchingNextPage, showGuides, className } = withDefaults(
+    props,
+    SVG_PATH_DEFAULTS,
+  );
+  const { emptyPlaceholder } = props;
   const { initialFocusIndex } = props;
   const { haikus, generatingDraft, excludeLabelIds, onHaikuDeleteFailed, onHaikuChanged } = props;
   const t = useTranslations("SVGPath.svgPath");
@@ -205,7 +208,8 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
               ))}
             <EmptyPathPlaceholder
               parsed={parsed}
-              eligible={showEmptyPlaceholder && haikus.length === 0}
+              variant={emptyPlaceholder ?? "createFirst"}
+              eligible={Boolean(emptyPlaceholder) && haikus.length === 0}
               generating={Boolean(generatingDraft)}
             />
             {exitingLanterns.map(({ haiku, transform }) => (

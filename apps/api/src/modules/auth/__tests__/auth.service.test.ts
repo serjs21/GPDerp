@@ -16,6 +16,7 @@ jest.mock("../repository", () => ({
     createRefreshToken: jest.fn(),
     invalidateEmailActionTokens: jest.fn(),
     createEmailActionToken: jest.fn(),
+    findLatestEmailActionTokenCreatedAt: jest.fn(),
     attachGoogleIdentity: jest.fn(),
     updateGoogleAvatarIfNotManual: jest.fn(),
     markUserEmailVerified: jest.fn(),
@@ -293,6 +294,37 @@ describe("authService", () => {
     await authService.resendVerification(mockApp, "USER@example.com");
 
     expect(sendVerificationEmail).toHaveBeenCalledWith(mockLog, "user@example.com", "user-1");
+  });
+
+  describe("resendVerificationForUser", () => {
+    it("does nothing for an already verified user", async () => {
+      authRepository.findUserById.mockResolvedValue({ id: "user-1", email: "a@example.com", emailVerifiedAt: new Date() });
+
+      await expect(authService.resendVerificationForUser(mockApp, "user-1")).resolves.toEqual({
+        status: "already_verified",
+      });
+      expect(sendVerificationEmail).not.toHaveBeenCalled();
+    });
+
+    it("refuses a second email inside the cooldown window", async () => {
+      authRepository.findUserById.mockResolvedValue({ id: "user-1", email: "a@example.com", emailVerifiedAt: null });
+      authRepository.findLatestEmailActionTokenCreatedAt.mockResolvedValue(new Date(Date.now() - 10_000));
+
+      await expect(authService.resendVerificationForUser(mockApp, "user-1")).resolves.toEqual({ status: "cooldown" });
+      expect(sendVerificationEmail).not.toHaveBeenCalled();
+    });
+
+    it("sends to the session user's own address once the cooldown has passed", async () => {
+      authRepository.findUserById.mockResolvedValue({ id: "user-1", email: "a@example.com", emailVerifiedAt: null });
+      authRepository.findLatestEmailActionTokenCreatedAt.mockResolvedValue(new Date(Date.now() - 120_000));
+
+      await expect(authService.resendVerificationForUser(mockApp, "user-1")).resolves.toEqual({ status: "sent" });
+      expect(sendVerificationEmail).toHaveBeenCalledWith(mockLog, "a@example.com", "user-1");
+      expect(authRepository.findLatestEmailActionTokenCreatedAt).toHaveBeenCalledWith({
+        userId: "user-1",
+        type: EmailActionType.EMAIL_VERIFICATION,
+      });
+    });
   });
 
   it("creates reset token during password reset request", async () => {

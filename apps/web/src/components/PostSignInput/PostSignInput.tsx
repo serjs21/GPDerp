@@ -7,7 +7,7 @@ import { withDefaults } from "@/utils/props/withDefaults";
 import { POST_SIGN_INPUT_WIDTH_REM } from "./constants";
 import { PostSignArt } from "./PostSignArt";
 import { PostSignForm } from "./PostSignForm";
-import { useFooterClearance } from "./useFooterClearance";
+import { useFooterClearance } from "@/hooks/useFooterClearance";
 import { postSignRootClassName, postSignRootStyle } from "./utils/postSignInputUtils";
 
 export type PostSignInputProps = {

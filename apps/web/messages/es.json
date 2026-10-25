@@ -387,7 +387,8 @@
   "HaikuGenerationStickyNote": {
     "generationFlow": {
       "errorTitle": "Que no cunda el pánico, pero algo salió mal",
-      "errorDescription": "Nuestros esclavos trabajan duro para arreglar este problema. Pronto enviaremos a alguien a pegarles más fuerte.\nInténtalo de nuevo más tarde."
+      "errorDescription": "Nuestros esclavos trabajan duro para arreglar este problema. Pronto enviaremos a alguien a pegarles más fuerte.\nInténtalo de nuevo más tarde.",
+      "emailNotVerified": "Verifica tu correo para escribir haikus"
     }
   },
   "Lantern": {
@@ -447,6 +448,11 @@
     "emptyPlaceholder": {
       "body": "Solo un marcador,\nelige un tema tuyo,\ntu haiku te espera.",
       "ariaLabel": "Farolillo de ejemplo: elige un tema abajo para crear tu primer haiku"
+    },
+    "verifyEmailPlaceholder": {
+      "title": "Se requiere verificar el correo",
+      "body": "Queda un pequeño paso,\nconfirma tu correo,\ny seguimos después.",
+      "ariaLabel": "Se requiere verificar el correo: envíate abajo un correo de verificación"
     }
   },
   "SavedHaikusLanternPath": {
@@ -907,5 +913,11 @@
   },
   "FetchEmptyState": {
     "caption": "No había nada que buscar"
+  },
+  "EmailVerificationView": {
+    "send": "Envíame el correo de verificación",
+    "sent": "Correo de verificación enviado: revisa tu bandeja de entrada",
+    "cooldown": "Acabamos de enviar uno: inténtalo de nuevo en un minuto",
+    "error": "No se pudo enviar el correo de verificación"
   }
 }
