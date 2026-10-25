@@ -1,11 +1,15 @@
-/* Below the lantern, pointing down at the subject input (the brush arrow is drawn pointing right). */
+/*
+ * On the paper below the text, pointing down at the subject input (the arrow is drawn pointing
+ * right). Sized and placed in % of the lantern box so it scales with the lantern.
+ */
 .arrow {
   position: absolute;
-  top: 100%;
+  top: 58%;
   left: 50%;
-  width: 4.5rem;
+  z-index: 1;
+  width: 26%;
   height: auto;
-  transform: translateX(-50%) rotate(90deg);
+  transform: translate(-50%, -50%) rotate(90deg);
   pointer-events: none;
   user-select: none;
   animation: arrowIn 0.4s ease-out both;
