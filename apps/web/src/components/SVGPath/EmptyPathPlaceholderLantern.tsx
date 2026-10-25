@@ -28,7 +28,6 @@ export function EmptyPathPlaceholderLantern({
   ariaLabel,
   isAnimating,
   suppressReveal,
-  showArrow,
 }: EmptyPathPlaceholderLanternProps) {
   const rootClassName = haloPathLanternClassName(svgPathLanternClassName(isAnimating), false);
   return (
@@ -45,10 +44,8 @@ export function EmptyPathPlaceholderLantern({
       >
         <Lantern haiku={haiku} showActions={false} showMeta={false} />
       </LanternFrame>
-      {showArrow ? (
-        // eslint-disable-next-line @next/next/no-img-element -- static public SVG
-        <img className={styles.arrow} src={EMPTY_PATH_PLACEHOLDER_ARROW_SRC} alt="" aria-hidden draggable={false} />
-      ) : null}
+      {/* eslint-disable-next-line @next/next/no-img-element -- static public SVG */}
+      <img className={styles.arrow} src={EMPTY_PATH_PLACEHOLDER_ARROW_SRC} alt="" aria-hidden draggable={false} />
     </div>
   );
 }

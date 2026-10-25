@@ -17,8 +17,6 @@ export type EmptyPathPlaceholderLanternProps = {
   isAnimating: boolean;
   /** Skip the lantern's mount fade (a parent animation owns the entrance). */
   suppressReveal: boolean;
-  /** Arrow down at the subject input; shown once the lantern is parked. */
-  showArrow: boolean;
 };
 
 export type ShownPlaceholderLanternProps = Pick<EmptyPathPlaceholderLanternProps, "haiku" | "ariaLabel"> & {

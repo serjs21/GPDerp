@@ -49,7 +49,6 @@ export function ShownPlaceholderLantern({
       ariaLabel={ariaLabel}
       isAnimating={entering}
       suppressReveal={suppressReveal}
-      showArrow={!entering}
     />
   );
 }

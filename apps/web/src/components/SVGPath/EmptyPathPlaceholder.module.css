@@ -12,25 +12,4 @@
   transform: translate(-50%, -50%) rotate(90deg);
   pointer-events: none;
   user-select: none;
-  animation: arrowDraw 0.3s ease-out both;
-}
-
-/*
- * Drawn top to bottom on screen. clip-path uses the image's own (unrotated) axes, where the
- * rotate(90deg) maps left → top, so revealing left to right reads top to bottom.
- */
-@keyframes arrowDraw {
-  from {
-    clip-path: inset(0 100% 0 0);
-  }
-
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .arrow {
-    animation: none;
-  }
 }
