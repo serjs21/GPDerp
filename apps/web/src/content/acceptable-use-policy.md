@@ -34,7 +34,7 @@ We may warn you, suspend access, or close accounts if we reasonably believe you 
 
 ## Reporting
 
-If you see abuse tied to the Haiku generation service, email [support@gpderp.party](mailto:support@gpderp.party). We cannot promise a specific outcome for every report, but we review genuine issues.
+If you see abuse tied to the Haiku generation service, email [toaster@gpderp.party](mailto:toaster@gpderp.party). We cannot promise a specific outcome for every report, but we review genuine issues.
 
 ---
 
@@ -46,4 +46,4 @@ We may update this AUP from time to time. The “Last updated” date will chang
 
 ## Contact
 
-Questions about this policy: email [support@gpderp.party](mailto:support@gpderp.party).
+Questions about this policy: email [toaster@gpderp.party](mailto:toaster@gpderp.party).

@@ -45,7 +45,7 @@ If credits were **never usable** due to a fault on our side and we confirm that,
 
 ## 5. How to request a refund or billing help
 
-1. **Contact us** at [support@gpderp.party](mailto:support@gpderp.party). Include your account email, approximate date of charge, and a short description of the issue.  
+1. **Contact us** at [toaster@gpderp.party](mailto:toaster@gpderp.party). Include your account email, approximate date of charge, and a short description of the issue.  
 2. If Paddle sent you a receipt or customer portal link, you can also **check Paddle’s buyer support** for payment-specific questions; as merchant of record, Paddle may handle certain requests directly.  
 
 We aim to reply within a **reasonable time**. Complex cases may take a bit longer. If we approve a refund, it is usually processed back through the original payment method, subject to Paddle’s and your bank’s processing times.
@@ -66,4 +66,4 @@ We may update this Policy from time to time. The “Last updated” date at the 
 
 ## 8. Contact
 
-For refund or billing questions, email [support@gpderp.party](mailto:support@gpderp.party). We will do our best to be helpful and clear.
+For refund or billing questions, email [toaster@gpderp.party](mailto:toaster@gpderp.party). We will do our best to be helpful and clear.

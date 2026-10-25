@@ -123,7 +123,7 @@ The Haiku generation service is not directed at children under the age where par
 
 ## 12. Contact
 
-For privacy questions or requests about your personal information, email [support@gpderp.party](mailto:support@gpderp.party). We aim to respond within a reasonable time.
+For privacy questions or requests about your personal information, email [toaster@gpderp.party](mailto:toaster@gpderp.party). We aim to respond within a reasonable time.
 
 ---
 

@@ -1,8 +1,10 @@
 # Terms of Service
 
-**Last updated:** October 24, 2026
+**Last updated:** October 25, 2026
 
-These Terms of Service (“Terms”) govern your access to and use of the Haiku generation service (the website, application, and related features we offer). By using the Haiku generation service, you agree to these Terms. If you do not agree, do not use the Haiku generation service.
+GPDerp (gpderp.party), the Haiku generation service, is operated by **Sergey Sablin**, a sole proprietor based in **Israel** (“we”, “us”, “our”).
+
+These Terms of Service (“Terms”) are an agreement between you and Sergey Sablin and govern your access to and use of the Haiku generation service (the website, application, and related features we offer). By using the Haiku generation service, you agree to these Terms. If you do not agree, do not use the Haiku generation service.
 
 We may update these Terms from time to time. When we do, we will revise the “Last updated” date above. Material changes may be communicated through the Haiku generation service or by email where appropriate. Continued use after changes take effect means you accept the updated Terms.
 
@@ -115,4 +117,4 @@ We may modify or discontinue parts of the Haiku generation service. We may updat
 
 ## 12. Contact
 
-Questions about these Terms or the Haiku generation service: email [support@gpderp.party](mailto:support@gpderp.party). We aim to respond within a reasonable time.
+GPDerp is operated by Sergey Sablin (sole proprietor, Israel). Questions about these Terms or the Haiku generation service: email [toaster@gpderp.party](mailto:toaster@gpderp.party). We aim to respond within a reasonable time.

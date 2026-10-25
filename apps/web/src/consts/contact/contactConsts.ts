@@ -1,1 +1,1 @@
-export const SUPPORT_EMAIL = "support@gpderp.party";
+export const SUPPORT_EMAIL = "toaster@gpderp.party";

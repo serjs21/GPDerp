@@ -38,4 +38,4 @@ We may update this Policy from time to time. The “Last updated” date above w
 
 ## Contact
 
-Questions: email [support@gpderp.party](mailto:support@gpderp.party), or see the [Privacy Policy](/privacy) for more on your rights and our practices.
+Questions: email [toaster@gpderp.party](mailto:toaster@gpderp.party), or see the [Privacy Policy](/privacy) for more on your rights and our practices.

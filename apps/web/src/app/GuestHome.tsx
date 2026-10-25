@@ -2,10 +2,9 @@
 
 import { CenteredAuthPrompt } from "@/components/AuthenticationNav/CenteredAuthPrompt";
 import { GoldenAgeTitle } from "@/components/GoldenAgeTitle";
-import { GuestProductIntro } from "@/components/GuestProductIntro";
 import styles from "./page.module.css";
 
-/** Signed-out Main: masthead, the Login / Register lanterns, and what the product is and costs. */
+/** Signed-out Main: masthead and the Login / Register lanterns (pricing and policies are linked in the footer). */
 export function GuestHome() {
   return (
     <>
@@ -13,7 +12,6 @@ export function GuestHome() {
         <GoldenAgeTitle />
       </div>
       <CenteredAuthPrompt />
-      <GuestProductIntro />
     </>
   );
 }
