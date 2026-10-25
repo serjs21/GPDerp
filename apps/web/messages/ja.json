@@ -30,7 +30,9 @@
       "updateSuccess": "プロフィールを更新しました",
       "updateError": "プロフィールを更新できませんでした",
       "avatarSaved": "プロフィール画像を保存しました",
-      "avatarError": "プロフィール画像をアカウントに保存できませんでした"
+      "avatarError": "プロフィール画像をアカウントに保存できませんでした",
+      "nicknameTaken": "このニックネームはすでに使われています",
+      "nicknameInvalid": "ニックネームは {min}〜{max} 文字の英数字とアンダースコアで入力してください"
     }
   },
   "BuyGenerations": {
@@ -56,6 +58,7 @@
   },
   "ProfileInfo": {
     "firstName": "名",
+    "nickname": "ニックネーム",
     "lastName": "姓"
   },
   "Themes": {

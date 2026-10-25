@@ -30,7 +30,9 @@
       "updateSuccess": "Profile updated",
       "updateError": "Could not update profile",
       "avatarSaved": "Profile picture saved",
-      "avatarError": "Could not save profile picture to your account"
+      "avatarError": "Could not save profile picture to your account",
+      "nicknameTaken": "That nickname is already taken",
+      "nicknameInvalid": "Nickname must be {min}–{max} characters: letters, numbers and underscores"
     }
   },
   "BuyGenerations": {
@@ -56,6 +58,7 @@
   },
   "ProfileInfo": {
     "firstName": "First name",
+    "nickname": "Nickname",
     "lastName": "Last name"
   },
   "Themes": {

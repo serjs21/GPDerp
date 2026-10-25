@@ -12,6 +12,7 @@ import {
   USER_MENU_GO_HOME,
   USER_MENU_TRIGGER_FILL,
 } from "./consts/userMenuConsts";
+import { resolveUserDisplayName } from "@/utils/user/userDisplayName";
 import { UserAvatar } from "./UserAvatar";
 import { UserMenuOptionIconLabel } from "./UserMenuOptionIconLabel";
 import { goHomeOption, isMainPage } from "./utils/userMenuOptionUtils";
@@ -23,10 +24,6 @@ export type UserMenuProps = {
   className?: string;
 };
 
-function resolveDisplayName(user: UserObject, fallback: string) {
-  return user.userName || user.email || fallback;
-}
-
 export function UserMenu({ user, onLogout, className }: UserMenuProps) {
   const t = useTranslations("UserMenu");
   const router = useRouter();
@@ -34,7 +31,7 @@ export function UserMenu({ user, onLogout, className }: UserMenuProps) {
   const { openAuthenticationModal } = useAuthenticationVerification();
   const onMainPage = isMainPage(pathname);
   const onSettingsPage = pathname.startsWith("/settings");
-  const displayName = resolveDisplayName(user, t("fallbackName"));
+  const displayName = resolveUserDisplayName(user, t("fallbackName"));
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 

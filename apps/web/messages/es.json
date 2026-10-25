@@ -30,7 +30,9 @@
       "updateSuccess": "Perfil actualizado",
       "updateError": "No se pudo actualizar el perfil",
       "avatarSaved": "Foto de perfil guardada",
-      "avatarError": "No se pudo guardar la foto de perfil en tu cuenta"
+      "avatarError": "No se pudo guardar la foto de perfil en tu cuenta",
+      "nicknameTaken": "Ese apodo ya está en uso",
+      "nicknameInvalid": "El apodo debe tener entre {min} y {max} caracteres: letras, números y guiones bajos"
     }
   },
   "BuyGenerations": {
@@ -56,6 +58,7 @@
   },
   "ProfileInfo": {
     "firstName": "Nombre",
+    "nickname": "Apodo",
     "lastName": "Apellido"
   },
   "Themes": {

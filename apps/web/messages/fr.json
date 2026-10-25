@@ -30,7 +30,9 @@
       "updateSuccess": "Profil mis à jour",
       "updateError": "Impossible de mettre à jour le profil",
       "avatarSaved": "Photo de profil enregistrée",
-      "avatarError": "Impossible d'enregistrer la photo de profil sur votre compte"
+      "avatarError": "Impossible d'enregistrer la photo de profil sur votre compte",
+      "nicknameTaken": "Ce pseudo est déjà pris",
+      "nicknameInvalid": "Le pseudo doit contenir de {min} à {max} caractères : lettres, chiffres et tirets bas"
     }
   },
   "BuyGenerations": {
@@ -56,6 +58,7 @@
   },
   "ProfileInfo": {
     "firstName": "Prenom",
+    "nickname": "Pseudo",
     "lastName": "Nom"
   },
   "Themes": {

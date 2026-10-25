@@ -30,7 +30,9 @@
       "updateSuccess": "Perfil atualizado",
       "updateError": "Não foi possível atualizar o perfil",
       "avatarSaved": "Foto de perfil salva",
-      "avatarError": "Não foi possível salvar a foto de perfil na sua conta"
+      "avatarError": "Não foi possível salvar a foto de perfil na sua conta",
+      "nicknameTaken": "Esse apelido já está em uso",
+      "nicknameInvalid": "O apelido deve ter de {min} a {max} caracteres: letras, números e sublinhados"
     }
   },
   "BuyGenerations": {
@@ -56,6 +58,7 @@
   },
   "ProfileInfo": {
     "firstName": "Nome",
+    "nickname": "Apelido",
     "lastName": "Sobrenome"
   },
   "Themes": {

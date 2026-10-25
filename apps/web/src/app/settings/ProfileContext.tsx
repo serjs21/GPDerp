@@ -5,6 +5,8 @@ import { createContext, useContext } from "react";
 type ProfileInfoFormValues = {
   firstName?: string;
   lastName?: string;
+  /** Saved as the account's unique username. */
+  nickname?: string;
 };
 
 export type ProfileContextValue = {
@@ -13,6 +15,7 @@ export type ProfileContextValue = {
   email: string;
   firstName: string;
   lastName: string;
+  nickname: string;
   saving: boolean;
   savingAvatar: boolean;
   saveProfileLabel: string;

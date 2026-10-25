@@ -30,7 +30,9 @@
       "updateSuccess": "Profil aktualisiert",
       "updateError": "Profil konnte nicht aktualisiert werden",
       "avatarSaved": "Profilbild gespeichert",
-      "avatarError": "Profilbild konnte nicht in deinem Konto gespeichert werden"
+      "avatarError": "Profilbild konnte nicht in deinem Konto gespeichert werden",
+      "nicknameTaken": "Dieser Spitzname ist bereits vergeben",
+      "nicknameInvalid": "Der Spitzname muss {min}–{max} Zeichen lang sein: Buchstaben, Zahlen und Unterstriche"
     }
   },
   "BuyGenerations": {
@@ -56,6 +58,7 @@
   },
   "ProfileInfo": {
     "firstName": "Vorname",
+    "nickname": "Spitzname",
     "lastName": "Nachname"
   },
   "Themes": {

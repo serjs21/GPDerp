@@ -30,7 +30,9 @@
       "updateSuccess": "个人资料已更新",
       "updateError": "无法更新个人资料",
       "avatarSaved": "头像已保存",
-      "avatarError": "无法将头像保存到你的账户"
+      "avatarError": "无法将头像保存到你的账户",
+      "nicknameTaken": "该昵称已被使用",
+      "nicknameInvalid": "昵称须为 {min}–{max} 个字符：字母、数字和下划线"
     }
   },
   "BuyGenerations": {
@@ -56,6 +58,7 @@
   },
   "ProfileInfo": {
     "firstName": "名",
+    "nickname": "昵称",
     "lastName": "姓"
   },
   "Themes": {

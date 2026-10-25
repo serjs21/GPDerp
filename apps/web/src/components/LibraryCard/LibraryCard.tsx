@@ -17,6 +17,7 @@ function readNameFields(form: HTMLFormElement) {
   return {
     firstName: String(data.get("firstName") ?? ""),
     lastName: String(data.get("lastName") ?? ""),
+    nickname: String(data.get("nickname") ?? "").trim(),
   };
 }
 
@@ -33,9 +34,10 @@ export function LibraryCard() {
 
   const saveNamesIfChanged = (form: HTMLFormElement) => {
     if (profile.saving) return;
-    const { firstName, lastName } = readNameFields(form);
-    if (firstName === profile.firstName && lastName === profile.lastName) return;
-    void profile.onSaveProfile({ firstName, lastName });
+    const { firstName, lastName, nickname } = readNameFields(form);
+    const nicknameChanged = nickname !== profile.nickname;
+    if (firstName === profile.firstName && lastName === profile.lastName && !nicknameChanged) return;
+    void profile.onSaveProfile({ firstName, lastName, nickname: nicknameChanged ? nickname : undefined });
   };
 
   return (
@@ -61,7 +63,8 @@ export function LibraryCard() {
             <div className={styles.details}>
               <p className={styles.belongsTo}>{t("belongsTo")}</p>
               <form
-                key={profile.email}
+                // Remount on save so inputs show the stored values (the nickname is normalized server-side).
+                key={`${profile.email}|${profile.nickname}|${profile.firstName}|${profile.lastName}`}
                 className={styles.nameForm}
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -73,14 +76,26 @@ export function LibraryCard() {
                   saveNamesIfChanged(e.currentTarget);
                 }}
               >
-                <label className={styles.field}>
-                  <span className={styles.fieldLabel}>{profileInfo("firstName")}</span>
-                  <ComicModalInput
-                    name="firstName"
-                    defaultValue={profile.firstName}
-                    aria-label={profileInfo("firstName")}
-                  />
-                </label>
+                <div className={styles.nameRow}>
+                  <label className={styles.field}>
+                    <span className={styles.fieldLabel}>{profileInfo("firstName")}</span>
+                    <ComicModalInput
+                      name="firstName"
+                      defaultValue={profile.firstName}
+                      aria-label={profileInfo("firstName")}
+                    />
+                  </label>
+                  <label className={styles.field}>
+                    <span className={styles.fieldLabel}>{profileInfo("nickname")}</span>
+                    <ComicModalInput
+                      name="nickname"
+                      defaultValue={profile.nickname}
+                      aria-label={profileInfo("nickname")}
+                      autoComplete="nickname"
+                      maxLength={32}
+                    />
+                  </label>
+                </div>
                 <label className={styles.field}>
                   <span className={styles.fieldLabel}>{profileInfo("lastName")}</span>
                   <ComicModalInput

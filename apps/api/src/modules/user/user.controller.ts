@@ -1,5 +1,6 @@
 import fp from "fastify-plugin";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { AUTH_CODES, AUTH_MESSAGES } from "../auth/constants";
 import { userService } from "./user.service";
 
 const userPluginImpl = async (app: FastifyInstance) => {
@@ -23,8 +24,17 @@ const userPluginImpl = async (app: FastifyInstance) => {
       if (!userId) return res.code(401).send({ ok: false, error: "Unauthorized" });
       const payload = (req.body as Record<string, unknown> | undefined) ?? {};
       const result = await userService.updateOwnProfile({ userId, payload });
-      if (!result.ok) return res.code(404).send({ ok: false, error: "User not found" });
-      return res.send({ ok: true, data: result.profile });
+      if (result.ok) return res.send({ ok: true, data: result.profile });
+      switch (result.reason.kind) {
+        case "invalid":
+          return res.code(400).send({ ok: false, error: result.reason.message });
+        case "username_taken":
+          return res
+            .code(409)
+            .send({ ok: false, error: AUTH_MESSAGES.usernameTaken, code: AUTH_CODES.USERNAME_TAKEN });
+        default:
+          return res.code(404).send({ ok: false, error: "User not found" });
+      }
     },
   );
 

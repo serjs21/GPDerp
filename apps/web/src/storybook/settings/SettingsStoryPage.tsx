@@ -19,6 +19,7 @@ const STORY_PROFILE: ProfileContextValue = {
   email: STORY_LOGGED_IN_USER.email,
   firstName: STORY_LOGGED_IN_USER.firstName,
   lastName: STORY_LOGGED_IN_USER.lastName,
+  nickname: STORY_LOGGED_IN_USER.userName ?? "",
   saving: false,
   savingAvatar: false,
   saveProfileLabel: "Save profile",

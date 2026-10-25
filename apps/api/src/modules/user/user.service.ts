@@ -135,6 +135,26 @@ async function recordDuplicatePasswordRegistrationAttempt(params: {
   }
 }
 
+export type ProfileUpdateFailure =
+  | { kind: "not_found" }
+  | { kind: "invalid"; message: string }
+  | { kind: "username_taken" };
+
+/**
+ * The profile "nickname" is the account's unique `userName`: same rules as registration. It can't be
+ * cleared, since a user without one is sent back to complete registration.
+ */
+function resolveUserNameUpdate(
+  raw: unknown,
+  current: string | null,
+): { kind: "skip" } | { kind: "set"; value: string } | { kind: "invalid"; message: string } {
+  if (typeof raw !== "string") return { kind: "skip" };
+  const validation = validateUsername(stripDangerousControlChars(raw));
+  if (!validation.valid) return { kind: "invalid", message: validation.message };
+  if (validation.normalized === current) return { kind: "skip" };
+  return { kind: "set", value: validation.normalized };
+}
+
 export type UserProfileView = {
   id: string;
   email: string;
@@ -462,9 +482,12 @@ export const userService = {
   async updateOwnProfile(params: {
     userId: string;
     payload: Record<string, unknown>;
-  }): Promise<{ ok: true; profile: UserProfileView } | { ok: false }> {
+  }): Promise<{ ok: true; profile: UserProfileView } | { ok: false; reason: ProfileUpdateFailure }> {
     const existing = await prismaClient.user.findUnique({ where: { id: params.userId } });
-    if (!existing) return { ok: false };
+    if (!existing) return { ok: false, reason: { kind: "not_found" } };
+
+    const userName = resolveUserNameUpdate(params.payload.userName, existing.userName);
+    if (userName.kind === "invalid") return { ok: false, reason: userName };
 
     const firstName = cleanText(params.payload.firstName, 120);
     const lastName = cleanText(params.payload.lastName, 120);
@@ -472,19 +495,26 @@ export const userService = {
     const data: {
       firstName?: string;
       lastName?: string;
+      userName?: string;
     } = {};
     if (firstName !== undefined) data.firstName = firstName;
     if (lastName !== undefined) data.lastName = lastName;
+    if (userName.kind === "set") data.userName = userName.value;
 
     if (Object.keys(data).length > 0) {
-      await prismaClient.user.update({
-        where: { id: params.userId },
-        data,
-      });
+      try {
+        await prismaClient.user.update({
+          where: { id: params.userId },
+          data,
+        });
+      } catch (error) {
+        if (isUniqueConstraintError(error)) return { ok: false, reason: { kind: "username_taken" } };
+        throw error;
+      }
     }
 
     const profile = await userService.getOwnProfile(params.userId);
-    if (!profile) return { ok: false };
+    if (!profile) return { ok: false, reason: { kind: "not_found" } };
     return { ok: true, profile };
   },
 

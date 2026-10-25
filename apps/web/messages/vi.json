@@ -30,7 +30,9 @@
       "updateSuccess": "Đã cập nhật hồ sơ",
       "updateError": "Không thể cập nhật hồ sơ",
       "avatarSaved": "Đã lưu ảnh đại diện",
-      "avatarError": "Không thể lưu ảnh đại diện vào tài khoản của bạn"
+      "avatarError": "Không thể lưu ảnh đại diện vào tài khoản của bạn",
+      "nicknameTaken": "Biệt danh này đã có người dùng",
+      "nicknameInvalid": "Biệt danh phải dài {min}–{max} ký tự: chữ cái, chữ số và dấu gạch dưới"
     }
   },
   "BuyGenerations": {
@@ -56,6 +58,7 @@
   },
   "ProfileInfo": {
     "firstName": "Tên",
+    "nickname": "Biệt danh",
     "lastName": "Họ"
   },
   "Themes": {

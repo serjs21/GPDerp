@@ -30,7 +30,9 @@
       "updateSuccess": "Profilo aggiornato",
       "updateError": "Impossibile aggiornare il profilo",
       "avatarSaved": "Immagine del profilo salvata",
-      "avatarError": "Impossibile salvare l'immagine del profilo nel tuo account"
+      "avatarError": "Impossibile salvare l'immagine del profilo nel tuo account",
+      "nicknameTaken": "Questo soprannome è già in uso",
+      "nicknameInvalid": "Il soprannome deve avere da {min} a {max} caratteri: lettere, numeri e trattini bassi"
     }
   },
   "BuyGenerations": {
@@ -56,6 +58,7 @@
   },
   "ProfileInfo": {
     "firstName": "Nome",
+    "nickname": "Soprannome",
     "lastName": "Cognome"
   },
   "Themes": {

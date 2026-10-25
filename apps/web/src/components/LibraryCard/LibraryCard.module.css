@@ -68,6 +68,19 @@
   box-sizing: border-box;
 }
 
+/* First name with the nickname to its right. */
+.nameRow {
+  display: flex;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .nameRow {
+    flex-direction: column;
+  }
+}
+
 .field {
   display: flex;
   flex: 1 1 auto;

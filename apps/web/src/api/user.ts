@@ -28,7 +28,12 @@ export async function fetchOwnProfile(): Promise<UserProfileResponse> {
   return data.data;
 }
 
-export async function updateOwnProfile(body: { firstName?: string; lastName?: string }): Promise<UserProfileResponse> {
+/** `userName` is the profile nickname: 400 if it breaks the username rules, 409 if it's taken. */
+export async function updateOwnProfile(body: {
+  firstName?: string;
+  lastName?: string;
+  userName?: string;
+}): Promise<UserProfileResponse> {
   const { data } = await axios.patch<ProfileApiResponse>("/user/profile", body);
   if (!data.ok) throw new Error(data.error ?? "Failed to update profile");
   return data.data;
