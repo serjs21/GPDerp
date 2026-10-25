@@ -4,8 +4,8 @@ import { useTranslations } from "next-intl";
 import type { HaikuDto } from "@/api/haikus";
 import { EMPTY_PATH_PLACEHOLDER_ID } from "./consts/emptyPathPlaceholderConsts";
 import type { EmptyPathPlaceholderProps } from "./EmptyPathPlaceholder.types";
-import { EnteringPlaceholderLantern } from "./EnteringPlaceholderLantern";
-import { ParkedPlaceholderLantern } from "./ParkedPlaceholderLantern";
+import { ExitingPlaceholderLantern } from "./ExitingPlaceholderLantern";
+import { ShownPlaceholderLantern } from "./ShownPlaceholderLantern";
 import { usePathEmptyPlaceholder } from "./usePathEmptyPlaceholder";
 
 function placeholderHaiku(body: string): HaikuDto {
@@ -34,18 +34,15 @@ export function EmptyPathPlaceholder({ parsed, eligible, generating }: EmptyPath
   const haiku = placeholderHaiku(t("body"));
   const ariaLabel = t("ariaLabel");
 
-  if (phase === "entering") {
-    return (
-      <EnteringPlaceholderLantern haiku={haiku} ariaLabel={ariaLabel} parsed={parsed} onComplete={onEnterComplete} />
-    );
-  }
-  return (
-    <ParkedPlaceholderLantern
+  return phase === "exiting" ? (
+    <ExitingPlaceholderLantern parsed={parsed} haiku={haiku} onExitComplete={onExitComplete} />
+  ) : (
+    <ShownPlaceholderLantern
       parsed={parsed}
       haiku={haiku}
       ariaLabel={ariaLabel}
-      exiting={phase === "exiting"}
-      onExitComplete={onExitComplete}
+      entering={phase === "entering"}
+      onEnterComplete={onEnterComplete}
     />
   );
 }

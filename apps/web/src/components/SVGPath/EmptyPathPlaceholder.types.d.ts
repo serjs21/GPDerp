@@ -15,17 +15,20 @@ export type EmptyPathPlaceholderLanternProps = {
   transform: LanternTransform;
   ariaLabel: string;
   isAnimating: boolean;
+  /** Skip the lantern's mount fade (a parent animation owns the entrance). */
+  suppressReveal: boolean;
   /** Arrow down at the subject input; shown once the lantern is parked. */
   showArrow: boolean;
 };
 
-export type EnteringPlaceholderLanternProps = Pick<EmptyPathPlaceholderLanternProps, "haiku" | "ariaLabel"> & {
+export type ShownPlaceholderLanternProps = Pick<EmptyPathPlaceholderLanternProps, "haiku" | "ariaLabel"> & {
   parsed: ParsedSplitPathSvg;
-  onComplete: () => void;
+  /** Flying in along the creation path; parked on the focus stop once false. */
+  entering: boolean;
+  onEnterComplete: () => void;
 };
 
-export type ParkedPlaceholderLanternProps = Pick<EmptyPathPlaceholderLanternProps, "haiku" | "ariaLabel"> & {
+export type ExitingPlaceholderLanternProps = Pick<EmptyPathPlaceholderLanternProps, "haiku"> & {
   parsed: ParsedSplitPathSvg;
-  exiting: boolean;
   onExitComplete: () => void;
 };

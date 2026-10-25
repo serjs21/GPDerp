@@ -1,6 +1,7 @@
 "use client";
 
 import { Lantern } from "@/components/Lantern/Lantern";
+import lanternStyles from "@/components/Lantern/Lantern.module.css";
 import { LanternFrame } from "@/components/Lantern/LanternFrame";
 import { SVG_PATH_LANTERN_WIDTH_REM } from "./consts/pathLanternLayoutConsts";
 import { EMPTY_PATH_PLACEHOLDER_ARROW_SRC } from "./consts/emptyPathPlaceholderConsts";
@@ -26,11 +27,13 @@ export function EmptyPathPlaceholderLantern({
   transform,
   ariaLabel,
   isAnimating,
+  suppressReveal,
   showArrow,
 }: EmptyPathPlaceholderLanternProps) {
+  const rootClassName = haloPathLanternClassName(svgPathLanternClassName(isAnimating), false);
   return (
     <div
-      className={haloPathLanternClassName(svgPathLanternClassName(isAnimating), false)}
+      className={suppressReveal ? `${rootClassName} ${lanternStyles.suppressReveal}` : rootClassName}
       style={pathLanternCssVars(transform)}
     >
       <LanternFrame

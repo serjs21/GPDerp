@@ -12,16 +12,20 @@
   transform: translate(-50%, -50%) rotate(90deg);
   pointer-events: none;
   user-select: none;
-  animation: arrowIn 0.4s ease-out both;
+  animation: arrowDraw 0.3s ease-out both;
 }
 
-@keyframes arrowIn {
+/*
+ * Drawn top to bottom on screen. clip-path uses the image's own (unrotated) axes, where the
+ * rotate(90deg) maps left → top, so revealing left to right reads top to bottom.
+ */
+@keyframes arrowDraw {
   from {
-    opacity: 0;
+    clip-path: inset(0 100% 0 0);
   }
 
   to {
-    opacity: 1;
+    clip-path: inset(0 0 0 0);
   }
 }
 
