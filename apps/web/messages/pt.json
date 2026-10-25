@@ -416,6 +416,10 @@
       "generating": "Gerando haiku: {subject}",
       "haikuLantern": "Lanterna de haiku: {title}",
       "labels": "Etiquetas de {label}"
+    },
+    "emptyPlaceholder": {
+      "body": "Só um marcador,\nEscolha um tema seu,\nSeu haiku espera.",
+      "ariaLabel": "Lanterna de exemplo: escolha um tema abaixo para criar seu primeiro haiku"
     }
   },
   "SavedHaikusLanternPath": {

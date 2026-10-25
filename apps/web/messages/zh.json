@@ -416,6 +416,10 @@
       "generating": "正在生成俳句：{subject}",
       "haikuLantern": "俳句灯笼：{title}",
       "labels": "{label} 的标签"
+    },
+    "emptyPlaceholder": {
+      "body": "只是个占位，\n选一个你自己的主题，\n你的俳句在等你。",
+      "ariaLabel": "占位灯笼：在下方选择主题，创作你的第一首俳句"
     }
   },
   "SavedHaikusLanternPath": {

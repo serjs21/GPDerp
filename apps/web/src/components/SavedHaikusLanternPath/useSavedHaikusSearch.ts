@@ -58,6 +58,8 @@ export function useSavedHaikusSearch(params: {
 
   return {
     selectedLabelIds,
+    /** A search or label filter narrows the list (an empty result is "no matches", not "no haikus"). */
+    isFiltering: isSearching || selectedLabelIds.length > 0 || excludedLabelIds.length > 0,
     filteredHaikus,
     showSearchLoader: searchPending && filteredHaikus.length === 0,
     paging: visibleHaikuPaging({ isSearching, searchPending, list: listPaging, search: searchQuery }),

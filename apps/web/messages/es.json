@@ -416,6 +416,10 @@
       "generating": "Generando haiku: {subject}",
       "haikuLantern": "Farolillo de haiku: {title}",
       "labels": "Etiquetas de {label}"
+    },
+    "emptyPlaceholder": {
+      "body": "Solo un marcador,\nelige un tema tuyo,\ntu haiku te espera.",
+      "ariaLabel": "Farolillo de ejemplo: elige un tema abajo para crear tu primer haiku"
     }
   },
   "SavedHaikusLanternPath": {

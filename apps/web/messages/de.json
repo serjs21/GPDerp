@@ -416,6 +416,10 @@
       "generating": "Haiku wird generiert: {subject}",
       "haikuLantern": "Haiku-Laterne: {title}",
       "labels": "Labels von {label}"
+    },
+    "emptyPlaceholder": {
+      "body": "Nur ein Platzhalter,\nWähle dein eigenes Thema,\nDein Haiku wartet.",
+      "ariaLabel": "Platzhalter-Laterne: Wähle unten ein Thema für dein erstes Haiku"
     }
   },
   "SavedHaikusLanternPath": {

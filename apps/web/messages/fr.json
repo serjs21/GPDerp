@@ -416,6 +416,10 @@
       "generating": "Génération du haïku : {subject}",
       "haikuLantern": "Lanterne haïku : {title}",
       "labels": "Étiquettes de {label}"
+    },
+    "emptyPlaceholder": {
+      "body": "Simple espace réservé,\nChoisis ton propre sujet,\nTon haïku t’attend.",
+      "ariaLabel": "Lanterne d’exemple : choisis un sujet ci-dessous pour créer ton premier haïku"
     }
   },
   "SavedHaikusLanternPath": {

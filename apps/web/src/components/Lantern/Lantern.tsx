@@ -27,6 +27,8 @@ export type LanternProps = HaikuContainerProps & {
   bodyOnly?: boolean;
   /** Hover actions; omit during path tween so content stays cheap. */
   showActions?: boolean;
+  /** Saved haiku's date line under the text; off for placeholder lanterns. Defaults to true. */
+  showMeta?: boolean;
   onDelete?: () => Promise<void>;
   onDeleted?: () => void;
   onChanged?: () => void;
@@ -62,12 +64,12 @@ function resolveGeneratingContent(draft: GeneratingDraft) {
   };
 }
 
-function resolveSavedContent(haiku: NonNullable<HaikuContainerProps["haiku"]>) {
+function resolveSavedContent(haiku: NonNullable<HaikuContainerProps["haiku"]>, showMeta: boolean) {
   const title = formatHaikuTitle(haiku);
   return {
     title,
     body: haiku.body,
-    meta: <LocalDateTime iso={haiku.createdAt} />,
+    meta: showMeta ? <LocalDateTime iso={haiku.createdAt} /> : undefined,
     generating: false,
   };
 }
@@ -194,6 +196,7 @@ function resolveHaikuStack(
     style,
     bodyOnly = false,
     showActions = true,
+    showMeta,
     typing = false,
     onDelete,
     onDeleted,
@@ -237,7 +240,7 @@ function resolveHaikuStack(
   }
 
   const { haiku } = noteProps;
-  const { title, body, meta } = resolveSavedContent(haiku);
+  const { title, body, meta } = resolveSavedContent(haiku, showMeta !== false);
 
   return (
     <div className={stackClass} style={stackStyle}>

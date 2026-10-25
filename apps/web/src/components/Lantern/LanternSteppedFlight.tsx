@@ -28,6 +28,8 @@ export type LanternSteppedFlightProps = {
   widthRem?: number;
   active?: boolean;
   reducedMotion?: boolean;
+  /** Forwarded to the flying Lantern (placeholder lanterns hide the date line). */
+  showMeta?: boolean;
   onComplete: () => void;
   onPoseHold?: (poseIndex: number) => void;
 };
@@ -44,6 +46,7 @@ export function LanternSteppedFlight({
   widthRem = 19,
   active = true,
   reducedMotion: reducedMotionProp,
+  showMeta,
   onComplete,
   onPoseHold,
 }: LanternSteppedFlightProps) {
@@ -90,7 +93,7 @@ export function LanternSteppedFlight({
             haikuLabels={haiku.labels}
             excludeLabelIds={excludeLabelIds}
           >
-            <Lantern haiku={haiku} showActions={false} />
+            <Lantern haiku={haiku} showActions={false} showMeta={showMeta} />
           </LanternFrame>
         );
       }}

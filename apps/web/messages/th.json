@@ -416,6 +416,10 @@
       "generating": "กำลังสร้างไฮกุ: {subject}",
       "haikuLantern": "โคมไฮกุ: {title}",
       "labels": "ป้ายของ {label}"
+    },
+    "emptyPlaceholder": {
+      "body": "เป็นเพียงตัวอย่าง\nเลือกหัวข้อของคุณเอง\nไฮกุของคุณรออยู่",
+      "ariaLabel": "โคมตัวอย่าง: เลือกหัวข้อด้านล่างเพื่อสร้างไฮกุแรกของคุณ"
     }
   },
   "SavedHaikusLanternPath": {

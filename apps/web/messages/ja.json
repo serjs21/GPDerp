@@ -416,6 +416,10 @@
       "generating": "俳句を生成中: {subject}",
       "haikuLantern": "俳句の提灯: {title}",
       "labels": "{label} のラベル"
+    },
+    "emptyPlaceholder": {
+      "body": "ただの仮置き\n好きなお題を選んでね\n俳句が待ってる",
+      "ariaLabel": "仮置きの提灯：下でお題を選んで最初の俳句を詠もう"
     }
   },
   "SavedHaikusLanternPath": {

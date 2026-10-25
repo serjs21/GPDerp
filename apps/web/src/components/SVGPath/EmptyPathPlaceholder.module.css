@@ -1,0 +1,28 @@
+/* Below the lantern, pointing down at the subject input (the brush arrow is drawn pointing right). */
+.arrow {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 4.5rem;
+  height: auto;
+  transform: translateX(-50%) rotate(90deg);
+  pointer-events: none;
+  user-select: none;
+  animation: arrowIn 0.4s ease-out both;
+}
+
+@keyframes arrowIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arrow {
+    animation: none;
+  }
+}

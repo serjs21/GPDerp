@@ -416,6 +416,10 @@
       "generating": "Đang tạo haiku: {subject}",
       "haikuLantern": "Đèn lồng haiku: {title}",
       "labels": "Nhãn của {label}"
+    },
+    "emptyPlaceholder": {
+      "body": "Chỉ là chỗ giữ,\nHãy chọn chủ đề của bạn,\nHaiku đang chờ bạn.",
+      "ariaLabel": "Đèn lồng mẫu: chọn một chủ đề bên dưới để tạo haiku đầu tiên"
     }
   },
   "SavedHaikusLanternPath": {

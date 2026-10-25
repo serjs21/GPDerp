@@ -416,6 +416,10 @@
       "generating": "Generating haiku: {subject}",
       "haikuLantern": "Haiku lantern: {title}",
       "labels": "{label} labels"
+    },
+    "emptyPlaceholder": {
+      "body": "Just a placeholder,\nChoose a subject of your own,\nYour haiku awaits.",
+      "ariaLabel": "Placeholder lantern: choose a subject below to create your first haiku"
     }
   },
   "SavedHaikusLanternPath": {
