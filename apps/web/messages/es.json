@@ -103,15 +103,38 @@
       "description": "Normas para un uso justo del servicio de generación de haikus."
     }
   },
+  "PricingPage": {
+    "title": "Precios",
+    "description": "Precios de GPDerp: 5 generaciones de haiku gratis para cuentas nuevas y después 100 más por 3,00 US$ (pago único).",
+    "intro": "GPDerp convierte cualquier tema en un farolillo de haiku escrito por IA. Cada generación escribe un haiku.",
+    "free": {
+      "name": "Gratis",
+      "price": "0 US$",
+      "detail": "5 generaciones de haiku para cada cuenta nueva."
+    },
+    "pack": {
+      "name": "100 generaciones de haiku",
+      "price": "3,00 US$",
+      "priceNote": "USD, pago único, más impuestos aplicables",
+      "detail": "Una compra añade exactamente 100 créditos de generación a tu cuenta."
+    },
+    "notesTitle": "Para tener en cuenta",
+    "notes": {
+      "noSubscription": "Sin suscripción ni cargos recurrentes: solo vuelves a pagar si compras otro paquete.",
+      "paddle": "Los pagos los procesa Paddle como comerciante registrado (merchant of record); los impuestos aplicables se calculan al pagar.",
+      "credits": "Los créditos se añaden a tu cuenta en cuanto se confirma el pago.",
+      "policies": "Los reembolsos y la facturación se rigen por nuestra <refund>Política de reembolsos</refund> y los <terms>Términos del servicio</terms>."
+    }
+  },
   "SiteFooter": {
     "legalPolicies": "Políticas legales",
+    "pricing": "Precios",
     "terms": "Términos del servicio",
     "privacy": "Política de privacidad",
     "refund": "Política de reembolso",
     "acceptableUse": "Uso aceptable",
     "cookies": "Política de cookies",
     "paddleNotice": "Los pagos los procesa <buyerTerms>Paddle</buyerTerms> como comerciante registrado. Al comprar se aplican la <refund>política de reembolso para compradores</refund>, los <checkout>términos de pago</checkout> y el <privacy>aviso de privacidad</privacy> de Paddle.",
-    "about": "GPDerp convierte cualquier tema en una linterna con un haiku escrito por IA. Las cuentas nuevas reciben 5 generaciones gratis; 100 más cuestan $3.00 (pago único, más impuestos aplicables).",
     "contactUs": "Contáctanos",
     "contactAriaLabel": "Contáctanos: escribe a {email}"
   },

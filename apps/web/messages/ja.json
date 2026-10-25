@@ -103,15 +103,38 @@
       "description": "俳句生成サービスを公正に利用するためのルールです。"
     }
   },
+  "PricingPage": {
+    "title": "料金",
+    "description": "GPDerp の料金：新規アカウントは俳句生成 5 回まで無料、その後は 100 回分が 3.00 米ドル（買い切り）。",
+    "intro": "GPDerp はどんなお題も AI が詠む俳句の提灯に変えます。1 回の生成で俳句を 1 句詠みます。",
+    "free": {
+      "name": "無料",
+      "price": "0 米ドル",
+      "detail": "新規アカウントごとに俳句生成 5 回分。"
+    },
+    "pack": {
+      "name": "俳句生成 100 回分",
+      "price": "3.00 米ドル",
+      "priceNote": "米ドル・買い切り・別途税金",
+      "detail": "1 回の購入で、アカウントに生成クレジットがちょうど 100 回分追加されます。"
+    },
+    "notesTitle": "ご案内",
+    "notes": {
+      "noSubscription": "サブスクリプションや定期課金はありません。追加のパックを購入した場合のみ再度お支払いいただきます。",
+      "paddle": "お支払いは販売事業者(Merchant of Record)である Paddle が処理し、適用される税金は決済時に計算されます。",
+      "credits": "お支払いが確認され次第、クレジットがアカウントに追加されます。",
+      "policies": "返金とお支払いについては<refund>返金ポリシー</refund>と<terms>利用規約</terms>をご覧ください。"
+    }
+  },
   "SiteFooter": {
     "legalPolicies": "法的ポリシー",
+    "pricing": "料金",
     "terms": "利用規約",
     "privacy": "プライバシーポリシー",
     "refund": "返金ポリシー",
     "acceptableUse": "利用ポリシー",
     "cookies": "Cookie ポリシー",
     "paddleNotice": "お支払いは販売事業者(Merchant of Record)である <buyerTerms>Paddle</buyerTerms> が処理します。購入時には Paddle の<refund>購入者向け返金ポリシー</refund>、<checkout>決済規約</checkout>、<privacy>プライバシー通知</privacy>が適用されます。",
-    "about": "GPDerp はどんなお題も AI が詠む俳句の灯籠に変えます。新規アカウントは 5 回まで無料で生成でき、追加の 100 回は $3.00（買い切り、税別）です。",
     "contactUs": "お問い合わせ",
     "contactAriaLabel": "お問い合わせ：{email} にメール"
   },

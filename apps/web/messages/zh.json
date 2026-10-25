@@ -103,15 +103,38 @@
       "description": "合理使用俳句生成服务的规则。"
     }
   },
+  "PricingPage": {
+    "title": "价格",
+    "description": "GPDerp 价格：新账户可免费生成 5 首俳句，之后 100 次生成仅需 3.00 美元（一次性付款）。",
+    "intro": "GPDerp 能把任何主题变成由 AI 写成的俳句灯笼。每次生成写一首俳句。",
+    "free": {
+      "name": "免费",
+      "price": "0 美元",
+      "detail": "每个新账户可生成 5 首俳句。"
+    },
+    "pack": {
+      "name": "100 次俳句生成",
+      "price": "3.00 美元",
+      "priceNote": "美元，一次性付款，另加适用税费",
+      "detail": "每次购买为你的账户添加正好 100 个生成点数。"
+    },
+    "notesTitle": "须知",
+    "notes": {
+      "noSubscription": "没有订阅，也没有定期扣费——只有再买一个点数包时才会再次付款。",
+      "paddle": "付款由 Paddle 作为记录商家（merchant of record）处理；适用税费在结账时计算。",
+      "credits": "付款确认后，点数会立即添加到你的账户。",
+      "policies": "退款和账单事宜请参阅我们的<refund>退款政策</refund>和<terms>服务条款</terms>。"
+    }
+  },
   "SiteFooter": {
     "legalPolicies": "法律政策",
+    "pricing": "价格",
     "terms": "服务条款",
     "privacy": "隐私政策",
     "refund": "退款政策",
     "acceptableUse": "可接受使用",
     "cookies": "Cookie 政策",
     "paddleNotice": "付款由 <buyerTerms>Paddle</buyerTerms> 作为记录商户处理。购买时适用 Paddle 的<refund>买家退款政策</refund>、<checkout>结账条款</checkout>和<privacy>隐私声明</privacy>。",
-    "about": "GPDerp 能把任何主题变成一盏由 AI 写下俳句的灯笼。新账户可免费生成 5 次；再购买 100 次只需 $3.00（一次性付款，另加适用税费）。",
     "contactUs": "联系我们",
     "contactAriaLabel": "联系我们：发送邮件至 {email}"
   },

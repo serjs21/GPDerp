@@ -103,15 +103,38 @@
       "description": "Règles d'utilisation équitable du service de génération de haïkus."
     }
   },
+  "PricingPage": {
+    "title": "Tarifs",
+    "description": "Tarifs de GPDerp : 5 générations de haïku gratuites pour les nouveaux comptes, puis 100 de plus pour 3,00 $ US (paiement unique).",
+    "intro": "GPDerp transforme n’importe quel sujet en lanterne haïku écrite par l’IA. Chaque génération écrit un haïku.",
+    "free": {
+      "name": "Gratuit",
+      "price": "0 $ US",
+      "detail": "5 générations de haïku pour chaque nouveau compte."
+    },
+    "pack": {
+      "name": "100 générations de haïku",
+      "price": "3,00 $ US",
+      "priceNote": "USD, paiement unique, taxes applicables en sus",
+      "detail": "Un achat ajoute exactement 100 crédits de génération à ton compte."
+    },
+    "notesTitle": "Bon à savoir",
+    "notes": {
+      "noSubscription": "Pas d’abonnement ni de frais récurrents : tu ne paies à nouveau que si tu achètes un autre pack.",
+      "paddle": "Les paiements sont traités par Paddle en tant que marchand officiel (merchant of record) ; les taxes applicables sont calculées au paiement.",
+      "credits": "Les crédits sont ajoutés à ton compte dès que le paiement est confirmé.",
+      "policies": "Les remboursements et la facturation relèvent de notre <refund>Politique de remboursement</refund> et de nos <terms>Conditions d’utilisation</terms>."
+    }
+  },
   "SiteFooter": {
     "legalPolicies": "Informations légales",
+    "pricing": "Tarifs",
     "terms": "Conditions d'utilisation",
     "privacy": "Politique de confidentialité",
     "refund": "Politique de remboursement",
     "acceptableUse": "Utilisation acceptable",
     "cookies": "Politique relative aux cookies",
     "paddleNotice": "Les paiements sont traités par <buyerTerms>Paddle</buyerTerms> en tant que marchand officiel. La <refund>politique de remboursement acheteur</refund>, les <checkout>conditions de paiement</checkout> et la <privacy>politique de confidentialité</privacy> de Paddle s'appliquent lors de l'achat.",
-    "about": "GPDerp transforme n'importe quel sujet en lanterne de haïku écrit par l'IA. Les nouveaux comptes reçoivent 5 générations gratuites ; 100 de plus coûtent $3.00 (paiement unique, taxes applicables en sus).",
     "contactUs": "Nous contacter",
     "contactAriaLabel": "Nous contacter : écrire à {email}"
   },

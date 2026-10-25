@@ -103,15 +103,38 @@
       "description": "Regole per un uso corretto del servizio di generazione di haiku."
     }
   },
+  "PricingPage": {
+    "title": "Prezzi",
+    "description": "Prezzi di GPDerp: 5 generazioni di haiku gratuite per i nuovi account, poi altre 100 a 3,00 US$ (una tantum).",
+    "intro": "GPDerp trasforma qualsiasi soggetto in una lanterna haiku scritta dall’IA. Ogni generazione scrive un haiku.",
+    "free": {
+      "name": "Gratis",
+      "price": "0 US$",
+      "detail": "5 generazioni di haiku per ogni nuovo account."
+    },
+    "pack": {
+      "name": "100 generazioni di haiku",
+      "price": "3,00 US$",
+      "priceNote": "USD, una tantum, più eventuali imposte",
+      "detail": "Un acquisto aggiunge esattamente 100 crediti di generazione al tuo account."
+    },
+    "notesTitle": "Da sapere",
+    "notes": {
+      "noSubscription": "Nessun abbonamento e nessun addebito ricorrente: paghi di nuovo solo se acquisti un altro pacchetto.",
+      "paddle": "I pagamenti sono elaborati da Paddle come merchant of record; le imposte applicabili vengono calcolate al checkout.",
+      "credits": "I crediti vengono aggiunti al tuo account non appena il pagamento è confermato.",
+      "policies": "Rimborsi e fatturazione sono regolati dalla nostra <refund>Politica di rimborso</refund> e dai <terms>Termini di servizio</terms>."
+    }
+  },
   "SiteFooter": {
     "legalPolicies": "Note legali",
+    "pricing": "Prezzi",
     "terms": "Termini di servizio",
     "privacy": "Informativa sulla privacy",
     "refund": "Politica di rimborso",
     "acceptableUse": "Utilizzo accettabile",
     "cookies": "Cookie Policy",
     "paddleNotice": "I pagamenti sono elaborati da <buyerTerms>Paddle</buyerTerms> in qualità di merchant of record. Al momento dell'acquisto si applicano la <refund>politica di rimborso per gli acquirenti</refund>, i <checkout>termini del checkout</checkout> e l'<privacy>informativa sulla privacy</privacy> di Paddle.",
-    "about": "GPDerp trasforma qualsiasi argomento in una lanterna con un haiku scritto dall'IA. I nuovi account ricevono 5 generazioni gratuite; altre 100 costano $3.00 (pagamento unico, più eventuali imposte).",
     "contactUs": "Contattaci",
     "contactAriaLabel": "Contattaci: scrivi a {email}"
   },

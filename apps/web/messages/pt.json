@@ -103,15 +103,38 @@
       "description": "Regras para o uso justo do serviço de geração de haiku."
     }
   },
+  "PricingPage": {
+    "title": "Preços",
+    "description": "Preços do GPDerp: 5 gerações de haiku grátis para novas contas e depois mais 100 por US$ 3,00 (pagamento único).",
+    "intro": "O GPDerp transforma qualquer tema em uma lanterna de haiku escrita por IA. Cada geração escreve um haiku.",
+    "free": {
+      "name": "Grátis",
+      "price": "US$ 0",
+      "detail": "5 gerações de haiku para cada nova conta."
+    },
+    "pack": {
+      "name": "100 gerações de haiku",
+      "price": "US$ 3,00",
+      "priceNote": "USD, pagamento único, mais impostos aplicáveis",
+      "detail": "Uma compra adiciona exatamente 100 créditos de geração à sua conta."
+    },
+    "notesTitle": "Bom saber",
+    "notes": {
+      "noSubscription": "Sem assinatura e sem cobranças recorrentes — você só paga de novo se comprar outro pacote.",
+      "paddle": "Os pagamentos são processados pela Paddle como merchant of record; os impostos aplicáveis são calculados no checkout.",
+      "credits": "Os créditos são adicionados à sua conta assim que o pagamento é confirmado.",
+      "policies": "Reembolsos e cobrança seguem nossa <refund>Política de reembolso</refund> e os <terms>Termos de serviço</terms>."
+    }
+  },
   "SiteFooter": {
     "legalPolicies": "Políticas legais",
+    "pricing": "Preços",
     "terms": "Termos de Serviço",
     "privacy": "Política de Privacidade",
     "refund": "Política de Reembolso",
     "acceptableUse": "Uso Aceitável",
     "cookies": "Política de Cookies",
     "paddleNotice": "Os pagamentos são processados pela <buyerTerms>Paddle</buyerTerms> como revendedora oficial. A <refund>política de reembolso ao comprador</refund>, os <checkout>termos de checkout</checkout> e o <privacy>aviso de privacidade</privacy> da Paddle se aplicam à compra.",
-    "about": "GPDerp transforma qualquer tema em uma lanterna com um haicai escrito por IA. Contas novas recebem 5 gerações grátis; mais 100 custam $3.00 (pagamento único, mais impostos aplicáveis).",
     "contactUs": "Fale conosco",
     "contactAriaLabel": "Fale conosco: envie um e-mail para {email}"
   },

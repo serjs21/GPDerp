@@ -103,15 +103,38 @@
       "description": "Regeln für die faire Nutzung des Haiku-Generierungsdienstes."
     }
   },
+  "PricingPage": {
+    "title": "Preise",
+    "description": "GPDerp-Preise: 5 kostenlose Haiku-Generierungen für neue Konten, danach 100 weitere für 3,00 $ (einmalig).",
+    "intro": "GPDerp verwandelt jedes Thema in eine Haiku-Laterne, geschrieben von KI. Jede Generierung schreibt ein Haiku.",
+    "free": {
+      "name": "Kostenlos",
+      "price": "0 $",
+      "detail": "5 Haiku-Generierungen für jedes neue Konto."
+    },
+    "pack": {
+      "name": "100 Haiku-Generierungen",
+      "price": "3,00 $",
+      "priceNote": "USD, einmalig, zzgl. anfallender Steuern",
+      "detail": "Ein Kauf fügt deinem Konto genau 100 Generierungs-Credits hinzu."
+    },
+    "notesTitle": "Gut zu wissen",
+    "notes": {
+      "noSubscription": "Kein Abo und keine wiederkehrenden Kosten – du zahlst nur erneut, wenn du ein weiteres Paket kaufst.",
+      "paddle": "Zahlungen werden von Paddle als Händler (Merchant of Record) abgewickelt; anfallende Steuern werden beim Checkout berechnet.",
+      "credits": "Die Credits werden deinem Konto gutgeschrieben, sobald die Zahlung bestätigt ist.",
+      "policies": "Erstattungen und Abrechnung regeln unsere <refund>Erstattungsrichtlinie</refund> und <terms>Nutzungsbedingungen</terms>."
+    }
+  },
   "SiteFooter": {
     "legalPolicies": "Rechtliches",
+    "pricing": "Preise",
     "terms": "Nutzungsbedingungen",
     "privacy": "Datenschutzerklärung",
     "refund": "Erstattungsrichtlinie",
     "acceptableUse": "Akzeptable Nutzung",
     "cookies": "Cookie-Richtlinie",
     "paddleNotice": "Zahlungen werden von <buyerTerms>Paddle</buyerTerms> als Händler (Merchant of Record) abgewickelt. Beim Kauf gelten Paddles <refund>Erstattungsrichtlinie für Käufer</refund>, <checkout>Checkout-Bedingungen</checkout> und <privacy>Datenschutzhinweise</privacy>.",
-    "about": "GPDerp verwandelt jedes Thema in eine KI-geschriebene Haiku-Laterne. Neue Konten erhalten 5 kostenlose Generierungen; 100 weitere kosten $3.00 (einmalig, zzgl. anfallender Steuern).",
     "contactUs": "Kontakt",
     "contactAriaLabel": "Kontakt: E-Mail an {email}"
   },

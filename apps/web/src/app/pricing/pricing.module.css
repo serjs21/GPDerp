@@ -1,0 +1,55 @@
+.plans {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0 2rem;
+}
+
+@media (max-width: 560px) {
+  .plans {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.plan {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.25rem 1rem 1.4rem;
+  border: 1px solid rgba(45, 45, 45, 0.18);
+  border-radius: 4px;
+  background: #fff;
+  text-align: center;
+}
+
+.planFeatured {
+  border: 2px solid var(--accent-red);
+}
+
+.planName {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: 1.35rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+}
+
+.planPrice {
+  margin: 0;
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.planPriceNote {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.planDetail {
+  margin: 0.85rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}

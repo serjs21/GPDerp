@@ -15,8 +15,9 @@ export function SiteFooter() {
   const t = useTranslations("SiteFooter");
   return (
     <footer className={styles.footer}>
-      <p className={styles.about}>{t("about")}</p>
       <nav className={styles.links} aria-label={t("legalPolicies")}>
+        <Link href="/pricing">{t("pricing")}</Link>
+        <Sep />
         <Link href="/terms">{t("terms")}</Link>
         <Sep />
         <Link href="/privacy">{t("privacy")}</Link>

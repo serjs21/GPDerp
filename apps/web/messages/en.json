@@ -103,15 +103,38 @@
       "description": "Rules for fair use of the Haiku generation service."
     }
   },
+  "PricingPage": {
+    "title": "Pricing",
+    "description": "GPDerp pricing: 5 free haiku generations for new accounts, then 100 more for $3.00 (one-time).",
+    "intro": "GPDerp turns any subject into an AI-written haiku lantern. Each generation writes one haiku.",
+    "free": {
+      "name": "Free",
+      "price": "$0",
+      "detail": "5 haiku generations for every new account."
+    },
+    "pack": {
+      "name": "100 Haiku Generations",
+      "price": "$3.00",
+      "priceNote": "USD, one-time, plus applicable tax",
+      "detail": "One purchase adds exactly 100 generation credits to your account."
+    },
+    "notesTitle": "Good to know",
+    "notes": {
+      "noSubscription": "No subscription and no recurring charges — you only pay again if you buy another pack.",
+      "paddle": "Payments are processed by Paddle as merchant of record; applicable taxes are calculated at checkout.",
+      "credits": "Credits are added to your account as soon as the payment is confirmed.",
+      "policies": "Refunds and billing are covered by our <refund>Refund Policy</refund> and <terms>Terms of Service</terms>."
+    }
+  },
   "SiteFooter": {
     "legalPolicies": "Legal policies",
+    "pricing": "Pricing",
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
     "refund": "Refund Policy",
     "acceptableUse": "Acceptable Use",
     "cookies": "Cookie Policy",
     "paddleNotice": "Payments are processed by <buyerTerms>Paddle</buyerTerms> as merchant of record. Paddle's <refund>buyer refund policy</refund>, <checkout>checkout terms</checkout>, and <privacy>privacy notice</privacy> apply at purchase.",
-    "about": "GPDerp turns any subject into an AI-written haiku lantern. New accounts get 5 free generations; 100 more cost $3.00 (one-time, plus applicable tax).",
     "contactUs": "Contact us",
     "contactAriaLabel": "Contact us: email {email}"
   },

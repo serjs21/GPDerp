@@ -7,14 +7,6 @@
   border-top: 1px solid var(--footer-border);
 }
 
-.about {
-  font-size: 0.8125rem;
-  line-height: 1.5;
-  color: var(--highlight-on-sky, var(--sumi-ink));
-  max-width: 36rem;
-  margin: 0 auto 0.35rem;
-}
-
 .contactButton {
   position: absolute;
   right: 1.25rem;

@@ -103,15 +103,38 @@
       "description": "Quy tắc sử dụng hợp lý dịch vụ tạo haiku."
     }
   },
+  "PricingPage": {
+    "title": "Bảng giá",
+    "description": "Bảng giá GPDerp: tài khoản mới được tạo 5 bài haiku miễn phí, sau đó thêm 100 lượt với giá 3,00 USD (trả một lần).",
+    "intro": "GPDerp biến mọi chủ đề thành một đèn lồng haiku do AI viết. Mỗi lượt tạo viết một bài haiku.",
+    "free": {
+      "name": "Miễn phí",
+      "price": "0 USD",
+      "detail": "5 lượt tạo haiku cho mỗi tài khoản mới."
+    },
+    "pack": {
+      "name": "100 lượt tạo haiku",
+      "price": "3,00 USD",
+      "priceNote": "USD, trả một lần, chưa gồm thuế áp dụng",
+      "detail": "Mỗi lần mua cộng đúng 100 tín dụng tạo haiku vào tài khoản của bạn."
+    },
+    "notesTitle": "Cần biết",
+    "notes": {
+      "noSubscription": "Không có gói đăng ký và không thu phí định kỳ — bạn chỉ trả tiền lại nếu mua thêm gói.",
+      "paddle": "Thanh toán do Paddle xử lý với vai trò bên bán chính thức (merchant of record); thuế áp dụng được tính khi thanh toán.",
+      "credits": "Tín dụng được cộng vào tài khoản ngay khi thanh toán được xác nhận.",
+      "policies": "Việc hoàn tiền và thanh toán tuân theo <refund>Chính sách hoàn tiền</refund> và <terms>Điều khoản dịch vụ</terms> của chúng tôi."
+    }
+  },
   "SiteFooter": {
     "legalPolicies": "Chính sách pháp lý",
+    "pricing": "Bảng giá",
     "terms": "Điều khoản dịch vụ",
     "privacy": "Chính sách quyền riêng tư",
     "refund": "Chính sách hoàn tiền",
     "acceptableUse": "Sử dụng được chấp nhận",
     "cookies": "Chính sách cookie",
     "paddleNotice": "Thanh toán được xử lý bởi <buyerTerms>Paddle</buyerTerms> với tư cách bên bán chính thức. <refund>Chính sách hoàn tiền cho người mua</refund>, <checkout>điều khoản thanh toán</checkout> và <privacy>thông báo quyền riêng tư</privacy> của Paddle được áp dụng khi mua hàng.",
-    "about": "GPDerp biến mọi chủ đề thành một chiếc đèn lồng thơ haiku do AI viết. Tài khoản mới được 5 lượt tạo miễn phí; thêm 100 lượt có giá $3.00 (thanh toán một lần, chưa gồm thuế áp dụng).",
     "contactUs": "Liên hệ",
     "contactAriaLabel": "Liên hệ: gửi email tới {email}"
   },
