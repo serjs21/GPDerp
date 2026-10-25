@@ -919,5 +919,10 @@
     "sent": "Đã gửi email xác minh — hãy kiểm tra hộp thư",
     "cooldown": "Chúng tôi vừa gửi — thử lại sau một phút",
     "error": "Không gửi được email xác minh"
+  },
+  "GuestProductIntro": {
+    "summary": "GPDerp biến mọi chủ đề thành một chiếc đèn lồng thơ haiku do AI viết. Tài khoản mới được 5 lượt tạo miễn phí; thêm 100 lượt có giá $3.00 (thanh toán một lần, chưa gồm thuế áp dụng).",
+    "ariaLabel": "Giới thiệu GPDerp",
+    "linksAriaLabel": "Thêm về GPDerp"
   }
 }

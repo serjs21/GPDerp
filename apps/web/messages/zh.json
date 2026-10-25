@@ -919,5 +919,10 @@
     "sent": "验证邮件已发送，请查收",
     "cooldown": "刚刚已发送，请一分钟后再试",
     "error": "无法发送验证邮件"
+  },
+  "GuestProductIntro": {
+    "summary": "GPDerp 能把任何主题变成一盏由 AI 写下俳句的灯笼。新账户可免费生成 5 次；再购买 100 次只需 $3.00（一次性付款，另加适用税费）。",
+    "ariaLabel": "关于 GPDerp",
+    "linksAriaLabel": "了解更多 GPDerp"
   }
 }

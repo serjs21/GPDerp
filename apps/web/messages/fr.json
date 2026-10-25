@@ -919,5 +919,10 @@
     "sent": "E-mail de vérification envoyé — consulte ta boîte de réception",
     "cooldown": "Nous venons d’en envoyer un — réessaie dans une minute",
     "error": "Impossible d’envoyer l’e-mail de vérification"
+  },
+  "GuestProductIntro": {
+    "summary": "GPDerp transforme n'importe quel sujet en lanterne de haïku écrit par l'IA. Les nouveaux comptes reçoivent 5 générations gratuites ; 100 de plus coûtent $3.00 (paiement unique, taxes applicables en sus).",
+    "ariaLabel": "À propos de GPDerp",
+    "linksAriaLabel": "En savoir plus sur GPDerp"
   }
 }
