@@ -112,7 +112,8 @@
     "cookies": "Cookie ポリシー",
     "paddleNotice": "お支払いは販売事業者(Merchant of Record)である <buyerTerms>Paddle</buyerTerms> が処理します。購入時には Paddle の<refund>購入者向け返金ポリシー</refund>、<checkout>決済規約</checkout>、<privacy>プライバシー通知</privacy>が適用されます。",
     "about": "GPDerp はどんなお題も AI が詠む俳句の灯籠に変えます。新規アカウントは 5 回まで無料で生成でき、追加の 100 回は $3.00（買い切り、税別）です。",
-    "contact": "お問い合わせ: <email>support@gpderp.party</email>"
+    "contactUs": "お問い合わせ",
+    "contactAriaLabel": "お問い合わせ：{email} にメール"
   },
   "NoCreditsLeft": {
     "continueGenerationOffer": {

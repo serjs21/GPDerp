@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { SiteFooterContact } from "./SiteFooterContact";
 import styles from "./SiteFooter.module.css";
 
 const PADDLE_BUYER_TERMS = "https://www.paddle.com/legal/checkout-buyer-terms";
 const PADDLE_PRIVACY = "https://www.paddle.com/legal/privacy";
 const PADDLE_REFUND = "https://www.paddle.com/legal/refund-policy";
-const SUPPORT_EMAIL = "support@gpderp.party";
 
 function Sep() {
   return <span className={styles.sep} aria-hidden="true">·</span>;
@@ -16,11 +16,6 @@ export function SiteFooter() {
   return (
     <footer className={styles.footer}>
       <p className={styles.about}>{t("about")}</p>
-      <p className={styles.contact}>
-        {t.rich("contact", {
-          email: (chunks) => <a href={`mailto:${SUPPORT_EMAIL}`}>{chunks}</a>,
-        })}
-      </p>
       <nav className={styles.links} aria-label={t("legalPolicies")}>
         <Link href="/terms">{t("terms")}</Link>
         <Sep />
@@ -56,6 +51,7 @@ export function SiteFooter() {
           ),
         })}
       </p>
+      <SiteFooterContact />
     </footer>
   );
 }

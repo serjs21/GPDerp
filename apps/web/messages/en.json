@@ -112,7 +112,8 @@
     "cookies": "Cookie Policy",
     "paddleNotice": "Payments are processed by <buyerTerms>Paddle</buyerTerms> as merchant of record. Paddle's <refund>buyer refund policy</refund>, <checkout>checkout terms</checkout>, and <privacy>privacy notice</privacy> apply at purchase.",
     "about": "GPDerp turns any subject into an AI-written haiku lantern. New accounts get 5 free generations; 100 more cost $3.00 (one-time, plus applicable tax).",
-    "contact": "Contact: <email>support@gpderp.party</email>"
+    "contactUs": "Contact us",
+    "contactAriaLabel": "Contact us: email {email}"
   },
   "NoCreditsLeft": {
     "continueGenerationOffer": {

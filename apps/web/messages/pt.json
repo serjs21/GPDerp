@@ -112,7 +112,8 @@
     "cookies": "Política de Cookies",
     "paddleNotice": "Os pagamentos são processados pela <buyerTerms>Paddle</buyerTerms> como revendedora oficial. A <refund>política de reembolso ao comprador</refund>, os <checkout>termos de checkout</checkout> e o <privacy>aviso de privacidade</privacy> da Paddle se aplicam à compra.",
     "about": "GPDerp transforma qualquer tema em uma lanterna com um haicai escrito por IA. Contas novas recebem 5 gerações grátis; mais 100 custam $3.00 (pagamento único, mais impostos aplicáveis).",
-    "contact": "Contato: <email>support@gpderp.party</email>"
+    "contactUs": "Fale conosco",
+    "contactAriaLabel": "Fale conosco: envie um e-mail para {email}"
   },
   "NoCreditsLeft": {
     "continueGenerationOffer": {

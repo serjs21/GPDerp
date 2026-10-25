@@ -112,7 +112,8 @@
     "cookies": "Política de cookies",
     "paddleNotice": "Los pagos los procesa <buyerTerms>Paddle</buyerTerms> como comerciante registrado. Al comprar se aplican la <refund>política de reembolso para compradores</refund>, los <checkout>términos de pago</checkout> y el <privacy>aviso de privacidad</privacy> de Paddle.",
     "about": "GPDerp convierte cualquier tema en una linterna con un haiku escrito por IA. Las cuentas nuevas reciben 5 generaciones gratis; 100 más cuestan $3.00 (pago único, más impuestos aplicables).",
-    "contact": "Contacto: <email>support@gpderp.party</email>"
+    "contactUs": "Contáctanos",
+    "contactAriaLabel": "Contáctanos: escribe a {email}"
   },
   "NoCreditsLeft": {
     "continueGenerationOffer": {

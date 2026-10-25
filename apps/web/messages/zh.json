@@ -112,7 +112,8 @@
     "cookies": "Cookie 政策",
     "paddleNotice": "付款由 <buyerTerms>Paddle</buyerTerms> 作为记录商户处理。购买时适用 Paddle 的<refund>买家退款政策</refund>、<checkout>结账条款</checkout>和<privacy>隐私声明</privacy>。",
     "about": "GPDerp 能把任何主题变成一盏由 AI 写下俳句的灯笼。新账户可免费生成 5 次；再购买 100 次只需 $3.00（一次性付款，另加适用税费）。",
-    "contact": "联系我们：<email>support@gpderp.party</email>"
+    "contactUs": "联系我们",
+    "contactAriaLabel": "联系我们：发送邮件至 {email}"
   },
   "NoCreditsLeft": {
     "continueGenerationOffer": {

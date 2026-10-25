@@ -112,7 +112,8 @@
     "cookies": "Cookie-Richtlinie",
     "paddleNotice": "Zahlungen werden von <buyerTerms>Paddle</buyerTerms> als Händler (Merchant of Record) abgewickelt. Beim Kauf gelten Paddles <refund>Erstattungsrichtlinie für Käufer</refund>, <checkout>Checkout-Bedingungen</checkout> und <privacy>Datenschutzhinweise</privacy>.",
     "about": "GPDerp verwandelt jedes Thema in eine KI-geschriebene Haiku-Laterne. Neue Konten erhalten 5 kostenlose Generierungen; 100 weitere kosten $3.00 (einmalig, zzgl. anfallender Steuern).",
-    "contact": "Kontakt: <email>support@gpderp.party</email>"
+    "contactUs": "Kontakt",
+    "contactAriaLabel": "Kontakt: E-Mail an {email}"
   },
   "NoCreditsLeft": {
     "continueGenerationOffer": {

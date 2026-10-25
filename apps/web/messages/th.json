@@ -112,7 +112,8 @@
     "cookies": "นโยบายคุกกี้",
     "paddleNotice": "การชำระเงินดำเนินการโดย <buyerTerms>Paddle</buyerTerms> ในฐานะผู้ขายอย่างเป็นทางการ โดย<refund>นโยบายการคืนเงินสำหรับผู้ซื้อ</refund> <checkout>ข้อกำหนดการชำระเงิน</checkout> และ<privacy>ประกาศความเป็นส่วนตัว</privacy>ของ Paddle จะมีผลเมื่อซื้อ",
     "about": "GPDerp เปลี่ยนทุกหัวข้อให้เป็นโคมไฮกุที่เขียนโดย AI บัญชีใหม่สร้างได้ฟรี 5 ครั้ง และซื้อเพิ่ม 100 ครั้งในราคา $3.00 (ชำระครั้งเดียว ไม่รวมภาษีที่เกี่ยวข้อง)",
-    "contact": "ติดต่อ: <email>support@gpderp.party</email>"
+    "contactUs": "ติดต่อเรา",
+    "contactAriaLabel": "ติดต่อเรา: ส่งอีเมลถึง {email}"
   },
   "NoCreditsLeft": {
     "continueGenerationOffer": {

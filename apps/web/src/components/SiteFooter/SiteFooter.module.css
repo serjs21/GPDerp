@@ -1,4 +1,5 @@
 .footer {
+  position: relative;
   flex-shrink: 0;
   padding: 1.25rem 1.25rem 1.5rem;
   text-align: center;
@@ -14,18 +15,58 @@
   margin: 0 auto 0.35rem;
 }
 
-.contact {
-  font-size: 0.8125rem;
-  line-height: 1.5;
+.contactButton {
+  position: absolute;
+  right: 1.25rem;
+  bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
   color: var(--highlight-on-sky, var(--sumi-ink));
-  margin: 0 0 0.6rem;
+  text-decoration: none;
+  transition: transform 0.15s ease;
 }
 
-.contact a {
-  color: var(--highlight-on-sky, var(--accent-red));
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+.contactButton:hover,
+.contactButton:focus-visible {
+  transform: scale(1.06);
+}
+
+/* The SVG's lines and dots are near-black on transparent: as a mask they take the highlight color. */
+.contactIcon {
+  display: block;
+  width: 3.5rem;
+  aspect-ratio: 350.28 / 392.69;
+  background-color: currentColor;
+  mask: url("/contact_us.svg") center / contain no-repeat;
+  -webkit-mask: url("/contact_us.svg") center / contain no-repeat;
+}
+
+.contactCaption {
+  font-family: var(--font-comic-label), "Bangers", sans-serif;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/*
+ * Below ~820px the centered 36rem text block reaches the right corner, so the button joins the
+ * flow below it instead of overlapping.
+ */
+@media (max-width: 819.98px) {
+  .contactButton {
+    position: static;
+    width: fit-content;
+    margin: 0.85rem auto 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contactButton {
+    transition: none;
+  }
 }
 
 .links {
