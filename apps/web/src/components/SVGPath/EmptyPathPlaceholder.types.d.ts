@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { HaikuDto } from "@/api/haikus";
 import type { LanternTransform } from "@/components/Lantern/lanternTransform";
 import type { EmptyPathPlaceholderVariant } from "./consts/emptyPathPlaceholderConsts";
@@ -10,6 +11,8 @@ export type EmptyPathPlaceholderProps = {
   eligible: boolean;
   /** A haiku is generating: the placeholder makes way for its lantern. */
   generating: boolean;
+  /** Rendered 5rem under the parked lantern (e.g. the resend-verification button). */
+  action?: ReactNode;
 };
 
 export type EmptyPathPlaceholderLanternProps = {
@@ -21,11 +24,12 @@ export type EmptyPathPlaceholderLanternProps = {
   suppressReveal: boolean;
   /** Arrow on the paper pointing down at what sits below the path. */
   showArrow: boolean;
+  action?: ReactNode;
 };
 
 export type ShownPlaceholderLanternProps = Pick<
   EmptyPathPlaceholderLanternProps,
-  "haiku" | "ariaLabel" | "showArrow"
+  "haiku" | "ariaLabel" | "showArrow" | "action"
 > & {
   parsed: ParsedSplitPathSvg;
   /** Flying in along the creation path; parked on the focus stop once false. */

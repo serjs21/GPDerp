@@ -12,7 +12,7 @@ import { emptyPathPlaceholderContent } from "./utils/emptyPathPlaceholderUtils";
  * the path. Flies away like a deleted haiku as a generation starts; flies in like a created one
  * when the path empties again.
  */
-export function EmptyPathPlaceholder({ parsed, variant, eligible, generating }: EmptyPathPlaceholderProps) {
+export function EmptyPathPlaceholder({ parsed, variant, eligible, generating, action }: EmptyPathPlaceholderProps) {
   const t = useTranslations("SVGPath");
   const { phase, onEnterComplete, onExitComplete } = usePathEmptyPlaceholder({ eligible, generating });
   if (phase === "gone" || !parsed) return null;
@@ -27,6 +27,7 @@ export function EmptyPathPlaceholder({ parsed, variant, eligible, generating }: 
       haiku={haiku}
       ariaLabel={ariaLabel}
       showArrow={showArrow}
+      action={action}
       entering={phase === "entering"}
       onEnterComplete={onEnterComplete}
     />

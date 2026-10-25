@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useImperativeHandle, useRef } from "react";
+import { forwardRef, useImperativeHandle, useRef, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import type { HaikuDto } from "@/api/haikus";
 import type { GeneratingDraft } from "@/hooks/useHaikuSocket";
@@ -62,6 +62,8 @@ export type SVGPathProps = {
   excludeLabelIds?: string[];
   /** Placeholder lantern shown while `haikus` is empty; omit for none (e.g. filtered lists with no matches). */
   emptyPlaceholder?: EmptyPathPlaceholderVariant;
+  /** Shown 5rem under the parked placeholder lantern (e.g. the resend-verification button). */
+  emptyPlaceholderAction?: ReactNode;
   className?: string;
   showGuides?: boolean;
 };
@@ -78,7 +80,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
     props,
     SVG_PATH_DEFAULTS,
   );
-  const { emptyPlaceholder } = props;
+  const { emptyPlaceholder, emptyPlaceholderAction } = props;
   const { initialFocusIndex } = props;
   const { haikus, generatingDraft, excludeLabelIds, onHaikuDeleteFailed, onHaikuChanged } = props;
   const t = useTranslations("SVGPath.svgPath");
@@ -211,6 +213,7 @@ export const SVGPath = forwardRef<SVGPathHandle, SVGPathProps>(function SVGPath(
               variant={emptyPlaceholder ?? "createFirst"}
               eligible={Boolean(emptyPlaceholder) && haikus.length === 0}
               generating={Boolean(generatingDraft)}
+              action={emptyPlaceholderAction}
             />
             {exitingLanterns.map(({ haiku, transform }) => (
               <ExitingPathLantern

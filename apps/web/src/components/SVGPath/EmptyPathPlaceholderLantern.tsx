@@ -29,6 +29,7 @@ export function EmptyPathPlaceholderLantern({
   isAnimating,
   suppressReveal,
   showArrow,
+  action,
 }: EmptyPathPlaceholderLanternProps) {
   const rootClassName = haloPathLanternClassName(svgPathLanternClassName(isAnimating), false);
   return (
@@ -49,6 +50,7 @@ export function EmptyPathPlaceholderLantern({
         // eslint-disable-next-line @next/next/no-img-element -- static public SVG
         <img className={styles.arrow} src={EMPTY_PATH_PLACEHOLDER_ARROW_SRC} alt="" aria-hidden draggable={false} />
       ) : null}
+      {action ? <div className={styles.action}>{action}</div> : null}
     </div>
   );
 }

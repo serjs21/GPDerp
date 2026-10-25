@@ -16,6 +16,7 @@ describe("emptyPathPlaceholderContent", () => {
     expect(content.haiku.title).toBe("<verifyEmailPlaceholder.title>");
     expect(content.haiku.body).toBe("<verifyEmailPlaceholder.body>");
     expect(content.ariaLabel).toBe("<verifyEmailPlaceholder.ariaLabel>");
+    expect(content.showArrow).toBe(false);
     expect(content.haiku.id).not.toBe(emptyPathPlaceholderContent("createFirst", t).haiku.id);
   });
 });

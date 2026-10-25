@@ -18,6 +18,7 @@ export function ShownPlaceholderLantern({
   haiku,
   ariaLabel,
   showArrow,
+  action,
   entering,
   onEnterComplete,
 }: ShownPlaceholderLanternProps) {
@@ -51,6 +52,7 @@ export function ShownPlaceholderLantern({
       isAnimating={entering}
       suppressReveal={suppressReveal}
       showArrow={showArrow}
+      action={entering ? undefined : action}
     />
   );
 }

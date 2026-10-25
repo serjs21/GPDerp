@@ -13,3 +13,15 @@
   pointer-events: none;
   user-select: none;
 }
+
+/* Action under the parked lantern (lantern scale is 1 on the focus stop, so the gap is a true 5rem). */
+.action {
+  position: absolute;
+  top: calc(100% + 5rem);
+  left: 50%;
+  z-index: 2;
+  /* Own width: an absolute box would otherwise shrink to the lantern's width and squash the button. */
+  width: max-content;
+  transform: translateX(-50%);
+  pointer-events: auto;
+}

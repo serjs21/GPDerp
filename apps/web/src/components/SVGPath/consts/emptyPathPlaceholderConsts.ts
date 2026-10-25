@@ -16,6 +16,6 @@ export const EMPTY_PATH_PLACEHOLDER_VARIANTS: Record<
 > = {
   /** No haikus yet: points at the subject input. */
   createFirst: { messageKey: "emptyPlaceholder", hasTitle: false, showArrow: true },
-  /** Email not verified: points at the resend button. */
-  verifyEmail: { messageKey: "verifyEmailPlaceholder", hasTitle: true, showArrow: true },
+  /** Email not verified: the resend button sits right under the lantern instead. */
+  verifyEmail: { messageKey: "verifyEmailPlaceholder", hasTitle: true, showArrow: false },
 };
