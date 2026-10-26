@@ -10,6 +10,7 @@ import { ComicPanelTabs } from "@/components/ComicPanelTabs";
 import { LabelMethodIcon } from "@/components/LabelMethodIcon";
 import { LoginFlow, type AuthFlowHandle } from "@/components/AuthFlows/LoginFlow";
 import { RegisterFlow } from "@/components/AuthFlows/RegisterFlow";
+import { useAuthCredentials } from "@/hooks/useAuthCredentials";
 import { GoogleOAuthScope } from "@/components/GoogleOAuthScope";
 import { useAuthenticationVerification } from "@/app/providers/AuthenticationVerificationProvider";
 import styles from "./styles.module.css";
@@ -38,6 +39,9 @@ export function AuthGateModal({
     onForgotPassword ?? (() => authVerification.openResetPasswordModal({ mode: "request" }));
   const [mode, setMode] = useState<AuthGateMode>(initialMode);
   const [submitting, setSubmitting] = useState(false);
+  // Shared by the Login and Register tabs so switching tabs keeps what was typed.
+  const credentials = useAuthCredentials();
+  const { setEmail, setPassword } = credentials;
   const loginRef = useRef<AuthFlowHandle>(null);
   const registerRef = useRef<AuthFlowHandle>(null);
 
@@ -45,7 +49,9 @@ export function AuthGateModal({
     if (!open) return;
     setMode(initialMode);
     setSubmitting(false);
-  }, [open, initialMode]);
+    setEmail("");
+    setPassword("");
+  }, [open, initialMode, setEmail, setPassword]);
 
   const handleAuthenticated = () => {
     onAuthenticated();
@@ -136,6 +142,7 @@ export function AuthGateModal({
                   onSubmittingChange={setSubmitting}
                   onSuccess={handleAuthenticated}
                   onGoogleSignupRequired={() => setMode("register")}
+                  credentials={credentials}
                 />
               ) : (
                 <RegisterFlow
@@ -144,6 +151,7 @@ export function AuthGateModal({
                   hideCta
                   onSubmittingChange={setSubmitting}
                   onSuccess={handleAuthenticated}
+                  credentials={credentials}
                 />
               )}
             </GoogleOAuthScope>

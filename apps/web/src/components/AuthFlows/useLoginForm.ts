@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { continueWithGoogleCredential } from "@/api/authentication";
 import { useGoogleOAuthAvailability } from "@/app/providers/GoogleOAuthAvailabilityProvider";
+import { useAuthCredentials } from "@/hooks/useAuthCredentials";
 import type { LoginFlowProps } from "./LoginFlow.types";
 import { loginFormErrorKey } from "./utils/authFlowValidation";
 import {
@@ -25,11 +26,12 @@ export function useLoginForm({
   showGoogle,
   onGoogleSignupRequired,
   onSubmittingChange,
+  credentials,
 }: Omit<LoginFlowProps, "hideCta" | "showGoogle"> & { showGoogle: boolean }) {
   const t = useTranslations("AuthFlows.login");
   const googleOAuthEnabled = useGoogleOAuthAvailability();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const ownCredentials = useAuthCredentials();
+  const { email, password, setEmail, setPassword } = credentials ?? ownCredentials;
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

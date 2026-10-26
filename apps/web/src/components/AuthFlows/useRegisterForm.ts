@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useGoogleOAuthAvailability } from "@/app/providers/GoogleOAuthAvailabilityProvider";
+import { useAuthCredentials } from "@/hooks/useAuthCredentials";
 import { useRegistration, type RegisterFormValues } from "@/hooks/useRegistration";
 import type { RegisterFlowProps } from "./RegisterFlow.types";
 import { registerFormErrorKey } from "./utils/authFlowValidation";
@@ -12,11 +13,12 @@ export function useRegisterForm({
   onSuccess,
   showGoogle,
   onSubmittingChange,
+  credentials,
 }: Omit<RegisterFlowProps, "hideCta" | "showGoogle"> & { showGoogle: boolean }) {
   const t = useTranslations("AuthFlows.register");
   const googleOAuthEnabled = useGoogleOAuthAvailability();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const ownCredentials = useAuthCredentials();
+  const { email, password, setEmail, setPassword } = credentials ?? ownCredentials;
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
 

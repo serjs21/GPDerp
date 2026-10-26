@@ -23,6 +23,7 @@ export const LoginFlow = forwardRef<AuthFlowHandle, LoginFlowProps>(function Log
     showGoogle,
     onGoogleSignupRequired: props.onGoogleSignupRequired,
     onSubmittingChange: props.onSubmittingChange,
+    credentials: props.credentials,
   });
 
   useImperativeHandle(ref, () => ({

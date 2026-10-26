@@ -21,6 +21,7 @@ export const RegisterFlow = forwardRef<AuthFlowHandle, RegisterFlowProps>(functi
     onSuccess: props.onSuccess,
     showGoogle,
     onSubmittingChange: props.onSubmittingChange,
+    credentials: props.credentials,
   });
 
   useImperativeHandle(ref, () => ({
