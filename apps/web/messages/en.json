@@ -919,10 +919,5 @@
     "sent": "Verification email sent — check your inbox",
     "cooldown": "We just sent one — try again in a minute",
     "error": "Could not send the verification email"
-  },
-  "GuestProductIntro": {
-    "summary": "GPDerp turns any subject into an AI-written haiku lantern. New accounts get 5 free generations; 100 more cost $3.00 (one-time, plus applicable tax).",
-    "ariaLabel": "About GPDerp",
-    "linksAriaLabel": "More about GPDerp"
   }
 }

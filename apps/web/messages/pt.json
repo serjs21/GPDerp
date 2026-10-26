@@ -919,10 +919,5 @@
     "sent": "E-mail de verificação enviado — confira sua caixa de entrada",
     "cooldown": "Acabamos de enviar um — tente de novo em um minuto",
     "error": "Não foi possível enviar o e-mail de verificação"
-  },
-  "GuestProductIntro": {
-    "summary": "GPDerp transforma qualquer tema em uma lanterna com um haicai escrito por IA. Contas novas recebem 5 gerações grátis; mais 100 custam $3.00 (pagamento único, mais impostos aplicáveis).",
-    "ariaLabel": "Sobre o GPDerp",
-    "linksAriaLabel": "Mais sobre o GPDerp"
   }
 }

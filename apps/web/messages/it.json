@@ -919,10 +919,5 @@
     "sent": "Email di verifica inviata: controlla la tua casella",
     "cooldown": "Ne abbiamo appena inviata una: riprova tra un minuto",
     "error": "Impossibile inviare l’email di verifica"
-  },
-  "GuestProductIntro": {
-    "summary": "GPDerp trasforma qualsiasi argomento in una lanterna con un haiku scritto dall'IA. I nuovi account ricevono 5 generazioni gratuite; altre 100 costano $3.00 (pagamento unico, più eventuali imposte).",
-    "ariaLabel": "Informazioni su GPDerp",
-    "linksAriaLabel": "Altro su GPDerp"
   }
 }

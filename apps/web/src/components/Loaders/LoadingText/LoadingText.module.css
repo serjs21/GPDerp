@@ -11,14 +11,6 @@
   pointer-events: none;
 }
 
-.root::before {
-  content: attr(data-loading-text);
-}
-
-.dot::before {
-  content: ".";
-}
-
 /* Dot n shows from step n of a (dots + 1)-step cycle; hidden dots keep their width so the text doesn't shift. */
 .dot {
   animation: var(--loading-text-dots-duration) step-end infinite;

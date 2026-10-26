@@ -919,10 +919,5 @@
     "sent": "Correo de verificación enviado: revisa tu bandeja de entrada",
     "cooldown": "Acabamos de enviar uno: inténtalo de nuevo en un minuto",
     "error": "No se pudo enviar el correo de verificación"
-  },
-  "GuestProductIntro": {
-    "summary": "GPDerp convierte cualquier tema en una linterna con un haiku escrito por IA. Las cuentas nuevas reciben 5 generaciones gratis; 100 más cuestan $3.00 (pago único, más impuestos aplicables).",
-    "ariaLabel": "Acerca de GPDerp",
-    "linksAriaLabel": "Más sobre GPDerp"
   }
 }

@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { SUPPORT_EMAIL } from "@/consts/contact/contactConsts";
+import { SUPPORT_EMAIL } from "./consts/siteFooterConsts";
 import styles from "./SiteFooter.module.css";
 
 /** Footer corner contact button: highlight-colored illustration with a comic caption, opening a support email. */

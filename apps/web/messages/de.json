@@ -919,10 +919,5 @@
     "sent": "Bestätigungs-E-Mail gesendet – sieh in deinem Posteingang nach",
     "cooldown": "Wir haben gerade eine gesendet – versuche es in einer Minute erneut",
     "error": "Die Bestätigungs-E-Mail konnte nicht gesendet werden"
-  },
-  "GuestProductIntro": {
-    "summary": "GPDerp verwandelt jedes Thema in eine KI-geschriebene Haiku-Laterne. Neue Konten erhalten 5 kostenlose Generierungen; 100 weitere kosten $3.00 (einmalig, zzgl. anfallender Steuern).",
-    "ariaLabel": "Über GPDerp",
-    "linksAriaLabel": "Mehr über GPDerp"
   }
 }
