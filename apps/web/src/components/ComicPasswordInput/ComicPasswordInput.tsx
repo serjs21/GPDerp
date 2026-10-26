@@ -3,15 +3,15 @@
 import { forwardRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ComicModalInput } from "@/components/ComicModalInput";
-import { usePasswordClaps } from "@/hooks/usePasswordClaps";
+import { usePasswordClap } from "@/hooks/usePasswordClap";
 import { PASSWORD_HIDDEN_ICON_SRC, PASSWORD_VISIBLE_ICON_SRC } from "./consts/comicPasswordInputConsts";
 import type { ComicPasswordInputProps } from "./ComicPasswordInput.types";
-import { PasswordClapBursts } from "./PasswordClapBursts";
+import { PasswordClapBurst } from "./PasswordClapBurst";
 import styles from "./ComicPasswordInput.module.css";
 
 /**
  * ComicModalInput for passwords, with a button inside the field that shows or hides the typed text.
- * Each toggle pops a clap sound effect centre-left of the icon in a random colour, spot and tilt.
+ * Each toggle pops a clap sound effect left of the icon in a random colour and tilt, replacing the last one.
  */
 export const ComicPasswordInput = forwardRef<HTMLInputElement, ComicPasswordInputProps>(function ComicPasswordInput(
   { className, ...props },
@@ -19,7 +19,7 @@ export const ComicPasswordInput = forwardRef<HTMLInputElement, ComicPasswordInpu
 ) {
   const t = useTranslations("ComicPasswordInput");
   const [visible, setVisible] = useState(false);
-  const { claps, playClap, removeClap } = usePasswordClaps();
+  const { clap, playClap, clearClap } = usePasswordClap();
 
   const handleToggle = () => {
     playClap();
@@ -51,7 +51,7 @@ export const ComicPasswordInput = forwardRef<HTMLInputElement, ComicPasswordInpu
           aria-hidden
           draggable={false}
         />
-        <PasswordClapBursts claps={claps} onClapDone={removeClap} />
+        <PasswordClapBurst clap={clap} onClapDone={clearClap} />
       </button>
     </span>
   );
