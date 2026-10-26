@@ -10,13 +10,14 @@ import {
 import { GuestMenu } from "@/components/UserMenu";
 import { HeaderPreferences } from "./HeaderPreferences";
 import { LoggedInUserNav } from "./LoggedInUserNav";
+import { showsGuestMenu } from "./utils/authNavigationUtils";
 import styles from "./style.module.css";
 import toolStyles from "@/components/HeaderHaikuTools/HeaderHaikuTools.module.css";
 
 export const AuthNavigation = () => {
   const { initialized, isLoggedIn, user, logout } = useAuthenticationState();
   const pathname = usePathname();
-  const onSharePage = pathname.startsWith("/share/");
+  const guestMenuPage = showsGuestMenu(pathname);
 
   if (!initialized) return null;
   return (
@@ -29,7 +30,7 @@ export const AuthNavigation = () => {
             <HeaderOrderDropdown />
             <HeaderSearchButton />
           </div>
-        ) : onSharePage ? (
+        ) : guestMenuPage ? (
           <div className={toolStyles.toolsSlot}>
             <GuestMenu />
           </div>

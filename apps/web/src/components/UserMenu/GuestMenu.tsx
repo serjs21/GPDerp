@@ -20,7 +20,7 @@ import { goHomeOption, isMainPage } from "./utils/userMenuOptionUtils";
 import frameStyles from "./UserMenuBurstFrame.module.css";
 import styles from "./UserMenu.module.css";
 
-/** Brush menu for logged-out visitors (share link page): Go home + Login. */
+/** Brush menu for logged-out visitors (share link and footer pages): Go home + Login. */
 export function GuestMenu({ className }: GuestMenuProps) {
   const t = useTranslations("UserMenu");
   const guestLabel = t(GUEST_MENU_LABEL_KEY);
