@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import {
+  PASSWORD_CLAP_BASE_TILT_DEG,
   PASSWORD_CLAP_FADE_MS,
   PASSWORD_CLAP_GAP_REM,
   PASSWORD_CLAP_HOLD_MS,
@@ -18,13 +19,13 @@ export function pickPasswordClapColor(random: () => number = Math.random): strin
 
 /**
  * Burst just left of the toggle icon on its centre line (toggle-box rem coordinates),
- * tilted counter-clockwise by a random amount up to PASSWORD_CLAP_MAX_TILT_DEG.
+ * tilted counter-clockwise from PASSWORD_CLAP_BASE_TILT_DEG by a random amount up to PASSWORD_CLAP_MAX_TILT_DEG.
  */
 export function pickPasswordClapPlacement(random: () => number = Math.random): PasswordClapPlacement {
   return {
     cx: -(PASSWORD_CLAP_GAP_REM + PASSWORD_CLAP_SIZE_REM / 2),
     cy: PASSWORD_TOGGLE_SIZE_REM / 2,
-    deg: -random() * PASSWORD_CLAP_MAX_TILT_DEG,
+    deg: PASSWORD_CLAP_BASE_TILT_DEG - random() * PASSWORD_CLAP_MAX_TILT_DEG,
   };
 }
 
