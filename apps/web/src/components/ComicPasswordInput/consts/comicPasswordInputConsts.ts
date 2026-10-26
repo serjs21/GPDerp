@@ -3,7 +3,7 @@ export const PASSWORD_HIDDEN_ICON_SRC = "/password_input/password_hidden.svg";
 export const PASSWORD_VISIBLE_ICON_SRC = "/password_input/password_visible.svg";
 
 /** Clap burst size (rem); same as the lantern actions clap. The art itself is a CSS mask. */
-export const PASSWORD_CLAP_SIZE_REM = 2.1;
+export const PASSWORD_CLAP_SIZE_REM = 1.3;
 /** Toggle button size (rem); matches `.toggle` in ComicPasswordInput.module.css. */
 export const PASSWORD_TOGGLE_SIZE_REM = 2.25;
 /** Clearance (rem) between the icon's left edge and the burst's right edge. */
