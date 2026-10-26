@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import authStyles from "@/app/auth.shared.module.css";
 import { AuthField, GoogleSquareButton } from "@/components/AuthFlows/AuthFlowChrome";
 import { ComicModalInput } from "@/components/ComicModalInput";
+import { ComicPasswordInput } from "@/components/ComicPasswordInput";
 import { ComicPageCtaAction } from "@/components/ComicPageLayout";
 import { comicToast } from "@/components/ComicToast";
 import { withDefaults } from "@/utils/props/withDefaults";
@@ -61,8 +62,7 @@ export const LoginFlow = forwardRef<AuthFlowHandle, LoginFlowProps>(function Log
           />
         </AuthField>
         <AuthField>
-          <ComicModalInput
-            type="password"
+          <ComicPasswordInput
             name="password"
             autoComplete="current-password"
             value={form.password}

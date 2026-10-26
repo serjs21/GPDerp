@@ -919,5 +919,9 @@
     "sent": "Email di verifica inviata: controlla la tua casella",
     "cooldown": "Ne abbiamo appena inviata una: riprova tra un minuto",
     "error": "Impossibile inviare l’email di verifica"
+  },
+  "ComicPasswordInput": {
+    "show": "Mostra password",
+    "hide": "Nascondi password"
   }
 }

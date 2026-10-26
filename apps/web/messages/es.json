@@ -919,5 +919,9 @@
     "sent": "Correo de verificación enviado: revisa tu bandeja de entrada",
     "cooldown": "Acabamos de enviar uno: inténtalo de nuevo en un minuto",
     "error": "No se pudo enviar el correo de verificación"
+  },
+  "ComicPasswordInput": {
+    "show": "Mostrar contraseña",
+    "hide": "Ocultar contraseña"
   }
 }

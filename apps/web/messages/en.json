@@ -919,5 +919,9 @@
     "sent": "Verification email sent — check your inbox",
     "cooldown": "We just sent one — try again in a minute",
     "error": "Could not send the verification email"
+  },
+  "ComicPasswordInput": {
+    "show": "Show password",
+    "hide": "Hide password"
   }
 }

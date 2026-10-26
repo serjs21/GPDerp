@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { AuthField } from "@/components/AuthFlows/AuthFlowChrome";
-import { ComicModalInput } from "@/components/ComicModalInput";
+import { ComicPasswordInput } from "@/components/ComicPasswordInput";
 import { ComicPageCtaAction, ComicPagePanel } from "@/components/ComicPageLayout";
 import type { EmailChangeRevertPasswordStepProps } from "./EmailChangeRevertPasswordStep.types";
 import { EmailChangeRevertSuccessRow } from "./EmailChangeRevertSuccessRow";
@@ -36,8 +36,7 @@ export function EmailChangeRevertPasswordStep({
       <ComicPagePanel background="solid" color="white" className={styles.stackPanel}>
         <form className={styles.form} onSubmit={form.onFormSubmit} noValidate>
           <AuthField>
-            <ComicModalInput
-              type="password"
+            <ComicPasswordInput
               name="password"
               autoComplete="new-password"
               value={form.password}
@@ -47,8 +46,7 @@ export function EmailChangeRevertPasswordStep({
             />
           </AuthField>
           <AuthField>
-            <ComicModalInput
-              type="password"
+            <ComicPasswordInput
               name="confirm"
               autoComplete="new-password"
               value={form.confirmation}

@@ -919,5 +919,9 @@
     "sent": "E-mail de verificação enviado — confira sua caixa de entrada",
     "cooldown": "Acabamos de enviar um — tente de novo em um minuto",
     "error": "Não foi possível enviar o e-mail de verificação"
+  },
+  "ComicPasswordInput": {
+    "show": "Mostrar senha",
+    "hide": "Ocultar senha"
   }
 }

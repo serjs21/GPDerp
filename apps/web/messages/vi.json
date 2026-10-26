@@ -919,5 +919,9 @@
     "sent": "Đã gửi email xác minh — hãy kiểm tra hộp thư",
     "cooldown": "Chúng tôi vừa gửi — thử lại sau một phút",
     "error": "Không gửi được email xác minh"
+  },
+  "ComicPasswordInput": {
+    "show": "Hiện mật khẩu",
+    "hide": "Ẩn mật khẩu"
   }
 }

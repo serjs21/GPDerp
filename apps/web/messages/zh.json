@@ -919,5 +919,9 @@
     "sent": "验证邮件已发送，请查收",
     "cooldown": "刚刚已发送，请一分钟后再试",
     "error": "无法发送验证邮件"
+  },
+  "ComicPasswordInput": {
+    "show": "显示密码",
+    "hide": "隐藏密码"
   }
 }

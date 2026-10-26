@@ -919,5 +919,9 @@
     "sent": "Bestätigungs-E-Mail gesendet – sieh in deinem Posteingang nach",
     "cooldown": "Wir haben gerade eine gesendet – versuche es in einer Minute erneut",
     "error": "Die Bestätigungs-E-Mail konnte nicht gesendet werden"
+  },
+  "ComicPasswordInput": {
+    "show": "Passwort anzeigen",
+    "hide": "Passwort verbergen"
   }
 }

@@ -5,6 +5,7 @@ import axios from "axios";
 import { useTranslations } from "next-intl";
 import { AuthField } from "@/components/AuthFlows/AuthFlowChrome";
 import { ComicModalInput } from "@/components/ComicModalInput";
+import { ComicPasswordInput } from "@/components/ComicPasswordInput";
 import { ComicPageCtaAction, ComicPageDialog } from "@/components/ComicPageLayout";
 import { comicToast } from "@/components/ComicToast";
 import styles from "./ResetPasswordModal.module.css";
@@ -159,8 +160,7 @@ export function ResetPasswordModal({
           ) : (
             <>
               <AuthField>
-                <ComicModalInput
-                  type="password"
+                <ComicPasswordInput
                   name="password"
                   autoComplete="new-password"
                   value={password}
@@ -173,8 +173,7 @@ export function ResetPasswordModal({
                 />
               </AuthField>
               <AuthField>
-                <ComicModalInput
-                  type="password"
+                <ComicPasswordInput
                   name="confirm"
                   autoComplete="new-password"
                   value={confirm}
