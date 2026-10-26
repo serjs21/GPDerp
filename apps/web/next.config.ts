@@ -11,6 +11,16 @@ const nextConfig: NextConfig = {
     PADDLE_ENV: process.env.PADDLE_ENV ?? "sandbox",
     PADDLE_PRICE_ID_100_HAIKUS: process.env.PADDLE_PRICE_ID_100_HAIKUS ?? "",
   },
+  // Common policy URLs that site scanners guess; temporary (307) so removing them later isn't cached by browsers.
+  async redirects() {
+    return [
+      { source: "/cookie-policy", destination: "/cookies", permanent: false },
+      { source: "/privacy-policy", destination: "/privacy", permanent: false },
+      { source: "/refund-policy", destination: "/refund", permanent: false },
+      { source: "/terms-of-service", destination: "/terms", permanent: false },
+      { source: "/acceptable-use-policy", destination: "/acceptable-use", permanent: false },
+    ];
+  },
   async headers() {
     return [
       {
