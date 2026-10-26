@@ -3,7 +3,6 @@ import {
   PASSWORD_CLAP_FADE_MS,
   PASSWORD_CLAP_GAP_REM,
   PASSWORD_CLAP_HOLD_MS,
-  PASSWORD_CLAP_JITTER_Y_REM,
   PASSWORD_CLAP_LIGHTNESS,
   PASSWORD_CLAP_MAX_TILT_DEG,
   PASSWORD_CLAP_SATURATION,
@@ -18,13 +17,13 @@ export function pickPasswordClapColor(random: () => number = Math.random): strin
 }
 
 /**
- * Burst just left of the toggle icon (toggle-box rem coordinates): fixed x, random drift
- * around the icon's centre line, tilted counter-clockwise by up to PASSWORD_CLAP_MAX_TILT_DEG.
+ * Burst just left of the toggle icon on its centre line (toggle-box rem coordinates),
+ * tilted counter-clockwise by a random amount up to PASSWORD_CLAP_MAX_TILT_DEG.
  */
 export function pickPasswordClapPlacement(random: () => number = Math.random): PasswordClapPlacement {
   return {
     cx: -(PASSWORD_CLAP_GAP_REM + PASSWORD_CLAP_SIZE_REM / 2),
-    cy: PASSWORD_TOGGLE_SIZE_REM / 2 + (random() * 2 - 1) * PASSWORD_CLAP_JITTER_Y_REM,
+    cy: PASSWORD_TOGGLE_SIZE_REM / 2,
     deg: -random() * PASSWORD_CLAP_MAX_TILT_DEG,
   };
 }

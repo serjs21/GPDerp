@@ -8,10 +8,8 @@ export const PASSWORD_CLAP_SIZE_REM = 2.1;
 export const PASSWORD_TOGGLE_SIZE_REM = 2.25;
 /** Clearance (rem) between the icon's left edge and the burst's right edge. */
 export const PASSWORD_CLAP_GAP_REM = 0.15;
-/** Max vertical drift (rem) above or below the icon's centre line. */
-export const PASSWORD_CLAP_JITTER_Y_REM = 0.6;
 /** Max counter-clockwise tilt from upright, in degrees. */
-export const PASSWORD_CLAP_MAX_TILT_DEG = 20;
+export const PASSWORD_CLAP_MAX_TILT_DEG = 30;
 /** Random hue per burst; saturation/lightness match the order-by sound effects. */
 export const PASSWORD_CLAP_SATURATION = 85;
 export const PASSWORD_CLAP_LIGHTNESS = 50;
