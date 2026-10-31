@@ -214,6 +214,7 @@
       "passwordPlaceholder": "Password",
       "invalidEmail": "You need a valid email for this to work. Determination alone will not deliver the message.",
       "passwordRequired": "Enter your password. Silence will not open this door.",
+      "passwordTooShort": "At least 8 characters",
       "divider": "or sign in with email",
       "submit": "Sign in",
       "submitting": "Signing in",

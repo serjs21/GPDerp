@@ -214,6 +214,7 @@
       "passwordPlaceholder": "Mật khẩu",
       "invalidEmail": "Bạn cần một email hợp lệ để việc này thành công. Chỉ quyết tâm thôi thì không gửi được thư đâu.",
       "passwordRequired": "Nhập mật khẩu của bạn. Im lặng sẽ không mở được cánh cửa này.",
+      "passwordTooShort": "Ít nhất 8 ký tự",
       "divider": "hoặc đăng nhập bằng email",
       "submit": "Đăng nhập",
       "submitting": "Đang đăng nhập",

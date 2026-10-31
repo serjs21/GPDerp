@@ -214,6 +214,7 @@
       "passwordPlaceholder": "Passwort",
       "invalidEmail": "Dafür brauchst du eine gültige E-Mail. Entschlossenheit allein stellt die Nachricht nicht zu.",
       "passwordRequired": "Gib dein Passwort ein. Schweigen öffnet diese Tür nicht.",
+      "passwordTooShort": "Mindestens 8 Zeichen",
       "divider": "oder mit E-Mail anmelden",
       "submit": "Anmelden",
       "submitting": "Anmeldung läuft",

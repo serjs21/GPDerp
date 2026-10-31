@@ -214,6 +214,7 @@
       "passwordPlaceholder": "Senha",
       "invalidEmail": "Você precisa de um e-mail válido para isso funcionar. Só determinação não vai entregar a mensagem.",
       "passwordRequired": "Digite sua senha. O silêncio não vai abrir esta porta.",
+      "passwordTooShort": "Pelo menos 8 caracteres",
       "divider": "ou entre com e-mail",
       "submit": "Entrar",
       "submitting": "Entrando",

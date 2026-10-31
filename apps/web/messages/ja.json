@@ -214,6 +214,7 @@
       "passwordPlaceholder": "パスワード",
       "invalidEmail": "有効なメールアドレスが必要です。気合いだけではメッセージは届きません。",
       "passwordRequired": "パスワードを入力してください。沈黙ではこの扉は開きません。",
+      "passwordTooShort": "8文字以上",
       "divider": "またはメールアドレスでログイン",
       "submit": "ログイン",
       "submitting": "ログイン中",

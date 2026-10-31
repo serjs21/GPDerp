@@ -214,6 +214,7 @@
       "passwordPlaceholder": "Password",
       "invalidEmail": "Serve un'email valida perché funzioni. La sola determinazione non recapiterà il messaggio.",
       "passwordRequired": "Inserisci la password. Il silenzio non aprirà questa porta.",
+      "passwordTooShort": "Almeno 8 caratteri",
       "divider": "oppure accedi con l'email",
       "submit": "Accedi",
       "submitting": "Accesso in corso",

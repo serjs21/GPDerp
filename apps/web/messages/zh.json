@@ -214,6 +214,7 @@
       "passwordPlaceholder": "密码",
       "invalidEmail": "需要一个有效的邮箱才行。光靠决心可送不到消息。",
       "passwordRequired": "请输入密码。沉默可打不开这扇门。",
+      "passwordTooShort": "至少 8 个字符",
       "divider": "或使用邮箱登录",
       "submit": "登录",
       "submitting": "正在登录",
