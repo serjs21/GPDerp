@@ -27,6 +27,7 @@ step "Build $IMAGE (linux/amd64, context apps/api)"
 # --load stores the single-platform image in the local Docker engine (works on Apple Silicon via emulation/cross-build).
 docker buildx build --platform linux/amd64 --load ${CACHE_FLAG[@]+"${CACHE_FLAG[@]}"} \
   --label "org.opencontainers.image.revision=$(git_sha)" \
+  --build-arg "GIT_SHA=$(git_sha)" \
   -t "$IMAGE" -t "$LOCAL_IMAGE_REPO:latest" "$API_DIR"
 
 ARCH="$(docker image inspect -f '{{.Architecture}}/{{.Os}}' "$IMAGE")"
@@ -34,7 +35,7 @@ ARCH="$(docker image inspect -f '{{.Architecture}}/{{.Os}}' "$IMAGE")"
 ok "built $IMAGE ($ARCH, $(docker image ls "$IMAGE" --format '{{.Size}}'))"
 
 ENV_NAMES="$(docker image inspect -f '{{range .Config.Env}}{{println .}}{{end}}' "$IMAGE" | cut -d= -f1 | grep -v '^$' | sort | tr '\n' ' ')"
-UNEXPECTED="$(tr ' ' '\n' <<<"$ENV_NAMES" | grep -v '^$' | grep -vE '^(NODE_ENV|PORT|NODE_OPTIONS|PATH|NODE_VERSION|YARN_VERSION)$' || true)"
+UNEXPECTED="$(tr ' ' '\n' <<<"$ENV_NAMES" | grep -v '^$' | grep -vE '^(NODE_ENV|PORT|NODE_OPTIONS|APP_RELEASE|PATH|NODE_VERSION|YARN_VERSION)$' || true)"
 [ -z "$UNEXPECTED" ] || die "unexpected env baked into the image: $UNEXPECTED"
 ok "image env holds no runtime configuration ($ENV_NAMES)"
 ENV_FILES="$(docker run --rm --platform linux/amd64 --entrypoint sh "$IMAGE" -c 'find /app -maxdepth 3 \( -name ".env*" -o -name ".neon" \) -print' || true)"

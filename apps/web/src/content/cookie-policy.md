@@ -50,6 +50,12 @@ Cloudflare may also set other security cookies (such as **\_\_cf\_bm**, which la
 
 ---
 
+## Error reporting
+
+When something breaks in your browser (a page crashes, or our server answers with an error), our pages send a short **error report** to **Better Stack**, the service we use to find and fix bugs. A report contains the error message and where in our code it happened, the page address **without** any query string, your browser type and version, the app version, and a random request identifier that lets us match it with our server logs. It uses no cookies or local storage, does not record your screen or clicks, and contains no account details. Nothing is sent while everything works. See [Better Stack's privacy policy](https://betterstack.com/privacy).
+
+---
+
 ## Third parties you choose to use
 
 - **Google sign-in.** When you open the sign-in or registration screen, your browser loads Google's sign-in script from accounts.google.com so the "Continue with Google" button can work. If you sign in with Google, Google handles that step under [Google's privacy policy](https://policies.google.com/privacy) and may use its own cookies on its own domains.

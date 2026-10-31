@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { AxiosError, AxiosRequestConfig } from "axios";
 import { getTabId } from "./utils/tabId";
+import { newRequestId, reportApiFailure, REQUEST_ID_HEADER } from "./utils/monitoring/apiFailure";
 import Cookies from "js-cookie";
 import {
   hasCsrfCookie,
@@ -92,6 +93,8 @@ axios.defaults.headers[TAB_HEADER_KEY] = getTabId();
 
 axios.interceptors.request.use((config) => {
   config.headers[TAB_HEADER_KEY] = getTabId();
+  // Correlates this request with API logs and error reports (the API echoes it back).
+  config.headers[REQUEST_ID_HEADER] = newRequestId();
 
   // Optional: support a non-cookie auth mechanism for dev or internal tooling.
   // Cookie-based JWT auth is the default and requires no `Authorization` header.
@@ -114,6 +117,12 @@ axios.interceptors.request.use((config) => {
   }
 
   return config;
+});
+
+// Report unexpected (5xx) API failures; the error continues unchanged to the handlers below.
+axios.interceptors.response.use(undefined, (err) => {
+  reportApiFailure(err);
+  return Promise.reject(err);
 });
 
 // Ensure consecutive requests stay authenticated by transparently refreshing once on 401.

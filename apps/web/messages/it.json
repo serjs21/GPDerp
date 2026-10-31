@@ -923,5 +923,9 @@
   "ComicPasswordInput": {
     "show": "Mostra password",
     "hide": "Nascondi password"
+  },
+  "ErrorFallback": {
+    "message": "Qualcosa è andato storto in questa pagina. Stiamo riaccendendo le lanterne.",
+    "retry": "Riprova"
   }
 }

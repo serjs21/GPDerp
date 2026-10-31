@@ -923,5 +923,9 @@
   "ComicPasswordInput": {
     "show": "Hiện mật khẩu",
     "hide": "Ẩn mật khẩu"
+  },
+  "ErrorFallback": {
+    "message": "Đã xảy ra lỗi trên trang này. Những chiếc đèn lồng đang được thắp lại.",
+    "retry": "Thử lại"
   }
 }

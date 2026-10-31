@@ -24,6 +24,10 @@ GPDerp is operated by **Sergey Sablin**, a sole proprietor based in **Israel** (
 
 **Server logs.** Like most websites, our servers record technical details of each request, such as the date and time, the page or address requested, the response status, and your **IP address**. Sign-in cookies, passwords and similar credentials are removed from these logs. We use them to operate the service, investigate errors and protect against abuse.
 
+**Error reports.** When an error happens in your browser or on our servers, we send an error report to **Better Stack** so we can find and fix it. Browser reports contain the error details, the page address without its query string, your browser type and version, the app version and a random request identifier. Server reports contain the error details, the request's route, method and status, and the same request identifier; request contents, cookies, passwords and tokens are removed first. Our servers also send warning and error log lines (without IP addresses or request contents) to Better Stack. Successful requests are not sent.
+
+**Usage statistics.** Once a week we calculate totals from our own records (new registrations, haikus generated, and the average number of haikus per person who generated one) and store only those numbers with Cloudflare. They contain no personal data.
+
 **Site measurement and security by Cloudflare.** Our site is delivered through **Cloudflare**. Cloudflare runs an automated bot check in your browser, may receive error reports if a page fails to load, and measures page views and loading speed (Cloudflare Web Analytics). For each page view this measurement sends Cloudflare the page address, the referring page, your browser type and page-load timing; we only see aggregated statistics. Details are in our [Cookie Policy](/cookies).
 
 **Content you provide.** If you submit text (such as haiku subjects), preferences, images, or other content to the Haiku generation service, we store and process it as needed to provide the features you use. Haiku subjects are sent to our AI model provider to generate the haiku.
@@ -64,8 +68,9 @@ This Policy is not a complete legal analysis of every jurisdiction. If you have 
 
 We use service providers that help us run the Haiku generation service. They process information on our behalf according to their roles and their own terms and privacy notices:
 
-- **Cloudflare** — delivering the website, file storage for uploaded images, security and bot protection, error reporting, and page-view and performance measurement ([privacy policy](https://www.cloudflare.com/privacypolicy/))  
+- **Cloudflare** — delivering the website, file storage for uploaded images, security and bot protection, network error reporting, page-view and performance measurement, and storing weekly usage totals ([privacy policy](https://www.cloudflare.com/privacypolicy/))  
 - **Amazon Web Services** — hosting our application server and its logs  
+- **Better Stack** — error reports and warning/error logs, used to find and fix problems ([privacy policy](https://betterstack.com/privacy))  
 - **Database hosting** — storing account data, haikus and related records  
 - **Email delivery** — sending account, security and service emails  
 - **AI model provider (OpenAI)** — generating haikus from the subjects you submit  

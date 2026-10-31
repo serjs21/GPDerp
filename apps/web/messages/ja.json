@@ -923,5 +923,9 @@
   "ComicPasswordInput": {
     "show": "パスワードを表示",
     "hide": "パスワードを隠す"
+  },
+  "ErrorFallback": {
+    "message": "このページで問題が発生しました。灯籠を灯し直しています。",
+    "retry": "もう一度試す"
   }
 }

@@ -32,10 +32,13 @@ RUN pnpm install --prod --frozen-lockfile
 
 # ---- runtime ----
 FROM ${NODE_IMAGE} AS runtime
+# Commit the image was built from (infra/aws/build.sh); reported as the release by logs and error tracking.
+ARG GIT_SHA=unknown
 # Heap cap leaves room in a 1 GB container for native memory (argon2, resvg, Prisma WASM).
 ENV NODE_ENV=production \
     PORT=8080 \
-    NODE_OPTIONS=--max-old-space-size=512
+    NODE_OPTIONS=--max-old-space-size=512 \
+    APP_RELEASE=${GIT_SHA}
 WORKDIR /app
 
 COPY --from=prod-deps /app/node_modules ./node_modules

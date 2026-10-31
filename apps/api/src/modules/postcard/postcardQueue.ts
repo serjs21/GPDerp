@@ -15,6 +15,7 @@ import {
 import { PG_BOSS_POOL_MAX } from "../../consts/database";
 import { postgresConnectionString } from "../../lib/postgresConnectionString";
 import { sanitizeDbError } from "../../utils/databaseUrl";
+import { startUsageMetricsSchedule } from "../usageMetrics/usageMetricsQueue";
 import { postcardBatchRepository } from "./postcardBatch.repository";
 import {
   processPostcardEmailDeadLetter,
@@ -84,6 +85,7 @@ export async function startPostcardQueue(): Promise<void> {
     if (deleted > 0) console.log(LOG_PREFIX, `cleaned up ${deleted} postcard batches`);
   });
   await instance.schedule(POSTCARD_BATCH_CLEANUP_QUEUE, POSTCARD_BATCH_CLEANUP_CRON);
+  await startUsageMetricsSchedule(instance);
 
   boss = instance;
   console.log(LOG_PREFIX, "started");

@@ -28,6 +28,7 @@
     "SMTP_PORT": "positive-int",
     "TRUST_PROXY_HOPS": "non-negative-int",
     "PADDLE_ENV": "one-of:sandbox,production",
+    "USAGE_METRICS_INGEST_URL": "https-url",
     "HAIKU_GENERATION_API": "one-of:prod,dev"
   },
   "variables": [
@@ -64,6 +65,17 @@
     { "name": "CORS_METHODS", "required": false, "secret": false, "description": "" },
     { "name": "CORS_HEADERS", "required": false, "secret": false, "description": "" },
     { "name": "CORS_CREDENTIALS", "required": false, "secret": false, "description": "" },
-    { "name": "ICON_UPLOAD_DEBUG", "required": false, "secret": false, "description": "" }
+    { "name": "ICON_UPLOAD_DEBUG", "required": false, "secret": false, "description": "" },
+    { "name": "APP_ENV", "required": false, "secret": false, "description": "Environment name on logs and error reports (default NODE_ENV)" },
+    { "name": "LOG_LEVEL", "required": false, "secret": false, "description": "Stdout log level (default info)" },
+    { "name": "BETTERSTACK_ERRORS_DSN", "required": false, "secret": true, "description": "Better Stack Errors (Sentry SDK) DSN; unset disables error tracking" },
+    { "name": "BETTERSTACK_ERRORS_SAMPLE_RATE", "required": false, "secret": false, "description": "0..1, share of errors sent (default 1)" },
+    { "name": "BETTERSTACK_TRACES_SAMPLE_RATE", "required": false, "secret": false, "description": "0..1, performance traces (default 0)" },
+    { "name": "BETTERSTACK_LOGS_SOURCE_TOKEN", "required": false, "secret": true, "description": "Better Stack Logs source token; unset keeps logs on stdout only" },
+    { "name": "BETTERSTACK_LOGS_INGESTING_HOST", "required": false, "secret": false, "description": "Better Stack Logs ingesting host (no https://)" },
+    { "name": "BETTERSTACK_LOG_LEVEL", "required": false, "secret": false, "description": "Minimum level shipped to Better Stack (default warn)" },
+    { "name": "MONITORING_DEV_ROUTES", "required": false, "secret": false, "description": "true enables /dev/monitoring/* test routes in production (keep unset)" },
+    { "name": "USAGE_METRICS_INGEST_URL", "required": false, "secret": false, "description": "https://gpderp.party/api/internal/usage-metrics" },
+    { "name": "USAGE_METRICS_INGEST_TOKEN", "required": false, "secret": true, "description": "Shared with the web Worker secret of the same name" }
   ]
 }

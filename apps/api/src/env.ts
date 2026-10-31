@@ -4,7 +4,7 @@ import { parseDatabaseUrl } from "./utils/databaseUrl";
 
 const toList = (value: string) => value.split(",").map((s) => s.trim());
 /** Headers the web client always sends; must survive any CORS_HEADERS override. */
-const REQUIRED_CORS_HEADERS = ["x-tab-id", "x-csrf-token"];
+const REQUIRED_CORS_HEADERS = ["x-tab-id", "x-csrf-token", "x-request-id"];
 const withRequiredCorsHeaders = (headers: string[]) => {
   const present = new Set(headers.map((h) => h.toLowerCase()));
   return [...headers, ...REQUIRED_CORS_HEADERS.filter((h) => !present.has(h))];

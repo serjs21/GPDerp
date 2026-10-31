@@ -91,7 +91,19 @@ Classification key: **Necessary/exempt**, **Consent required**, **Conditional/un
 | Emails | First party (nodemailer) | Transactional emails | No tracking pixels; images are attached inline (`cid:`) | — | Not tracking | No | `apps/api/src/modules/email/` |
 | Fonts | First party | Typography | Self-hosted via `next/font` (no Google Fonts requests at runtime) | — | Not tracking | No | `apps/web/src/app/layout.tsx` |
 
-**Not present (verified by code search and runtime):** Sentry or any other error-reporting SDK, session replay, Google Analytics/Tag Manager, Meta/LinkedIn/TikTok pixels, advertising tags, fingerprinting libraries in app code, and backend event tracking. The `next-auth` package is a dependency but is not used by app code.
+### 2.4 Added after the audit: monitoring and usage totals (see `docs/monitoring.md`)
+
+| Technology | Provider | Purpose | Storage/identifier | Duration | Classification | Consent required | Source location |
+|---|---|---|---|---|---|---|---|
+| Browser error reporting (`@sentry/react`) | Better Stack | Find and fix crashes and failed API calls | No cookies or storage. On an error only: message and stack, page URL without query/fragment, user agent, release, random request id. No breadcrumbs, replay, sessions, tracing or user data | Better Stack Errors retention (90 days on the current plan, per pricing page; verify) | **Conditional/uncertain** (diagnostics script reading browser information; legitimate interest relied on, documented in the policies) | Uncertain in the EU; chosen to run without consent with minimal data | `apps/web/src/instrumentation-client.ts`, `src/utils/monitoring/` |
+| API error reporting (`@sentry/node`) | Better Stack | Unexpected 5xx and crashes | Server-side only; bodies, cookies, query strings, credential headers, local variables, DB and AI data excluded | As above | Personal-data processing (server-side), not a device-access matter | No | `apps/api/src/instrument.ts`, `src/lib/observability/` |
+| API warning/error log shipping (`@logtail/pino`) | Better Stack | Operational logs for failures | Server-side only; client IPs stripped before shipping; credentials redacted. Residual risk: third-party error messages (e.g. SMTP) may quote an email address | 3 days (free plan source retention) | Personal-data processing (server-side) | No | `apps/api/src/lib/observability/logger.ts` |
+| `x-request-id` | First party | Correlate a browser request with API logs and error reports | Random per-request id in a request/response header; not stored in the browser | Per request | Necessary/exempt (no storage, not linked across requests) | No | `apps/web/src/axios.setup.ts`, `apps/api/src/lib/observability/requestId.ts` |
+| Weekly usage totals | Cloudflare Workers Analytics Engine | New users, generations, generating users, average per user, per ISO week | Aggregate numbers only, computed server-side from existing tables; no ids, emails, IPs or content | Analytics Engine retention (verify) | Not personal data | No | `apps/api/src/modules/usageMetrics/`, `apps/web/src/app/api/internal/usage-metrics/route.ts` |
+
+Effect on the decision: browser error reporting adds a second conditional item (after Cloudflare Web Analytics). It runs without a consent banner by explicit choice, with data minimized as above and disclosed in the Cookie and Privacy Policies. Server-side error tracking, log shipping and the weekly totals do not access the visitor's device.
+
+**Not present at audit time (verified by code search and runtime):** Sentry or any other error-reporting SDK (since added: Better Stack via the Sentry SDK, section 2.4), session replay, Google Analytics/Tag Manager, Meta/LinkedIn/TikTok pixels, advertising tags, fingerprinting libraries in app code, and backend event tracking. The `next-auth` package is a dependency but is not used by app code.
 
 ---
 

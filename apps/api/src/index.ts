@@ -1,3 +1,5 @@
+import "./instrument";
+import * as Sentry from "@sentry/node";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import multipart from "@fastify/multipart";
@@ -19,25 +21,25 @@ import { startPostcardQueue, stopPostcardQueue } from "./modules/postcard/postca
 import { isPostcardDevRouteEnabled, postcardDevPlugin } from "./modules/postcard/postcardDev.controller";
 import { emailPreviewDevPlugin, isEmailPreviewDevRouteEnabled } from "./modules/email/emailPreviewDev.controller";
 import { healthPlugin } from "./modules/health/health.controller";
+import { isMonitoringDevRouteEnabled, monitoringDevPlugin } from "./modules/monitoring/monitoringDev.controller";
 import { prismaClient } from "./lib/prisma";
 import { SHUTDOWN_TIMEOUT_MS } from "./consts/server";
 import { redactDatabaseUrls, sanitizeDbError } from "./utils/databaseUrl";
+import { readObservabilityConfig } from "./lib/observability/config";
+import { createLogger } from "./lib/observability/logger";
+import { registerObservability } from "./lib/observability/registerObservability";
+import { REQUEST_ID_HEADER, resolveRequestId } from "./lib/observability/requestId";
+
+const observability = readObservabilityConfig();
+const SENTRY_FLUSH_TIMEOUT_MS = 2000;
 
 const app = Fastify({
-  logger: {
-    // Credentials and session/tab identifiers never reach the logs, even when headers are serialized.
-    redact: {
-      paths: [
-        "req.headers.cookie",
-        "req.headers.authorization",
-        'req.headers["x-csrf-token"]',
-        'req.headers["x-tab-id"]',
-        'req.headers["sec-websocket-protocol"]',
-        'res.headers["set-cookie"]',
-      ],
-      censor: "[redacted]",
-    },
-  },
+  // Credentials and session/tab identifiers never reach the logs (see LOG_REDACT_PATHS).
+  loggerInstance: createLogger(observability),
+  // One structured line per request comes from registerObservability instead of Fastify's two.
+  disableRequestLogging: true,
+  requestIdHeader: false,
+  genReqId: (req) => resolveRequestId(req.headers[REQUEST_ID_HEADER]),
   // Trust only the configured proxy hops (Lightsail load balancer) so X-Forwarded-For cannot be spoofed.
   trustProxy: env.TRUST_PROXY_HOPS,
 });
@@ -54,6 +56,8 @@ async function run() {
 
   /* ---------- Plugins (MUST come before routes) ---------- */
 
+  await app.register(registerObservability, { release: observability.release });
+
   await app.register(cors, {
     origin: (origin, cb) => {
       // Allow non-browser requests (no `Origin` header).
@@ -64,6 +68,7 @@ async function run() {
     credentials: env.CORS_CREDENTIALS,
     methods: env.CORS_METHODS,
     allowedHeaders: env.CORS_HEADERS.length ? env.CORS_HEADERS : undefined,
+    exposedHeaders: [REQUEST_ID_HEADER],
   });
 
   await app.register(multipart, {
@@ -88,6 +93,9 @@ async function run() {
   }
   if (isEmailPreviewDevRouteEnabled()) {
     await app.register(emailPreviewDevPlugin);
+  }
+  if (isMonitoringDevRouteEnabled()) {
+    await app.register(monitoringDevPlugin);
   }
 
   /* ------------------------------ Routes ------------------------------ */
@@ -125,6 +133,7 @@ const shutdown = (signal: NodeJS.Signals) => {
   }, SHUTDOWN_TIMEOUT_MS).unref();
   app
     .close()
+    .then(() => Sentry.close(SENTRY_FLUSH_TIMEOUT_MS))
     .then(() => process.exit(0))
     .catch((err) => {
       console.error("Shutdown failed:", err);

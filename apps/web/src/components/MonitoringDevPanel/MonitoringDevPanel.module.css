@@ -1,0 +1,31 @@
+.root {
+  display: grid;
+  gap: 0.75rem;
+  width: min(100%, 32rem);
+  margin: 3rem auto;
+  padding: 1.5rem;
+  border: 2px solid var(--comic-ink, #2d2d2d);
+  border-radius: 0.5rem;
+  background: #fff;
+  color: #1a1a1a;
+}
+
+.button {
+  padding: 0.6rem 1rem;
+  border: 2px solid var(--comic-ink, #2d2d2d);
+  border-radius: 0.25rem;
+  background: #fff9c4;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--comic-ink, #2d2d2d);
+  outline-offset: 2px;
+}
+
+.status {
+  min-height: 1.5em;
+  font-size: 0.9rem;
+}

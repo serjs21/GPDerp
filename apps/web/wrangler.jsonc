@@ -21,6 +21,13 @@
   "images": {
     "binding": "IMAGES"
   },
+  // Weekly usage totals (no personal data) written by /api/internal/usage-metrics.
+  "analytics_engine_datasets": [
+    {
+      "binding": "USAGE_METRICS",
+      "dataset": "gpderp_weekly_usage"
+    }
+  ],
   "observability": {
     "enabled": true
   },
