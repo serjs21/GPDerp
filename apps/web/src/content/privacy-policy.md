@@ -1,8 +1,8 @@
 # Privacy Policy
 
-**Last updated:** October 24, 2026
+**Last updated:** October 31, 2026
 
-This Privacy Policy describes how we handle personal information when you use the Haiku generation service (the site, app, and related features). We keep collection limited to what we need to run the product, support accounts, and understand usage at a basic level.
+This Privacy Policy describes how we handle personal information when you use GPDerp (gpderp.party), the Haiku generation service (the site, app, and related features). We keep collection limited to what we need to run the product, support accounts, keep the service secure, and understand usage at a basic level.
 
 If you do not agree with this Policy, please do not use the Haiku generation service.
 
@@ -12,17 +12,21 @@ We may update this Policy from time to time. When we do, we will change the “L
 
 ## 1. Who we are
 
-The Haiku generation service is operated by an independent developer. For privacy requests, use the contact method described at the end of this Policy.
+GPDerp is operated by **Sergey Sablin**, a sole proprietor based in **Israel** (“we”, “us”, “our”), who is responsible for the personal information described in this Policy. For privacy requests, use the contact method described at the end of this Policy.
 
 ---
 
 ## 2. What information we collect
 
-**Account and authentication.** If you sign up or log in, we typically collect information such as your email address, and data needed to maintain your session or verify your identity (for example, tokens or identifiers associated with your account). If you use a third-party sign-in provider, we receive whatever profile details that provider shares with us according to your choices and their policies.
+**Account and authentication.** If you sign up or log in, we collect your email address, the name and nickname you provide, and a securely hashed password if you use one. To keep you signed in and protect your account, each sign-in session records the **IP address** and **browser type (user agent)** it was created from. If you sign in with **Google**, we receive the basic profile details Google shares with us (such as your name, email address and profile picture) according to your choices and Google's policies.
 
-**Usage and technical data.** We may collect basic information about how you use the Haiku generation service, such as pages or features accessed, approximate timestamps, and diagnostic data that helps us fix errors or improve performance. This is generally aggregated or logged at a level that supports operations rather than detailed profiling.
+**Abuse prevention.** If a registration attempt looks suspicious, we record its email address, IP address, approximate country and browser type so we can detect and block abuse.
 
-**Content you provide.** If you submit text, preferences, or other content to the Haiku generation service, we store and process it as needed to provide the features you use.
+**Server logs.** Like most websites, our servers record technical details of each request, such as the date and time, the page or address requested, the response status, and your **IP address**. Sign-in cookies, passwords and similar credentials are removed from these logs. We use them to operate the service, investigate errors and protect against abuse.
+
+**Site measurement and security by Cloudflare.** Our site is delivered through **Cloudflare**. Cloudflare runs an automated bot check in your browser, may receive error reports if a page fails to load, and measures page views and loading speed (Cloudflare Web Analytics). For each page view this measurement sends Cloudflare the page address, the referring page, your browser type and page-load timing; we only see aggregated statistics. Details are in our [Cookie Policy](/cookies).
+
+**Content you provide.** If you submit text (such as haiku subjects), preferences, images, or other content to the Haiku generation service, we store and process it as needed to provide the features you use. Haiku subjects are sent to our AI model provider to generate the haiku.
 
 **Payments.** We do not receive or store your full payment card details on our own systems. Purchases are processed by **Paddle**, which acts as **merchant of record**. Paddle collects payment information and billing details required to complete a transaction. We may receive limited information from Paddle or from our own records, such as whether a purchase succeeded, product or plan identifiers, and enough detail to provide access you paid for.
 
@@ -40,7 +44,8 @@ We use the information above to:
 - Authenticate users and protect accounts  
 - Process transactions and manage access tied to purchases  
 - Send service-related messages (such as security notices, receipts, or responses to support)  
-- Understand aggregate or basic usage patterns and fix technical issues  
+- Understand aggregate usage and page performance, and fix technical issues  
+- Detect and prevent abuse, fraud and automated attacks  
 - Comply with legal obligations and enforce our terms  
 
 We do not sell your personal information. We do not use your data to build aggressive cross-site advertising profiles through our own product.
@@ -57,12 +62,15 @@ This Policy is not a complete legal analysis of every jurisdiction. If you have 
 
 ## 5. Third-party services
 
-We use service providers that help us run the Haiku generation service. They process information on our behalf according to their roles and their own terms and privacy notices. Examples may include:
+We use service providers that help us run the Haiku generation service. They process information on our behalf according to their roles and their own terms and privacy notices:
 
-- **Paddle** — payment processing and related checkout, tax, and invoicing as merchant of record  
-- **Hosting, email, and infrastructure** — storing data and delivering the application  
-- **Authentication providers** — if you choose to sign in through a third party  
-- **Analytics** — basic measurement of traffic or product usage, configured to stay proportionate to our needs  
+- **Cloudflare** — delivering the website, file storage for uploaded images, security and bot protection, error reporting, and page-view and performance measurement ([privacy policy](https://www.cloudflare.com/privacypolicy/))  
+- **Amazon Web Services** — hosting our application server and its logs  
+- **Database hosting** — storing account data, haikus and related records  
+- **Email delivery** — sending account, security and service emails  
+- **AI model provider (OpenAI)** — generating haikus from the subjects you submit  
+- **Google** — only if you choose to sign in with Google ([privacy policy](https://policies.google.com/privacy))  
+- **Paddle** — payment processing and related checkout, tax, and invoicing as merchant of record ([privacy notice](https://www.paddle.com/legal/privacy))  
 
 We encourage you to read the privacy policies of providers you interact with directly (especially at checkout with Paddle).
 
@@ -70,17 +78,15 @@ We encourage you to read the privacy policies of providers you interact with dir
 
 ## 6. Cookies and similar technologies
 
-We may use cookies, local storage, or similar technologies to keep you signed in, remember preferences, protect against abuse, and support basic analytics. You can control many cookies through your browser settings; blocking some cookies may limit certain features (for example, staying logged in).
+We use cookies and browser storage to keep you signed in, protect your account, and remember your preferences. Cloudflare adds a security cookie and a cookie-free measurement script, as described above. We do not use advertising cookies, advertising pixels, cross-site tracking or session recording. You can control cookies through your browser settings; blocking the sign-in cookies will sign you out.
 
-We do not use cookies in complicated or hidden ways beyond what is typical for a small authenticated web application and proportionate analytics.
-
-For a dedicated overview, see our [Cookie Policy](/cookies).
+Our [Cookie Policy](/cookies) lists each cookie and similar technology, what it is for, and how long it lasts.
 
 ---
 
 ## 7. How long we keep information
 
-We retain information only as long as needed for the purposes described in this Policy, unless a longer period is required or permitted by law (for example, tax or accounting records handled by Paddle or our tools). When data is no longer needed, we delete or anonymize it where feasible, subject to technical limits and backups.
+We retain information only as long as needed for the purposes described in this Policy, unless a longer period is required or permitted by law (for example, tax or accounting records handled by Paddle or our tools). Sign-in sessions expire after at most 30 days. Account data and the content you create are kept while your account exists. When data is no longer needed, we delete or anonymize it where feasible, subject to technical limits and backups.
 
 Exact retention periods can vary by data type and legal context; if you want more detail about your own data, contact us.
 
